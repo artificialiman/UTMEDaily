@@ -2,41 +2,10 @@
 // Zero fetching. Questions are defined as QUESTIONS[] in each quiz page.
 // Duration is defined as DURATION (seconds) in each quiz page.
 
-// ── Fisher-Yates Shuffle ─────────────────────────────────────
-function shuffleQuestionOptions(questions) {
-    return questions.map(q => {
-        // Build array of option objects
-        const opts = ['A','B','C','D']
-            .filter(k => q.options[k] !== undefined && q.options[k] !== null && q.options[k] !== '')
-            .map(k => ({ key: k, text: q.options[k] }));
-
-        // Fisher-Yates shuffle
-        for (let i = opts.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [opts[i], opts[j]] = [opts[j], opts[i]];
-        }
-
-        // Rebuild options with new A/B/C/D labels
-        const newOptions = {};
-        const labelMap   = {};  // old key → new label
-        const labels = ['A','B','C','D'];
-        opts.forEach((opt, idx) => {
-            newOptions[labels[idx]] = opt.text;
-            labelMap[opt.key] = labels[idx];
-        });
-
-        return {
-            ...q,
-            options: newOptions,
-            answer: labelMap[q.answer]   // remap correct answer to new position
-        };
-    });
-}
-
 // ── Quiz State ──────────────────────────────────────────────
 class QuizState {
     constructor(questions, duration) {
-        this.questions             = shuffleQuestionOptions(questions);
+        this.questions             = questions;  // already shuffled at build time by build.py
         this.duration              = duration;
         this.timeRemaining         = duration;
         this.currentQuestionIndex  = 0;
@@ -469,7 +438,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizState = new QuizState(QUESTIONS, duration);
     const quizUI    = new QuizUI(quizState);
 
-    window.addEventListener('beforeunload', e => {
-        if (!quizState.isSubmitted) { e.preventDefault(); e.returnValue = ''; }
-    });
+
 });
