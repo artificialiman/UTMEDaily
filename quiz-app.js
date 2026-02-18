@@ -2,10 +2,41 @@
 // Zero fetching. Questions are defined as QUESTIONS[] in each quiz page.
 // Duration is defined as DURATION (seconds) in each quiz page.
 
+// ── Fisher-Yates Shuffle ─────────────────────────────────────
+function shuffleQuestionOptions(questions) {
+    return questions.map(q => {
+        // Build array of option objects
+        const opts = ['A','B','C','D']
+            .filter(k => q.options[k] !== undefined && q.options[k] !== null && q.options[k] !== '')
+            .map(k => ({ key: k, text: q.options[k] }));
+
+        // Fisher-Yates shuffle
+        for (let i = opts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opts[i], opts[j]] = [opts[j], opts[i]];
+        }
+
+        // Rebuild options with new A/B/C/D labels
+        const newOptions = {};
+        const labelMap   = {};  // old key → new label
+        const labels = ['A','B','C','D'];
+        opts.forEach((opt, idx) => {
+            newOptions[labels[idx]] = opt.text;
+            labelMap[opt.key] = labels[idx];
+        });
+
+        return {
+            ...q,
+            options: newOptions,
+            answer: labelMap[q.answer]   // remap correct answer to new position
+        };
+    });
+}
+
 // ── Quiz State ──────────────────────────────────────────────
 class QuizState {
     constructor(questions, duration) {
-        this.questions             = questions;
+        this.questions             = shuffleQuestionOptions(questions);
         this.duration              = duration;
         this.timeRemaining         = duration;
         this.currentQuestionIndex  = 0;
@@ -222,11 +253,9 @@ class QuizUI {
     _tickTimer(t) {
         this.el.timerDisplay.textContent = this.state.formatTime(t);
 
-        // SVG ring: circumference 163.36 for r=26
         const offset = 163.36 - (t / this.state.duration) * 163.36;
         this.el.timerProgressCircle.style.strokeDashoffset = offset;
 
-        // Colour states
         const tc = this.el.timerContainer;
         const td = this.el.timerDisplay;
         tc && tc.classList.remove('warning','danger');
@@ -283,19 +312,14 @@ class QuizUI {
         const today  = new Date().toISOString().slice(0, 10);
         const meta   = window.quizMetadata || {};
         const subject   = meta.subject   || this.state.questions[0]?.subject || 'Practice Test';
-        const period    = meta.period    ? `Period ${meta.period}` : '';
-        const dayRange  = meta.days      ? `Day ${meta.days}` : '';
         const timeTaken = this._formatTimeTaken(this.state.duration - this.state.timeRemaining);
 
-        // Build question breakdown rows
         const rows = this.state.questions.map((q, i) => {
             const yours   = this.state.getAnswer(q.id) || '—';
             const correct = q.answer;
             const isRight = yours === correct;
-            const statusSymbol = isRight ? '✓' : '✗';
             const shortText = q.text.length > 55 ? q.text.slice(0, 52) + '…' : q.text;
 
-            // Explanation row (only for wrong answers)
             const explanationRow = (!isRight && q.explanation)
                 ? `<tr class="expl-row">
                      <td></td>
@@ -311,7 +335,7 @@ class QuizUI {
                 <td class="col-num">${i + 1}</td>
                 <td class="col-q">${shortText}</td>
                 <td class="col-ans ${isRight ? '' : 'wrong-ans'}">${yours}</td>
-                <td class="col-correct">${correct} <span class="status-symbol">${statusSymbol}</span></td>
+                <td class="col-correct">${correct} <span class="status-symbol">${isRight ? '✓' : '✗'}</span></td>
               </tr>
               ${explanationRow}`;
         }).join('');
@@ -323,176 +347,70 @@ class QuizUI {
   <title>Results — ${subject}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      background: #fff;
-      color: #111;
-      padding: 2.5rem;
-      max-width: 820px;
-      margin: 0 auto;
-      font-size: 13px;
-    }
-
-    /* ── HEADER ── */
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 2.5rem; max-width: 820px; margin: 0 auto; font-size: 13px; }
     .report-header { margin-bottom: 1.5rem; }
     .brand { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; color: #111; }
     .brand span { color: #f59e0b; }
     .report-title { font-size: 0.8rem; color: #666; margin-top: 0.15rem; }
-
-    /* ── SCORE CARD ── */
-    .score-card {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      padding: 1.25rem 1.5rem;
-      border: 2px solid #111;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-      background: #fafafa;
-    }
-    .score-big {
-      font-size: 2.75rem;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.04em;
-    }
+    .score-card { display: flex; align-items: center; gap: 2rem; padding: 1.25rem 1.5rem; border: 2px solid #111; border-radius: 10px; margin-bottom: 1.5rem; background: #fafafa; }
+    .score-big { font-size: 2.75rem; font-weight: 800; line-height: 1; letter-spacing: -0.04em; }
     .score-big.excellent { color: #059669; }
     .score-big.average   { color: #d97706; }
     .score-big.poor      { color: #dc2626; }
-
     .score-details { flex: 1; }
     .score-line { font-size: 1rem; font-weight: 700; margin-bottom: 0.15rem; }
     .score-meta { font-size: 0.78rem; color: #555; line-height: 1.7; }
     .score-meta strong { color: #111; }
-
-    .grade-badge {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      text-transform: uppercase;
-    }
+    .grade-badge { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; padding: 0.3rem 0.75rem; border-radius: 999px; text-transform: uppercase; }
     .grade-badge.excellent { background: #d1fae5; color: #065f46; }
     .grade-badge.average   { background: #fef3c7; color: #92400e; }
     .grade-badge.poor      { background: #fee2e2; color: #991b1b; }
-
-    /* ── TABLE ── */
-    .section-title {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 0.6rem;
-    }
-
+    .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #888; margin-bottom: 0.6rem; }
     table { width: 100%; border-collapse: collapse; }
-    thead th {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #888;
-      border-bottom: 2px solid #111;
-      padding: 0.4rem 0.5rem;
-      text-align: left;
-    }
+    thead th { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #888; border-bottom: 2px solid #111; padding: 0.4rem 0.5rem; text-align: left; }
     tbody tr.row-correct td { background: #f0fdf4; }
     tbody tr.row-wrong   td { background: #fff7f7; }
-    tbody td {
-      padding: 0.45rem 0.5rem;
-      border-bottom: 1px solid #e5e7eb;
-      vertical-align: top;
-      line-height: 1.5;
-    }
-    .col-num     { width: 32px;  color: #888; font-size: 0.75rem; }
-    .col-q       { color: #111; }
-    .col-ans     { width: 52px; text-align: center; font-weight: 700; }
+    tbody td { padding: 0.45rem 0.5rem; border-bottom: 1px solid #e5e7eb; vertical-align: top; line-height: 1.5; }
+    .col-num { width: 32px; color: #888; font-size: 0.75rem; }
+    .col-ans { width: 52px; text-align: center; font-weight: 700; }
     .col-correct { width: 72px; text-align: center; font-weight: 700; color: #059669; }
-    .wrong-ans   { color: #dc2626; }
-    .status-symbol { font-size: 0.8rem; }
-
-    /* ── EXPLANATION ROWS ── */
+    .wrong-ans { color: #dc2626; }
     tr.expl-row td { background: #fffbeb !important; border-bottom: 1px solid #fde68a; padding: 0.4rem 0.5rem 0.6rem 2rem; }
     .explanation-cell { font-size: 0.78rem; color: #555; line-height: 1.6; }
     .expl-label { font-weight: 700; color: #92400e; }
-
-    /* ── FOOTER ── */
-    .report-footer {
-      margin-top: 1.5rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.72rem;
-      color: #aaa;
-    }
-
-    /* ── PRINT ── */
-    @media print {
-      body { padding: 1.5rem; }
-      .no-print { display: none !important; }
-      tr.expl-row { page-break-inside: avoid; }
-    }
+    .report-footer { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; font-size: 0.72rem; color: #aaa; }
+    @media print { body { padding: 1.5rem; } .no-print { display: none !important; } }
   </style>
 </head>
 <body>
-
   <div class="report-header">
     <div class="brand">Grant<span>App</span> AI</div>
-    <div class="report-title">JAMB Practice Test Results ${today}</div>
+    <div class="report-title">JAMB Practice Test Results — ${today}</div>
   </div>
-
   <div class="score-card">
-    <div class="score-big ${pct >= 70 ? 'excellent' : pct >= 50 ? 'average' : 'poor'}">
-      ${pct.toFixed(1)}%
-    </div>
+    <div class="score-big ${pct >= 70 ? 'excellent' : pct >= 50 ? 'average' : 'poor'}">${pct.toFixed(1)}%</div>
     <div class="score-details">
-      <div class="score-line">${s.correct} / ${s.total} Correct answers</div>
-      <div class="score-meta">
-        <strong>${subject}</strong>${period ? ' &nbsp;·&nbsp; ' + period : ''}${dayRange ? ' &nbsp;·&nbsp; ' + dayRange : ''}<br>
-        Time taken: ${timeTaken}
-      </div>
+      <div class="score-line">${s.correct} / ${s.total} Correct</div>
+      <div class="score-meta"><strong>${subject}</strong><br>Time taken: ${timeTaken}</div>
     </div>
     <div class="grade-badge ${pct >= 70 ? 'excellent' : pct >= 50 ? 'average' : 'poor'}">${grade}</div>
   </div>
-
   <div class="section-title">Question Breakdown</div>
   <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Question</th>
-        <th style="text-align:center">Yours</th>
-        <th style="text-align:center">Answer</th>
-      </tr>
-    </thead>
+    <thead><tr><th>#</th><th>Question</th><th style="text-align:center">Yours</th><th style="text-align:center">Answer</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-
   <div class="report-footer">
     <span>GrantApp AI &nbsp;·&nbsp; 100 Days to UTME</span>
     <span>Page 1 of 1</span>
   </div>
-
   <div class="no-print" style="text-align:center;margin-top:2rem;">
-    <button onclick="window.print()"
-      style="padding:0.65rem 1.5rem;background:#f59e0b;color:#000;border:none;border-radius:8px;
-             font-weight:700;font-size:0.9rem;cursor:pointer;margin-right:0.75rem;">
-      Save as PDF
-    </button>
-    <button onclick="history.back()"
-      style="padding:0.65rem 1.5rem;background:#f3f4f6;color:#111;border:1px solid #d1d5db;
-             border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;">
-      ← Back
-    </button>
+    <button onclick="window.print()" style="padding:0.65rem 1.5rem;background:#f59e0b;color:#000;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;margin-right:0.75rem;">Save as PDF</button>
+    <button onclick="history.back()" style="padding:0.65rem 1.5rem;background:#f3f4f6;color:#111;border:1px solid #d1d5db;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;">← Back</button>
   </div>
-
 </body>
 </html>`;
 
-        // Open results in same tab
         document.open();
         document.write(html);
         document.close();
@@ -542,10 +460,6 @@ class QuizUI {
 
 // ── Boot ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    // QUESTIONS and DURATION must be defined in the quiz HTML page as:
-    //   const QUESTIONS = [ { id, subject, text, options:{A,B,C,D}, answer, explanation, exception }, ... ];
-    //   const DURATION  = 900; // seconds
-
     if (typeof QUESTIONS === 'undefined' || !QUESTIONS.length) {
         document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a0f;color:#f0eff4;font-family:sans-serif;text-align:center;padding:2rem"><div><div style="font-size:3rem;margin-bottom:1rem">⚠️</div><h2 style="margin-bottom:0.5rem">No Questions Found</h2><p style="color:#7a7a8c;margin-bottom:1.5rem">QUESTIONS array is not defined on this page.</p><button onclick="history.back()" style="padding:0.6rem 1.2rem;background:#f59e0b;color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer">← Go Back</button></div></div>`;
         return;
