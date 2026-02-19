@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Physics — JAMB Practice · GrantApp AI</title>
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="quiz-body">
+
+<!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
+<script>
+const DURATION = 900;
+
+const QUESTIONS = [
+  {
+    id: 1, subject: 'Physics',
+    text: 'A body moving with constant velocity has:',
+    options: { A: 'Zero acceleration', B: 'Constant acceleration', C: 'Increasing acceleration', D: 'Decreasing acceleration' },
+    answer: 'A',
+    explanation: 'Constant velocity means no change in speed or direction, so a = Δv/Δt = 0.',
+    exception: 'Constant speed with changing direction (circular motion) HAS acceleration — don\'t confuse velocity with speed.',
+  },
+  {
+    id: 2, subject: 'Physics',
+    text: 'An object is thrown vertically upward. At its highest point:',
+    options: { A: 'Velocity = 0, acceleration = 0', B: 'Velocity = 0, acceleration = g downward', C: 'Velocity = g, acceleration = 0', D: 'Both velocity and acceleration are maximum' },
+    answer: 'B',
+    explanation: 'At the peak, v = 0 instantaneously, but gravity still acts (a = 9.8 m/s² downward).',
+    exception: 'Acceleration is NOT zero at the highest point — gravity never stops acting.',
+  },
+  {
+    id: 3, subject: 'Physics',
+    text: 'A 5 kg block is pushed with 20 N force against a 5 N friction force. Find the acceleration:',
+    options: { A: '3 m/s²', B: '4 m/s²', C: '5 m/s²', D: '1 m/s²' },
+    answer: 'A',
+    explanation: 'Net force = 20 − 5 = 15 N. a = F/m = 15/5 = 3 m/s².',
+    exception: 'Always subtract friction from the applied force before using F = ma.',
+  },
+  {
+    id: 4, subject: 'Physics',
+    text: 'Two forces of 6 N and 8 N act perpendicular to each other. The resultant force is:',
+    options: { A: '2 N', B: '10 N', C: '14 N', D: '48 N' },
+    answer: 'B',
+    explanation: 'R = √(6² + 8²) = √(36 + 64) = √100 = 10 N.',
+    exception: 'Perpendicular forces must be added as vectors (Pythagoras), not simply added linearly.',
+  },
+  {
+    id: 5, subject: 'Physics',
+    text: 'A car accelerates from rest and travels 100 m in 5 s. Find the acceleration:',
+    options: { A: '4 m/s²', B: '8 m/s²', C: '10 m/s²', D: '20 m/s²' },
+    answer: 'B',
+    explanation: 's = ut + ½at². With u = 0: 100 = ½a(25), so a = 8 m/s².',
+    exception: 'Cannot use v = u + at without knowing the final velocity; use the displacement equation.',
+  },
+  {
+    id: 6, subject: 'Physics',
+    text: 'Newton\'s third law action-reaction pairs:',
+    options: { A: 'Act on the same object', B: 'Act on different objects', C: 'Cancel each other out', D: 'Only apply to collisions' },
+    answer: 'B',
+    explanation: 'Action and reaction forces act on DIFFERENT objects (e.g., book on table / table on book).',
+    exception: 'They cannot cancel because they act on different bodies — a common misconception.',
+  },
+  {
+    id: 7, subject: 'Physics',
+    text: 'An object weighs 60 N on Earth (g = 10 m/s²). On the Moon (g = 1.6 m/s²), it weighs:',
+    options: { A: '9.6 N', B: '36 N', C: '60 N', D: '360 N' },
+    answer: 'A',
+    explanation: 'Mass = W/g = 60/10 = 6 kg (constant). Moon weight = 6 × 1.6 = 9.6 N.',
+    exception: 'Mass is invariant; weight changes with gravity — the most common confusion in mechanics.',
+  },
+  {
+    id: 8, subject: 'Physics',
+    text: 'A projectile is launched at 45° for maximum range. At 30°, the range is:',
+    options: { A: 'Greater than at 45°', B: 'Less than at 45°', C: 'Equal to at 45°', D: 'Zero' },
+    answer: 'B',
+    explanation: 'Maximum range occurs at 45°. Any other angle gives a smaller range for the same launch speed.',
+    exception: 'Complementary angles (30° and 60°) give equal ranges to each other, but both less than at 45°.',
+  },
+  {
+    id: 9, subject: 'Physics',
+    text: 'A ball dropped from height h takes time t to hit the ground. From height 4h, time taken is:',
+    options: { A: 't', B: '2t', C: '4t', D: '16t' },
+    answer: 'B',
+    explanation: 'h ∝ t² (from h = ½gt²). If h increases 4×, t increases √4 = 2×.',
+    exception: 'Linear thinking (4h → 4t) is wrong; the relationship between height and time is quadratic.',
+  },
+  {
+    id: 10, subject: 'Physics',
+    text: 'Momentum is conserved in:',
+    options: { A: 'Elastic collisions only', B: 'Inelastic collisions only', C: 'All collisions in an isolated system', D: 'No collisions' },
+    answer: 'C',
+    explanation: 'Momentum is conserved in ALL collisions as long as no net external force acts.',
+    exception: 'Kinetic energy is conserved ONLY in elastic collisions — don\'t confuse the two conservation laws.',
+  },
+  {
+    id: 11, subject: 'Physics',
+    text: 'A 2 kg object at 5 m/s collides and sticks to a stationary 3 kg object. Final velocity:',
+    options: { A: '1 m/s', B: '2 m/s', C: '3 m/s', D: '5 m/s' },
+    answer: 'B',
+    explanation: 'Momentum conservation: 2(5) + 3(0) = 5v, so v = 2 m/s.',
+    exception: 'This is a perfectly inelastic collision — kinetic energy is NOT conserved, only momentum.',
+  },
+  {
+    id: 12, subject: 'Physics',
+    text: 'Power is defined as:',
+    options: { A: 'Work done per unit time', B: 'Force times distance', C: 'Energy stored', D: 'Mass times acceleration' },
+    answer: 'A',
+    explanation: 'P = W/t (primary definition). Also equivalent to P = Fv for constant force.',
+    exception: 'P = Fv is the instantaneous power form; both expressions are valid definitions.',
+  },
+  {
+    id: 13, subject: 'Physics',
+    text: 'A machine lifts a 500 N load 2 m using 200 N effort over 6 m. Efficiency is:',
+    options: { A: '40%', B: '60%', C: '83.3%', D: '120%' },
+    answer: 'C',
+    explanation: 'Efficiency = (Work output / Work input) × 100 = (500×2)/(200×6) × 100 = 83.3%.',
+    exception: 'Efficiency can NEVER exceed 100% — this would violate conservation of energy.',
+  },
+  {
+    id: 14, subject: 'Physics',
+    text: 'The unit of impulse is:',
+    options: { A: 'N', B: 'N·s', C: 'J', D: 'W' },
+    answer: 'B',
+    explanation: 'Impulse = FΔt (units: N·s) = change in momentum (kg·m/s). Both units are equivalent.',
+    exception: 'N·s and kg·m/s look different but are dimensionally identical; impulse = Δ(mv).',
+  },
+  {
+    id: 15, subject: 'Physics',
+    text: 'A spring (k = 100 N/m) is compressed 0.2 m. Elastic PE stored:',
+    options: { A: '2 J', B: '4 J', C: '10 J', D: '20 J' },
+    answer: 'A',
+    explanation: 'PE = ½kx² = ½ × 100 × 0.04 = 2 J.',
+    exception: 'Common error: forgetting the ½ factor or not squaring the displacement.',
+  },
+  {
+    id: 16, subject: 'Physics',
+    text: 'Two resistors (4 Ω and 6 Ω) in parallel have equivalent resistance:',
+    options: { A: '2.4 Ω', B: '5 Ω', C: '10 Ω', D: '24 Ω' },
+    answer: 'A',
+    explanation: '1/R = 1/4 + 1/6 = 3/12 + 2/12 = 5/12, so R = 12/5 = 2.4 Ω.',
+    exception: 'Parallel resistance is always LESS than the smallest individual resistor — never their sum.',
+  },
+  {
+    id: 17, subject: 'Physics',
+    text: 'A wire of resistance R is stretched to double its length (volume constant). New resistance:',
+    options: { A: 'R/2', B: 'R', C: '2R', D: '4R' },
+    answer: 'D',
+    explanation: 'R = ρL/A. If L doubles, volume conservation means A halves. R_new = ρ(2L)/(A/2) = 4R.',
+    exception: 'Resistance scales with the square of the length ratio when volume is constant.',
+  },
+  {
+    id: 18, subject: 'Physics',
+    text: 'In a circuit, an ammeter should be connected in:',
+    options: { A: 'Series', B: 'Parallel', C: 'Either', D: 'Depends on value' },
+    answer: 'A',
+    explanation: 'Ammeter measures current and must be in series (very low resistance). Voltmeter goes in parallel.',
+    exception: 'Ideal ammeter has zero resistance; real ammeters have a small but non-zero resistance.',
+  },
+  {
+    id: 19, subject: 'Physics',
+    text: 'Kirchhoff\'s current law (KCL) states:',
+    options: { A: 'Sum of currents entering a junction equals sum leaving', B: 'Voltage drop around a loop equals zero', C: 'Resistance is constant', D: 'Power is conserved' },
+    answer: 'A',
+    explanation: 'KCL: ΣI_in = ΣI_out at any junction (charge conservation).',
+    exception: 'KVL (voltage law) covers energy around loops; KCL covers charge at junctions — don\'t confuse them.',
+  },
+  {
+    id: 20, subject: 'Physics',
+    text: 'A transformer has 100 primary turns and 500 secondary turns. It is a:',
+    options: { A: 'Step-down transformer (voltage decreases)', B: 'Step-up transformer (voltage increases 5×)', C: '1:1 ratio transformer', D: 'Current amplifier (current increases 5×)' },
+    answer: 'B',
+    explanation: 'V_s/V_p = N_s/N_p = 500/100 = 5. Voltage increases by a factor of 5.',
+    exception: 'Current does the opposite: it decreases by factor 5. Power is conserved (ideal transformer).',
+  },
+  {
+    id: 21, subject: 'Physics',
+    text: 'An AC supply has an RMS current of 10 A. The peak current is:',
+    options: { A: '7.07 A', B: '10 A', C: '14.14 A', D: '20 A' },
+    answer: 'C',
+    explanation: 'I_peak = I_rms × √2 = 10 × 1.414 ≈ 14.14 A.',
+    exception: 'Peak is √2 times RMS, not 2 times. RMS is the effective (heating-equivalent) value.',
+  },
+  {
+    id: 22, subject: 'Physics',
+    text: 'The speed of light in glass (refractive index n = 1.5) is:',
+    options: { A: '3 × 10⁸ m/s', B: '2 × 10⁸ m/s', C: '1.5 × 10⁸ m/s', D: '4.5 × 10⁸ m/s' },
+    answer: 'B',
+    explanation: 'n = c/v, so v = c/n = (3 × 10⁸)/1.5 = 2 × 10⁸ m/s.',
+    exception: 'Light always slows when entering a denser medium and can never exceed c (speed in vacuum).',
+  },
+  {
+    id: 23, subject: 'Physics',
+    text: 'Total internal reflection occurs when light travels:',
+    options: { A: 'From a denser to a rarer medium at an angle greater than the critical angle', B: 'From a rarer to a denser medium', C: 'At any angle', D: 'Only inside optical fibers' },
+    answer: 'A',
+    explanation: 'TIR requires two conditions: denser → rarer medium AND angle of incidence > critical angle.',
+    exception: 'TIR cannot occur going rarer → denser; light always refracts into a denser medium.',
+  },
+  {
+    id: 24, subject: 'Physics',
+    text: 'A concave mirror has focal length 20 cm. An object placed 30 cm away forms an image at:',
+    options: { A: '60 cm (real, inverted)', B: '12 cm (virtual, upright)', C: '60 cm (virtual, upright)', D: 'Infinity' },
+    answer: 'A',
+    explanation: '1/f = 1/u + 1/v → 1/20 = 1/30 + 1/v → v = 60 cm. Positive v means real and inverted.',
+    exception: 'Between F and C the image is magnified, real, and inverted — beyond C on the same side.',
+  },
+  {
+    id: 25, subject: 'Physics',
+    text: 'Two waves of the same frequency interfere with a path difference of λ/2. The result is:',
+    options: { A: 'Constructive interference (bright fringe)', B: 'Destructive interference (dark fringe)', C: 'No interference', D: 'Partial interference' },
+    answer: 'B',
+    explanation: 'Path difference = (n + ½)λ gives destructive interference (180° phase shift).',
+    exception: 'Path difference = nλ gives constructive interference; half-wavelength shift inverts the wave.',
+  },
+  {
+    id: 26, subject: 'Physics',
+    text: 'A wave has wavelength 2 m and travels at 10 m/s. Its frequency is:',
+    options: { A: '0.2 Hz', B: '5 Hz', C: '20 Hz', D: '50 Hz' },
+    answer: 'B',
+    explanation: 'v = fλ, so f = v/λ = 10/2 = 5 Hz.',
+    exception: 'Frequency (oscillations/second) and wave speed (distance/second) are different quantities.',
+  },
+  {
+    id: 27, subject: 'Physics',
+    text: 'When a sound source approaches an observer, the Doppler effect causes the observed frequency to:',
+    options: { A: 'Increase', B: 'Decrease', C: 'Remain constant', D: 'Double' },
+    answer: 'A',
+    explanation: 'Approaching source compresses wavefronts → shorter wavelength → higher observed frequency.',
+    exception: 'The effect applies to light too: approaching sources appear blue-shifted, receding ones red-shifted.',
+  },
+  {
+    id: 28, subject: 'Physics',
+    text: 'In a standing wave, the distance between two consecutive nodes is:',
+    options: { A: 'λ/4', B: 'λ/2', C: 'λ', D: '2λ' },
+    answer: 'B',
+    explanation: 'Node-to-node distance = λ/2. Antinode-to-antinode is also λ/2. Node-to-antinode is λ/4.',
+    exception: 'Don\'t confuse node spacing (λ/2) with antinode-to-next-node spacing (also λ/4).',
+  },
+  {
+    id: 29, subject: 'Physics',
+    text: 'At absolute zero (0 K), according to quantum mechanics:',
+    options: { A: 'All molecular motion stops completely', B: 'Some motion remains due to zero-point energy', C: 'Molecular motion increases', D: 'Motion becomes completely chaotic' },
+    answer: 'B',
+    explanation: 'Classically motion stops, but the Heisenberg uncertainty principle forbids truly zero motion (zero-point energy).',
+    exception: 'This is the key difference between classical and quantum predictions at 0 K.',
+  },
+  {
+    id: 30, subject: 'Physics',
+    text: 'The internal energy of an ideal gas depends on:',
+    options: { A: 'Temperature only', B: 'Pressure and volume', C: 'Volume only', D: 'All of the above equally' },
+    answer: 'A',
+    explanation: 'For an ideal gas, U depends only on temperature (it equals the total kinetic energy of molecules).',
+    exception: 'Real gases also have intermolecular potential energy, so U depends on volume too.',
+  },
+  {
+    id: 31, subject: 'Physics',
+    text: 'The first law of thermodynamics states:',
+    options: { A: 'ΔU = Q − W', B: 'Entropy always increases', C: 'Heat flows from hot to cold spontaneously', D: 'Total energy of the universe is constant' },
+    answer: 'A',
+    explanation: 'ΔU = Q − W: change in internal energy equals heat added minus work done BY the system.',
+    exception: 'Some textbooks use ΔU = Q + W where W is work done ON the system; check the sign convention.',
+  },
+  {
+    id: 32, subject: 'Physics',
+    text: 'In an adiabatic process:',
+    options: { A: 'Q = 0 (no heat transfer)', B: 'ΔU = 0', C: 'W = 0', D: 'Pressure is constant' },
+    answer: 'A',
+    explanation: 'Adiabatic means thermally isolated, so Q = 0. From the first law: ΔU = −W.',
+    exception: 'Temperature DOES change in an adiabatic process — unlike an isothermal process where T is constant.',
+  },
+  {
+    id: 33, subject: 'Physics',
+    text: 'Water has specific heat capacity 4200 J/(kg·K). Energy needed to raise 2 kg by 5°C:',
+    options: { A: '2100 J', B: '8400 J', C: '21 000 J', D: '42 000 J' },
+    answer: 'D',
+    explanation: 'Q = mcΔT = 2 × 4200 × 5 = 42 000 J.',
+    exception: 'Specific heat capacity is per kg per degree; don\'t forget to multiply by BOTH mass and ΔT.',
+  },
+  {
+    id: 34, subject: 'Physics',
+    text: 'The photoelectric effect — electrons emitted only above a threshold frequency — supports:',
+    options: { A: 'Classical wave theory of light', B: 'Quantum (particle) theory of light', C: 'Both theories equally', D: 'Neither theory' },
+    answer: 'B',
+    explanation: 'Below the threshold, no electrons are emitted regardless of intensity — proving photons carry discrete energy packets.',
+    exception: 'Classical wave theory predicted intensity (not frequency) should govern emission; experiment disproved this.',
+  },
+  {
+    id: 35, subject: 'Physics',
+    text: 'The de Broglie wavelength of a particle with momentum p is:',
+    options: { A: 'λ = h/p', B: 'λ = p/h', C: 'λ = hp', D: 'λ = h/p²' },
+    answer: 'A',
+    explanation: 'λ = h/p, where h is Planck\'s constant. This links wave and particle descriptions of matter.',
+    exception: 'All matter has a de Broglie wavelength, but it is only significant for very small masses like electrons.',
+  },
+];
+</script>
+
+<!-- Fixed Header -->
+<header class="quiz-header">
+    <div class="quiz-header-container">
+
+        <div class="quiz-header-left">
+            <button class="btn-icon" id="menuBtn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="subject-info">
+                <div class="subject-name" id="subjectName">Physics</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">35</span></div>
+            </div>
+        </div>
+
+        <div class="quiz-timer-container" id="quizTimerContainer">
+            <div class="timer-progress-ring">
+                <svg viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
+                            stroke="var(--accent)" stroke-width="4"
+                            stroke-dasharray="163.36" stroke-dashoffset="0"
+                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="timer-icon"><i class="fas fa-clock"></i></div>
+            <div class="timer-display" id="timerDisplay">15:00</div>
+        </div>
+
+        <div class="quiz-header-right">
+            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
+                <i class="fas fa-calculator"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
+        </div>
+    </div>
+</header>
+
+<div class="quiz-container">
+
+    <aside class="quiz-sidebar" id="quizSidebar">
+        <div class="sidebar-header">
+            <h3>Navigator</h3>
+            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="answeredCount">0</div>
+                <div class="stat-label">Done</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="unansweredCount">35</div>
+                <div class="stat-label">Left</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="flaggedCount">0</div>
+                <div class="stat-label">Flagged</div>
+            </div>
+        </div>
+        <div class="question-palette" id="questionPalette"></div>
+        <div class="sidebar-legend">
+            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
+            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
+            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
+            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
+        </div>
+        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
+            <a href="science_clusters.html"
+               class="btn btn-secondary"
+               style="width:100%;text-align:center;text-decoration:none;display:block;"
+               onclick="return confirm('Leave quiz? Progress will be lost.')">
+                &#8592; Back
+            </a>
+        </div>
+    </aside>
+
+    <main class="quiz-main">
+        <div class="question-card" id="questionCard">
+            <div class="question-header">
+                <div class="question-number">Question <span id="questionNumber">1</span></div>
+                <button class="btn-flag" id="flagBtn" aria-label="Flag">
+                    <i class="far fa-flag"></i> Flag
+                </button>
+            </div>
+            <div class="question-text" id="questionText">Loading...</div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div class="question-explanation hidden" id="questionExplanation">
+                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
+                <div class="explanation-content" id="explanationContent"></div>
+            </div>
+        </div>
+
+        <div class="quiz-navigation">
+            <button class="btn btn-secondary" id="prevBtn" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-secondary" id="clearBtn">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button class="btn btn-primary" id="nextBtn">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </main>
+</div>
+
+<div class="mobile-palette-trigger" id="mobilePaletteBtn">
+    <i class="fas fa-th"></i> <span>Questions</span>
+</div>
+
+<!-- Submit Modal -->
+<div class="modal-overlay hidden" id="submitModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Submit Test?</h3>
+            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="submit-summary">
+                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">35</span></div>
+                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
+                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">35</span></div>
+                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">15:00</span></div>
+            </div>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>You cannot change answers after submission.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
+            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Time Up Modal -->
+<div class="modal-overlay hidden" id="timeUpModal">
+    <div class="modal">
+        <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
+        <div class="modal-body">
+            <p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="viewResultsBtn">View Results</button>
+        </div>
+    </div>
+</div>
+
+<!-- Calculator Modal -->
+<div class="modal-overlay hidden" id="calculatorModal">
+    <div class="modal calculator-modal">
+        <div class="modal-header">
+            <h3>Calculator</h3>
+            <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="calculator">
+                <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
+                <div class="calculator-buttons">
+                    <button class="calc-btn" data-action="clear">C</button>
+                    <button class="calc-btn" data-action="delete">&#8592;</button>
+                    <button class="calc-btn" data-action="divide">&#247;</button>
+                    <button class="calc-btn" data-action="multiply">&#215;</button>
+                    <button class="calc-btn" data-value="7">7</button>
+                    <button class="calc-btn" data-value="8">8</button>
+                    <button class="calc-btn" data-value="9">9</button>
+                    <button class="calc-btn" data-action="subtract">&#8722;</button>
+                    <button class="calc-btn" data-value="4">4</button>
+                    <button class="calc-btn" data-value="5">5</button>
+                    <button class="calc-btn" data-value="6">6</button>
+                    <button class="calc-btn" data-action="add">+</button>
+                    <button class="calc-btn" data-value="1">1</button>
+                    <button class="calc-btn" data-value="2">2</button>
+                    <button class="calc-btn" data-value="3">3</button>
+                    <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
+                    <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
+                    <button class="calc-btn" data-value=".">.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="quiz-app.js"></script>
+</body>
+</html>
