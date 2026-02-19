@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon — GrantApp AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #111118;
+            --surface-2: #16161f;
+            --border: #1e1e2e;
+            --border-bright: #2a2a3e;
+            --text: #f0eff4;
+            --muted: #7a7a8c;
+            --accent: #f59e0b;
+            --accent-dim: rgba(245,158,11,0.12);
+            --accent-glow: rgba(245,158,11,0.25);
+            --green: #10b981;
+            --green-dim: rgba(16,185,129,0.12);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* ── GRID BACKGROUND ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
+            background-size: 64px 64px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── NAV ── */
+        nav {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(10,10,15,0.85);
+            backdrop-filter: blur(16px);
+            z-index: 100;
+        }
+
+        .brand {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+        .brand span { color: var(--accent); }
+
+        .back-home {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: color 0.2s;
+        }
+        .back-home:hover { color: var(--text); }
+        .back-home::before { content: '←'; }
+
+        /* ── MAIN ── */
+        main {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 600px;
+            padding: 5rem 2rem 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+        }
+
+        /* ── GLOW ORB ── */
+        .orb {
+            position: absolute;
+            top: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(40px);
+        }
+
+        /* ── BADGE ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(245,158,11,0.3);
+            background: var(--accent-dim);
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 2rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* ── HEADING ── */
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.2rem, 6vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.25rem;
+        }
+
+        h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--accent) 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sub {
+            font-size: 1rem;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 440px;
+            margin: 0 auto 3rem;
+        }
+
+        /* ── FORM CARD ── */
+        .form-card {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border-bright);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(245,158,11,0.4), transparent);
+        }
+
+        .form-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.85rem 1rem;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input::placeholder { color: var(--muted); }
+
+        .form-input:focus {
+            border-color: rgba(245,158,11,0.5);
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
+        }
+
+        /* ── EXAM SELECTOR ── */
+        .exam-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 0.75rem;
+            text-align: left;
+        }
+
+        .exam-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .chip {
+            font-size: 0.78rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            background: transparent;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .chip:hover {
+            border-color: var(--border-bright);
+            color: var(--text);
+        }
+
+        .chip.selected {
+            background: var(--accent-dim);
+            border-color: rgba(245,158,11,0.4);
+            color: var(--accent);
+        }
+
+        /* ── SUBMIT BUTTON ── */
+        .btn-notify {
+            width: 100%;
+            background: var(--accent);
+            color: #0a0a0f;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.9rem 1.5rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-notify:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(245,158,11,0.25);
+        }
+
+        .btn-notify:active { transform: translateY(0); }
+
+        .btn-notify.loading { opacity: 0.7; pointer-events: none; }
+
+        /* ── SUCCESS STATE ── */
+        .success-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 0 0.5rem;
+        }
+
+        .success-state.visible { display: flex; }
+        .form-content.hidden { display: none; }
+
+        .success-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--green-dim);
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .success-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--green);
+        }
+
+        .success-sub {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* ── WHATSAPP CTA ── */
+        .wa-cta {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .btn-wa {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border-bright);
+            border-radius: 0.75rem;
+            padding: 0.65rem 1.1rem;
+            font-size: 0.82rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        .btn-wa:hover {
+            border-color: #25d366;
+            transform: translateY(-2px);
+        }
+
+        .btn-wa svg {
+            width: 16px;
+            height: 16px;
+            fill: #25d366;
+            flex-shrink: 0;
+        }
+
+        /* ── BACK LINK ── */
+        .go-home {
+            font-size: 0.82rem;
+            color: var(--muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            border: 1px solid var(--border);
+            padding: 0.55rem 1.1rem;
+            border-radius: 0.75rem;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .go-home:hover { border-color: var(--border-bright); color: var(--text); }
+
+        /* ── FOOTER ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            text-align: center;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        footer span { color: var(--accent); }
+
+        /* ── RESPONSIVE ── */
+        @media (min-width: 480px) {
+            .form-row { flex-direction: row; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="brand">Grant<span>App</span> AI</a>
+    <a href="index.html" class="back-home">Back to Home</a>
+</nav>
+
+<main>
+    <div class="orb"></div>
+
+    <div class="badge">
+        <span class="badge-dot"></span>
+        In Development
+    </div>
+
+    <h1>Something <em>big</em><br>is coming.</h1>
+
+    <p class="sub">
+        We're building this section right now. Drop your details and we'll notify you the moment it goes live — you'll be among the first in.
+    </p>
+
+    <div class="form-card">
+        <div class="form-content" id="formContent">
+            <div class="form-row">
+                <div style="flex:1">
+                    <label class="form-label" for="nameInput">Your Name</label>
+                    <input class="form-input" id="nameInput" type="text" placeholder="Ada Okonkwo" autocomplete="name">
+                </div>
+                <div style="flex:1">
+                    <label class="form-label" for="phoneInput">WhatsApp Number</label>
+                    <input class="form-input" id="phoneInput" type="tel" placeholder="+234 800 000 0000" autocomplete="tel">
+                </div>
+            </div>
+
+            <span class="exam-label">What are you preparing for?</span>
+            <div class="exam-chips" id="examChips">
+                <span class="chip" data-val="JAMB">JAMB / UTME</span>
+                <span class="chip" data-val="WASSCE">WASSCE</span>
+                <span class="chip" data-val="AP">AP Exams</span>
+                <span class="chip" data-val="SAT">SAT</span>
+                <span class="chip" data-val="10K">10K Mastery</span>
+                <span class="chip" data-val="Other">Other</span>
+            </div>
+
+            <button class="btn-notify" id="notifyBtn" onclick="handleSubmit()">
+                Notify Me When It's Ready →
+            </button>
+        </div>
+
+        <div class="success-state" id="successState">
+            <div class="success-icon">✓</div>
+            <div class="success-title">You're on the list.</div>
+            <div class="success-sub" id="successMsg">We'll reach you on WhatsApp the moment this goes live.</div>
+        </div>
+    </div>
+
+    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1.25rem;">
+        Or join our community now while you wait
+    </p>
+
+    <div class="wa-cta">
+        <a class="btn-wa" href="https://chat.whatsapp.com/BVloVed0PIDIbojLeRMQCU?mode=gi_t" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            Join the Group
+        </a>
+        <a class="btn-wa" href="https://whatsapp.com/channel/0029VbCMrEVIyPtLYUrc7I3K" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            Follow the Channel
+        </a>
+    </div>
+
+    <a href="index.html" class="go-home">← Back to GrantApp</a>
+</main>
+
+<footer>
+    © 2025 <span>GrantApp AI</span> · Africa's best matriculation exam prep
+</footer>
+
+<script>
+    // Chip toggle
+    document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    });
+
+    function handleSubmit() {
+        const name  = document.getElementById('nameInput').value.trim();
+        const phone = document.getElementById('phoneInput').value.trim();
+        const exams = [...document.querySelectorAll('.chip.selected')].map(c => c.dataset.val);
+
+        if (!name || !phone) {
+            document.getElementById('nameInput').focus();
+            document.getElementById('nameInput').style.borderColor = 'rgba(245,158,11,0.6)';
+            setTimeout(() => document.getElementById('nameInput').style.borderColor = '', 1500);
+            return;
+        }
+
+        // Build WhatsApp pre-fill message → sends contact to admin
+        const examList = exams.length ? exams.join(', ') : 'Not specified';
+        const msg = encodeURIComponent(
+            `Hi GrantApp AI 👋\nI want to be notified when the new section is live.\n\nName: ${name}\nExam: ${examList}`
+        );
+
+        // Show success immediately, then open WhatsApp
+        document.getElementById('formContent').classList.add('hidden');
+        document.getElementById('successMsg').textContent =
+            `We'll reach you on WhatsApp soon, ${name.split(' ')[0]}.`;
+        document.getElementById('successState').classList.add('visible');
+
+        // Small delay so user sees confirmation before redirect
+        setTimeout(() => {
+            window.open(`https://wa.me/2348000000000?text=${msg}`, '_blank');
+        }, 800);
+    }
+</script>
+
+</body>
+</html>
