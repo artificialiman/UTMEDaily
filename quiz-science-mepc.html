@@ -10,6 +10,7 @@
 </head>
 <body class="quiz-body">
 
+<!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
 <script>
 const DURATION = 3600;
 
@@ -1142,94 +1143,190 @@ const QUESTIONS = [
 
 ];
 </script>
+</script>
 
+<!-- Fixed Header -->
 <header class="quiz-header">
-    <div class="quiz-header__left">
-        <button class="btn btn--ghost btn--sm back-btn" onclick="window.location.href='science_clusters.html'">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <div class="quiz-header__info">
-            <h1 class="quiz-header__title">MEPC · Batch 4</h1>
-            <p class="quiz-header__sub">Maths · English · Physics · Chemistry</p>
+    <div class="quiz-header-container">
+
+        <div class="quiz-header-left">
+            <button class="btn-icon" id="menuBtn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="subject-info">
+                <div class="subject-name" id="subjectName">Science: MEPC</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">140</span></div>
+            </div>
         </div>
-    </div>
-    <div class="quiz-header__center">
-        <div class="timer-ring" id="timerRing">
-            <svg viewBox="0 0 44 44">
-                <circle class="timer-ring__bg" cx="22" cy="22" r="18"/>
-                <circle class="timer-ring__fill" id="timerCircle" cx="22" cy="22" r="18"/>
-            </svg>
-            <span class="timer-ring__text" id="timerDisplay">60:00</span>
+
+        <div class="quiz-timer-container" id="quizTimerContainer">
+            <div class="timer-progress-ring">
+                <svg viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
+                            stroke="var(--accent)" stroke-width="4"
+                            stroke-dasharray="163.36" stroke-dashoffset="0"
+                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="timer-icon"><i class="fas fa-clock"></i></div>
+            <div class="timer-display" id="timerDisplay">60:00</div>
         </div>
-    </div>
-    <div class="quiz-header__right">
-        <button class="btn btn--ghost btn--sm" id="calculatorBtn">
-            <i class="fas fa-calculator"></i>
-        </button>
-        <button class="btn btn--primary btn--sm" id="submitBtn">Submit</button>
+
+        <div class="quiz-header-right">
+            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
+                <i class="fas fa-calculator"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
+        </div>
     </div>
 </header>
 
 <div class="quiz-container">
+
     <aside class="quiz-sidebar" id="quizSidebar">
-        <div class="sidebar-section">
-            <h3 class="sidebar-label">Navigator</h3>
-            <div class="question-palette" id="questionPalette"></div>
+        <div class="sidebar-header">
+            <h3>Navigator</h3>
+            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <div class="sidebar-section">
-            <h3 class="sidebar-label">Stats</h3>
-            <div class="stats-grid" id="statsGrid"></div>
-        </div>
-        <div class="sidebar-section">
-            <h3 class="sidebar-label">Legend</h3>
-            <div class="legend">
-                <span class="legend-item"><span class="palette-btn answered"></span> Answered</span>
-                <span class="legend-item"><span class="palette-btn flagged"></span> Flagged</span>
-                <span class="legend-item"><span class="palette-btn current"></span> Current</span>
+        <div class="sidebar-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="answeredCount">0</div>
+                <div class="stat-label">Done</div>
             </div>
+            <div class="stat-item">
+                <div class="stat-value" id="unansweredCount">140</div>
+                <div class="stat-label">Left</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="flaggedCount">0</div>
+                <div class="stat-label">Flagged</div>
+            </div>
+        </div>
+        <div class="question-palette" id="questionPalette"></div>
+        <div class="sidebar-legend">
+            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
+            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
+            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
+            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
+        </div>
+        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
+            <a href="science_clusters.html"
+               class="btn btn-secondary"
+               style="width:100%;text-align:center;text-decoration:none;display:block;"
+               onclick="return confirm('Leave quiz? Progress will be lost.')">
+                &#8592; Back
+            </a>
         </div>
     </aside>
 
-    <main class="quiz-main" id="quizMain"></main>
+    <main class="quiz-main">
+        <div class="question-card" id="questionCard">
+            <div class="question-header">
+                <div class="question-number">Question <span id="questionNumber">1</span></div>
+                <button class="btn-flag" id="flagBtn" aria-label="Flag">
+                    <i class="far fa-flag"></i> Flag
+                </button>
+            </div>
+            <div class="question-text" id="questionText">Loading...</div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div class="question-explanation hidden" id="questionExplanation">
+                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
+                <div class="explanation-content" id="explanationContent"></div>
+            </div>
+        </div>
+
+        <div class="quiz-navigation">
+            <button class="btn btn-secondary" id="prevBtn" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-secondary" id="clearBtn">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button class="btn btn-primary" id="nextBtn">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </main>
 </div>
 
-<div class="mobile-palette-trigger" id="mobilePaletteTrigger">
-    <i class="fas fa-th"></i>
-    <span id="mobilePaletteCount">0/140</span>
+<div class="mobile-palette-trigger" id="mobilePaletteBtn">
+    <i class="fas fa-th"></i> <span>Questions</span>
 </div>
 
 <!-- Submit Modal -->
-<div class="modal-overlay" id="submitModal">
+<div class="modal-overlay hidden" id="submitModal">
     <div class="modal">
-        <h2 class="modal__title">Submit Quiz?</h2>
-        <p class="modal__body" id="submitModalBody"></p>
-        <div class="modal__actions">
-            <button class="btn btn--ghost" id="cancelSubmit">Review</button>
-            <button class="btn btn--primary" id="confirmSubmit">Submit</button>
+        <div class="modal-header">
+            <h3>Submit Test?</h3>
+            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="submit-summary">
+                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">140</span></div>
+                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
+                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">140</span></div>
+                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">60:00</span></div>
+            </div>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>You cannot change answers after submission.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
+            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
         </div>
     </div>
 </div>
 
 <!-- Time Up Modal -->
-<div class="modal-overlay" id="timeUpModal">
+<div class="modal-overlay hidden" id="timeUpModal">
     <div class="modal">
-        <h2 class="modal__title">Time Up!</h2>
-        <p class="modal__body">Your time has expired. Your answers have been submitted.</p>
-        <div class="modal__actions">
-            <button class="btn btn--primary" id="timeUpConfirm">See Results</button>
+        <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
+        <div class="modal-body">
+            <p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="viewResultsBtn">View Results</button>
         </div>
     </div>
 </div>
 
 <!-- Calculator Modal -->
-<div class="modal-overlay" id="calculatorModal">
-    <div class="modal modal--calculator">
-        <div class="calc-header">
-            <span>Calculator</span>
-            <button class="btn btn--ghost btn--sm" id="closeCalculator"><i class="fas fa-times"></i></button>
+<div class="modal-overlay hidden" id="calculatorModal">
+    <div class="modal calculator-modal">
+        <div class="modal-header">
+            <h3>Calculator</h3>
+            <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
         </div>
-        <div class="calc-display" id="calcDisplay">0</div>
-        <div class="calc-grid" id="calcGrid"></div>
+        <div class="modal-body">
+            <div class="calculator">
+                <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
+                <div class="calculator-buttons">
+                    <button class="calc-btn" data-action="clear">C</button>
+                    <button class="calc-btn" data-action="delete">&#8592;</button>
+                    <button class="calc-btn" data-action="divide">&#247;</button>
+                    <button class="calc-btn" data-action="multiply">&#215;</button>
+                    <button class="calc-btn" data-value="7">7</button>
+                    <button class="calc-btn" data-value="8">8</button>
+                    <button class="calc-btn" data-value="9">9</button>
+                    <button class="calc-btn" data-action="subtract">&#8722;</button>
+                    <button class="calc-btn" data-value="4">4</button>
+                    <button class="calc-btn" data-value="5">5</button>
+                    <button class="calc-btn" data-value="6">6</button>
+                    <button class="calc-btn" data-action="add">+</button>
+                    <button class="calc-btn" data-value="1">1</button>
+                    <button class="calc-btn" data-value="2">2</button>
+                    <button class="calc-btn" data-value="3">3</button>
+                    <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
+                    <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
+                    <button class="calc-btn" data-value=".">.</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
