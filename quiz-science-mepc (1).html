@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Science — MEPC — JAMB Practice · GrantApp AI</title>
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="quiz-body">
+
+<!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
+<script>
+const DURATION = 3600;
+
+const QUESTIONS = [
+  {
+    id: 1, subject: 'Mathematics',
+    text: 'If 0.000456 is written in standard form as 4.56 × 10ⁿ, what is n?',
+    options: { A: '-4', B: '-2', C: '3', D: '-3' },
+    answer: 'A',
+    explanation: 'Move decimal right for negative powers. 0.000456 = 4.56 × 10⁻⁴',
+    exception: 'The count starts AFTER the first non-zero digit.',
+  },
+  {
+    id: 2, subject: 'Mathematics',
+    text: 'Simplify: (√2 + √3)(√2 − √3)',
+    options: { A: '-1', B: '5', C: '1', D: '√6' },
+    answer: 'A',
+    explanation: 'Difference of squares: (a+b)(a−b) = a² − b². Result = 2 − 3 = −1.',
+    exception: 'Students expect positive result when both surds are positive.',
+  },
+  {
+    id: 3, subject: 'Mathematics',
+    text: 'If log₁₀ 2 = 0.3010, find log₁₀ 0.02',
+    options: { A: '0.699', B: '1.699', C: '-0.699', D: '-1.699' },
+    answer: 'D',
+    explanation: 'log(0.02) = log(2 × 10⁻²) = 0.3010 − 2 = −1.699.',
+    exception: 'Logarithms of numbers < 1 are NEGATIVE, not undefined.',
+  },
+  {
+    id: 4, subject: 'Mathematics',
+    text: 'What is the remainder when 2x³ + 3x² − 5x + 7 is divided by (x + 2)?',
+    options: { A: '-11', B: '21', C: '3', D: '11' },
+    answer: 'B',
+    explanation: 'Remainder theorem: f(−2) = −16 + 12 + 10 + 7 = 21.',
+    exception: 'Use x = −2, not +2, because divisor is (x + 2).',
+  },
+  {
+    id: 5, subject: 'Mathematics',
+    text: 'Solve: |2x − 3| = 5',
+    options: { A: 'x = −1 only', B: 'x = 4 only', C: 'x = 1 or x = 4', D: 'x = −1 or x = 4' },
+    answer: 'D',
+    explanation: '|a| = b gives a = ±b. So 2x − 3 = 5 OR 2x − 3 = −5, giving x = 4 or x = −1.',
+    exception: 'TWO solutions exist, not one.',
+  },
+  {
+    id: 6, subject: 'Mathematics',
+    text: 'If sin θ = 3/5 and θ is acute, find cos θ',
+    options: { A: '5/3', B: '3/5', C: '4/5', D: '5/4' },
+    answer: 'C',
+    explanation: 'cos θ = √(1 − sin²θ) = √(1 − 9/25) = √(16/25) = 4/5.',
+    exception: 'cos θ is positive ONLY because θ is acute.',
+  },
+  {
+    id: 7, subject: 'Mathematics',
+    text: 'Find the nth term of: 3, 7, 11, 15 ...',
+    options: { A: '3n + 1', B: '3n + 4', C: '4n + 1', D: '4n − 1' },
+    answer: 'D',
+    explanation: 'AP: Tₙ = a + (n−1)d = 3 + 4(n−1) = 4n − 1.',
+    exception: 'Verify: when n = 1, 4(1) − 1 = 3 ✓',
+  },
+  {
+    id: 8, subject: 'Mathematics',
+    text: 'Evaluate: ∛(−27)',
+    options: { A: '−3', B: '3', C: 'Undefined', D: '±3' },
+    answer: 'A',
+    explanation: 'Cube roots of negative numbers ARE defined. ∛(−27) = −3.',
+    exception: 'Odd roots preserve sign; only even roots require non-negative radicands.',
+  },
+  {
+    id: 9, subject: 'Mathematics',
+    text: 'If 3ˣ = 27ˣ⁻², find x',
+    options: { A: '4', B: '3', C: '6', D: '2' },
+    answer: 'B',
+    explanation: '3ˣ = (3³)ˣ⁻² = 3³ˣ⁻⁶. Equate: x = 3x − 6, so x = 3.',
+    exception: 'This only works because bases are equal.',
+  },
+  {
+    id: 10, subject: 'Mathematics',
+    text: 'A binary operation * is defined by a * b = a² − b². Calculate 3 * 2',
+    options: { A: '1', B: '13', C: '25', D: '5' },
+    answer: 'D',
+    explanation: '3 * 2 = 3² − 2² = 9 − 4 = 5.',
+    exception: '* here does not mean multiplication.',
+  },
+  {
+    id: 11, subject: 'Mathematics',
+    text: 'Find the inverse of f(x) = (2x + 1)/(x − 3)',
+    options: { A: '(3x − 1)/(x − 2)', B: '(x − 3)/(2x + 1)', C: '(3x + 1)/(x − 2)', D: '(2x − 1)/(x + 3)' },
+    answer: 'C',
+    explanation: 'Swap x and y, solve for y: f⁻¹(x) = (3x + 1)/(x − 2).',
+    exception: 'Domain excludes x = 2 (division by zero).',
+  },
+  {
+    id: 12, subject: 'Mathematics',
+    text: 'How many diagonals does a regular hexagon have?',
+    options: { A: '15', B: '6', C: '12', D: '9' },
+    answer: 'D',
+    explanation: 'Formula: n(n−3)/2. For n=6: 6(3)/2 = 9.',
+    exception: 'Total line segments = n(n−1)/2 = 15; diagonals exclude the 6 sides.',
+  },
+  {
+    id: 13, subject: 'Mathematics',
+    text: 'If P = {1,2,3} and Q = {2,3,4}, find n(P ∪ Q)',
+    options: { A: '3', B: '2', C: '6', D: '4' },
+    answer: 'D',
+    explanation: 'P ∪ Q = {1,2,3,4}, n = 4. Using formula: 3 + 3 − 2 = 4.',
+    exception: 'Don\'t count repeated elements.',
+  },
+  {
+    id: 14, subject: 'Mathematics',
+    text: 'Differentiate y = x³ − 3x² + 2 with respect to x',
+    options: { A: '3x² − 6x', B: 'x² − 6x', C: '3x² − 3x', D: '3x³ − 6x²' },
+    answer: 'A',
+    explanation: 'Power rule: dy/dx = 3x² − 6x.',
+    exception: 'Constant term (2) disappears; derivative of constant = 0.',
+  },
+  {
+    id: 15, subject: 'Mathematics',
+    text: 'Convert 234₅ to base 10',
+    options: { A: '69', B: '119', C: '64', D: '54' },
+    answer: 'A',
+    explanation: '2(25) + 3(5) + 4(1) = 50 + 15 + 4 = 69.',
+    exception: 'In base 5, digits must be 0–4; a digit ≥5 is invalid.',
+  },
+  {
+    id: 16, subject: 'Mathematics',
+    text: 'Find the median of: 2, 8, 6, 4, 10',
+    options: { A: '4', B: '8', C: '10', D: '6' },
+    answer: 'D',
+    explanation: 'Order: 2, 4, 6, 8, 10. Middle value = 6.',
+    exception: 'For even count, median = average of two middle values.',
+  },
+  {
+    id: 17, subject: 'Mathematics',
+    text: 'Simplify: (x² − 9)/(x² + 6x + 9)',
+    options: { A: '(x − 3)/(x + 3)', B: '(x − 3)/(x + 3)²', C: '(x + 3)/(x − 3)', D: '1' },
+    answer: 'A',
+    explanation: 'Factor: (x−3)(x+3)/(x+3)² = (x−3)/(x+3).',
+    exception: 'x ≠ −3 (domain restriction).',
+  },
+  {
+    id: 18, subject: 'Mathematics',
+    text: 'A rectangle has length (x + 3) and width (x − 2). Find the area',
+    options: { A: 'x² + 5x − 6', B: 'x² − x − 6', C: 'x² + x − 6', D: 'x² − 6' },
+    answer: 'C',
+    explanation: 'Area = (x+3)(x−2) = x² − 2x + 3x − 6 = x² + x − 6.',
+    exception: 'Expand fully; middle terms do not cancel.',
+  },
+  {
+    id: 19, subject: 'Mathematics',
+    text: 'In a class of 40, 24 like Math, 16 like English, 8 like both. How many like neither?',
+    options: { A: '8', B: '0', C: '12', D: '4' },
+    answer: 'A',
+    explanation: 'n(M∪E) = 24 + 16 − 8 = 32. Neither = 40 − 32 = 8.',
+    exception: 'Include/Exclusion principle is essential here.',
+  },
+  {
+    id: 20, subject: 'Mathematics',
+    text: 'Find the sum of the first 10 terms of: 2 + 4 + 6 + 8 ...',
+    options: { A: '110', B: '120', C: '90', D: '100' },
+    answer: 'A',
+    explanation: 'Sₙ = n/2(2a + (n−1)d) = 5(4+18) = 110.',
+  },
+  {
+    id: 21, subject: 'Mathematics',
+    text: 'If the mean of 4, 7, x, 10, 9 is 8, find x',
+    options: { A: '8', B: '10', C: '9', D: '11' },
+    answer: 'B',
+    explanation: 'Sum = 5 × 8 = 40. 4+7+x+10+9 = 30+x = 40, so x = 10.',
+  },
+  {
+    id: 22, subject: 'Mathematics',
+    text: 'Factorize: 6x² + 7x − 3',
+    options: { A: '(6x − 1)(x + 3)', B: '(2x − 1)(3x + 3)', C: '(3x − 1)(2x + 3)', D: '(2x + 3)(3x − 1)' },
+    answer: 'D',
+    explanation: 'Product = −18, sum = 7. 6x² + 9x − 2x − 3 = (3x−1)(2x+3).',
+  },
+  {
+    id: 23, subject: 'Mathematics',
+    text: 'Evaluate: ∫(3x² + 2x)dx',
+    options: { A: 'x³ + x + C', B: '6x + 2 + C', C: 'x³ + x² + C', D: '3x³ + 2x² + C' },
+    answer: 'C',
+    explanation: '∫xⁿ dx = xⁿ⁺¹/(n+1). ∫3x² = x³; ∫2x = x². Total: x³ + x² + C.',
+    exception: 'Always add constant C for indefinite integrals.',
+  },
+  {
+    id: 24, subject: 'Mathematics',
+    text: 'A circle has equation x² + y² = 25. What is the radius?',
+    options: { A: '5', B: '25', C: '10', D: '√5' },
+    answer: 'A',
+    explanation: 'Standard form x² + y² = r². r² = 25, so r = 5.',
+    exception: 'r = √25 = 5, not 25.',
+  },
+  {
+    id: 25, subject: 'Mathematics',
+    text: 'If 4x − 3 ≤ 13, find the range of x',
+    options: { A: 'x ≤ 4', B: 'x ≤ −4', C: 'x ≥ 4', D: 'x ≥ −4' },
+    answer: 'A',
+    explanation: '4x ≤ 16, x ≤ 4.',
+    exception: 'Inequality sign only flips when dividing/multiplying by a negative number.',
+  },
+  {
+    id: 26, subject: 'Mathematics',
+    text: 'Find the equation of a line with gradient 2 passing through (1, 3)',
+    options: { A: 'y = x + 2', B: 'y = 2x + 1', C: 'y = 2x + 3', D: 'y = 2x − 1' },
+    answer: 'B',
+    explanation: 'y − y₁ = m(x − x₁): y − 3 = 2(x − 1), y = 2x + 1.',
+    exception: 'Substitute the given point, not the origin.',
+  },
+  {
+    id: 27, subject: 'Mathematics',
+    text: 'How many ways can 5 students be arranged in a row?',
+    options: { A: '60', B: '20', C: '5', D: '120' },
+    answer: 'D',
+    explanation: '5! = 5 × 4 × 3 × 2 × 1 = 120.',
+    exception: 'Permutation (order matters) ≠ combination (order irrelevant).',
+  },
+  {
+    id: 28, subject: 'Mathematics',
+    text: 'A bag contains 3 red and 2 blue balls. A ball is drawn at random. P(red) =',
+    options: { A: '3/2', B: '1/2', C: '3/5', D: '2/5' },
+    answer: 'C',
+    explanation: 'P(red) = 3/(3+2) = 3/5.',
+    exception: 'Probability must be between 0 and 1; 3/2 is impossible.',
+  },
+  {
+    id: 29, subject: 'Mathematics',
+    text: 'The angles of a triangle are in ratio 1:2:3. Find the largest angle',
+    options: { A: '90°', B: '30°', C: '60°', D: '120°' },
+    answer: 'A',
+    explanation: 'Sum = 180°. Parts: 1+2+3 = 6. Largest = (3/6) × 180 = 90°.',
+    exception: 'Sum of triangle angles is always 180°, not 360°.',
+  },
+  {
+    id: 30, subject: 'Mathematics',
+    text: 'Calculate the volume of a cylinder with radius 7cm and height 10cm (π = 22/7)',
+    options: { A: '1540 cm³', B: '220 cm³', C: '440 cm³', D: '4400 cm³' },
+    answer: 'A',
+    explanation: 'V = πr²h = (22/7) × 49 × 10 = 22 × 70 = 1540 cm³.',
+    exception: 'Use r², not r; a common error is computing πrh instead.',
+  },
+  {
+    id: 31, subject: 'Mathematics',
+    text: 'If y varies directly as x and y = 12 when x = 4, find y when x = 7',
+    options: { A: '28', B: '21', C: '18', D: '24' },
+    answer: 'B',
+    explanation: 'y = kx. k = 12/4 = 3. y = 3 × 7 = 21.',
+  },
+  {
+    id: 32, subject: 'Mathematics',
+    text: 'Express 0.1̄ (0.111...) as a fraction',
+    options: { A: '10/99', B: '1/10', C: '1/11', D: '1/9' },
+    answer: 'D',
+    explanation: 'Let x = 0.111... Then 10x = 1.111... Subtract: 9x = 1, x = 1/9.',
+    exception: '0.1̄ ≠ 1/10. Only 0.1 (terminating) equals 1/10.',
+  },
+  {
+    id: 33, subject: 'Mathematics',
+    text: 'Find the value of x in the equation 2^(x+1) = 32',
+    options: { A: '4', B: '6', C: '5', D: '3' },
+    answer: 'A',
+    explanation: '32 = 2⁵. So x+1 = 5, x = 4.',
+    exception: 'Express both sides as powers of the same base first.',
+  },
+  {
+    id: 34, subject: 'Mathematics',
+    text: 'The gradient of a line perpendicular to y = 3x + 5 is',
+    options: { A: '1/3', B: '3', C: '−1/3', D: '−3' },
+    answer: 'C',
+    explanation: 'Perpendicular gradient = −1/m = −1/3.',
+    exception: 'Product of perpendicular gradients = −1. Not the negative, but the negative reciprocal.',
+  },
+  {
+    id: 35, subject: 'Mathematics',
+    text: 'Simplify: 2log 5 + log 4 − log 2',
+    options: { A: 'log 100', B: 'log 48', C: 'log 50', D: 'log 25' },
+    answer: 'C',
+    explanation: '2log5 = log25. log25 + log4 − log2 = log(25 × 4 / 2) = log(50).',
+    exception: 'log addition = multiplication; log subtraction = division of arguments.',
+  },
+  {
+    id: 36, subject: 'English',
+    text: 'Choose the word that is OPPOSITE in meaning to "ubiquitous"',
+    options: { A: 'Rare', B: 'Common', C: 'Universal', D: 'Frequent' },
+    answer: 'A',
+    explanation: 'Ubiquitous means present everywhere. Opposite = rare.',
+  },
+  {
+    id: 37, subject: 'English',
+    text: 'Choose the option with the same vowel sound as the underlined letters in "blood"',
+    options: { A: 'Good', B: 'Mood', C: 'Food', D: 'Flood' },
+    answer: 'D',
+    explanation: '"Blood" /blud/ rhymes with "flood" /flud/, both have /u/ sound.',
+  },
+  {
+    id: 38, subject: 'English',
+    text: 'In the sentence "The committee has submitted its report," the verb "has" agrees with:',
+    options: { A: 'Committee (singular collective noun)', B: 'Members (implied plural)', C: 'Either A or B', D: 'Report (object)' },
+    answer: 'A',
+    explanation: 'Collective nouns take singular verbs when acting as a unit.',
+    exception: 'British English often uses plural verbs for collectives.',
+  },
+  {
+    id: 39, subject: 'English',
+    text: 'Identify the literary device: "The classroom was a zoo"',
+    options: { A: 'Metaphor', B: 'Hyperbole', C: 'Personification', D: 'Simile' },
+    answer: 'A',
+    explanation: 'Direct comparison without like/as = metaphor.',
+  },
+  {
+    id: 40, subject: 'English',
+    text: 'Which sentence uses "lie" correctly?',
+    options: { A: 'I will lay down for a nap', B: 'The hen has laid five eggs', C: 'Yesterday, I lay down to rest', D: 'The book is laying on the table' },
+    answer: 'C',
+    explanation: 'Lie (recline) is intransitive: lie/lay/lain. Lay (put down) is transitive: lay/laid/laid.',
+  },
+  {
+    id: 41, subject: 'English',
+    text: 'Choose the correctly punctuated sentence:',
+    options: { A: 'The teacher said: "homework is due tomorrow."', B: 'The teacher said, "homework is due tomorrow".', C: 'The teacher said "Homework is due tomorrow."', D: 'The teacher said, "Homework is due tomorrow."' },
+    answer: 'D',
+    explanation: 'Comma before quote, capital letter starts quote, period inside closing quote.',
+  },
+  {
+    id: 42, subject: 'English',
+    text: 'Identify the error: "Neither the students nor the teacher were present"',
+    options: { A: 'Pronoun error', B: 'Tense error', C: 'Subject-verb disagreement', D: 'No error' },
+    answer: 'C',
+    explanation: 'With neither...nor, verb agrees with NEAREST subject. Teacher (singular) requires was.',
+  },
+  {
+    id: 43, subject: 'English',
+    text: 'The prefix "bi-" in "biannual" means:',
+    options: { A: 'Half a year', B: 'Twice a year', C: 'Once every two years', D: 'Two years long' },
+    answer: 'B',
+    explanation: 'Biannual = twice yearly.',
+    exception: 'Biennial = every two years. These are commonly confused.',
+  },
+  {
+    id: 44, subject: 'English',
+    text: 'Choose the word with correct spelling:',
+    options: { A: 'Ocurred', B: 'Occurred', C: 'Occureed', D: 'Occured' },
+    answer: 'B',
+    explanation: 'Double the final consonant before -ed when: stressed final syllable ends in CVC.',
+  },
+  {
+    id: 45, subject: 'English',
+    text: 'In "The faster you run, the sooner you\'ll arrive," the structure is:',
+    options: { A: 'Parallel structure', B: 'Superlative comparison', C: 'Conditional clause', D: 'Comparative correlation' },
+    answer: 'D',
+    explanation: 'The + comparative...the + comparative shows correlation.',
+  },
+  {
+    id: 46, subject: 'English',
+    text: 'Identify the sentence with correct pronoun usage:',
+    options: { A: 'Myself and John will attend', B: 'Between you and I, he\'s wrong', C: 'He gave the gift to my wife and I', D: 'The secret is between you and me' },
+    answer: 'D',
+    explanation: 'After prepositions, use objective case (me/him/her).',
+  },
+  {
+    id: 47, subject: 'English',
+    text: 'The word "sanction" can mean:',
+    options: { A: 'To approve OR to penalize', B: 'To ignore', C: 'Only to penalize', D: 'Only to approve' },
+    answer: 'A',
+    explanation: 'Sanction is an auto-antonym—means both approve AND punish.',
+  },
+  {
+    id: 48, subject: 'English',
+    text: 'Which uses the subjunctive mood correctly?',
+    options: { A: 'She acts like she was the boss', B: 'If he were here, he\'d help', C: 'If I was rich, I\'d travel', D: 'I wish I was taller' },
+    answer: 'B',
+    explanation: 'Subjunctive uses were for all persons in contrary-to-fact conditions.',
+  },
+  {
+    id: 49, subject: 'English',
+    text: 'Identify the dangling modifier:',
+    options: { A: 'I walked home in the rain', B: 'While walking home, I felt raindrops', C: 'The rain started as I walked home', D: 'Walking home, the rain started' },
+    answer: 'D',
+    explanation: 'Walking home illogically modifies rain (rain can\'t walk).',
+  },
+  {
+    id: 50, subject: 'English',
+    text: 'The word "egregious" originally meant "remarkably good" but now means "remarkably bad." This is:',
+    options: { A: 'Generalization', B: 'Amelioration', C: 'Specialization', D: 'Pejoration' },
+    answer: 'D',
+    explanation: 'Pejoration = word becomes more negative over time.',
+  },
+  {
+    id: 51, subject: 'English',
+    text: 'In "She is taller than I," the implied ending is:',
+    options: { A: 'Than I am', B: 'Than I be', C: 'Either A or B', D: 'Than me' },
+    answer: 'A',
+    explanation: 'After than in formal writing, use subject case when verb is implied.',
+  },
+  {
+    id: 52, subject: 'English',
+    text: 'Choose the sentence with correct parallel structure:',
+    options: { A: 'She likes reading, writing, and painting', B: 'She likes reading, to write, and painting', C: 'She likes to read, writing, and to paint', D: 'She likes to read, to write, and painting' },
+    answer: 'A',
+    explanation: 'Parallel elements must have same grammatical form (all gerunds or all infinitives).',
+  },
+  {
+    id: 53, subject: 'English',
+    text: 'The phrase "I could care less" is:',
+    options: { A: 'Regional variation, both acceptable', B: 'Correct and means indifference', C: 'Incorrect; should be "couldn\'t care less"', D: 'Means extreme caring' },
+    answer: 'C',
+    explanation: 'Logically, couldn\'t care less means zero care possible.',
+  },
+  {
+    id: 54, subject: 'English',
+    text: 'Identify the oxymoron:',
+    options: { A: 'Fast car', B: 'Hot coffee', C: 'Very unique', D: 'Deafening silence' },
+    answer: 'D',
+    explanation: 'Oxymoron combines contradictory terms. Silence can\'t be loud.',
+  },
+  {
+    id: 55, subject: 'English',
+    text: 'In passive voice, the sentence "The cat chased the mouse" becomes:',
+    options: { A: 'The mouse was chased by the cat', B: 'The mouse is chased by the cat', C: 'The mouse has been chased', D: 'The cat was chasing the mouse' },
+    answer: 'A',
+    explanation: 'Passive: object becomes subject, verb becomes be + past participle.',
+  },
+  {
+    id: 56, subject: 'English',
+    text: 'The word "literally" is increasingly used to mean:',
+    options: { A: 'Figuratively (opposite of original meaning)', B: 'Exactly', C: 'Only in literal sense', D: 'Approximately' },
+    answer: 'A',
+    explanation: 'Literally now often intensifies figurative statements.',
+  },
+  {
+    id: 57, subject: 'English',
+    text: 'Choose the sentence with correct comma usage:',
+    options: { A: 'The red, old, car broke down', B: 'The old, red car broke down', C: 'The, old, red, car broke down', D: 'The old red car broke down' },
+    answer: 'B',
+    explanation: 'Coordinate adjectives (interchangeable order) need commas.',
+  },
+  {
+    id: 58, subject: 'English',
+    text: 'The error in "Irregardless of the cost, we\'ll proceed" is:',
+    options: { A: 'Wrong preposition', B: 'Comma splice', C: 'No error', D: '"Irregardless" is non-standard' },
+    answer: 'D',
+    explanation: 'Irregardless is double negative (ir- + -less). Standard form: regardless.',
+  },
+  {
+    id: 59, subject: 'English',
+    text: 'In "The data is conclusive," the subject-verb agreement is:',
+    options: { A: 'Correct (modern usage)', B: 'Incorrect; should be "data are"', C: 'Either acceptable', D: 'Regional variation' },
+    answer: 'C',
+    explanation: 'Data is Latin plural of datum. Modern usage treats it as singular mass noun.',
+  },
+  {
+    id: 60, subject: 'English',
+    text: 'Identify the malapropism: "Texas has a large Portuguese population"',
+    options: { A: 'No error', B: 'Large (wrong word)', C: 'Portuguese (should be "populace")', D: 'Texas (wrong place)' },
+    answer: 'C',
+    explanation: 'Malapropism substitutes similar-sounding wrong word.',
+  },
+  {
+    id: 61, subject: 'English',
+    text: 'The sentence "Whom did you see?" is:',
+    options: { A: 'Archaic and incorrect', B: 'Conversationally wrong', C: 'Formally correct', D: 'Missing auxiliary verb' },
+    answer: 'C',
+    explanation: 'Whom is object case (direct object of see).',
+  },
+  {
+    id: 62, subject: 'English',
+    text: 'Choose the correct verb form: "If I _____ known, I would have come"',
+    options: { A: 'would have', B: 'have', C: 'had', D: 'has' },
+    answer: 'C',
+    explanation: 'Past perfect in if clause pairs with would have in main clause (third conditional).',
+  },
+  {
+    id: 63, subject: 'English',
+    text: 'The phrase "beg the question" traditionally means:',
+    options: { A: 'To avoid answering', B: 'To ask formally', C: 'To raise a question', D: 'To assume what you\'re trying to prove (circular reasoning)' },
+    answer: 'D',
+    explanation: 'Beg the question is logical fallacy (petitio principii).',
+  },
+  {
+    id: 64, subject: 'English',
+    text: 'In "She is one of those teachers who inspire students," the verb "inspire" is:',
+    options: { A: 'Incorrect; should be "inspires"', B: 'Correct (agrees with "teachers")', C: 'Subjunctive mood', D: 'Either acceptable' },
+    answer: 'B',
+    explanation: 'Who refers to teachers (plural antecedent), so inspire (plural verb).',
+  },
+  {
+    id: 65, subject: 'English',
+    text: 'Identify the split infinitive:',
+    options: { A: 'To go boldly where no one has gone', B: 'Both B and C', C: 'Boldly to go where no one has gone', D: 'To boldly go where no one has gone' },
+    answer: 'D',
+    explanation: 'Adverb between to and verb = split infinitive.',
+  },
+  {
+    id: 66, subject: 'English',
+    text: 'The word "presently" means:',
+    options: { A: 'In the past', B: 'Currently OR soon', C: 'Only currently', D: 'Only soon' },
+    answer: 'B',
+    explanation: 'Presently means soon (traditional) OR now (American usage).',
+  },
+  {
+    id: 67, subject: 'English',
+    text: 'Choose the correct form: "Neither of the answers _____ correct"',
+    options: { A: 'are', B: 'is', C: 'be', D: 'were' },
+    answer: 'B',
+    explanation: 'Neither is singular pronoun, takes singular verb.',
+  },
+  {
+    id: 68, subject: 'English',
+    text: 'In "The house was engulfed in flames," the phrase "in flames" functions as:',
+    options: { A: 'Prepositional object', B: 'Noun phrase', C: 'Adjectival phrase', D: 'Adverbial phrase' },
+    answer: 'D',
+    explanation: 'In flames describes how/in what state house was engulfed (modifies verb).',
+  },
+  {
+    id: 69, subject: 'English',
+    text: 'The sentence "We was ready to leave" contains:',
+    options: { A: 'Random error', B: 'Code-switching', C: 'Dialect grammar (nonstandard but systematic)', D: 'Correct grammar' },
+    answer: 'C',
+    explanation: 'We was appears in some English dialects.',
+  },
+  {
+    id: 70, subject: 'English',
+    text: 'Identify the zeugma: "She broke his car and his heart"',
+    options: { A: '"Broke" applies literally and figuratively', B: 'No rhetorical device', C: 'Metaphor only', D: 'Parallel structure' },
+    answer: 'A',
+    explanation: 'Zeugma uses one word in two senses simultaneously.',
+  },
+  {
+    id: 71, subject: 'Chemistry',
+    text: 'An element X has atomic number 17 and mass number 35. The number of neutrons is:',
+    options: { A: '52', B: '18', C: '17', D: '35' },
+    answer: 'B',
+    explanation: 'Neutrons = mass number - atomic number = 35 - 17 = 18.',
+    exception: 'Isotopes of same element have different neutron counts but same atomic number.',
+  },
+  {
+    id: 72, subject: 'Chemistry',
+    text: 'Which electronic configuration violates Hund\'s rule?',
+    options: { A: '1s2 2s2 2p6', B: '1s2 2s2 2p4 (up-down up-down up)', C: '1s2 2s2 2p4 (up-down up up)', D: '1s2 2s2 2p3 (up up up)' },
+    answer: 'B',
+    explanation: 'Hund\'s rule: electrons singly occupy orbitals before pairing. Option C pairs prematurely.',
+    exception: 'Maximum multiplicity (unpaired electrons) gives lowest energy.',
+  },
+  {
+    id: 73, subject: 'Chemistry',
+    text: 'The ion with electronic configuration 1s2 2s2 2p6 could be:',
+    options: { A: 'Both Na+ and F-', B: 'Neither', C: 'F- only', D: 'Na+ only' },
+    answer: 'A',
+    explanation: 'Both have 10 electrons (isoelectronic with Ne). Na loses 1e-, F gains 1e-.',
+    exception: 'Isoelectronic species have same electron count but different nuclear charges.',
+  },
+  {
+    id: 74, subject: 'Chemistry',
+    text: 'Electronegativity increases across a period because:',
+    options: { A: 'Atomic radius increases', B: 'Ionization energy decreases', C: 'Nuclear charge increases, atomic radius decreases', D: 'Shielding increases' },
+    answer: 'C',
+    explanation: 'More protons pull electrons stronger; smaller size means closer to nucleus.',
+    exception: 'Noble gases often excluded from electronegativity trends.',
+  },
+  {
+    id: 75, subject: 'Chemistry',
+    text: 'Which statement about first ionization energies is correct?',
+    options: { A: 'Cannot be determined', B: 'Na > Mg', C: 'Mg > Na (IE increases across period)', D: 'They are equal' },
+    answer: 'C',
+    explanation: 'IE generally increases across period. Mg > Na.',
+    exception: 'Actual exceptions: Al < Mg (subshell), O < N (pairing energy).',
+  },
+  {
+    id: 76, subject: 'Chemistry',
+    text: 'Noble gases are unreactive because:',
+    options: { A: 'Large atomic radius', B: 'Low ionization energy', C: 'High electronegativity', D: 'Full valence shell (stable octet)' },
+    answer: 'D',
+    explanation: 'ns2np6 configuration is stable.',
+    exception: 'Xe and Kr CAN form compounds with highly electronegative F.',
+  },
+  {
+    id: 77, subject: 'Chemistry',
+    text: 'The bond angle in water (104.5°) is less than methane (109.5°) because:',
+    options: { A: 'Lone pairs repel more than bonding pairs', B: 'Hydrogen bonding', C: 'Oxygen is more electronegative', D: 'Water is polar' },
+    answer: 'A',
+    explanation: 'VSEPR: lone pair-lone pair > lone pair-bond > bond-bond repulsion.',
+    exception: 'NH3 (107°) also compressed from tetrahedral but less than H2O.',
+  },
+  {
+    id: 78, subject: 'Chemistry',
+    text: 'Which molecule is nonpolar despite having polar bonds?',
+    options: { A: 'CO2 (linear, symmetrical)', B: 'H2O', C: 'NH3', D: 'HCl' },
+    answer: 'A',
+    explanation: 'CO2: two C=O bonds cancel (linear geometry).',
+    exception: 'CCl4 also nonpolar (tetrahedral symmetry) despite polar C-Cl bonds.',
+  },
+  {
+    id: 79, subject: 'Chemistry',
+    text: 'The hybridization of carbon in CO2 is:',
+    options: { A: 'sp2', B: 'sp3d', C: 'sp3', D: 'sp' },
+    answer: 'D',
+    explanation: 'Linear geometry = sp hybridization (2 regions of electron density).',
+    exception: 'Same carbon can have different hybridizations: CH4 (sp3), C2H4 (sp2), C2H2 (sp).',
+  },
+  {
+    id: 80, subject: 'Chemistry',
+    text: 'Resonance structures of benzene show:',
+    options: { A: 'Double bonds alternate rapidly', B: 'Molecule oscillates between structures', C: 'Electrons are delocalized (not fixed double bonds)', D: 'Two different compounds exist' },
+    answer: 'C',
+    explanation: 'Resonance = single structure with delocalized electrons, NOT equilibrium between forms.',
+  },
+  {
+    id: 81, subject: 'Chemistry',
+    text: 'Hydrogen bonding is strongest between:',
+    options: { A: 'C-H...O', B: 'F-H...F (most electronegative)', C: 'N-H...N', D: 'O-H...O' },
+    answer: 'B',
+    explanation: 'Strength: F-H > O-H > N-H (electronegativity trend).',
+    exception: 'O-H bonds in water are more biologically important despite F-H being stronger.',
+  },
+  {
+    id: 82, subject: 'Chemistry',
+    text: 'The pH of 0.01 M HCl is:',
+    options: { A: '2', B: '1', C: '0.01', D: '12' },
+    answer: 'A',
+    explanation: 'pH = -log[H+] = -log(10-2) = 2.',
+    exception: 'Very concentrated acids (>1M) can have negative pH.',
+  },
+  {
+    id: 83, subject: 'Chemistry',
+    text: 'A buffer solution resists pH change because:',
+    options: { A: 'Contains strong acid', B: 'Is neutral', C: 'Contains weak acid and its conjugate base', D: 'Has high concentration' },
+    answer: 'C',
+    explanation: 'Buffer: HA/A- pair. Absorbs added H+ or OH-.',
+    exception: 'Buffers only effective within ±1 pH unit of pKa.',
+  },
+  {
+    id: 84, subject: 'Chemistry',
+    text: 'The pH at equivalence point in strong acid-strong base titration is:',
+    options: { A: 'Greater than 7', B: 'Less than 7', C: 'Depends on concentrations', D: '7' },
+    answer: 'D',
+    explanation: 'Neutral salt formed (NaCl from HCl + NaOH).',
+    exception: 'Weak acid-strong base gives pH >7; strong acid-weak base gives pH <7 at equivalence.',
+  },
+  {
+    id: 85, subject: 'Chemistry',
+    text: 'At higher temperature, Kw (= [H+][OH-] = 10-14 at 25°C):',
+    options: { A: 'Decreases', B: 'Stays constant', C: 'Increases (ionization is endothermic)', D: 'Becomes zero' },
+    answer: 'C',
+    explanation: 'Water ionization is endothermic; Le Chatelier predicts increase with temperature.',
+    exception: 'Neutral pH at 60°C is ~6.5 (not 7) because Kw increases.',
+  },
+  {
+    id: 86, subject: 'Chemistry',
+    text: 'The oxidation number of Cr in K2Cr2O7 is:',
+    options: { A: '+14', B: '+6', C: '+12', D: '+7' },
+    answer: 'B',
+    explanation: '2(+1) + 2x + 7(-2) = 0, so x = +6.',
+    exception: 'Maximum oxidation state usually equals group number; Cr in Group 6 can reach +6.',
+  },
+  {
+    id: 87, subject: 'Chemistry',
+    text: 'In the reaction 2Fe2+ → 2Fe3+ + 2e-, iron is:',
+    options: { A: 'Oxidized (loses electrons)', B: 'Oxidizing agent', C: 'Reduced', D: 'Unchanged' },
+    answer: 'A',
+    explanation: 'Oxidation = loss of electrons (OIL RIG). Fe2+ is reducing agent.',
+  },
+  {
+    id: 88, subject: 'Chemistry',
+    text: 'The standard hydrogen electrode is assigned:',
+    options: { A: 'E° = 1.00 V', B: 'E° = 0.00 V (reference point)', C: 'E° = -1.00 V', D: 'E° = +0.76 V' },
+    answer: 'B',
+    explanation: 'SHE is reference; all other potentials measured relative to it.',
+  },
+  {
+    id: 89, subject: 'Chemistry',
+    text: 'In galvanic cell, the anode is:',
+    options: { A: 'Positive electrode', B: 'Negative electrode (oxidation occurs)', C: 'Where reduction occurs', D: 'Made of copper' },
+    answer: 'B',
+    explanation: 'Anode = oxidation = negative in galvanic cell.',
+    exception: 'In electrolytic cell, anode is POSITIVE (but still oxidation site).',
+  },
+  {
+    id: 90, subject: 'Chemistry',
+    text: 'Faraday\'s law: mass deposited is proportional to:',
+    options: { A: 'Charge passed (Q = nF)', B: 'Current only', C: 'Voltage', D: 'Resistance' },
+    answer: 'A',
+    explanation: 'm is proportional to Q. Specifically: m = (Q × M)/(n × F).',
+    exception: 'Time matters through Q = It; doubling current OR doubling time doubles mass.',
+  },
+  {
+    id: 91, subject: 'Chemistry',
+    text: 'Haber process produces ammonia at:',
+    options: { A: 'High temperature only', B: 'Low pressure, high temperature', C: 'High pressure, moderate temperature, Fe catalyst', D: 'Room conditions' },
+    answer: 'C',
+    explanation: 'N2 + 3H2 = 2NH3 (exothermic). Le Chatelier: high P favors products.',
+    exception: 'Equilibrium position vs rate conflict requires optimization at ~450°C.',
+  },
+  {
+    id: 92, subject: 'Chemistry',
+    text: 'In N2 + 3H2 = 2NH3, adding more N2:',
+    options: { A: 'Shifts equilibrium right (more NH3)', B: 'No effect on equilibrium', C: 'Stops reaction', D: 'Shifts left' },
+    answer: 'A',
+    explanation: 'Le Chatelier: system counteracts change by consuming added N2.',
+    exception: 'Kp unchanged; only position shifts, not equilibrium constant.',
+  },
+  {
+    id: 93, subject: 'Chemistry',
+    text: 'The equilibrium constant Kc for 2A = B is 4. For B = 2A, Kc is:',
+    options: { A: '16', B: '0.25 (1/4)', C: '2', D: '4' },
+    answer: 'B',
+    explanation: 'Reversing reaction inverts K: K_reverse = 1/K_forward.',
+    exception: 'Multiplying equation by n raises K to power n.',
+  },
+  {
+    id: 94, subject: 'Chemistry',
+    text: 'A reaction is spontaneous if:',
+    options: { A: 'ΔG < 0', B: 'ΔH < 0', C: 'All of the above always', D: 'ΔS > 0' },
+    answer: 'A',
+    explanation: 'Gibbs: ΔG = ΔH - TΔS. Spontaneous when ΔG < 0.',
+    exception: 'Endothermic reactions CAN be spontaneous if ΔS is large and positive.',
+  },
+  {
+    id: 95, subject: 'Chemistry',
+    text: 'Diamond is harder than graphite because:',
+    options: { A: 'Diamond has more electrons', B: 'Graphite has ionic bonding', C: 'Diamond has metallic bonding', D: '3D network of strong C-C bonds vs 2D layers' },
+    answer: 'D',
+    explanation: 'Diamond: sp3, tetrahedral. Graphite: sp2, layered with weak van der Waals between layers.',
+    exception: 'Graphite conducts electricity (delocalized electrons in layers); diamond doesn\'t.',
+  },
+  {
+    id: 96, subject: 'Chemistry',
+    text: 'The melting point of NaCl (ionic) is higher than I2 (molecular) because:',
+    options: { A: 'I2 is covalent', B: 'NaCl is soluble in water', C: 'Ionic bonds stronger than van der Waals forces', D: 'NaCl has more atoms' },
+    answer: 'C',
+    explanation: 'Ionic > covalent network > metallic > polar molecular > nonpolar molecular (general trend).',
+  },
+  {
+    id: 97, subject: 'Chemistry',
+    text: 'Transition metals show variable oxidation states because:',
+    options: { A: 'They are large atoms', B: 'They conduct electricity', C: 'They are metals', D: 'd electrons participate in bonding' },
+    answer: 'D',
+    explanation: 'd electrons have similar energy to s electrons; can lose different numbers.',
+    exception: 'Scandium and zinc show mainly +3 and +2 respectively.',
+  },
+  {
+    id: 98, subject: 'Chemistry',
+    text: 'Which is a Lewis acid?',
+    options: { A: 'H2O', B: 'NH3', C: 'OH-', D: 'BF3 (electron deficient)' },
+    answer: 'D',
+    explanation: 'Lewis acid = electron pair acceptor. BF3 has empty orbital.',
+    exception: 'Broader than Bronsted (proton transfer); includes species without H+.',
+  },
+  {
+    id: 99, subject: 'Chemistry',
+    text: 'The pH of 10-8 M HCl is approximately:',
+    options: { A: '14', B: 'Exactly -8', C: '7 (water ionization dominates)', D: 'Exactly 8' },
+    answer: 'C',
+    explanation: 'At very low acid concentration, water\'s H+ (10-7 M) becomes significant.',
+    exception: 'Can\'t ignore water ionization when acid concentration < 10-6 M.',
+  },
+  {
+    id: 100, subject: 'Chemistry',
+    text: 'Effusion rate of gas A is twice that of gas B. If M_A = 4, then M_B is:',
+    options: { A: '8', B: '1', C: '2', D: '16' },
+    answer: 'D',
+    explanation: 'Graham\'s law: rate is proportional to 1/sqrt(M). 2 = sqrt(M_B/4), so M_B = 16.',
+  },
+  {
+    id: 101, subject: 'Chemistry',
+    text: 'Real gases deviate from ideal behavior at:',
+    options: { A: 'All conditions equally', B: 'Never deviate', C: 'High pressure and low temperature', D: 'Low pressure and high temperature' },
+    answer: 'C',
+    explanation: 'High P: volume of molecules matters. Low T: intermolecular forces matter.',
+  },
+  {
+    id: 102, subject: 'Chemistry',
+    text: 'The van der Waals equation corrects ideal gas law for:',
+    options: { A: 'Chemical reactions', B: 'Molecular volume (b) and intermolecular forces (a)', C: 'Pressure only', D: 'Temperature only' },
+    answer: 'B',
+    explanation: '(P + a/V2)(V - b) = RT. a corrects pressure, b corrects volume.',
+  },
+  {
+    id: 103, subject: 'Chemistry',
+    text: 'Charcoal adsorbs gases because:',
+    options: { A: 'It is black', B: 'It is carbon', C: 'High surface area (porous structure)', D: 'It is solid' },
+    answer: 'C',
+    explanation: 'Adsorption (surface) vs absorption (volume). Activated charcoal has huge surface area.',
+  },
+  {
+    id: 104, subject: 'Chemistry',
+    text: 'A catalyst increases reaction rate by:',
+    options: { A: 'Increasing temperature', B: 'Shifting equilibrium', C: 'Lowering activation energy', D: 'Increasing concentration' },
+    answer: 'C',
+    explanation: 'Catalyst provides alternative pathway with lower Ea.',
+    exception: 'Catalyst doesn\'t change ΔH, ΔG, or equilibrium position.',
+  },
+  {
+    id: 105, subject: 'Chemistry',
+    text: 'Rate = k[A]2[B]. If [A] doubles and [B] triples, rate:',
+    options: { A: 'Increases 6x', B: 'Doubles', C: 'Triples', D: 'Increases 12x (2² × 3)' },
+    answer: 'D',
+    explanation: 'Rate_new = k(2[A])2(3[B]) = 4 × 3 × k[A]2[B] = 12 × Rate_old.',
+  },
+
+  /* ─────────────────────────────────────────────
+     PHYSICS  ·  Questions 106 – 140
+     ───────────────────────────────────────────── */
+  {
+    id: 106, subject: 'Physics',
+    text: 'A car accelerates uniformly from rest to 30 m/s in 10 s. What is the distance covered?',
+    options: { A: '300 m', B: '150 m', C: '3 m', D: '600 m' },
+    answer: 'B',
+    explanation: 'v = u + at → a = 3 m/s². s = ut + ½at² = 0 + ½(3)(100) = 150 m. Equivalently, s = (u + v)/2 × t = 15 × 10 = 150 m.',
+    exception: 'Students write s = vt = 30 × 10 = 300 m, forgetting velocity built from 0, not a constant 30 m/s.',
+  },
+  {
+    id: 107, subject: 'Physics',
+    text: 'A ball is thrown vertically upward at 20 m/s. How high does it reach? (g = 10 m/s²)',
+    options: { A: '10 m', B: '40 m', C: '20 m', D: '2 m' },
+    answer: 'C',
+    explanation: 'At maximum height, v = 0. Using v² = u² − 2gs: 0 = 400 − 20s, so s = 20 m.',
+    exception: 'Crossover trap with Maths — same quadratic structure. The most common mistake is using +g instead of −g, giving s = −20 m.',
+  },
+  {
+    id: 108, subject: 'Physics',
+    text: 'A projectile is launched at 45° with initial speed 20 m/s. What is the horizontal range? (g = 10 m/s²)',
+    options: { A: '40 m', B: '20 m', C: '80 m', D: '10 m' },
+    answer: 'A',
+    explanation: 'R = u²sin(2θ)/g = (400 × sin 90°)/10 = 40 m. sin 90° = 1, so 45° gives maximum range.',
+    exception: 'Students confuse sin(2θ) with 2sin(θ). sin(2 × 45°) = sin(90°) = 1; 2sin(45°) = √2 ≠ 1.',
+  },
+  {
+    id: 109, subject: 'Physics',
+    text: 'A force of 50 N acts on a 10 kg mass. What acceleration does it produce?',
+    options: { A: '500 m/s²', B: '0.2 m/s²', C: '5 m/s²', D: '60 m/s²' },
+    answer: 'C',
+    explanation: 'Newton\'s second law: F = ma → a = F/m = 50/10 = 5 m/s².',
+    exception: 'Units check: N ÷ kg = kg·m/s² ÷ kg = m/s². Always verify units in Newton\'s law questions.',
+  },
+  {
+    id: 110, subject: 'Physics',
+    text: 'A 5 kg object moves at 4 m/s. What is its kinetic energy?',
+    options: { A: '20 J', B: '10 J', C: '80 J', D: '40 J' },
+    answer: 'D',
+    explanation: 'KE = ½mv² = ½ × 5 × 4² = ½ × 5 × 16 = 40 J.',
+    exception: 'Forgetting to square v gives ½ × 5 × 4 = 10 J. The v² is the most skipped step in this formula.',
+  },
+  {
+    id: 111, subject: 'Physics',
+    text: 'A 2 kg mass is raised 5 m vertically. What work was done against gravity? (g = 10 m/s²)',
+    options: { A: '10 J', B: '100 J', C: '25 J', D: '1000 J' },
+    answer: 'B',
+    explanation: 'W = mgh = 2 × 10 × 5 = 100 J. This equals the gravitational potential energy gained.',
+    exception: 'Work done against gravity depends only on vertical height, NOT the path taken. A ramp or direct lift gives the same answer.',
+  },
+  {
+    id: 112, subject: 'Physics',
+    text: 'Which expression for power is correct?',
+    options: { A: 'P = F × v', B: 'P = W × t', C: 'P = ma', D: 'P = E/m' },
+    answer: 'A',
+    explanation: 'P = W/t = (F × s)/t = F × v. When a force moves an object at velocity v, power = Fv.',
+    exception: 'P = W × t is wrong — it inverts the relationship. Power = work PER unit time, not work TIMES time.',
+  },
+  {
+    id: 113, subject: 'Physics',
+    text: 'A machine has 75% efficiency. If useful output is 300 J, total input work is:',
+    options: { A: '225 J', B: '400 J', C: '375 J', D: '300 J' },
+    answer: 'B',
+    explanation: 'Efficiency = output/input. Input = output/efficiency = 300/0.75 = 400 J.',
+    exception: 'The 100 J "lost" is not destroyed — it becomes heat, sound, or deformation energy. Energy is always conserved.',
+  },
+  {
+    id: 114, subject: 'Physics',
+    text: 'A 1000 kg car at 20 m/s must stop in 50 m. What braking force is required?',
+    options: { A: '2000 N', B: '400 N', C: '4000 N', D: '200 N' },
+    answer: 'C',
+    explanation: 'First: v² = u² + 2as → 0 = 400 + 100a → a = −4 m/s². Then: F = ma = 1000 × 4 = 4000 N.',
+    exception: 'Crossover trap — you must apply kinematics before Newton\'s law. Students who jump straight to F = ma have no value for a.',
+  },
+  {
+    id: 115, subject: 'Physics',
+    text: 'A 5 kg block rests on a surface with coefficient of static friction μ = 0.4. The maximum static friction is: (g = 10 m/s²)',
+    options: { A: '50 N', B: '0.08 N', C: '20 N', D: '2 N' },
+    answer: 'C',
+    explanation: 'f_max = μN = μmg = 0.4 × 5 × 10 = 20 N. This is the maximum force before the block starts moving.',
+    exception: 'Static friction is self-adjusting — if you push with 10 N, friction is exactly 10 N (not 20 N). The formula gives the maximum, not the actual value.',
+  },
+  {
+    id: 116, subject: 'Physics',
+    text: 'An object in uniform circular motion at constant speed has:',
+    options: { A: 'Constant velocity and zero acceleration', B: 'Changing velocity and centripetal acceleration toward the centre', C: 'Centrifugal acceleration away from centre', D: 'No net force acting' },
+    answer: 'B',
+    explanation: 'Speed is constant but velocity (a vector) changes direction continuously — therefore acceleration exists. It points toward the centre (centripetal).',
+    exception: '"Centrifugal force" is a fictitious force in a rotating frame. In the ground frame, only centripetal force exists. No inward force = object moves in a straight line.',
+  },
+  {
+    id: 117, subject: 'Physics',
+    text: 'A satellite of mass m orbits Earth at radius r with speed v. The centripetal force is:',
+    options: { A: 'mv/r', B: 'mv²/r', C: 'mr/v²', D: 'mgr' },
+    answer: 'B',
+    explanation: 'F_c = mv²/r. For an orbiting satellite, gravity provides this force: GMm/r² = mv²/r.',
+    exception: 'The satellite is in freefall — it is continually falling toward Earth but moving sideways fast enough to keep missing. There is no "centrifugal" counterbalance.',
+  },
+  {
+    id: 118, subject: 'Physics',
+    text: 'In simple harmonic motion (SHM), maximum kinetic energy occurs at:',
+    options: { A: 'Maximum displacement (amplitude)', B: 'The endpoints of oscillation', C: 'The equilibrium position', D: 'Midpoint between equilibrium and amplitude' },
+    answer: 'C',
+    explanation: 'At equilibrium, potential energy = 0 and all energy is kinetic → v_max = ωA. At the endpoints, v = 0 and all energy is potential.',
+    exception: 'Maximum acceleration occurs at maximum displacement (endpoints), NOT at equilibrium. Acceleration and velocity are 90° out of phase in SHM.',
+  },
+  {
+    id: 119, subject: 'Physics',
+    text: 'The period of a simple pendulum depends on:',
+    options: { A: 'Mass of the bob', B: 'Initial amplitude (for small angles)', C: 'Length of string and g only', D: 'Mass and length both' },
+    answer: 'C',
+    explanation: 'T = 2π√(L/g). Mass cancels out. Period increases if L increases or if g decreases (e.g., on the moon).',
+    exception: 'For large angles, the approximation breaks down and T increases slightly with amplitude. JAMB assumes small-angle approximation unless stated.',
+  },
+  {
+    id: 120, subject: 'Physics',
+    text: 'Two sound sources of frequencies 256 Hz and 260 Hz are played together. The beat frequency heard is:',
+    options: { A: '516 Hz', B: '2 Hz', C: '4 Hz', D: '258 Hz' },
+    answer: 'C',
+    explanation: 'Beat frequency = |f₁ − f₂| = |260 − 256| = 4 Hz. This is perceived as 4 loudness pulses per second.',
+    exception: '516 Hz is the sum of frequencies — that gives a note, not beats. Beats require two closely spaced frequencies, heard as periodic amplitude variation.',
+  },
+  {
+    id: 121, subject: 'Physics',
+    text: 'The speed of sound is greatest in which medium?',
+    options: { A: 'Vacuum', B: 'Air at room temperature', C: 'Water', D: 'Steel' },
+    answer: 'D',
+    explanation: 'Sound speed increases with elasticity and decreases with density. Steel ≈ 5000 m/s; water ≈ 1500 m/s; air ≈ 340 m/s. Sound cannot travel in vacuum.',
+    exception: 'Light travels FASTEST in vacuum and slows in denser media — the opposite pattern to sound. Students who confuse the two choose vacuum.',
+  },
+  {
+    id: 122, subject: 'Physics',
+    text: 'A sound wave has frequency 500 Hz and wavelength 0.68 m. Its speed is:',
+    options: { A: '0.00136 m/s', B: '735 m/s', C: '340 m/s', D: '170 m/s' },
+    answer: 'C',
+    explanation: 'v = fλ = 500 × 0.68 = 340 m/s. This is the speed of sound in air at approximately 15°C.',
+  },
+  {
+    id: 123, subject: 'Physics',
+    text: 'Total internal reflection occurs when light travels from glass to air. This requires:',
+    options: { A: 'Any angle of incidence', B: 'Angle of incidence less than critical angle', C: 'Angle of incidence greater than or equal to the critical angle', D: 'Only when the glass is curved' },
+    answer: 'C',
+    explanation: 'TIR occurs when the angle of incidence ≥ critical angle AND light travels from denser to less dense medium. sin(c) = n₂/n₁ = 1/1.5 ≈ 41.8° for glass-air.',
+    exception: 'TIR is impossible going from air to glass (rarer to denser). Light always refracts in that direction — never reflects entirely.',
+  },
+  {
+    id: 124, subject: 'Physics',
+    text: 'A convex lens (f = 20 cm) has an object at 30 cm. Using the lens formula, the image distance is:',
+    options: { A: '60 cm (real, inverted)', B: '−60 cm', C: '12 cm', D: '−12 cm' },
+    answer: 'A',
+    explanation: '1/f = 1/v − 1/u. Taking u = −30 cm: 1/20 = 1/v + 1/30 → 1/v = 1/20 − 1/30 = 1/60. v = 60 cm (real image).',
+    exception: 'Sign convention is the biggest source of error in optics. Choose one convention and apply it consistently throughout a single calculation.',
+  },
+  {
+    id: 125, subject: 'Physics',
+    text: 'A plane mirror always forms an image that is:',
+    options: { A: 'Real, inverted, same size', B: 'Virtual, erect, same size', C: 'Virtual, inverted, magnified', D: 'Real, erect, diminished' },
+    answer: 'B',
+    explanation: 'Plane mirror: image is virtual (behind mirror), erect (right-way up), same size (magnification = 1), same distance behind mirror as object is in front.',
+    exception: 'The image is laterally inverted (left becomes right), but NOT vertically inverted. Students confuse lateral inversion with vertical flip.',
+  },
+  {
+    id: 126, subject: 'Physics',
+    text: 'Two point charges +3 μC and −3 μC are separated by 0.03 m. The electrostatic force between them is: (k = 9 × 10⁹ N m² C⁻²)',
+    options: { A: '90 N', B: '9 N', C: '0.09 N', D: '900 N' },
+    answer: 'A',
+    explanation: 'F = kq₁q₂/r² = (9×10⁹ × 3×10⁻⁶ × 3×10⁻⁶)/(0.03)² = 81×10⁻³/9×10⁻⁴ = 90 N.',
+    exception: 'Opposite charges attract — the force is attractive, magnitude 90 N. The negative sign in the formula signals direction only; magnitude is still 90 N.',
+  },
+  {
+    id: 127, subject: 'Physics',
+    text: 'A 10 Ω resistor has 50 V across it. What current flows through it?',
+    options: { A: '500 A', B: '5 A', C: '0.2 A', D: '0.5 A' },
+    answer: 'B',
+    explanation: 'Ohm\'s law: I = V/R = 50/10 = 5 A.',
+    exception: 'V = IR is Ohm\'s law only if resistance is constant (ohmic conductor). Non-ohmic devices (diodes, filament bulbs) change resistance with current.',
+  },
+  {
+    id: 128, subject: 'Physics',
+    text: 'Resistors of 2 Ω, 3 Ω, and 6 Ω are connected in parallel. The combined resistance is:',
+    options: { A: '11 Ω', B: '6 Ω', C: '1 Ω', D: '3 Ω' },
+    answer: 'C',
+    explanation: '1/R = 1/2 + 1/3 + 1/6 = 3/6 + 2/6 + 1/6 = 6/6 = 1. Therefore R = 1 Ω.',
+    exception: 'Parallel resistance is ALWAYS less than the smallest individual resistor. If your answer is ≥ 2 Ω here, it is wrong. This is a reliable self-check.',
+  },
+  {
+    id: 129, subject: 'Physics',
+    text: 'A 4 Ω resistor carries a current of 3 A. Power dissipated is:',
+    options: { A: '12 W', B: '0.75 W', C: '36 W', D: '48 W' },
+    answer: 'C',
+    explanation: 'P = I²R = 3² × 4 = 9 × 4 = 36 W. Equivalent forms: P = IV = I²R = V²/R.',
+    exception: 'Choose the formula based on what you are given. Given I and R → use I²R. Given V and R → use V²/R. Given I and V → use IV.',
+  },
+  {
+    id: 130, subject: 'Physics',
+    text: 'A capacitor of capacitance C is charged to voltage V. The energy stored is:',
+    options: { A: 'E = QV', B: 'E = ½QV = ½CV²', C: 'E = CV', D: 'E = Q/V' },
+    answer: 'B',
+    explanation: 'E = ½CV². The ½ arises because voltage increases linearly from 0 to V as charge builds — the average voltage during charging is V/2.',
+    exception: 'E = QV (without ½) overcounts — it assumes constant voltage V throughout charging, which is false. This is one of the most frequently misremembered formulas.',
+  },
+  {
+    id: 131, subject: 'Physics',
+    text: 'An EMF of 12 V is induced in a coil when flux changes by 0.6 Wb in 0.05 s. The number of turns is:',
+    options: { A: '36', B: '1', C: '10', D: '0.36' },
+    answer: 'C',
+    explanation: 'Faraday\'s law: EMF = N × ΔΦ/Δt → N = EMF × Δt/ΔΦ = 12 × 0.05/0.6 = 10 turns.',
+    exception: 'EMF depends on the RATE of flux change (ΔΦ/Δt), not on flux magnitude alone. A constant flux induces zero EMF.',
+  },
+  {
+    id: 132, subject: 'Physics',
+    text: 'Lenz\'s law states that the direction of induced current is such that it:',
+    options: { A: 'Flows in the same direction as the applied magnetic field', B: 'Opposes the change in flux that caused it', C: 'Maximises the induced EMF', D: 'Flows perpendicular to the conductor' },
+    answer: 'B',
+    explanation: 'Lenz\'s law is a consequence of energy conservation. If induced current aided the flux change, we could get energy for free — which violates conservation of energy.',
+    exception: 'This is why electric generators require mechanical work input — the induced current creates a magnetic force opposing the rotation (back-EMF).',
+  },
+  {
+    id: 133, subject: 'Physics',
+    text: 'A transformer has 100 primary turns and 500 secondary turns. Input voltage = 240 V. Output voltage is:',
+    options: { A: '48 V', B: '1200 V', C: '240 V', D: '24 V' },
+    answer: 'B',
+    explanation: 'V_s/V_p = N_s/N_p → V_s = 240 × 500/100 = 1200 V. More secondary turns = step-up transformer.',
+    exception: 'A step-up transformer increases voltage but decreases current by the same ratio (P = IV, power conserved). High voltage is NOT high power.',
+  },
+  {
+    id: 134, subject: 'Physics',
+    text: 'Radioactive decay rate is:',
+    options: { A: 'Proportional to temperature', B: 'Affected by chemical state of the element', C: 'Constant and independent of all external physical conditions', D: 'Proportional to pressure' },
+    answer: 'C',
+    explanation: 'Radioactive decay is a nuclear process — completely unaffected by temperature, pressure, chemical environment, or electromagnetic fields.',
+    exception: 'This is what fundamentally distinguishes nuclear reactions from chemical reactions. A chemistry student\'s instinct is to say "temperature increases rate" — correct for chemistry, wrong for radioactivity.',
+  },
+  {
+    id: 135, subject: 'Physics',
+    text: 'A radioactive sample has a half-life of 3 days. After 12 days, what fraction of the original sample remains?',
+    options: { A: '1/8', B: '1/4', C: '1/16', D: '1/2' },
+    answer: 'C',
+    explanation: '12 days ÷ 3 days = 4 half-lives. Remaining fraction = (½)⁴ = 1/16.',
+    exception: 'First compute number of half-lives (n = total time / t½), then raise ½ to that power. Students who just divide 1/2 by 12 get a nonsense answer.',
+  },
+  {
+    id: 136, subject: 'Physics',
+    text: 'Alpha (α) particles are:',
+    options: { A: 'High-energy electrons', B: 'Electromagnetic radiation (photons)', C: 'Helium-4 nuclei — 2 protons + 2 neutrons, charge +2', D: 'Neutrons ejected from the nucleus' },
+    answer: 'C',
+    explanation: 'α-particle = ⁴₂He nucleus. Stopped by a sheet of paper or a few centimetres of air. Most ionising of the three radiation types despite lowest penetration.',
+    exception: 'Penetration vs ionisation are inversely related: α (least penetrating, most ionising) → β → γ (most penetrating, least ionising). Students often reverse these.',
+  },
+  {
+    id: 137, subject: 'Physics',
+    text: 'The pressure at depth h in a fluid of density ρ is:',
+    options: { A: 'P = ρg/h', B: 'P = ρh', C: 'P = ρgh', D: 'P = gh/ρ' },
+    answer: 'C',
+    explanation: 'P = ρgh. This is gauge pressure — pressure due to the fluid column above. Absolute pressure also includes atmospheric pressure: P_abs = P_atm + ρgh.',
+    exception: 'Pressure acts equally in all directions at the same depth (Pascal\'s principle). It does not depend on the shape of the container.',
+  },
+  {
+    id: 138, subject: 'Physics',
+    text: 'According to Archimedes\' principle, the upthrust on an object equals:',
+    options: { A: 'Weight of the object', B: 'Volume of the object', C: 'Weight of the fluid displaced by the object', D: 'Mass of the object × g' },
+    answer: 'C',
+    explanation: 'Upthrust = ρ_fluid × V_submerged × g = weight of displaced fluid. Object floats when upthrust equals its weight (density ≤ density of fluid).',
+    exception: 'A steel ship floats because its hull encloses air — its average density is less than water even though steel itself is denser. Volume matters, not just material.',
+  },
+  {
+    id: 139, subject: 'Physics',
+    text: 'The specific heat capacity of water is 4200 J kg⁻¹ K⁻¹. Energy required to heat 2 kg of water by 5°C:',
+    options: { A: '4200 J', B: '42000 J', C: '210 J', D: '2100 J' },
+    answer: 'B',
+    explanation: 'Q = mcΔT = 2 × 4200 × 5 = 42 000 J.',
+    exception: '"Specific" in specific heat capacity means per kg. You must multiply by mass. Then multiply again by temperature change. Forgetting either multiplication is the typical error.',
+  },
+  {
+    id: 140, subject: 'Physics',
+    text: 'Which of the following is a LONGITUDINAL wave?',
+    options: { A: 'X-rays', B: 'Sound waves in air', C: 'Visible light', D: 'Microwaves' },
+    answer: 'B',
+    explanation: 'Sound travels as compressions and rarefactions — particle oscillation is parallel to wave direction (longitudinal). All electromagnetic waves (X-ray, light, microwave) are transverse.',
+    exception: 'The definitive test: can the wave be polarised? Only transverse waves can be polarised. Sound cannot be polarised — confirming it is longitudinal.',
+  },
+
+  /* ─────────────────────────────────────────────
+     BATCH 2  ·  Questions 141 – 175
+     New nodes: mole concept, momentum, GP, organic
+     chemistry, gas laws, latent heat, binomial,
+     stoichiometry, matrices, photoelectric effect,
+     conditional probability, oral English (stress),
+     nuclear equations, electric field, partial
+     fractions, idioms, reported speech, terminal v.
+     ───────────────────────────────────────────── */
+  {
+    id: 141, subject: 'Chemistry',
+    text: 'What is the number of moles in 11 g of CO₂? (C = 12, O = 16)',
+    options: { A: '0.25 mol', B: '0.5 mol', C: '2 mol', D: '4 mol' },
+    answer: 'A',
+    explanation: 'Molar mass of CO₂ = 12 + (2×16) = 44 g/mol. Moles = mass/Mr = 11/44 = 0.25 mol.',
+    exception: 'Students use atomic mass of C (12) instead of molar mass of the whole molecule (44). Always sum all atoms in the formula first.',
+  },
+  {
+    id: 142, subject: 'Physics',
+    text: 'A 2 kg ball moving at 5 m/s strikes a wall and rebounds at 3 m/s in the opposite direction. The magnitude of the change in momentum is:',
+    options: { A: '4 kg m/s', B: '16 kg m/s', C: '6 kg m/s', D: '10 kg m/s' },
+    answer: 'B',
+    explanation: 'Δp = m(v_f − v_i). Taking initial direction as positive: v_i = +5, v_f = −3. Δp = 2(−3 − 5) = −16 kg m/s. Magnitude = 16 kg m/s.',
+    exception: 'The trap answer is 4 kg m/s — students subtract magnitudes (5 − 3 = 2, × 2 = 4). Direction reversal means you ADD the speed magnitudes when computing the change in momentum.',
+  },
+  {
+    id: 143, subject: 'Mathematics',
+    text: 'The equation x² + kx + 4 = 0 has equal roots. Find all possible values of k.',
+    options: { A: 'k = 4 only', B: 'k = ±4', C: 'k = ±2', D: 'k = 2 only' },
+    answer: 'B',
+    explanation: 'Equal roots when discriminant = 0: b² − 4ac = k² − 16 = 0 → k² = 16 → k = ±4.',
+    exception: 'Students pick k = 4 only, missing the negative solution. Both k = 4 (double root at −2) and k = −4 (double root at +2) satisfy the condition.',
+  },
+  {
+    id: 144, subject: 'Chemistry',
+    text: 'Ethene decolourises bromine water because ethene undergoes:',
+    options: { A: 'Substitution', B: 'Addition', C: 'Elimination', D: 'Oxidation' },
+    answer: 'B',
+    explanation: 'The C=C double bond reacts with Br₂: CH₂=CH₂ + Br₂ → CH₂BrCH₂Br. The double bond breaks and bromine adds across it. Decolourisation of bromine water is the test for unsaturation (C=C).',
+    exception: 'Alkanes react with halogens via substitution (in UV light), not addition. Students confuse alkene/alkane reaction types. The presence of C=C is what enables addition.',
+  },
+  {
+    id: 145, subject: 'Physics',
+    text: 'A gas occupies 4 L at 2 atm. At constant temperature, what volume does it occupy at 8 atm?',
+    options: { A: '16 L', B: '2 L', C: '1 L', D: '32 L' },
+    answer: 'C',
+    explanation: 'Boyle\'s Law: P₁V₁ = P₂V₂ (constant T). 2 × 4 = 8 × V₂ → V₂ = 1 L.',
+    exception: 'Pressure and volume are inversely proportional — pressure × 4 means volume ÷ 4. Students who choose 16 L have multiplied; they\'ve applied direct instead of inverse proportion.',
+  },
+  {
+    id: 146, subject: 'Mathematics',
+    text: 'The 3rd term of a GP is 18 and the 5th term is 162. Find the common ratio.',
+    options: { A: '9', B: '6', C: '3', D: '2' },
+    answer: 'C',
+    explanation: 'T₅/T₃ = ar⁴/ar² = r² = 162/18 = 9 → r = 3.',
+    exception: 'r = 9 is the trap — that is r², not r. Dividing consecutive-power terms cancels \'a\' cleanly without needing to find it first.',
+  },
+  {
+    id: 147, subject: 'English',
+    text: 'Which syllable carries the primary stress in the word "PHOTOGRAPHY"?',
+    options: { A: 'First (PHO-)', B: 'Second (-TOG-)', C: 'Third (-ra-)', D: 'Fourth (-phy)' },
+    answer: 'B',
+    explanation: 'pho-TOG-ra-phy. Stress on the second syllable. Compare: PHO-to-graph (stress on first) and pho-to-GRAPH-ic (stress on third). Same root, different stress each time the word grows longer.',
+    exception: 'This stress-shift pattern across word forms (noun → derived noun → adjective) is a core JAMB oral English pattern. The stress moves rightward as the word gains syllables.',
+  },
+  {
+    id: 148, subject: 'Chemistry',
+    text: 'A compound contains 40% carbon, 6.7% hydrogen, and 53.3% oxygen by mass. Its empirical formula is: (C = 12, H = 1, O = 16)',
+    options: { A: 'CHO', B: 'CH₂O', C: 'CH₃O', D: 'C₂H₄O₂' },
+    answer: 'B',
+    explanation: 'Divide each % by atomic mass: C = 40/12 = 3.33, H = 6.7/1 = 6.7, O = 53.3/16 = 3.33. Divide by smallest (3.33): C:H:O = 1:2:1 → CH₂O.',
+    exception: 'CH₂O and C₂H₄O₂ have the SAME empirical formula — C₂H₄O₂ is a molecular formula that doubles it. Empirical formula is the simplest whole-number ratio, not the actual molecule.',
+  },
+  {
+    id: 149, subject: 'Physics',
+    text: 'A 4 kg trolley moving at 6 m/s collides with and sticks to a stationary 2 kg trolley. Their common speed after collision is:',
+    options: { A: '6 m/s', B: '3 m/s', C: '4 m/s', D: '2 m/s' },
+    answer: 'C',
+    explanation: 'Conservation of momentum: m₁v₁ = (m₁ + m₂)v₂. 4 × 6 = 6 × v₂ → v₂ = 4 m/s.',
+    exception: 'This is a perfectly inelastic collision — objects stick together, KE is NOT conserved. Momentum is always conserved. Students who try to use KE conservation get v = 6 m/s.',
+  },
+  {
+    id: 150, subject: 'Mathematics',
+    text: 'Express x² − 6x + 11 in the form (x − a)² + b. Find the value of b.',
+    options: { A: '9', B: '2', C: '11', D: '-9' },
+    answer: 'B',
+    explanation: '(x − 3)² = x² − 6x + 9. So x² − 6x + 11 = (x − 3)² + 2. b = 2.',
+    exception: 'The minimum value of the expression is b = 2, occurring at x = 3. Students write (x − 3)² + 9 by forgetting to adjust: completing the square adds 9, so the remaining constant is 11 − 9 = 2, not 9.',
+  },
+  {
+    id: 151, subject: 'Chemistry',
+    text: 'During electrolysis of dilute sulphuric acid, the gas produced at the CATHODE is:',
+    options: { A: 'Oxygen', B: 'Sulphur dioxide', C: 'Hydrogen', D: 'Sulphur trioxide' },
+    answer: 'C',
+    explanation: 'Cathode = reduction. H⁺ ions migrate to cathode and gain electrons: 2H⁺ + 2e⁻ → H₂. Oxygen forms at the anode: 2H₂O → O₂ + 4H⁺ + 4e⁻.',
+    exception: 'In electrolytic cells, anode is positive and cathode is negative. But oxidation still occurs at anode, reduction at cathode — same rule as galvanic cells. The sign assignment differs, but the OIL RIG rule never changes.',
+  },
+  {
+    id: 152, subject: 'Physics',
+    text: 'Energy needed to melt 2 kg of ice at 0°C without raising its temperature: (specific latent heat of fusion of ice = 334 kJ/kg)',
+    options: { A: '334 kJ', B: '167 kJ', C: '668 kJ', D: '1002 kJ' },
+    answer: 'C',
+    explanation: 'Q = mL = 2 × 334 = 668 kJ. Latent heat involves NO temperature change — energy goes entirely into breaking the intermolecular bonds holding ice together.',
+    exception: 'Students reach for Q = mcΔT with ΔT = 0, getting Q = 0. That formula only applies when temperature changes. A phase change at constant temperature is exactly what the latent heat formula Q = mL is for.',
+  },
+  {
+    id: 153, subject: 'English',
+    text: 'The phrasal verb "to come across" means:',
+    options: { A: 'To cross a busy road', B: 'To encounter unexpectedly', C: 'To arrive after a long journey', D: 'To surpass everyone' },
+    answer: 'B',
+    explanation: '"Come across" = encounter by chance. "I came across my old passport" = found it unexpectedly. Phrasal verbs rarely carry the sum of their literal parts.',
+    exception: 'JAMB always tests the idiomatic meaning, never the literal reading. If a literal-sounding option and an idiomatic option both exist, the idiomatic one is almost always correct.',
+  },
+  {
+    id: 154, subject: 'Mathematics',
+    text: 'A force of 3 N and a force of 4 N act on a point at right angles to each other. Their resultant is:',
+    options: { A: '7 N', B: '1 N', C: '5 N', D: '12 N' },
+    answer: 'C',
+    explanation: 'Resultant = √(3² + 4²) = √(9 + 16) = √25 = 5 N. Right angle → Pythagoras.',
+    exception: '7 N assumes the forces act in the same direction. 12 N is 3 × 4. Perpendicular vectors always require Pythagoras, not arithmetic addition. Classic Maths/Physics crossover.',
+  },
+  {
+    id: 155, subject: 'Chemistry',
+    text: 'In the reaction 2H₂ + O₂ → 2H₂O, how many moles of water are produced from 0.5 mol of O₂?',
+    options: { A: '0.5 mol', B: '2 mol', C: '0.25 mol', D: '1 mol' },
+    answer: 'D',
+    explanation: 'From coefficients: 1 mol O₂ → 2 mol H₂O. So 0.5 mol O₂ → 0.5 × 2 = 1 mol H₂O.',
+    exception: 'Students read O₂:H₂O as 1:1 and answer 0.5 mol. The coefficients in the balanced equation give the mole ratio — 1 mol O₂ produces 2 mol H₂O, not 1.',
+  },
+  {
+    id: 156, subject: 'Physics',
+    text: 'A gas has volume 300 cm³ at 27°C. At constant pressure, its volume at 127°C is:',
+    options: { A: '1411 cm³', B: '400 cm³', C: '200 cm³', D: '300 cm³' },
+    answer: 'B',
+    explanation: 'Charles\' Law: V₁/T₁ = V₂/T₂. Convert to Kelvin: T₁ = 300 K, T₂ = 400 K. V₂ = 300 × (400/300) = 400 cm³.',
+    exception: '1411 cm³ is the trap: 300 × 127/27, using Celsius. Gas laws require absolute temperature (Kelvin). Adding 273 is non-negotiable — the question giving "27°C and 127°C" (whose Kelvin values are clean 300 K and 400 K) is a deliberate JAMB pattern.',
+  },
+  {
+    id: 157, subject: 'English',
+    text: 'In the word pair "RE-cord" (noun) and "re-CORD" (verb), the stress difference illustrates:',
+    options: { A: 'Stress always falls on the first syllable in English', B: 'Nouns and verbs of the same spelling often carry different stress', C: 'Verbs are always unstressed in isolation', D: 'Two-syllable words follow no predictable rule' },
+    answer: 'B',
+    explanation: 'RE-cord (noun) → re-CORD (verb). The same pattern: PER-mit/per-MIT, CON-duct/con-DUCT, RE-fuse/re-FUSE, PRO-ject/pro-JECT.',
+    exception: 'Not all noun/verb pairs shift: LOVE, HOPE, VISIT, WATER do not. The pattern mainly applies to two-syllable words of Latin or French origin where both syllables are relatively equal in weight.',
+  },
+  {
+    id: 158, subject: 'Mathematics',
+    text: 'Find the 3rd term in the binomial expansion of (1 + x)⁵.',
+    options: { A: '5x', B: '10x³', C: '10x²', D: '5x⁴' },
+    answer: 'C',
+    explanation: 'T_{r+1} = C(5, r) × xʳ. For 3rd term: r = 2. T₃ = C(5,2) × x² = 10x².',
+    exception: 'Students set r = 3 for the 3rd term. The formula T_{r+1} means the 3rd term (T₃) requires r = 2. This off-by-one error is the single most common binomial expansion mistake.',
+  },
+  {
+    id: 159, subject: 'Chemistry',
+    text: 'In the Contact Process for manufacturing sulphuric acid, the catalyst in the oxidation of SO₂ to SO₃ is:',
+    options: { A: 'Iron', B: 'Nickel', C: 'Platinum', D: 'Vanadium(V) oxide' },
+    answer: 'D',
+    explanation: '2SO₂ + O₂ ⇌ 2SO₃. Catalyst: V₂O₅ at ~450°C. SO₃ is absorbed in concentrated H₂SO₄ (forming oleum), not in water directly.',
+    exception: 'Platinum was the original catalyst but is easily poisoned by impurities. V₂O₅ is cheaper and more robust. Iron is the Haber process catalyst (for NH₃). Confusing the two industrial processes is one of the most repeated errors in JAMB Chemistry.',
+  },
+  {
+    id: 160, subject: 'Physics',
+    text: 'In the photoelectric effect, increasing light INTENSITY while keeping frequency constant will:',
+    options: { A: 'Increase the maximum KE of emitted electrons', B: 'Increase the number of electrons emitted per second', C: 'Decrease the threshold frequency', D: 'Have no effect on emission' },
+    answer: 'B',
+    explanation: 'More intensity = more photons per second = more electrons ejected per second. But KE per electron = hf − φ, which depends only on frequency — intensity does not change it.',
+    exception: 'Classical wave theory predicted intensity would increase electron KE. It does not — this is precisely what shattered classical physics and demanded quantum explanation. Frequency controls energy per photon; intensity controls photon count.',
+  },
+  {
+    id: 161, subject: 'Mathematics',
+    text: 'Find the determinant of the matrix [[3, 2], [1, 4]].',
+    options: { A: '14', B: '10', C: '-10', D: '5' },
+    answer: 'B',
+    explanation: 'det = (3 × 4) − (2 × 1) = 12 − 2 = 10.',
+    exception: '14 = 3×4 + 2×1. Students compute ad + bc instead of ad − bc. The determinant formula is STRICTLY subtraction: top-left × bottom-right MINUS top-right × bottom-left.',
+  },
+  {
+    id: 162, subject: 'English',
+    text: '"I will come tomorrow," she said. Which reported speech version is correct?',
+    options: { A: 'She said she will come tomorrow.', B: 'She said she would come the following day.', C: 'She said she would come tomorrow.', D: 'She said she comes the following day.' },
+    answer: 'B',
+    explanation: 'Tense backshift: will → would. Time expression shift: tomorrow → the following day (when reporting is not simultaneous with the utterance).',
+    exception: 'Option C keeps "tomorrow" — acceptable only if reporting immediately. Option A keeps "will" without backshift. JAMB questions assume reporting occurs at a different time from the original statement.',
+  },
+  {
+    id: 163, subject: 'Chemistry',
+    text: 'Uranium-238 (atomic number 92) undergoes alpha decay. The mass number and atomic number of the daughter nucleus are:',
+    options: { A: 'Mass 236, Z = 90', B: 'Mass 234, Z = 91', C: 'Mass 234, Z = 90', D: 'Mass 242, Z = 94' },
+    answer: 'C',
+    explanation: 'Alpha particle = ⁴₂He. Mass number: 238 − 4 = 234. Atomic number: 92 − 2 = 90. The daughter is Thorium-234.',
+    exception: 'Beta decay increases Z by 1 (neutron → proton + electron). Alpha decay decreases A by 4 and Z by 2. Students who mix up the two decay types get option B (Z = 91). Write the equation out if in doubt: ²³⁸₉₂U → ⁴₂He + ²³⁴₉₀Th.',
+  },
+  {
+    id: 164, subject: 'Physics',
+    text: 'A wire of length 0.5 m carrying 4 A is placed perpendicular to a magnetic field of 2 T. The force on the wire is:',
+    options: { A: '8 N', B: '4 N', C: '0.25 N', D: '16 N' },
+    answer: 'B',
+    explanation: 'F = BIL sin θ = 2 × 4 × 0.5 × sin 90° = 4 × 1 = 4 N.',
+    exception: 'F is maximum when current is perpendicular to field (sin 90° = 1). If current were parallel to field (sin 0° = 0), force = 0. Students who omit the sin θ factor or don\'t know the formula get 8 N (2 × 4 × 1).',
+  },
+  {
+    id: 165, subject: 'Mathematics',
+    text: 'Express (3x + 1)/((x + 1)(x − 1)) in partial fractions.',
+    options: { A: '2/(x+1) + 1/(x−1)', B: '1/(x+1) + 2/(x−1)', C: '3/(x+1) − 1/(x−1)', D: '2/(x+1) − 1/(x−1)' },
+    answer: 'B',
+    explanation: 'A/(x+1) + B/(x−1) = (3x+1)/((x+1)(x−1)). Multiply up: 3x+1 = A(x−1) + B(x+1). x=1: 4 = 2B → B=2. x=−1: −2 = −2A → A=1.',
+    exception: 'Students substitute x=1 and assign the result to A instead of B. Always: substitute the root of the factor in the DENOMINATOR of the term you are solving for (root of (x−1) is x=1, which eliminates A\'s term, solving for B).',
+  },
+  {
+    id: 166, subject: 'English',
+    text: 'The idiom "to burn the midnight oil" means:',
+    options: { A: 'To waste valuable resources', B: 'To work or study very late into the night', C: 'To start a fire deliberately', D: 'To cook an elaborate late dinner' },
+    answer: 'B',
+    explanation: 'From the era of oil lamps: burning oil past midnight meant you were working through the night. Now means working or studying very late.',
+    exception: 'JAMB idiom questions always include a literal-sounding distractor (option C or D here). The idiomatic reading is the correct one — idioms mean something different from the literal sum of their words.',
+  },
+  {
+    id: 167, subject: 'Chemistry',
+    text: 'Adding a non-volatile solute to a pure solvent:',
+    options: { A: 'Lowers the boiling point and raises the freezing point', B: 'Lowers both boiling and freezing points', C: 'Raises the boiling point and lowers the freezing point', D: 'Has no effect on boiling or freezing point' },
+    answer: 'C',
+    explanation: 'Colligative properties: solute lowers vapour pressure → BP rises (needs more energy to vaporise), FP falls (solution must be cooled further before solidifying). Effects go in OPPOSITE directions.',
+    exception: 'Students commonly think both go the same way. The mechanism: solute particles disrupt solvent structure at both phase boundaries, but in different directions — hindering vaporisation (BP up) and hindering crystallisation (FP down).',
+  },
+  {
+    id: 168, subject: 'Physics',
+    text: 'An open pipe of length L resonates at its fundamental frequency. The wavelength of this note is:',
+    options: { A: 'L/2', B: 'L', C: '2L', D: '4L' },
+    answer: 'C',
+    explanation: 'Open pipe: both ends are displacement antinodes. Fundamental = half a wavelength fits in the pipe. L = λ/2 → λ = 2L.',
+    exception: 'Closed pipe (one end closed): node at closed end, antinode at open end. Fundamental: L = λ/4 → λ = 4L. Students swap the two. Open = 2L; Closed = 4L at fundamental.',
+  },
+  {
+    id: 169, subject: 'Mathematics',
+    text: 'The discriminant of x² − 4x + 4 = 0 equals zero. This means the equation has:',
+    options: { A: 'Two distinct real roots', B: 'No real roots', C: 'One repeated real root at x = 2', D: 'Two complex roots' },
+    answer: 'C',
+    explanation: 'b² − 4ac = 16 − 16 = 0 → repeated root. x = −b/2a = 4/2 = 2. The root x = 2 occurs twice.',
+    exception: 'A quadratic always has exactly two roots counting multiplicity. A double root is two roots that happen to be equal. Students expecting "two different values" incorrectly choose option A.',
+  },
+  {
+    id: 170, subject: 'Chemistry',
+    text: 'The compound (CH₃)₂CHOH is classified as:',
+    options: { A: 'Primary alcohol', B: 'Secondary alcohol', C: 'Tertiary alcohol', D: 'Phenol' },
+    answer: 'B',
+    explanation: 'The carbon bearing -OH is attached to two other carbon groups → secondary alcohol (propan-2-ol).',
+    exception: 'Classification depends on how many carbons are attached to the carbon bearing -OH. Primary: 1 carbon (e.g. ethanol). Secondary: 2 carbons. Tertiary: 3 carbons (e.g. (CH₃)₃COH). Count C-C bonds at the OH carbon, not total carbons in molecule.',
+  },
+  {
+    id: 171, subject: 'Physics',
+    text: 'Two parallel plates 0.02 m apart have a potential difference of 100 V. The electric field strength between the plates is:',
+    options: { A: '2 V/m', B: '0.2 V/m', C: '50 V/m', D: '5000 V/m' },
+    answer: 'D',
+    explanation: 'Uniform electric field between parallel plates: E = V/d = 100/0.02 = 5000 V/m.',
+    exception: 'The calculation is 100 ÷ 0.02 = 100 × 50 = 5000. Students who misread 0.02 as 2 (forgetting it\'s in metres) get 50 V/m. Always confirm units — d must be in metres.',
+  },
+  {
+    id: 172, subject: 'English',
+    text: '"The quality of the goods _____ satisfactory." Choose the correct verb form.',
+    options: { A: 'are', B: 'have been', C: 'were', D: 'is' },
+    answer: 'D',
+    explanation: 'Subject = "quality" (singular). "Of the goods" is a prepositional phrase modifying the subject — it does not change subject number. Singular subject → singular verb: "is".',
+    exception: '"Goods" (plural) sits immediately before the verb and creates a phantom pull toward "are". Rule: verb agrees with grammatical subject, never with a noun inside an intervening prepositional phrase.',
+  },
+  {
+    id: 173, subject: 'Mathematics',
+    text: 'A bag has 3 red and 2 blue balls. Two balls are drawn without replacement. P(both red) =',
+    options: { A: '9/25', B: '3/10', C: '6/25', D: '2/5' },
+    answer: 'B',
+    explanation: 'P = P(1st red) × P(2nd red | 1st red) = 3/5 × 2/4 = 6/20 = 3/10.',
+    exception: '9/25 is the answer WITH replacement (3/5 × 3/5). Without replacement, after drawing one red ball, only 4 balls remain with 2 red. The phrase "without replacement" is the trigger to update both numerator and denominator on the second draw.',
+  },
+  {
+    id: 174, subject: 'Chemistry',
+    text: 'A reaction has a theoretical yield of 18 g but produces 13.5 g of product. The percentage yield is:',
+    options: { A: '25%', B: '133%', C: '75%', D: '18%' },
+    answer: 'C',
+    explanation: 'Percentage yield = (actual/theoretical) × 100 = (13.5/18) × 100 = 75%.',
+    exception: '25% is the percentage LOST, not the percentage yield. 133% is impossible — actual yield cannot exceed theoretical yield. If your answer exceeds 100%, the calculation is wrong.',
+  },
+  {
+    id: 175, subject: 'Physics',
+    text: 'A sphere falling through viscous oil reaches terminal velocity when:',
+    options: { A: 'Gravitational force becomes zero', B: 'Drag force alone equals the weight', C: 'Upthrust plus drag force equals the weight', D: 'The sphere is halfway to the bottom' },
+    answer: 'C',
+    explanation: 'Terminal velocity: net force = 0. Upward forces = viscous drag + upthrust (Archimedes). Downward force = weight. Terminal when upthrust + drag = weight.',
+    exception: 'Option B (drag alone = weight) is the simplification for falling in air, where upthrust is negligible. In a liquid, upthrust is significant and must be included. JAMB specifies the medium — read it carefully.',
+  },
+];
+</script>
+
+<!-- Fixed Header -->
+<header class="quiz-header">
+    <div class="quiz-header-container">
+
+        <div class="quiz-header-left">
+            <button class="btn-icon" id="menuBtn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="subject-info">
+                <div class="subject-name" id="subjectName">Science: MEPC</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">175</span></div>
+            </div>
+        </div>
+
+        <div class="quiz-timer-container" id="quizTimerContainer">
+            <div class="timer-progress-ring">
+                <svg viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
+                            stroke="var(--accent)" stroke-width="4"
+                            stroke-dasharray="163.36" stroke-dashoffset="0"
+                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="timer-icon"><i class="fas fa-clock"></i></div>
+            <div class="timer-display" id="timerDisplay">60:00</div>
+        </div>
+
+        <div class="quiz-header-right">
+            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
+                <i class="fas fa-calculator"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
+        </div>
+    </div>
+</header>
+
+<div class="quiz-container">
+
+    <aside class="quiz-sidebar" id="quizSidebar">
+        <div class="sidebar-header">
+            <h3>Navigator</h3>
+            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="answeredCount">0</div>
+                <div class="stat-label">Done</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="unansweredCount">175</div>
+                <div class="stat-label">Left</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="flaggedCount">0</div>
+                <div class="stat-label">Flagged</div>
+            </div>
+        </div>
+        <div class="question-palette" id="questionPalette"></div>
+        <div class="sidebar-legend">
+            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
+            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
+            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
+            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
+        </div>
+        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
+            <a href="science_clusters.html"
+               class="btn btn-secondary"
+               style="width:100%;text-align:center;text-decoration:none;display:block;"
+               onclick="return confirm('Leave quiz? Progress will be lost.')">
+                &#8592; Back
+            </a>
+        </div>
+    </aside>
+
+    <main class="quiz-main">
+        <div class="question-card" id="questionCard">
+            <div class="question-header">
+                <div class="question-number">Question <span id="questionNumber">1</span></div>
+                <button class="btn-flag" id="flagBtn" aria-label="Flag">
+                    <i class="far fa-flag"></i> Flag
+                </button>
+            </div>
+            <div class="question-text" id="questionText">Loading...</div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div class="question-explanation hidden" id="questionExplanation">
+                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
+                <div class="explanation-content" id="explanationContent"></div>
+            </div>
+        </div>
+
+        <div class="quiz-navigation">
+            <button class="btn btn-secondary" id="prevBtn" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-secondary" id="clearBtn">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button class="btn btn-primary" id="nextBtn">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </main>
+</div>
+
+<div class="mobile-palette-trigger" id="mobilePaletteBtn">
+    <i class="fas fa-th"></i> <span>Questions</span>
+</div>
+
+<!-- Submit Modal -->
+<div class="modal-overlay hidden" id="submitModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Submit Test?</h3>
+            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="submit-summary">
+                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">175</span></div>
+                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
+                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">175</span></div>
+                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">60:00</span></div>
+            </div>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>You cannot change answers after submission.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
+            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Time Up Modal -->
+<div class="modal-overlay hidden" id="timeUpModal">
+    <div class="modal">
+        <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
+        <div class="modal-body">
+            <p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="viewResultsBtn">View Results</button>
+        </div>
+    </div>
+</div>
+
+<!-- Calculator Modal -->
+<div class="modal-overlay hidden" id="calculatorModal">
+    <div class="modal calculator-modal">
+        <div class="modal-header">
+            <h3>Calculator</h3>
+            <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="calculator">
+                <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
+                <div class="calculator-buttons">
+                    <button class="calc-btn" data-action="clear">C</button>
+                    <button class="calc-btn" data-action="delete">&#8592;</button>
+                    <button class="calc-btn" data-action="divide">&#247;</button>
+                    <button class="calc-btn" data-action="multiply">&#215;</button>
+                    <button class="calc-btn" data-value="7">7</button>
+                    <button class="calc-btn" data-value="8">8</button>
+                    <button class="calc-btn" data-value="9">9</button>
+                    <button class="calc-btn" data-action="subtract">&#8722;</button>
+                    <button class="calc-btn" data-value="4">4</button>
+                    <button class="calc-btn" data-value="5">5</button>
+                    <button class="calc-btn" data-value="6">6</button>
+                    <button class="calc-btn" data-action="add">+</button>
+                    <button class="calc-btn" data-value="1">1</button>
+                    <button class="calc-btn" data-value="2">2</button>
+                    <button class="calc-btn" data-value="3">3</button>
+                    <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
+                    <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
+                    <button class="calc-btn" data-value=".">.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="quiz-app.js"></script>
+</body>
+</html>
