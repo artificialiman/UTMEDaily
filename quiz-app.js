@@ -1,442 +1,746 @@
-// quiz-app.js — GrantApp AI
-// Zero fetching. Questions are defined as QUESTIONS[] in each quiz page.
-// Duration is defined as DURATION (seconds) in each quiz page.
+// quiz-app.js - UTME Quiz Interface Logic
 
-// ── Quiz State ──────────────────────────────────────────────
+// Question Data Parser
+function parseQuestionFile(text, subject) {
+    const questions = [];
+    const lines = text.split('\n');
+    let currentQuestion = null;
+    let collectingExplanation = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Match question number pattern (e.g., "1. " or "35. ")
+        const questionMatch = line.match(/^(\d+)\.\s+(.+)$/);
+        if (questionMatch) {
+            // Save previous question if exists
+            if (currentQuestion) {
+                questions.push(currentQuestion);
+            }
+            
+            // Start new question
+            currentQuestion = {
+                id: parseInt(questionMatch[1]),
+                subject: subject,
+                text: questionMatch[2],
+                options: {},
+                answer: null,
+                explanation: null,
+                exception: null
+            };
+            collectingExplanation = false;
+            continue;
+        }
+        
+        // Match options (A., B., C., D.)
+        const optionMatch = line.match(/^([A-D])\.\s+(.+)$/);
+        if (optionMatch && currentQuestion) {
+            currentQuestion.options[optionMatch[1]] = optionMatch[2];
+            continue;
+        }
+        
+        // Match answer
+        if (line.startsWith('Answer:') && currentQuestion) {
+            currentQuestion.answer = line.replace('Answer:', '').trim();
+            continue;
+        }
+        
+        // Match explanation
+        if (line.startsWith('Explanation:') && currentQuestion) {
+            currentQuestion.explanation = line.replace('Explanation:', '').trim();
+            collectingExplanation = true;
+            continue;
+        }
+        
+        // Match exception
+        if (line.startsWith('Exception:') && currentQuestion) {
+            currentQuestion.exception = line.replace('Exception:', '').trim();
+            collectingExplanation = false;
+            continue;
+        }
+        
+        // Continue collecting explanation if we're in explanation mode
+        if (collectingExplanation && line && currentQuestion) {
+            currentQuestion.explanation += ' ' + line;
+        }
+    }
+    
+    // Don't forget the last question
+    if (currentQuestion) {
+        questions.push(currentQuestion);
+    }
+    
+    return questions;
+}
+
+// Sample questions (in production, load from files)
+const sampleQuestions = [
+    {
+        id: 1,
+        subject: 'Physics',
+        text: 'A body moving with constant velocity has:',
+        options: {
+            'A': 'Zero acceleration',
+            'B': 'Constant acceleration',
+            'C': 'Increasing acceleration',
+            'D': 'Decreasing acceleration'
+        },
+        answer: 'A',
+        explanation: 'Constant velocity means no change in speed or direction, so a = Δv/Δt = 0.',
+        exception: 'Many confuse velocity with speed; constant speed with changing direction (circular motion) HAS acceleration.'
+    },
+    {
+        id: 2,
+        subject: 'Physics',
+        text: 'An object is thrown vertically upward. At its highest point:',
+        options: {
+            'A': 'Velocity = 0, acceleration = 0',
+            'B': 'Velocity = 0, acceleration = g (downward)',
+            'C': 'Velocity = g, acceleration = 0',
+            'D': 'Both velocity and acceleration are maximum'
+        },
+        answer: 'B',
+        explanation: 'At peak, v = 0 instantaneously, but gravity still acts (a = 9.8 m/s² downward).',
+        exception: 'Acceleration is NOT zero at highest point—common misconception; gravity never stops acting.'
+    }
+    // Add more questions as needed
+];
+
+// Quiz State Management
 class QuizState {
-    constructor(questions, duration) {
-        this.questions             = questions;  // already shuffled at build time by build.py
-        this.duration              = duration;
-        this.timeRemaining         = duration;
-        this.currentQuestionIndex  = 0;
-        this.userAnswers           = {};       // { questionId: 'A'|'B'|'C'|'D' }
-        this.flaggedQuestions      = new Set();
-        this.timerInterval         = null;
-        this.isSubmitted           = false;
+    constructor(questions, duration = 900) { // 15 minutes default
+        this.questions = questions;
+        this.duration = duration; // in seconds
+        this.timeRemaining = duration;
+        this.currentQuestionIndex = 0;
+        this.userAnswers = {}; // { questionId: selectedOption }
+        this.flaggedQuestions = new Set();
+        this.startTime = Date.now();
+        this.timerInterval = null;
+        this.isSubmitted = false;
     }
-
-    getCurrentQuestion() { return this.questions[this.currentQuestionIndex]; }
-
-    setAnswer(id, option)  { this.userAnswers[id] = option; }
-    getAnswer(id)          { return this.userAnswers[id] || null; }
-    clearAnswer(id)        { delete this.userAnswers[id]; }
-
-    toggleFlag(id) {
-        this.flaggedQuestions.has(id)
-            ? this.flaggedQuestions.delete(id)
-            : this.flaggedQuestions.add(id);
+    
+    getCurrentQuestion() {
+        return this.questions[this.currentQuestionIndex];
     }
-    isFlagged(id) { return this.flaggedQuestions.has(id); }
-
-    goToQuestion(i)  { if (i >= 0 && i < this.questions.length) { this.currentQuestionIndex = i; return true; } return false; }
-    nextQuestion()   { return this.goToQuestion(this.currentQuestionIndex + 1); }
-    prevQuestion()   { return this.goToQuestion(this.currentQuestionIndex - 1); }
-
-    getAnsweredCount()   { return Object.keys(this.userAnswers).length; }
-    getUnansweredCount() { return this.questions.length - this.getAnsweredCount(); }
-    getFlaggedCount()    { return this.flaggedQuestions.size; }
-
+    
+    setAnswer(questionId, option) {
+        this.userAnswers[questionId] = option;
+    }
+    
+    getAnswer(questionId) {
+        return this.userAnswers[questionId];
+    }
+    
+    clearAnswer(questionId) {
+        delete this.userAnswers[questionId];
+    }
+    
+    toggleFlag(questionId) {
+        if (this.flaggedQuestions.has(questionId)) {
+            this.flaggedQuestions.delete(questionId);
+        } else {
+            this.flaggedQuestions.add(questionId);
+        }
+    }
+    
+    isFlagged(questionId) {
+        return this.flaggedQuestions.has(questionId);
+    }
+    
+    goToQuestion(index) {
+        if (index >= 0 && index < this.questions.length) {
+            this.currentQuestionIndex = index;
+            return true;
+        }
+        return false;
+    }
+    
+    nextQuestion() {
+        if (this.currentQuestionIndex < this.questions.length - 1) {
+            this.currentQuestionIndex++;
+            return true;
+        }
+        return false;
+    }
+    
+    prevQuestion() {
+        if (this.currentQuestionIndex > 0) {
+            this.currentQuestionIndex--;
+            return true;
+        }
+        return false;
+    }
+    
+    getAnsweredCount() {
+        return Object.keys(this.userAnswers).length;
+    }
+    
+    getUnansweredCount() {
+        return this.questions.length - this.getAnsweredCount();
+    }
+    
+    getFlaggedCount() {
+        return this.flaggedQuestions.size;
+    }
+    
     getScore() {
         let correct = 0;
-        for (const q of this.questions) {
-            if (this.userAnswers[q.id] === q.answer) correct++;
+        for (const question of this.questions) {
+            if (this.userAnswers[question.id] === question.answer) {
+                correct++;
+            }
         }
-        return { correct, total: this.questions.length, percentage: (correct / this.questions.length) * 100 };
+        return {
+            correct,
+            total: this.questions.length,
+            percentage: (correct / this.questions.length) * 100
+        };
     }
-
-    formatTime(s) {
-        const m = Math.floor(s / 60);
-        const sec = s % 60;
-        return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-    }
-
+    
     startTimer(onTick, onComplete) {
         this.timerInterval = setInterval(() => {
             this.timeRemaining--;
-            if (onTick) onTick(this.timeRemaining);
+            
+            if (onTick) {
+                onTick(this.timeRemaining);
+            }
+            
             if (this.timeRemaining <= 0) {
                 this.stopTimer();
-                if (onComplete) onComplete();
+                if (onComplete) {
+                    onComplete();
+                }
             }
         }, 1000);
     }
-
+    
     stopTimer() {
-        if (this.timerInterval) { clearInterval(this.timerInterval); this.timerInterval = null; }
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+    
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 }
 
-// ── Quiz UI ──────────────────────────────────────────────────
+// UI Controller
 class QuizUI {
-    constructor(state) {
-        this.state = state;
-        this.el    = this._cache();
-        this._bind();
+    constructor(quizState) {
+        this.state = quizState;
+        this.elements = this.cacheElements();
+        this.attachEventListeners();
         this.render();
-        this._startTimer();
+        this.startTimer();
     }
-
-    _cache() {
-        const g = id => document.getElementById(id);
+    
+    cacheElements() {
         return {
-            subjectName:          g('subjectName'),
-            currentQuestionNum:   g('currentQuestionNum'),
-            totalQuestions:       g('totalQuestions'),
-            timerDisplay:         g('timerDisplay'),
-            timerProgressCircle:  g('timerProgressCircle'),
-            timerContainer:       g('quizTimerContainer'),
-
-            sidebar:              g('quizSidebar'),
-            questionPalette:      g('questionPalette'),
-            answeredCount:        g('answeredCount'),
-            unansweredCount:      g('unansweredCount'),
-            flaggedCount:         g('flaggedCount'),
-
-            questionNumber:       g('questionNumber'),
-            questionText:         g('questionText'),
-            optionsContainer:     g('optionsContainer'),
-            questionExplanation:  g('questionExplanation'),
-            explanationContent:   g('explanationContent'),
-
-            prevBtn:              g('prevBtn'),
-            nextBtn:              g('nextBtn'),
-            clearBtn:             g('clearBtn'),
-            flagBtn:              g('flagBtn'),
-
-            menuBtn:              g('menuBtn'),
-            closeSidebar:         g('closeSidebar'),
-            mobilePaletteBtn:     g('mobilePaletteBtn'),
-            submitBtn:            g('submitBtn'),
-            calculatorBtn:        g('calculatorBtn'),
-
-            submitModal:          g('submitModal'),
-            closeSubmitModal:     g('closeSubmitModal'),
-            cancelSubmitBtn:      g('cancelSubmitBtn'),
-            confirmSubmitBtn:     g('confirmSubmitBtn'),
-            calculatorModal:      g('calculatorModal'),
-            closeCalculatorModal: g('closeCalculatorModal'),
-            timeUpModal:          g('timeUpModal'),
-            viewResultsBtn:       g('viewResultsBtn'),
+            // Header
+            subjectName: document.getElementById('subjectName'),
+            currentQuestionNum: document.getElementById('currentQuestionNum'),
+            totalQuestions: document.getElementById('totalQuestions'),
+            timerDisplay: document.getElementById('timerDisplay'),
+            timerProgressCircle: document.getElementById('timerProgressCircle'),
+            
+            // Sidebar
+            sidebar: document.getElementById('quizSidebar'),
+            questionPalette: document.getElementById('questionPalette'),
+            answeredCount: document.getElementById('answeredCount'),
+            unansweredCount: document.getElementById('unansweredCount'),
+            flaggedCount: document.getElementById('flaggedCount'),
+            
+            // Main
+            questionCard: document.getElementById('questionCard'),
+            questionNumber: document.getElementById('questionNumber'),
+            questionText: document.getElementById('questionText'),
+            optionsContainer: document.getElementById('optionsContainer'),
+            questionExplanation: document.getElementById('questionExplanation'),
+            explanationContent: document.getElementById('explanationContent'),
+            
+            // Navigation
+            prevBtn: document.getElementById('prevBtn'),
+            nextBtn: document.getElementById('nextBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            flagBtn: document.getElementById('flagBtn'),
+            
+            // Buttons
+            menuBtn: document.getElementById('menuBtn'),
+            closeSidebar: document.getElementById('closeSidebar'),
+            mobilePaletteBtn: document.getElementById('mobilePaletteBtn'),
+            submitBtn: document.getElementById('submitBtn'),
+            calculatorBtn: document.getElementById('calculatorBtn'),
+            
+            // Modals
+            submitModal: document.getElementById('submitModal'),
+            closeSubmitModal: document.getElementById('closeSubmitModal'),
+            cancelSubmitBtn: document.getElementById('cancelSubmitBtn'),
+            confirmSubmitBtn: document.getElementById('confirmSubmitBtn'),
+            calculatorModal: document.getElementById('calculatorModal'),
+            closeCalculatorModal: document.getElementById('closeCalculatorModal'),
+            timeUpModal: document.getElementById('timeUpModal'),
+            viewResultsBtn: document.getElementById('viewResultsBtn')
         };
     }
-
-    _bind() {
-        const e = this.el;
-        e.prevBtn.addEventListener('click',             () => this._prev());
-        e.nextBtn.addEventListener('click',             () => this._next());
-        e.clearBtn.addEventListener('click',            () => this._clearAnswer());
-        e.flagBtn.addEventListener('click',             () => this._toggleFlag());
-        e.menuBtn.addEventListener('click',             () => this._toggleSidebar());
-        e.closeSidebar.addEventListener('click',        () => this._toggleSidebar());
-        e.mobilePaletteBtn.addEventListener('click',    () => this._toggleSidebar());
-        e.submitBtn.addEventListener('click',           () => this._showSubmitModal());
-        e.closeSubmitModal.addEventListener('click',    () => this._hideSubmitModal());
-        e.cancelSubmitBtn.addEventListener('click',     () => this._hideSubmitModal());
-        e.confirmSubmitBtn.addEventListener('click',    () => this._submit());
-        e.calculatorBtn.addEventListener('click',       () => this._showCalc());
-        e.closeCalculatorModal.addEventListener('click',() => this._hideCalc());
-        e.viewResultsBtn.addEventListener('click',      () => this._showResults());
-
-        document.querySelectorAll('.calc-btn').forEach(btn =>
-            btn.addEventListener('click', e => this._handleCalc(e))
-        );
-
-        document.addEventListener('keydown', e => this._keyboard(e));
+    
+    attachEventListeners() {
+        // Navigation
+        this.elements.prevBtn.addEventListener('click', () => this.handlePrevious());
+        this.elements.nextBtn.addEventListener('click', () => this.handleNext());
+        this.elements.clearBtn.addEventListener('click', () => this.handleClearAnswer());
+        this.elements.flagBtn.addEventListener('click', () => this.handleToggleFlag());
+        
+        // Sidebar
+        this.elements.menuBtn.addEventListener('click', () => this.toggleSidebar());
+        this.elements.closeSidebar.addEventListener('click', () => this.toggleSidebar());
+        this.elements.mobilePaletteBtn.addEventListener('click', () => this.toggleSidebar());
+        
+        // Submit
+        this.elements.submitBtn.addEventListener('click', () => this.showSubmitModal());
+        this.elements.closeSubmitModal.addEventListener('click', () => this.hideSubmitModal());
+        this.elements.cancelSubmitBtn.addEventListener('click', () => this.hideSubmitModal());
+        this.elements.confirmSubmitBtn.addEventListener('click', () => this.handleSubmit());
+        
+        // Calculator
+        this.elements.calculatorBtn.addEventListener('click', () => this.showCalculatorModal());
+        this.elements.closeCalculatorModal.addEventListener('click', () => this.hideCalculatorModal());
+        
+        // Calculator buttons
+        document.querySelectorAll('.calc-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleCalculator(e));
+        });
+        
+        // View results
+        this.elements.viewResultsBtn.addEventListener('click', () => this.showResults());
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => this.handleKeyboard(e));
     }
-
-    // ── Render ──
+    
     render() {
-        this._renderHeader();
-        this._renderPalette();
-        this._renderQuestion();
-        this._renderStats();
+        this.renderHeader();
+        this.renderQuestionPalette();
+        this.renderQuestion();
+        this.renderStats();
     }
-
-    _renderHeader() {
-        const q = this.state.getCurrentQuestion();
-        this.el.subjectName.textContent        = q.subject;
-        this.el.currentQuestionNum.textContent = this.state.currentQuestionIndex + 1;
-        this.el.totalQuestions.textContent     = this.state.questions.length;
+    
+    renderHeader() {
+        const question = this.state.getCurrentQuestion();
+        this.elements.subjectName.textContent = question.subject;
+        this.elements.currentQuestionNum.textContent = this.state.currentQuestionIndex + 1;
+        this.elements.totalQuestions.textContent = this.state.questions.length;
     }
-
-    _renderPalette() {
-        const palette = this.el.questionPalette;
-        palette.innerHTML = '';
-        this.state.questions.forEach((q, i) => {
+    
+    renderQuestionPalette() {
+        this.elements.questionPalette.innerHTML = '';
+        
+        this.state.questions.forEach((question, index) => {
             const btn = document.createElement('button');
-            btn.className   = 'palette-btn';
-            btn.textContent = i + 1;
-            if (i === this.state.currentQuestionIndex)   btn.classList.add('current');
-            else if (this.state.getAnswer(q.id))         btn.classList.add('answered');
-            if (this.state.isFlagged(q.id))              btn.classList.add('flagged');
-            btn.addEventListener('click', () => { this.state.goToQuestion(i); this.render(); this._closeSidebarMobile(); });
-            palette.appendChild(btn);
+            btn.className = 'palette-btn';
+            btn.textContent = index + 1;
+            
+            // Add status classes
+            if (index === this.state.currentQuestionIndex) {
+                btn.classList.add('current');
+            } else if (this.state.getAnswer(question.id)) {
+                btn.classList.add('answered');
+            }
+            
+            if (this.state.isFlagged(question.id)) {
+                btn.classList.add('flagged');
+            }
+            
+            btn.addEventListener('click', () => {
+                this.state.goToQuestion(index);
+                this.render();
+                this.closeSidebarOnMobile();
+            });
+            
+            this.elements.questionPalette.appendChild(btn);
         });
     }
+    
+    renderQuestion() {
+        const question = this.state.getCurrentQuestion();
 
-    _renderQuestion() {
-        const q = this.state.getCurrentQuestion();
-        this.el.questionNumber.textContent = this.state.currentQuestionIndex + 1;
-        this.el.questionText.textContent   = q.text;
+        // ── Passage panel ──────────────────────────────────────────────────
+        // Re-use the existing panel when the passage is the same object so the
+        // reader's scroll position is preserved while navigating within a group.
+        // quiz-app.js detects identity by string equality (first 40 chars) as
+        // documented in the HTML comments.
+        const passageKey = question.passage ? question.passage.slice(0, 40) : null;
+        let passagePanel = document.getElementById('passagePanel');
 
-        // Options
-        this.el.optionsContainer.innerHTML = '';
-        ['A','B','C','D'].forEach(label => {
-            if (!q.options[label]) return;
-            const div = document.createElement('div');
-            div.className = 'option';
-            if (this.state.getAnswer(q.id) === label) div.classList.add('selected');
-            div.innerHTML = `<div class="option-label">${label}</div><div class="option-text">${q.options[label]}</div>`;
-            div.addEventListener('click', () => { this.state.setAnswer(q.id, label); this.render(); });
-            this.el.optionsContainer.appendChild(div);
+        if (question.passage) {
+            if (!passagePanel) {
+                passagePanel = document.createElement('div');
+                passagePanel.id = 'passagePanel';
+                passagePanel.style.cssText = [
+                    'background:var(--surface-2,#1e1e2e)',
+                    'border-left:4px solid var(--accent,#7c3aed)',
+                    'border-radius:10px',
+                    'padding:1.1rem 1.25rem',
+                    'margin-bottom:1.1rem',
+                    'max-height:260px',
+                    'overflow-y:auto',
+                    'scroll-behavior:smooth',
+                ].join(';');
+                // Insert before the question-header div (first child of questionCard)
+                this.elements.questionCard.insertBefore(
+                    passagePanel,
+                    this.elements.questionCard.firstChild
+                );
+            }
+            // Only rewrite innerHTML when the passage actually changes
+            if (passagePanel.dataset.passageKey !== passageKey) {
+                passagePanel.dataset.passageKey = passageKey;
+                const title = question.passageTitle || 'Read the passage below';
+                passagePanel.innerHTML =
+                    `<div style="font-size:0.7rem;letter-spacing:.08em;text-transform:uppercase;` +
+                    `color:var(--accent,#7c3aed);font-weight:700;margin-bottom:.6rem;">` +
+                    `📄 ${title}</div>` +
+                    `<div style="font-size:0.855rem;line-height:1.8;` +
+                    `color:var(--text,#cdd6f4);white-space:pre-wrap;">${question.passage}</div>`;
+                passagePanel.scrollTop = 0;
+            }
+        } else if (passagePanel) {
+            // Question has no passage — remove panel entirely
+            passagePanel.remove();
+        }
+        // ──────────────────────────────────────────────────────────────────
+
+        // Update question number and text
+        this.elements.questionNumber.textContent = this.state.currentQuestionIndex + 1;
+        this.elements.questionText.textContent = question.text;
+        
+        // Render options
+        this.elements.optionsContainer.innerHTML = '';
+        const optionLabels = ['A', 'B', 'C', 'D'];
+        
+        optionLabels.forEach(label => {
+            if (question.options[label]) {
+                const option = document.createElement('div');
+                option.className = 'option';
+                
+                const userAnswer = this.state.getAnswer(question.id);
+                if (userAnswer === label) {
+                    option.classList.add('selected');
+                }
+                
+                option.innerHTML = `
+                    <div class="option-label">${label}</div>
+                    <div class="option-text">${question.options[label]}</div>
+                `;
+                
+                option.addEventListener('click', () => this.handleSelectOption(label));
+                
+                this.elements.optionsContainer.appendChild(option);
+            }
         });
-
-        // Flag button state
-        const flagged = this.state.isFlagged(q.id);
-        this.el.flagBtn.classList.toggle('flagged', flagged);
-        const fi = this.el.flagBtn.querySelector('i');
-        if (fi) { fi.className = flagged ? 'fas fa-flag' : 'far fa-flag'; }
-
-        // Nav buttons
-        this.el.prevBtn.disabled = this.state.currentQuestionIndex === 0;
-        const isLast = this.state.currentQuestionIndex === this.state.questions.length - 1;
-        this.el.nextBtn.innerHTML = isLast
-            ? '<i class="fas fa-check"></i> Review &amp; Submit'
-            : 'Next <i class="fas fa-arrow-right"></i>';
+        
+        // Update flag button
+        const isFlagged = this.state.isFlagged(question.id);
+        if (isFlagged) {
+            this.elements.flagBtn.classList.add('flagged');
+            this.elements.flagBtn.querySelector('i').classList.remove('far');
+            this.elements.flagBtn.querySelector('i').classList.add('fas');
+        } else {
+            this.elements.flagBtn.classList.remove('flagged');
+            this.elements.flagBtn.querySelector('i').classList.remove('fas');
+            this.elements.flagBtn.querySelector('i').classList.add('far');
+        }
+        
+        // Update navigation buttons
+        this.elements.prevBtn.disabled = this.state.currentQuestionIndex === 0;
+        
+        if (this.state.currentQuestionIndex === this.state.questions.length - 1) {
+            this.elements.nextBtn.textContent = 'Submit';
+            this.elements.nextBtn.innerHTML = '<i class="fas fa-check"></i> Review & Submit';
+        } else {
+            this.elements.nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+        }
+        
+        // Scroll to top
+        this.elements.questionCard.scrollTop = 0;
     }
-
-    _renderStats() {
-        this.el.answeredCount.textContent   = this.state.getAnsweredCount();
-        this.el.unansweredCount.textContent = this.state.getUnansweredCount();
-        this.el.flaggedCount.textContent    = this.state.getFlaggedCount();
+    
+    renderStats() {
+        this.elements.answeredCount.textContent = this.state.getAnsweredCount();
+        this.elements.unansweredCount.textContent = this.state.getUnansweredCount();
+        this.elements.flaggedCount.textContent = this.state.getFlaggedCount();
     }
-
-    // ── Timer ──
-    _startTimer() {
+    
+    startTimer() {
         this.state.startTimer(
-            t => this._tickTimer(t),
-            () => this._timeUp()
+            (timeRemaining) => this.updateTimer(timeRemaining),
+            () => this.handleTimeUp()
         );
     }
-
-    _tickTimer(t) {
-        this.el.timerDisplay.textContent = this.state.formatTime(t);
-
-        const offset = 163.36 - (t / this.state.duration) * 163.36;
-        this.el.timerProgressCircle.style.strokeDashoffset = offset;
-
-        const tc = this.el.timerContainer;
-        const td = this.el.timerDisplay;
-        tc && tc.classList.remove('warning','danger');
-        td.classList.remove('warning','danger');
-
-        if (t <= 60) {
-            tc && tc.classList.add('danger');
-            td.classList.add('danger');
-            this.el.timerProgressCircle.style.stroke = 'var(--red, #ef4444)';
-        } else if (t <= 300) {
-            tc && tc.classList.add('warning');
-            td.classList.add('warning');
-            this.el.timerProgressCircle.style.stroke = '#fbbf24';
+    
+    updateTimer(timeRemaining) {
+        const formatted = this.state.formatTime(timeRemaining);
+        this.elements.timerDisplay.textContent = formatted;
+        
+        // Update progress circle
+        const progress = (timeRemaining / this.state.duration) * 163.36; // Circle circumference
+        this.elements.timerProgressCircle.style.strokeDashoffset = 163.36 - progress;
+        
+        // Add warning/danger classes
+        this.elements.timerDisplay.classList.remove('warning', 'danger');
+        if (timeRemaining <= 300 && timeRemaining > 60) { // 5 minutes
+            this.elements.timerDisplay.classList.add('warning');
+        } else if (timeRemaining <= 60) { // 1 minute
+            this.elements.timerDisplay.classList.add('danger');
         }
     }
-
-    // ── Actions ──
-    _prev()         { if (this.state.prevQuestion()) this.render(); }
-    _next()         { this.state.currentQuestionIndex === this.state.questions.length - 1 ? this._showSubmitModal() : (this.state.nextQuestion() && this.render()); }
-    _clearAnswer()  { this.state.clearAnswer(this.state.getCurrentQuestion().id); this.render(); }
-    _toggleFlag()   { this.state.toggleFlag(this.state.getCurrentQuestion().id); this.render(); }
-
-    _toggleSidebar()     { this.el.sidebar.classList.toggle('open'); }
-    _closeSidebarMobile(){ if (window.innerWidth <= 1024) this.el.sidebar.classList.remove('open'); }
-
-    _showSubmitModal() {
-        document.getElementById('modalTotalQuestions').textContent  = this.state.questions.length;
-        document.getElementById('modalAnsweredCount').textContent   = this.state.getAnsweredCount();
+    
+    handleSelectOption(option) {
+        const question = this.state.getCurrentQuestion();
+        this.state.setAnswer(question.id, option);
+        this.render();
+    }
+    
+    handleClearAnswer() {
+        const question = this.state.getCurrentQuestion();
+        this.state.clearAnswer(question.id);
+        this.render();
+    }
+    
+    handleToggleFlag() {
+        const question = this.state.getCurrentQuestion();
+        this.state.toggleFlag(question.id);
+        this.render();
+    }
+    
+    handlePrevious() {
+        if (this.state.prevQuestion()) {
+            this.render();
+        }
+    }
+    
+    handleNext() {
+        // If last question, show submit modal
+        if (this.state.currentQuestionIndex === this.state.questions.length - 1) {
+            this.showSubmitModal();
+        } else if (this.state.nextQuestion()) {
+            this.render();
+        }
+    }
+    
+    handleKeyboard(e) {
+        // Don't trigger shortcuts in modals or inputs
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
+        switch(e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                this.handlePrevious();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                this.handleNext();
+                break;
+            case 'a':
+            case 'A':
+                e.preventDefault();
+                this.handleSelectOption('A');
+                break;
+            case 'b':
+            case 'B':
+                e.preventDefault();
+                this.handleSelectOption('B');
+                break;
+            case 'c':
+            case 'C':
+                e.preventDefault();
+                this.handleSelectOption('C');
+                break;
+            case 'd':
+            case 'D':
+                e.preventDefault();
+                this.handleSelectOption('D');
+                break;
+            case 'f':
+            case 'F':
+                e.preventDefault();
+                this.handleToggleFlag();
+                break;
+            case 'Escape':
+                this.hideSubmitModal();
+                this.hideCalculatorModal();
+                break;
+        }
+    }
+    
+    toggleSidebar() {
+        this.elements.sidebar.classList.toggle('open');
+    }
+    
+    closeSidebarOnMobile() {
+        if (window.innerWidth <= 1024) {
+            this.elements.sidebar.classList.remove('open');
+        }
+    }
+    
+    showSubmitModal() {
+        document.getElementById('modalTotalQuestions').textContent = this.state.questions.length;
+        document.getElementById('modalAnsweredCount').textContent = this.state.getAnsweredCount();
         document.getElementById('modalUnansweredCount').textContent = this.state.getUnansweredCount();
-        document.getElementById('modalTimeRemaining').textContent   = this.state.formatTime(this.state.timeRemaining);
-        this.el.submitModal.classList.remove('hidden');
+        document.getElementById('modalTimeRemaining').textContent = this.state.formatTime(this.state.timeRemaining);
+        
+        this.elements.submitModal.classList.remove('hidden');
     }
-    _hideSubmitModal() { this.el.submitModal.classList.add('hidden'); }
-
-    _showCalc()  { this.el.calculatorModal.classList.remove('hidden'); }
-    _hideCalc()  { this.el.calculatorModal.classList.add('hidden'); }
-
-    _submit() {
-        this.state.isSubmitted = true;
-        this.state.stopTimer();
-        this._hideSubmitModal();
-        this._showResults();
+    
+    hideSubmitModal() {
+        this.elements.submitModal.classList.add('hidden');
     }
-
-    _timeUp() {
-        this.state.isSubmitted = true;
-        this.el.timeUpModal && this.el.timeUpModal.classList.remove('hidden');
+    
+    showCalculatorModal() {
+        this.elements.calculatorModal.classList.remove('hidden');
     }
-
-    _showResults() {
-        const s      = this.state.getScore();
-        const pct    = s.percentage;
-        const grade  = pct >= 70 ? 'EXCELLENT' : pct >= 50 ? 'AVERAGE' : 'NEEDS WORK';
-        const today  = new Date().toISOString().slice(0, 10);
-        const meta   = window.quizMetadata || {};
-        const subject   = meta.subject   || this.state.questions[0]?.subject || 'Practice Test';
-        const timeTaken = this._formatTimeTaken(this.state.duration - this.state.timeRemaining);
-
-        const rows = this.state.questions.map((q, i) => {
-            const yours   = this.state.getAnswer(q.id) || '—';
-            const correct = q.answer;
-            const isRight = yours === correct;
-            const shortText = q.text.length > 55 ? q.text.slice(0, 52) + '…' : q.text;
-
-            const explanationRow = (!isRight && q.explanation)
-                ? `<tr class="expl-row">
-                     <td></td>
-                     <td colspan="3" class="explanation-cell">
-                       <span class="expl-label">Explanation:</span> ${q.explanation}
-                       ${q.exception ? `<br><span class="expl-label">Note:</span> ${q.exception}` : ''}
-                     </td>
-                   </tr>`
-                : '';
-
-            return `
-              <tr class="${isRight ? 'row-correct' : 'row-wrong'}">
-                <td class="col-num">${i + 1}</td>
-                <td class="col-q">${shortText}</td>
-                <td class="col-ans ${isRight ? '' : 'wrong-ans'}">${yours}</td>
-                <td class="col-correct">${correct} <span class="status-symbol">${isRight ? '✓' : '✗'}</span></td>
-              </tr>
-              ${explanationRow}`;
-        }).join('');
-
-        const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Results — ${subject}</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 2.5rem; max-width: 820px; margin: 0 auto; font-size: 13px; }
-    .report-header { margin-bottom: 1.5rem; }
-    .brand { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; color: #111; }
-    .brand span { color: #f59e0b; }
-    .report-title { font-size: 0.8rem; color: #666; margin-top: 0.15rem; }
-    .score-card { display: flex; align-items: center; gap: 2rem; padding: 1.25rem 1.5rem; border: 2px solid #111; border-radius: 10px; margin-bottom: 1.5rem; background: #fafafa; }
-    .score-big { font-size: 2.75rem; font-weight: 800; line-height: 1; letter-spacing: -0.04em; }
-    .score-big.excellent { color: #059669; }
-    .score-big.average   { color: #d97706; }
-    .score-big.poor      { color: #dc2626; }
-    .score-details { flex: 1; }
-    .score-line { font-size: 1rem; font-weight: 700; margin-bottom: 0.15rem; }
-    .score-meta { font-size: 0.78rem; color: #555; line-height: 1.7; }
-    .score-meta strong { color: #111; }
-    .grade-badge { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; padding: 0.3rem 0.75rem; border-radius: 999px; text-transform: uppercase; }
-    .grade-badge.excellent { background: #d1fae5; color: #065f46; }
-    .grade-badge.average   { background: #fef3c7; color: #92400e; }
-    .grade-badge.poor      { background: #fee2e2; color: #991b1b; }
-    .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #888; margin-bottom: 0.6rem; }
-    table { width: 100%; border-collapse: collapse; }
-    thead th { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #888; border-bottom: 2px solid #111; padding: 0.4rem 0.5rem; text-align: left; }
-    tbody tr.row-correct td { background: #f0fdf4; }
-    tbody tr.row-wrong   td { background: #fff7f7; }
-    tbody td { padding: 0.45rem 0.5rem; border-bottom: 1px solid #e5e7eb; vertical-align: top; line-height: 1.5; }
-    .col-num { width: 32px; color: #888; font-size: 0.75rem; }
-    .col-ans { width: 52px; text-align: center; font-weight: 700; }
-    .col-correct { width: 72px; text-align: center; font-weight: 700; color: #059669; }
-    .wrong-ans { color: #dc2626; }
-    tr.expl-row td { background: #fffbeb !important; border-bottom: 1px solid #fde68a; padding: 0.4rem 0.5rem 0.6rem 2rem; }
-    .explanation-cell { font-size: 0.78rem; color: #555; line-height: 1.6; }
-    .expl-label { font-weight: 700; color: #92400e; }
-    .report-footer { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; font-size: 0.72rem; color: #aaa; }
-    @media print { body { padding: 1.5rem; } .no-print { display: none !important; } }
-  </style>
-</head>
-<body>
-  <div class="report-header">
-    <div class="brand">Grant<span>App</span> AI</div>
-    <div class="report-title">JAMB Practice Test Results — ${today}</div>
-  </div>
-  <div class="score-card">
-    <div class="score-big ${pct >= 70 ? 'excellent' : pct >= 50 ? 'average' : 'poor'}">${pct.toFixed(1)}%</div>
-    <div class="score-details">
-      <div class="score-line">${s.correct} / ${s.total} Correct</div>
-      <div class="score-meta"><strong>${subject}</strong><br>Time taken: ${timeTaken}</div>
-    </div>
-    <div class="grade-badge ${pct >= 70 ? 'excellent' : pct >= 50 ? 'average' : 'poor'}">${grade}</div>
-  </div>
-  <div class="section-title">Question Breakdown</div>
-  <table>
-    <thead><tr><th>#</th><th>Question</th><th style="text-align:center">Yours</th><th style="text-align:center">Answer</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-  <div class="report-footer">
-    <span>GrantApp AI &nbsp;·&nbsp; 100 Days to UTME</span>
-    <span>Page 1 of 1</span>
-  </div>
-  <div class="no-print" style="text-align:center;margin-top:2rem;">
-    <button onclick="window.print()" style="padding:0.65rem 1.5rem;background:#f59e0b;color:#000;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;margin-right:0.75rem;">Save as PDF</button>
-    <button onclick="history.back()" style="padding:0.65rem 1.5rem;background:#f3f4f6;color:#111;border:1px solid #d1d5db;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;">← Back</button>
-  </div>
-</body>
-</html>`;
-
-        document.open();
-        document.write(html);
-        document.close();
+    
+    hideCalculatorModal() {
+        this.elements.calculatorModal.classList.add('hidden');
     }
-
-    _formatTimeTaken(seconds) {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
-
-    _handleCalc(e) {
-        const btn     = e.currentTarget;
+    
+    handleCalculator(e) {
+        const btn = e.currentTarget;
         const display = document.getElementById('calcDisplay');
-        const val     = btn.dataset.value;
-        const action  = btn.dataset.action;
-        if (val) {
-            display.value = display.value === '0' ? val : display.value + val;
+        const value = btn.dataset.value;
+        const action = btn.dataset.action;
+        
+        if (value) {
+            if (display.value === '0') {
+                display.value = value;
+            } else {
+                display.value += value;
+            }
         } else if (action) {
-            switch (action) {
-                case 'clear':    display.value = '0'; break;
-                case 'delete':   display.value = display.value.slice(0,-1) || '0'; break;
-                case 'add': case 'subtract': case 'multiply': case 'divide':
-                    display.value += ' ' + btn.textContent + ' '; break;
+            switch(action) {
+                case 'clear':
+                    display.value = '0';
+                    break;
+                case 'delete':
+                    display.value = display.value.slice(0, -1) || '0';
+                    break;
+                case 'add':
+                case 'subtract':
+                case 'multiply':
+                case 'divide':
+                    display.value += ' ' + btn.textContent + ' ';
+                    break;
                 case 'equals':
                     try {
-                        display.value = eval(display.value.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-'));
-                    } catch { display.value = 'Error'; setTimeout(() => display.value = '0', 1000); }
+                        const expr = display.value
+                            .replace(/×/g, '*')
+                            .replace(/÷/g, '/')
+                            .replace(/−/g, '-');
+                        display.value = eval(expr);
+                    } catch {
+                        display.value = 'Error';
+                        setTimeout(() => display.value = '0', 1000);
+                    }
                     break;
             }
         }
     }
-
-    _keyboard(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-        const map = { ArrowLeft: () => this._prev(), ArrowRight: () => this._next(),
-                      a:'A', b:'B', c:'C', d:'D', A:'A', B:'B', C:'C', D:'D',
-                      f: () => this._toggleFlag(), F: () => this._toggleFlag(),
-                      Escape: () => { this._hideSubmitModal(); this._hideCalc(); } };
-        const v = map[e.key];
-        if (!v) return;
-        e.preventDefault();
-        if (typeof v === 'function') v();
-        else { this.state.setAnswer(this.state.getCurrentQuestion().id, v); this.render(); }
+    
+    handleSubmit() {
+        this.state.isSubmitted = true;
+        this.state.stopTimer();
+        this.hideSubmitModal();
+        this.showResults();
+    }
+    
+    handleTimeUp() {
+        this.state.isSubmitted = true;
+        document.getElementById('timeUpModal').classList.remove('hidden');
+    }
+    
+    showResults() {
+        const score = this.state.getScore();
+        
+        // In production, navigate to results page
+        alert(`Quiz Complete!\n\nScore: ${score.correct}/${score.total} (${score.percentage.toFixed(1)}%)`);
+        
+        // For now, just reload
+        window.location.reload();
     }
 }
 
-// ── Boot ────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof QUESTIONS === 'undefined' || !QUESTIONS.length) {
-        document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a0f;color:#f0eff4;font-family:sans-serif;text-align:center;padding:2rem"><div><div style="font-size:3rem;margin-bottom:1rem">⚠️</div><h2 style="margin-bottom:0.5rem">No Questions Found</h2><p style="color:#7a7a8c;margin-bottom:1.5rem">QUESTIONS array is not defined on this page.</p><button onclick="history.back()" style="padding:0.6rem 1.2rem;background:#f59e0b;color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer">← Go Back</button></div></div>`;
-        return;
+// Initialize Quiz
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Show loading state
+        document.body.style.cursor = 'wait';
+        
+        // Initialize launcher
+        const launcher = new QuizLauncher();
+        
+        // Load questions based on URL parameters
+        const questions = await launcher.initializeFromUrl();
+        
+        if (!questions || questions.length === 0) {
+            throw new Error('No questions loaded');
+        }
+        
+        console.log(`Loaded ${questions.length} questions`);
+        
+        // Create quiz state with loaded questions
+        const quizState = new QuizState(questions, QUIZ_CONFIG.duration);
+        
+        // Initialize UI
+        const quizUI = new QuizUI(quizState);
+        
+        // Prevent accidental page exit
+        window.addEventListener('beforeunload', (e) => {
+            if (!quizState.isSubmitted) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+        
+        document.body.style.cursor = 'default';
+        
+    } catch (error) {
+        console.error('Failed to initialize quiz:', error);
+        
+        // Show error message
+        document.body.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; 
+                        height: 100vh; background: #f8f9fa; padding: 2rem;">
+                <div style="text-align: center; max-width: 500px;">
+                    <div style="font-size: 4rem; color: #ef4444; margin-bottom: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #1f2937;">
+                        Failed to Load Quiz
+                    </h1>
+                    <p style="font-size: 1rem; color: #6b7280; margin-bottom: 2rem;">
+                        ${error.message}
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button onclick="window.location.reload()" 
+                                style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; 
+                                       border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                        <button onclick="window.history.back()" 
+                                style="padding: 0.75rem 1.5rem; background: white; color: #1f2937; 
+                                       border: 2px solid #e5e7eb; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-arrow-left"></i> Go Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
     }
-
-    const duration  = typeof DURATION !== 'undefined' ? DURATION : 900;
-    const quizState = new QuizState(QUESTIONS, duration);
-    const quizUI    = new QuizUI(quizState);
-
-
 });
