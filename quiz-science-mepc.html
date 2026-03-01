@@ -1451,5 +1451,66 @@ const QUESTIONS = [
 </div>
 
 <script src="quiz-app.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PASSAGE PANEL DRIVER
+     quiz-app.js is untouched. This script drives the #passagePanel
+     that is already declared in the HTML above. It watches
+     #questionNumber (always updated by quiz-app.js on every render)
+     via MutationObserver, reads the current question straight from
+     the QUESTIONS array, and shows/hides the panel accordingly.
+     No fetch. No routing. HTML for HTML things.
+════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  const panel      = document.getElementById('passagePanel');
+  const titleEl    = document.getElementById('passageTitle');
+  const bodyEl     = document.getElementById('passageBody');
+  const toggleBtn  = document.getElementById('passageToggleBtn');
+  const qNumEl     = document.getElementById('questionNumber');
+
+  // Toggle collapse/expand (the button already exists in the HTML)
+  let collapsed = false;
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      collapsed = !collapsed;
+      bodyEl.style.display = collapsed ? 'none' : '';
+      toggleBtn.innerHTML  = collapsed
+        ? '<i class="fas fa-expand-alt"></i> Show Passage'
+        : '<i class="fas fa-compress-alt"></i> Hide Passage';
+    });
+  }
+
+  function syncPassage() {
+    const n = parseInt(qNumEl.textContent, 10);
+    if (!n || !Array.isArray(QUESTIONS)) return;
+
+    const q = QUESTIONS[n - 1];
+    if (q && q.passage) {
+      // Only rewrite DOM when the passage actually changes
+      const key = q.passage.slice(0, 40);
+      if (bodyEl.dataset.key !== key) {
+        bodyEl.dataset.key  = key;
+        titleEl.textContent = q.passageTitle || 'Comprehension Passage';
+        bodyEl.textContent  = q.passage;   // textContent — safe, no XSS
+        panel.scrollTop     = 0;
+        // Reset collapse state when a new passage appears
+        collapsed          = false;
+        bodyEl.style.display = '';
+        if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Hide Passage';
+      }
+      panel.classList.remove('hidden');
+    } else {
+      panel.classList.add('hidden');
+    }
+  }
+
+  // Fire on every question navigation (quiz-app.js always updates #questionNumber)
+  new MutationObserver(syncPassage).observe(qNumEl, {
+    childList: true, subtree: true, characterData: true
+  });
+  syncPassage(); // run once on load
+})();
+</script>
 </body>
 </html>

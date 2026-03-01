@@ -676,71 +676,15 @@ class QuizUI {
 }
 
 // Initialize Quiz
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // Show loading state
-        document.body.style.cursor = 'wait';
-        
-        // Initialize launcher
-        const launcher = new QuizLauncher();
-        
-        // Load questions based on URL parameters
-        const questions = await launcher.initializeFromUrl();
-        
-        if (!questions || questions.length === 0) {
-            throw new Error('No questions loaded');
+// QUESTIONS and DURATION are declared in the HTML's inline <script> — no loading, no routing.
+document.addEventListener('DOMContentLoaded', () => {
+    const quizState = new QuizState(QUESTIONS, typeof DURATION !== 'undefined' ? DURATION : 3600);
+    const quizUI    = new QuizUI(quizState);
+
+    window.addEventListener('beforeunload', (e) => {
+        if (!quizState.isSubmitted) {
+            e.preventDefault();
+            e.returnValue = '';
         }
-        
-        console.log(`Loaded ${questions.length} questions`);
-        
-        // Create quiz state with loaded questions
-        const quizState = new QuizState(questions, QUIZ_CONFIG.duration);
-        
-        // Initialize UI
-        const quizUI = new QuizUI(quizState);
-        
-        // Prevent accidental page exit
-        window.addEventListener('beforeunload', (e) => {
-            if (!quizState.isSubmitted) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-        });
-        
-        document.body.style.cursor = 'default';
-        
-    } catch (error) {
-        console.error('Failed to initialize quiz:', error);
-        
-        // Show error message
-        document.body.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; 
-                        height: 100vh; background: #f8f9fa; padding: 2rem;">
-                <div style="text-align: center; max-width: 500px;">
-                    <div style="font-size: 4rem; color: #ef4444; margin-bottom: 1rem;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #1f2937;">
-                        Failed to Load Quiz
-                    </h1>
-                    <p style="font-size: 1rem; color: #6b7280; margin-bottom: 2rem;">
-                        ${error.message}
-                    </p>
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <button onclick="window.location.reload()" 
-                                style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; 
-                                       border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                            <i class="fas fa-redo"></i> Try Again
-                        </button>
-                        <button onclick="window.history.back()" 
-                                style="padding: 0.75rem 1.5rem; background: white; color: #1f2937; 
-                                       border: 2px solid #e5e7eb; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                            <i class="fas fa-arrow-left"></i> Go Back
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
+    });
 });
