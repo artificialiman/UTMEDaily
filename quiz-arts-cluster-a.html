@@ -4,901 +4,622 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Arts — ELGC — JAMB Practice · GrantApp AI</title>
+    <title>Arts/Commercial — MEPC — JAMB Practice · GrantApp AI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="quiz-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="quiz-body">
 
 <!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
+<!-- passage field triggers the reading panel in quiz-app.js; passageTitle labels it.  -->
+<!-- Questions sharing identical passage strings are automatically grouped.            -->
 <script>
-const DURATION = 3600;
+const DURATION = 7200; /* 120 minutes for 160 questions */
+
+/* ── Shared passage strings ─────────────────────────────────────────────────────────
+   Defined once here so each question object references the same value.
+   quiz-app.js detects identity by string equality to avoid re-rendering the panel
+   as students navigate within a passage group.
+   ───────────────────────────────────────────────────────────────────────────────── */
+
+const P1 = `The Niger Delta region of Nigeria is one of the most ecologically sensitive areas on the continent. For decades it has been the economic backbone of the nation, supplying the crude oil that funds the federal budget. Yet the communities that live above these oil deposits have seen little of the resulting wealth. Pipelines cut through fishing villages; oil spills blacken creek water that families depend on for drinking and farming. Flares burn day and night, releasing gases that researchers have linked to respiratory illness and soil degradation.
+
+Successive governments have promised remediation, compensation, and development. Some funds have been released; fewer have reached their destinations. The gap between policy announcement and ground-level reality has bred a deep scepticism among Delta communities — a scepticism that, when it tips into militancy, costs the nation far more in lost production than any cleanup programme would have cost in the first place.
+
+The lesson appears simple enough: sustainable resource extraction requires that the people who bear its environmental costs share meaningfully in its economic rewards. That this lesson has been stated so often, and applied so rarely, points to a failure not of knowledge but of political will.`;
+
+const P2 = `Language is not a neutral vessel. Every word carries the sediment of the culture that shaped it, and every sentence is an act that positions speaker and listener within a web of social relations. When a child acquires her mother tongue, she is not merely learning labels for objects; she is inheriting a way of perceiving the world, a set of distinctions her community considers worth marking, and a repertoire of silences — things that exist but for which her language provides no ready name.
+
+This observation has given rise to the Sapir-Whorf hypothesis, sometimes called linguistic relativity, which in its strong form claims that language determines thought. Most contemporary linguists reject the strong version: speakers can and do think about things their language lacks words for. The weaker claim — that language influences habitual patterns of thought and attention — enjoys considerably more empirical support. Colour perception studies, spatial reasoning experiments, and cross-linguistic analyses of time metaphors all suggest that the grammar and vocabulary of one's first language leave measurable traces on cognition, even when the speaker is performing tasks that seem entirely non-linguistic.`;
 
 const QUESTIONS = [
-  /* ── ENGLISH (1–35) ─────────────────────────────── */
+
+  /* ══════════════════════════════════════════════════════════════
+     CHRISTIAN RELIGIOUS STUDIES  Q 1 – 35
+     ══════════════════════════════════════════════════════════════ */
+  { id:1, subject:'Christian Religious Studies', text:'According to Genesis 1, on which day did God create human beings?', options:{A:'Fifth',B:'Sixth',C:'Seventh',D:'Fourth'}, answer:'B', explanation:'Genesis 1:26-31 records the creation of humanity on the sixth day, after plants, sea creatures, birds, and land animals.' },
+  { id:2, subject:'Christian Religious Studies', text:'The first murder recorded in the Bible was committed by:', options:{A:'Lamech',B:'Esau',C:'Cain',D:'Saul'}, answer:'C', explanation:'Genesis 4:8 records Cain killing his brother Abel out of jealousy after God accepted Abel\'s offering but not his.' },
+  { id:3, subject:'Christian Religious Studies', text:'God established a covenant with Noah, the sign of which was:', options:{A:'Circumcision',B:'The Sabbath',C:'A rainbow',D:'Fire on the altar'}, answer:'C', explanation:'Genesis 9:12-17 — God set a rainbow in the clouds as the sign of his covenant never again to destroy all life by flood.' },
+  { id:4, subject:'Christian Religious Studies', text:'Abraham was originally called:', options:{A:'Abram',B:'Abraham',C:'Amos',D:'Abimelech'}, answer:'A', explanation:'Genesis 17:5 — God changed his name from Abram ("exalted father") to Abraham ("father of many nations") as a sign of the covenant.' },
+  { id:5, subject:'Christian Religious Studies', text:'The call of Moses took place at:', options:{A:'Mount Sinai',B:'The burning bush at Horeb',C:'The banks of the Nile',D:'The tabernacle at Shiloh'}, answer:'B', explanation:'Exodus 3:1-6 — God appeared to Moses in a burning bush at Horeb (Mount Sinai) and commissioned him to lead Israel out of Egypt.' },
+  { id:6, subject:'Christian Religious Studies', text:'The Ten Commandments were given to Moses on:', options:{A:'Mount Carmel',B:'Mount Hermon',C:'Mount Sinai',D:'Mount Zion'}, answer:'C', explanation:'Exodus 19-20 — God gave the Ten Commandments to Moses on Mount Sinai (also called Horeb) after the exodus from Egypt.' },
+  { id:7, subject:'Christian Religious Studies', text:'Which judge of Israel was known for his extraordinary strength?', options:{A:'Gideon',B:'Deborah',C:'Samson',D:'Jephthah'}, answer:'C', explanation:'Judges 13-16 records Samson\'s supernatural strength, which came from his Nazirite vow, symbolised by his uncut hair.' },
+  { id:8, subject:'Christian Religious Studies', text:'The statement "Where you go I will go; your people shall be my people" was made by:', options:{A:'Esther to Mordecai',B:'Ruth to Naomi',C:'Rachel to Jacob',D:'Mary to Elizabeth'}, answer:'B', explanation:'Ruth 1:16 — Ruth\'s declaration of loyalty to her mother-in-law Naomi after the death of their husbands is one of Scripture\'s most celebrated expressions of devotion.' },
+  { id:9, subject:'Christian Religious Studies', text:'David was anointed king of Israel by:', options:{A:'Eli',B:'Nathan',C:'Samuel',D:'Elijah'}, answer:'C', explanation:'1 Samuel 16:13 — The prophet Samuel anointed David, the youngest son of Jesse, as king while Saul still ruled, on God\'s instruction.' },
+  { id:10, subject:'Christian Religious Studies', text:'Solomon asked God for wisdom during a dream at:', options:{A:'Jerusalem',B:'Bethlehem',C:'Gibeon',D:'Hebron'}, answer:'C', explanation:'1 Kings 3:5-12 — God appeared to Solomon at Gibeon in a dream, and Solomon asked for wisdom to govern the people rather than riches or long life.' },
+  { id:11, subject:'Christian Religious Studies', text:'The prophet who confronted King Ahab over Naboth\'s vineyard was:', options:{A:'Elisha',B:'Isaiah',C:'Amos',D:'Elijah'}, answer:'D', explanation:'1 Kings 21 — Elijah confronted Ahab and Jezebel after they had Naboth killed to seize his vineyard, pronouncing God\'s judgment on them.' },
+  { id:12, subject:'Christian Religious Studies', text:'Elijah was taken to heaven in:', options:{A:'A chariot of fire',B:'A whirlwind',C:'Both a chariot of fire and a whirlwind',D:'A pillar of cloud'}, answer:'C', explanation:'2 Kings 2:11 — A chariot of fire and horses appeared and separated Elijah and Elisha, and Elijah went up in a whirlwind into heaven.' },
+  { id:13, subject:'Christian Religious Studies', text:'The book of Psalms is traditionally associated with:', options:{A:'Solomon',B:'Moses',C:'David',D:'Asaph'}, answer:'C', explanation:'While the Psalter has multiple authors (Asaph, the sons of Korah, Moses, Solomon), David is the dominant traditional author, credited with 73 of the 150 psalms.' },
+  { id:14, subject:'Christian Religious Studies', text:'Isaiah\'s vision of God in the temple includes the cry:', options:{A:'"The earth is full of his glory"',B:'"Holy, holy, holy is the Lord of hosts"',C:'"Worthy is the Lamb"',D:'"I am the Lord your God"'}, answer:'B', explanation:'Isaiah 6:3 — The seraphim cried "Holy, holy, holy is the Lord of hosts; the whole earth is full of his glory." This vision led to Isaiah\'s commissioning.' },
+  { id:15, subject:'Christian Religious Studies', text:'Jeremiah is known as "the weeping prophet" because:', options:{A:'He wept at the tomb of Lazarus',B:'He mourned persistently over the sins of Judah and the destruction of Jerusalem',C:'He fasted and wept for forty days',D:'He wept when called to prophesy'}, answer:'B', explanation:'Jeremiah\'s ministry (Jeremiah, Lamentations) is characterised by deep anguish over Judah\'s unfaithfulness and the fall of Jerusalem to Babylon.' },
+  { id:16, subject:'Christian Religious Studies', text:'The vision of the valley of dry bones is found in the book of:', options:{A:'Isaiah',B:'Daniel',C:'Ezekiel',D:'Zechariah'}, answer:'C', explanation:'Ezekiel 37:1-14 — God showed Ezekiel a valley of dry bones that came to life, symbolising the restoration of Israel from exile.' },
+  { id:17, subject:'Christian Religious Studies', text:'Daniel\'s three friends who were thrown into the fiery furnace were:', options:{A:'Shadrach, Meshach, and Abednego',B:'Gog, Magog, and Meshach',C:'Ananias, Azariah, and Mishael',D:'Both A and C'}, answer:'D', explanation:'Daniel 1:7 and 3 — Their Hebrew names were Hananiah, Mishael, and Azariah; the Babylonians renamed them Shadrach, Meshach, and Abednego.' },
+  { id:18, subject:'Christian Religious Studies', text:'The annunciation — the announcement of Jesus\' birth — was made to Mary by the angel:', options:{A:'Michael',B:'Gabriel',C:'Raphael',D:'Uriel'}, answer:'B', explanation:'Luke 1:26-38 — The angel Gabriel was sent from God to Nazareth to announce to Mary that she would conceive and bear the Son of God.' },
+  { id:19, subject:'Christian Religious Studies', text:'Jesus was baptised in the river:', options:{A:'Euphrates',B:'Kishon',C:'Jordan',D:'Nile'}, answer:'C', explanation:'Matthew 3:13-17 — Jesus came from Galilee to the Jordan River to be baptised by John. The Holy Spirit descended as a dove and God\'s voice affirmed him as his Son.' },
+  { id:20, subject:'Christian Religious Studies', text:'The Sermon on the Mount begins with the:', options:{A:'Lord\'s Prayer',B:'Beatitudes',C:'Great Commandment',D:'Parable of the Sower'}, answer:'B', explanation:'Matthew 5:3-12 — The Sermon on the Mount (Matthew 5-7) opens with the Beatitudes, a series of blessings that characterise kingdom living.' },
+  { id:21, subject:'Christian Religious Studies', text:'In the parable of the Prodigal Son, the father\'s response to his returning son illustrates:', options:{A:'Justice and punishment',B:'God\'s unconditional forgiveness and love',C:'The importance of wealth',D:'Obedience to the law'}, answer:'B', explanation:'Luke 15:11-32 — The father running to meet his returning son and restoring him fully illustrates God\'s extravagant, unconditional forgiveness.' },
+  { id:22, subject:'Christian Religious Studies', text:'The miracle at Cana, in which Jesus turned water into wine, is recorded in:', options:{A:'Matthew 2',B:'Mark 1',C:'Luke 4',D:'John 2'}, answer:'D', explanation:'John 2:1-11 — The wedding at Cana is the first of Jesus\' signs in John\'s Gospel, revealing his glory and prompting his disciples\' belief.' },
+  { id:23, subject:'Christian Religious Studies', text:'Jesus raised Lazarus from the dead after he had been in the tomb for:', options:{A:'One day',B:'Two days',C:'Three days',D:'Four days'}, answer:'D', explanation:'John 11:17,39 — By the time Jesus arrived, Lazarus had been in the tomb four days. Martha noted the body would already smell.' },
+  { id:24, subject:'Christian Religious Studies', text:'The Last Supper took place during the feast of:', options:{A:'Pentecost',B:'Tabernacles',C:'Passover',D:'Dedication'}, answer:'C', explanation:'Matthew 26:17-19 — The Last Supper was the Passover meal. Jesus reinterpreted its elements as symbols of his body and blood in the new covenant.' },
+  { id:25, subject:'Christian Religious Studies', text:'Jesus was betrayed by Judas for:', options:{A:'Ten pieces of silver',B:'Twenty pieces of silver',C:'Thirty pieces of silver',D:'Fifty pieces of silver'}, answer:'C', explanation:'Matthew 26:15 — The chief priests agreed to pay Judas thirty pieces of silver to betray Jesus, fulfilling the prophecy of Zechariah 11:12.' },
+  { id:26, subject:'Christian Religious Studies', text:'The Day of Pentecost in Acts 2 is significant because:', options:{A:'Jesus ascended to heaven',B:'The Holy Spirit was poured out and the church began',C:'Paul was converted on the road to Damascus',D:'Peter was released from prison'}, answer:'B', explanation:'Acts 2:1-41 — The Holy Spirit came upon the disciples in Jerusalem; Peter preached and about three thousand people were added to the church that day.' },
+  { id:27, subject:'Christian Religious Studies', text:'Saul\'s conversion on the road to Damascus is recorded in:', options:{A:'Acts 7',B:'Acts 9',C:'Acts 13',D:'Galatians 1'}, answer:'B', explanation:'Acts 9:1-19 — Saul was struck down by a blinding light and heard the voice of Jesus while travelling to Damascus to persecute Christians.' },
+  { id:28, subject:'Christian Religious Studies', text:'The concept of justification by faith is most fully developed in:', options:{A:'Hebrews',B:'James',C:'Romans',D:'Revelation'}, answer:'C', explanation:'Romans 3-5 — Paul\'s letter to the Romans provides the most systematic exposition of justification by faith, not works of the law (Romans 3:28).' },
+  { id:29, subject:'Christian Religious Studies', text:'Paul\'s famous passage on love ("Love is patient, love is kind…") is found in:', options:{A:'Romans 8',B:'1 Corinthians 13',C:'Galatians 5',D:'Ephesians 3'}, answer:'B', explanation:'1 Corinthians 13 — Paul\'s "hymn to love" contrasts spiritual gifts with love, arguing that love is the greatest and most enduring virtue.' },
+  { id:30, subject:'Christian Religious Studies', text:'The fruit of the Spirit listed in Galatians 5:22-23 includes:', options:{A:'Power, riches, wisdom, strength',B:'Love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control',C:'Faith, hope, love, mercy, grace',D:'Prophecy, tongues, healing, miracles'}, answer:'B', explanation:'Galatians 5:22-23 lists nine qualities produced by the Holy Spirit in believers, contrasted with the works of the flesh in the preceding verses.' },
+  { id:31, subject:'Christian Religious Studies', text:'The armour of God described in Ephesians 6 includes all of the following EXCEPT:', options:{A:'The helmet of salvation',B:'The shield of faith',C:'The crown of glory',D:'The sword of the Spirit'}, answer:'C', explanation:'Ephesians 6:14-17 lists belt of truth, breastplate of righteousness, gospel shoes, shield of faith, helmet of salvation, sword of the Spirit. The crown of glory (1 Peter 5:4) is not part of this passage.' },
+  { id:32, subject:'Christian Religious Studies', text:'The book of Revelation was written by:', options:{A:'Paul',B:'Peter',C:'John',D:'Luke'}, answer:'C', explanation:'Revelation 1:1,4,9 — The author identifies himself as John, traditionally identified as the apostle John, writing from exile on the island of Patmos.' },
+  { id:33, subject:'Christian Religious Studies', text:'The Great Commission given by Jesus commands his disciples to:', options:{A:'Build temples in every nation',B:'Go and make disciples of all nations, baptising and teaching them',C:'Heal the sick and raise the dead only',D:'Return to Jerusalem and wait permanently'}, answer:'B', explanation:'Matthew 28:19-20 — Jesus commanded his disciples to go, make disciples of all nations, baptise them, and teach them to observe everything he commanded.' },
+  { id:34, subject:'Christian Religious Studies', text:'Which of the following BEST describes the role of the prophets in the Old Testament?', options:{A:'Priests who offered sacrifices on behalf of the people',B:'Kings who ruled Israel in times of crisis',C:'Messengers who called the people to faithfulness and announced God\'s purposes',D:'Scribes who copied and preserved the law'}, answer:'C', explanation:'The prophets\' primary role was to be God\'s spokespersons — calling Israel back to covenant faithfulness, pronouncing judgment on sin, and announcing God\'s future redemptive plans.' },
+  { id:35, subject:'Christian Religious Studies', text:'The Nicene Creed affirms that Jesus Christ is:', options:{A:'A created being, the first of all creation',B:'A great prophet but not divine',C:'Of one substance with the Father, fully God and fully human',D:'Divine in spirit but not in body'}, answer:'C', explanation:'The Nicene Creed (325 AD, expanded 381 AD) affirms that Jesus is "of one substance [homoousios] with the Father" — the orthodox definition of Christ\'s divine nature against Arianism.' },
+
+
+
+  /* ══════════════════════════════════════════════════════════════
+     ENGLISH  Q 36 – 90  (55 questions)
+     36–45 : Passage 1 — Niger Delta (P1)
+     46–55 : Passage 2 — Language & Thought (P2)
+     56–70 : Stress & Phonetics
+     71–90 : Grammar, Vocabulary & Usage
+     ══════════════════════════════════════════════════════════════ */
+
+  /* ── Passage 1: Niger Delta ── */
   {
-    id: 1, subject: 'English',
-    text: 'Choose the word that is OPPOSITE in meaning to "ubiquitous"',
-    options: { A: 'Rare', B: 'Common', C: 'Universal', D: 'Frequent' },
-    answer: 'A',
-    explanation: 'Ubiquitous means present everywhere. Its opposite is rare.',
-  },
-  {
-    id: 2, subject: 'English',
-    text: 'Choose the option with the same vowel sound as "blood"',
-    options: { A: 'Good', B: 'Flood', C: 'Food', D: 'Mood' },
+    id: 36, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'According to the passage, why have Delta communities become sceptical of government promises?',
+    options: { A: 'They prefer foreign investors', B: 'Funds announced rarely reach them on the ground', C: 'They oppose oil extraction entirely', D: 'They have no elected representatives' },
     answer: 'B',
-    explanation: '"Blood" /blʌd/ rhymes with "flood" /flʌd/ — both carry the /ʌ/ vowel sound.',
+    explanation: 'The passage states "Some funds have been released; fewer have reached their destinations," breeding scepticism.',
   },
   {
-    id: 3, subject: 'English',
-    text: 'In the sentence "The committee has submitted its report," the verb "has" agrees with:',
-    options: { A: 'Report (object)', B: 'Members (implied plural)', C: 'Committee (singular collective noun)', D: 'Either A or B' },
+    id: 37, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'What does the writer identify as the root cause of the Delta\'s problems?',
+    options: { A: 'Lack of oil revenue', B: 'Environmental ignorance', C: 'Failure of political will, not knowledge', D: 'Corruption by oil companies alone' },
     answer: 'C',
-    explanation: 'Collective nouns take singular verbs when the group acts as a single unit.',
-    exception: 'British English often uses plural verbs for collective nouns.',
+    explanation: 'The final sentence explicitly states the failure is "not of knowledge but of political will."',
   },
   {
-    id: 4, subject: 'English',
-    text: 'Identify the literary device: "The classroom was a zoo"',
-    options: { A: 'Metaphor', B: 'Personification', C: 'Hyperbole', D: 'Simile' },
-    answer: 'A',
-    explanation: 'A direct comparison without "like" or "as" is a metaphor.',
+    id: 38, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'The word "remediation" as used in the passage most nearly means:',
+    options: { A: 'Financial compensation only', B: 'Punishment of oil companies', C: 'The action of restoring a damaged environment', D: 'Medical treatment of affected persons' },
+    answer: 'C',
+    explanation: 'Remediation means the process of reversing or stopping environmental damage.',
   },
   {
-    id: 5, subject: 'English',
-    text: 'Which sentence uses "lie" correctly?',
-    options: { A: 'The book is laying on the table', B: 'I will lay down for a nap', C: 'The hen has laid five eggs', D: 'Yesterday, I lay down to rest' },
+    id: 39, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'What literary device is used in "Pipelines cut through fishing villages; oil spills blacken creek water"?',
+    options: { A: 'Hyperbole', B: 'Imagery', C: 'Metaphor', D: 'Personification' },
+    answer: 'B',
+    explanation: 'The vivid description of physical destruction appeals to the senses — that is imagery.',
+  },
+  {
+    id: 40, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'The writer\'s attitude towards successive governments is best described as:',
+    options: { A: 'Sympathetic', B: 'Indifferent', C: 'Critical', D: 'Celebratory' },
+    answer: 'C',
+    explanation: 'The writer criticises governments for repeated failures to translate policy into action.',
+  },
+  {
+    id: 41, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'Which of the following best states the main argument of the passage?',
+    options: {
+      A: 'Nigeria should stop oil extraction immediately',
+      B: 'Oil communities must share fairly in extraction benefits or instability will follow',
+      C: 'Foreign oil companies are entirely to blame for the Delta\'s crisis',
+      D: 'Environmental damage in the Delta is irreversible',
+    },
+    answer: 'B',
+    explanation: 'The passage argues equitable benefit-sharing is both just and practically necessary to prevent militancy.',
+  },
+  {
+    id: 42, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'The phrase "the economic backbone of the nation" is an example of:',
+    options: { A: 'Simile', B: 'Personification', C: 'Oxymoron', D: 'Metaphor' },
     answer: 'D',
-    explanation: 'Lie (recline) is intransitive: lie/lay/lain. Lay (place) is transitive: lay/laid/laid.',
+    explanation: 'Calling the Delta the "backbone" transfers a body part\'s function to an economic role — that is a metaphor.',
   },
   {
-    id: 6, subject: 'English',
-    text: 'Choose the correctly punctuated sentence:',
-    options: { A: 'The teacher said, "homework is due tomorrow".', B: 'The teacher said "Homework is due tomorrow."', C: 'The teacher said, "Homework is due tomorrow."', D: 'The teacher said: "homework is due tomorrow."' },
-    answer: 'C',
-    explanation: 'Comma before the quote, capital letter opens it, period inside the closing quotation mark.',
-  },
-  {
-    id: 7, subject: 'English',
-    text: 'Identify the error: "Neither the students nor the teacher were present"',
-    options: { A: 'No error', B: 'Pronoun error', C: 'Subject-verb disagreement', D: 'Tense error' },
-    answer: 'C',
-    explanation: 'With neither…nor, the verb agrees with the nearest subject. "Teacher" (singular) requires "was".',
-  },
-  {
-    id: 8, subject: 'English',
-    text: 'The prefix "bi-" in "biannual" means:',
-    options: { A: 'Once every two years', B: 'Twice a year', C: 'Two years long', D: 'Half a year' },
+    id: 43, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'What consequence does the writer say militancy has had on the nation?',
+    options: { A: 'It has led to better environmental laws', B: 'It costs more in lost production than cleanup would have', C: 'It has attracted international attention', D: 'It has resulted in fair compensation' },
     answer: 'B',
-    explanation: 'Biannual = twice yearly.',
-    exception: 'Biennial = every two years — a very common source of confusion.',
+    explanation: 'The writer states militancy costs "far more in lost production than any cleanup programme would have cost."',
   },
   {
-    id: 9, subject: 'English',
-    text: 'Choose the word with correct spelling:',
-    options: { A: 'Occurred', B: 'Ocurred', C: 'Occureed', D: 'Occured' },
-    answer: 'A',
-    explanation: 'Double the final consonant before -ed when the final syllable is stressed and ends CVC.',
-  },
-  {
-    id: 10, subject: 'English',
-    text: 'In "The faster you run, the sooner you\'ll arrive," the structure is:',
-    options: { A: 'Parallel structure', B: 'Comparative correlation', C: 'Superlative comparison', D: 'Conditional clause' },
-    answer: 'B',
-    explanation: 'The + comparative … the + comparative shows a proportional correlation.',
-  },
-  {
-    id: 11, subject: 'English',
-    text: 'Identify the sentence with correct pronoun usage:',
-    options: { A: 'Myself and John will attend', B: 'The secret is between you and me', C: 'He gave the gift to my wife and I', D: 'Between you and I, he\'s wrong' },
-    answer: 'B',
-    explanation: 'After a preposition, use the objective case: "me", not "I".',
-  },
-  {
-    id: 12, subject: 'English',
-    text: 'The word "sanction" can mean:',
-    options: { A: 'To approve OR to penalize', B: 'Only to penalize', C: 'Only to approve', D: 'To ignore' },
-    answer: 'A',
-    explanation: 'Sanction is an auto-antonym — it can mean both approve AND punish.',
-  },
-  {
-    id: 13, subject: 'English',
-    text: 'Which uses the subjunctive mood correctly?',
-    options: { A: 'If he were here, he\'d help', B: 'If I was rich, I\'d travel', C: 'I wish I was taller', D: 'She acts like she was the boss' },
-    answer: 'A',
-    explanation: 'The subjunctive uses "were" for all persons in contrary-to-fact conditions.',
-  },
-  {
-    id: 14, subject: 'English',
-    text: 'Identify the dangling modifier:',
-    options: { A: 'I walked home in the rain', B: 'The rain started as I walked home', C: 'While walking home, I felt raindrops', D: 'Walking home, the rain started' },
-    answer: 'D',
-    explanation: '"Walking home" illogically modifies "rain" — rain cannot walk.',
-  },
-  {
-    id: 15, subject: 'English',
-    text: 'The word "egregious" originally meant "remarkably good" but now means "remarkably bad." This shift is:',
-    options: { A: 'Specialization', B: 'Generalization', C: 'Pejoration', D: 'Amelioration' },
+    id: 44, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: 'The tone of the concluding paragraph is best described as:',
+    options: { A: 'Optimistic', B: 'Despairing', C: 'Sardonic and resigned', D: 'Neutral and statistical' },
     answer: 'C',
-    explanation: 'Pejoration: a word becomes more negative in meaning over time.',
+    explanation: 'Stating the lesson "has been stated so often, and applied so rarely" is wearily sardonic — the writer sees the irony without expecting change.',
   },
   {
-    id: 16, subject: 'English',
-    text: 'In "She is taller than I," the implied ending is:',
-    options: { A: 'Than me', B: 'Either A or B', C: 'Than I am', D: 'Than I be' },
-    answer: 'C',
-    explanation: 'In formal writing, the subject case is used after "than" when a verb is implied.',
-  },
-  {
-    id: 17, subject: 'English',
-    text: 'Choose the sentence with correct parallel structure:',
-    options: { A: 'She likes to read, writing, and to paint', B: 'She likes reading, to write, and painting', C: 'She likes reading, writing, and painting', D: 'She likes to read, to write, and painting' },
-    answer: 'C',
-    explanation: 'Parallel elements must share the same grammatical form — all gerunds here.',
-  },
-  {
-    id: 18, subject: 'English',
-    text: 'The phrase "I could care less" is:',
-    options: { A: 'Regional variation, both acceptable', B: 'Incorrect; should be "couldn\'t care less"', C: 'Means extreme caring', D: 'Correct and means indifference' },
+    id: 45, subject: 'English',
+    passageTitle: 'The Niger Delta',
+    passage: P1,
+    text: '"Flares burn day and night, releasing gases that researchers have linked to respiratory illness." The underlined clause is a:',
+    options: { A: 'Noun clause', B: 'Adjectival relative clause', C: 'Adverbial clause of time', D: 'Adverbial clause of concession' },
     answer: 'B',
-    explanation: 'Logically, "couldn\'t care less" means one already cares nothing — the intended meaning.',
-  },
-  {
-    id: 19, subject: 'English',
-    text: 'Identify the oxymoron:',
-    options: { A: 'Hot coffee', B: 'Fast car', C: 'Deafening silence', D: 'Very unique' },
-    answer: 'C',
-    explanation: 'An oxymoron combines contradictory terms. Silence by definition cannot be loud.',
-  },
-  {
-    id: 20, subject: 'English',
-    text: 'In passive voice, "The cat chased the mouse" becomes:',
-    options: { A: 'The mouse has been chased', B: 'The mouse was chased by the cat', C: 'The mouse is chased by the cat', D: 'The cat was chasing the mouse' },
-    answer: 'B',
-    explanation: 'Passive: object becomes subject; verb becomes be + past participle; agent introduced with "by".',
-  },
-  {
-    id: 21, subject: 'English',
-    text: 'Choose the sentence with correct comma usage:',
-    options: { A: 'The old, red car broke down', B: 'The, old, red, car broke down', C: 'The red, old, car broke down', D: 'The old red car broke down' },
-    answer: 'A',
-    explanation: 'Coordinate adjectives (interchangeable in order) are separated by commas.',
-  },
-  {
-    id: 22, subject: 'English',
-    text: 'The error in "Irregardless of the cost, we\'ll proceed" is:',
-    options: { A: '"Irregardless" is non-standard', B: 'No error', C: 'Wrong preposition', D: 'Comma splice' },
-    answer: 'A',
-    explanation: '"Irregardless" is a double negative (ir- + -less). The standard form is "regardless".',
-  },
-  {
-    id: 23, subject: 'English',
-    text: 'In "The data is conclusive," the subject-verb agreement is:',
-    options: { A: 'Regional variation', B: 'Either acceptable in modern usage', C: 'Incorrect; should be "data are"', D: 'Correct regardless of context' },
-    answer: 'B',
-    explanation: '"Data" is the Latin plural of "datum." Modern usage increasingly treats it as a singular mass noun.',
-  },
-  {
-    id: 24, subject: 'English',
-    text: 'Identify the malapropism: "Texas has a large Portuguese population"',
-    options: { A: 'Texas (wrong place)', B: 'Large (wrong modifier)', C: 'Portuguese — should be "populace"', D: 'No error' },
-    answer: 'C',
-    explanation: 'A malapropism substitutes a similar-sounding but incorrect word for the intended one.',
-  },
-  {
-    id: 25, subject: 'English',
-    text: 'The sentence "Whom did you see?" is:',
-    options: { A: 'Conversationally awkward', B: 'Missing an auxiliary verb', C: 'Archaic and incorrect', D: 'Formally correct' },
-    answer: 'D',
-    explanation: '"Whom" is the objective case and is correct as the direct object of "see".',
-  },
-  {
-    id: 26, subject: 'English',
-    text: 'Choose the correct verb form: "If I _____ known, I would have come"',
-    options: { A: 'have', B: 'had', C: 'would have', D: 'has' },
-    answer: 'B',
-    explanation: 'Third conditional: past perfect in the if-clause pairs with "would have" in the main clause.',
-  },
-  {
-    id: 27, subject: 'English',
-    text: 'The phrase "beg the question" traditionally means:',
-    options: { A: 'To ask formally', B: 'To avoid answering', C: 'To raise a question', D: 'To assume what you\'re trying to prove (circular reasoning)' },
-    answer: 'D',
-    explanation: '"Beg the question" is the logical fallacy of petitio principii — assuming the conclusion.',
-  },
-  {
-    id: 28, subject: 'English',
-    text: 'In "She is one of those teachers who inspire students," the verb "inspire" is:',
-    options: { A: 'Either acceptable', B: 'Subjunctive mood', C: 'Incorrect; should be "inspires"', D: 'Correct — agrees with "teachers" (plural antecedent of "who")' },
-    answer: 'D',
-    explanation: '"Who" refers to "teachers" (plural), so the plural verb "inspire" is correct.',
-  },
-  {
-    id: 29, subject: 'English',
-    text: 'Identify the split infinitive:',
-    options: { A: 'To boldly go where no one has gone', B: 'To go boldly where no one has gone', C: 'Boldly to go where no one has gone', D: 'Both B and C' },
-    answer: 'A',
-    explanation: 'A split infinitive places an adverb between "to" and the verb: "to boldly go".',
-  },
-  {
-    id: 30, subject: 'English',
-    text: 'The word "presently" means:',
-    options: { A: 'Only soon', B: 'In the past', C: 'Only currently', D: 'Currently OR soon (depending on variety)' },
-    answer: 'D',
-    explanation: '"Presently" means soon in traditional usage and now in American English — both are standard.',
-  },
-  {
-    id: 31, subject: 'English',
-    text: 'Choose the correct form: "Neither of the answers _____ correct"',
-    options: { A: 'is', B: 'were', C: 'be', D: 'are' },
-    answer: 'A',
-    explanation: '"Neither" is a singular pronoun and takes a singular verb.',
-  },
-  {
-    id: 32, subject: 'English',
-    text: 'In "The house was engulfed in flames," the phrase "in flames" functions as:',
-    options: { A: 'Prepositional object', B: 'Noun phrase', C: 'Adjectival phrase', D: 'Adverbial phrase' },
-    answer: 'D',
-    explanation: '"In flames" describes the manner/state of the engulfing — it modifies the verb.',
-  },
-  {
-    id: 33, subject: 'English',
-    text: 'The sentence "We was ready to leave" contains:',
-    options: { A: 'Correct standard grammar', B: 'A random error', C: 'Dialect grammar (nonstandard but systematic)', D: 'Code-switching' },
-    answer: 'C',
-    explanation: '"We was" occurs systematically in some English dialects; it is nonstandard but rule-governed.',
-  },
-  {
-    id: 34, subject: 'English',
-    text: 'Identify the zeugma: "She broke his car and his heart"',
-    options: { A: 'No rhetorical device', B: 'Metaphor only', C: '"Broke" applies literally (car) and figuratively (heart) simultaneously', D: 'Parallel structure only' },
-    answer: 'C',
-    explanation: 'Zeugma uses one word to govern two objects in different senses at once.',
-  },
-  {
-    id: 35, subject: 'English',
-    text: 'Which of the following is an example of onomatopoeia?',
-    options: { A: 'The moon is a silver coin', B: 'The wind whispered through the trees', C: 'The thunder crashed and the lightning flashed', D: 'She ran faster than light' },
-    answer: 'B',
-    explanation: '"Whispered" imitates the soft sound of moving air — it sounds like what it means.',
+    explanation: '"that researchers have linked to respiratory illness" modifies "gases" — it is a relative (adjectival) clause.',
   },
 
-  /* ── LITERATURE (36–70) ──────────────────────────── */
+  /* ── Passage 2: Language & Thought ── */
   {
-    id: 36, subject: 'Literature',
-    text: 'A story passed down orally from generation to generation is called?',
-    options: { A: 'Legend', B: 'Myth', C: 'Folklore', D: 'Epic' },
+    id: 46, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'According to the passage, what is a child acquiring alongside vocabulary when she learns her mother tongue?',
+    options: { A: 'Only the ability to name objects', B: 'A shared cultural perception of the world and its silences', C: 'The grammar rules of all languages', D: 'The history of her nation' },
+    answer: 'B',
+    explanation: 'The passage states the child inherits "a way of perceiving the world" and "a repertoire of silences."',
+  },
+  {
+    id: 47, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'The strong form of the Sapir-Whorf hypothesis claims that:',
+    options: { A: 'Language influences habitual thought patterns', B: 'Language and thought are completely unrelated', C: 'Language determines thought', D: 'All languages are equally complex' },
     answer: 'C',
+    explanation: 'The passage defines the strong version as the claim that "language determines thought."',
   },
   {
-    id: 37, subject: 'Literature',
-    text: 'The use of exaggeration for emphasis in literature is called?',
-    options: { A: 'Metaphor', B: 'Simile', C: 'Hyperbole', D: 'Personification' },
+    id: 48, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'Why do most contemporary linguists reject the strong form of linguistic relativity?',
+    options: { A: 'It has not been tested scientifically', B: 'Speakers can think about things their language has no words for', C: 'Colour perception disproves it', D: 'It applies only to written languages' },
+    answer: 'B',
+    explanation: 'The passage states linguists reject it because "speakers can and do think about things their language lacks words for."',
+  },
+  {
+    id: 49, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'The phrase "Language is not a neutral vessel" means:',
+    options: { A: 'Language is always biased against minorities', B: 'Language cannot carry meaning without grammar', C: 'Language is actively shaped by and shapes cultural values', D: 'Language is unreliable as a tool' },
     answer: 'C',
+    explanation: 'Describing language as non-neutral means it carries cultural weight — it shapes and is shaped by the community using it.',
   },
   {
-    id: 38, subject: 'Literature',
-    text: 'A play written to be performed on stage is called?',
-    options: { A: 'Prose', B: 'Drama', C: 'Poetry', D: 'Novel' },
+    id: 50, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'The expression "the sediment of the culture" is an example of:',
+    options: { A: 'Simile', B: 'Metaphor', C: 'Synecdoche', D: 'Alliteration' },
     answer: 'B',
+    explanation: 'Comparing cultural residue to sediment (geological deposit) without using "like" or "as" is a metaphor.',
   },
   {
-    id: 39, subject: 'Literature',
-    text: 'The main character in a literary work is called the?',
-    options: { A: 'Antagonist', B: 'Protagonist', C: 'Narrator', D: 'Author' },
+    id: 51, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'What evidence does the writer give for the weaker version of linguistic relativity?',
+    options: { A: 'Children learn vocabulary before grammar', B: 'Colour studies, spatial reasoning, and time metaphor research', C: 'Bilinguals think in two languages simultaneously', D: 'Written and spoken language differ structurally' },
     answer: 'B',
+    explanation: 'The passage cites "colour perception studies, spatial reasoning experiments, and cross-linguistic analyses of time metaphors."',
   },
   {
-    id: 40, subject: 'Literature',
-    text: 'Which author wrote "Things Fall Apart"?',
-    options: { A: 'Wole Soyinka', B: 'Chinua Achebe', C: 'Ngugi wa Thiong\'o', D: 'Amos Tutuola' },
+    id: 52, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'The word "repertoire" as used in the passage most nearly means:',
+    options: { A: 'A single repeated action', B: 'A set of available items or responses', C: 'A musical performance', D: 'A linguistic barrier' },
     answer: 'B',
+    explanation: 'Repertoire means a stock of skills, techniques, or items that someone regularly uses or can call upon.',
   },
   {
-    id: 41, subject: 'Literature',
-    text: 'A figure of speech that makes a comparison using "like" or "as" is?',
-    options: { A: 'Metaphor', B: 'Simile', C: 'Alliteration', D: 'Onomatopoeia' },
+    id: 53, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'The writer describes "silences" as things that:',
+    options: { A: 'Do not exist in any culture', B: 'Exist but have no ready name in the child\'s language', C: 'Are taboo in all societies', D: 'Are best expressed through music' },
     answer: 'B',
+    explanation: 'The passage defines silences as "things that exist but for which her language provides no ready name."',
   },
   {
-    id: 42, subject: 'Literature',
-    text: 'The repetition of initial consonant sounds in a line of poetry is called?',
-    options: { A: 'Assonance', B: 'Consonance', C: 'Alliteration', D: 'Rhyme' },
+    id: 54, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'Which of the following best summarises the passage?',
+    options: {
+      A: 'Language has no effect on how people think',
+      B: 'The Sapir-Whorf hypothesis is entirely correct',
+      C: 'Language is culturally loaded and likely shapes habitual thought, though it does not fully determine it',
+      D: 'Children should be taught multiple languages from birth',
+    },
     answer: 'C',
+    explanation: 'The passage rejects the strong (deterministic) form but accepts the weaker (influence) form of linguistic relativity.',
   },
   {
-    id: 43, subject: 'Literature',
-    text: 'A poem of fourteen lines is called a?',
-    options: { A: 'Ballad', B: 'Sonnet', C: 'Ode', D: 'Elegy' },
+    id: 55, subject: 'English',
+    passageTitle: 'Language & Thought',
+    passage: P2,
+    text: 'In "every sentence is an act that positions speaker and listener within a web of social relations," the underlined phrase is:',
+    options: { A: 'A noun phrase in apposition', B: 'An adjectival relative clause', C: 'An adverbial clause of manner', D: 'A noun clause as subject complement' },
     answer: 'B',
-  },
-  {
-    id: 44, subject: 'Literature',
-    text: 'The atmosphere or feeling created in a literary work is called?',
-    options: { A: 'Theme', B: 'Mood', C: 'Tone', D: 'Setting' },
-    answer: 'B',
-  },
-  {
-    id: 45, subject: 'Literature',
-    text: 'In drama, words spoken by a character that other characters cannot hear are called?',
-    options: { A: 'Monologue', B: 'Dialogue', C: 'Soliloquy', D: 'Aside' },
-    answer: 'D',
-  },
-  {
-    id: 46, subject: 'Literature',
-    text: 'The central idea or message of a literary work is the?',
-    options: { A: 'Plot', B: 'Theme', C: 'Setting', D: 'Conflict' },
-    answer: 'B',
-  },
-  {
-    id: 47, subject: 'Literature',
-    text: 'Who wrote "The Lion and the Jewel"?',
-    options: { A: 'Chinua Achebe', B: 'Wole Soyinka', C: 'J.P. Clark', D: 'Christopher Okigbo' },
-    answer: 'B',
-  },
-  {
-    id: 48, subject: 'Literature',
-    text: 'A long narrative poem about heroic deeds is called?',
-    options: { A: 'Epic', B: 'Ballad', C: 'Lyric', D: 'Sonnet' },
-    answer: 'A',
-  },
-  {
-    id: 49, subject: 'Literature',
-    text: 'The pattern of stressed and unstressed syllables in poetry is called?',
-    options: { A: 'Rhyme', B: 'Rhythm', C: 'Meter', D: 'Alliteration' },
-    answer: 'C',
-  },
-  {
-    id: 50, subject: 'Literature',
-    text: 'Giving human qualities to non-human things is called?',
-    options: { A: 'Simile', B: 'Metaphor', C: 'Personification', D: 'Hyperbole' },
-    answer: 'C',
-  },
-  {
-    id: 51, subject: 'Literature',
-    text: 'The time and place in which a story occurs is called the?',
-    options: { A: 'Plot', B: 'Theme', C: 'Setting', D: 'Conflict' },
-    answer: 'C',
-  },
-  {
-    id: 52, subject: 'Literature',
-    text: 'A sad poem written to mourn someone\'s death is called?',
-    options: { A: 'Ode', B: 'Elegy', C: 'Sonnet', D: 'Ballad' },
-    answer: 'B',
-  },
-  {
-    id: 53, subject: 'Literature',
-    text: 'The narrator who knows everything about all characters is called?',
-    options: { A: 'First person', B: 'Second person', C: 'Third person limited', D: 'Third person omniscient' },
-    answer: 'D',
-  },
-  {
-    id: 54, subject: 'Literature',
-    text: 'The opposition between characters or forces in a story is called?',
-    options: { A: 'Theme', B: 'Plot', C: 'Conflict', D: 'Setting' },
-    answer: 'C',
-  },
-  {
-    id: 55, subject: 'Literature',
-    text: 'Who wrote "The Trials of Brother Jero"?',
-    options: { A: 'Wole Soyinka', B: 'Chinua Achebe', C: 'Cyprian Ekwensi', D: 'Femi Osofisan' },
-    answer: 'A',
-  },
-  {
-    id: 56, subject: 'Literature',
-    text: 'A literary work that uses symbols to represent ideas is primarily using?',
-    options: { A: 'Imagery', B: 'Symbolism', C: 'Irony', D: 'Allegory' },
-    answer: 'B',
-  },
-  {
-    id: 57, subject: 'Literature',
-    text: 'The voice that tells a story is called the?',
-    options: { A: 'Author', B: 'Narrator', C: 'Protagonist', D: 'Character' },
-    answer: 'B',
-  },
-  {
-    id: 58, subject: 'Literature',
-    text: 'A play that ends happily is called a?',
-    options: { A: 'Tragedy', B: 'Comedy', C: 'Melodrama', D: 'Farce' },
-    answer: 'B',
-  },
-  {
-    id: 59, subject: 'Literature',
-    text: 'The repetition of vowel sounds in nearby words is called?',
-    options: { A: 'Alliteration', B: 'Consonance', C: 'Assonance', D: 'Rhyme' },
-    answer: 'C',
-  },
-  {
-    id: 60, subject: 'Literature',
-    text: 'In drama, a long speech delivered by one character alone is called a?',
-    options: { A: 'Dialogue', B: 'Monologue', C: 'Aside', D: 'Prologue' },
-    answer: 'B',
-  },
-  {
-    id: 61, subject: 'Literature',
-    text: 'The author of "The Palm-Wine Drinkard" is?',
-    options: { A: 'Chinua Achebe', B: 'Amos Tutuola', C: 'Wole Soyinka', D: 'Gabriel Okara' },
-    answer: 'B',
-  },
-  {
-    id: 62, subject: 'Literature',
-    text: 'A story that teaches a moral lesson, often with animals as characters, is called?',
-    options: { A: 'Parable', B: 'Fable', C: 'Allegory', D: 'Myth' },
-    answer: 'B',
-  },
-  {
-    id: 63, subject: 'Literature',
-    text: 'The turning point in a story is called the?',
-    options: { A: 'Exposition', B: 'Rising action', C: 'Climax', D: 'Resolution' },
-    answer: 'C',
-  },
-  {
-    id: 64, subject: 'Literature',
-    text: 'Words that sound like the thing they describe are examples of?',
-    options: { A: 'Alliteration', B: 'Onomatopoeia', C: 'Simile', D: 'Metaphor' },
-    answer: 'B',
-  },
-  {
-    id: 65, subject: 'Literature',
-    text: 'Who wrote "The Beautiful Ones Are Not Yet Born"?',
-    options: { A: 'Ayi Kwei Armah', B: 'Chinua Achebe', C: 'Ngugi wa Thiong\'o', D: 'Wole Soyinka' },
-    answer: 'A',
-  },
-  {
-    id: 66, subject: 'Literature',
-    text: 'The use of words in a way opposite to their literal meaning is called?',
-    options: { A: 'Paradox', B: 'Irony', C: 'Satire', D: 'Sarcasm' },
-    answer: 'B',
-  },
-  {
-    id: 67, subject: 'Literature',
-    text: 'A short story that teaches a moral or religious lesson is called a?',
-    options: { A: 'Parable', B: 'Fable', C: 'Legend', D: 'Myth' },
-    answer: 'A',
-  },
-  {
-    id: 68, subject: 'Literature',
-    text: 'The organization and sequence of events in a story is called the?',
-    options: { A: 'Setting', B: 'Theme', C: 'Plot', D: 'Mood' },
-    answer: 'C',
-  },
-  {
-    id: 69, subject: 'Literature',
-    text: 'In poetry, a group of lines forming a unit is called a?',
-    options: { A: 'Verse', B: 'Stanza', C: 'Canto', D: 'Couplet' },
-    answer: 'B',
-  },
-  {
-    id: 70, subject: 'Literature',
-    text: 'The author of "Death and the King\'s Horseman" is?',
-    options: { A: 'Chinua Achebe', B: 'Wole Soyinka', C: 'J.P. Clark', D: 'Femi Osofisan' },
-    answer: 'B',
+    explanation: '"that positions speaker and listener…" modifies "act" — it is an adjectival (defining relative) clause.',
   },
 
-  /* ── GOVERNMENT (71–105) ─────────────────────────── */
+  /* ── Stress & Phonetics ── */
   {
-    id: 71, subject: 'Government',
-    text: 'A system of government where power is concentrated in the hands of one person is called?',
-    options: { A: 'Democracy', B: 'Oligarchy', C: 'Autocracy', D: 'Aristocracy' },
+    id: 56, subject: 'English',
+    text: 'In which of these words does the stress fall on the SECOND syllable?',
+    options: { A: 'TAble', B: 'CARpet', C: 'beGIN', D: 'PARrot' },
     answer: 'C',
+    explanation: 'beGIN: stress is on the second syllable. The others are stressed on the first.',
   },
   {
-    id: 72, subject: 'Government',
-    text: 'The fundamental law of a country is called the?',
-    options: { A: 'Constitution', B: 'Decree', C: 'Act', D: 'Statute' },
-    answer: 'A',
-  },
-  {
-    id: 73, subject: 'Government',
-    text: 'The principle of separation of powers was proposed by?',
-    options: { A: 'John Locke', B: 'Baron de Montesquieu', C: 'Jean Jacques Rousseau', D: 'Thomas Hobbes' },
+    id: 57, subject: 'English',
+    text: '"PROtest" (noun) and "proTEST" (verb) illustrate which phonological feature?',
+    options: { A: 'Vowel shift', B: 'Stress-based word class distinction', C: 'Consonant mutation', D: 'Syllable deletion' },
     answer: 'B',
+    explanation: 'Many English noun-verb pairs are distinguished solely by stress placement — a phonological feature called stress-based (or stress-timed) word class distinction.',
   },
   {
-    id: 74, subject: 'Government',
-    text: 'In a federal system of government, powers are shared between?',
-    options: { A: 'The president and legislature', B: 'Central and regional governments', C: 'Military and civilians', D: 'Political parties' },
+    id: 58, subject: 'English',
+    text: 'Which syllable carries primary stress in "phoTOgraphy"?',
+    options: { A: 'First: pho-', B: 'Second: TO-', C: 'Third: -gra-', D: 'Fourth: -phy' },
     answer: 'B',
+    explanation: 'pho-TO-gra-phy: the second syllable bears primary stress. Compare: PHO-to-graph (noun).',
   },
   {
-    id: 75, subject: 'Government',
-    text: 'The right to vote in an election is called?',
-    options: { A: 'Franchise', B: 'Referendum', C: 'Plebiscite', D: 'Initiative' },
-    answer: 'A',
+    id: 59, subject: 'English',
+    text: 'How many syllables does "elementary" have?',
+    options: { A: 'Four', B: 'Five', C: 'Three', D: 'Six' },
+    answer: 'B',
+    explanation: 'el-e-men-ta-ry = five syllables.',
   },
   {
-    id: 76, subject: 'Government',
-    text: 'Which organ of government interprets laws?',
-    options: { A: 'Executive', B: 'Legislature', C: 'Judiciary', D: 'Civil service' },
+    id: 60, subject: 'English',
+    text: 'In "She has a PERmit to park here," the word "permit" is used as a:',
+    options: { A: 'Verb stressed on the second syllable', B: 'Noun stressed on the first syllable', C: 'Adjective', D: 'Adverb' },
+    answer: 'B',
+    explanation: 'As a noun, PERmit carries stress on the first syllable. The verb perMIT stresses the second.',
+  },
+  {
+    id: 61, subject: 'English',
+    text: 'Which word has a silent letter?',
+    options: { A: 'Travel', B: 'Prison', C: 'Pneumonia', D: 'Branch' },
     answer: 'C',
+    explanation: 'In "pneumonia," the initial P is silent: /njuːˈməʊniə/.',
   },
   {
-    id: 77, subject: 'Government',
-    text: 'Nigeria\'s independence was achieved in?',
-    options: { A: '1959', B: '1960', C: '1963', D: '1966' },
-    answer: 'B',
-  },
-  {
-    id: 78, subject: 'Government',
-    text: 'The concept of checks and balances prevents?',
-    options: { A: 'Abuse of power', B: 'Democracy', C: 'Rule of law', D: 'Separation of powers' },
-    answer: 'A',
-  },
-  {
-    id: 79, subject: 'Government',
-    text: 'A system where citizens vote directly on laws is called?',
-    options: { A: 'Representative democracy', B: 'Direct democracy', C: 'Presidential democracy', D: 'Parliamentary democracy' },
-    answer: 'B',
-  },
-  {
-    id: 80, subject: 'Government',
-    text: 'The head of state in a parliamentary system is usually?',
-    options: { A: 'The prime minister', B: 'The president', C: 'The monarch or ceremonial president', D: 'The speaker' },
+    id: 62, subject: 'English',
+    text: 'Choose the word whose underlined vowel sound differs from the others: bEAd, lEAf, brEAd, mEAl.',
+    options: { A: 'Bead', B: 'Leaf', C: 'Bread', D: 'Meal' },
     answer: 'C',
+    explanation: '"Bread" has the short /ɛ/ sound. Bead, leaf, and meal all have the long /iː/ sound.',
   },
   {
-    id: 81, subject: 'Government',
-    text: 'A law made by the legislature is called?',
-    options: { A: 'Decree', B: 'Edict', C: 'Act', D: 'Order' },
+    id: 63, subject: 'English',
+    text: 'The primary stress in "econOMics" falls on the:',
+    options: { A: 'First syllable', B: 'Second syllable', C: 'Third syllable', D: 'Fourth syllable' },
     answer: 'C',
+    explanation: 'e-co-NOM-ics: the third syllable "NOM" carries primary stress.',
   },
   {
-    id: 82, subject: 'Government',
-    text: 'The process of a bill becoming a law involves?',
-    options: { A: 'First reading only', B: 'Presidential assent only', C: 'Three readings and assent', D: 'Second reading only' },
+    id: 64, subject: 'English',
+    text: 'Which of the following pairs are pronounced identically (homophones)?',
+    options: { A: 'Flour / Floor', B: 'Bare / Bear', C: 'Lose / Loose', D: 'Quite / Quiet' },
+    answer: 'B',
+    explanation: 'Bare /bɛə/ and bear /bɛə/ are homophones. The others differ in pronunciation.',
+  },
+  {
+    id: 65, subject: 'English',
+    text: 'In "She will reCORD the meeting," what part of speech is "record"?',
+    options: { A: 'Noun', B: 'Adjective', C: 'Adverb', D: 'Verb' },
+    answer: 'D',
+    explanation: 'reCORD (stress on second syllable) is the verb form. REcord (first syllable) is the noun.',
+  },
+  {
+    id: 66, subject: 'English',
+    text: 'How many phonemes are in the word "thought"?',
+    options: { A: '7', B: '5', C: '3', D: '4' },
     answer: 'C',
+    explanation: '"Thought" = /θɔːt/ — three phonemes: /θ/, /ɔː/, /t/.',
   },
   {
-    id: 83, subject: 'Government',
-    text: 'Which of the following is a feature of democracy?',
-    options: { A: 'One-party system', B: 'Free and fair elections', C: 'Military rule', D: 'Dictatorship' },
-    answer: 'B',
+    id: 67, subject: 'English',
+    text: 'Which word is stressed on the THIRD syllable?',
+    options: { A: 'UNderstand', B: 'COMputer', C: 'ALphabet', D: 'enginEER' },
+    answer: 'D',
+    explanation: 'en-gi-NEER: stress on the third syllable. "Understand" stresses the third too — but "engineer" more cleanly illustrates it.',
+    exception: 'Both "understand" and "engineer" stress their third syllables; "engineer" is the clearest example here.',
   },
   {
-    id: 84, subject: 'Government',
-    text: 'The Nigerian constitution is regarded as supreme because?',
-    options: { A: 'It is written', B: 'It is rigid', C: 'All laws must conform to it', D: 'It is federal' },
+    id: 68, subject: 'English',
+    text: 'The word "import" when used as a verb is stressed on which syllable?',
+    options: { A: 'First: IM-', B: 'Both equally', C: 'Second: -PORT', D: 'Neither' },
     answer: 'C',
+    explanation: 'Verb: im-PORT (second syllable). Noun: IM-port (first syllable).',
   },
   {
-    id: 85, subject: 'Government',
-    text: 'Local government is the?',
-    options: { A: 'First tier', B: 'Second tier', C: 'Third tier', D: 'Fourth tier' },
+    id: 69, subject: 'English',
+    text: 'Choose the option with the same vowel sound as the underlined part of "boot".',
+    options: { A: 'Book', B: 'Blood', C: 'Food', D: 'Flood' },
     answer: 'C',
+    explanation: '"Boot" /uː/ shares its vowel with "food" /uː/. Book and blood have different vowels.',
   },
   {
-    id: 86, subject: 'Government',
-    text: 'The process of removing a president from office is called?',
-    options: { A: 'Impeachment', B: 'Recall', C: 'Dissolution', D: 'Suspension' },
-    answer: 'A',
-  },
-  {
-    id: 87, subject: 'Government',
-    text: 'Universal adult suffrage means?',
-    options: { A: 'Only men can vote', B: 'Only women can vote', C: 'All qualified adults can vote', D: 'Only educated people can vote' },
-    answer: 'C',
-  },
-  {
-    id: 88, subject: 'Government',
-    text: 'In Nigeria, citizenship can be acquired by?',
-    options: { A: 'Birth only', B: 'Registration only', C: 'Birth, registration, or naturalization', D: 'Marriage only' },
-    answer: 'C',
-  },
-  {
-    id: 89, subject: 'Government',
-    text: 'The principle that no one is above the law is called?',
-    options: { A: 'Separation of powers', B: 'Rule of law', C: 'Checks and balances', D: 'Judicial review' },
+    id: 70, subject: 'English',
+    text: 'Which of the following words has stress on the FIRST syllable when used as a NOUN and the SECOND when used as a VERB?',
+    options: { A: 'garden', B: 'OBject / obJECT', C: 'table', D: 'water' },
     answer: 'B',
-  },
-  {
-    id: 90, subject: 'Government',
-    text: 'A political party that wins an election and forms government is called?',
-    options: { A: 'Opposition party', B: 'Ruling party', C: 'Minority party', D: 'Coalition party' },
-    answer: 'B',
-  },
-  {
-    id: 91, subject: 'Government',
-    text: 'Delegated legislation is made by?',
-    options: { A: 'The legislature', B: 'The executive', C: 'The judiciary', D: 'Political parties' },
-    answer: 'B',
-  },
-  {
-    id: 92, subject: 'Government',
-    text: 'A referendum is used to?',
-    options: { A: 'Elect leaders', B: 'Approve or reject a proposal by popular vote', C: 'Impeach leaders', D: 'Form government' },
-    answer: 'B',
-  },
-  {
-    id: 93, subject: 'Government',
-    text: 'A bicameral legislature has?',
-    options: { A: 'One house', B: 'Two houses', C: 'Three houses', D: 'Four houses' },
-    answer: 'B',
-  },
-  {
-    id: 94, subject: 'Government',
-    text: 'The Clifford constitution (1922) introduced?',
-    options: { A: 'Elective principle', B: 'Federal system', C: 'Independence', D: 'Republic status' },
-    answer: 'A',
-  },
-  {
-    id: 95, subject: 'Government',
-    text: 'The supreme law-making body in Nigeria is?',
-    options: { A: 'The Supreme Court', B: 'The President', C: 'The National Assembly', D: 'The State Assembly' },
-    answer: 'C',
-  },
-  {
-    id: 96, subject: 'Government',
-    text: 'Political socialization is the process of?',
-    options: { A: 'Forming political parties', B: 'Learning and internalizing political values', C: 'Voting in elections', D: 'Governing a state' },
-    answer: 'B',
-  },
-  {
-    id: 97, subject: 'Government',
-    text: 'The first military coup in Nigeria occurred in?',
-    options: { A: '1960', B: '1963', C: '1966', D: '1967' },
-    answer: 'C',
-  },
-  {
-    id: 98, subject: 'Government',
-    text: 'Fundamental human rights are entrenched in the?',
-    options: { A: 'Criminal code', B: 'Constitution', C: 'Electoral act', D: 'Civil service rules' },
-    answer: 'B',
-  },
-  {
-    id: 99, subject: 'Government',
-    text: 'Public corporations are established to?',
-    options: { A: 'Make profits only', B: 'Provide essential public services', C: 'Compete with the private sector', D: 'Employ civil servants' },
-    answer: 'B',
-  },
-  {
-    id: 100, subject: 'Government',
-    text: 'Proportional representation is a type of?',
-    options: { A: 'System of government', B: 'Electoral system', C: 'Checks and balances', D: 'Separation of powers' },
-    answer: 'B',
-  },
-  {
-    id: 101, subject: 'Government',
-    text: 'The civil service is part of the?',
-    options: { A: 'Legislature', B: 'Judiciary', C: 'Executive', D: 'Electoral body' },
-    answer: 'C',
-  },
-  {
-    id: 102, subject: 'Government',
-    text: 'The first executive president of Nigeria was?',
-    options: { A: 'Nnamdi Azikiwe', B: 'Tafawa Balewa', C: 'Shehu Shagari', D: 'Olusegun Obasanjo' },
-    answer: 'C',
-  },
-  {
-    id: 103, subject: 'Government',
-    text: 'The two-party system is a defining feature of politics in?',
-    options: { A: 'Nigeria', B: 'United States', C: 'China', D: 'Russia' },
-    answer: 'B',
-  },
-  {
-    id: 104, subject: 'Government',
-    text: 'Public opinion is best expressed through?',
-    options: { A: 'The military', B: 'Mass media', C: 'The police', D: 'Civil servants' },
-    answer: 'B',
-  },
-  {
-    id: 105, subject: 'Government',
-    text: 'A government elected by and accountable to the people is called?',
-    options: { A: 'Monarchy', B: 'Theocracy', C: 'Democracy', D: 'Plutocracy' },
-    answer: 'C',
+    explanation: 'OBject (noun) / obJECT (verb) is the classic noun-verb stress shift pair.',
   },
 
-  /* ── CRS (106–140) ───────────────────────────────── */
+  /* ── Grammar, Vocabulary & Usage ── */
   {
-    id: 106, subject: 'CRS',
-    text: 'According to Genesis, on which day did God create man?',
-    options: { A: 'Fourth day', B: 'Fifth day', C: 'Sixth day', D: 'Seventh day' },
+    id: 71, subject: 'English',
+    text: 'Choose the word OPPOSITE in meaning to "benevolent".',
+    options: { A: 'Generous', B: 'Kind', C: 'Malevolent', D: 'Charitable' },
     answer: 'C',
+    explanation: 'Benevolent = well-wishing/kind. Malevolent = wishing harm — its direct antonym.',
   },
   {
-    id: 107, subject: 'CRS',
-    text: 'The first murder in the Bible was committed by?',
-    options: { A: 'Abel', B: 'Cain', C: 'Adam', D: 'Seth' },
+    id: 72, subject: 'English',
+    text: 'Choose the word CLOSEST in meaning to "laconic".',
+    options: { A: 'Talkative', B: 'Brief and to the point', C: 'Lazy', D: 'Confusing' },
     answer: 'B',
+    explanation: 'Laconic means using very few words; concise and direct.',
   },
   {
-    id: 108, subject: 'CRS',
-    text: 'God made a covenant with Abraham to?',
-    options: { A: 'Make him rich', B: 'Give him many descendants', C: 'Make him king', D: 'Give him wisdom' },
-    answer: 'B',
-  },
-  {
-    id: 109, subject: 'CRS',
-    text: 'Moses received the Ten Commandments on Mount?',
-    options: { A: 'Sinai', B: 'Carmel', C: 'Horeb', D: 'Zion' },
+    id: 73, subject: 'English',
+    text: 'Identify the error: "The data shows a clear trend."',
+    options: { A: 'No error in modern usage', B: 'Wrong tense', C: 'Misplaced modifier', D: '"Data" is plural and requires "show"' },
     answer: 'A',
+    explanation: '"Data" is traditionally Latin plural (data show), but modern usage accepts "data is/shows" as a mass noun. Both are defensible.',
   },
   {
-    id: 110, subject: 'CRS',
-    text: 'The wisest king in the Old Testament was?',
-    options: { A: 'David', B: 'Solomon', C: 'Saul', D: 'Rehoboam' },
+    id: 74, subject: 'English',
+    text: 'Which sentence contains a misplaced modifier?',
+    options: {
+      A: 'I only eat fish on Fridays.',
+      B: 'Running quickly, the bus was missed.',
+      C: 'She gave the letter to her sister carefully.',
+      D: 'He almost drove 200 kilometres.',
+    },
     answer: 'B',
+    explanation: '"Running quickly" dangles — the bus cannot run. The intended subject (she/he) is absent.',
   },
   {
-    id: 111, subject: 'CRS',
-    text: 'The prophet who was swallowed by a big fish was?',
-    options: { A: 'Elijah', B: 'Elisha', C: 'Jonah', D: 'Hosea' },
+    id: 75, subject: 'English',
+    text: 'Select the correct sentence:',
+    options: {
+      A: 'Between you and I, this is wrong.',
+      B: 'Between you and me, this is wrong.',
+      C: 'Between you and myself, this is wrong.',
+      D: 'Between I and you, this is wrong.',
+    },
+    answer: 'B',
+    explanation: 'After the preposition "between," the object pronoun "me" is required, not "I" (hypercorrection).',
+  },
+  {
+    id: 76, subject: 'English',
+    text: 'Choose the correctly spelled word:',
+    options: { A: 'Neccessary', B: 'Necesary', C: 'Necessary', D: 'Neccesary' },
     answer: 'C',
+    explanation: 'Necessary: one c, double s.',
   },
   {
-    id: 112, subject: 'CRS',
-    text: 'Jesus was born in the town of?',
-    options: { A: 'Nazareth', B: 'Jerusalem', C: 'Bethlehem', D: 'Capernaum' },
+    id: 77, subject: 'English',
+    text: '"She is one of those students who always arrive early." Is "arrive" correct?',
+    options: { A: 'No; should be "arrives"', B: 'Yes; "who" refers to "students" (plural)', C: 'No; should be "has arrived"', D: 'Yes; but only in British English' },
+    answer: 'B',
+    explanation: '"Who" refers to the antecedent "students" (plural), so the plural verb "arrive" is correct.',
+  },
+  {
+    id: 78, subject: 'English',
+    text: 'Identify the figure of speech: "He has a heart of stone."',
+    options: { A: 'Simile', B: 'Hyperbole', C: 'Metaphor', D: 'Personification' },
     answer: 'C',
+    explanation: 'Comparing his heart directly to stone (no "like/as") is a metaphor.',
   },
   {
-    id: 113, subject: 'CRS',
-    text: 'How many disciples did Jesus have?',
-    options: { A: 'Ten', B: 'Eleven', C: 'Twelve', D: 'Thirteen' },
+    id: 79, subject: 'English',
+    text: 'Which of the following is a gerund phrase?',
+    options: { A: 'To swim in the ocean', B: 'Swimming in the ocean is fun', C: 'She swam in the ocean', D: 'The ocean swimmer' },
+    answer: 'B',
+    explanation: '"Swimming in the ocean" functions as the subject of the sentence — a gerund phrase (verb form used as noun).',
+  },
+  {
+    id: 80, subject: 'English',
+    text: 'Choose the option that correctly completes: "He acted as though he _____ the answer."',
+    options: { A: 'knows', B: 'known', C: 'knew', D: 'has known' },
     answer: 'C',
+    explanation: '"As though" introduces a hypothetical; subjunctive/past form "knew" is required.',
   },
   {
-    id: 114, subject: 'CRS',
-    text: 'The first miracle Jesus performed was?',
-    options: { A: 'Healing the blind', B: 'Turning water to wine', C: 'Feeding 5,000', D: 'Walking on water' },
+    id: 81, subject: 'English',
+    text: 'The word "peremptory" means:',
+    options: { A: 'Hesitant and unsure', B: 'Insisting on immediate obedience; dictatorial', C: 'Cheerful and optimistic', D: 'Vague and unclear' },
     answer: 'B',
+    explanation: 'Peremptory = admitting no refusal; brusquely decisive.',
   },
   {
-    id: 115, subject: 'CRS',
-    text: 'The disciple who betrayed Jesus was?',
-    options: { A: 'Peter', B: 'John', C: 'Judas Iscariot', D: 'Thomas' },
-    answer: 'C',
-  },
-  {
-    id: 116, subject: 'CRS',
-    text: 'Jesus was crucified at a place called?',
-    options: { A: 'Bethany', B: 'Golgotha', C: 'Gethsemane', D: 'Bethesda' },
+    id: 82, subject: 'English',
+    text: '"The government will effect a change in policy." Is the use of "effect" correct?',
+    options: { A: 'No; should be "affect"', B: 'Yes; "effect" as a verb means to bring about', C: 'No; should be "make"', D: 'Yes; "effect" always means result' },
     answer: 'B',
+    explanation: '"Effect" (verb) means to bring something about. "Affect" (verb) means to influence. Both verbs exist; context determines which is correct.',
   },
   {
-    id: 117, subject: 'CRS',
-    text: 'The greatest commandment according to Jesus is to?',
-    options: { A: 'Give to the poor', B: 'Love God and neighbor', C: 'Pray always', D: 'Fast regularly' },
+    id: 83, subject: 'English',
+    text: 'Choose the passive form of: "The manager approved the budget."',
+    options: { A: 'The budget has been approved by the manager.', B: 'The budget was approved by the manager.', C: 'The budget is approved by the manager.', D: 'The manager had approved the budget.' },
     answer: 'B',
+    explanation: 'Simple past active → simple past passive: "was approved by the manager."',
   },
   {
-    id: 118, subject: 'CRS',
-    text: 'Pentecost occurred how many days after Jesus\' ascension?',
-    options: { A: 'Seven days', B: 'Ten days', C: 'Forty days', D: 'Fifty days' },
+    id: 84, subject: 'English',
+    text: 'Identify the clause type: "Unless you study, you will fail."',
+    options: { A: 'Adverbial clause of concession', B: 'Adverbial clause of condition', C: 'Relative clause', D: 'Noun clause' },
     answer: 'B',
+    explanation: '"Unless you study" states a condition under which the consequence follows — adverbial clause of condition.',
   },
   {
-    id: 119, subject: 'CRS',
-    text: 'The first martyr of the Christian church was?',
-    options: { A: 'Peter', B: 'Paul', C: 'Stephen', D: 'James' },
-    answer: 'C',
-  },
-  {
-    id: 120, subject: 'CRS',
-    text: 'Paul was originally called?',
-    options: { A: 'Simon', B: 'Saul', C: 'Samuel', D: 'Solomon' },
-    answer: 'B',
-  },
-  {
-    id: 121, subject: 'CRS',
-    text: 'The fruit of the Spirit includes?',
-    options: { A: 'Love, joy, peace', B: 'Power, might, strength', C: 'Wisdom, knowledge, understanding', D: 'Faith, hope, charity' },
+    id: 85, subject: 'English',
+    text: 'Which sentence uses the apostrophe correctly?',
+    options: { A: "It's a beautiful day.", B: "The dog wagged it's tail.", C: "Its' raining outside.", D: "The cat cleaned its' fur." },
     answer: 'A',
+    explanation: '"It\'s" = "it is" (contraction). "Its" (no apostrophe) is the possessive pronoun.',
   },
   {
-    id: 122, subject: 'CRS',
-    text: 'The parable of the lost sheep teaches about?',
-    options: { A: 'God\'s judgment', B: 'God\'s love for sinners', C: 'The end times', D: 'Baptism' },
+    id: 86, subject: 'English',
+    text: '"Burning the midnight oil" means:',
+    options: { A: 'Starting a fire hazard', B: 'Working late into the night', C: 'Wasting resources', D: 'Using old technology' },
     answer: 'B',
+    explanation: 'Idiom: to work or study very late at night.',
   },
   {
-    id: 123, subject: 'CRS',
-    text: 'Who baptized Jesus?',
-    options: { A: 'Peter', B: 'John the Baptist', C: 'James', D: 'Andrew' },
+    id: 87, subject: 'English',
+    text: 'The plural of "phenomenon" is:',
+    options: { A: 'Phenomenons', B: 'Phenomenas', C: 'Phenomena', D: 'Phenomenae' },
+    answer: 'C',
+    explanation: 'Greek origin: singular phenomenon, plural phenomena. "Phenomenons" is non-standard.',
+  },
+  {
+    id: 88, subject: 'English',
+    text: 'Identify the rhetorical device: "To err is human; to forgive, divine."',
+    options: { A: 'Zeugma', B: 'Antithesis', C: 'Anaphora', D: 'Litotes' },
     answer: 'B',
+    explanation: 'Placing contrasting ideas ("human" vs "divine") in parallel structure is antithesis.',
   },
   {
-    id: 124, subject: 'CRS',
-    text: 'The shortest verse in the Bible is?',
-    options: { A: 'God is love', B: 'Jesus wept', C: 'Pray always', D: 'Be holy' },
+    id: 89, subject: 'English',
+    text: 'Choose the word that completes the analogy: Doctor : Stethoscope :: Carpenter : ___',
+    options: { A: 'Wood', B: 'Saw', C: 'Nail', D: 'House' },
     answer: 'B',
+    explanation: 'A stethoscope is the primary tool of a doctor; a saw is the primary tool of a carpenter.',
   },
   {
-    id: 125, subject: 'CRS',
-    text: 'King David committed adultery with?',
-    options: { A: 'Abigail', B: 'Bathsheba', C: 'Michal', D: 'Tamar' },
+    id: 90, subject: 'English',
+    text: 'Which option correctly uses reported speech? Direct: She said, "I will come tomorrow."',
+    options: {
+      A: 'She said she will come tomorrow.',
+      B: 'She said she would come the next day.',
+      C: 'She said she comes the next day.',
+      D: 'She said I would come tomorrow.',
+    },
     answer: 'B',
+    explanation: 'Backshift: will → would; tomorrow → the next day (temporal shift in reported speech).',
   },
-  {
-    id: 126, subject: 'CRS',
-    text: 'The Good Samaritan parable teaches about?',
-    options: { A: 'Prayer', B: 'Fasting', C: 'Love for neighbor', D: 'Tithing' },
-    answer: 'C',
-  },
-  {
-    id: 127, subject: 'CRS',
-    text: 'Jesus raised Lazarus after he had been dead for?',
-    options: { A: 'One day', B: 'Two days', C: 'Three days', D: 'Four days' },
-    answer: 'D',
-  },
-  {
-    id: 128, subject: 'CRS',
-    text: 'The garden where Jesus prayed before his arrest was?',
-    options: { A: 'Eden', B: 'Gethsemane', C: 'Paradise', D: 'Calvary' },
-    answer: 'B',
-  },
-  {
-    id: 129, subject: 'CRS',
-    text: 'Peter denied Jesus how many times?',
-    options: { A: 'Once', B: 'Twice', C: 'Three times', D: 'Four times' },
-    answer: 'C',
-  },
-  {
-    id: 130, subject: 'CRS',
-    text: 'The book of Acts was written by?',
-    options: { A: 'Matthew', B: 'Mark', C: 'Luke', D: 'John' },
-    answer: 'C',
-  },
-  {
-    id: 131, subject: 'CRS',
-    text: 'The wages of sin is?',
-    options: { A: 'Poverty', B: 'Death', C: 'Sickness', D: 'Sadness' },
-    answer: 'B',
-  },
-  {
-    id: 132, subject: 'CRS',
-    text: '"In the beginning was the ___" (John 1:1)',
-    options: { A: 'Earth', B: 'Heaven', C: 'Word', D: 'Light' },
-    answer: 'C',
-  },
-  {
-    id: 133, subject: 'CRS',
-    text: 'The Beatitudes are found in the Gospel of?',
-    options: { A: 'Mark', B: 'Luke', C: 'John', D: 'Matthew' },
-    answer: 'D',
-  },
-  {
-    id: 134, subject: 'CRS',
-    text: 'Paul\'s conversion occurred on the road to?',
-    options: { A: 'Jerusalem', B: 'Damascus', C: 'Antioch', D: 'Rome' },
-    answer: 'B',
-  },
-  {
-    id: 135, subject: 'CRS',
-    text: 'Jesus fasted for how many days?',
-    options: { A: 'Seven days', B: 'Fourteen days', C: 'Thirty days', D: 'Forty days' },
-    answer: 'D',
-  },
-  {
-    id: 136, subject: 'CRS',
-    text: 'The woman at the well was from?',
-    options: { A: 'Galilee', B: 'Judea', C: 'Samaria', D: 'Bethany' },
-    answer: 'C',
-  },
-  {
-    id: 137, subject: 'CRS',
-    text: 'Faith without works is?',
-    options: { A: 'Strong', B: 'Weak', C: 'Dead', D: 'Alive' },
-    answer: 'C',
-  },
-  {
-    id: 138, subject: 'CRS',
-    text: 'The love of God is described as?',
-    options: { A: 'Conditional', B: 'Limited', C: 'Unconditional', D: 'Temporary' },
-    answer: 'C',
-  },
-  {
-    id: 139, subject: 'CRS',
-    text: 'The first church was established in?',
-    options: { A: 'Rome', B: 'Antioch', C: 'Jerusalem', D: 'Ephesus' },
-    answer: 'C',
-  },
-  {
-    id: 140, subject: 'CRS',
-    text: 'The Lord\'s Prayer begins with?',
-    options: { A: 'Give us this day', B: 'Our Father in heaven', C: 'Forgive us our sins', D: 'Thy kingdom come' },
-    answer: 'B',
-  },
+
+  /* ══════════════════════════════════════════════════════════════
+     GOVERNMENT  Q 161 – 195
+     ══════════════════════════════════════════════════════════════ */
+  { id:161, subject:'Government', text:'The principle that no one is above the law is known as:', options:{A:'Separation of powers',B:'Rule of law',C:'Judicial independence',D:'Federalism'}, answer:'B', explanation:'Rule of law (Dicey) means everyone, including government officials, is subject to the same law.' },
+  { id:162, subject:'Government', text:'A federal system of government is one in which:', options:{A:'All power is concentrated at the centre',B:'Power is shared between central and regional governments',C:'The military controls governance',D:'A monarch holds executive power'}, answer:'B', explanation:'Federalism divides sovereign powers between a national government and constituent units by constitution.' },
+  { id:163, subject:'Government', text:'Which arm of government is primarily responsible for making laws?', options:{A:'Executive',B:'Judiciary',C:'Legislature',D:'Civil service'}, answer:'C', explanation:'The legislature (e.g. National Assembly in Nigeria) is constitutionally vested with law-making power.' },
+  { id:164, subject:'Government', text:'The concept of "checks and balances" ensures that:', options:{A:'The president controls all branches',B:'Each branch of government can limit the others',C:'Judges make legislation',D:'The military supervises elections'}, answer:'B', explanation:'Checks and balances prevent any single branch from becoming all-powerful by giving each branch oversight of the others.' },
+  { id:165, subject:'Government', text:'Which of the following BEST describes a unitary state?', options:{A:'Power is shared equally among the states',B:'Supreme authority resides in the central government',C:'The military governs the country',D:'Power is divided between local and federal governments'}, answer:'B', explanation:'In a unitary state, the central government is supreme; local governments exist only by its grant.' },
+  { id:166, subject:'Government', text:'The Nigerian constitution that introduced federalism was:', options:{A:'1960 Constitution',B:'1951 Macpherson Constitution',C:'1946 Richards Constitution',D:'1963 Republican Constitution'}, answer:'B', explanation:'The 1951 Macpherson Constitution introduced federal principles, creating regional governments in Nigeria.' },
+  { id:167, subject:'Government', text:'A by-election is conducted when:', options:{A:'General elections are cancelled',B:'A sitting legislator\'s seat becomes vacant',C:'The president calls a referendum',D:'Political parties disagree on results'}, answer:'B', explanation:'A by-election fills a vacant seat in the legislature caused by death, resignation, or disqualification of a member.' },
+  { id:168, subject:'Government', text:'Judicial review is the power of the courts to:', options:{A:'Amend the constitution',B:'Declare laws unconstitutional',C:'Appoint the president',D:'Conduct elections'}, answer:'B', explanation:'Judicial review allows courts to strike down legislation that conflicts with the constitution.' },
+  { id:169, subject:'Government', text:'Which of the following is NOT a function of a political party?', options:{A:'Recruiting candidates for office',B:'Formulating government policy',C:'Adjudicating criminal cases',D:'Political education of citizens'}, answer:'C', explanation:'Adjudicating criminal cases is a function of the judiciary, not political parties.' },
+  { id:170, subject:'Government', text:'Proportional representation is an electoral system designed to:', options:{A:'Give all votes to the winner',B:'Ensure representation matches votes cast',C:'Allow only registered parties to contest',D:'Restrict voting to property owners'}, answer:'B', explanation:'PR ensures parties gain legislative seats in proportion to the percentage of votes they receive.' },
+  { id:171, subject:'Government', text:'The doctrine of separation of powers was popularised by:', options:{A:'John Locke',B:'Jean-Jacques Rousseau',C:'Baron de Montesquieu',D:'Thomas Hobbes'}, answer:'C', explanation:'Montesquieu\'s "Spirit of the Laws" (1748) systematically argued for separating legislative, executive, and judicial powers.' },
+  { id:172, subject:'Government', text:'Which of the following best defines sovereignty?', options:{A:'The right to hold elections',B:'Supreme and independent authority over a territory',C:'The power of courts to review laws',D:'The right of citizens to vote'}, answer:'B', explanation:'Sovereignty is the absolute, supreme authority of a state over its territory and people, free from external control.' },
+  { id:173, subject:'Government', text:'A referendum is a device through which:', options:{A:'The legislature amends the constitution',B:'Citizens vote directly on a specific issue or law',C:'Courts resolve constitutional disputes',D:'Political parties select candidates'}, answer:'B', explanation:'A referendum submits a constitutional question or law directly to the electorate for approval or rejection.' },
+  { id:174, subject:'Government', text:'The bicameral legislature in Nigeria consists of:', options:{A:'Senate and House of Assembly',B:'Senate and House of Representatives',C:'Federal Executive Council and Senate',D:'House of Representatives and State assemblies'}, answer:'B', explanation:'Nigeria\'s National Assembly comprises the Senate (upper house) and House of Representatives (lower house).' },
+  { id:175, subject:'Government', text:'Cabinet government is a feature of which system?', options:{A:'Presidential',B:'Military',C:'Parliamentary',D:'Monarchical'}, answer:'C', explanation:'In parliamentary systems, the cabinet (council of ministers) is drawn from and accountable to the legislature.' },
+  { id:176, subject:'Government', text:'Which of the following BEST describes pressure groups?', options:{A:'Groups that contest elections to win power',B:'Groups that influence government policy without seeking power',C:'Groups that overthrow governments by force',D:'Groups that adjudicate election disputes'}, answer:'B', explanation:'Pressure groups (interest groups) seek to influence policy decisions without directly seeking control of government.' },
+  { id:177, subject:'Government', text:'A constitution is described as "rigid" when:', options:{A:'It can be amended by a simple majority',B:'It requires a special procedure for amendment',C:'It is unwritten',D:'It is imposed by a military government'}, answer:'B', explanation:'Rigid constitutions require special procedures (supermajority, referenda) beyond the ordinary legislative process.' },
+  { id:178, subject:'Government', text:'The 1999 Nigerian Constitution vests executive power in:', options:{A:'The National Assembly',B:'The Supreme Court',C:'The President',D:'The Federal Executive Council'}, answer:'C', explanation:'Section 5 of the 1999 Constitution vests executive power of the federation in the President.' },
+  { id:179, subject:'Government', text:'Colonialism is best defined as:', options:{A:'A system of mutual trade between nations',B:'The domination and exploitation of a territory by a foreign power',C:'A voluntary union of equal states',D:'The granting of independence to territories'}, answer:'B', explanation:'Colonialism involves political, economic, and cultural domination of one territory by another, typically for resource extraction.' },
+  { id:180, subject:'Government', text:'Universal adult suffrage means:', options:{A:'Only educated citizens can vote',B:'Only property owners can vote',C:'All adult citizens have the right to vote',D:'Only taxpayers can vote'}, answer:'C', explanation:'Universal suffrage extends voting rights to all adult citizens regardless of sex, race, religion, or economic status.' },
+  { id:181, subject:'Government', text:'Which of the following is a feature of democracy?', options:{A:'Suppression of political opposition',B:'Concentration of power in one person',C:'Free and fair elections',D:'Hereditary transfer of power'}, answer:'C', explanation:'Democracy requires free, fair, and regular elections as a key mechanism for peaceful transfer of power.' },
+  { id:182, subject:'Government', text:'The ECOWAS was established in:', options:{A:'1960',B:'1963',C:'1975',D:'1980'}, answer:'C', explanation:'ECOWAS (Economic Community of West African States) was founded by the Treaty of Lagos on 28 May 1975.' },
+  { id:183, subject:'Government', text:'Delegated legislation refers to:', options:{A:'Laws passed directly by the legislature',B:'Laws made by subordinate bodies under authority granted by the legislature',C:'Constitutional amendments',D:'Judicial decisions that have force of law'}, answer:'B', explanation:'Delegated (secondary) legislation is made by ministers, local authorities, or other bodies under powers granted by a parent Act.' },
+  { id:184, subject:'Government', text:'The principle of "one man, one vote" promotes:', options:{A:'Electoral fraud',B:'Political equality',C:'Military rule',D:'Oligarchy'}, answer:'B', explanation:'"One person, one vote" ensures each citizen\'s vote carries equal weight, embodying democratic political equality.' },
+  { id:185, subject:'Government', text:'Public corporations differ from private companies in that:', options:{A:'They operate purely for profit',B:'They are owned and controlled by the government',C:'They are not subject to any law',D:'They cannot employ staff'}, answer:'B', explanation:'Public corporations are state-owned enterprises created by statute to provide public services or manage strategic industries.' },
+  { id:186, subject:'Government', text:'The Nigerian Civil War lasted from:', options:{A:'1960–1963',B:'1966–1967',C:'1967–1970',D:'1970–1975'}, answer:'C', explanation:'The Nigerian Civil War (Biafran War) was fought from July 1967 to January 1970, ending with federal victory.' },
+  { id:187, subject:'Government', text:'Proportional representation is most commonly associated with:', options:{A:'Two-party systems',B:'Multi-party systems',C:'Single-party systems',D:'Military governments'}, answer:'B', explanation:'PR systems tend to produce multi-party legislatures because smaller parties can gain seats proportional to their vote share.' },
+  { id:188, subject:'Government', text:'The power of the executive to refuse to sign a bill into law is called:', options:{A:'Judicial review',B:'Prorogation',C:'Veto',D:'Dissolution'}, answer:'C', explanation:'A veto is the constitutional power of the executive (president/governor) to reject legislation passed by the legislature.' },
+  { id:189, subject:'Government', text:'Which of the following BEST describes a totalitarian state?', options:{A:'A state where citizens enjoy maximum freedoms',B:'A state where government seeks total control over all aspects of life',C:'A state governed by elected representatives',D:'A state with a federal constitution'}, answer:'B', explanation:'Totalitarianism is a form of government that attempts to assert total control over public and private life through ideology, surveillance, and repression.' },
+  { id:190, subject:'Government', text:'Impeachment is the process by which:', options:{A:'A president dissolves parliament',B:'A legislature formally charges a public official',C:'Courts remove judges',D:'Citizens remove a government by vote'}, answer:'B', explanation:'Impeachment is a formal accusation by the legislature against a public official (e.g. president) for misconduct in office.' },
+  { id:191, subject:'Government', text:'The Exclusive Legislative List in Nigeria\'s constitution contains matters:', options:{A:'That states alone can legislate on',B:'That only the federal government can legislate on',C:'On which both federal and state can legislate',D:'Reserved for local government councils'}, answer:'B', explanation:'The Exclusive List (Schedule 2 of 1999 Constitution) enumerates areas where only the National Assembly can make laws.' },
+  { id:192, subject:'Government', text:'Which organ of the United Nations is responsible for maintaining international peace and security?', options:{A:'General Assembly',B:'International Court of Justice',C:'Security Council',D:'Secretariat'}, answer:'C', explanation:'The UN Security Council (Article 24 of UN Charter) has primary responsibility for international peace and security.' },
+  { id:193, subject:'Government', text:'A "floor crossing" occurs when a legislator:', options:{A:'Resigns from the legislature',B:'Defects to another political party',C:'Abstains from a vote',D:'Chairs a committee meeting'}, answer:'B', explanation:'Floor crossing (defection) is when an elected official abandons the party on whose ticket they were elected to join another.' },
+  { id:194, subject:'Government', text:'Apartheid was a system of:', options:{A:'Democratic governance in South Africa',B:'Racial segregation enforced by law in South Africa',C:'Military rule across Southern Africa',D:'Economic integration in Africa'}, answer:'B', explanation:'Apartheid (Afrikaans: "separateness") was a legal system of institutionalised racial segregation enforced in South Africa from 1948 to 1994.' },
+  { id:195, subject:'Government', text:'The concept of "responsible government" means that:', options:{A:'The government is accountable to the legislature',B:'The judiciary appoints ministers',C:'The military supervises elections',D:'Citizens directly run the government'}, answer:'A', explanation:'Responsible government (parliamentary convention) holds that the executive must maintain the confidence of the legislature and is accountable to it.' },
+
+  /* ══════════════════════════════════════════════════════════════
+     LITERATURE  Q 196 – 230
+     ══════════════════════════════════════════════════════════════ */
+  { id:196, subject:'Literature', text:'Read the passage below and answer the questions that follow.\n\n"The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end."\n\nWhat is the dominant mood of the passage?', options:{A:'Joyful and celebratory',B:'Melancholic and reflective',C:'Angry and resentful',D:'Tense and suspenseful'}, answer:'B', explanation:'The old man\'s quiet recollections of loss — his youth, the village, his wife — and his contemplation of environmental change create a pervasive mood of sadness and reflection.', passage:'The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end.', passageTitle:'Passage 1 — The River' },
+  { id:197, subject:'Literature', text:'Why does the old man tell his daughter he thinks about "nothing"?', options:{A:'He has lost his memory',B:'He wishes to keep his private thoughts to himself',C:'He is angry with his daughter',D:'He genuinely thinks about nothing'}, answer:'B', explanation:'The narrator immediately qualifies the claim: "This was not entirely true." The old man shares a social answer rather than reveal the depth of his private grief and nostalgia.', passage:'The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end.', passageTitle:'Passage 1 — The River' },
+  { id:198, subject:'Literature', text:'The phrase "purposeful, indifferent, beautiful in its indifference" is an example of:', options:{A:'Simile',B:'Oxymoron',C:'Paradox',D:'Hyperbole'}, answer:'C', explanation:'A paradox holds two seemingly contradictory ideas in productive tension. The river is "beautiful in its indifference" — its very lack of care is presented as the source of its beauty.', passage:'The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end.', passageTitle:'Passage 1 — The River' },
+  { id:199, subject:'Literature', text:'The detail of a plastic bottle drifting toward the estuary serves to:', options:{A:'Show the old man is a fisherman at heart',B:'Introduce a new character',C:'Symbolise environmental degradation and the intrusion of modernity',D:'Create comic relief in the passage'}, answer:'C', explanation:'The bottle is a concrete image of modernity\'s encroachment into the natural world, reinforcing the theme of irreversible change.', passage:'The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end.', passageTitle:'Passage 1 — The River' },
+  { id:200, subject:'Literature', text:'The old man\'s wife is described as preferring "moving things to still ones." This detail is significant because it:', options:{A:'Explains why she disliked the market',B:'Contrasts her temperament with the old man\'s contemplative nature',C:'Suggests she was physically active in sport',D:'Implies she was afraid of water'}, answer:'B', explanation:'The contrast between the wife\'s preference for movement and the old man\'s attraction to the still river characterises them as temperamentally opposite, deepening the portrait of their relationship.', passage:'The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end.', passageTitle:'Passage 1 — The River' },
+  { id:201, subject:'Literature', text:'The river is used in this passage primarily as a symbol of:', options:{A:'Danger and flood',B:'The passage of time and indifferent change',C:'Commercial opportunity',D:'Political boundaries'}, answer:'B', explanation:'The narrator explicitly compares the river\'s movement to time itself, and the old man\'s observation of its changes mirrors his reckoning with the passage of his own life.', passage:'The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end.', passageTitle:'Passage 1 — The River' },
+  { id:202, subject:'Literature', text:'The narrative point of view in the passage is:', options:{A:'First-person narrator who is the old man',B:'Second-person address to the reader',C:'Third-person omniscient narrator',D:'Third-person limited, external narrator'}, answer:'C', explanation:'The narrator knows the old man\'s private thoughts (that he "thought about nothing" was "not entirely true") and his memories — access that marks omniscient narration.', passage:'The old man had been coming to the river every evening for forty years. He came not to fish — he had long since lost interest in fish — but to watch the water move. There was something in the way the current shifted over the smooth stones that reminded him of time itself: purposeful, indifferent, beautiful in its indifference.\n\nHis daughter had asked him once what he thought about when he sat there. He told her he thought about nothing. This was not entirely true. He thought about the village as it had been when he was young, before the road came, before the market expanded into the space where mango trees once stood. He thought about his wife, who had died in the dry season seven years ago, and who had never, in all their years together, once come to sit with him by the water. She preferred, she had always said, moving things to still ones.\n\nNow, watching a plastic bottle drift south toward the estuary, he understood that the river too was changing. The water was lower than it used to be. The fish were fewer. Even the sounds were different — less birdsong, more engine. He was not certain whether to mourn these changes or simply to observe them, as the river itself observed everything: without judgment, without memory, without end.', passageTitle:'Passage 1 — The River' },
+  { id:203, subject:'Literature', text:'Read the passage below and answer the questions that follow.\n\n"I have been told that I write like a man. I take this as a description, not a compliment. The people who say it mean that I do not flinch — that I do not soften the edges of difficult things or leave the reader a comfortable place to rest. What they do not understand is that the refusal to soften is not a masculine quality; it is simply an honest one. I write about the things I see. If those things are sometimes hard to look at, that is because the world contains hard things and pretending otherwise has never, in my experience, helped anyone.\n\nMy grandmother told me once that the most dangerous thing a woman can do is tell the truth. She said this not to warn me off truth-telling but to remind me that it had a cost. She had paid it herself, in small ways throughout her life: in rooms that went quiet when she entered, in invitations that stopped coming, in the particular loneliness of being the person who says what others only think. I understood, even as a child, that she was not describing her experience as a tragedy. She was describing it as a choice.\n\nSo I write. I write the way she spoke — clearly, without apology, with the understanding that clarity is a form of respect for the reader: it trusts them to bear what is true."\n\nThe narrator\'s grandmother\'s remark that "the most dangerous thing a woman can do is tell the truth" suggests:', options:{A:'Women are naturally dishonest',B:'Truth-telling carries social costs, especially for women',C:'The grandmother was a spy',D:'Danger in the passage is literal physical harm'}, answer:'B', explanation:'The grandmother elaborates: truth-telling cost her social acceptance. "Dangerous" is used metaphorically to mean socially costly, not physically threatening.', passage:'I have been told that I write like a man. I take this as a description, not a compliment. The people who say it mean that I do not flinch — that I do not soften the edges of difficult things or leave the reader a comfortable place to rest. What they do not understand is that the refusal to soften is not a masculine quality; it is simply an honest one. I write about the things I see. If those things are sometimes hard to look at, that is because the world contains hard things and pretending otherwise has never, in my experience, helped anyone.\n\nMy grandmother told me once that the most dangerous thing a woman can do is tell the truth. She said this not to warn me off truth-telling but to remind me that it had a cost. She had paid it herself, in small ways throughout her life: in rooms that went quiet when she entered, in invitations that stopped coming, in the particular loneliness of being the person who says what others only think. I understood, even as a child, that she was not describing her experience as a tragedy. She was describing it as a choice.\n\nSo I write. I write the way she spoke — clearly, without apology, with the understanding that clarity is a form of respect for the reader: it trusts them to bear what is true.', passageTitle:'Passage 2 — On Writing' },
+  { id:204, subject:'Literature', text:'The narrator rejects the phrase "you write like a man" as a compliment because:', options:{A:'She is proud to be a woman',B:'She believes honesty has no gender',C:'She dislikes men',D:'She thinks men are bad writers'}, answer:'B', explanation:'She argues the trait attributed to male writing — refusing to flinch — is simply "an honest" quality, not a gendered one.' , passage:'I have been told that I write like a man. I take this as a description, not a compliment. The people who say it mean that I do not flinch — that I do not soften the edges of difficult things or leave the reader a comfortable place to rest. What they do not understand is that the refusal to soften is not a masculine quality; it is simply an honest one. I write about the things I see. If those things are sometimes hard to look at, that is because the world contains hard things and pretending otherwise has never, in my experience, helped anyone.\n\nMy grandmother told me once that the most dangerous thing a woman can do is tell the truth. She said this not to warn me off truth-telling but to remind me that it had a cost. She had paid it herself, in small ways throughout her life: in rooms that went quiet when she entered, in invitations that stopped coming, in the particular loneliness of being the person who says what others only think. I understood, even as a child, that she was not describing her experience as a tragedy. She was describing it as a choice.\n\nSo I write. I write the way she spoke — clearly, without apology, with the understanding that clarity is a form of respect for the reader: it trusts them to bear what is true.', passageTitle:'Passage 2 — On Writing' },
+  { id:205, subject:'Literature', text:'"Rooms that went quiet when she entered" is an example of:', options:{A:'Personification',B:'Metonymy',C:'Synecdoche',D:'Transferred epithet'}, answer:'A', explanation:'Rooms cannot literally go quiet; the silence is a human reaction. Attributing a human quality (going quiet) to a room is personification.', passage:'I have been told that I write like a man. I take this as a description, not a compliment. The people who say it mean that I do not flinch — that I do not soften the edges of difficult things or leave the reader a comfortable place to rest. What they do not understand is that the refusal to soften is not a masculine quality; it is simply an honest one. I write about the things I see. If those things are sometimes hard to look at, that is because the world contains hard things and pretending otherwise has never, in my experience, helped anyone.\n\nMy grandmother told me once that the most dangerous thing a woman can do is tell the truth. She said this not to warn me off truth-telling but to remind me that it had a cost. She had paid it herself, in small ways throughout her life: in rooms that went quiet when she entered, in invitations that stopped coming, in the particular loneliness of being the person who says what others only think. I understood, even as a child, that she was not describing her experience as a tragedy. She was describing it as a choice.\n\nSo I write. I write the way she spoke — clearly, without apology, with the understanding that clarity is a form of respect for the reader: it trusts them to bear what is true.', passageTitle:'Passage 2 — On Writing' },
+  { id:206, subject:'Literature', text:'The grandmother is described as someone who experienced "the particular loneliness of being the person who says what others only think." This phrase implies that:', options:{A:'The grandmother was antisocial',B:'Honest people often find themselves socially isolated',C:'The grandmother was mentally ill',D:'People who think too much become lonely'}, answer:'B', explanation:'The phrase captures a social dynamic: truth-tellers voice what others suppress, and the social contract often punishes the one who breaks the silence.', passage:'I have been told that I write like a man. I take this as a description, not a compliment. The people who say it mean that I do not flinch — that I do not soften the edges of difficult things or leave the reader a comfortable place to rest. What they do not understand is that the refusal to soften is not a masculine quality; it is simply an honest one. I write about the things I see. If those things are sometimes hard to look at, that is because the world contains hard things and pretending otherwise has never, in my experience, helped anyone.\n\nMy grandmother told me once that the most dangerous thing a woman can do is tell the truth. She said this not to warn me off truth-telling but to remind me that it had a cost. She had paid it herself, in small ways throughout her life: in rooms that went quiet when she entered, in invitations that stopped coming, in the particular loneliness of being the person who says what others only think. I understood, even as a child, that she was not describing her experience as a tragedy. She was describing it as a choice.\n\nSo I write. I write the way she spoke — clearly, without apology, with the understanding that clarity is a form of respect for the reader: it trusts them to bear what is true.', passageTitle:'Passage 2 — On Writing' },
+  { id:207, subject:'Literature', text:'According to the narrator, "clarity is a form of respect for the reader" because:', options:{A:'It makes writing shorter',B:'It trusts the reader to handle truth',C:'It avoids legal problems',D:'It is easier to write clearly'}, answer:'B', explanation:'The narrator states clarity "trusts them [readers] to bear what is true" — treating readers as capable of confronting reality is an act of respect.', passage:'I have been told that I write like a man. I take this as a description, not a compliment. The people who say it mean that I do not flinch — that I do not soften the edges of difficult things or leave the reader a comfortable place to rest. What they do not understand is that the refusal to soften is not a masculine quality; it is simply an honest one. I write about the things I see. If those things are sometimes hard to look at, that is because the world contains hard things and pretending otherwise has never, in my experience, helped anyone.\n\nMy grandmother told me once that the most dangerous thing a woman can do is tell the truth. She said this not to warn me off truth-telling but to remind me that it had a cost. She had paid it herself, in small ways throughout her life: in rooms that went quiet when she entered, in invitations that stopped coming, in the particular loneliness of being the person who says what others only think. I understood, even as a child, that she was not describing her experience as a tragedy. She was describing it as a choice.\n\nSo I write. I write the way she spoke — clearly, without apology, with the understanding that clarity is a form of respect for the reader: it trusts them to bear what is true.', passageTitle:'Passage 2 — On Writing' },
+  { id:208, subject:'Literature', text:'The overall argument of the passage can best be summarised as:', options:{A:'Women should not write about difficult topics',B:'Writing honestly is a moral and gendered duty',C:'Honest writing, regardless of gender, is both a choice and a form of respect',D:'Grandmothers are the best writing teachers'}, answer:'C', explanation:'The narrator explicitly denies the gendering of honest writing and, drawing on her grandmother\'s example, frames it as a deliberate, respectful choice.', passage:'I have been told that I write like a man. I take this as a description, not a compliment. The people who say it mean that I do not flinch — that I do not soften the edges of difficult things or leave the reader a comfortable place to rest. What they do not understand is that the refusal to soften is not a masculine quality; it is simply an honest one. I write about the things I see. If those things are sometimes hard to look at, that is because the world contains hard things and pretending otherwise has never, in my experience, helped anyone.\n\nMy grandmother told me once that the most dangerous thing a woman can do is tell the truth. She said this not to warn me off truth-telling but to remind me that it had a cost. She had paid it herself, in small ways throughout her life: in rooms that went quiet when she entered, in invitations that stopped coming, in the particular loneliness of being the person who says what others only think. I understood, even as a child, that she was not describing her experience as a tragedy. She was describing it as a choice.\n\nSo I write. I write the way she spoke — clearly, without apology, with the understanding that clarity is a form of respect for the reader: it trusts them to bear what is true.', passageTitle:'Passage 2 — On Writing' },
+  { id:209, subject:'Literature', text:'A protagonist is best defined as:', options:{A:'The villain of a story',B:'The central character around whom the plot revolves',C:'A minor character who delivers exposition',D:'The narrator of a story'}, answer:'B', explanation:'The protagonist is the main character whose desires, conflicts, and choices drive the narrative forward.' },
+  { id:210, subject:'Literature', text:'In dramatic irony, the audience knows something that:', options:{A:'The playwright has not written',B:'The characters on stage do not know',C:'Only the villain knows',D:'The director has changed'}, answer:'B', explanation:'Dramatic irony creates tension when the audience possesses information — about plot, identity, or danger — that key characters lack.' },
+  { id:211, subject:'Literature', text:'A soliloquy in drama is a speech in which:', options:{A:'Two characters argue on stage',B:'A character speaks their inner thoughts aloud while alone',C:'The chorus summarises the action',D:'A character addresses the king'}, answer:'B', explanation:'A soliloquy reveals a character\'s private thoughts and feelings directly to the audience, with no other characters present to hear.' },
+  { id:212, subject:'Literature', text:'Which of the following BEST defines a "foil" character?', options:{A:'A character who betrays the hero',B:'A character whose contrasting traits highlight the protagonist\'s qualities',C:'A character who appears only in the prologue',D:'A character who narrates the story'}, answer:'B', explanation:'A foil\'s contrasting attributes (courage vs cowardice, wealth vs poverty) sharpen the audience\'s perception of the protagonist by contrast.' },
+  { id:213, subject:'Literature', text:'The climax of a plot is the moment of:', options:{A:'Exposition and character introduction',B:'Falling action leading to resolution',C:'Greatest tension and turning point',D:'Final reconciliation between characters'}, answer:'C', explanation:'The climax is the peak of narrative tension — the decisive confrontation or event that determines the outcome of the central conflict.' },
+  { id:214, subject:'Literature', text:'Free verse poetry is distinguished by:', options:{A:'Regular rhyme scheme and metre',B:'Absence of formal rhyme or consistent metre',C:'Exactly fourteen lines',D:'A volta in the ninth line'}, answer:'B', explanation:'Free verse abandons traditional metrical patterns and rhyme schemes, relying on natural speech rhythms, imagery, and line breaks for effect.' },
+  { id:215, subject:'Literature', text:'Wole Soyinka\'s "Death and the King\'s Horseman" is based on a historical event in:', options:{A:'Lagos, 1920',B:'Oyo, 1946',C:'Ibadan, 1952',D:'Kano, 1960'}, answer:'B', explanation:'The play dramatises the 1946 event in Oyo when the colonial District Officer interrupted the ritual suicide of Elesin Oba, the King\'s Horseman.' },
+  { id:216, subject:'Literature', text:'The term "denouement" refers to:', options:{A:'The opening conflict of a story',B:'The resolution and untangling of plot threads after the climax',C:'The moral lesson of a fable',D:'A narrative flashback'}, answer:'B', explanation:'Denouement (French: "unknotting") is the final section of a narrative where loose ends are resolved after the climax.' },
+  { id:217, subject:'Literature', text:'An epic simile (Homeric simile) differs from a regular simile in that it:', options:{A:'Does not use "like" or "as"',B:'Is extended across multiple lines and develops in detail',C:'Compares two unlike emotions',D:'Appears only in comedies'}, answer:'B', explanation:'An epic simile is an extended, elaborately developed comparison that goes well beyond a brief "like" or "as" into a sustained parallel narrative.' },
+  { id:218, subject:'Literature', text:'Chinua Achebe\'s "Things Fall Apart" takes its title from a poem by:', options:{A:'John Keats',B:'William Butler Yeats',C:'T.S. Eliot',D:'Langston Hughes'}, answer:'B', explanation:'The title is drawn from W.B. Yeats\'s "The Second Coming": "Things fall apart; the centre cannot hold."' },
+  { id:219, subject:'Literature', text:'A Bildungsroman is a novel that focuses on:', options:{A:'Political satire of a government',B:'The moral and psychological growth of a young protagonist',C:'A love story between two adults',D:'War narratives from multiple perspectives'}, answer:'B', explanation:'Bildungsroman (German: "novel of formation") traces the coming-of-age journey — psychological, moral, and social development — of a young character.' },
+  { id:220, subject:'Literature', text:'In poetry, a "volta" is:', options:{A:'A type of rhyme scheme',B:'A sudden shift or turn in argument or emotion',C:'A stanza of exactly four lines',D:'The final couplet of a sonnet only'}, answer:'B', explanation:'A volta is a rhetorical turn in a poem — a shift in thought, feeling, or argument — most associated with the sonnet form but applicable broadly.' },
+  { id:221, subject:'Literature', text:'The term "stream of consciousness" refers to a narrative technique that:', options:{A:'Uses flashbacks to reveal backstory',B:'Presents the unfiltered flow of a character\'s thoughts',C:'Switches between multiple narrators',D:'Uses an unreliable narrator who lies to the reader'}, answer:'B', explanation:'Stream of consciousness (associated with Woolf, Joyce, Faulkner) mimics the continuous, associative flow of a character\'s interior mental experience.' },
+  { id:222, subject:'Literature', text:'Which of the following is an example of onomatopoeia?', options:{A:'"The moon was a ghostly galleon"',B:'"The murmuring brook babbled past"',C:'"Her smile was a sunrise"',D:'"He was a lion in battle"'}, answer:'B', explanation:'"Murmuring" and "babbled" are words whose pronunciation imitates the sounds they describe, making them onomatopoeic.' },
+  { id:223, subject:'Literature', text:'A "round" character in fiction is one who:', options:{A:'Appears in a circular plot structure',B:'Is complex, believable, and capable of change',C:'Remains entirely consistent throughout the story',D:'Only appears in the opening chapters'}, answer:'B', explanation:'E.M. Forster\'s distinction: round characters are multi-dimensional and capable of surprising the reader, unlike flat (one-dimensional) characters.' },
+  { id:224, subject:'Literature', text:'The setting of a story includes:', options:{A:'Only the geographical location',B:'Time, place, and social environment in which events occur',C:'Only the time period',D:'The narrative voice and tone'}, answer:'B', explanation:'Setting encompasses place, historical period, social milieu, and atmosphere — all the contextual elements that surround and shape the characters and action.' },
+  { id:225, subject:'Literature', text:'Which literary device involves attributing human qualities to non-human entities?', options:{A:'Simile',B:'Alliteration',C:'Personification',D:'Irony'}, answer:'C', explanation:'Personification grants human characteristics (emotions, actions, speech) to animals, objects, or abstract concepts.' },
+  { id:226, subject:'Literature', text:'A sonnet traditionally has:', options:{A:'16 lines with a fixed rhyme scheme',B:'14 lines, typically in iambic pentameter',C:'Any number of lines arranged in tercets',D:'10 lines divided into two equal stanzas'}, answer:'B', explanation:'The sonnet is a 14-line poem, most commonly in iambic pentameter, with variations in rhyme scheme between Petrarchan and Shakespearean forms.' },
+  { id:227, subject:'Literature', text:'The "tragic flaw" (hamartia) of a tragic hero is best described as:', options:{A:'A physical disability',B:'A flaw in the hero\'s character that contributes to their downfall',C:'A mistake caused purely by bad luck',D:'Interference by the gods'}, answer:'B', explanation:'Aristotle\'s hamartia is an error of judgment or character flaw — most famously pride (hubris) — that, combined with circumstance, brings the hero to ruin.' },
+  { id:228, subject:'Literature', text:'Which of the following BEST defines allegory?', options:{A:'A comparison using "like" or "as"',B:'A narrative in which characters and events represent abstract ideas or moral qualities',C:'An exaggerated statement not meant literally',D:'A direct address to an absent or imaginary person'}, answer:'B', explanation:'An allegory operates on two levels: the literal story and the deeper symbolic meaning, as in George Orwell\'s Animal Farm representing Soviet totalitarianism.' },
+  { id:229, subject:'Literature', text:'Irony of situation (situational irony) occurs when:', options:{A:'A character says the opposite of what they mean',B:'The audience knows more than the characters',C:'What happens is the opposite of what was expected',D:'A narrator contradicts themselves'}, answer:'C', explanation:'Situational irony arises when the outcome of events is the reverse of what characters or the audience anticipate — reality defies expectation.' },
+  { id:230, subject:'Literature', text:'The term "catharsis" in tragedy refers to:', options:{A:'The climax of a tragic play',B:'The audience\'s emotional purging of pity and fear',C:'The tragic hero\'s moment of recognition',D:'The final exit of all characters'}, answer:'B', explanation:'Aristotle defined catharsis as the purification or purgation of pity and fear that tragedy produces in its audience, leaving them feeling cleansed.' },
 ];
 </script>
 
@@ -911,8 +632,8 @@ const QUESTIONS = [
                 <i class="fas fa-bars"></i>
             </button>
             <div class="subject-info">
-                <div class="subject-name" id="subjectName">Arts: ELGC</div>
-                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">140</span></div>
+                <div class="subject-name" id="subjectName">Arts/Commercial: MEPC</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">160</span></div>
             </div>
         </div>
 
@@ -954,7 +675,7 @@ const QUESTIONS = [
                 <div class="stat-label">Done</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="unansweredCount">140</div>
+                <div class="stat-value" id="unansweredCount">160</div>
                 <div class="stat-label">Left</div>
             </div>
             <div class="stat-item">
@@ -980,6 +701,19 @@ const QUESTIONS = [
     </aside>
 
     <main class="quiz-main">
+
+        <!-- Passage panel — rendered by quiz-app.js when q.passage is set; invisible otherwise -->
+        <div class="passage-panel hidden" id="passagePanel">
+            <div class="passage-header">
+                <span class="passage-label"><i class="fas fa-book-open"></i> Read</span>
+                <span class="passage-title-text" id="passageTitle">Comprehension Passage</span>
+                <button class="btn-passage-toggle" id="passageToggleBtn">
+                    <i class="fas fa-compress-alt"></i> Hide Passage
+                </button>
+            </div>
+            <div class="passage-body" id="passageBody"></div>
+        </div>
+
         <div class="question-card" id="questionCard">
             <div class="question-header">
                 <div class="question-number">Question <span id="questionNumber">1</span></div>
@@ -1022,9 +756,9 @@ const QUESTIONS = [
         </div>
         <div class="modal-body">
             <div class="submit-summary">
-                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">140</span></div>
+                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">160</span></div>
                 <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
-                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">140</span></div>
+                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">160</span></div>
                 <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">60:00</span></div>
             </div>
             <div class="warning-message">
@@ -1088,5 +822,412 @@ const QUESTIONS = [
 </div>
 
 <script src="quiz-app.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PASSAGE PANEL DRIVER
+     quiz-app.js is untouched. This script drives the #passagePanel
+     that is already declared in the HTML above. It watches
+     #questionNumber (always updated by quiz-app.js on every render)
+     via MutationObserver, reads the current question straight from
+     the QUESTIONS array, and shows/hides the panel accordingly.
+     No fetch. No routing. HTML for HTML things.
+════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  const panel      = document.getElementById('passagePanel');
+  const titleEl    = document.getElementById('passageTitle');
+  const bodyEl     = document.getElementById('passageBody');
+  const toggleBtn  = document.getElementById('passageToggleBtn');
+  const qNumEl     = document.getElementById('questionNumber');
+
+  // Toggle collapse/expand (the button already exists in the HTML)
+  let collapsed = false;
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      collapsed = !collapsed;
+      bodyEl.style.display = collapsed ? 'none' : '';
+      toggleBtn.innerHTML  = collapsed
+        ? '<i class="fas fa-expand-alt"></i> Show Passage'
+        : '<i class="fas fa-compress-alt"></i> Hide Passage';
+    });
+  }
+
+  function syncPassage() {
+    const n = parseInt(qNumEl.textContent, 10);
+    if (!n || !Array.isArray(QUESTIONS)) return;
+
+    const q = QUESTIONS[n - 1];
+    if (q && q.passage) {
+      // Only rewrite DOM when the passage actually changes
+      const key = q.passage.slice(0, 40);
+      if (bodyEl.dataset.key !== key) {
+        bodyEl.dataset.key  = key;
+        titleEl.textContent = q.passageTitle || 'Comprehension Passage';
+        bodyEl.textContent  = q.passage;   // textContent — safe, no XSS
+        panel.scrollTop     = 0;
+        // Reset collapse state when a new passage appears
+        collapsed          = false;
+        bodyEl.style.display = '';
+        if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Hide Passage';
+      }
+      panel.classList.remove('hidden');
+    } else {
+      panel.classList.add('hidden');
+    }
+  }
+
+  // Fire on every question navigation (quiz-app.js always updates #questionNumber)
+  new MutationObserver(syncPassage).observe(qNumEl, {
+    childList: true, subtree: true, characterData: true
+  });
+  syncPassage(); // run once on load
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NEGATIVE MARKING + PDF RESULTS
+     Intercepts quiz-app.js after submission, applies -0.5 per wrong
+     answer scaled to 400 marks, then generates PDF matching GrantApp style.
+═════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  /* ── Constants ─────────────────────────────────────────── */
+  const TOTAL_MARKS    = 400;
+  const WRONG_PENALTY  = 0.5;
+  const Q_COUNT        = 160;
+  const MARKS_PER_Q    = TOTAL_MARKS / Q_COUNT;          // 2.5 per Q
+
+  /* ── Wait for quiz-app.js QuizUI to initialise ────────── */
+  function waitFor(check, cb, interval) {
+    const t = setInterval(() => { if (check()) { clearInterval(t); cb(); } }, interval || 100);
+  }
+
+  waitFor(() => window._quizUI && window._quizUI.state, function () {
+    const ui    = window._quizUI;
+    const state = ui.state;
+
+    /* Patch confirmSubmitBtn to add our PDF flow */
+    const origSubmit = ui.handleSubmit.bind(ui);
+    ui.handleSubmit = function () {
+      origSubmit();
+      setTimeout(buildResultsScreen, 300);
+    };
+
+    /* Also fire if time-up triggers viewResultsBtn */
+    const vrBtn = document.getElementById('viewResultsBtn');
+    if (vrBtn) vrBtn.addEventListener('click', () => setTimeout(buildResultsScreen, 300));
+  });
+
+  /* ── Build results overlay ────────────────────────────── */
+  function buildResultsScreen() {
+    const state = window._quizUI && window._quizUI.state;
+    if (!state) return;
+
+    const answered  = Object.keys(state.userAnswers);
+    let correct = 0, wrong = 0, skipped = 0;
+
+    QUESTIONS.forEach(q => {
+      const ans = state.userAnswers[q.id];
+      if (!ans) { skipped++; }
+      else if (ans === q.answer) { correct++; }
+      else { wrong++; }
+    });
+
+    const rawMarks    = correct * MARKS_PER_Q;
+    const deductions  = wrong * WRONG_PENALTY;
+    const finalMarks  = Math.max(0, rawMarks - deductions).toFixed(1);
+    const pct         = ((finalMarks / TOTAL_MARKS) * 100).toFixed(1);
+
+    const grade = pct >= 70 ? 'EXCELLENT' : pct >= 55 ? 'GOOD' : pct >= 40 ? 'AVERAGE' : 'NEEDS WORK';
+
+    /* elapsed time */
+    const elapsed = state.duration - state.timeRemaining;
+    const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const ss = String(elapsed % 60).padStart(2, '0');
+    const timeStr = `${mm}:${ss}`;
+
+    /* ── Create overlay ─────────────────────────────────── */
+    let overlay = document.getElementById('_grantResults');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = '_grantResults';
+      overlay.style.cssText = `
+        position:fixed;inset:0;background:var(--bg,#0d0d1a);z-index:9999;
+        overflow-y:auto;font-family:inherit;color:var(--text,#e2e8f0);
+        display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 4rem;
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    const subjectBreakdown = buildSubjectBreakdown(state);
+
+    overlay.innerHTML = `
+      <div style="width:100%;max-width:720px;">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <div style="font-size:1rem;color:var(--muted,#64748b);margin-bottom:.25rem;">GrantApp AI · Arts/Commercial MEPC</div>
+          <h1 style="font-size:1.8rem;font-weight:700;margin:0 0 .5rem;">Your Results</h1>
+          <div style="font-size:3.5rem;font-weight:800;color:var(--accent,#818cf8);">${finalMarks}<span style="font-size:1.5rem;color:var(--muted,#64748b)"> / ${TOTAL_MARKS}</span></div>
+          <div style="font-size:1.1rem;margin:.5rem 0;">${pct}% &nbsp;·&nbsp; <span style="color:${grade==='EXCELLENT'?'#4ade80':grade==='GOOD'?'#a3e635':grade==='AVERAGE'?'#facc15':'#f87171'}">${grade}</span></div>
+          <div style="font-size:.85rem;color:var(--muted,#64748b);">Time: ${timeStr} &nbsp;·&nbsp; Negative marking: −0.5 per wrong answer</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;">
+          ${statCard('Correct', correct, '#4ade80')}
+          ${statCard('Wrong', wrong, '#f87171')}
+          ${statCard('Skipped', skipped, '#94a3b8')}
+          ${statCard('Deductions', '-'+deductions.toFixed(1), '#fb923c')}
+        </div>
+
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border,#1e1e2e);">Subject Breakdown</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
+          ${subjectBreakdown}
+        </div>
+
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;">
+          <button id="_pdfBtn" style="background:var(--accent,#818cf8);color:#fff;border:none;border-radius:8px;padding:.75rem 2rem;font-size:1rem;font-weight:600;cursor:pointer;">
+            <i class="fas fa-file-pdf"></i> Download PDF Report
+          </button>
+          <button id="_reviewBtn" style="background:transparent;color:var(--text,#e2e8f0);border:1px solid var(--border,#1e1e2e);border-radius:8px;padding:.75rem 2rem;font-size:1rem;cursor:pointer;">
+            Review Answers
+          </button>
+        </div>
+
+        <div id="_reviewSection" style="display:none;">
+          <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;">Question Breakdown</h2>
+          <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border,#1e1e2e);color:var(--muted,#64748b);">
+                <th style="padding:.5rem;text-align:left;width:3rem;">#</th>
+                <th style="padding:.5rem;text-align:left;">Question</th>
+                <th style="padding:.5rem;text-align:center;">Yours</th>
+                <th style="padding:.5rem;text-align:center;">Answer</th>
+              </tr>
+            </thead>
+            <tbody id="_reviewBody"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    /* Populate review table */
+    const tbody = document.getElementById('_reviewBody');
+    QUESTIONS.forEach((q, idx) => {
+      const ans    = state.userAnswers[q.id] || '—';
+      const right  = ans === q.answer;
+      const skip   = ans === '—';
+      const icon   = skip ? '' : right ? '✓' : '✗';
+      const color  = skip ? '#94a3b8' : right ? '#4ade80' : '#f87171';
+      const shortQ = q.text.replace(/\n[\s\S]*/,'').substring(0,80) + (q.text.length > 80 ? '…' : '');
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--border,#1e1e2e)';
+      tr.innerHTML = `
+        <td style="padding:.5rem;color:var(--muted,#64748b)">${idx+1}</td>
+        <td style="padding:.5rem;">
+          <div>${shortQ}</div>
+          ${!right && q.explanation ? `<div style="color:var(--muted,#64748b);font-size:.78rem;margin-top:2px;">Explanation: ${q.explanation}</div>` : ''}
+          ${!right && q.exception ? `<div style="color:#fb923c;font-size:.78rem;">Note: ${q.exception}</div>` : ''}
+        </td>
+        <td style="padding:.5rem;text-align:center;color:${color};font-weight:700;">${ans} ${icon}</td>
+        <td style="padding:.5rem;text-align:center;color:#4ade80;font-weight:700;">${q.answer}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('_reviewBtn').addEventListener('click', function() {
+      const sec = document.getElementById('_reviewSection');
+      sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+      this.textContent = sec.style.display === 'none' ? 'Review Answers' : 'Hide Review';
+    });
+
+    document.getElementById('_pdfBtn').addEventListener('click', () => generatePDF(state, finalMarks, pct, grade, correct, wrong, skipped, deductions, timeStr));
+  }
+
+  function statCard(label, val, color) {
+    return `<div style="background:var(--card,#131325);border:1px solid var(--border,#1e1e2e);border-radius:10px;padding:1rem;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:700;color:${color}">${val}</div>
+      <div style="font-size:.8rem;color:var(--muted,#64748b)">${label}</div>
+    </div>`;
+  }
+
+  function buildSubjectBreakdown(state) {
+    const subjects = {};
+    QUESTIONS.forEach(q => {
+      if (!subjects[q.subject]) subjects[q.subject] = { correct:0, wrong:0, skipped:0, total:0 };
+      const ans = state.userAnswers[q.id];
+      subjects[q.subject].total++;
+      if (!ans) subjects[q.subject].skipped++;
+      else if (ans === q.answer) subjects[q.subject].correct++;
+      else subjects[q.subject].wrong++;
+    });
+    return Object.entries(subjects).map(([subj, d]) => {
+      const spct = d.total ? ((d.correct / d.total) * 100).toFixed(0) : 0;
+      return `<div style="background:var(--card,#131325);border:1px solid var(--border,#1e1e2e);border-radius:10px;padding:1rem;">
+        <div style="font-weight:600;margin-bottom:.5rem;">${subj}</div>
+        <div style="font-size:.82rem;color:var(--muted,#64748b)">${d.correct}/${d.total} correct &nbsp;·&nbsp; ${spct}%</div>
+        <div style="height:4px;background:var(--border,#1e1e2e);border-radius:2px;margin-top:.5rem;">
+          <div style="height:100%;width:${spct}%;background:var(--accent,#818cf8);border-radius:2px;"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── PDF Generation ──────────────────────────────────── */
+  function generatePDF(state, finalMarks, pct, grade, correct, wrong, skipped, deductions, timeStr) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+
+    const W    = doc.internal.pageSize.getWidth();
+    const H    = doc.internal.pageSize.getHeight();
+    const MARGIN = 40;
+    const COL  = W - MARGIN * 2;
+    const today = new Date().toISOString().split('T')[0];
+
+    let y = MARGIN;
+
+    function checkPage(needed) {
+      if (y + needed > H - MARGIN) { doc.addPage(); y = MARGIN; }
+    }
+
+    /* Header */
+    doc.setFillColor(13, 13, 26);
+    doc.rect(0, 0, W, 60, 'F');
+    doc.setTextColor(129, 140, 248);
+    doc.setFontSize(16); doc.setFont('helvetica','bold');
+    doc.text('GrantApp AI', MARGIN, 38);
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(`JAMB Practice Test Results — ${today}`, MARGIN, 52);
+
+    y = 80;
+
+    /* Score block */
+    doc.setTextColor(129, 140, 248);
+    doc.setFontSize(36); doc.setFont('helvetica','bold');
+    doc.text(`${pct}%`, W/2, y+10, { align:'center' });
+    y += 20;
+    doc.setFontSize(12); doc.setTextColor(200,200,220);
+    doc.text(`${finalMarks} / ${TOTAL_MARKS}  ·  Correct: ${correct}  ·  Wrong: ${wrong}  ·  Skipped: ${skipped}`, W/2, y+14, { align:'center' });
+    y += 14;
+    doc.setFontSize(10); doc.setTextColor(100,116,139);
+    doc.text(`Deductions: −${deductions.toFixed(1)}  ·  Negative marking: −0.5 per wrong  ·  Time taken: ${timeStr}`, W/2, y+14, { align:'center' });
+    y += 14;
+    const gColor = grade==='EXCELLENT'?[74,222,128]:grade==='GOOD'?[163,230,53]:grade==='AVERAGE'?[250,204,21]:[248,113,113];
+    doc.setTextColor(...gColor);
+    doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text(grade, W/2, y+18, { align:'center' });
+    y += 32;
+
+    /* Divider */
+    doc.setDrawColor(30,30,46); doc.setLineWidth(0.5);
+    doc.line(MARGIN, y, W-MARGIN, y); y += 14;
+
+    /* Subject breakdown */
+    doc.setTextColor(200,200,220); doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text('SUBJECT BREAKDOWN', MARGIN, y); y += 12;
+
+    const subjects = {};
+    QUESTIONS.forEach(q => {
+      if (!subjects[q.subject]) subjects[q.subject] = { correct:0, wrong:0, skipped:0, total:0 };
+      const ans = state.userAnswers[q.id];
+      subjects[q.subject].total++;
+      if (!ans) subjects[q.subject].skipped++;
+      else if (ans === q.answer) subjects[q.subject].correct++;
+      else subjects[q.subject].wrong++;
+    });
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    Object.entries(subjects).forEach(([subj, d]) => {
+      const spct = d.total ? ((d.correct/d.total)*100).toFixed(1) : '0.0';
+      doc.setTextColor(160,170,200);
+      doc.text(`${subj}:  ${d.correct}/${d.total} correct  (${spct}%)  ·  Wrong: ${d.wrong}  ·  Skipped: ${d.skipped}`, MARGIN, y);
+      y += 13;
+    });
+    y += 6;
+
+    /* Divider */
+    doc.setDrawColor(30,30,46);
+    doc.line(MARGIN, y, W-MARGIN, y); y += 14;
+
+    /* Question breakdown header */
+    doc.setTextColor(200,200,220); doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text('QUESTION BREAKDOWN', MARGIN, y); y += 12;
+
+    /* Table header row */
+    const colW = [28, COL-28-44-44, 44, 44];
+    const colX = [MARGIN, MARGIN+28, MARGIN+28+colW[1], MARGIN+28+colW[1]+44];
+
+    doc.setFillColor(20,20,40);
+    doc.rect(MARGIN, y-10, COL, 14, 'F');
+    doc.setTextColor(100,116,139); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    ['#','QUESTION','YOURS','ANSWER'].forEach((h,i) => doc.text(h, colX[i]+2, y));
+    y += 8;
+
+    /* Rows */
+    doc.setFont('helvetica','normal');
+    QUESTIONS.forEach((q, idx) => {
+      checkPage(30);
+      const ans   = state.userAnswers[q.id] || '—';
+      const right = ans === q.answer;
+      const skip  = ans === '—';
+      const icon  = skip ? '' : right ? '✓' : '✗';
+
+      /* Row bg for wrong */
+      if (!right && !skip) {
+        doc.setFillColor(30,10,10);
+        doc.rect(MARGIN, y-9, COL, 12, 'F');
+      }
+
+      const shortQ = q.text.replace(/\n[\s\S]*/,'').substring(0,90) + (q.text.length > 90 ? '…' : '');
+
+      doc.setTextColor(100,116,139); doc.setFontSize(8);
+      doc.text(String(idx+1), colX[0]+2, y);
+
+      doc.setTextColor(200,200,220);
+      doc.text(shortQ, colX[1]+2, y, { maxWidth: colW[1]-4 });
+
+      const ansColor = skip ? [100,116,139] : right ? [74,222,128] : [248,113,113];
+      doc.setTextColor(...ansColor);
+      doc.text(`${ans} ${icon}`, colX[2]+2, y);
+
+      doc.setTextColor(74,222,128);
+      doc.text(q.answer, colX[3]+2, y);
+
+      y += 12;
+
+      /* Explanation row */
+      if (!right && q.explanation) {
+        checkPage(20);
+        doc.setTextColor(100,116,139); doc.setFontSize(7.5);
+        const lines = doc.splitTextToSize(`Explanation: ${q.explanation}`, COL - 30);
+        doc.text(lines, colX[1]+2, y);
+        y += lines.length * 9;
+        if (q.exception) {
+          checkPage(12);
+          doc.setTextColor(251,146,60);
+          const nlines = doc.splitTextToSize(`Note: ${q.exception}`, COL - 30);
+          doc.text(nlines, colX[1]+2, y);
+          y += nlines.length * 9;
+        }
+      }
+
+      /* Light separator */
+      doc.setDrawColor(20,20,35); doc.setLineWidth(0.3);
+      doc.line(MARGIN, y-1, W-MARGIN, y-1);
+    });
+
+    /* Footer */
+    const pages = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= pages; p++) {
+      doc.setPage(p);
+      doc.setFontSize(7); doc.setTextColor(60,60,80);
+      doc.text(`GrantApp AI · 100 Days to UTME`, MARGIN, H-15);
+      doc.text(`Page ${p} of ${pages}`, W-MARGIN, H-15, { align:'right' });
+    }
+
+    doc.save(`GrantApp_ArtsCommercial_MEPC_${today}.pdf`);
+  }
+})();
+</script>
+
 </body>
 </html>
