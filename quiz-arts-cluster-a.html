@@ -821,6 +821,199 @@ const QUESTIONS = [
     </div>
 </div>
 
+<!-- Pre-quiz-app.js: answer tracking only (must run before quiz-app.js) -->
+<script>
+(function(){
+  window._grantAnswers  = {};
+  window._grantStart    = Date.now();
+  window._grantQCount   = QUESTIONS.length;
+  window._grantTotal    = 400;
+  window._grantPenalty  = 0.5;
+  window._grantMarksPerQ = 400 / QUESTIONS.length;
+
+  // Track answer selections via capture (fires before quiz-app.js handlers)
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.option-btn,[data-option],.option-item,.option');
+    if(!btn) return;
+    const qNumEl = document.getElementById('questionNumber');
+    if(!qNumEl) return;
+    const q = QUESTIONS[parseInt(qNumEl.textContent,10)-1];
+    if(!q) return;
+    const opt = btn.dataset.option || btn.textContent.trim().charAt(0);
+    if(/^[A-D]$/.test(opt)) window._grantAnswers[q.id] = opt;
+  }, true);
+
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('#clearBtn')) return;
+    const qNumEl = document.getElementById('questionNumber');
+    if(!qNumEl) return;
+    const q = QUESTIONS[parseInt(qNumEl.textContent,10)-1];
+    if(q) delete window._grantAnswers[q.id];
+  }, true);
+
+
+  // Inject a floating PDF button after submit — fires after quiz-app.js renders results
+  function setupSubmitHook(){
+    const confirmBtn = document.getElementById('confirmSubmitBtn');
+    const viewBtn    = document.getElementById('viewResultsBtn');
+    function onSubmit(){
+      // Wait for quiz-app.js to render its results screen, then inject
+      setTimeout(injectFloatingPdfBtn, 800);
+    }
+    if(confirmBtn) confirmBtn.addEventListener('click', onSubmit, true);
+    if(viewBtn)    viewBtn.addEventListener('click', onSubmit, true);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', setupSubmitHook);
+  } else {
+    setupSubmitHook();
+  }
+
+  function injectFloatingPdfBtn(){
+    if(document.getElementById('_grantPdfBtn')) return;
+    const btn = document.createElement('button');
+    btn.id = '_grantPdfBtn';
+    btn.innerHTML = '<i class="fas fa-file-pdf" style="margin-right:6px;"></i>Download PDF Report';
+    btn.style.cssText = [
+      'position:fixed','bottom:24px','right:24px','z-index:99999',
+      'background:#818cf8','color:#fff','border:none','border-radius:10px',
+      'padding:.8rem 1.6rem','font-size:.95rem','font-weight:600',
+      'cursor:pointer','box-shadow:0 4px 20px rgba(0,0,0,.4)',
+      'display:flex','align-items:center','gap:6px'
+    ].join(';');
+    btn.onclick = buildAndDownloadPDF;
+    document.body.appendChild(btn);
+  }
+
+
+  function buildAndDownloadPDF(){
+    if(!window.jspdf){ alert('PDF library not loaded.'); return; }
+    const answers = window._grantAnswers;
+    let correct=0,wrong=0,skipped=0;
+    QUESTIONS.forEach(q=>{
+      const a=answers[q.id];
+      if(!a) skipped++;
+      else if(a===q.answer) correct++;
+      else wrong++;
+    });
+    const deductions = wrong * window._grantPenalty;
+    const final      = Math.max(0, correct*window._grantMarksPerQ - deductions);
+    const finalStr   = final.toFixed(1);
+    const pct        = ((final/window._grantTotal)*100).toFixed(1);
+    const grade      = pct>=70?'EXCELLENT':pct>=55?'GOOD':pct>=40?'AVERAGE':'NEEDS WORK';
+    const elapsed    = Math.round((Date.now()-window._grantStart)/1000);
+    const timeStr    = `${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
+
+    const subj={};
+    QUESTIONS.forEach(q=>{
+      if(!subj[q.subject]) subj[q.subject]={correct:0,wrong:0,skipped:0,total:0};
+      const a=answers[q.id];
+      subj[q.subject].total++;
+      if(!a) subj[q.subject].skipped++;
+      else if(a===q.answer) subj[q.subject].correct++;
+      else subj[q.subject].wrong++;
+    });
+
+    renderPDF(finalStr,pct,grade,correct,wrong,skipped,deductions,timeStr,subj,answers);
+  }
+
+  function renderPDF(finalStr,pct,grade,correct,wrong,skipped,deductions,timeStr,subj,answers){
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({unit:'pt',format:'a4'});
+    const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=40;
+    const today=new Date().toISOString().split('T')[0];
+    let y=M;
+
+    function np(n){if(y+n>H-M){doc.addPage();y=M;}}
+
+    // Header bar
+    doc.setFillColor(13,13,26); doc.rect(0,0,W,58,'F');
+    doc.setTextColor(129,140,248); doc.setFontSize(15); doc.setFont('helvetica','bold');
+    doc.text('GrantApp AI',M,36);
+    doc.setTextColor(100,116,139); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+    doc.text(`JAMB Practice Test Results — ${today}`,M,50);
+    y=76;
+
+    // Score
+    doc.setTextColor(129,140,248); doc.setFontSize(34); doc.setFont('helvetica','bold');
+    doc.text(`${pct}%`,W/2,y+8,{align:'center'}); y+=18;
+    doc.setFontSize(11); doc.setTextColor(200,200,220);
+    doc.text(`${finalStr} / ${window._grantTotal}   Correct: ${correct}   Wrong: ${wrong}   Skipped: ${skipped}`,W/2,y+12,{align:'center'}); y+=12;
+    doc.setFontSize(9); doc.setTextColor(100,116,139);
+    doc.text(`Deductions: −${deductions.toFixed(1)}   Negative marking: −0.5 per wrong   Time taken: ${timeStr}`,W/2,y+12,{align:'center'}); y+=12;
+    const gc=grade==='EXCELLENT'?[74,222,128]:grade==='GOOD'?[163,230,53]:grade==='AVERAGE'?[250,204,21]:[248,113,113];
+    doc.setTextColor(...gc); doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.text(grade,W/2,y+16,{align:'center'}); y+=28;
+
+    // Divider
+    doc.setDrawColor(30,30,46); doc.setLineWidth(0.5); doc.line(M,y,W-M,y); y+=12;
+
+    // Subject breakdown
+    doc.setTextColor(160,170,200); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('SUBJECT BREAKDOWN',M,y); y+=11;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+    Object.entries(subj).forEach(([s,d])=>{
+      const sp=d.total?((d.correct/d.total)*100).toFixed(1):'0.0';
+      doc.setTextColor(160,170,200);
+      doc.text(`${s}:  ${d.correct}/${d.total} correct  (${sp}%)  ·  Wrong: ${d.wrong}  ·  Skipped: ${d.skipped}`,M,y); y+=12;
+    }); y+=6;
+
+    // Divider
+    doc.line(M,y,W-M,y); y+=12;
+
+    // Question breakdown
+    doc.setTextColor(160,170,200); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('QUESTION BREAKDOWN',M,y); y+=12;
+
+    const CW=W-M*2, cols=[26,CW-26-40-40,40,40];
+    const cx=[M,M+26,M+26+cols[1],M+26+cols[1]+40];
+
+    doc.setFillColor(20,20,38); doc.rect(M,y-9,CW,13,'F');
+    doc.setTextColor(100,116,139); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+    ['#','QUESTION','YOURS','ANSWER'].forEach((h,i)=>doc.text(h,cx[i]+2,y)); y+=9;
+
+    doc.setFont('helvetica','normal');
+    QUESTIONS.forEach((q,i)=>{
+      np(28);
+      const ans=answers[q.id]||'—';
+      const right=ans===q.answer, skip=ans==='—';
+      const icon=skip?'':right?'✓':'✗';
+      if(!right&&!skip){doc.setFillColor(28,10,10);doc.rect(M,y-9,CW,12,'F');}
+      const shortQ=q.text.replace(/\n[\s\S]*/,'').substring(0,92)+(q.text.length>92?'…':'');
+      doc.setTextColor(100,116,139); doc.setFontSize(7.5);
+      doc.text(String(i+1),cx[0]+2,y);
+      doc.setTextColor(190,200,215);
+      doc.text(shortQ,cx[1]+2,y,{maxWidth:cols[1]-4});
+      const ac=skip?[100,116,139]:right?[74,222,128]:[248,113,113];
+      doc.setTextColor(...ac); doc.text(`${ans} ${icon}`,cx[2]+2,y);
+      doc.setTextColor(74,222,128); doc.text(q.answer,cx[3]+2,y); y+=12;
+
+      if(!right&&q.explanation){
+        np(18); doc.setTextColor(100,116,139); doc.setFontSize(7);
+        const el=doc.splitTextToSize(`Explanation: ${q.explanation}`,cols[1]-4);
+        doc.text(el,cx[1]+2,y); y+=el.length*8.5;
+        if(q.exception){
+          np(12); doc.setTextColor(251,146,60);
+          const nl=doc.splitTextToSize(`Note: ${q.exception}`,cols[1]-4);
+          doc.text(nl,cx[1]+2,y); y+=nl.length*8.5;
+        }
+      }
+      doc.setDrawColor(18,18,32); doc.setLineWidth(0.3); doc.line(M,y-1,W-M,y-1);
+    });
+
+    // Footers
+    const pages=doc.internal.getNumberOfPages();
+    for(let p=1;p<=pages;p++){
+      doc.setPage(p); doc.setFontSize(7); doc.setTextColor(55,55,75);
+      doc.text('GrantApp AI · 100 Days to UTME',M,H-14);
+      doc.text(`Page ${p} of ${pages}`,W-M,H-14,{align:'right'});
+    }
+    doc.save(`GrantApp_MEPC_${today}.pdf`);
+  }
+})();
+</script>
+
 <script src="quiz-app.js"></script>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -885,323 +1078,6 @@ const QUESTIONS = [
 </script>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     NEGATIVE MARKING + PDF RESULTS  v2
-     Fully self-contained — does NOT rely on quiz-app.js internals.
-     Tracks answers by intercepting option clicks independently,
-     then hooks submit/time-up to show results overlay + PDF.
-═════════════════════════════════════════════════════════════════ -->
-<script>
-(function () {
-  const TOTAL_MARKS   = 400;
-  const WRONG_PENALTY = 0.5;
-  const MARKS_PER_Q   = TOTAL_MARKS / QUESTIONS.length;  // 2.5
-
-  /* ── 1. Track answers independently ─────────────────────
-     quiz-app.js manages its own state; we mirror it by
-     watching option-button clicks on #optionsContainer.     */
-  const myAnswers = {};   // { questionId: 'A'|'B'|'C'|'D' }
-  let startTime   = Date.now();
-
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.option-btn, [data-option], .option');
-    if (!btn) return;
-    // Read current question id from the visible question number
-    const qNumEl = document.getElementById('questionNumber');
-    if (!qNumEl) return;
-    const qIdx  = parseInt(qNumEl.textContent, 10) - 1;
-    const q     = QUESTIONS[qIdx];
-    if (!q) return;
-    // Determine which option was clicked
-    const opt = btn.dataset.option || btn.getAttribute('data-option') ||
-                btn.textContent.trim().charAt(0);
-    if (/^[A-D]$/.test(opt)) myAnswers[q.id] = opt;
-  }, true);
-
-  /* Also intercept Clear button to remove answer */
-  document.addEventListener('click', function (e) {
-    if (e.target.closest('#clearBtn')) {
-      const qNumEl = document.getElementById('questionNumber');
-      if (!qNumEl) return;
-      const qIdx = parseInt(qNumEl.textContent, 10) - 1;
-      const q    = QUESTIONS[qIdx];
-      if (q) delete myAnswers[q.id];
-    }
-  }, true);
-
-  /* ── 2. Hook submit and time-up buttons ──────────────── */
-  function hookSubmit() {
-    const confirmBtn = document.getElementById('confirmSubmitBtn');
-    const viewBtn    = document.getElementById('viewResultsBtn');
-    if (confirmBtn) confirmBtn.addEventListener('click', () => setTimeout(showResults, 400));
-    if (viewBtn)    viewBtn.addEventListener('click',    () => setTimeout(showResults, 400));
-  }
-
-  // Buttons exist in HTML so hook immediately on DOMContentLoaded
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', hookSubmit);
-  } else {
-    hookSubmit();
-  }
-
-  /* ── 3. Results overlay ──────────────────────────────── */
-  function showResults() {
-    // Fallback: also scrape answers from quiz-app.js rendered DOM
-    // quiz-app.js marks selected options — try to harvest any we missed
-    scrapeRenderedAnswers();
-
-    let correct = 0, wrong = 0, skipped = 0;
-    QUESTIONS.forEach(q => {
-      const ans = myAnswers[q.id];
-      if (!ans)             skipped++;
-      else if (ans === q.answer) correct++;
-      else                  wrong++;
-    });
-
-    const deductions = wrong * WRONG_PENALTY;
-    const rawMarks   = correct * MARKS_PER_Q;
-    const final      = Math.max(0, rawMarks - deductions);
-    const finalStr   = final.toFixed(1);
-    const pct        = ((final / TOTAL_MARKS) * 100).toFixed(1);
-    const grade      = pct >= 70 ? 'EXCELLENT' : pct >= 55 ? 'GOOD' : pct >= 40 ? 'AVERAGE' : 'NEEDS WORK';
-    const gradeColor = grade==='EXCELLENT'?'#4ade80':grade==='GOOD'?'#a3e635':grade==='AVERAGE'?'#facc15':'#f87171';
-
-    const elapsed = Math.round((Date.now() - startTime) / 1000);
-    const mm = String(Math.floor(elapsed/60)).padStart(2,'0');
-    const ss = String(elapsed%60).padStart(2,'0');
-    const timeStr = `${mm}:${ss}`;
-
-    /* Build subject breakdown */
-    const subj = {};
-    QUESTIONS.forEach(q => {
-      if (!subj[q.subject]) subj[q.subject] = {correct:0,wrong:0,skipped:0,total:0};
-      const ans = myAnswers[q.id];
-      subj[q.subject].total++;
-      if (!ans) subj[q.subject].skipped++;
-      else if (ans === q.answer) subj[q.subject].correct++;
-      else subj[q.subject].wrong++;
-    });
-
-    const subjHTML = Object.entries(subj).map(([s,d]) => {
-      const sp = d.total ? ((d.correct/d.total)*100).toFixed(0) : 0;
-      return `<div style="background:var(--card,#131325);border:1px solid var(--border,#1e1e2e);border-radius:10px;padding:1rem;">
-        <div style="font-weight:600;margin-bottom:.4rem;font-size:.9rem;">${s}</div>
-        <div style="font-size:.8rem;color:var(--muted,#64748b);">${d.correct}/${d.total} &nbsp;·&nbsp; ${sp}%</div>
-        <div style="height:4px;background:var(--border,#1e1e2e);border-radius:2px;margin-top:.5rem;">
-          <div style="height:100%;width:${sp}%;background:var(--accent,#818cf8);border-radius:2px;transition:width .6s;"></div>
-        </div>
-      </div>`;
-    }).join('');
-
-    let overlay = document.getElementById('_gr');
-    if (!overlay) { overlay = document.createElement('div'); overlay.id = '_gr'; document.body.appendChild(overlay); }
-    overlay.style.cssText = 'position:fixed;inset:0;background:var(--bg,#0d0d1a);z-index:9999;overflow-y:auto;padding:2rem 1rem 5rem;color:var(--text,#e2e8f0);font-family:inherit;display:flex;flex-direction:column;align-items:center;';
-
-    overlay.innerHTML = `
-      <div style="width:100%;max-width:740px;">
-        <div style="text-align:center;margin-bottom:2rem;">
-          <div style="font-size:.85rem;color:var(--muted,#64748b);margin-bottom:.3rem;">GrantApp AI · Arts/Commercial MEPC</div>
-          <h1 style="font-size:1.6rem;font-weight:700;margin:0 0 .75rem;">Your Results</h1>
-          <div style="font-size:3.8rem;font-weight:800;color:var(--accent,#818cf8);line-height:1;">${finalStr}<span style="font-size:1.4rem;color:var(--muted,#64748b);"> / ${TOTAL_MARKS}</span></div>
-          <div style="margin:.6rem 0;font-size:1.05rem;">${pct}% &nbsp;·&nbsp; <span style="color:${gradeColor};font-weight:700;">${grade}</span></div>
-          <div style="font-size:.8rem;color:var(--muted,#64748b);">Time: ${timeStr} &nbsp;·&nbsp; −0.5 per wrong answer</div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;">
-          ${sc('Correct',correct,'#4ade80')}${sc('Wrong',wrong,'#f87171')}${sc('Skipped',skipped,'#94a3b8')}${sc('Deducted','−'+deductions.toFixed(1),'#fb923c')}
-        </div>
-
-        <h2 style="font-size:.9rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted,#64748b);margin-bottom:.75rem;">Subject Breakdown</h2>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-bottom:1.5rem;">${subjHTML}</div>
-
-        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;">
-          <button id="_pdfBtn" style="background:var(--accent,#818cf8);color:#fff;border:none;border-radius:8px;padding:.7rem 1.8rem;font-size:.95rem;font-weight:600;cursor:pointer;"><i class="fas fa-file-pdf"></i> Download PDF</button>
-          <button id="_revBtn" style="background:transparent;color:var(--text,#e2e8f0);border:1px solid var(--border,#1e1e2e);border-radius:8px;padding:.7rem 1.8rem;font-size:.95rem;cursor:pointer;">Review Answers</button>
-        </div>
-
-        <div id="_revSection" style="display:none;">
-          <h2 style="font-size:.9rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted,#64748b);margin-bottom:.75rem;">Question Breakdown</h2>
-          <table style="width:100%;border-collapse:collapse;font-size:.82rem;" id="_revTable">
-            <thead><tr style="color:var(--muted,#64748b);border-bottom:1px solid var(--border,#1e1e2e);">
-              <th style="padding:.4rem;text-align:left;width:2.5rem;">#</th>
-              <th style="padding:.4rem;text-align:left;">Question</th>
-              <th style="padding:.4rem;text-align:center;width:3.5rem;">Yours</th>
-              <th style="padding:.4rem;text-align:center;width:3.5rem;">Answer</th>
-            </tr></thead>
-            <tbody id="_revBody"></tbody>
-          </table>
-        </div>
-      </div>`;
-
-    /* Populate review table */
-    const tbody = document.getElementById('_revBody');
-    QUESTIONS.forEach((q,i) => {
-      const ans   = myAnswers[q.id] || '—';
-      const right = ans === q.answer;
-      const skip  = ans === '—';
-      const color = skip?'#94a3b8':right?'#4ade80':'#f87171';
-      const icon  = skip?'':right?'✓':'✗';
-      const shortQ = q.text.replace(/\n[\s\S]*/,'').substring(0,85)+(q.text.length>85?'…':'');
-      const tr = document.createElement('tr');
-      tr.style.borderBottom = '1px solid var(--border,#1e1e2e)';
-      if (!right && !skip) tr.style.background = 'rgba(248,113,113,.04)';
-      tr.innerHTML = `
-        <td style="padding:.4rem;color:var(--muted,#64748b)">${i+1}</td>
-        <td style="padding:.4rem;">
-          <div>${shortQ}</div>
-          ${!right&&q.explanation?`<div style="color:var(--muted,#64748b);font-size:.75rem;margin-top:2px;">Explanation: ${q.explanation}</div>`:''}
-          ${!right&&q.exception?`<div style="color:#fb923c;font-size:.75rem;">Note: ${q.exception}</div>`:''}
-        </td>
-        <td style="padding:.4rem;text-align:center;color:${color};font-weight:700;">${ans} ${icon}</td>
-        <td style="padding:.4rem;text-align:center;color:#4ade80;font-weight:700;">${q.answer}</td>`;
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById('_revBtn').onclick = function() {
-      const s = document.getElementById('_revSection');
-      const showing = s.style.display !== 'none';
-      s.style.display = showing ? 'none' : 'block';
-      this.textContent = showing ? 'Review Answers' : 'Hide Review';
-    };
-
-    document.getElementById('_pdfBtn').onclick = () =>
-      generatePDF(finalStr, pct, grade, gradeColor, correct, wrong, skipped, deductions, timeStr, subj);
-  }
-
-  function sc(label, val, color) {
-    return `<div style="background:var(--card,#131325);border:1px solid var(--border,#1e1e2e);border-radius:10px;padding:.85rem;text-align:center;">
-      <div style="font-size:1.5rem;font-weight:700;color:${color}">${val}</div>
-      <div style="font-size:.75rem;color:var(--muted,#64748b)">${label}</div>
-    </div>`;
-  }
-
-  /* ── 4. Scrape rendered DOM as fallback ──────────────── */
-  function scrapeRenderedAnswers() {
-    // quiz-app.js marks answered palette buttons — not reliable for answer letter
-    // Better: after submit quiz-app.js may add correct/selected classes to options
-    // We do our best but myAnswers tracked via click is the primary source
-  }
-
-  /* ── 5. PDF generation ───────────────────────────────── */
-  function generatePDF(finalStr, pct, grade, gradeColor, correct, wrong, skipped, deductions, timeStr, subj) {
-    if (!window.jspdf) { alert('PDF library not loaded. Please check your internet connection.'); return; }
-    const { jsPDF } = window.jspdf;
-    const doc  = new jsPDF({ unit:'pt', format:'a4' });
-    const W    = doc.internal.pageSize.getWidth();
-    const H    = doc.internal.pageSize.getHeight();
-    const M    = 40;
-    const today = new Date().toISOString().split('T')[0];
-    let y = M;
-
-    function np(need) { if (y+need > H-M) { doc.addPage(); y = M; } }
-
-    /* ── Header bar ── */
-    doc.setFillColor(13,13,26);
-    doc.rect(0,0,W,58,'F');
-    doc.setTextColor(129,140,248); doc.setFontSize(15); doc.setFont('helvetica','bold');
-    doc.text('GrantApp AI', M, 36);
-    doc.setTextColor(100,116,139); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
-    doc.text(`JAMB Practice Test Results — ${today}`, M, 50);
-
-    y = 76;
-
-    /* ── Score block ── */
-    doc.setTextColor(129,140,248); doc.setFontSize(34); doc.setFont('helvetica','bold');
-    doc.text(`${pct}%`, W/2, y+8, {align:'center'});
-    y += 18;
-    doc.setFontSize(11); doc.setTextColor(200,200,220);
-    doc.text(`${finalStr} / ${TOTAL_MARKS}   Correct: ${correct}   Wrong: ${wrong}   Skipped: ${skipped}`, W/2, y+12, {align:'center'});
-    y += 12;
-    doc.setFontSize(9); doc.setTextColor(100,116,139);
-    doc.text(`Deductions: −${deductions.toFixed(1)}   Negative marking: −0.5 per wrong answer   Time taken: ${timeStr}`, W/2, y+12, {align:'center'});
-    y += 12;
-    const gc = grade==='EXCELLENT'?[74,222,128]:grade==='GOOD'?[163,230,53]:grade==='AVERAGE'?[250,204,21]:[248,113,113];
-    doc.setTextColor(...gc); doc.setFontSize(12); doc.setFont('helvetica','bold');
-    doc.text(grade, W/2, y+16, {align:'center'});
-    y += 28;
-
-    /* ── Divider ── */
-    doc.setDrawColor(30,30,46); doc.setLineWidth(0.5); doc.line(M,y,W-M,y); y+=12;
-
-    /* ── Subject breakdown ── */
-    doc.setTextColor(160,170,200); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text('SUBJECT BREAKDOWN', M, y); y+=11;
-    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-    Object.entries(subj).forEach(([s,d]) => {
-      const sp = d.total?((d.correct/d.total)*100).toFixed(1):'0.0';
-      doc.setTextColor(160,170,200);
-      doc.text(`${s}:  ${d.correct}/${d.total} correct  (${sp}%)  ·  Wrong: ${d.wrong}  ·  Skipped: ${d.skipped}`, M, y);
-      y+=12;
-    });
-    y+=6;
-
-    /* ── Divider ── */
-    doc.line(M,y,W-M,y); y+=12;
-
-    /* ── Question breakdown ── */
-    doc.setTextColor(160,170,200); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text('QUESTION BREAKDOWN', M, y); y+=12;
-
-    const CW = W - M*2;
-    const cols = [26, CW-26-40-40, 40, 40];
-    const cx   = [M, M+26, M+26+cols[1], M+26+cols[1]+40];
-
-    /* Table header */
-    doc.setFillColor(20,20,38); doc.rect(M, y-9, CW, 13, 'F');
-    doc.setTextColor(100,116,139); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-    ['#','QUESTION','YOURS','ANSWER'].forEach((h,i) => doc.text(h, cx[i]+2, y));
-    y+=9;
-
-    doc.setFont('helvetica','normal');
-    QUESTIONS.forEach((q,i) => {
-      np(28);
-      const ans   = myAnswers[q.id]||'—';
-      const right = ans===q.answer;
-      const skip  = ans==='—';
-      const icon  = skip?'':right?'✓':'✗';
-
-      if (!right&&!skip) { doc.setFillColor(28,10,10); doc.rect(M,y-9,CW,12,'F'); }
-
-      const shortQ = q.text.replace(/\n[\s\S]*/,'').substring(0,92)+(q.text.length>92?'…':'');
-      doc.setTextColor(100,116,139); doc.setFontSize(7.5);
-      doc.text(String(i+1), cx[0]+2, y);
-      doc.setTextColor(190,200,215);
-      doc.text(shortQ, cx[1]+2, y, {maxWidth:cols[1]-4});
-      const ac = skip?[100,116,139]:right?[74,222,128]:[248,113,113];
-      doc.setTextColor(...ac);
-      doc.text(`${ans} ${icon}`, cx[2]+2, y);
-      doc.setTextColor(74,222,128);
-      doc.text(q.answer, cx[3]+2, y);
-      y+=12;
-
-      if (!right && q.explanation) {
-        np(18);
-        doc.setTextColor(100,116,139); doc.setFontSize(7);
-        const el = doc.splitTextToSize(`Explanation: ${q.explanation}`, cols[1]-4);
-        doc.text(el, cx[1]+2, y); y+=el.length*8.5;
-        if (q.exception) {
-          np(12); doc.setTextColor(251,146,60);
-          const nl = doc.splitTextToSize(`Note: ${q.exception}`, cols[1]-4);
-          doc.text(nl, cx[1]+2, y); y+=nl.length*8.5;
-        }
-      }
-      doc.setDrawColor(18,18,32); doc.setLineWidth(0.3); doc.line(M,y-1,W-M,y-1);
-    });
-
-    /* ── Page footers ── */
-    const pages = doc.internal.getNumberOfPages();
-    for (let p=1;p<=pages;p++) {
-      doc.setPage(p);
-      doc.setFontSize(7); doc.setTextColor(55,55,75);
-      doc.text('GrantApp AI · 100 Days to UTME', M, H-14);
-      doc.text(`Page ${p} of ${pages}`, W-M, H-14, {align:'right'});
-    }
-
-    doc.save(`GrantApp_ArtsCommercial_MEPC_${today}.pdf`);
-  }
-
-})();
-</script>
 
 </body>
 </html>
