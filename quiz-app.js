@@ -661,17 +661,259 @@ class QuizUI {
     
     handleTimeUp() {
         this.state.isSubmitted = true;
-        document.getElementById('timeUpModal').classList.remove('hidden');
+        this.state.stopTimer();
+        // Hide time-up modal and go straight to results
+        const timeUpModal = document.getElementById('timeUpModal');
+        if (timeUpModal) timeUpModal.classList.add('hidden');
+        this.showResults();
     }
-    
+
     showResults() {
-        const score = this.state.getScore();
-        
-        // In production, navigate to results page
-        alert(`Quiz Complete!\n\nScore: ${score.correct}/${score.total} (${score.percentage.toFixed(1)}%)`);
-        
-        // For now, just reload
-        window.location.reload();
+        const TOTAL_MARKS   = 400;
+        const WRONG_PENALTY = 0.5;
+        const marksPerQ     = TOTAL_MARKS / this.state.questions.length;
+
+        let correct = 0, wrong = 0, skipped = 0;
+        this.state.questions.forEach(q => {
+            const ans = this.state.userAnswers[q.id];
+            if (!ans)                  skipped++;
+            else if (ans === q.answer) correct++;
+            else                       wrong++;
+        });
+
+        const deductions = wrong * WRONG_PENALTY;
+        const final      = Math.max(0, correct * marksPerQ - deductions);
+        const finalStr   = final.toFixed(1);
+        const pct        = ((final / TOTAL_MARKS) * 100).toFixed(1);
+        const grade      = pct >= 70 ? 'EXCELLENT' : pct >= 55 ? 'GOOD' : pct >= 40 ? 'AVERAGE' : 'NEEDS WORK';
+        const gradeColor = grade === 'EXCELLENT' ? '#4ade80' : grade === 'GOOD' ? '#a3e635' : grade === 'AVERAGE' ? '#facc15' : '#f87171';
+
+        const elapsed  = Math.round((Date.now() - this.state.startTime) / 1000);
+        const timeStr  = this.state.formatTime(elapsed);
+
+        // Subject breakdown
+        const subj = {};
+        this.state.questions.forEach(q => {
+            if (!subj[q.subject]) subj[q.subject] = { correct: 0, wrong: 0, skipped: 0, total: 0 };
+            const ans = this.state.userAnswers[q.id];
+            subj[q.subject].total++;
+            if (!ans)                  subj[q.subject].skipped++;
+            else if (ans === q.answer) subj[q.subject].correct++;
+            else                       subj[q.subject].wrong++;
+        });
+
+        const statCard = (label, val, color) =>
+            `<div style="background:var(--card,#131325);border:1px solid var(--border,#1e1e2e);border-radius:10px;padding:.85rem;text-align:center;">
+                <div style="font-size:1.5rem;font-weight:700;color:${color}">${val}</div>
+                <div style="font-size:.75rem;color:var(--muted,#64748b)">${label}</div>
+            </div>`;
+
+        const subjHTML = Object.entries(subj).map(([s, d]) => {
+            const sp = d.total ? ((d.correct / d.total) * 100).toFixed(0) : 0;
+            return `<div style="background:var(--card,#131325);border:1px solid var(--border,#1e1e2e);border-radius:10px;padding:1rem;">
+                <div style="font-weight:600;margin-bottom:.4rem;font-size:.9rem;">${s}</div>
+                <div style="font-size:.8rem;color:var(--muted,#64748b);">${d.correct}/${d.total} &nbsp;·&nbsp; ${sp}%</div>
+                <div style="height:4px;background:var(--border,#1e1e2e);border-radius:2px;margin-top:.5rem;">
+                    <div style="height:100%;width:${sp}%;background:var(--accent,#818cf8);border-radius:2px;"></div>
+                </div>
+            </div>`;
+        }).join('');
+
+        // Build overlay
+        let overlay = document.getElementById('_grantResults');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = '_grantResults';
+            document.body.appendChild(overlay);
+        }
+        overlay.style.cssText = 'position:fixed;inset:0;background:var(--bg,#0d0d1a);z-index:9999;overflow-y:auto;padding:2rem 1rem 5rem;color:var(--text,#e2e8f0);font-family:inherit;display:flex;flex-direction:column;align-items:center;';
+
+        overlay.innerHTML = `
+            <div style="width:100%;max-width:740px;">
+                <div style="text-align:center;margin-bottom:2rem;">
+                    <div style="font-size:.85rem;color:var(--muted,#64748b);margin-bottom:.3rem;">GrantApp AI · JAMB Practice</div>
+                    <h1 style="font-size:1.6rem;font-weight:700;margin:0 0 .75rem;">Your Results</h1>
+                    <div style="font-size:3.8rem;font-weight:800;color:var(--accent,#818cf8);line-height:1;">${finalStr}<span style="font-size:1.4rem;color:var(--muted,#64748b);"> / ${TOTAL_MARKS}</span></div>
+                    <div style="margin:.6rem 0;font-size:1.05rem;">${pct}% &nbsp;·&nbsp; <span style="color:${gradeColor};font-weight:700;">${grade}</span></div>
+                    <div style="font-size:.8rem;color:var(--muted,#64748b);">Time: ${timeStr} &nbsp;·&nbsp; −0.5 per wrong answer</div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;">
+                    ${statCard('Correct', correct, '#4ade80')}
+                    ${statCard('Wrong', wrong, '#f87171')}
+                    ${statCard('Skipped', skipped, '#94a3b8')}
+                    ${statCard('Deducted', '−' + deductions.toFixed(1), '#fb923c')}
+                </div>
+
+                <h2 style="font-size:.9rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted,#64748b);margin-bottom:.75rem;">Subject Breakdown</h2>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-bottom:1.5rem;">${subjHTML}</div>
+
+                <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;">
+                    <button id="_pdfBtn" style="background:var(--accent,#818cf8);color:#fff;border:none;border-radius:8px;padding:.7rem 1.8rem;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-file-pdf"></i> Download PDF Report
+                    </button>
+                    <button id="_revBtn" style="background:transparent;color:var(--text,#e2e8f0);border:1px solid var(--border,#1e1e2e);border-radius:8px;padding:.7rem 1.8rem;font-size:.95rem;cursor:pointer;">
+                        Review Answers
+                    </button>
+                </div>
+
+                <div id="_revSection" style="display:none;">
+                    <h2 style="font-size:.9rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted,#64748b);margin-bottom:.75rem;">Question Breakdown</h2>
+                    <table style="width:100%;border-collapse:collapse;font-size:.82rem;">
+                        <thead><tr style="color:var(--muted,#64748b);border-bottom:1px solid var(--border,#1e1e2e);">
+                            <th style="padding:.4rem;text-align:left;width:2.5rem;">#</th>
+                            <th style="padding:.4rem;text-align:left;">Question</th>
+                            <th style="padding:.4rem;text-align:center;width:3.5rem;">Yours</th>
+                            <th style="padding:.4rem;text-align:center;width:3.5rem;">Answer</th>
+                        </tr></thead>
+                        <tbody id="_revBody"></tbody>
+                    </table>
+                </div>
+            </div>`;
+
+        // Populate review table
+        const tbody = document.getElementById('_revBody');
+        this.state.questions.forEach((q, i) => {
+            const ans   = this.state.userAnswers[q.id] || '—';
+            const right = ans === q.answer;
+            const skip  = ans === '—';
+            const color = skip ? '#94a3b8' : right ? '#4ade80' : '#f87171';
+            const icon  = skip ? '' : right ? '✓' : '✗';
+            const shortQ = q.text.replace(/\n[\s\S]*/, '').substring(0, 85) + (q.text.length > 85 ? '…' : '');
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid var(--border,#1e1e2e)';
+            if (!right && !skip) tr.style.background = 'rgba(248,113,113,.04)';
+            tr.innerHTML = `
+                <td style="padding:.4rem;color:var(--muted,#64748b)">${i + 1}</td>
+                <td style="padding:.4rem;">
+                    <div>${shortQ}</div>
+                    ${!right && q.explanation ? `<div style="color:var(--muted,#64748b);font-size:.75rem;margin-top:2px;">Explanation: ${q.explanation}</div>` : ''}
+                    ${!right && q.exception  ? `<div style="color:#fb923c;font-size:.75rem;">Note: ${q.exception}</div>` : ''}
+                </td>
+                <td style="padding:.4rem;text-align:center;color:${color};font-weight:700;">${ans} ${icon}</td>
+                <td style="padding:.4rem;text-align:center;color:#4ade80;font-weight:700;">${q.answer}</td>`;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('_revBtn').onclick = function () {
+            const s = document.getElementById('_revSection');
+            const showing = s.style.display !== 'none';
+            s.style.display = showing ? 'none' : 'block';
+            this.textContent = showing ? 'Review Answers' : 'Hide Review';
+        };
+
+        // Capture state for PDF closure
+        const stateSnapshot = {
+            questions: this.state.questions,
+            userAnswers: { ...this.state.userAnswers }
+        };
+        document.getElementById('_pdfBtn').onclick = () =>
+            this._generatePDF(stateSnapshot, finalStr, pct, grade, gradeColor, correct, wrong, skipped, deductions, timeStr, subj, TOTAL_MARKS);
+    }
+
+    _generatePDF(state, finalStr, pct, grade, gradeColor, correct, wrong, skipped, deductions, timeStr, subj, TOTAL_MARKS) {
+        if (!window.jspdf) {
+            alert('PDF library not loaded — ensure jsPDF is included in the page.');
+            return;
+        }
+        const { jsPDF } = window.jspdf;
+        const doc   = new jsPDF({ unit: 'pt', format: 'a4' });
+        const W     = doc.internal.pageSize.getWidth();
+        const H     = doc.internal.pageSize.getHeight();
+        const M     = 40;
+        const today = new Date().toISOString().split('T')[0];
+        let y = M;
+
+        const np = (need) => { if (y + need > H - M) { doc.addPage(); y = M; } };
+
+        // ── Header bar ──
+        doc.setFillColor(13, 13, 26);
+        doc.rect(0, 0, W, 58, 'F');
+        doc.setTextColor(129, 140, 248); doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+        doc.text('GrantApp AI', M, 36);
+        doc.setTextColor(100, 116, 139); doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
+        doc.text(`JAMB Practice Test Results — ${today}`, M, 50);
+        y = 76;
+
+        // ── Score ──
+        doc.setTextColor(129, 140, 248); doc.setFontSize(34); doc.setFont('helvetica', 'bold');
+        doc.text(`${pct}%`, W / 2, y + 8, { align: 'center' }); y += 18;
+        doc.setFontSize(11); doc.setTextColor(200, 200, 220);
+        doc.text(`${finalStr} / ${TOTAL_MARKS}   Correct: ${correct}   Wrong: ${wrong}   Skipped: ${skipped}`, W / 2, y + 12, { align: 'center' }); y += 12;
+        doc.setFontSize(9); doc.setTextColor(100, 116, 139);
+        doc.text(`Deductions: −${deductions.toFixed(1)}   Negative marking: −0.5 per wrong   Time taken: ${timeStr}`, W / 2, y + 12, { align: 'center' }); y += 12;
+        const gc = grade === 'EXCELLENT' ? [74, 222, 128] : grade === 'GOOD' ? [163, 230, 53] : grade === 'AVERAGE' ? [250, 204, 21] : [248, 113, 113];
+        doc.setTextColor(...gc); doc.setFontSize(12); doc.setFont('helvetica', 'bold');
+        doc.text(grade, W / 2, y + 16, { align: 'center' }); y += 28;
+
+        // ── Divider ──
+        doc.setDrawColor(30, 30, 46); doc.setLineWidth(0.5); doc.line(M, y, W - M, y); y += 12;
+
+        // ── Subject breakdown ──
+        doc.setTextColor(160, 170, 200); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+        doc.text('SUBJECT BREAKDOWN', M, y); y += 11;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+        Object.entries(subj).forEach(([s, d]) => {
+            const sp = d.total ? ((d.correct / d.total) * 100).toFixed(1) : '0.0';
+            doc.setTextColor(160, 170, 200);
+            doc.text(`${s}:  ${d.correct}/${d.total} correct  (${sp}%)  ·  Wrong: ${d.wrong}  ·  Skipped: ${d.skipped}`, M, y); y += 12;
+        }); y += 6;
+
+        // ── Divider ──
+        doc.line(M, y, W - M, y); y += 12;
+
+        // ── Question breakdown ──
+        doc.setTextColor(160, 170, 200); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+        doc.text('QUESTION BREAKDOWN', M, y); y += 12;
+
+        const CW   = W - M * 2;
+        const cols = [26, CW - 26 - 40 - 40, 40, 40];
+        const cx   = [M, M + 26, M + 26 + cols[1], M + 26 + cols[1] + 40];
+
+        doc.setFillColor(20, 20, 38); doc.rect(M, y - 9, CW, 13, 'F');
+        doc.setTextColor(100, 116, 139); doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
+        ['#', 'QUESTION', 'YOURS', 'ANSWER'].forEach((h, i) => doc.text(h, cx[i] + 2, y)); y += 9;
+
+        doc.setFont('helvetica', 'normal');
+        state.questions.forEach((q, i) => {
+            np(28);
+            const ans   = state.userAnswers[q.id] || '—';
+            const right = ans === q.answer;
+            const skip  = ans === '—';
+            const icon  = skip ? '' : right ? '✓' : '✗';
+
+            if (!right && !skip) { doc.setFillColor(28, 10, 10); doc.rect(M, y - 9, CW, 12, 'F'); }
+
+            const shortQ = q.text.replace(/\n[\s\S]*/, '').substring(0, 92) + (q.text.length > 92 ? '…' : '');
+            doc.setTextColor(100, 116, 139); doc.setFontSize(7.5);
+            doc.text(String(i + 1), cx[0] + 2, y);
+            doc.setTextColor(190, 200, 215);
+            doc.text(shortQ, cx[1] + 2, y, { maxWidth: cols[1] - 4 });
+            const ac = skip ? [100, 116, 139] : right ? [74, 222, 128] : [248, 113, 113];
+            doc.setTextColor(...ac); doc.text(`${ans} ${icon}`, cx[2] + 2, y);
+            doc.setTextColor(74, 222, 128); doc.text(q.answer, cx[3] + 2, y); y += 12;
+
+            if (!right && q.explanation) {
+                np(18); doc.setTextColor(100, 116, 139); doc.setFontSize(7);
+                const el = doc.splitTextToSize(`Explanation: ${q.explanation}`, cols[1] - 4);
+                doc.text(el, cx[1] + 2, y); y += el.length * 8.5;
+                if (q.exception) {
+                    np(12); doc.setTextColor(251, 146, 60);
+                    const nl = doc.splitTextToSize(`Note: ${q.exception}`, cols[1] - 4);
+                    doc.text(nl, cx[1] + 2, y); y += nl.length * 8.5;
+                }
+            }
+            doc.setDrawColor(18, 18, 32); doc.setLineWidth(0.3); doc.line(M, y - 1, W - M, y - 1);
+        });
+
+        // ── Page footers ──
+        const pages = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= pages; p++) {
+            doc.setPage(p); doc.setFontSize(7); doc.setTextColor(55, 55, 75);
+            doc.text('GrantApp AI · 100 Days to UTME', M, H - 14);
+            doc.text(`Page ${p} of ${pages}`, W - M, H - 14, { align: 'right' });
+        }
+        doc.save(`GrantApp_MEPC_${today}.pdf`);
     }
 }
 
