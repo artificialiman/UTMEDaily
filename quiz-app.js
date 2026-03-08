@@ -187,7 +187,7 @@ class QuizState {
     getScore() {
         let correct = 0;
         for (const question of this.questions) {
-            if (this.userAnswers[question.id] === (question.answer ?? question.ans)) {
+            if (this.userAnswers[question.id] === question.answer) {
                 correct++;
             }
         }
@@ -331,7 +331,7 @@ class QuizUI {
     
     renderHeader() {
         const question = this.state.getCurrentQuestion();
-        this.elements.subjectName.textContent = question.subject || question.topic || '';
+        this.elements.subjectName.textContent = question.subject;
         this.elements.currentQuestionNum.textContent = this.state.currentQuestionIndex + 1;
         this.elements.totalQuestions.textContent = this.state.questions.length;
     }
@@ -414,9 +414,6 @@ class QuizUI {
         }
         // ──────────────────────────────────────────────────────────────────
 
-        // field aliases — opts/ans/exp accepted alongside options/answer/explanation
-        const options = question.options ?? question.opts;
-
         // Update question number and text
         this.elements.questionNumber.textContent = this.state.currentQuestionIndex + 1;
         this.elements.questionText.textContent = question.text;
@@ -426,7 +423,7 @@ class QuizUI {
         const optionLabels = ['A', 'B', 'C', 'D'];
         
         optionLabels.forEach(label => {
-            if (options[label]) {
+            if (question.options[label]) {
                 const option = document.createElement('div');
                 option.className = 'option';
                 
@@ -437,7 +434,7 @@ class QuizUI {
                 
                 option.innerHTML = `
                     <div class="option-label">${label}</div>
-                    <div class="option-text">${options[label]}</div>
+                    <div class="option-text">${question.options[label]}</div>
                 `;
                 
                 option.addEventListener('click', () => this.handleSelectOption(label));
@@ -679,10 +676,9 @@ class QuizUI {
         let correct = 0, wrong = 0, skipped = 0;
         this.state.questions.forEach(q => {
             const ans = this.state.userAnswers[q.id];
-            const a   = q.answer ?? q.ans;
-            if (!ans)          skipped++;
-            else if (ans === a) correct++;
-            else               wrong++;
+            if (!ans)                  skipped++;
+            else if (ans === q.answer) correct++;
+            else                       wrong++;
         });
 
         const deductions = wrong * WRONG_PENALTY;
@@ -698,14 +694,12 @@ class QuizUI {
         // Subject breakdown
         const subj = {};
         this.state.questions.forEach(q => {
-            const sk = q.subject || q.topic || 'General';
-            const a  = q.answer ?? q.ans;
-            if (!subj[sk]) subj[sk] = { correct: 0, wrong: 0, skipped: 0, total: 0 };
+            if (!subj[q.subject]) subj[q.subject] = { correct: 0, wrong: 0, skipped: 0, total: 0 };
             const ans = this.state.userAnswers[q.id];
-            subj[sk].total++;
-            if (!ans)          subj[sk].skipped++;
-            else if (ans === a) subj[sk].correct++;
-            else               subj[sk].wrong++;
+            subj[q.subject].total++;
+            if (!ans)                  subj[q.subject].skipped++;
+            else if (ans === q.answer) subj[q.subject].correct++;
+            else                       subj[q.subject].wrong++;
         });
 
         const statCard = (label, val, color) =>
@@ -781,9 +775,7 @@ class QuizUI {
         const tbody = document.getElementById('_revBody');
         this.state.questions.forEach((q, i) => {
             const ans   = this.state.userAnswers[q.id] || '—';
-            const a     = q.answer ?? q.ans;
-            const expl  = q.explanation ?? q.exp;
-            const right = ans === a;
+            const right = ans === q.answer;
             const skip  = ans === '—';
             const color = skip ? '#94a3b8' : right ? '#4ade80' : '#f87171';
             const icon  = skip ? '' : right ? '✓' : '✗';
@@ -795,11 +787,11 @@ class QuizUI {
                 <td style="padding:.4rem;color:var(--muted,#64748b)">${i + 1}</td>
                 <td style="padding:.4rem;">
                     <div>${shortQ}</div>
-                    ${!right && expl ? `<div style="color:var(--muted,#64748b);font-size:.75rem;margin-top:2px;">Explanation: ${expl}</div>` : ''}
+                    ${!right && q.explanation ? `<div style="color:var(--muted,#64748b);font-size:.75rem;margin-top:2px;">Explanation: ${q.explanation}</div>` : ''}
                     ${!right && q.exception  ? `<div style="color:#fb923c;font-size:.75rem;">Note: ${q.exception}</div>` : ''}
                 </td>
                 <td style="padding:.4rem;text-align:center;color:${color};font-weight:700;">${ans} ${icon}</td>
-                <td style="padding:.4rem;text-align:center;color:#4ade80;font-weight:700;">${a}</td>`;
+                <td style="padding:.4rem;text-align:center;color:#4ade80;font-weight:700;">${q.answer}</td>`;
             tbody.appendChild(tr);
         });
 
@@ -886,9 +878,7 @@ class QuizUI {
         state.questions.forEach((q, i) => {
             np(28);
             const ans   = state.userAnswers[q.id] || '—';
-            const a     = q.answer ?? q.ans;
-            const expl  = q.explanation ?? q.exp;
-            const right = ans === a;
+            const right = ans === q.answer;
             const skip  = ans === '—';
             const icon  = skip ? '' : right ? '✓' : '✗';
 
@@ -901,11 +891,11 @@ class QuizUI {
             doc.text(shortQ, cx[1] + 2, y, { maxWidth: cols[1] - 4 });
             const ac = skip ? [100, 116, 139] : right ? [74, 222, 128] : [248, 113, 113];
             doc.setTextColor(...ac); doc.text(`${ans} ${icon}`, cx[2] + 2, y);
-            doc.setTextColor(74, 222, 128); doc.text(a, cx[3] + 2, y); y += 12;
+            doc.setTextColor(74, 222, 128); doc.text(q.answer, cx[3] + 2, y); y += 12;
 
-            if (!right && expl) {
+            if (!right && q.explanation) {
                 np(18); doc.setTextColor(100, 116, 139); doc.setFontSize(7);
-                const el = doc.splitTextToSize(`Explanation: ${expl}`, cols[1] - 4);
+                const el = doc.splitTextToSize(`Explanation: ${q.explanation}`, cols[1] - 4);
                 doc.text(el, cx[1] + 2, y); y += el.length * 8.5;
                 if (q.exception) {
                     np(12); doc.setTextColor(251, 146, 60);
