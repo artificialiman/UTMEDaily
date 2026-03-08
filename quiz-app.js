@@ -415,9 +415,7 @@ class QuizUI {
         // ──────────────────────────────────────────────────────────────────
 
         // field aliases — opts/ans/exp accepted alongside options/answer/explanation
-        const options     = question.options     ?? question.opts;
-        const answer      = question.answer      ?? question.ans;
-        const explanation = question.explanation ?? question.exp;
+        const options = question.options ?? question.opts;
 
         // Update question number and text
         this.elements.questionNumber.textContent = this.state.currentQuestionIndex + 1;
@@ -681,10 +679,10 @@ class QuizUI {
         let correct = 0, wrong = 0, skipped = 0;
         this.state.questions.forEach(q => {
             const ans = this.state.userAnswers[q.id];
-            const answer = q.answer ?? q.ans;
-            if (!ans)                 skipped++;
-            else if (ans === answer)  correct++;
-            else                      wrong++;
+            const a   = q.answer ?? q.ans;
+            if (!ans)          skipped++;
+            else if (ans === a) correct++;
+            else               wrong++;
         });
 
         const deductions = wrong * WRONG_PENALTY;
@@ -700,15 +698,14 @@ class QuizUI {
         // Subject breakdown
         const subj = {};
         this.state.questions.forEach(q => {
-            const subjKey = q.subject || q.topic || 'General';
-            if (!subj[subjKey]) subj[subjKey] = { correct: 0, wrong: 0, skipped: 0, total: 0 };
+            const sk = q.subject || q.topic || 'General';
+            const a  = q.answer ?? q.ans;
+            if (!subj[sk]) subj[sk] = { correct: 0, wrong: 0, skipped: 0, total: 0 };
             const ans = this.state.userAnswers[q.id];
-            const answer = q.answer ?? q.ans;
-            subj[subjKey].total++;
-            if (!ans)                subj[subjKey].skipped++;
-            else if (ans === answer) subj[subjKey].correct++;
-            else                     subj[subjKey].wrong++;
-        });
+            subj[sk].total++;
+            if (!ans)          subj[sk].skipped++;
+            else if (ans === a) subj[sk].correct++;
+            else               subj[sk].wrong++;
         });
 
         const statCard = (label, val, color) =>
@@ -784,9 +781,9 @@ class QuizUI {
         const tbody = document.getElementById('_revBody');
         this.state.questions.forEach((q, i) => {
             const ans   = this.state.userAnswers[q.id] || '—';
-            const qAnswer = q.answer ?? q.ans;
-            const qExpl   = q.explanation ?? q.exp;
-            const right = ans === qAnswer;
+            const a     = q.answer ?? q.ans;
+            const expl  = q.explanation ?? q.exp;
+            const right = ans === a;
             const skip  = ans === '—';
             const color = skip ? '#94a3b8' : right ? '#4ade80' : '#f87171';
             const icon  = skip ? '' : right ? '✓' : '✗';
@@ -798,11 +795,11 @@ class QuizUI {
                 <td style="padding:.4rem;color:var(--muted,#64748b)">${i + 1}</td>
                 <td style="padding:.4rem;">
                     <div>${shortQ}</div>
-                    ${!right && qExpl ? `<div style="color:var(--muted,#64748b);font-size:.75rem;margin-top:2px;">Explanation: ${qExpl}</div>` : ''}
+                    ${!right && expl ? `<div style="color:var(--muted,#64748b);font-size:.75rem;margin-top:2px;">Explanation: ${expl}</div>` : ''}
                     ${!right && q.exception  ? `<div style="color:#fb923c;font-size:.75rem;">Note: ${q.exception}</div>` : ''}
                 </td>
                 <td style="padding:.4rem;text-align:center;color:${color};font-weight:700;">${ans} ${icon}</td>
-                <td style="padding:.4rem;text-align:center;color:#4ade80;font-weight:700;">${qAnswer}</td>`;
+                <td style="padding:.4rem;text-align:center;color:#4ade80;font-weight:700;">${a}</td>`;
             tbody.appendChild(tr);
         });
 
@@ -888,12 +885,12 @@ class QuizUI {
         doc.setFont('helvetica', 'normal');
         state.questions.forEach((q, i) => {
             np(28);
-            const ans    = state.userAnswers[q.id] || '—';
-            const qAnswer = q.answer ?? q.ans;
-            const qExpl   = q.explanation ?? q.exp;
-            const right  = ans === qAnswer;
-            const skip   = ans === '—';
-            const icon   = skip ? '' : right ? '✓' : '✗';
+            const ans   = state.userAnswers[q.id] || '—';
+            const a     = q.answer ?? q.ans;
+            const expl  = q.explanation ?? q.exp;
+            const right = ans === a;
+            const skip  = ans === '—';
+            const icon  = skip ? '' : right ? '✓' : '✗';
 
             if (!right && !skip) { doc.setFillColor(28, 10, 10); doc.rect(M, y - 9, CW, 12, 'F'); }
 
@@ -904,11 +901,11 @@ class QuizUI {
             doc.text(shortQ, cx[1] + 2, y, { maxWidth: cols[1] - 4 });
             const ac = skip ? [100, 116, 139] : right ? [74, 222, 128] : [248, 113, 113];
             doc.setTextColor(...ac); doc.text(`${ans} ${icon}`, cx[2] + 2, y);
-            doc.setTextColor(74, 222, 128); doc.text(qAnswer, cx[3] + 2, y); y += 12;
+            doc.setTextColor(74, 222, 128); doc.text(a, cx[3] + 2, y); y += 12;
 
-            if (!right && qExpl) {
+            if (!right && expl) {
                 np(18); doc.setTextColor(100, 116, 139); doc.setFontSize(7);
-                const el = doc.splitTextToSize(`Explanation: ${qExpl}`, cols[1] - 4);
+                const el = doc.splitTextToSize(`Explanation: ${expl}`, cols[1] - 4);
                 doc.text(el, cx[1] + 2, y); y += el.length * 8.5;
                 if (q.exception) {
                     np(12); doc.setTextColor(251, 146, 60);
