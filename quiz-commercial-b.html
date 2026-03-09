@@ -4,970 +4,1023 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Commercial — EMEG — JAMB Practice · GrantApp AI</title>
+    <title>Arts — EMEG — JAMB Practice · GrantApp AI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="quiz-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="quiz-body">
 
 <!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
+<!-- passage field triggers the reading panel in quiz-app.js; passageTitle labels it.  -->
+<!-- Questions sharing identical passage strings are automatically grouped.            -->
 <script>
-const DURATION = 3600;
+const DURATION = 4800;
 
-const QUESTIONS = [
-  /* ── ENGLISH (1–35) ─────────────────────────────── */
-  {
-    id: 1, subject: 'English',
-    text: 'Choose the word that is OPPOSITE in meaning to "ubiquitous"',
-    options: { A: 'Rare', B: 'Common', C: 'Universal', D: 'Frequent' },
-    answer: 'A',
-    explanation: 'Ubiquitous means present everywhere. Its opposite is rare.',
-  },
-  {
-    id: 2, subject: 'English',
-    text: 'Choose the option with the same vowel sound as "blood"',
-    options: { A: 'Good', B: 'Flood', C: 'Food', D: 'Mood' },
-    answer: 'B',
-    explanation: '"Blood" /blʌd/ rhymes with "flood" /flʌd/ — both carry the /ʌ/ vowel sound.',
-  },
-  {
-    id: 3, subject: 'English',
-    text: 'In "The committee has submitted its report," the verb "has" agrees with:',
-    options: { A: 'Report (object)', B: 'Members (implied plural)', C: 'Committee (singular collective noun)', D: 'Either A or B' },
-    answer: 'C',
-    explanation: 'Collective nouns take singular verbs when the group acts as a single unit.',
-  },
-  {
-    id: 4, subject: 'English',
-    text: 'Identify the literary device: "The classroom was a zoo"',
-    options: { A: 'Metaphor', B: 'Personification', C: 'Hyperbole', D: 'Simile' },
-    answer: 'A',
-    explanation: 'A direct comparison without "like" or "as" is a metaphor.',
-  },
-  {
-    id: 5, subject: 'English',
-    text: 'Which sentence uses "lie" correctly?',
-    options: { A: 'The book is laying on the table', B: 'I will lay down for a nap', C: 'Yesterday, I lay down to rest', D: 'The hen has laid five eggs' },
-    answer: 'C',
-    explanation: 'Lie (recline) is intransitive: lie/lay/lain. Lay (place) is transitive: lay/laid/laid.',
-  },
-  {
-    id: 6, subject: 'English',
-    text: 'Choose the correctly punctuated sentence:',
-    options: { A: 'The teacher said, "homework is due tomorrow".', B: 'The teacher said "Homework is due tomorrow."', C: 'The teacher said, "Homework is due tomorrow."', D: 'The teacher said: "homework is due tomorrow."' },
-    answer: 'C',
-    explanation: 'Comma before the quote, capital letter opens it, period inside the closing quotation mark.',
-  },
-  {
-    id: 7, subject: 'English',
-    text: 'Identify the error: "Neither the students nor the teacher were present"',
-    options: { A: 'No error', B: 'Pronoun error', C: 'Subject-verb disagreement', D: 'Tense error' },
-    answer: 'C',
-    explanation: 'With neither…nor, the verb agrees with the nearest subject. "Teacher" (singular) requires "was".',
-  },
-  {
-    id: 8, subject: 'English',
-    text: 'The prefix "bi-" in "biannual" means:',
-    options: { A: 'Once every two years', B: 'Twice a year', C: 'Two years long', D: 'Half a year' },
-    answer: 'B',
-    explanation: 'Biannual = twice yearly. Biennial = every two years.',
-  },
-  {
-    id: 9, subject: 'English',
-    text: 'Choose the word with the correct spelling:',
-    options: { A: 'Occurred', B: 'Ocurred', C: 'Occureed', D: 'Occured' },
-    answer: 'A',
-    explanation: 'Double the final consonant before -ed when the stressed final syllable ends CVC.',
-  },
-  {
-    id: 10, subject: 'English',
-    text: 'Identify the sentence with correct pronoun usage:',
-    options: { A: 'Myself and John will attend', B: 'The secret is between you and me', C: 'He gave the gift to my wife and I', D: 'Between you and I, he\'s wrong' },
-    answer: 'B',
-    explanation: 'After a preposition, use the objective case: "me", not "I".',
-  },
-  {
-    id: 11, subject: 'English',
-    text: 'Which uses the subjunctive mood correctly?',
-    options: { A: 'If he were here, he\'d help', B: 'If I was rich, I\'d travel', C: 'I wish I was taller', D: 'She acts like she was the boss' },
-    answer: 'A',
-    explanation: 'The subjunctive uses "were" for all persons in contrary-to-fact conditions.',
-  },
-  {
-    id: 12, subject: 'English',
-    text: 'Identify the dangling modifier:',
-    options: { A: 'I walked home in the rain', B: 'The rain started as I walked home', C: 'While walking home, I felt raindrops', D: 'Walking home, the rain started' },
-    answer: 'D',
-    explanation: '"Walking home" illogically modifies "rain" — rain cannot walk.',
-  },
-  {
-    id: 13, subject: 'English',
-    text: 'Choose the sentence with correct parallel structure:',
-    options: { A: 'She likes to read, writing, and to paint', B: 'She likes reading, to write, and painting', C: 'She likes reading, writing, and painting', D: 'She likes to read, to write, and painting' },
-    answer: 'C',
-    explanation: 'Parallel elements must share the same grammatical form — all gerunds here.',
-  },
-  {
-    id: 14, subject: 'English',
-    text: 'Identify the oxymoron:',
-    options: { A: 'Hot coffee', B: 'Fast car', C: 'Deafening silence', D: 'Very unique' },
-    answer: 'C',
-    explanation: 'An oxymoron combines contradictory terms. Silence by definition cannot be loud.',
-  },
-  {
-    id: 15, subject: 'English',
-    text: 'In passive voice, "The cat chased the mouse" becomes:',
-    options: { A: 'The mouse has been chased', B: 'The mouse was chased by the cat', C: 'The mouse is chased by the cat', D: 'The cat was chasing the mouse' },
-    answer: 'B',
-    explanation: 'Passive: object becomes subject; verb becomes be + past participle.',
-  },
-  {
-    id: 16, subject: 'English',
-    text: 'Choose the correct verb form: "If I _____ known, I would have come"',
-    options: { A: 'have', B: 'had', C: 'would have', D: 'has' },
-    answer: 'B',
-    explanation: 'Third conditional: past perfect in the if-clause pairs with "would have" in the main clause.',
-  },
-  {
-    id: 17, subject: 'English',
-    text: 'Choose the sentence with correct comma usage:',
-    options: { A: 'The old, red car broke down', B: 'The, old, red, car broke down', C: 'The red, old, car broke down', D: 'The old red car broke down' },
-    answer: 'A',
-    explanation: 'Coordinate adjectives (interchangeable in order) are separated by commas.',
-  },
-  {
-    id: 18, subject: 'English',
-    text: 'The sentence "Whom did you see?" is:',
-    options: { A: 'Conversationally awkward', B: 'Missing an auxiliary verb', C: 'Archaic and incorrect', D: 'Formally correct' },
-    answer: 'D',
-    explanation: '"Whom" is the objective case and is correct as the direct object of "see".',
-  },
-  {
-    id: 19, subject: 'English',
-    text: '"She broke his car and his heart" — "broke" used in two senses is an example of:',
-    options: { A: 'Paradox', B: 'Zeugma', C: 'Synecdoche', D: 'Antithesis' },
-    answer: 'B',
-    explanation: 'Zeugma uses one verb to govern two objects in different (literal and figurative) senses.',
-  },
-  {
-    id: 20, subject: 'English',
-    text: 'The error in "Irregardless of the cost, we\'ll proceed" is:',
-    options: { A: '"Irregardless" is non-standard (double negative)', B: 'No error', C: 'Wrong preposition', D: 'Comma splice' },
-    answer: 'A',
-    explanation: '"Irregardless" is a double negative. The standard form is "regardless".',
-  },
-  {
-    id: 21, subject: 'English',
-    text: 'Choose the correct form: "Neither of the answers _____ correct"',
-    options: { A: 'is', B: 'were', C: 'be', D: 'are' },
-    answer: 'A',
-    explanation: '"Neither" is a singular pronoun and takes a singular verb.',
-  },
-  {
-    id: 22, subject: 'English',
-    text: 'The phrase "beg the question" traditionally means:',
-    options: { A: 'To ask formally', B: 'To avoid answering', C: 'To raise a question', D: 'To assume what you\'re trying to prove' },
-    answer: 'D',
-    explanation: '"Beg the question" is the logical fallacy of petitio principii — circular reasoning.',
-  },
-  {
-    id: 23, subject: 'English',
-    text: 'The word "sanction" can mean:',
-    options: { A: 'To approve OR to penalize', B: 'Only to penalize', C: 'Only to approve', D: 'To ignore' },
-    answer: 'A',
-    explanation: 'Sanction is an auto-antonym — it can mean both approve AND punish.',
-  },
-  {
-    id: 24, subject: 'English',
-    text: 'Identify the split infinitive:',
-    options: { A: 'To boldly go where no one has gone', B: 'To go boldly where no one has gone', C: 'Boldly to go where no one has gone', D: 'Both B and C' },
-    answer: 'A',
-    explanation: 'A split infinitive places an adverb between "to" and the verb.',
-  },
-  {
-    id: 25, subject: 'English',
-    text: 'In "She is one of those teachers who inspire students," the verb "inspire" is:',
-    options: { A: 'Either acceptable', B: 'Subjunctive', C: 'Incorrect; should be "inspires"', D: 'Correct — agrees with "teachers" (plural antecedent of "who")' },
-    answer: 'D',
-    explanation: '"Who" refers to "teachers" (plural), so the plural verb "inspire" is correct.',
-  },
-  {
-    id: 26, subject: 'English',
-    text: 'The word "presently" means:',
-    options: { A: 'Only soon', B: 'In the past', C: 'Only currently', D: 'Currently OR soon (depending on variety of English)' },
-    answer: 'D',
-    explanation: '"Presently" means soon in traditional usage and now in American English.',
-  },
-  {
-    id: 27, subject: 'English',
-    text: 'In "The house was engulfed in flames," "in flames" functions as:',
-    options: { A: 'Prepositional object', B: 'Noun phrase', C: 'Adjectival phrase', D: 'Adverbial phrase' },
-    answer: 'D',
-    explanation: '"In flames" describes the manner/state of the engulfing — it modifies the verb.',
-  },
-  {
-    id: 28, subject: 'English',
-    text: 'The word "egregious" shifting from "remarkably good" to "remarkably bad" illustrates:',
-    options: { A: 'Specialization', B: 'Generalization', C: 'Pejoration', D: 'Amelioration' },
-    answer: 'C',
-    explanation: 'Pejoration: a word becomes more negative in meaning over time.',
-  },
-  {
-    id: 29, subject: 'English',
-    text: 'Choose the sentence with correct parallel structure:',
-    options: { A: 'He likes swimming, to jog, and cycling', B: 'He likes swimming, jogging, and cycling', C: 'He likes to swim, jogging, and to cycle', D: 'He likes swim, jog, and cycling' },
-    answer: 'B',
-    explanation: 'All three activities must share the same grammatical form — all gerunds.',
-  },
-  {
-    id: 30, subject: 'English',
-    text: 'The phrase "I could care less" is:',
-    options: { A: 'Regional variation, both acceptable', B: 'Incorrect; should be "couldn\'t care less"', C: 'Means extreme caring', D: 'Correct and means indifference' },
-    answer: 'B',
-    explanation: 'Logically, "couldn\'t care less" means one already cares nothing — the intended meaning.',
-  },
-  {
-    id: 31, subject: 'English',
-    text: 'Which of the following correctly uses the subjunctive?',
-    options: { A: 'The board requires that he attends the meeting', B: 'The board requires that he attend the meeting', C: 'The board requires that he attended the meeting', D: 'The board requires that he is attending the meeting' },
-    answer: 'B',
-    explanation: 'Mandative subjunctive after "requires that" uses the base form (no -s): "attend".',
-  },
-  {
-    id: 32, subject: 'English',
-    text: 'In "She is taller than I," the implied ending is:',
-    options: { A: 'Than me', B: 'Either A or B', C: 'Than I am', D: 'Than I be' },
-    answer: 'C',
-    explanation: 'In formal writing, subject case is used after "than" when a verb is implied.',
-  },
-  {
-    id: 33, subject: 'English',
-    text: 'Identify the malapropism: "Texas has a large Portuguese population"',
-    options: { A: 'Texas (wrong place)', B: 'Large (wrong modifier)', C: 'Portuguese — should be "populace"', D: 'No error' },
-    answer: 'C',
-    explanation: 'A malapropism substitutes a similar-sounding but incorrect word.',
-  },
-  {
-    id: 34, subject: 'English',
-    text: 'In "The data is conclusive," the subject-verb agreement is:',
-    options: { A: 'Regional variation', B: 'Either acceptable in modern usage', C: 'Incorrect; should be "data are"', D: 'Correct regardless of context' },
-    answer: 'B',
-    explanation: '"Data" is increasingly treated as a singular mass noun in modern English.',
-  },
-  {
-    id: 35, subject: 'English',
-    text: 'Which of the following is an example of onomatopoeia?',
-    options: { A: 'The moon is a silver coin', B: 'The wind whispered through the trees', C: 'She ran faster than light', D: 'His heart was a stone' },
-    answer: 'B',
-    explanation: '"Whispered" imitates the soft sound of moving air.',
-  },
+const PA = `Mr. Bepo Adewale walked to the podium that morning with the gait of a man carrying the world on his shoulders. The students, lined up in neat rows, watched their principal in silence. He was known for his booming voice, his confident stride, his jokes that made even the most nervous student relax. But that morning, he stood at the microphone and said nothing. He opened his mouth. He closed it. He tried again. And then, to the collective shock of Stardom Schools, Mr. Bepo began to weep.
 
-  /* ── MATHEMATICS (36–70) ─────────────────────────── */
-  {
-    id: 36, subject: 'Mathematics',
-    text: 'If 0.000456 is written in standard form as 4.56 × 10ⁿ, what is n?',
-    options: { A: '-4', B: '-3', C: '-2', D: '3' },
-    answer: 'A',
-    explanation: '0.000456 = 4.56 × 10⁻⁴.',
-  },
-  {
-    id: 37, subject: 'Mathematics',
-    text: 'Simplify: (√2 + √3)(√2 − √3)',
-    options: { A: '-1', B: '1', C: '5', D: '√6' },
-    answer: 'A',
-    explanation: 'Difference of squares: 2 − 3 = −1.',
-  },
-  {
-    id: 38, subject: 'Mathematics',
-    text: 'What is the remainder when 2x³ + 3x² − 5x + 7 is divided by (x + 2)?',
-    options: { A: '-11', B: '3', C: '11', D: '21' },
-    answer: 'D',
-    explanation: 'Remainder theorem: f(−2) = −16 + 12 + 10 + 7 = 21.',
-  },
-  {
-    id: 39, subject: 'Mathematics',
-    text: 'Solve: |2x − 3| = 5',
-    options: { A: 'x = −1 or x = 4', B: 'x = 1 or x = 4', C: 'x = −1 only', D: 'x = 4 only' },
-    answer: 'A',
-    explanation: '2x − 3 = ±5 gives x = 4 or x = −1.',
-  },
-  {
-    id: 40, subject: 'Mathematics',
-    text: 'If sin θ = 3/5 and θ is acute, find cos θ',
-    options: { A: '3/5', B: '4/5', C: '5/3', D: '5/4' },
-    answer: 'B',
-    explanation: 'cos θ = √(1 − 9/25) = 4/5.',
-  },
-  {
-    id: 41, subject: 'Mathematics',
-    text: 'Find the nth term of: 3, 7, 11, 15 …',
-    options: { A: '3n + 1', B: '4n − 1', C: '4n + 1', D: '3n + 4' },
-    answer: 'B',
-    explanation: 'AP: Tₙ = 3 + 4(n−1) = 4n − 1.',
-  },
-  {
-    id: 42, subject: 'Mathematics',
-    text: 'If 3ˣ = 27ˣ⁻², find x',
-    options: { A: '2', B: '3', C: '4', D: '6' },
-    answer: 'B',
-    explanation: 'Equate exponents: x = 3x − 6, so x = 3.',
-  },
-  {
-    id: 43, subject: 'Mathematics',
-    text: 'How many diagonals does a regular hexagon have?',
-    options: { A: '6', B: '9', C: '12', D: '15' },
-    answer: 'B',
-    explanation: 'n(n−3)/2 = 6(3)/2 = 9.',
-  },
-  {
-    id: 44, subject: 'Mathematics',
-    text: 'If P = {1,2,3} and Q = {2,3,4}, find n(P ∪ Q)',
-    options: { A: '2', B: '3', C: '4', D: '6' },
-    answer: 'C',
-    explanation: 'P ∪ Q = {1,2,3,4}; n = 4.',
-  },
-  {
-    id: 45, subject: 'Mathematics',
-    text: 'Differentiate y = x³ − 3x² + 2 with respect to x',
-    options: { A: '3x² − 3x', B: '3x² − 6x', C: 'x² − 6x', D: '3x³ − 6x²' },
-    answer: 'B',
-    explanation: 'dy/dx = 3x² − 6x.',
-  },
-  {
-    id: 46, subject: 'Mathematics',
-    text: 'Convert 234₅ to base 10',
-    options: { A: '54', B: '64', C: '69', D: '119' },
-    answer: 'C',
-    explanation: '2(25) + 3(5) + 4(1) = 69.',
-  },
-  {
-    id: 47, subject: 'Mathematics',
-    text: 'Find the median of: 2, 8, 6, 4, 10',
-    options: { A: '4', B: '6', C: '8', D: '10' },
-    answer: 'B',
-    explanation: 'Ordered: 2,4,6,8,10. Middle = 6.',
-  },
-  {
-    id: 48, subject: 'Mathematics',
-    text: 'If matrix A = [2, 3; 1, 4], find det(A)',
-    options: { A: '5', B: '8', C: '11', D: '14' },
-    answer: 'A',
-    explanation: 'det = 2(4) − 3(1) = 5.',
-  },
-  {
-    id: 49, subject: 'Mathematics',
-    text: 'In a class of 40, 24 like Maths, 16 like English, 8 like both. How many like neither?',
-    options: { A: '0', B: '4', C: '8', D: '12' },
-    answer: 'C',
-    explanation: 'n(M∪E) = 24+16−8 = 32; neither = 40−32 = 8.',
-  },
-  {
-    id: 50, subject: 'Mathematics',
-    text: 'Find the sum of the first 10 terms of: 2 + 4 + 6 + 8 …',
-    options: { A: '90', B: '100', C: '110', D: '120' },
-    answer: 'C',
-    explanation: 'Sₙ = n/2(first+last) = 5(2+20) = 110.',
-  },
-  {
-    id: 51, subject: 'Mathematics',
-    text: 'If the mean of 4, 7, x, 10, 9 is 8, find x',
-    options: { A: '8', B: '9', C: '10', D: '11' },
-    answer: 'C',
-    explanation: '30 + x = 40, so x = 10.',
-  },
-  {
-    id: 52, subject: 'Mathematics',
-    text: 'Evaluate: ∫(3x² + 2x) dx',
-    options: { A: 'x³ + x² + C', B: '6x + 2 + C', C: 'x³ + x + C', D: '3x³ + 2x² + C' },
-    answer: 'A',
-    explanation: '∫3x²=x³; ∫2x=x². Total: x³ + x² + C.',
-  },
-  {
-    id: 53, subject: 'Mathematics',
-    text: 'If 4x − 3 ≤ 13, find the range of x',
-    options: { A: 'x ≤ 4', B: 'x ≥ 4', C: 'x ≤ −4', D: 'x ≥ −4' },
-    answer: 'A',
-    explanation: '4x ≤ 16, so x ≤ 4.',
-  },
-  {
-    id: 54, subject: 'Mathematics',
-    text: 'Find the equation of a line with gradient 2 passing through (1, 3)',
-    options: { A: 'y = 2x + 1', B: 'y = 2x − 1', C: 'y = 2x + 3', D: 'y = x + 2' },
-    answer: 'A',
-    explanation: 'y − 3 = 2(x − 1), so y = 2x + 1.',
-  },
-  {
-    id: 55, subject: 'Mathematics',
-    text: 'How many ways can 5 students be arranged in a row?',
-    options: { A: '5', B: '20', C: '60', D: '120' },
-    answer: 'D',
-    explanation: '5! = 120.',
-  },
-  {
-    id: 56, subject: 'Mathematics',
-    text: 'A bag contains 3 red and 2 blue balls. P(red) =',
-    options: { A: '2/5', B: '3/5', C: '1/2', D: '3/2' },
-    answer: 'B',
-    explanation: 'P(red) = 3/5.',
-  },
-  {
-    id: 57, subject: 'Mathematics',
-    text: 'The angles of a triangle are in ratio 1:2:3. Find the largest angle.',
-    options: { A: '30°', B: '60°', C: '90°', D: '120°' },
-    answer: 'C',
-    explanation: '(3/6) × 180° = 90°.',
-  },
-  {
-    id: 58, subject: 'Mathematics',
-    text: 'Calculate the volume of a cylinder r = 7 cm, h = 10 cm (π = 22/7)',
-    options: { A: '440 cm³', B: '1540 cm³', C: '220 cm³', D: '4400 cm³' },
-    answer: 'B',
-    explanation: 'V = πr²h = (22/7)(49)(10) = 1540 cm³.',
-  },
-  {
-    id: 59, subject: 'Mathematics',
-    text: 'If y varies directly as x and y = 12 when x = 4, find y when x = 7',
-    options: { A: '18', B: '21', C: '24', D: '28' },
-    answer: 'B',
-    explanation: 'k = 3; y = 3 × 7 = 21.',
-  },
-  {
-    id: 60, subject: 'Mathematics',
-    text: 'Express 0.1̄ (0.111…) as a fraction',
-    options: { A: '1/9', B: '1/10', C: '1/11', D: '10/99' },
-    answer: 'A',
-    explanation: '9x = 1, so x = 1/9.',
-  },
-  {
-    id: 61, subject: 'Mathematics',
-    text: 'Find the value of x if 2^(x+1) = 32',
-    options: { A: '3', B: '4', C: '5', D: '6' },
-    answer: 'B',
-    explanation: '32 = 2⁵; x+1 = 5, so x = 4.',
-  },
-  {
-    id: 62, subject: 'Mathematics',
-    text: 'The gradient of a line perpendicular to y = 3x + 5 is:',
-    options: { A: '3', B: '1/3', C: '−1/3', D: '−3' },
-    answer: 'C',
-    explanation: 'Perpendicular gradient = −1/m = −1/3.',
-  },
-  {
-    id: 63, subject: 'Mathematics',
-    text: 'Simplify: 2 log 5 + log 4 − log 2',
-    options: { A: 'log 25', B: 'log 50', C: 'log 48', D: 'log 100' },
-    answer: 'B',
-    explanation: 'log(25 × 4 / 2) = log 50.',
-  },
-  {
-    id: 64, subject: 'Mathematics',
-    text: 'Factorize completely: 6x² + 7x − 3',
-    options: { A: '(3x − 1)(2x + 3)', B: '(3x + 1)(2x − 3)', C: '(2x − 1)(3x + 3)', D: '(6x − 1)(x + 3)' },
-    answer: 'A',
-    explanation: '(3x−1)(2x+3) = 6x²+7x−3 ✓',
-  },
-  {
-    id: 65, subject: 'Mathematics',
-    text: 'Find the range of y = x² − 4x + 3',
-    options: { A: 'y ≥ −1', B: 'y ≥ 0', C: 'y ≥ 1', D: 'y ≥ 3' },
-    answer: 'A',
-    explanation: 'Complete the square: y = (x−2)² − 1. Minimum = −1.',
-  },
-  {
-    id: 66, subject: 'Mathematics',
-    text: 'If α and β are roots of x² − 5x + 6 = 0, find α + β',
-    options: { A: '−6', B: '−5', C: '5', D: '6' },
-    answer: 'C',
-    explanation: 'Vieta: sum of roots = −b/a = 5.',
-  },
-  {
-    id: 67, subject: 'Mathematics',
-    text: 'A fair die is rolled. P(odd number or multiple of 3) =',
-    options: { A: '1/2', B: '2/3', C: '5/6', D: '1' },
-    answer: 'B',
-    explanation: 'Union: {1,3,5,6} = 4 outcomes. P = 4/6 = 2/3.',
-  },
-  {
-    id: 68, subject: 'Mathematics',
-    text: 'If 5, x, y, 40 are in GP, find x',
-    options: { A: '10', B: '15', C: '20', D: '25' },
-    answer: 'A',
-    explanation: 'r = ∛(40/5) = 2; x = 5 × 2 = 10.',
-  },
-  {
-    id: 69, subject: 'Mathematics',
-    text: 'The sum of an AP with first term 2, last term 50, 13 terms is:',
-    options: { A: '312', B: '338', C: '364', D: '650' },
-    answer: 'B',
-    explanation: 'Sₙ = 13(2+50)/2 = 338.',
-  },
-  {
-    id: 70, subject: 'Mathematics',
-    text: 'If f(x) = 2x + 3 and g(x) = x², find g(f(2))',
-    options: { A: '14', B: '25', C: '49', D: '100' },
-    answer: 'C',
-    explanation: 'f(2) = 7; g(7) = 49.',
-  },
+Mrs. Grace Apeh, the Vice Principal, moved quickly. She stepped forward, placed a firm hand on his arm, and addressed the assembly herself. "Return to your classrooms," she said, her voice calm though her eyes were not. "The principal is unwell." Staff members led Bepo away, and the school watched as its most dependable figure was walked off the stage he had commanded for over two decades.`;
 
-  /* ── ECONOMICS (71–105) ──────────────────────────── */
-  {
-    id: 71, subject: 'Economics',
-    text: 'Economics is primarily concerned with:',
-    options: { A: 'Making money for individuals', B: 'Satisfying unlimited wants with limited resources', C: 'Government taxation policies', D: 'Industrial production only' },
-    answer: 'B',
-    explanation: 'The core problem of economics: unlimited wants vs. scarce resources.',
-  },
-  {
-    id: 72, subject: 'Economics',
-    text: 'The price at which quantity demanded equals quantity supplied is the:',
-    options: { A: 'Floor price', B: 'Ceiling price', C: 'Equilibrium price', D: 'Control price' },
-    answer: 'C',
-    explanation: 'At equilibrium, the market clears — no surplus or shortage exists.',
-  },
-  {
-    id: 73, subject: 'Economics',
-    text: 'A fall in the price of a good normally causes:',
-    options: { A: 'An increase in quantity demanded', B: 'A decrease in quantity demanded', C: 'No change in demand', D: 'A leftward shift of the demand curve' },
-    answer: 'A',
-    explanation: 'Law of demand: price and quantity demanded move in opposite directions.',
-  },
-  {
-    id: 74, subject: 'Economics',
-    text: 'The four factors of production are:',
-    options: { A: 'Money, labour, capital, enterprise', B: 'Land, labour, capital, enterprise', C: 'Land, water, capital, labour', D: 'Labour, capital, profit, rent' },
-    answer: 'B',
-    explanation: 'The classic factors: land, labour, capital, and entrepreneurship.',
-  },
-  {
-    id: 75, subject: 'Economics',
-    text: 'The reward for capital as a factor of production is:',
-    options: { A: 'Wages', B: 'Rent', C: 'Profit', D: 'Interest' },
-    answer: 'D',
-    explanation: 'Factor rewards: land→rent, labour→wages, capital→interest, enterprise→profit.',
-  },
-  {
-    id: 76, subject: 'Economics',
-    text: 'If demand rises while supply remains constant, the equilibrium price will:',
-    options: { A: 'Fall', B: 'Remain the same', C: 'Rise', D: 'Become zero' },
-    answer: 'C',
-    explanation: 'Excess demand at the old price pushes the price up.',
-  },
-  {
-    id: 77, subject: 'Economics',
-    text: 'A good whose demand falls as income rises is called:',
-    options: { A: 'A normal good', B: 'A luxury good', C: 'An inferior good', D: 'A complementary good' },
-    answer: 'C',
-    explanation: 'Inferior goods have a negative income elasticity of demand.',
-  },
-  {
-    id: 78, subject: 'Economics',
-    text: 'Price elasticity of demand is said to be unitary when its absolute value is:',
-    options: { A: 'Greater than 1', B: 'Less than 1', C: 'Zero', D: 'Exactly 1' },
-    answer: 'D',
-    explanation: 'Unitary elasticity: a 1% price change causes exactly a 1% quantity change.',
-  },
-  {
-    id: 79, subject: 'Economics',
-    text: 'A government budget deficit occurs when:',
-    options: { A: 'Expenditure exceeds revenue', B: 'Revenue exceeds expenditure', C: 'Exports exceed imports', D: 'Imports exceed exports' },
-    answer: 'A',
-    explanation: 'Deficit = spending more than is collected in revenue.',
-  },
-  {
-    id: 80, subject: 'Economics',
-    text: 'Inflation is defined as a sustained rise in:',
-    options: { A: 'National income', B: 'Government spending', C: 'The general price level', D: 'Money supply only' },
-    answer: 'C',
-    explanation: 'Inflation erodes purchasing power when the general price level rises persistently.',
-  },
-  {
-    id: 81, subject: 'Economics',
-    text: 'GDP measures:',
-    options: { A: 'Government income only', B: 'The total value of exports', C: 'Total monetary value of all final goods and services produced in a country', D: 'Household savings' },
-    answer: 'C',
-    explanation: 'GDP = total output of an economy within a period, counted at market prices.',
-  },
-  {
-    id: 82, subject: 'Economics',
-    text: 'Commercial banks create money through:',
-    options: { A: 'Printing currency', B: 'The credit (money) multiplier process', C: 'Government grants', D: 'Foreign exchange transactions only' },
-    answer: 'B',
-    explanation: 'Banks lend out deposits, which are redeposited and re-lent, multiplying money supply.',
-  },
-  {
-    id: 83, subject: 'Economics',
-    text: 'In a perfectly competitive market there are:',
-    options: { A: 'Few sellers and one buyer', B: 'Many buyers and sellers trading identical products', C: 'One seller and many buyers', D: 'Few buyers and sellers' },
-    answer: 'B',
-    explanation: 'Perfect competition: many firms, homogeneous product, free entry/exit, price takers.',
-  },
-  {
-    id: 84, subject: 'Economics',
-    text: 'A monopoly exists when there is:',
-    options: { A: 'Many sellers', B: 'Two sellers', C: 'Only one seller', D: 'Many buyers' },
-    answer: 'C',
-    explanation: 'A monopolist is the sole supplier and therefore a price maker.',
-  },
-  {
-    id: 85, subject: 'Economics',
-    text: 'The law of diminishing returns states that adding more of one factor (others fixed) eventually:',
-    options: { A: 'Increases output proportionally', B: 'Decreases total output immediately', C: 'Keeps output constant', D: 'Reduces the marginal product of that factor' },
-    answer: 'D',
-    explanation: 'After a point, each additional unit of a variable factor adds less and less to output.',
-  },
-  {
-    id: 86, subject: 'Economics',
-    text: 'Opportunity cost is defined as:',
-    options: { A: 'The monetary cost of a good', B: 'The total cost of production', C: 'The value of the next best alternative forgone', D: 'The market price of a resource' },
-    answer: 'C',
-    explanation: 'Every choice involves sacrificing the next best alternative — that sacrifice is the opportunity cost.',
-  },
-  {
-    id: 87, subject: 'Economics',
-    text: 'A tax levied on goods at the point of purchase (e.g. VAT) is:',
-    options: { A: 'Income tax', B: 'Corporation tax', C: 'Direct tax', D: 'Indirect tax' },
-    answer: 'D',
-    explanation: 'Indirect taxes are collected by an intermediary (seller) and passed on to government.',
-  },
-  {
-    id: 88, subject: 'Economics',
-    text: 'The balance of payments records:',
-    options: { A: 'Government budget', B: 'A country\'s transactions with the rest of the world', C: 'Money supply', D: 'National income accounts' },
-    answer: 'B',
-    explanation: 'It includes the current account, capital account, and financial account.',
-  },
-  {
-    id: 89, subject: 'Economics',
-    text: 'Foreign exchange rate is the:',
-    options: { A: 'Interest rate on foreign loans', B: 'Price of one currency expressed in terms of another', C: 'Value of a country\'s exports', D: 'Government tariff on imports' },
-    answer: 'B',
-    explanation: 'E.g., ₦1,500 per $1 — the price of dollars measured in naira.',
-  },
-  {
-    id: 90, subject: 'Economics',
-    text: 'The term "ceteris paribus" means:',
-    options: { A: 'Other things change', B: 'All other things being equal (held constant)', C: 'Nothing changes', D: 'Everything changes simultaneously' },
-    answer: 'B',
-    explanation: 'Used to isolate the effect of one variable by assuming all others are unchanged.',
-  },
-  {
-    id: 91, subject: 'Economics',
-    text: 'Consumer surplus is the:',
-    options: { A: 'Excess supply over demand', B: 'Profit made by producers', C: 'Government revenue from consumers', D: 'Difference between what consumers are willing to pay and what they actually pay' },
-    answer: 'D',
-    explanation: 'It measures the welfare gain to buyers from trading at the market price.',
-  },
-  {
-    id: 92, subject: 'Economics',
-    text: 'A tariff is:',
-    options: { A: 'A subsidy on domestic goods', B: 'A ban on trade', C: 'A tax on imports', D: 'A tax on exports only' },
-    answer: 'C',
-    explanation: 'Tariffs protect domestic industries by raising the price of imported goods.',
-  },
-  {
-    id: 93, subject: 'Economics',
-    text: 'The multiplier effect shows how an initial injection of spending leads to:',
-    options: { A: 'A proportionally smaller increase in income', B: 'No change in income', C: 'A larger total increase in national income', D: 'A decrease in national income' },
-    answer: 'C',
-    explanation: 'Each round of spending becomes someone else\'s income, amplifying the original injection.',
-  },
-  {
-    id: 94, subject: 'Economics',
-    text: 'Public goods are characterized by:',
-    options: { A: 'Rivalry and excludability', B: 'Non-rivalry and non-excludability', C: 'High price and artificial scarcity', D: 'Private ownership and profit motive' },
-    answer: 'B',
-    explanation: 'Non-rival: one person\'s use doesn\'t reduce availability. Non-excludable: no one can be prevented from using it.',
-  },
-  {
-    id: 95, subject: 'Economics',
-    text: 'Devaluation of a currency makes:',
-    options: { A: 'Imports cheaper and exports more expensive', B: 'Both imports and exports cheaper', C: 'Exports cheaper and imports more expensive', D: 'No change to trade flows' },
-    answer: 'C',
-    explanation: 'A weaker currency means foreign buyers pay less for exports, and imports cost more domestically.',
-  },
-  {
-    id: 96, subject: 'Economics',
-    text: 'Stagflation refers to:',
-    options: { A: 'High growth and low inflation', B: 'High inflation combined with high unemployment and slow growth', C: 'Low unemployment and rapid growth', D: 'Falling prices alongside high growth' },
-    answer: 'B',
-    explanation: 'Stagflation is difficult to cure: policies to fight inflation worsen unemployment and vice versa.',
-  },
-  {
-    id: 97, subject: 'Economics',
-    text: 'A mixed economy combines:',
-    options: { A: 'Agriculture and industry only', B: 'Rural and urban sectors', C: 'Capitalism and feudalism', D: 'Private and public ownership of resources' },
-    answer: 'D',
-    explanation: 'Most modern economies are mixed — the market allocates most resources, but government intervenes.',
-  },
-  {
-    id: 98, subject: 'Economics',
-    text: 'A firm\'s long-run average cost curve is typically:',
-    options: { A: 'Always falling', B: 'U-shaped due to economies then diseconomies of scale', C: 'Always constant', D: 'Always rising' },
-    answer: 'B',
-    explanation: 'LRAC falls (economies of scale), reaches a minimum, then rises (diseconomies).',
-  },
-  {
-    id: 99, subject: 'Economics',
-    text: 'The quantity theory of money states MV = PT, where M is money supply and V is:',
-    options: { A: 'Value of goods', B: 'Volume of imports', C: 'Velocity of money (how often each unit is spent)', D: 'Variance in prices' },
-    answer: 'C',
-    explanation: 'V measures the average number of times a unit of money changes hands in a period.',
-  },
-  {
-    id: 100, subject: 'Economics',
-    text: 'A subsidy is:',
-    options: { A: 'A tax on production', B: 'A fine for non-compliance with regulations', C: 'A trade restriction imposed by government', D: 'A payment by government to reduce costs for producers or consumers' },
-    answer: 'D',
-    explanation: 'Subsidies lower prices, encourage production, or make essential goods affordable.',
-  },
-  {
-    id: 101, subject: 'Economics',
-    text: 'Which of the following best defines scarcity in economics?',
-    options: { A: 'Poverty', B: 'Resources are insufficient to satisfy all wants', C: 'Goods are unavailable in shops', D: 'Production is at zero' },
-    answer: 'B',
-    explanation: 'Scarcity is universal — even wealthy economies face it because wants are unlimited.',
-  },
-  {
-    id: 102, subject: 'Economics',
-    text: 'An increase in the price of petrol raises bus fares. Petrol and bus transport are:',
-    options: { A: 'Substitute goods', B: 'Independent goods', C: 'Complementary goods', D: 'Giffen goods' },
-    answer: 'C',
-    explanation: 'Complementary goods are used together; a rise in the price of one reduces demand for both.',
-  },
-  {
-    id: 103, subject: 'Economics',
-    text: 'Which monetary policy tool directly controls the amount of money banks must hold in reserve?',
-    options: { A: 'Open market operations', B: 'Cash reserve ratio', C: 'Interest rate', D: 'Moral suasion' },
-    answer: 'B',
-    explanation: 'The cash reserve ratio sets the minimum fraction of deposits banks must keep, limiting lending.',
-  },
-  {
-    id: 104, subject: 'Economics',
-    text: 'Economic growth is best measured by:',
-    options: { A: 'An increase in population', B: 'A rise in imports', C: 'An increase in real GDP over time', D: 'A fall in unemployment only' },
-    answer: 'C',
-    explanation: 'Real GDP growth (adjusted for inflation) is the standard measure of economic growth.',
-  },
-  {
-    id: 105, subject: 'Economics',
-    text: 'Price discrimination occurs when a seller charges:',
-    options: { A: 'The same price to all buyers', B: 'Different prices to different buyers for the same good', C: 'Prices below cost of production', D: 'Government-mandated prices' },
-    answer: 'B',
-    explanation: 'E.g., student discounts, peak vs. off-peak fares — same service, different prices.',
-  },
+const PB = `"Three thousand, six hundred pounds," said Mr. Dada, tapping the table with each syllable. "Every month. That is what they are paying teachers in the UK. Every. Single. Month." He looked around at the other staff members. "And you people are here arguing with Bepo about leaving?"
 
-  /* ── GOVERNMENT (106–140) ────────────────────────── */
-  {
-    id: 106, subject: 'Government',
-    text: 'A system of government where power is concentrated in one person is called?',
-    options: { A: 'Democracy', B: 'Oligarchy', C: 'Autocracy', D: 'Aristocracy' },
-    answer: 'C',
-  },
-  {
-    id: 107, subject: 'Government',
-    text: 'The fundamental law of a country is called the?',
-    options: { A: 'Constitution', B: 'Decree', C: 'Act', D: 'Statute' },
-    answer: 'A',
-  },
-  {
-    id: 108, subject: 'Government',
-    text: 'The principle of separation of powers was proposed by?',
-    options: { A: 'John Locke', B: 'Baron de Montesquieu', C: 'Jean Jacques Rousseau', D: 'Thomas Hobbes' },
-    answer: 'B',
-  },
-  {
-    id: 109, subject: 'Government',
-    text: 'In a federal system, powers are shared between?',
-    options: { A: 'The president and legislature', B: 'Central and regional governments', C: 'Military and civilians', D: 'Political parties' },
-    answer: 'B',
-  },
-  {
-    id: 110, subject: 'Government',
-    text: 'The right to vote is called?',
-    options: { A: 'Franchise', B: 'Referendum', C: 'Plebiscite', D: 'Initiative' },
-    answer: 'A',
-  },
-  {
-    id: 111, subject: 'Government',
-    text: 'Which organ of government interprets laws?',
-    options: { A: 'Executive', B: 'Legislature', C: 'Judiciary', D: 'Civil service' },
-    answer: 'C',
-  },
-  {
-    id: 112, subject: 'Government',
-    text: 'Nigeria\'s independence was achieved in?',
-    options: { A: '1959', B: '1960', C: '1963', D: '1966' },
-    answer: 'B',
-  },
-  {
-    id: 113, subject: 'Government',
-    text: 'The concept of checks and balances prevents?',
-    options: { A: 'Abuse of power', B: 'Democracy', C: 'Rule of law', D: 'Separation of powers' },
-    answer: 'A',
-  },
-  {
-    id: 114, subject: 'Government',
-    text: 'A system where citizens vote directly on laws is called?',
-    options: { A: 'Representative democracy', B: 'Direct democracy', C: 'Presidential democracy', D: 'Parliamentary democracy' },
-    answer: 'B',
-  },
-  {
-    id: 115, subject: 'Government',
-    text: 'The Nigerian constitution is supreme because?',
-    options: { A: 'It is written', B: 'It is rigid', C: 'All laws must conform to it', D: 'It is federal' },
-    answer: 'C',
-  },
-  {
-    id: 116, subject: 'Government',
-    text: 'Local government is the _____ tier of government.',
-    options: { A: 'First', B: 'Second', C: 'Third', D: 'Fourth' },
-    answer: 'C',
-  },
-  {
-    id: 117, subject: 'Government',
-    text: 'The process of removing a president from office is called?',
-    options: { A: 'Impeachment', B: 'Recall', C: 'Dissolution', D: 'Suspension' },
-    answer: 'A',
-  },
-  {
-    id: 118, subject: 'Government',
-    text: 'Universal adult suffrage means?',
-    options: { A: 'Only men can vote', B: 'Only women can vote', C: 'All qualified adults can vote', D: 'Only educated people can vote' },
-    answer: 'C',
-  },
-  {
-    id: 119, subject: 'Government',
-    text: 'The principle that no one is above the law is called?',
-    options: { A: 'Separation of powers', B: 'Rule of law', C: 'Checks and balances', D: 'Judicial review' },
-    answer: 'B',
-  },
-  {
-    id: 120, subject: 'Government',
-    text: 'A law made by the legislature is called?',
-    options: { A: 'Decree', B: 'Edict', C: 'Act', D: 'Order' },
-    answer: 'C',
-  },
-  {
-    id: 121, subject: 'Government',
-    text: 'A referendum is used to?',
-    options: { A: 'Elect leaders', B: 'Approve or reject a proposal by popular vote', C: 'Impeach leaders', D: 'Form government' },
-    answer: 'B',
-  },
-  {
-    id: 122, subject: 'Government',
-    text: 'A bicameral legislature has?',
-    options: { A: 'One house', B: 'Two houses', C: 'Three houses', D: 'Four houses' },
-    answer: 'B',
-  },
-  {
-    id: 123, subject: 'Government',
-    text: 'The Clifford constitution (1922) introduced?',
-    options: { A: 'Elective principle', B: 'Federal system', C: 'Independence', D: 'Republic status' },
-    answer: 'A',
-  },
-  {
-    id: 124, subject: 'Government',
-    text: 'The supreme law-making body in Nigeria is?',
-    options: { A: 'The Supreme Court', B: 'The President', C: 'The National Assembly', D: 'The State Assembly' },
-    answer: 'C',
-  },
-  {
-    id: 125, subject: 'Government',
-    text: 'Political socialization is the process of?',
-    options: { A: 'Forming political parties', B: 'Learning and internalizing political values', C: 'Voting in elections', D: 'Governing a state' },
-    answer: 'B',
-  },
-  {
-    id: 126, subject: 'Government',
-    text: 'The first military coup in Nigeria occurred in?',
-    options: { A: '1960', B: '1963', C: '1966', D: '1967' },
-    answer: 'C',
-  },
-  {
-    id: 127, subject: 'Government',
-    text: 'Fundamental human rights are entrenched in the?',
-    options: { A: 'Criminal code', B: 'Constitution', C: 'Electoral act', D: 'Civil service rules' },
-    answer: 'B',
-  },
-  {
-    id: 128, subject: 'Government',
-    text: 'Proportional representation is a type of?',
-    options: { A: 'System of government', B: 'Electoral system', C: 'Checks and balances', D: 'Separation of powers' },
-    answer: 'B',
-  },
-  {
-    id: 129, subject: 'Government',
-    text: 'Public corporations are established to?',
-    options: { A: 'Make profits only', B: 'Provide essential public services', C: 'Compete with the private sector', D: 'Employ civil servants' },
-    answer: 'B',
-  },
-  {
-    id: 130, subject: 'Government',
-    text: 'The civil service is part of the?',
-    options: { A: 'Legislature', B: 'Judiciary', C: 'Executive', D: 'Electoral body' },
-    answer: 'C',
-  },
-  {
-    id: 131, subject: 'Government',
-    text: 'The first executive president of Nigeria was?',
-    options: { A: 'Nnamdi Azikiwe', B: 'Tafawa Balewa', C: 'Shehu Shagari', D: 'Olusegun Obasanjo' },
-    answer: 'C',
-  },
-  {
-    id: 132, subject: 'Government',
-    text: 'The two-party system is most associated with?',
-    options: { A: 'Nigeria', B: 'United States', C: 'China', D: 'Russia' },
-    answer: 'B',
-  },
-  {
-    id: 133, subject: 'Government',
-    text: 'Public opinion is best expressed through?',
-    options: { A: 'The military', B: 'Mass media', C: 'The police', D: 'Civil servants' },
-    answer: 'B',
-  },
-  {
-    id: 134, subject: 'Government',
-    text: 'Delegated legislation is made by?',
-    options: { A: 'The legislature', B: 'The executive', C: 'The judiciary', D: 'Political parties' },
-    answer: 'B',
-  },
-  {
-    id: 135, subject: 'Government',
-    text: 'A government elected by and accountable to the people is called?',
-    options: { A: 'Monarchy', B: 'Theocracy', C: 'Democracy', D: 'Plutocracy' },
-    answer: 'C',
-  },
-  {
-    id: 136, subject: 'Government',
-    text: 'The process of a bill becoming a law involves?',
-    options: { A: 'First reading only', B: 'Presidential assent only', C: 'Three readings and assent', D: 'Second reading only' },
-    answer: 'C',
-  },
-  {
-    id: 137, subject: 'Government',
-    text: 'Nigeria\'s citizenship can be acquired by?',
-    options: { A: 'Birth only', B: 'Registration only', C: 'Birth, registration, or naturalization', D: 'Marriage only' },
-    answer: 'C',
-  },
-  {
-    id: 138, subject: 'Government',
-    text: 'A political party that wins election and forms government is called?',
-    options: { A: 'Opposition party', B: 'Ruling party', C: 'Minority party', D: 'Coalition party' },
-    answer: 'B',
-  },
-  {
-    id: 139, subject: 'Government',
-    text: 'Which of the following is a feature of democracy?',
-    options: { A: 'One-party system', B: 'Free and fair elections', C: 'Military rule', D: 'Dictatorship' },
-    answer: 'B',
-  },
-  {
-    id: 140, subject: 'Government',
-    text: 'The head of state in a parliamentary system is usually?',
-    options: { A: 'The prime minister', B: 'The president', C: 'The monarch or ceremonial president', D: 'The speaker' },
-    answer: 'C',
-  },
+Bepo smiled quietly. He did not say what he was thinking — that the four hundred thousand naira he earned here had been converted into something else entirely: loyalty, legacy, the particular satisfaction of knowing each student's name. He had been at Stardom Schools for twenty-three years. His wife Seri was already in London. His daughters Nike and Kike were in school there. Everyone agreed the sensible thing was to go. And yet, every morning he drove through the Lekki gates, something in him refused to call it sensible.
+
+The colleagues did not understand. They spoke of the exchange rate with the reverence of men reciting scripture. "Eight hundred thousand naira equivalent," Mr. Dada continued. "Every month. And you want to stay here because of what — sentiment?"`;
+
+   const QUESTIONS = [
+
+  /* ══════════════════════════════════════════════════
+     ENGLISH — 55 QUESTIONS
+  ══════════════════════════════════════════════════ */
+
+{ id: 1, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Read Passage A. The phrase 'carrying the world on his shoulders' is an example of:",
+    options: { A:"Simile", B:"Personification", C:"Hyperbole / idiom", D:"Alliteration" },
+    answer: "C", subject: 'English',
+    explanation: "This is a hyperbolic idiom — an exaggeration expressing extreme emotional weight. It is not a simile (no 'like'/'as') and not personification (no human qualities given to a non-human object)." },
+
+{ id: 2, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Why does the narrator list Bepo's qualities before describing his breakdown?",
+    options: { A:"To fulfil a grammar requirement", B:"To make the reader dislike Bepo", C:"To establish the contrast that makes his breakdown so shocking", D:"To show off the author's writing skill" },
+    answer: "C", subject: 'English',
+    explanation: "This is juxtaposition. By first building a vivid picture of Bepo's normal strength, the author makes his collapse far more emotionally powerful — the greater the height, the greater the fall." },
+
+{ id: 3, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The sentence structure 'He opened his mouth. He closed it. He tried again.' mimics:",
+    options: { A:"A list of historical events", B:"The halting, struggling rhythm of Bepo's failed attempts to speak", C:"The author's desire to save space", D:"A grammatical error" },
+    answer: "B", subject: 'English',
+    explanation: "Short staccato sentences reproduce the stop-start of someone trying and failing to speak. The form enacts the content — broken sentences mirror broken composure." },
+
+{ id: 4, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Mrs. Apeh's voice was calm 'though her eyes were not'. This detail suggests she:",
+    options: { A:"Disliked Bepo", B:"Was maintaining professional control while genuinely alarmed", C:"Had planned the incident", D:"Was acting in a school play" },
+    answer: "B", subject: 'English',
+    explanation: "External composure versus internal distress — this shows Mrs. Apeh as a professional who prioritises the school's calm over personal expression. It signals to the reader that the situation is genuinely serious." },
+
+{ id: 5, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The phrase 'the stage he had commanded' uses the word 'commanded' as a:",
+    options: { A:"Literal military term", B:"Metaphor elevating Bepo's leadership to the authority of a general or ruler", C:"Simile comparing Bepo to a soldier", D:"Onomatopoeia" },
+    answer: "B", subject: 'English',
+    explanation: "'Commanded' applies military language to a school assembly stage. This metaphor elevates Bepo's status while making his removal more poignant — a commander being led from his own stage." },
+
+{ id: 6, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The opening of Lekki Headmaster begins with a crisis rather than background information. This narrative technique is called:",
+    options: { A:"Flashback", B:"In medias res — beginning in the middle of dramatic action", C:"Foreshadowing", D:"Exposition" },
+    answer: "B", subject: 'English',
+    explanation: "'In medias res' (Latin: into the middle of things) is beginning a narrative with action already underway. Garba opens with the crisis to hook the reader before explaining its cause." },
+
+{ id: 7, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Which of the following best describes the mood of Passage A?",
+    options: { A:"Joyful and celebratory", B:"Tense, sombre and unsettling", C:"Angry and confrontational", D:"Peaceful and nostalgic" },
+    answer: "B", subject: 'English',
+    explanation: "Vocabulary such as 'silence', 'shock', 'unwell', 'eyes were not calm' builds a tense and sombre atmosphere. The unusual event of a strong leader weeping publicly creates psychological unease." },
+
+{ id: 8, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The word 'collective' in 'the collective shock of Stardom Schools' most nearly means:",
+    options: { A:"Individually", B:"Shared by the entire group", C:"Gradually building", D:"Historically significant" },
+    answer: "B", subject: 'English',
+    explanation: "'Collective' means belonging to or shared by all members of a group. 'Collective shock' = the shock was felt by everyone present, not just one person." },
+
+{ id: 9, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The best title for Passage A would be:",
+    options: { A:"A Normal Morning at Stardom Schools", B:"The Day the Principal Wept", C:"Mrs. Apeh Takes Charge", D:"The Students' Assembly" },
+    answer: "B", subject: 'English',
+    explanation: "The passage centres entirely on Bepo's unexpected emotional breakdown and its effect on the school. 'The Day the Principal Wept' captures the central dramatic event and its significance." },
+
+{ id: 10, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "Read Passage B. Mr. Dada 'tapped the table with each syllable' while reciting the salary figure. This action conveys:",
+    options: { A:"That he was nervous", B:"Rhetorical emphasis — his body language reinforcing a financial argument", C:"That he was angry at Bepo personally", D:"That he was bored with the conversation" },
+    answer: "B", subject: 'English',
+    explanation: "Tapping each syllable is a physical performance of persuasion. Mr. Dada is making a financial argument and uses gesture to give weight to every single number — a technique of emphasis." },
+
+{ id: 11, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "Bepo's thought that his salary had been 'converted into loyalty, legacy, the satisfaction of knowing each student's name' uses the word 'converted' as:",
+    options: { A:"A financial metaphor — reframing his salary as currency exchanged for intangible wealth", B:"A simile comparing money to loyalty", C:"Personification of loyalty", D:"Hyperbole about his memory" },
+    answer: "A", subject: 'English',
+    explanation: "Garba uses financial vocabulary ('converted') deliberately. Bepo's 'exchange rate' trades money for meaning, critiquing the assumption that financial conversion is the only valid kind." },
+
+{ id: 12, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The phrase 'spoke of the exchange rate with the reverence of men reciting scripture' is a:",
+    options: { A:"Metaphor", B:"Simile comparing financial worship to religious devotion", C:"Alliteration", D:"Onomatopoeia" },
+    answer: "B", subject: 'English',
+    explanation: "This is a simile (using 'with the reverence of'). It compares the colleagues' attitude to money to religious devotion, satirising the 'Japa' mentality that elevates financial migration to almost sacred status." },
+
+{ id: 13, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "Mr. Dada uses the word 'sentiment' dismissively. He implies that sentiment is:",
+    options: { A:"Admirable and worth preserving", B:"Irrational and inferior to financial logic", C:"A technical economic term", D:"A compliment to Bepo's loyalty" },
+    answer: "B", subject: 'English',
+    explanation: "Mr. Dada uses 'sentiment' disparagingly — as if emotional attachment is a weakness. This sets up the novel's central tension: is loyalty irrational, or a different and equally valid kind of wisdom?" },
+
+{ id: 14, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The narrative perspective of Passage B is best described as:",
+    options: { A:"First-person narrator", B:"Third-person limited — external events narrated but Bepo's inner thoughts accessible", C:"Second-person narration", D:"Omniscient narrator with no character viewpoints" },
+    answer: "B", subject: 'English',
+    explanation: "The passage says 'He did not say what he was thinking' — third-person narration with access to Bepo's interior. This is third-person limited — the dominant mode for character-centred literary fiction." },
+
+{ id: 15, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The phrase 'Twenty-three years' standing as its own sentence reinforces:",
+    options: { A:"That Bepo is very old", B:"The enormous weight of time and investment Bepo has made in Stardom", C:"That the school is old", D:"The length of Lagos traffic jams" },
+    answer: "B", subject: 'English',
+    explanation: "A number given its own sentence (rhetorical isolation) forces the reader to feel its weight. Twenty-three years is not just a fact — it is the bedrock of Bepo's entire adult professional identity." },
+
+{ id: 16, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The main idea of Passage B is that:",
+    options: { A:"Teachers in Nigeria are poorly paid", B:"Bepo is being persuaded to leave by colleagues who measure value only in financial terms, though he measures it differently", C:"Mr. Dada is Bepo's enemy", D:"Seri forced Bepo to emigrate" },
+    answer: "B", subject: 'English',
+    explanation: "The passage dramatises the collision between two value systems — the colleagues' financial calculus and Bepo's intangible investments (loyalty, legacy, identity). The central tension is the novel's theme." },
+
+{ id: 17, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The word 'enticement' (Chapter 2 title) most nearly means:",
+    options: { A:"Punishment", B:"A formal invitation", C:"A temptation drawing someone toward something", D:"A warning" },
+    answer: "C", subject: 'English',
+    explanation: "'Enticement' = the act of attracting or tempting. The chapter title frames the UK opportunity as a temptation — something that pulls at Bepo but carries the implication of danger." },
+
+{ id: 18, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The phrase 'something in him refused to call it sensible' implies that Bepo:",
+    options: { A:"Is irrational and needs help", B:"Has a deep instinctive attachment to Stardom that defies purely rational analysis", C:"Does not understand the financial figures", D:"Is afraid of flying to the UK" },
+    answer: "B", subject: 'English',
+    explanation: "The word 'something' is deliberately vague — Garba signals that Bepo's attachment cannot be fully articulated. It is instinctive, pre-rational, and more powerful for being beyond the exchange-rate argument." },
+
+{ id: 19,
+    text: "The 'Japa syndrome' as depicted in 'Lekki Headmaster' refers to:",
+    options: { A:"A tropical disease affecting teachers", B:"The mass emigration of Nigerian professionals seeking better opportunities abroad", C:"A Lagos street slang for laziness", D:"The preference for Japanese electronics" },
+    answer: "B", subject: 'English',
+    explanation: "'Japa' is Yoruba slang meaning 'to flee'. The 'Japa syndrome' describes the wave of skilled Nigerians emigrating to the UK, USA and Canada — the novel dramatises this through Bepo and colleagues." },
+
+{ id: 20,
+    text: "At the end of 'Lekki Headmaster', Bepo:",
+    options: { A:"Successfully settles in the UK", B:"Retires from education entirely", C:"Returns to Stardom Schools, declaring his purpose remains there", D:"Dies before making a decision" },
+    answer: "C", subject: 'English',
+    explanation: "Bepo boards the plane but turns back, returning to Stardom Schools. This resolution affirms the novel's central argument: vocation and belonging are stronger forces than financial logic." },
+
+{ id: 21,
+    text: "The Managing Director of Stardom Schools in 'Lekki Headmaster' is:",
+    options: { A:"Mrs. Grace Apeh", B:"Mrs. Ibidun Gloss", C:"Seri Adewale", D:"Mrs. Ogunwale" },
+    answer: "B", subject: 'English',
+    explanation: "Mrs. Ibidun Gloss is the MD — a strong administrator who deeply values Bepo's contributions. Her wit and emotional response to Bepo's departure humanise the institutional side of the story." },
+
+{ id: 22,
+    text: "The character Jide in 'Lekki Headmaster' is:",
+    options: { A:"Bepo's son", B:"The landlord's grandson, mentored by Bepo", C:"A former student turned colleague", D:"Bepo's younger brother" },
+    answer: "B", subject: 'English',
+    explanation: "Jide is the grandson of Bepo's landlord (Mr. Ogunwale) and a product of Bepo's mentorship. His devastation at Bepo's planned departure illustrates the human cost of brain drain." },
+
+{ id: 23,
+    text: "The idiom 'a snake in the roof' as used in Chapter 5 of 'Lekki Headmaster' means:",
+    options: { A:"A literal snake in the building", B:"A dangerous problem ignored within an organisation that will eventually cause harm", C:"A government spy", D:"Bepo's difficult personality" },
+    answer: "B", subject: 'English',
+    explanation: "Chief Mrs. Bayo uses this idiom to warn that the cooperative fund situation is a hidden threat. Like a snake in a roof, it is dangerous and will cause harm if not addressed." },
+
+{ id: 24,
+    text: "The prefect election conflict in Chapter 8 escalates because Banky:",
+    options: { A:"Cheats by bribing voters", B:"Publicly references Tosh's father's past imprisonment during a school speech", C:"Is caught stealing cooperative funds", D:"Assaults Tosh physically" },
+    answer: "B", subject: 'English',
+    explanation: "Banky's speech insults Tosh by bringing up Chief Didi Ogba's past imprisonment, transforming a student election into a proxy for adult family rivalries." },
+
+{ id: 25,
+    text: "The 'Breath Project' in Chapter 8 of 'Lekki Headmaster' refers to:",
+    options: { A:"An asthma treatment programme", B:"A student invention to build a phone from recycled materials", C:"A breathing exercise for exam stress", D:"A musical performance by the choir" },
+    answer: "B", subject: 'English',
+    explanation: "Bepo's pride in the Invention Club's Breath Project — a phone made from recycled materials — symbolises Nigerian ingenuity and educational possibility. It is one of the things he fears losing by leaving." },
+
+{ id: 26,
+    text: "Kabir Alabi Garba, author of 'Lekki Headmaster', is professionally known as:",
+    options: { A:"A medical doctor", B:"A journalist, author and education advocate", C:"A former minister of education", D:"A former secondary school student" },
+    answer: "B", subject: 'English',
+    explanation: "Kabir Alabi Garba is a seasoned Nigerian journalist and author. His media background shapes the novel's sharp, observational prose and its precise engagement with contemporary Nigerian social issues." },
+
+{ id: 27,
+    text: "The grammatical controversy in Chapter 6 of 'Lekki Headmaster' concerns the sentence:",
+    options: { A:"'Neither the boys nor the girl are present'", B:"'Ade as well as Jide comes early'", C:"'The team are ready to play'", D:"'Each student have a book'" },
+    answer: "B", subject: 'English',
+    explanation: "A parent complains that 'comes' (singular) is wrong after 'Ade as well as Jide'. Bepo defends the teacher: with 'as well as', the verb agrees with the first subject (Ade = singular), so 'comes' is correct." },
+
+{ id: 28,
+    text: "In 'Lekki Headmaster', Bepo's wife Seri and daughters Nike and Kike are already:",
+    options: { A:"In Canada", B:"In the United States", C:"In London, United Kingdom", D:"In Germany" },
+    answer: "C", subject: 'English',
+    explanation: "Seri is already in London and their daughters Nike and Kike are in school there. This makes Bepo the outlier — the family pull toward the UK is real, making his decision to stay all the more resonant." },
+
+  /* ── Targeted: Stress / Phonology ── */,
+
+{ id: 29,
+    text: "The primary stress in 'certificate' falls on the:",
+    options: { A:"First syllable (CER)", B:"Second syllable (TIF)", C:"Third syllable (I)", D:"Fourth syllable (CATE)" },
+    answer: "B", subject: 'English',
+    explanation: "cer-TIF-i-cate: stress falls on the second syllable TIF. A common trap is stressing the first syllable. Think: 'I cer-TIF-y it is a cer-TIF-i-cate.'" },
+
+{ id: 30,
+    text: "In 'She will PROduce fresh results', the word 'produce' is used as a:",
+    options: { A:"Noun (first-syllable stress)", B:"Verb (second-syllable stress)", C:"Adjective", D:"Adverb" },
+    answer: "B", subject: 'English',
+    explanation: "proDUCE (stress on 2nd syllable) = the verb 'to produce/create'. PROduce (stress on 1st syllable) = the noun. The sentence uses a modal + verb, so it is the verb form." },
+
+{ id: 31,
+    text: "Which syllable carries primary stress in 'geography'?",
+    options: { A:"First: GEO", B:"Second: OG", C:"Third: RA", D:"Fourth: PHY" },
+    answer: "B", subject: 'English',
+    explanation: "ge-OG-ra-phy: stress on the second syllable OG. Compare: ge-OG-ra-phy / ge-o-GRAPH-ic (shifts to third in adjective form)." },
+
+{ id: 32,
+    text: "Which syllable carries primary stress in 'underSTAND'?",
+    options: { A:"First: UN", B:"Second: DER", C:"Third: STAND", D:"The word has only two syllables" },
+    answer: "C", subject: 'English',
+    explanation: "un-der-STAND: stress falls on the third syllable STAND. This follows the pattern for many compound verbs where the final syllable carries stress." },
+
+{ id: 33,
+    text: "The word 'export' when used as a NOUN is stressed on which syllable?",
+    options: { A:"Second syllable: PORT", B:"First syllable: EX", C:"Both equally", D:"Neither — it is unstressed" },
+    answer: "B", subject: 'English',
+    explanation: "Noun: EX-port (stress on first). Verb: ex-PORT (stress on second). This noun/verb stress shift pattern also applies to: REcord/reCORD, PERmit/perMIT, INcrease/inCREASE." },
+
+{ id: 34,
+    text: "How many syllables does 'comfortable' have in standard British English?",
+    options: { A:"Five", B:"Three", C:"Four", D:"Two" },
+    answer: "B", subject: 'English',
+    explanation: "In British English: COMF-ta-ble (3 syllables). The second vowel is elided. American English may use 4 syllables. JAMB follows British pronunciation — 3 syllables." },
+
+{ id: 35,
+    text: "How many phonemes are in the word 'church'?",
+    options: { A:"Five", B:"Four", C:"Three", D:"Six" },
+    answer: "C", subject: 'English',
+    explanation: "/tʃ/ + /ɜː/ + /tʃ/ = 3 phonemes. Despite having 6 letters, 'church' has only 3 sounds. Letters ≠ phonemes." },
+
+{ id: 36,
+    text: "Which word has a different vowel sound from the others?",
+    options: { A:"boot", B:"food", C:"blood", D:"mood" },
+    answer: "C", subject: 'English',
+    explanation: "boot /uː/, food /uː/, mood /uː/ — all share the long /uː/ vowel. Blood /blʌd/ has the short /ʌ/ vowel (as in 'cup'). Spelling is misleading here." },
+
+{ id: 37,
+    text: "Which word contains a silent consonant?",
+    options: { A:"brand", B:"kneel", C:"crest", D:"bland" },
+    answer: "B", subject: 'English',
+    explanation: "In 'kneel', the 'k' is silent — pronounced /niːl/. Silent consonant patterns: kn- (kneel, knight, know), wr- (write, wrong), -mb (lamb, climb), gh (night, light)." },
+
+{ id: 38,
+    text: "'REcord' (noun) and 'reCORD' (verb) illustrate the phonological process of:",
+    options: { A:"Assimilation", B:"Functional stress shift — stress placement differentiates word class", C:"Elision", D:"Vowel reduction" },
+    answer: "B", subject: 'English',
+    explanation: "This is functional stress shift — the same spelling changes stress placement based on grammatical role (noun vs verb). Same word, different stress, different function." },
+
+  /* ── Targeted: Grammar ── */,
+
+{ id: 39,
+    text: "Identify the clause type: 'Although she was tired, she continued studying.'",
+    options: { A:"Adverbial clause of time", B:"Adverbial clause of concession", C:"Noun clause", D:"Relative clause" },
+    answer: "B", subject: 'English',
+    explanation: "'Although' introduces a concession — an unexpected contrast. Concession conjunctions: although, though, even though, despite the fact that, while (when meaning 'whereas')." },
+
+{ id: 40,
+    text: "Which sentence contains a dangling modifier?",
+    options: { A:"Running down the street, she dropped her bag.", B:"He found the book on the shelf.", C:"Walking to school, the rain began to fall.", D:"After studying hard, she passed the exam." },
+    answer: "C", subject: 'English',
+    explanation: "'Walking to school' does not logically modify 'the rain' — rain cannot walk. The intended subject (a person) is absent. Correct: 'Walking to school, she was caught in the rain.'" },
+
+{ id: 41,
+    text: "Select the CORRECT sentence:",
+    options: { A:"It is her who called the office.", B:"It is she who called the office.", C:"It was them who came late.", D:"It was him who answered." },
+    answer: "B", subject: 'English',
+    explanation: "After 'It is/was', a subject pronoun is required: she, he, they, I — not her, him, them, me. 'It is she' is correct in formal English." },
+
+{ id: 42,
+    text: "Which sentence uses the apostrophe correctly?",
+    options: { A:"The boy's books were left on the bus.", B:"The boys book's were left on the bus.", C:"The boys' book's were left on the bus.", D:"The boys books were left on the bus." },
+    answer: "A", subject: 'English',
+    explanation: "'The boy's books' = books belonging to one boy. For plural possession: 'the boys' books' (apostrophe after s). No apostrophe is needed on a simple plural noun." },
+
+{ id: 43,
+    text: "Choose the correct reported speech. Direct: 'He said, \"I have finished my work.\"'",
+    options: { A:"He said that he had finished his work.", B:"He said that he has finished his work.", C:"He said that I have finished his work.", D:"He said he finishes his work." },
+    answer: "A", subject: 'English',
+    explanation: "Backshift rule: present perfect ('have finished') → past perfect ('had finished'). Also: 'I' → 'he'; 'my' → 'his'. Full reported form: 'He said that he had finished his work.'" },
+
+{ id: 44,
+    text: "Identify the error: 'Neither the students nor the teacher were present.'",
+    options: { A:"'were' should be 'was' — the verb agrees with the nearest subject 'teacher' (singular)", B:"'Neither...nor' should be 'either...or'", C:"'students' should be 'student'", D:"There is no error" },
+    answer: "A", subject: 'English',
+    explanation: "With neither...nor / either...or, the verb agrees with the NEAREST subject (proximity rule). 'Teacher' (singular) is nearest, so the verb must be 'was'." },
+
+{ id: 45,
+    text: "In 'She said, \"I am going to Lagos tomorrow\"', which changes occur in reported speech?",
+    options: { A:"Only tense changes", B:"Only pronoun changes", C:"'am going' → 'was going'; 'tomorrow' → 'the following day'; 'I' → 'she'", D:"No changes required" },
+    answer: "C", subject: 'English',
+    explanation: "Three changes: tense backshift (present continuous → past continuous), time expression (tomorrow → the following day), and pronoun shift (I → she). Full form: 'She said she was going to Lagos the following day.'" },
+
+{ id: 46,
+    text: "Which of the following contains a NOUN CLAUSE?",
+    options: { A:"The boy who came late was punished.", B:"What he said surprised everyone.", C:"She left before I arrived.", D:"He runs faster than I do." },
+    answer: "B", subject: 'English',
+    explanation: "'What he said' functions as the SUBJECT of the sentence — it is a noun clause. Noun clauses do the job of a noun: subject, object, or complement. 'Who came late' in A is a relative clause." },
+
+{ id: 47,
+    text: "Choose the sentence that correctly uses the SUBJUNCTIVE mood:",
+    options: { A:"If he was the president, things would change.", B:"She wishes she was taller.", C:"I suggest that he studies harder.", D:"It is important that every student be present." },
+    answer: "D", subject: 'English',
+    explanation: "The mandative subjunctive uses the base form of the verb (be, not is/was) after verbs of suggestion/demand: 'It is important that he be...', 'I suggest that she leave...'" },
+
+{ id: 48,
+    text: "The sentence 'The government sought to affect a change in policy' is incorrect because:",
+    options: { A:"'sought' should be 'seeked'", B:"'affect' should be 'effect' — 'to effect a change' means to bring it about", C:"'policy' should be 'policies'", D:"There is no error" },
+    answer: "B", subject: 'English',
+    explanation: "'Effect' as a VERB means to bring about: 'to effect a change' = to implement/cause a change. 'Affect' as a verb means to influence. 'Sought to effect a change' is correct." },
+
+{ id: 49,
+    text: "Identify the rhetorical device: 'O Romeo, Romeo! Wherefore art thou Romeo?'",
+    options: { A:"Anaphora", B:"Apostrophe — directly addressing an absent person", C:"Hyperbole", D:"Synecdoche" },
+    answer: "B", subject: 'English',
+    explanation: "Rhetorical apostrophe = directly addressing an absent, dead, or imaginary person/thing. Juliet addresses Romeo who is not present — this is apostrophe (not the punctuation mark)." },
+
+{ id: 50,
+    text: "Complete the analogy: Composer : Symphony :: Architect : ___",
+    options: { A:"Music", B:"Design", C:"Building", D:"Blueprint" },
+    answer: "C", subject: 'English',
+    explanation: "A composer creates a symphony (the end product). An architect creates a BUILDING — the tangible end product of architectural work. Blueprint is a plan, not the product." },
+
+{ id: 51,
+    text: "The plural of 'criterion' is:",
+    options: { A:"Criterions", B:"Criterias", C:"Criteria", D:"Criterium" },
+    answer: "C", subject: 'English',
+    explanation: "'Criterion' is from Greek. Greek/Latin plurals: criterion → criteria, phenomenon → phenomena, datum → data, medium → media. 'Criterias' is always wrong." },
+
+{ id: 52,
+    text: "Choose the word OPPOSITE in meaning to 'verbose':",
+    options: { A:"Wordy", B:"Eloquent", C:"Laconic", D:"Fluent" },
+    answer: "C", subject: 'English',
+    explanation: "'Verbose' = using too many words. 'Laconic' = using very few words; brief and to the point. Direct antonyms. Eloquent = fluent/persuasive — not opposite to verbose." },
+
+{ id: 53,
+    text: "The phrase 'To add fuel to the fire' means:",
+    options: { A:"To start a cooking fire", B:"To make a bad situation worse by adding more provocation", C:"To provide energy to a process", D:"To warm up a cold relationship" },
+    answer: "B", subject: 'English',
+    explanation: "This idiom means to worsen an already bad situation by introducing more aggravating elements. Example: 'His angry reply only added fuel to the fire.'" },
+
+{ id: 54,
+    text: "Which of the following pairs are HOMOPHONES?",
+    options: { A:"their / there / they're only", B:"to / too / two only", C:"knew / new only", D:"All of the above are homophones" },
+    answer: "D", subject: 'English',
+    explanation: "Homophones = words that sound identical but differ in spelling/meaning. Their/there/they're = /ðeə/. To/too/two = /tuː/. Knew/new = /njuː/. All qualify as homophones." },
+
+{ id: 55,
+    text: "Which sentence uses 'fewer' and 'less' CORRECTLY?",
+    options: { A:"There are less students in the hall today.", B:"She spent fewer money than expected.", C:"There are fewer students and less noise today.", D:"He has less friends but fewer problems." },
+    answer: "C", subject: 'English',
+    explanation: "'Fewer' is for countable nouns (fewer students, fewer books). 'Less' is for uncountable nouns (less noise, less water, less money). Only C applies both rules correctly." },
+
+  /* ══════════════════════════════════════════════════
+     MATHEMATICS — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */,
+
+  /* ══════════════════════════════════════════════════
+     MATHEMATICS — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */
+
+{ id: 56,
+    text: "A polynomial g(x) = x³ − 3x² + kx − 2 has (x − 2) as a factor. Find k.",
+    options: { A:"3", B:"4", C:"−3", D:"2" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "If (x−2) is a factor, g(2)=0. 8−12+2k−2=0 → 2k=6 → k=3." },
+
+{ id: 57,
+    text: "Solve |2x + 4| = 10.",
+    options: { A:"x = 3 or x = −7", B:"x = 7 or x = −3", C:"x = 3 or x = 7", D:"x = −7 only" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "2x+4=10 → x=3; or 2x+4=−10 → x=−7." },
+
+{ id: 58,
+    text: "Find the equation of the line perpendicular to 3x + y = 7 passing through (0, 2).",
+    options: { A:"y = 3x + 2", B:"y = −3x + 2", C:"y = ⅓x + 2", D:"y = −⅓x + 2" },
+    answer: "C", subject: 'Mathematics',
+    explanation: "Gradient of 3x+y=7 is −3. Perpendicular gradient = 1/3 (negative reciprocal). y = ⅓x + 2." },
+
+{ id: 59,
+    text: "Express the recurring decimal 0.27̄ as a fraction.",
+    options: { A:"27/99", B:"3/11", C:"27/100", D:"9/33" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "Let x=0.2727... Then 100x=27.2727... → 99x=27 → x=27/99=3/11." },
+
+{ id: 60,
+    text: "How many ways can a committee of 4 be chosen from 9 people?",
+    options: { A:"126", B:"3024", C:"36", D:"84" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "⁹C₄ = 9!/(4!5!) = (9×8×7×6)/24 = 126." },
+
+{ id: 61,
+    text: "Find the values of x for which 3x² − 5x − 2 = 0.",
+    options: { A:"x = 2 or x = −⅓", B:"x = −2 or x = ⅓", C:"x = 2 or x = ⅓", D:"x = −2 or x = −⅓" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "Factorise: (3x+1)(x−2)=0. x=2 or x=−1/3." },
+
+{ id: 62,
+    text: "A sector of radius 7 cm subtends 120° at the centre. Find its area (π = 22/7).",
+    options: { A:"51.33 cm²", B:"44 cm²", C:"88 cm²", D:"154 cm²" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "Area = (120/360)×(22/7)×49 = (1/3)×154 = 51.33 cm²." },
+
+{ id: 63,
+    text: "Express in partial fractions: 7/((x−1)(x+2)).",
+    options: { A:"(7/3)/(x−1) − (7/3)/(x+2)", B:"1/(x−1) + 1/(x+2)", C:"7/(x−1) − 7/(x+2)", D:"3/(x−1) − 3/(x+2)" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "7=A(x+2)+B(x−1). x=1: A=7/3. x=−2: B=−7/3." },
+
+{ id: 64,
+    text: "Evaluate ∫₀³ (2x + 1) dx.",
+    options: { A:"12", B:"9", C:"15", D:"10" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "∫(2x+1)dx = x²+x. Evaluate from 0 to 3: [9+3]−[0] = 12." },
+
+{ id: 65,
+    text: "Find the sum of the first 6 terms of the GP: 2, 6, 18, 54 …",
+    options: { A:"728", B:"364", C:"486", D:"242" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "S₆ = 2(3⁶−1)/(3−1) = 2×728/2 = 728." },
+
+{ id: 66,
+    text: "The 3rd term of an AP is 11 and the 7th term is 23. Find the common difference.",
+    options: { A:"2", B:"3", C:"4", D:"6" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "T₃=a+2d=11, T₇=a+6d=23. Subtracting: 4d=12 → d=3." },
+
+{ id: 67,
+    text: "If tan θ = 7/24 and θ is acute, find sin θ.",
+    options: { A:"7/25", B:"24/25", C:"7/24", D:"25/7" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "Hyp = √(49+576) = √625 = 25. sin θ = 7/25." },
+
+{ id: 68,
+    text: "If log₁₀ 2 = 0.3010, find log₁₀ 8.",
+    options: { A:"0.6020", B:"0.9030", C:"0.8010", D:"2.4080" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "log₁₀ 8 = log₁₀ 2³ = 3 × 0.3010 = 0.9030." },
+
+{ id: 69,
+    text: "What is the coefficient of x² in the expansion of (1 + x)⁵?",
+    options: { A:"5", B:"10", C:"20", D:"15" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "⁵C₂ = 10." },
+
+{ id: 70,
+    text: "If y varies directly as x² and y = 12 when x = 2, find y when x = 3.",
+    options: { A:"18", B:"27", C:"36", D:"24" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "y=kx². 12=4k → k=3. y=3×9=27." },
+
+{ id: 71,
+    text: "Convert 110111₂ to base 10.",
+    options: { A:"53", B:"55", C:"51", D:"59" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "32+16+0+4+2+1 = 55." },
+
+{ id: 72,
+    text: "Differentiate y = (3x − 2)⁴ with respect to x.",
+    options: { A:"4(3x−2)³", B:"12(3x−2)³", C:"(3x−2)³", D:"3(3x−2)³" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "Chain rule: 4(3x−2)³ × 3 = 12(3x−2)³." },
+
+{ id: 73,
+    text: "Find the range of x satisfying 2x − 5 < 9.",
+    options: { A:"x < 2", B:"x < 7", C:"x > 7", D:"x < 14" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "2x < 14 → x < 7." },
+
+{ id: 74,
+    text: "Express in partial fractions: 3x/((x+1)(x−2)).",
+    options: { A:"−1/(x+1) + 2/(x−2)", B:"1/(x+1) + 2/(x−2)", C:"2/(x+1) − 1/(x−2)", D:"3/(x+1) + 3/(x−2)" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "3x=A(x−2)+B(x+1). x=2: 6=3B → B=2. x=−1: −3=−3A → A=1. Result: 1/(x+1) + 2/(x−2). Verify: [(x−2)+2(x+1)]/denom = 3x/denom ✓" },
+
+{ id: 75,
+    text: "The volume of a sphere of diameter 6 cm is (π = 22/7):",
+    options: { A:"113.14 cm³", B:"904.8 cm³", C:"452.4 cm³", D:"56.6 cm³" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "r=3. V=(4/3)×(22/7)×27 = 2376/21 = 113.14 cm³." },
+
+{ id: 76,
+    text: "A triangle has vertices P(2,1), Q(6,1), R(4,5). Find its area.",
+    options: { A:"8 sq units", B:"4 sq units", C:"16 sq units", D:"10 sq units" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "Base PQ=4, height=|5−1|=4. Area=½×4×4=8 sq units." },
+
+{ id: 77,
+    text: "If f(x) = 2x + 3 and g(x) = x², find g(f(1)).",
+    options: { A:"25", B:"10", C:"7", D:"49" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "f(1)=5. g(5)=25." },
+
+{ id: 78,
+    text: "The 4th term of a GP is 24 and the common ratio is 2. Find the first term.",
+    options: { A:"3", B:"6", C:"12", D:"8" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "ar³=24 → a×8=24 → a=3." },
+
+{ id: 79,
+    text: "Evaluate log₅ 125 − log₅ 5.",
+    options: { A:"1", B:"2", C:"3", D:"0" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "log₅ 125=3, log₅ 5=1. 3−1=2." },
+
+{ id: 80,
+    text: "Solve: 4x − 3 ≥ 2x + 7.",
+    options: { A:"x ≥ 5", B:"x ≥ 2", C:"x ≤ 5", D:"x ≥ 10" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "2x ≥ 10 → x ≥ 5." },
+
+{ id: 81,
+    text: "The standard deviation of 5, 5, 5, 5 is:",
+    options: { A:"5", B:"1", C:"4", D:"0" },
+    answer: "D", subject: 'Mathematics',
+    explanation: "All values identical. Each deviation from mean = 0. SD = 0." },
+
+{ id: 82,
+    text: "If f(x) = x² − 1 and g(x) = 2x + 1, find f(g(3)).",
+    options: { A:"48", B:"63", C:"24", D:"35" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "g(3)=7. f(7)=49−1=48." },
+
+{ id: 83,
+    text: "Find the equation of a circle with centre (3, −2) and radius 4.",
+    options: { A:"(x−3)² + (y+2)² = 16", B:"(x+3)² + (y−2)² = 16", C:"(x−3)² + (y−2)² = 4", D:"(x+3)² + (y+2)² = 16" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "(x−h)²+(y−k)²=r². Centre (3,−2): (x−3)²+(y−(−2))²=16 → (x−3)²+(y+2)²=16." },
+
+{ id: 84,
+    text: "If cos θ = 5/13 and θ is acute, find tan θ.",
+    options: { A:"5/12", B:"12/5", C:"13/12", D:"12/13" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "opp=√(169−25)=12. tan θ=12/5." },
+
+{ id: 85,
+    text: "The second term of a GP is 6 and the fifth term is 48. Find the common ratio.",
+    options: { A:"2", B:"3", C:"4", D:"8" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "T₂=ar=6, T₅=ar⁴=48. Dividing: r³=8 → r=2." },
+
+{ id: 86,
+    text: "Find the minimum value of y = x² − 4x + 7.",
+    options: { A:"3", B:"7", C:"−4", D:"0" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "Complete the square: (x−2)²+3. Minimum = 3 at x=2." },
+
+{ id: 87,
+    text: "Evaluate ¹²C₃.",
+    options: { A:"220", B:"1320", C:"440", D:"180" },
+    answer: "A", subject: 'Mathematics',
+    explanation: "(12×11×10)/(3×2×1) = 220." },
+
+{ id: 88,
+    text: "A circle has centre (−2, 3) and passes through (1, 3). What is its radius?",
+    options: { A:"2", B:"4", C:"3", D:"5" },
+    answer: "C", subject: 'Mathematics',
+    explanation: "r=√((1+2)²+(3−3)²)=√9=3." },
+
+{ id: 89,
+    text: "How many ways can 5 people be arranged in a line?",
+    options: { A:"25", B:"120", C:"60", D:"10" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "5! = 120." },
+
+{ id: 90,
+    text: "Differentiate y = (x² + 1)³ with respect to x.",
+    options: { A:"3(x²+1)²", B:"6x(x²+1)²", C:"3x(x²+1)²", D:"2x(x²+1)³" },
+    answer: "B", subject: 'Mathematics',
+    explanation: "Chain rule: 3(x²+1)² × 2x = 6x(x²+1)²." },
+
+  /* ══════════════════════════════════════════════════
+     PHYSICS — 35 QUESTIONS
+     Weak areas: optics, momentum, transformers,
+     circular motion, fission/fusion, critical angle
+  ══════════════════════════════════════════════════ */,
+
+  /* ══════════════════════════════════════════════════
+     ECONOMICS — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */
+
+  { id: 91,
+    text: "Economics is best defined as:",
+    options: { A:"The study of money and banking", B:"The study of how individuals and societies allocate scarce resources among unlimited wants", C:"The management of government finances", D:"The study of trade between countries only" },
+    answer: "B", subject: 'Economics',
+    explanation: "Lionel Robbins (1932): Economics is the science that studies human behaviour as a relationship between ends and scarce means which have alternative uses. Scarcity is the fundamental economic problem." },
+
+  { id: 92,
+    text: "The concept of 'opportunity cost' refers to:",
+    options: { A:"The monetary price of a good", B:"The value of the next best alternative foregone when a choice is made", C:"The cost of producing one extra unit", D:"The total cost of all alternatives" },
+    answer: "B", subject: 'Economics',
+    explanation: "Opportunity cost = what you give up to get something else. E.g. if you choose to study rather than work, the opportunity cost is the wage you could have earned. It is the foundation of economic decision-making." },
+
+  { id: 93,
+    text: "A production possibility curve (PPC) illustrates:",
+    options: { A:"The relationship between price and quantity demanded", B:"The maximum combinations of two goods an economy can produce given its resources and technology", C:"How firms maximise profit", D:"The distribution of income in an economy" },
+    answer: "B", subject: 'Economics',
+    explanation: "The PPC shows all efficient output combinations of two goods when all resources are fully employed. Points on the curve = efficient; inside = underemployment; outside = unattainable. The slope reflects opportunity cost." },
+
+  { id: 94,
+    text: "The law of demand states that, all other things being equal:",
+    options: { A:"As income rises, demand for all goods increases", B:"As the price of a good rises, the quantity demanded falls", C:"As supply increases, demand increases", D:"Price and quantity demanded move in the same direction" },
+    answer: "B", subject: 'Economics',
+    explanation: "The law of demand: there is an inverse (negative) relationship between price and quantity demanded, ceteris paribus. This is because of the substitution effect (consumers switch to cheaper alternatives) and income effect." },
+
+  { id: 95,
+    text: "Which of the following would cause the demand curve for a good to SHIFT to the right?",
+    options: { A:"A fall in the price of the good", B:"A rise in consumers' incomes (for a normal good)", C:"A rise in the price of a complementary good", D:"A decrease in population" },
+    answer: "B", subject: 'Economics',
+    explanation: "Movement along a demand curve = price change. A shift of the demand curve = change in a non-price determinant: income, tastes, price of substitutes/complements, population, expectations. Rising income shifts demand right for normal goods." },
+
+  { id: 96,
+    text: "Price elasticity of demand (PED) measures:",
+    options: { A:"How much producers respond to price changes", B:"The responsiveness of quantity demanded to a change in the price of the good", C:"How quickly prices adjust to equilibrium", D:"The sensitivity of supply to income changes" },
+    answer: "B", subject: 'Economics',
+    explanation: "PED = % change in quantity demanded / % change in price. |PED| > 1 = elastic (demand is responsive); |PED| < 1 = inelastic; |PED| = 1 = unit elastic. Determines pricing strategy and tax incidence." },
+
+  { id: 97,
+    text: "A good with price elasticity of demand less than 1 (inelastic) is likely to be:",
+    options: { A:"A luxury good with many substitutes", B:"A necessity with few substitutes, such as salt or insulin", C:"A good that takes up a large share of income", D:"A good purchased infrequently" },
+    answer: "B", subject: 'Economics',
+    explanation: "Demand is inelastic when: few substitutes exist, the good is a necessity, it takes a small share of income, or consumers are habituated. Elastic: many substitutes, luxury, large income share, long time horizon." },
+
+  { id: 98,
+    text: "Market equilibrium occurs when:",
+    options: { A:"The government sets the price", B:"Quantity demanded equals quantity supplied — there is no tendency for price to change", C:"Producers are making maximum profit", D:"All consumers can afford the good" },
+    answer: "B", subject: 'Economics',
+    explanation: "At equilibrium price (P*), Qd = Qs. Above P*: surplus → price falls. Below P*: shortage → price rises. The market 'clears' at equilibrium. Adam Smith called this the 'invisible hand'." },
+
+  { id: 99,
+    text: "A price ceiling is set BELOW the equilibrium price. Its effect is:",
+    options: { A:"A surplus of the good", B:"A shortage — quantity demanded exceeds quantity supplied", C:"No effect on the market", D:"An increase in equilibrium price" },
+    answer: "B", subject: 'Economics',
+    explanation: "A price ceiling (maximum price) below equilibrium keeps price artificially low. Qd > Qs → shortage. Examples: rent control, price controls on essential goods. Producers supply less; consumers demand more." },
+
+  { id: 100,
+    text: "A price floor set ABOVE the equilibrium price creates:",
+    options: { A:"A shortage", B:"A surplus — quantity supplied exceeds quantity demanded", C:"Higher consumer welfare", D:"No change in market outcome" },
+    answer: "B", subject: 'Economics',
+    explanation: "A price floor (minimum price) above equilibrium keeps price artificially high. Qs > Qd → surplus. Example: minimum wage (labour surplus/unemployment), agricultural price supports (food surpluses)." },
+
+  { id: 101,
+    text: "The concept of 'utility' in economics refers to:",
+    options: { A:"The usefulness of a machine in production", B:"The satisfaction or benefit a consumer derives from consuming a good or service", C:"The profit earned by a firm", D:"The tax paid on a good" },
+    answer: "B", subject: 'Economics',
+    explanation: "Utility = subjective satisfaction from consumption. Total utility rises as consumption increases (up to a point). Marginal utility = additional satisfaction from one more unit. The law of diminishing marginal utility: each additional unit gives less satisfaction." },
+
+  { id: 102,
+    text: "Which of the following is a characteristic of a perfectly competitive market?",
+    options: { A:"A few large sellers with market power", B:"Many buyers and sellers, homogeneous product, free entry/exit and perfect information", C:"Firms are price makers", D:"Products are heavily differentiated" },
+    answer: "B", subject: 'Economics',
+    explanation: "Perfect competition conditions: many buyers/sellers (no single one affects price), homogeneous (identical) products, free entry and exit, perfect information. Firms are price takers. Long-run economic profit = zero." },
+
+  { id: 103,
+    text: "A monopoly market is characterised by:",
+    options: { A:"Many competing firms with similar products", B:"A single seller with significant barriers to entry, who is a price maker", C:"Perfect information and free entry", D:"Government ownership of all firms" },
+    answer: "B", subject: 'Economics',
+    explanation: "Monopoly: one seller controls the entire market, faces the market demand curve, sets price (price maker), maintains barriers to entry (patents, economies of scale, legal barriers). Can earn supernormal profit in the long run." },
+
+  { id: 104,
+    text: "Economies of scale refer to:",
+    options: { A:"The increase in cost when a firm grows too large", B:"The reduction in average cost per unit as a firm increases its output/scale of production", C:"The benefit of trading between countries of different sizes", D:"Tax savings from larger firms" },
+    answer: "B", subject: 'Economics',
+    explanation: "Economies of scale: as output increases, long-run average cost falls. Sources: specialisation, bulk buying, spreading fixed costs, technical economies. Diseconomies of scale occur when average cost rises beyond optimal scale." },
+
+  { id: 105,
+    text: "GDP (Gross Domestic Product) measures:",
+    options: { A:"The total income of a country's citizens wherever they are in the world", B:"The total monetary value of all final goods and services produced within a country's borders in a given period", C:"The value of exports minus imports", D:"The total stock of wealth in an economy" },
+    answer: "B", subject: 'Economics',
+    explanation: "GDP = C + I + G + (X−M). It measures domestic output regardless of ownership nationality. GNP/GNI includes citizens' income abroad but excludes foreign nationals' output domestically. GDP is the most common measure of economic size." },
+
+  { id: 106,
+    text: "Inflation is defined as:",
+    options: { A:"A rise in the price of one specific good", B:"A sustained general rise in the price level, reducing the purchasing power of money", C:"A fall in the value of exports", D:"An increase in the money supply only" },
+    answer: "B", subject: 'Economics',
+    explanation: "Inflation = sustained increase in the general (average) price level. Measured by CPI (Consumer Price Index) or GDP deflator. Reduces real purchasing power of money. Causes: demand-pull (excess demand), cost-push (rising input costs), monetary (excess money supply)." },
+
+  { id: 107,
+    text: "Demand-pull inflation occurs when:",
+    options: { A:"Production costs rise, pushing prices up", B:"Aggregate demand in the economy exceeds aggregate supply — 'too much money chasing too few goods'", C:"The government reduces money supply", D:"Import prices rise sharply" },
+    answer: "B", subject: 'Economics',
+    explanation: "Demand-pull inflation: AD > AS at full employment. Causes: excessive government spending, loose monetary policy, consumer/business confidence boom. Associated with economic growth. Contrast: cost-push inflation (supply-side shock)." },
+
+  { id: 108,
+    text: "Unemployment that occurs because workers are between jobs while searching for better positions is called:",
+    options: { A:"Cyclical unemployment", B:"Structural unemployment", C:"Frictional unemployment", D:"Seasonal unemployment" },
+    answer: "C", subject: 'Economics',
+    explanation: "Frictional unemployment = short-term, voluntary job search. Normal and inevitable in a dynamic economy. Structural = skills mismatch (industry decline). Cyclical = recession-related fall in AD. Seasonal = fluctuating labour demand by season." },
+
+  { id: 109,
+    text: "The central bank of Nigeria is:",
+    options: { A:"First Bank of Nigeria", B:"The Central Bank of Nigeria (CBN)", C:"The Nigerian Export-Import Bank", D:"The Federal Ministry of Finance" },
+    answer: "B", subject: 'Economics',
+    explanation: "The CBN (established 1958) is Nigeria's apex bank. Functions: issue currency, manage monetary policy, regulate/supervise banks, manage foreign reserves, act as lender of last resort and banker to government." },
+
+  { id: 110,
+    text: "Monetary policy refers to the use of:",
+    options: { A:"Government spending and taxation to influence the economy", B:"Interest rates and money supply by the central bank to control inflation and stabilise the economy", C:"Trade tariffs and quotas to protect domestic industry", D:"Exchange rate manipulation to boost exports" },
+    answer: "B", subject: 'Economics',
+    explanation: "Monetary policy = central bank tools: interest rates (repo rate), open market operations (buying/selling government bonds), reserve requirements, and direct credit controls. Fiscal policy = government budget (spending and tax)." },
+
+  { id: 111,
+    text: "Fiscal policy refers to:",
+    options: { A:"The central bank's control of interest rates", B:"The government's use of taxation and public expenditure to influence aggregate demand and the economy", C:"The management of the exchange rate", D:"The regulation of commercial banks" },
+    answer: "B", subject: 'Economics',
+    explanation: "Fiscal policy instruments: government spending (G) and taxation (T). Expansionary: increase G, reduce T → stimulates AD. Contractionary: reduce G, increase T → dampens AD. Used to manage growth, unemployment and inflation." },
+
+  { id: 112,
+    text: "A progressive tax system is one in which:",
+    options: { A:"All taxpayers pay the same flat rate", B:"The tax rate increases as taxable income increases — higher earners pay a larger proportion", C:"Only corporations pay tax", D:"The poor pay more than the rich proportionally" },
+    answer: "B", subject: 'Economics',
+    explanation: "Progressive tax: marginal rate rises with income. Example: Nigeria's PAYE (Pay As You Earn). Redistributes income. Proportional (flat) tax: same rate for all. Regressive tax: lower-income earners pay a higher proportion (e.g. VAT as share of income)." },
+
+  { id: 113,
+    text: "Value Added Tax (VAT) is an example of:",
+    options: { A:"A direct tax levied on income", B:"An indirect tax levied on the consumption of goods and services", C:"A progressive income tax", D:"A corporate profit tax" },
+    answer: "B", subject: 'Economics',
+    explanation: "Indirect taxes are collected by businesses on behalf of the government and passed on in prices. VAT in Nigeria is currently 7.5%. Direct taxes (income tax, company tax) are levied directly on income/profit." },
+
+  { id: 114,
+    text: "The balance of payments records:",
+    options: { A:"The government's annual budget surplus or deficit", B:"All economic transactions between a country's residents and the rest of the world over a period", C:"The total foreign debt of a country", D:"The gold reserves of the central bank" },
+    answer: "B", subject: 'Economics',
+    explanation: "The balance of payments has three accounts: Current account (trade in goods/services, income, transfers), Capital account (capital transfers), Financial account (investment flows). The overall balance must sum to zero." },
+
+  { id: 115,
+    text: "Comparative advantage is the principle that countries should specialise in producing goods:",
+    options: { A:"Which they can produce at the lowest absolute cost", B:"For which they have the lowest opportunity cost relative to other countries, and trade for the rest", C:"Which other countries cannot produce at all", D:"Which generate the highest export revenue" },
+    answer: "B", subject: 'Economics',
+    explanation: "Ricardo's comparative advantage: even if one country is absolutely better at everything, mutually beneficial trade is possible if each specialises where its opportunity cost is lowest. This is the basis of international trade theory." },
+
+  { id: 116,
+    text: "A tariff is:",
+    options: { A:"A limit on the quantity of goods that can be imported", B:"A tax on imported goods, raising their domestic price to protect home industries", C:"A government subsidy to exporters", D:"A bilateral trade agreement" },
+    answer: "B", subject: 'Economics',
+    explanation: "Tariffs raise the price of imports, reducing their competitiveness and protecting domestic producers. Revenue goes to government. A quota limits quantity. A subsidy reduces domestic producers' costs. An embargo bans trade entirely." },
+
+  { id: 117,
+    text: "Mixed economy refers to an economic system in which:",
+    options: { A:"Only the government owns all means of production", B:"Both the private sector and the government play significant roles in resource allocation", C:"All decisions are made by market forces alone", D:"Production is shared equally among all citizens" },
+    answer: "B", subject: 'Economics',
+    explanation: "A mixed economy combines market mechanisms (private enterprise, price signals) with government intervention (public goods, regulation, welfare). Nigeria operates a mixed economy. Pure capitalism and pure command economies are theoretical extremes." },
+
+  { id: 118,
+    text: "In economics, 'capital' as a factor of production refers to:",
+    options: { A:"Money held in bank accounts", B:"Man-made resources used in the production of other goods and services (machinery, tools, buildings)", C:"Natural resources like land and minerals", D:"The entrepreneurial skills of business owners" },
+    answer: "B", subject: 'Economics',
+    explanation: "The four factors of production: Land (natural resources), Labour (human effort), Capital (man-made productive assets), Enterprise (risk-taking/organisation). Capital is distinct from money — it is physical productive equipment." },
+
+  { id: 119,
+    text: "Which of the following is a public good?",
+    options: { A:"A loaf of bread", B:"A cinema ticket", C:"National defence", D:"A private hospital" },
+    answer: "C", subject: 'Economics',
+    explanation: "Public goods are: non-excludable (cannot prevent anyone from benefiting) and non-rival (one person's use does not reduce availability for others). Examples: national defence, street lighting, lighthouses. Markets under-provide them → market failure → government provision." },
+
+  { id: 120,
+    text: "An externality occurs when:",
+    options: { A:"A firm earns profit from overseas sales", B:"The actions of producers or consumers impose costs or benefits on third parties not reflected in market prices", C:"A government imposes a tax on production", D:"A firm uses resources from another country" },
+    answer: "B", subject: 'Economics',
+    explanation: "Negative externality: third-party costs (pollution, congestion). Positive externality: third-party benefits (education, vaccination). Both cause market failure. Government responses: taxes (Pigouvian tax) for negative, subsidies for positive externalities." },
+
+  { id: 121,
+    text: "The multiplier effect in macroeconomics describes how:",
+    options: { A:"Compound interest increases savings over time", B:"An initial change in spending leads to a larger total change in national income", C:"Monetary policy multiplies the effect of interest rate changes", D:"Inflation multiplies the cost of living" },
+    answer: "B", subject: 'Economics',
+    explanation: "Multiplier = 1/(1−MPC) or 1/MPS. An initial injection (e.g. government spending ₦100bn) generates additional rounds of spending as recipients spend a fraction of their income, producing a larger final increase in GDP." },
+
+  { id: 122,
+    text: "Devaluation of a currency means:",
+    options: { A:"A rise in the exchange rate value of the currency", B:"A deliberate reduction in the official exchange rate, making exports cheaper and imports more expensive", C:"Removing the currency from circulation", D:"Pegging the currency to gold" },
+    answer: "B", subject: 'Economics',
+    explanation: "Devaluation (fixed exchange rate system) = official reduction in currency value. Depreciation = market-driven fall (floating system). Effects: exports become cheaper → more competitive; imports become more expensive → reduces import demand → can improve trade balance." },
+
+  { id: 123,
+    text: "The Malthusian theory of population states that:",
+    options: { A:"Population grows in line with food supply", B:"Population grows geometrically (exponentially) while food supply grows arithmetically — leading to eventual crisis unless checked", C:"Economic development always reduces population growth", D:"Population decline is the main threat to economies" },
+    answer: "B", subject: 'Economics',
+    explanation: "Thomas Malthus (1798): unchecked population doubles every 25 years (1,2,4,8...) but food supply grows linearly (1,2,3,4...). The gap leads to 'positive checks' (famine, disease, war) or 'preventive checks' (delayed marriage, celibacy). Relevant to Nigeria's demographic challenge." },
+
+  { id: 124,
+    text: "Subsistence agriculture refers to farming in which:",
+    options: { A:"Crops are grown mainly for export", B:"Output is mainly consumed by the farming household with little or no surplus for sale", C:"Advanced machinery and chemicals are used", D:"The government owns all farmland" },
+    answer: "B", subject: 'Economics',
+    explanation: "Subsistence agriculture: production for household consumption. Common in rural Nigeria. Contrasts with commercial agriculture (production for market). Features: small-scale, low capital, traditional techniques, low productivity." },
+
+  { id: 125,
+    text: "The term 'privatisation' in economics means:",
+    options: { A:"The government taking over private companies", B:"The transfer of ownership of state-owned enterprises to private individuals or companies", C:"Restricting foreign investment", D:"Making government spending transparent" },
+    answer: "B", subject: 'Economics',
+    explanation: "Privatisation = transfer of government assets to private sector. Rationale: improve efficiency, raise capital, reduce government burden. Nigeria has privatised NITEL, power sector (PHCN→DISCOs/GENCOs). Contrasts with nationalisation." }
+
+  /* ══════════════════════════════════════════════════
+     GOVERNMENT — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */
+
+  { id: 126,
+    text: "The theory of social contract is associated with which trio of philosophers?",
+    options: { A:"Marx, Engels, Lenin", B:"Hobbes, Locke, Rousseau", C:"Plato, Aristotle, Socrates", D:"Montesquieu, Voltaire, Hegel" },
+    answer: "B", subject: 'Government',
+    explanation: "Hobbes (Leviathan, 1651), Locke (Two Treatises, 1689) and Rousseau (Social Contract, 1762) are the three major social contract theorists. Each differed on the nature of the original state and what citizens surrender." },
+
+  { id: 127,
+    text: "Political socialisation is best defined as:",
+    options: { A:"The process by which citizens are taught to obey the law", B:"The process by which individuals acquire political values, beliefs and attitudes through agents like family, school and media", C:"The registration of voters before an election", D:"The redistribution of wealth through taxation" },
+    answer: "B", subject: 'Government',
+    explanation: "Political socialisation = the lifelong process of acquiring political orientations. Primary agent: family. Secondary agents: school, peer groups, religion, mass media. Shapes political culture, participation and identity." },
+
+  { id: 128,
+    text: "A constitution is described as 'rigid' when:",
+    options: { A:"It is written in complex language", B:"It can only be amended through a special procedure more demanding than ordinary legislation", C:"It cannot be amended under any circumstances", D:"It is enforced strictly by courts only" },
+    answer: "B", subject: 'Government',
+    explanation: "Rigid constitutions (e.g. Nigeria's 1999 Constitution, USA) require supermajorities and special procedures to amend. Section 9 of Nigeria's 1999 Constitution requires two-thirds of both chambers plus two-thirds of State Houses of Assembly." },
+
+  { id: 129,
+    text: "Which of the following is a characteristic of a written constitution?",
+    options: { A:"It is always rigid", B:"It is contained in a single document or set of documents and is supreme over ordinary law", C:"It cannot be amended", D:"It only exists in federal states" },
+    answer: "B", subject: 'Government',
+    explanation: "A written (codified) constitution is contained in one or more documents, typically supreme over ordinary legislation. Any inconsistent law is null and void. Nigeria, USA, Germany have written constitutions; the UK does not." },
+
+  { id: 130,
+    text: "Citizenship by naturalisation refers to:",
+    options: { A:"Citizenship acquired automatically at birth by place of birth", B:"Citizenship acquired through a legal process available to qualifying foreign nationals", C:"Citizenship inherited through parents", D:"Citizenship granted only to military veterans" },
+    answer: "B", subject: 'Government',
+    explanation: "Naturalisation = a legal process by which a foreign national meeting specified requirements (residency, language, loyalty oath) is granted citizenship. Different from jus soli (birth) or jus sanguinis (descent)." },
+
+  { id: 131,
+    text: "A 'coup d'état' is best defined as:",
+    options: { A:"A popular mass revolution", B:"A sudden illegal seizure of state power, usually by the military", C:"A constitutional transfer of government", D:"A vote of no confidence in parliament" },
+    answer: "B", subject: 'Government',
+    explanation: "Coup d'état (French: stroke of state) = sudden, typically coercive seizure of power bypassing constitutional processes. Nigeria experienced coups in 1966 (Jan & Jul), 1975, 1983, 1985 and 1993." },
+
+  { id: 132,
+    text: "Which of the following BEST describes liberal democracy?",
+    options: { A:"A system where the state owns all property", B:"A system combining competitive elections, rule of law, protection of individual rights and limited government", C:"A system governed by religious law", D:"A system where only property owners may vote" },
+    answer: "B", subject: 'Government',
+    explanation: "Liberal democracy: free and fair elections, constitutional limits on government, protection of civil liberties, rule of law, independent judiciary. Examples: USA, UK, Germany." },
+
+  { id: 133,
+    text: "The concurrent legislative list in Nigeria's 1999 Constitution contains matters that:",
+    options: { A:"Only the federal government can legislate on", B:"Both the National Assembly and State Houses of Assembly can legislate on, with federal law prevailing in conflict", C:"Only state governments can legislate on", D:"Are reserved for local government councils" },
+    answer: "B", subject: 'Government',
+    explanation: "Concurrent list matters (education, agriculture, health) may be legislated on by both federal and state. Where there is conflict, federal law prevails under Section 4(5) of the 1999 Constitution." },
+
+  { id: 134,
+    text: "The Supreme Court of Nigeria has original jurisdiction in disputes between:",
+    options: { A:"An individual and the state government", B:"The Federation and a State, or between States", C:"An individual and the Federal Government", D:"A state government and a local government" },
+    answer: "B", subject: 'Government',
+    explanation: "Section 232 of the 1999 Constitution gives the Supreme Court original jurisdiction in disputes between the Federation and a state or between states. This is its unique role in the federal structure." },
+
+  { id: 135,
+    text: "The principle of 'federal character' in Nigeria's 1999 Constitution requires that:",
+    options: { A:"All federal ministers must be lawyers", B:"Federal appointments must reflect the diversity and geographic spread of Nigeria — no state should dominate", C:"The President must come from the north", D:"All ethnic groups must have equal Senate seats" },
+    answer: "B", subject: 'Government',
+    explanation: "Section 14(3): the composition of the Federal Government shall reflect the federal character of Nigeria to promote national unity and prevent domination. The Federal Character Commission enforces compliance." },
+
+  { id: 136,
+    text: "The Nigerian Senate consists of how many members?",
+    options: { A:"360", B:"109", C:"120", D:"469" },
+    answer: "B", subject: 'Government',
+    explanation: "The Senate has 109 members: 3 senators per state (36 × 3 = 108) plus 1 for the FCT. The House of Representatives has 360. Together they form the National Assembly." },
+
+  { id: 137,
+    text: "12 June is celebrated as Democracy Day in Nigeria because:",
+    options: { A:"The 1999 Constitution was signed on that date", B:"The 12 June 1993 presidential election won by MKO Abiola is considered Nigeria's freest election", C:"Nigeria gained independence on 12 June", D:"The first military coup occurred on 12 June" },
+    answer: "B", subject: 'Government',
+    explanation: "President Buhari moved Democracy Day from 29 May to 12 June 2019 to honour the annulled 12 June 1993 election won by Chief MKO Abiola — widely regarded as Nigeria's fairest election." },
+
+  { id: 138,
+    text: "The Fourth Republic of Nigeria began in:",
+    options: { A:"1993", B:"1996", C:"1999", D:"2003" },
+    answer: "C", subject: 'Government',
+    explanation: "Nigeria's Fourth Republic began 29 May 1999 when Olusegun Obasanjo was inaugurated as President, ending 16 years of military rule." },
+
+  { id: 139,
+    text: "The ECOWAS Monitoring Group (ECOMOG) is the:",
+    options: { A:"Economic research arm of ECOWAS", B:"Military intervention force of ECOWAS deployed to restore peace in member states", C:"Electoral monitoring body for ECOWAS elections", D:"Anti-corruption unit of ECOWAS" },
+    answer: "B", subject: 'Government',
+    explanation: "ECOMOG is ECOWAS's military force, deployed in Liberia (1990), Sierra Leone (1997) and Guinea-Bissau (1998). Nigeria contributed the largest contingent and bore most costs." },
+
+  { id: 140,
+    text: "Which organ of the United Nations is responsible for international peace and security?",
+    options: { A:"The General Assembly", B:"The International Court of Justice", C:"The Security Council", D:"The Secretariat" },
+    answer: "C", subject: 'Government',
+    explanation: "The UN Security Council (5 permanent + 10 rotating members) has primary responsibility for international peace and security under Chapters VI and VII of the UN Charter, including authorising military action." },
+
+  { id: 141,
+    text: "The veto power in the UN Security Council means that:",
+    options: { A:"Any member state can block a resolution", B:"A 'No' vote by any of the 5 permanent members blocks a substantive resolution", C:"The Secretary-General can reject any resolution", D:"Unanimous agreement from all 15 members is required" },
+    answer: "B", subject: 'Government',
+    explanation: "The P5 (USA, UK, France, Russia, China) each have veto power — a single 'No' blocks any substantive resolution. This prevents the UN from acting against major powers." },
+
+  { id: 142,
+    text: "The concept of 'constitutional monarchy' means a system where:",
+    options: { A:"The monarch has absolute power", B:"The monarch reigns but does not govern — powers are exercised by elected officials under the constitution", C:"There is no written constitution", D:"The monarch appoints all ministers" },
+    answer: "B", subject: 'Government',
+    explanation: "Constitutional monarchy (UK, Netherlands, Spain): the monarch is head of state but real executive power rests with the elected Prime Minister and Cabinet. The monarch acts only on ministerial advice." },
+
+  { id: 143,
+    text: "A 'motion of no confidence' in a parliamentary system leads to:",
+    options: { A:"Removal of the Speaker", B:"Resignation or dissolution of the government if it loses the vote", C:"Impeachment of the President", D:"A constitutional amendment" },
+    answer: "B", subject: 'Government',
+    explanation: "In parliamentary systems the government must retain legislative confidence. A successful no-confidence vote requires the Prime Minister to resign or request dissolution of parliament for fresh elections." },
+
+  { id: 144,
+    text: "The Universal Declaration of Human Rights (UDHR) was adopted by the UN General Assembly in:",
+    options: { A:"1945", B:"1948", C:"1960", D:"1966" },
+    answer: "B", subject: 'Government',
+    explanation: "The UDHR was adopted 10 December 1948 — now Human Rights Day. It proclaims 30 articles of fundamental rights applicable to all humans regardless of nationality, sex or religion." },
+
+  { id: 145,
+    text: "Local government is described as the 'third tier' of government in Nigeria because:",
+    options: { A:"It was the third to be created", B:"It is the level of government closest to the people, below federal and state tiers", C:"It has the third largest budget", D:"It was established by the third military government" },
+    answer: "B", subject: 'Government',
+    explanation: "Nigeria operates a three-tier system: federal (1st), state (2nd), local government (3rd). The 774 LGAs are constitutionally recognised under Section 7 of the 1999 Constitution as democratically elected councils." },
+
+  { id: 146,
+    text: "Fascism as a political ideology is characterised by:",
+    options: { A:"Democratic elections and individual rights", B:"Extreme nationalism, dictatorial power, suppression of opposition and state control of society", C:"Collective ownership of the means of production", D:"Minimal government and maximum individual freedom" },
+    answer: "B", subject: 'Government',
+    explanation: "Fascism (Mussolini's Italy, Hitler's Germany) combines extreme nationalism, authoritarianism, suppression of dissent and glorification of the state. It rejects both liberal democracy and communism." },
+
+  { id: 147,
+    text: "The Nigerian Bar Association, NMA and ASUU are examples of:",
+    options: { A:"Political parties", B:"Professional/sectional pressure groups", C:"Promotional/cause groups", D:"Paramilitary organisations" },
+    answer: "B", subject: 'Government',
+    explanation: "Sectional groups represent a particular section of society (profession/occupation). NBA, NMA and ASUU protect members' interests. Promotional groups (e.g. human rights NGOs) pursue broader public causes." },
+
+  { id: 148,
+    text: "Which of the following is a function of political parties in a democracy?",
+    options: { A:"To enforce the law", B:"To aggregate interests, recruit candidates, educate citizens and form government", C:"To impeach the President", D:"To manage the national economy directly" },
+    answer: "B", subject: 'Government',
+    explanation: "Functions: interest aggregation, political recruitment (fielding candidates), political education, forming government, providing loyal opposition and alternative policies." },
+
+  { id: 149,
+    text: "The concept of 'power sharing' in a federation is BEST illustrated by:",
+    options: { A:"The President appointing all governors", B:"The division of legislative powers between federal and state governments through exclusive, concurrent and residual lists", C:"The army controlling national security", D:"All revenue going to the central government" },
+    answer: "B", subject: 'Government',
+    explanation: "In Nigerian federalism, the Exclusive List (federal only), Concurrent List (both), and Residual List (states only) constitutionally divide legislative power between tiers." },
+
+  { id: 150,
+    text: "An 'interim government' is one that:",
+    options: { A:"Is elected for a fixed four-year term", B:"Is established temporarily to manage a transition between regimes or pending fresh elections", C:"Governs indefinitely without elections", D:"Is led jointly by two parties" },
+    answer: "B", subject: 'Government',
+    explanation: "An interim government is a caretaker administration. Nigeria had one in 1993 under Chief Ernest Shonekan after the annulled June 12 election, before General Abacha's coup in November 1993." },
+
+  { id: 151,
+    text: "The 'iron law of oligarchy' propounded by Robert Michels states that:",
+    options: { A:"Iron is essential for national power", B:"All organisations — including democratic ones — eventually come to be dominated by a small elite leadership", C:"Oligarchies always collapse into democracies", D:"Economic power always determines political power" },
+    answer: "B", subject: 'Government',
+    explanation: "Michels (1911): all complex organisations inevitably develop oligarchic leadership. Even socialist parties become controlled by a professional leadership class — power concentrates regardless of stated ideology." },
+
+  { id: 152,
+    text: "Gerrymandering refers to:",
+    options: { A:"Voter intimidation at polling stations", B:"Manipulation of electoral constituency boundaries to favour a particular party or group", C:"Stuffing ballot boxes with fraudulent votes", D:"Buying votes with money or gifts" },
+    answer: "B", subject: 'Government',
+    explanation: "Gerrymandering = drawing constituency boundaries to give one party an unfair advantage. Named after Governor Elbridge Gerry of Massachusetts who approved a salamander-shaped district in 1812 to benefit his party." },
+
+  { id: 153,
+    text: "The Commonwealth of Nations is an association of:",
+    options: { A:"Countries sharing a common currency", B:"Mainly former territories of the British Empire united by shared values and history", C:"Countries with nuclear weapons", D:"Only African and Caribbean nations" },
+    answer: "B", subject: 'Government',
+    explanation: "The Commonwealth (54 members) consists mainly of former British colonies sharing English language, legal traditions and common institutions. The British monarch is the symbolic head." },
+
+  { id: 154,
+    text: "The principle of 'popular sovereignty' means that:",
+    options: { A:"The most popular leader has sovereign power", B:"Ultimate political authority rests with the people, who delegate it to government through elections and consent", C:"Sovereignty belongs to parliament alone", D:"Only the majority group holds sovereignty" },
+    answer: "B", subject: 'Government',
+    explanation: "Popular sovereignty: the people are the ultimate source of governmental authority. Government derives its just powers from the consent of the governed (Jefferson, Locke). Expressed through elections, referenda and constitutional processes." },
+
+  { id: 155,
+    text: "The African Union (AU) was established in 2002, replacing the:",
+    options: { A:"Non-Aligned Movement", B:"Organisation of African Unity (OAU)", C:"African Development Bank", D:"Economic Commission for Africa" },
+    answer: "B", subject: 'Government',
+    explanation: "The OAU (founded 1963) was replaced by the African Union (AU) in 2002. The AU has stronger institutions, including the Peace and Security Council, African Court on Human Rights, and a vision of deeper integration (modelled partly on the EU)." },
+
+  { id: 156,
+    text: "Bicameralism refers to a legislature with:",
+    options: { A:"Two dominant political parties", B:"Two chambers — an upper and a lower house", C:"Two co-equal presidents", D:"A legislature that meets twice a year" },
+    answer: "B", subject: 'Government',
+    explanation: "A bicameral legislature has two chambers (e.g. Nigeria: Senate + House of Representatives; UK: Lords + Commons; USA: Senate + House). A unicameral legislature has one chamber." },
+
+  { id: 157,
+    text: "Proportional representation in elections ensures that:",
+    options: { A:"Every candidate wins at least one seat", B:"Parties win seats in proportion to their share of the total votes cast", C:"Only the largest party forms government", D:"All constituencies have equal populations" },
+    answer: "B", subject: 'Government',
+    explanation: "Under PR, a party winning 30% of votes receives approximately 30% of seats. Fairer to smaller parties than first-past-the-post. Used widely in European and African democracies." },
+
+  { id: 158,
+    text: "The concept of 'delegated legislation' refers to:",
+    options: { A:"Laws passed directly by the electorate in a referendum", B:"Law-making powers granted by the legislature to ministers, local authorities or regulatory agencies", C:"Constitutional amendments passed by states", D:"International treaties ratified by parliament" },
+    answer: "B", subject: 'Government',
+    explanation: "Delegated legislation: parliament grants rule-making powers to executive bodies who make detailed regulations within a parent Act. Examples: ministerial orders, bye-laws. Saves parliamentary time but raises accountability concerns." },
+
+  { id: 159,
+    text: "The civil service is described as 'permanent' and 'neutral' because:",
+    options: { A:"Civil servants never retire", B:"They serve regardless of which party is in power and implement government policy without personal political bias", C:"They are appointed for life by the judiciary", D:"They are protected from any form of discipline" },
+    answer: "B", subject: 'Government',
+    explanation: "Civil servants are permanent (continue across changes of government), neutral (implement policy without public political affiliation), and anonymous (ministers take public responsibility for departments)." },
+
+  { id: 160,
+    text: "Which of the following BEST defines sovereignty?",
+    options: { A:"The ability of a state to maintain a large army", B:"The supreme, absolute and independent authority of a state to govern itself without external interference", C:"The right of citizens to overthrow government", D:"The power of the courts to override the legislature" },
+    answer: "B", subject: 'Government',
+    explanation: "Sovereignty = the highest authority within a state (internal sovereignty) and independence from external control (external sovereignty). Jean Bodin first systematically theorised sovereignty." }
+
 ];
+
 </script>
 
 <!-- Fixed Header -->
@@ -979,11 +1032,11 @@ const QUESTIONS = [
                 <i class="fas fa-bars"></i>
             </button>
             <div class="subject-info">
-                <div class="subject-name" id="subjectName">Commercial: EMEG</div>
-                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">140</span></div>
+                <div class="subject-name" id="subjectName">Arts: EMEG</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">160</span></div>
             </div>
         </div>
-
+        
         <div class="quiz-timer-container" id="quizTimerContainer">
             <div class="timer-progress-ring">
                 <svg viewBox="0 0 60 60">
@@ -1022,7 +1075,7 @@ const QUESTIONS = [
                 <div class="stat-label">Done</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="unansweredCount">140</div>
+                <div class="stat-value" id="unansweredCount">160</div>
                 <div class="stat-label">Left</div>
             </div>
             <div class="stat-item">
@@ -1038,7 +1091,7 @@ const QUESTIONS = [
             <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
         </div>
         <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
-            <a href="commercial_clusters.html"
+            <a href="art_clusters.html"
                class="btn btn-secondary"
                style="width:100%;text-align:center;text-decoration:none;display:block;"
                onclick="return confirm('Leave quiz? Progress will be lost.')">
@@ -1048,6 +1101,18 @@ const QUESTIONS = [
     </aside>
 
     <main class="quiz-main">
+      <!-- Passage panel — rendered by quiz-app.js when q.passage is set; invisible otherwise -->
+        <div class="passage-panel hidden" id="passagePanel">
+            <div class="passage-header">
+                <span class="passage-label"><i class="fas fa-book-open"></i> Read</span>
+                <span class="passage-title-text" id="passageTitle">Comprehension Passage</span>
+                <button class="btn-passage-toggle" id="passageToggleBtn">
+                    <i class="fas fa-compress-alt"></i> Hide Passage
+                </button>
+            </div>
+            <div class="passage-body" id="passageBody"></div>
+        </div>
+
         <div class="question-card" id="questionCard">
             <div class="question-header">
                 <div class="question-number">Question <span id="questionNumber">1</span></div>
@@ -1063,7 +1128,7 @@ const QUESTIONS = [
             </div>
         </div>
 
-        <div class="quiz-navigation">
+<div class="quiz-navigation">
             <button class="btn btn-secondary" id="prevBtn" disabled>
                 <i class="fas fa-arrow-left"></i> Previous
             </button>
@@ -1090,9 +1155,9 @@ const QUESTIONS = [
         </div>
         <div class="modal-body">
             <div class="submit-summary">
-                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">140</span></div>
+                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">160</span></div>
                 <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
-                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">140</span></div>
+                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">160</span></div>
                 <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">60:00</span></div>
             </div>
             <div class="warning-message">
@@ -1156,5 +1221,70 @@ const QUESTIONS = [
 </div>
 
 <script src="quiz-app.js"></script>
+
+<
+!--═══════════════════════════════════════════════════════════════
+PASSAGE PANEL DRIVER
+quiz - app.js is untouched.This script drives the #passagePanel
+that is already declared in the HTML above.It watches
+#questionNumber(always updated by quiz - app.js on every render)
+via MutationObserver, reads the current question straight from
+the QUESTIONS array, and shows / hides the panel accordingly.
+No fetch.No routing.HTML
+for HTML things.════════════════════════════════════════════════════════════════-- >
+  <script>
+(function () {
+  const panel      = document.getElementById('passagePanel');
+  const titleEl    = document.getElementById('passageTitle');
+  const bodyEl     = document.getElementById('passageBody');
+  const toggleBtn  = document.getElementById('passageToggleBtn');
+  const qNumEl     = document.getElementById('questionNumber');
+
+  // Toggle collapse/expand (the button already exists in the HTML)
+  let collapsed = false;
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      collapsed = !collapsed;
+      bodyEl.style.display = collapsed ? 'none' : '';
+      toggleBtn.innerHTML  = collapsed
+        ? '<i class="fas fa-expand-alt"></i> Show Passage'
+        : '<i class="fas fa-compress-alt"></i> Hide Passage';
+    });
+  }
+
+  function syncPassage() {
+    const n = parseInt(qNumEl.textContent, 10);
+    if (!n || !Array.isArray(QUESTIONS)) return;
+
+    const q = QUESTIONS[n - 1];
+    if (q && q.passage) {
+      // Only rewrite DOM when the passage actually changes
+      const key = q.passage.slice(0, 40);
+      if (bodyEl.dataset.key !== key) {
+        bodyEl.dataset.key  = key;
+        titleEl.textContent = q.passageTitle || 'Comprehension Passage';
+        bodyEl.textContent  = q.passage;   // textContent — safe, no XSS
+        panel.scrollTop     = 0;
+        // Reset collapse state when a new passage appears
+        collapsed          = false;
+        bodyEl.style.display = '';
+        if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Hide Passage';
+      }
+      panel.classList.remove('hidden');
+    } else {
+      panel.classList.add('hidden');
+    }
+  }
+
+  // Fire on every question navigation (quiz-app.js always updates #questionNumber)
+  new MutationObserver(syncPassage).observe(qNumEl, {
+    childList: true, subtree: true, characterData: true
+  });
+  syncPassage(); // run once on load
+})();
+</script>
+
+
+
 </body>
 </html>

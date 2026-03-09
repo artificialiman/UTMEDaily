@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Science — BEPC — JAMB Practice · GrantApp AI</title>
-    <link rel="stylesheet" href="quiz-styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="quiz-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="quiz-body">
@@ -15,1034 +15,1010 @@
 <!-- passage field triggers the reading panel in quiz-app.js; passageTitle labels it.  -->
 <!-- Questions sharing identical passage strings are automatically grouped.            -->
 <script>
-const DURATION = 3600;
+const DURATION = 4800;
 
-/* ── Shared passage strings ─────────────────────────────────────────────────────────
-   Defined once here so each question object references the same value.
-   quiz-app.js detects identity by string equality to avoid re-rendering the panel
-   as students navigate within a passage group.
-   ───────────────────────────────────────────────────────────────────────────────── */
+const PA = `Mr. Bepo Adewale walked to the podium that morning with the gait of a man carrying the world on his shoulders. The students, lined up in neat rows, watched their principal in silence. He was known for his booming voice, his confident stride, his jokes that made even the most nervous student relax. But that morning, he stood at the microphone and said nothing. He opened his mouth. He closed it. He tried again. And then, to the collective shock of Stardom Schools, Mr. Bepo began to weep.
 
-const P1 = `The Niger Delta region of Nigeria is one of the most ecologically sensitive areas on the continent. For decades it has been the economic backbone of the nation, supplying the crude oil that funds the federal budget. Yet the communities that live above these oil deposits have seen little of the resulting wealth. Pipelines cut through fishing villages; oil spills blacken creek water that families depend on for drinking and farming. Flares burn day and night, releasing gases that researchers have linked to respiratory illness and soil degradation.
+Mrs. Grace Apeh, the Vice Principal, moved quickly. She stepped forward, placed a firm hand on his arm, and addressed the assembly herself. "Return to your classrooms," she said, her voice calm though her eyes were not. "The principal is unwell." Staff members led Bepo away, and the school watched as its most dependable figure was walked off the stage he had commanded for over two decades.`;
 
-Successive governments have promised remediation, compensation, and development. Some funds have been released; fewer have reached their destinations. The gap between policy announcement and ground-level reality has bred a deep scepticism among Delta communities — a scepticism that, when it tips into militancy, costs the nation far more in lost production than any cleanup programme would have cost in the first place.
+const PB = `"Three thousand, six hundred pounds," said Mr. Dada, tapping the table with each syllable. "Every month. That is what they are paying teachers in the UK. Every. Single. Month." He looked around at the other staff members. "And you people are here arguing with Bepo about leaving?"
 
-The lesson appears simple enough: sustainable resource extraction requires that the people who bear its environmental costs share meaningfully in its economic rewards. That this lesson has been stated so often, and applied so rarely, points to a failure not of knowledge but of political will.`;
+Bepo smiled quietly. He did not say what he was thinking — that the four hundred thousand naira he earned here had been converted into something else entirely: loyalty, legacy, the particular satisfaction of knowing each student's name. He had been at Stardom Schools for twenty-three years. His wife Seri was already in London. His daughters Nike and Kike were in school there. Everyone agreed the sensible thing was to go. And yet, every morning he drove through the Lekki gates, something in him refused to call it sensible.
 
-const P2 = `Language is not a neutral vessel. Every word carries the sediment of the culture that shaped it, and every sentence is an act that positions speaker and listener within a web of social relations. When a child acquires her mother tongue, she is not merely learning labels for objects; she is inheriting a way of perceiving the world, a set of distinctions her community considers worth marking, and a repertoire of silences — things that exist but for which her language provides no ready name.
+The colleagues did not understand. They spoke of the exchange rate with the reverence of men reciting scripture. "Eight hundred thousand naira equivalent," Mr. Dada continued. "Every month. And you want to stay here because of what — sentiment?"`;
 
-This observation has given rise to the Sapir-Whorf hypothesis, sometimes called linguistic relativity, which in its strong form claims that language determines thought. Most contemporary linguists reject the strong version: speakers can and do think about things their language lacks words for. The weaker claim — that language influences habitual patterns of thought and attention — enjoys considerably more empirical support. Colour perception studies, spatial reasoning experiments, and cross-linguistic analyses of time metaphors all suggest that the grammar and vocabulary of one's first language leave measurable traces on cognition, even when the speaker is performing tasks that seem entirely non-linguistic.`;
+   const QUESTIONS = [
 
-const QUESTIONS = [
+  /* ══════════════════════════════════════════════════
+     BIOLOGY — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */
 
-  /* ══════════════════════════════════════════════════════════════
-     BIOLOGY  Q 1 – 35
-     ══════════════════════════════════════════════════════════════ */
-  { id:1, subject:'Biology', text:'The organelle responsible for the synthesis of proteins is the:', options:{A:'Mitochondrion',B:'Ribosome',C:'Golgi apparatus',D:'Lysosome'}, answer:'B', explanation:'Ribosomes are the sites of translation where mRNA is decoded to assemble amino acids into polypeptide chains.', exception:'Ribosomes are found free in the cytoplasm or attached to the rough ER; both make proteins but for different destinations.' },
-  { id:2, subject:'Biology', text:'Which of the following correctly describes the cell membrane?', options:{A:'Rigid structure made of cellulose',B:'Selectively permeable phospholipid bilayer',C:'Fully permeable single protein layer',D:'Impermeable lipid monolayer'}, answer:'B', explanation:'The fluid mosaic model describes the membrane as a phospholipid bilayer embedded with proteins, selectively permeable to substances.', exception:'Plant cells ALSO have a rigid cellulose cell wall outside the membrane, but the membrane itself is not rigid.' },
-  { id:3, subject:'Biology', text:'Osmosis is best defined as the movement of:', options:{A:'Solute molecules from high to low concentration',B:'Water molecules across a semi-permeable membrane from low to high solute concentration',C:'Any molecule against its concentration gradient',D:'Ions through protein channels'}, answer:'B', explanation:'Osmosis is the net movement of water molecules through a selectively permeable membrane from a region of lower solute concentration (higher water potential) to higher solute concentration.', exception:'Osmosis is a special case of diffusion — only water moves; solute does not cross the membrane.' },
-  { id:4, subject:'Biology', text:'The process by which plants manufacture food using sunlight is called:', options:{A:'Respiration',B:'Transpiration',C:'Photosynthesis',D:'Translocation'}, answer:'C', explanation:'Photosynthesis converts CO₂ and H₂O into glucose and O₂ using light energy captured by chlorophyll: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂.' },
-  { id:5, subject:'Biology', text:'The site of photosynthesis in a plant cell is the:', options:{A:'Mitochondrion',B:'Nucleus',C:'Chloroplast',D:'Vacuole'}, answer:'C', explanation:'Chloroplasts contain chlorophyll pigments in the thylakoid membranes and the stroma where the light-dependent and light-independent reactions occur respectively.' },
-  { id:6, subject:'Biology', text:'During aerobic respiration, the net number of ATP molecules produced per glucose molecule is approximately:', options:{A:'2',B:'4',C:'36–38',D:'12'}, answer:'C', explanation:'Aerobic respiration yields approximately 36–38 ATP per glucose via glycolysis (2), Krebs cycle (2), and oxidative phosphorylation (~32–34).', exception:'Anaerobic respiration yields only 2 ATP (net) from glycolysis alone.' },
-  { id:7, subject:'Biology', text:'Which blood group is the universal donor?', options:{A:'AB',B:'A',C:'B',D:'O'}, answer:'D', explanation:'Blood group O has no A or B antigens on red blood cells, so its cells are not attacked by antibodies in any recipient\'s blood.', exception:'Group O is the universal donor of RED BLOOD CELLS only; for plasma, AB is the universal donor (no anti-A or anti-B antibodies).' },
-  { id:8, subject:'Biology', text:'The functional unit of the kidney is the:', options:{A:'Nephron',B:'Glomerulus',C:'Loop of Henle',D:'Ureter'}, answer:'A', explanation:'The nephron is the structural and functional unit of the kidney, consisting of the Bowman\'s capsule, proximal tubule, loop of Henle, distal tubule, and collecting duct.' },
-  { id:9, subject:'Biology', text:'Which of the following is NOT a function of the liver?', options:{A:'Detoxification of drugs',B:'Production of bile',C:'Synthesis of insulin',D:'Storage of glycogen'}, answer:'C', explanation:'Insulin is synthesised by the beta cells of the islets of Langerhans in the pancreas, not the liver. The liver responds to insulin but does not produce it.' },
-  { id:10, subject:'Biology', text:'The chemical equation for aerobic respiration is:', options:{A:'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + energy',B:'6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂',C:'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + energy',D:'C₆H₁₂O₆ + 6H₂O → 6CO₂ + 12H₂ + energy'}, answer:'A', explanation:'Aerobic respiration oxidises glucose completely to CO₂ and H₂O, releasing energy (ATP). Option B is photosynthesis; Option C is anaerobic fermentation.' },
-  { id:11, subject:'Biology', text:'Mitosis results in:', options:{A:'Four haploid daughter cells',B:'Two haploid daughter cells',C:'Two diploid daughter cells genetically identical to the parent',D:'Four diploid daughter cells'}, answer:'C', explanation:'Mitosis produces two daughter cells with the same chromosome number (diploid) and genetic content as the parent cell. It is used for growth, repair, and asexual reproduction.', exception:'Meiosis produces four haploid cells with half the chromosome number — used in sexual reproduction.' },
-  { id:12, subject:'Biology', text:'The male sex hormone testosterone is produced by the:', options:{A:'Adrenal cortex',B:'Pituitary gland',C:'Testes',D:'Seminal vesicles'}, answer:'C', explanation:'Testosterone is produced by the Leydig (interstitial) cells in the testes, stimulated by LH from the anterior pituitary.' },
-  { id:13, subject:'Biology', text:'Which of the following is a correct description of DNA?', options:{A:'Single-stranded helix of ribose sugars and bases',B:'Double helix of deoxyribose sugar, phosphate, and four bases (A, T, G, C)',C:'Double helix containing uracil instead of thymine',D:'Single strand of amino acids'}, answer:'B', explanation:'DNA is a double helix with a deoxyribose-phosphate backbone and four bases: adenine (A), thymine (T), guanine (G), cytosine (C). A pairs with T; G pairs with C.', exception:'RNA uses ribose sugar and has uracil (U) instead of thymine (T), and is usually single-stranded.' },
-  { id:14, subject:'Biology', text:'Transpiration in plants occurs mainly through the:', options:{A:'Lenticels',B:'Stomata',C:'Root hair cells',D:'Xylem vessels'}, answer:'B', explanation:'About 90% of water loss in plants occurs through stomata (pores on leaves controlled by guard cells). Lenticels account for a small amount of the remainder.' },
-  { id:15, subject:'Biology', text:'The part of the brain responsible for maintaining balance and coordinating movement is the:', options:{A:'Cerebrum',B:'Medulla oblongata',C:'Hypothalamus',D:'Cerebellum'}, answer:'D', explanation:'The cerebellum coordinates voluntary muscle movements, posture, and balance by comparing intended and actual movements and making corrections.', exception:'The medulla oblongata controls involuntary functions (breathing, heart rate); the cerebrum controls conscious thought and voluntary movement.' },
-  { id:16, subject:'Biology', text:'In humans, how many pairs of chromosomes are found in a normal somatic cell?', options:{A:'23',B:'46',C:'22',D:'48'}, answer:'A', explanation:'Human somatic (body) cells have 46 chromosomes arranged as 23 pairs (diploid, 2n = 46). Gametes have 23 single chromosomes (haploid, n = 23).', exception:'The answer is 23 PAIRS (= 46 individual chromosomes). Exam questions may ask for either number — read carefully.' },
-  { id:17, subject:'Biology', text:'The enzyme that breaks down starch in the mouth is:', options:{A:'Pepsin',B:'Lipase',C:'Salivary amylase',D:'Trypsin'}, answer:'C', explanation:'Salivary amylase (ptyalin) is secreted by the salivary glands and begins the digestion of starch into maltose in the mouth at pH ~7.', exception:'Pepsin digests proteins in the stomach (pH ~2); lipase digests fats; trypsin digests proteins in the small intestine.' },
-  { id:18, subject:'Biology', text:'Which of the following correctly pairs a disease with its causative organism?', options:{A:'Malaria — bacterium',B:'Tuberculosis — virus',C:'Cholera — Vibrio cholerae (bacterium)',D:'AIDS — fungus'}, answer:'C', explanation:'Cholera is caused by the bacterium Vibrio cholerae. Malaria is caused by the protozoan Plasmodium; TB by Mycobacterium tuberculosis (bacterium); AIDS by HIV (virus).' },
-  { id:19, subject:'Biology', text:'The exchange of gases in the lungs occurs in the:', options:{A:'Bronchi',B:'Trachea',C:'Alveoli',D:'Bronchioles'}, answer:'C', explanation:'Alveoli are tiny air sacs with very thin walls, moist surfaces, and a rich blood supply — providing maximum surface area for efficient O₂/CO₂ exchange by diffusion.' },
-  { id:20, subject:'Biology', text:'Active transport differs from diffusion in that active transport:', options:{A:'Moves substances down a concentration gradient',B:'Requires no energy',C:'Moves substances against a concentration gradient using ATP',D:'Only occurs in plant cells'}, answer:'C', explanation:'Active transport uses carrier proteins and metabolic energy (ATP) to move molecules against their concentration gradient — from low to high concentration.', exception:'Diffusion and osmosis are passive (no ATP needed); active transport is the only one requiring energy.' },
-  { id:21, subject:'Biology', text:'Which part of the flower develops into the fruit?', options:{A:'Sepal',B:'Petal',C:'Ovary',D:'Anther'}, answer:'C', explanation:'After fertilisation, the ovary wall (pericarp) develops into the fruit, while the ovule(s) inside develop into seed(s).' },
-  { id:22, subject:'Biology', text:'The sickle cell trait (AS genotype) is an example of:', options:{A:'Complete dominance',B:'Codominance',C:'Incomplete dominance',D:'Sex-linkage'}, answer:'B', explanation:'In sickle cell genetics, both the normal (Hb-A) and sickle (Hb-S) alleles are expressed in AS individuals — both types of haemoglobin are produced — making it codominance.', exception:'Incomplete dominance produces a BLEND; codominance shows BOTH traits simultaneously. Sickle cell is codominance.' },
-  { id:23, subject:'Biology', text:'Which of the following organisms is a producer in a food chain?', options:{A:'Lion',B:'Grasshopper',C:'Green plant',D:'Mushroom'}, answer:'C', explanation:'Producers (autotrophs) manufacture their own food via photosynthesis. Green plants form the base of most food chains. Mushrooms are decomposers; grasshoppers and lions are consumers.' },
-  { id:24, subject:'Biology', text:'The fluid that surrounds the foetus in the uterus is called:', options:{A:'Amniotic fluid',B:'Placental fluid',C:'Seminal fluid',D:'Lymph'}, answer:'A', explanation:'Amniotic fluid fills the amniotic sac, cushioning the foetus, maintaining temperature, and allowing movement during development.' },
-  { id:25, subject:'Biology', text:'In a food chain, energy flow is:', options:{A:'Cyclic — it is recycled completely',B:'Unidirectional — from producers to consumers with losses at each level',C:'Bidirectional — between predator and prey equally',D:'Constant — no energy is lost between trophic levels'}, answer:'B', explanation:'Energy flows in one direction through a food chain. Only about 10% of energy is transferred to the next trophic level; the rest is lost as heat (respiration) at each level.', exception:'Matter/nutrients cycle; energy does NOT — it flows through and is lost as heat.' },
-  { id:26, subject:'Biology', text:'The process of nitrogen fixation converts:', options:{A:'Nitrates into nitrogen gas',B:'Atmospheric nitrogen (N₂) into ammonia or nitrates usable by plants',C:'Proteins into amino acids',D:'Ammonia into nitrogen gas'}, answer:'B', explanation:'Nitrogen-fixing bacteria (e.g. Rhizobium in root nodules, Azotobacter) convert atmospheric N₂ into NH₃/NH₄⁺, which is then converted to nitrates that plants can absorb.' },
-  { id:27, subject:'Biology', text:'A reflex arc typically involves the following sequence:', options:{A:'Effector → sensory neurone → relay neurone → motor neurone → receptor',B:'Receptor → sensory neurone → relay neurone → motor neurone → effector',C:'Brain → spinal cord → sensory neurone → effector',D:'Receptor → motor neurone → brain → effector'}, answer:'B', explanation:'The reflex arc pathway: stimulus → receptor → sensory neurone → relay neurone (in spinal cord) → motor neurone → effector (muscle/gland) → response.' },
-  { id:28, subject:'Biology', text:'Which of the following is a vector of malaria?', options:{A:'Aedes mosquito',B:'Tsetse fly',C:'Female Anopheles mosquito',D:'Culex mosquito'}, answer:'C', explanation:'The female Anopheles mosquito is the vector of malaria, transmitting Plasmodium parasites when it takes a blood meal.', exception:'Aedes transmits yellow fever and dengue; Culex transmits filariasis; tsetse fly transmits sleeping sickness (trypanosomiasis).' },
-  { id:29, subject:'Biology', text:'The primary function of red blood cells is to:', options:{A:'Fight infection',B:'Clot blood at wounds',C:'Transport oxygen via haemoglobin',D:'Produce antibodies'}, answer:'C', explanation:'Red blood cells (erythrocytes) contain haemoglobin which binds O₂ in the lungs and releases it in tissues. They lack a nucleus to maximise haemoglobin content.' },
-  { id:30, subject:'Biology', text:'Which hormone is responsible for regulating blood glucose levels by stimulating glycogen storage?', options:{A:'Glucagon',B:'Adrenaline',C:'Insulin',D:'Thyroxine'}, answer:'C', explanation:'Insulin, secreted by beta cells of the pancreas when blood glucose rises, stimulates cells to take up glucose and the liver to convert excess glucose to glycogen.', exception:'Glucagon (from alpha cells) has the OPPOSITE effect — it stimulates glycogen breakdown when blood glucose falls.' },
-  { id:31, subject:'Biology', text:'The Hardy-Weinberg principle states that allele frequencies in a population remain constant if:', options:{A:'Natural selection is occurring',B:'The population is small and isolated',C:'Mating is random and no evolutionary forces are acting',D:'Mutations are frequent'}, answer:'C', explanation:'Hardy-Weinberg equilibrium requires: random mating, large population, no mutation, no migration, no natural selection. It provides a baseline to detect evolution.' },
-  { id:32, subject:'Biology', text:'Which of the following is an example of insect-pollinated flowers?', options:{A:'Maize',B:'Grass',C:'Hibiscus',D:'Pine tree'}, answer:'C', explanation:'Insect-pollinated (entomophilous) flowers like Hibiscus have bright petals, nectar, scent, and large sticky/spiny pollen to attract and adhere to insects.', exception:'Maize, grass, and pine are wind-pollinated (anemophilous) — they have small dull flowers, no nectar, and produce large amounts of light pollen.' },
-  { id:33, subject:'Biology', text:'Haemophilia is a sex-linked recessive disorder. A carrier mother (X^H X^h) and a normal father (X^H Y) will produce what proportion of haemophiliac sons?', options:{A:'All sons',B:'No sons',C:'Half of the sons',D:'A quarter of all children'}, answer:'C', explanation:'Mother produces X^H and X^h gametes equally. Sons receive Y from father plus either X^H (normal) or X^h (haemophiliac) from mother — so 50% of sons are affected.' },
-  { id:34, subject:'Biology', text:'The role of decomposers in an ecosystem is to:', options:{A:'Photosynthesise and produce oxygen',B:'Consume primary producers',C:'Break down dead organic matter, recycling nutrients',D:'Fix atmospheric nitrogen into soil'}, answer:'C', explanation:'Decomposers (bacteria and fungi) break down dead organisms and waste into inorganic compounds (CO₂, H₂O, mineral salts), returning nutrients to the soil for producers.' },
-  { id:35, subject:'Biology', text:'Which of the following is the correct sequence of ecological organisation from smallest to largest?', options:{A:'Ecosystem → community → population → organism',B:'Organism → population → community → ecosystem',C:'Population → organism → ecosystem → community',D:'Community → ecosystem → population → organism'}, answer:'B', explanation:'Ecological hierarchy: organism (individual) → population (same species in area) → community (all species in area) → ecosystem (community + abiotic environment).' },
+  { id: 1,
+    text: "The basic structural and functional unit of all living organisms is the:",
+    options: { A:"Tissue", B:"Organ", C:"Cell", D:"Organelle" },
+    answer: "C", subject: 'Biology',
+    explanation: "The cell theory (Schleiden, Schwann, Virchow) establishes that the cell is the basic unit of life. All living things are made of one or more cells; all cells arise from pre-existing cells." },
 
+  { id: 2,
+    text: "Which organelle is responsible for ATP production through aerobic respiration?",
+    options: { A:"Ribosome", B:"Mitochondrion", C:"Chloroplast", D:"Golgi apparatus" },
+    answer: "B", subject: 'Biology',
+    explanation: "The mitochondrion is the 'powerhouse of the cell'. ATP is produced via the Krebs cycle and oxidative phosphorylation in the inner mitochondrial membrane. Cells with high energy demands (muscle, liver) have more mitochondria." },
 
+  { id: 3,
+    text: "The process by which green plants manufacture food using light energy is called:",
+    options: { A:"Respiration", B:"Transpiration", C:"Photosynthesis", D:"Digestion" },
+    answer: "C", subject: 'Biology',
+    explanation: "Photosynthesis: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂. It occurs in chloroplasts. The light-dependent reactions occur in the thylakoid membranes; the Calvin cycle (light-independent) occurs in the stroma." },
 
-  /* ══════════════════════════════════════════════════════════════
-     ENGLISH  Q 36 – 90  (55 questions)
-     36–45 : Passage 1 — Niger Delta (P1)
-     46–55 : Passage 2 — Language & Thought (P2)
-     56–70 : Stress & Phonetics
-     71–90 : Grammar, Vocabulary & Usage
-     ══════════════════════════════════════════════════════════════ */
+  { id: 4,
+    text: "Which part of the chloroplast is the site of the light-dependent reactions of photosynthesis?",
+    options: { A:"Stroma", B:"Thylakoid membrane", C:"Outer membrane", D:"Ribosome" },
+    answer: "B", subject: 'Biology',
+    explanation: "Light-dependent reactions occur in the thylakoid membranes where chlorophyll absorbs light, water is split (photolysis), O₂ is released and ATP/NADPH are produced. The Calvin cycle then uses these in the stroma." },
 
-  /* ── Passage 1: Niger Delta ── */
-  {
-    id: 36, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'According to the passage, why have Delta communities become sceptical of government promises?',
-    options: { A: 'They prefer foreign investors', B: 'Funds announced rarely reach them on the ground', C: 'They oppose oil extraction entirely', D: 'They have no elected representatives' },
-    answer: 'B',
-    explanation: 'The passage states "Some funds have been released; fewer have reached their destinations," breeding scepticism.',
-  },
-  {
-    id: 37, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'What does the writer identify as the root cause of the Delta\'s problems?',
-    options: { A: 'Lack of oil revenue', B: 'Environmental ignorance', C: 'Failure of political will, not knowledge', D: 'Corruption by oil companies alone' },
-    answer: 'C',
-    explanation: 'The final sentence explicitly states the failure is "not of knowledge but of political will."',
-  },
-  {
-    id: 38, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'The word "remediation" as used in the passage most nearly means:',
-    options: { A: 'Financial compensation only', B: 'Punishment of oil companies', C: 'The action of restoring a damaged environment', D: 'Medical treatment of affected persons' },
-    answer: 'C',
-    explanation: 'Remediation means the process of reversing or stopping environmental damage.',
-  },
-  {
-    id: 39, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'What literary device is used in "Pipelines cut through fishing villages; oil spills blacken creek water"?',
-    options: { A: 'Hyperbole', B: 'Imagery', C: 'Metaphor', D: 'Personification' },
-    answer: 'B',
-    explanation: 'The vivid description of physical destruction appeals to the senses — that is imagery.',
-  },
-  {
-    id: 40, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'The writer\'s attitude towards successive governments is best described as:',
-    options: { A: 'Sympathetic', B: 'Indifferent', C: 'Critical', D: 'Celebratory' },
-    answer: 'C',
-    explanation: 'The writer criticises governments for repeated failures to translate policy into action.',
-  },
-  {
-    id: 41, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'Which of the following best states the main argument of the passage?',
-    options: {
-      A: 'Nigeria should stop oil extraction immediately',
-      B: 'Oil communities must share fairly in extraction benefits or instability will follow',
-      C: 'Foreign oil companies are entirely to blame for the Delta\'s crisis',
-      D: 'Environmental damage in the Delta is irreversible',
-    },
-    answer: 'B',
-    explanation: 'The passage argues equitable benefit-sharing is both just and practically necessary to prevent militancy.',
-  },
-  {
-    id: 42, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'The phrase "the economic backbone of the nation" is an example of:',
-    options: { A: 'Simile', B: 'Personification', C: 'Oxymoron', D: 'Metaphor' },
-    answer: 'D',
-    explanation: 'Calling the Delta the "backbone" transfers a body part\'s function to an economic role — that is a metaphor.',
-  },
-  {
-    id: 43, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'What consequence does the writer say militancy has had on the nation?',
-    options: { A: 'It has led to better environmental laws', B: 'It costs more in lost production than cleanup would have', C: 'It has attracted international attention', D: 'It has resulted in fair compensation' },
-    answer: 'B',
-    explanation: 'The writer states militancy costs "far more in lost production than any cleanup programme would have cost."',
-  },
-  {
-    id: 44, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: 'The tone of the concluding paragraph is best described as:',
-    options: { A: 'Optimistic', B: 'Despairing', C: 'Sardonic and resigned', D: 'Neutral and statistical' },
-    answer: 'C',
-    explanation: 'Stating the lesson "has been stated so often, and applied so rarely" is wearily sardonic — the writer sees the irony without expecting change.',
-  },
-  {
-    id: 45, subject: 'English',
-    passageTitle: 'The Niger Delta',
-    passage: P1,
-    text: '"Flares burn day and night, releasing gases that researchers have linked to respiratory illness." The underlined clause is a:',
-    options: { A: 'Noun clause', B: 'Adjectival relative clause', C: 'Adverbial clause of time', D: 'Adverbial clause of concession' },
-    answer: 'B',
-    explanation: '"that researchers have linked to respiratory illness" modifies "gases" — it is a relative (adjectival) clause.',
-  },
+  { id: 5,
+    text: "Osmosis is defined as the movement of water molecules:",
+    options: { A:"From low to high solute concentration through a permeable membrane", B:"From a region of high water potential to low water potential through a selectively permeable membrane", C:"Of solutes from high to low concentration", D:"Against a concentration gradient using energy" },
+    answer: "B", subject: 'Biology',
+    explanation: "Osmosis = movement of water from high water potential (dilute solution) to low water potential (concentrated solution) across a selectively permeable membrane. No energy is required — it is passive." },
 
-  /* ── Passage 2: Language & Thought ── */
-  {
-    id: 46, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'According to the passage, what is a child acquiring alongside vocabulary when she learns her mother tongue?',
-    options: { A: 'Only the ability to name objects', B: 'A shared cultural perception of the world and its silences', C: 'The grammar rules of all languages', D: 'The history of her nation' },
-    answer: 'B',
-    explanation: 'The passage states the child inherits "a way of perceiving the world" and "a repertoire of silences."',
-  },
-  {
-    id: 47, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'The strong form of the Sapir-Whorf hypothesis claims that:',
-    options: { A: 'Language influences habitual thought patterns', B: 'Language and thought are completely unrelated', C: 'Language determines thought', D: 'All languages are equally complex' },
-    answer: 'C',
-    explanation: 'The passage defines the strong version as the claim that "language determines thought."',
-  },
-  {
-    id: 48, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'Why do most contemporary linguists reject the strong form of linguistic relativity?',
-    options: { A: 'It has not been tested scientifically', B: 'Speakers can think about things their language has no words for', C: 'Colour perception disproves it', D: 'It applies only to written languages' },
-    answer: 'B',
-    explanation: 'The passage states linguists reject it because "speakers can and do think about things their language lacks words for."',
-  },
-  {
-    id: 49, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'The phrase "Language is not a neutral vessel" means:',
-    options: { A: 'Language is always biased against minorities', B: 'Language cannot carry meaning without grammar', C: 'Language is actively shaped by and shapes cultural values', D: 'Language is unreliable as a tool' },
-    answer: 'C',
-    explanation: 'Describing language as non-neutral means it carries cultural weight — it shapes and is shaped by the community using it.',
-  },
-  {
-    id: 50, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'The expression "the sediment of the culture" is an example of:',
-    options: { A: 'Simile', B: 'Metaphor', C: 'Synecdoche', D: 'Alliteration' },
-    answer: 'B',
-    explanation: 'Comparing cultural residue to sediment (geological deposit) without using "like" or "as" is a metaphor.',
-  },
-  {
-    id: 51, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'What evidence does the writer give for the weaker version of linguistic relativity?',
-    options: { A: 'Children learn vocabulary before grammar', B: 'Colour studies, spatial reasoning, and time metaphor research', C: 'Bilinguals think in two languages simultaneously', D: 'Written and spoken language differ structurally' },
-    answer: 'B',
-    explanation: 'The passage cites "colour perception studies, spatial reasoning experiments, and cross-linguistic analyses of time metaphors."',
-  },
-  {
-    id: 52, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'The word "repertoire" as used in the passage most nearly means:',
-    options: { A: 'A single repeated action', B: 'A set of available items or responses', C: 'A musical performance', D: 'A linguistic barrier' },
-    answer: 'B',
-    explanation: 'Repertoire means a stock of skills, techniques, or items that someone regularly uses or can call upon.',
-  },
-  {
-    id: 53, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'The writer describes "silences" as things that:',
-    options: { A: 'Do not exist in any culture', B: 'Exist but have no ready name in the child\'s language', C: 'Are taboo in all societies', D: 'Are best expressed through music' },
-    answer: 'B',
-    explanation: 'The passage defines silences as "things that exist but for which her language provides no ready name."',
-  },
-  {
-    id: 54, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'Which of the following best summarises the passage?',
-    options: {
-      A: 'Language has no effect on how people think',
-      B: 'The Sapir-Whorf hypothesis is entirely correct',
-      C: 'Language is culturally loaded and likely shapes habitual thought, though it does not fully determine it',
-      D: 'Children should be taught multiple languages from birth',
-    },
-    answer: 'C',
-    explanation: 'The passage rejects the strong (deterministic) form but accepts the weaker (influence) form of linguistic relativity.',
-  },
-  {
-    id: 55, subject: 'English',
-    passageTitle: 'Language & Thought',
-    passage: P2,
-    text: 'In "every sentence is an act that positions speaker and listener within a web of social relations," the underlined phrase is:',
-    options: { A: 'A noun phrase in apposition', B: 'An adjectival relative clause', C: 'An adverbial clause of manner', D: 'A noun clause as subject complement' },
-    answer: 'B',
-    explanation: '"that positions speaker and listener…" modifies "act" — it is an adjectival (defining relative) clause.',
-  },
+  { id: 6,
+    text: "A cell placed in a hypotonic solution will:",
+    options: { A:"Shrink as water leaves by osmosis", B:"Remain unchanged", C:"Swell as water enters by osmosis and may burst (lyse)", D:"Lose solutes to the solution" },
+    answer: "C", subject: 'Biology',
+    explanation: "A hypotonic solution has lower solute concentration than the cell. Water moves in by osmosis (from high to low water potential — into the cell). Animal cells may lyse; plant cells become turgid (the cell wall prevents bursting)." },
 
-  /* ── Stress & Phonetics ── */
-  {
-    id: 56, subject: 'English',
-    text: 'In which of these words does the stress fall on the SECOND syllable?',
-    options: { A: 'TAble', B: 'CARpet', C: 'beGIN', D: 'PARrot' },
-    answer: 'C',
-    explanation: 'beGIN: stress is on the second syllable. The others are stressed on the first.',
-  },
-  {
-    id: 57, subject: 'English',
-    text: '"PROtest" (noun) and "proTEST" (verb) illustrate which phonological feature?',
-    options: { A: 'Vowel shift', B: 'Stress-based word class distinction', C: 'Consonant mutation', D: 'Syllable deletion' },
-    answer: 'B',
-    explanation: 'Many English noun-verb pairs are distinguished solely by stress placement — a phonological feature called stress-based (or stress-timed) word class distinction.',
-  },
-  {
-    id: 58, subject: 'English',
-    text: 'Which syllable carries primary stress in "phoTOgraphy"?',
-    options: { A: 'First: pho-', B: 'Second: TO-', C: 'Third: -gra-', D: 'Fourth: -phy' },
-    answer: 'B',
-    explanation: 'pho-TO-gra-phy: the second syllable bears primary stress. Compare: PHO-to-graph (noun).',
-  },
-  {
-    id: 59, subject: 'English',
-    text: 'How many syllables does "elementary" have?',
-    options: { A: 'Four', B: 'Five', C: 'Three', D: 'Six' },
-    answer: 'B',
-    explanation: 'el-e-men-ta-ry = five syllables.',
-  },
-  {
-    id: 60, subject: 'English',
-    text: 'In "She has a PERmit to park here," the word "permit" is used as a:',
-    options: { A: 'Verb stressed on the second syllable', B: 'Noun stressed on the first syllable', C: 'Adjective', D: 'Adverb' },
-    answer: 'B',
-    explanation: 'As a noun, PERmit carries stress on the first syllable. The verb perMIT stresses the second.',
-  },
-  {
-    id: 61, subject: 'English',
-    text: 'Which word has a silent letter?',
-    options: { A: 'Travel', B: 'Prison', C: 'Pneumonia', D: 'Branch' },
-    answer: 'C',
-    explanation: 'In "pneumonia," the initial P is silent: /njuːˈməʊniə/.',
-  },
-  {
-    id: 62, subject: 'English',
-    text: 'Choose the word whose underlined vowel sound differs from the others: bEAd, lEAf, brEAd, mEAl.',
-    options: { A: 'Bead', B: 'Leaf', C: 'Bread', D: 'Meal' },
-    answer: 'C',
-    explanation: '"Bread" has the short /ɛ/ sound. Bead, leaf, and meal all have the long /iː/ sound.',
-  },
-  {
-    id: 63, subject: 'English',
-    text: 'The primary stress in "econOMics" falls on the:',
-    options: { A: 'First syllable', B: 'Second syllable', C: 'Third syllable', D: 'Fourth syllable' },
-    answer: 'C',
-    explanation: 'e-co-NOM-ics: the third syllable "NOM" carries primary stress.',
-  },
-  {
-    id: 64, subject: 'English',
-    text: 'Which of the following pairs are pronounced identically (homophones)?',
-    options: { A: 'Flour / Floor', B: 'Bare / Bear', C: 'Lose / Loose', D: 'Quite / Quiet' },
-    answer: 'B',
-    explanation: 'Bare /bɛə/ and bear /bɛə/ are homophones. The others differ in pronunciation.',
-  },
-  {
-    id: 65, subject: 'English',
-    text: 'In "She will reCORD the meeting," what part of speech is "record"?',
-    options: { A: 'Noun', B: 'Adjective', C: 'Adverb', D: 'Verb' },
-    answer: 'D',
-    explanation: 'reCORD (stress on second syllable) is the verb form. REcord (first syllable) is the noun.',
-  },
-  {
-    id: 66, subject: 'English',
-    text: 'How many phonemes are in the word "thought"?',
-    options: { A: '7', B: '5', C: '3', D: '4' },
-    answer: 'C',
-    explanation: '"Thought" = /θɔːt/ — three phonemes: /θ/, /ɔː/, /t/.',
-  },
-  {
-    id: 67, subject: 'English',
-    text: 'Which word is stressed on the THIRD syllable?',
-    options: { A: 'UNderstand', B: 'COMputer', C: 'ALphabet', D: 'enginEER' },
-    answer: 'D',
-    explanation: 'en-gi-NEER: stress on the third syllable. "Understand" stresses the third too — but "engineer" more cleanly illustrates it.',
-    exception: 'Both "understand" and "engineer" stress their third syllables; "engineer" is the clearest example here.',
-  },
-  {
-    id: 68, subject: 'English',
-    text: 'The word "import" when used as a verb is stressed on which syllable?',
-    options: { A: 'First: IM-', B: 'Both equally', C: 'Second: -PORT', D: 'Neither' },
-    answer: 'C',
-    explanation: 'Verb: im-PORT (second syllable). Noun: IM-port (first syllable).',
-  },
-  {
-    id: 69, subject: 'English',
-    text: 'Choose the option with the same vowel sound as the underlined part of "boot".',
-    options: { A: 'Book', B: 'Blood', C: 'Food', D: 'Flood' },
-    answer: 'C',
-    explanation: '"Boot" /uː/ shares its vowel with "food" /uː/. Book and blood have different vowels.',
-  },
-  {
-    id: 70, subject: 'English',
-    text: 'Which of the following words has stress on the FIRST syllable when used as a NOUN and the SECOND when used as a VERB?',
-    options: { A: 'garden', B: 'OBject / obJECT', C: 'table', D: 'water' },
-    answer: 'B',
-    explanation: 'OBject (noun) / obJECT (verb) is the classic noun-verb stress shift pair.',
-  },
+  { id: 7,
+    text: "During aerobic respiration, the net yield of ATP from one molecule of glucose is approximately:",
+    options: { A:"2 ATP", B:"8 ATP", C:"36–38 ATP", D:"100 ATP" },
+    answer: "C", subject: 'Biology',
+    explanation: "Glycolysis: 2 ATP net. Krebs cycle: 2 ATP. Oxidative phosphorylation: ~32–34 ATP. Total: ~36–38 ATP per glucose molecule. Anaerobic respiration yields only 2 ATP (glycolysis only)." },
 
-  /* ── Grammar, Vocabulary & Usage ── */
-  {
-    id: 71, subject: 'English',
-    text: 'Choose the word OPPOSITE in meaning to "benevolent".',
-    options: { A: 'Generous', B: 'Kind', C: 'Malevolent', D: 'Charitable' },
-    answer: 'C',
-    explanation: 'Benevolent = well-wishing/kind. Malevolent = wishing harm — its direct antonym.',
-  },
-  {
-    id: 72, subject: 'English',
-    text: 'Choose the word CLOSEST in meaning to "laconic".',
-    options: { A: 'Talkative', B: 'Brief and to the point', C: 'Lazy', D: 'Confusing' },
-    answer: 'B',
-    explanation: 'Laconic means using very few words; concise and direct.',
-  },
-  {
-    id: 73, subject: 'English',
-    text: 'Identify the error: "The data shows a clear trend."',
-    options: { A: 'No error in modern usage', B: 'Wrong tense', C: 'Misplaced modifier', D: '"Data" is plural and requires "show"' },
-    answer: 'A',
-    explanation: '"Data" is traditionally Latin plural (data show), but modern usage accepts "data is/shows" as a mass noun. Both are defensible.',
-  },
-  {
-    id: 74, subject: 'English',
-    text: 'Which sentence contains a misplaced modifier?',
-    options: {
-      A: 'I only eat fish on Fridays.',
-      B: 'Running quickly, the bus was missed.',
-      C: 'She gave the letter to her sister carefully.',
-      D: 'He almost drove 200 kilometres.',
-    },
-    answer: 'B',
-    explanation: '"Running quickly" dangles — the bus cannot run. The intended subject (she/he) is absent.',
-  },
-  {
-    id: 75, subject: 'English',
-    text: 'Select the correct sentence:',
-    options: {
-      A: 'Between you and I, this is wrong.',
-      B: 'Between you and me, this is wrong.',
-      C: 'Between you and myself, this is wrong.',
-      D: 'Between I and you, this is wrong.',
-    },
-    answer: 'B',
-    explanation: 'After the preposition "between," the object pronoun "me" is required, not "I" (hypercorrection).',
-  },
-  {
-    id: 76, subject: 'English',
-    text: 'Choose the correctly spelled word:',
-    options: { A: 'Neccessary', B: 'Necesary', C: 'Necessary', D: 'Neccesary' },
-    answer: 'C',
-    explanation: 'Necessary: one c, double s.',
-  },
-  {
-    id: 77, subject: 'English',
-    text: '"She is one of those students who always arrive early." Is "arrive" correct?',
-    options: { A: 'No; should be "arrives"', B: 'Yes; "who" refers to "students" (plural)', C: 'No; should be "has arrived"', D: 'Yes; but only in British English' },
-    answer: 'B',
-    explanation: '"Who" refers to the antecedent "students" (plural), so the plural verb "arrive" is correct.',
-  },
-  {
-    id: 78, subject: 'English',
-    text: 'Identify the figure of speech: "He has a heart of stone."',
-    options: { A: 'Simile', B: 'Hyperbole', C: 'Metaphor', D: 'Personification' },
-    answer: 'C',
-    explanation: 'Comparing his heart directly to stone (no "like/as") is a metaphor.',
-  },
-  {
-    id: 79, subject: 'English',
-    text: 'Which of the following is a gerund phrase?',
-    options: { A: 'To swim in the ocean', B: 'Swimming in the ocean is fun', C: 'She swam in the ocean', D: 'The ocean swimmer' },
-    answer: 'B',
-    explanation: '"Swimming in the ocean" functions as the subject of the sentence — a gerund phrase (verb form used as noun).',
-  },
-  {
-    id: 80, subject: 'English',
-    text: 'Choose the option that correctly completes: "He acted as though he _____ the answer."',
-    options: { A: 'knows', B: 'known', C: 'knew', D: 'has known' },
-    answer: 'C',
-    explanation: '"As though" introduces a hypothetical; subjunctive/past form "knew" is required.',
-  },
-  {
-    id: 81, subject: 'English',
-    text: 'The word "peremptory" means:',
-    options: { A: 'Hesitant and unsure', B: 'Insisting on immediate obedience; dictatorial', C: 'Cheerful and optimistic', D: 'Vague and unclear' },
-    answer: 'B',
-    explanation: 'Peremptory = admitting no refusal; brusquely decisive.',
-  },
-  {
-    id: 82, subject: 'English',
-    text: '"The government will effect a change in policy." Is the use of "effect" correct?',
-    options: { A: 'No; should be "affect"', B: 'Yes; "effect" as a verb means to bring about', C: 'No; should be "make"', D: 'Yes; "effect" always means result' },
-    answer: 'B',
-    explanation: '"Effect" (verb) means to bring something about. "Affect" (verb) means to influence. Both verbs exist; context determines which is correct.',
-  },
-  {
-    id: 83, subject: 'English',
-    text: 'Choose the passive form of: "The manager approved the budget."',
-    options: { A: 'The budget has been approved by the manager.', B: 'The budget was approved by the manager.', C: 'The budget is approved by the manager.', D: 'The manager had approved the budget.' },
-    answer: 'B',
-    explanation: 'Simple past active → simple past passive: "was approved by the manager."',
-  },
-  {
-    id: 84, subject: 'English',
-    text: 'Identify the clause type: "Unless you study, you will fail."',
-    options: { A: 'Adverbial clause of concession', B: 'Adverbial clause of condition', C: 'Relative clause', D: 'Noun clause' },
-    answer: 'B',
-    explanation: '"Unless you study" states a condition under which the consequence follows — adverbial clause of condition.',
-  },
-  {
-    id: 85, subject: 'English',
-    text: 'Which sentence uses the apostrophe correctly?',
-    options: { A: "It's a beautiful day.", B: "The dog wagged it's tail.", C: "Its' raining outside.", D: "The cat cleaned its' fur." },
-    answer: 'A',
-    explanation: '"It\'s" = "it is" (contraction). "Its" (no apostrophe) is the possessive pronoun.',
-  },
-  {
-    id: 86, subject: 'English',
-    text: '"Burning the midnight oil" means:',
-    options: { A: 'Starting a fire hazard', B: 'Working late into the night', C: 'Wasting resources', D: 'Using old technology' },
-    answer: 'B',
-    explanation: 'Idiom: to work or study very late at night.',
-  },
-  {
-    id: 87, subject: 'English',
-    text: 'The plural of "phenomenon" is:',
-    options: { A: 'Phenomenons', B: 'Phenomenas', C: 'Phenomena', D: 'Phenomenae' },
-    answer: 'C',
-    explanation: 'Greek origin: singular phenomenon, plural phenomena. "Phenomenons" is non-standard.',
-  },
-  {
-    id: 88, subject: 'English',
-    text: 'Identify the rhetorical device: "To err is human; to forgive, divine."',
-    options: { A: 'Zeugma', B: 'Antithesis', C: 'Anaphora', D: 'Litotes' },
-    answer: 'B',
-    explanation: 'Placing contrasting ideas ("human" vs "divine") in parallel structure is antithesis.',
-  },
-  {
-    id: 89, subject: 'English',
-    text: 'Choose the word that completes the analogy: Doctor : Stethoscope :: Carpenter : ___',
-    options: { A: 'Wood', B: 'Saw', C: 'Nail', D: 'House' },
-    answer: 'B',
-    explanation: 'A stethoscope is the primary tool of a doctor; a saw is the primary tool of a carpenter.',
-  },
-  {
-    id: 90, subject: 'English',
-    text: 'Which option correctly uses reported speech? Direct: She said, "I will come tomorrow."',
-    options: {
-      A: 'She said she will come tomorrow.',
-      B: 'She said she would come the next day.',
-      C: 'She said she comes the next day.',
-      D: 'She said I would come tomorrow.',
-    },
-    answer: 'B',
-    explanation: 'Backshift: will → would; tomorrow → the next day (temporal shift in reported speech).',
-  },
+  { id: 8,
+    text: "The equation for anaerobic respiration in yeast is:",
+    options: { A:"Glucose → lactic acid + energy", B:"Glucose → ethanol + CO₂ + energy", C:"Glucose + O₂ → CO₂ + H₂O + energy", D:"Glucose → pyruvate + O₂" },
+    answer: "B", subject: 'Biology',
+    explanation: "In yeast (fermentation): C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + 2ATP. In animals (e.g. during intense exercise): glucose → lactic acid + 2ATP. Both are anaerobic — no oxygen used." },
 
-  /* ══════════════════════════════════════════════════════════════
-     PHYSICS  Q 91 – 125
-     ══════════════════════════════════════════════════════════════ */
-  {
-    id: 91, subject: 'Physics',
-    text: 'Which of the following is a scalar quantity?',
-    options: { A: 'Force', B: 'Velocity', C: 'Acceleration', D: 'Speed' },
-    answer: 'D',
-    explanation: 'Scalar quantities have magnitude only. Speed has no direction; velocity does.',
-  },
-  {
-    id: 92, subject: 'Physics',
-    text: 'Newton\'s second law of motion states that force equals:',
-    options: { A: 'mass × velocity', B: 'mass × acceleration', C: 'mass / acceleration', D: 'mass × distance' },
-    answer: 'B',
-    explanation: 'F = ma. Force = mass × acceleration.',
-  },
-  {
-    id: 93, subject: 'Physics',
-    text: 'A body of mass 5 kg is acted on by a net force of 20 N. Its acceleration is:',
-    options: { A: '100 m/s²', B: '2 m/s²', C: '25 m/s²', D: '4 m/s²' },
-    answer: 'D',
-    explanation: 'a = F/m = 20/5 = 4 m/s².',
-  },
-  {
-    id: 94, subject: 'Physics',
-    text: 'The work done by a force of 50 N moving an object 8 m in the direction of the force is:',
-    options: { A: '6.25 J', B: '400 J', C: '58 J', D: '42 J' },
-    answer: 'B',
-    explanation: 'W = Fs = 50 × 8 = 400 J.',
-  },
-  {
-    id: 95, subject: 'Physics',
-    text: 'Which statement about kinetic energy is correct?',
-    options: { A: 'KE = mgh', B: 'KE = ½mv', C: 'KE = ½mv²', D: 'KE = mv²' },
-    answer: 'C',
-    explanation: 'Kinetic energy KE = ½mv². The squared velocity is essential.',
-  },
-  {
-    id: 96, subject: 'Physics',
-    text: 'A ball is dropped from rest at a height of 20 m. Its velocity just before hitting the ground is (g = 10 m/s²):',
-    options: { A: '10 m/s', B: '20 m/s', C: '40 m/s', D: '200 m/s' },
-    answer: 'B',
-    explanation: 'v² = 2gh = 2×10×20 = 400. v = 20 m/s.',
-  },
-  {
-    id: 97, subject: 'Physics',
-    text: 'The principle of conservation of momentum states that the total momentum of a system:',
-    options: { A: 'Increases with time', B: 'Is always zero', C: 'Remains constant if no external force acts', D: 'Decreases due to friction' },
-    answer: 'C',
-    explanation: 'In a closed system with no net external force, total momentum is conserved.',
-  },
-  {
-    id: 98, subject: 'Physics',
-    text: 'Waves that require a material medium for propagation are called:',
-    options: { A: 'Electromagnetic waves', B: 'Transverse waves', C: 'Mechanical waves', D: 'Radio waves' },
-    answer: 'C',
-    explanation: 'Mechanical waves (sound, seismic) need a medium. Electromagnetic waves travel through a vacuum.',
-  },
-  {
-    id: 99, subject: 'Physics',
-    text: 'The speed of light in a vacuum is approximately:',
-    options: { A: '3 × 10⁶ m/s', B: '3 × 10⁸ m/s', C: '3 × 10¹⁰ m/s', D: '3 × 10⁴ m/s' },
-    answer: 'B',
-    explanation: 'c ≈ 3 × 10⁸ m/s.',
-  },
-  {
-    id: 100, subject: 'Physics',
-    text: 'Ohm\'s Law states that, at constant temperature, the current through a conductor is:',
-    options: { A: 'Inversely proportional to voltage', B: 'Directly proportional to resistance', C: 'Directly proportional to voltage', D: 'Independent of voltage' },
-    answer: 'C',
-    explanation: 'V = IR → I = V/R. At constant R, I is directly proportional to V.',
-  },
-  {
-    id: 101, subject: 'Physics',
-    text: 'Three resistors of 6 Ω each are connected in parallel. The effective resistance is:',
-    options: { A: '18 Ω', B: '2 Ω', C: '3 Ω', D: '6 Ω' },
-    answer: 'B',
-    explanation: '1/R = 1/6+1/6+1/6 = 3/6. R = 2 Ω.',
-  },
-  {
-    id: 102, subject: 'Physics',
-    text: 'Which of the following is the unit of electrical power?',
-    options: { A: 'Joule', B: 'Volt', C: 'Ampere', D: 'Watt' },
-    answer: 'D',
-    explanation: 'Power P = IV, measured in Watts (W = J/s).',
-  },
-  {
-    id: 103, subject: 'Physics',
-    text: 'A transformer has 200 primary turns and 1000 secondary turns. If the primary voltage is 50 V, the secondary voltage is:',
-    options: { A: '10 V', B: '250 V', C: '200 V', D: '500 V' },
-    answer: 'B',
-    explanation: 'Vs/Vp = Ns/Np → Vs = 50 × (1000/200) = 250 V. Step-up transformer.',
-  },
-  {
-    id: 104, subject: 'Physics',
-    text: 'The process by which a radioactive nucleus emits an electron is called:',
-    options: { A: 'Alpha decay', B: 'Gamma decay', C: 'Beta decay', D: 'Fission' },
-    answer: 'C',
-    explanation: 'Beta (β⁻) decay: a neutron converts to a proton, emitting an electron and an antineutrino.',
-  },
-  {
-    id: 105, subject: 'Physics',
-    text: 'Which type of mirror is used as a rear-view mirror in cars?',
-    options: { A: 'Concave', B: 'Plane', C: 'Parabolic', D: 'Convex' },
-    answer: 'D',
-    explanation: 'Convex mirrors give a wider field of view (virtual, erect, diminished image) — ideal for rear-view.',
-  },
-  {
-    id: 106, subject: 'Physics',
-    text: 'Refraction of light occurs because light changes:',
-    options: { A: 'Frequency', B: 'Colour', C: 'Speed when passing between media', D: 'Wavelength in a vacuum' },
-    answer: 'C',
-    explanation: 'Refraction is the bending of light due to a change in speed as it moves from one medium to another.',
-  },
-  {
-    id: 107, subject: 'Physics',
-    text: 'The critical angle of a medium is the angle of incidence above which:',
-    options: { A: 'Reflection is absorbed', B: 'Total internal reflection occurs', C: 'Refraction doubles', D: 'Light is diffracted' },
-    answer: 'B',
-    explanation: 'At angles of incidence greater than the critical angle, all light is reflected back into the denser medium (TIR).',
-  },
-  {
-    id: 108, subject: 'Physics',
-    text: 'The frequency of a wave is 500 Hz and its speed is 340 m/s. Its wavelength is:',
-    options: { A: '0.68 m', B: '1.47 m', C: '170 000 m', D: '6.8 m' },
-    answer: 'A',
-    explanation: 'λ = v/f = 340/500 = 0.68 m.',
-  },
-  {
-    id: 109, subject: 'Physics',
-    text: 'Which instrument is used to measure atmospheric pressure?',
-    options: { A: 'Thermometer', B: 'Barometer', C: 'Manometer', D: 'Hygrometer' },
-    answer: 'B',
-    explanation: 'A barometer measures atmospheric pressure. A manometer measures gauge pressure of gases.',
-  },
-  {
-    id: 110, subject: 'Physics',
-    text: 'Boyle\'s Law states that at constant temperature, the pressure of a gas is:',
-    options: { A: 'Directly proportional to volume', B: 'Inversely proportional to volume', C: 'Directly proportional to temperature', D: 'Independent of volume' },
-    answer: 'B',
-    explanation: 'PV = constant (at fixed T). P ∝ 1/V.',
-  },
-  {
-    id: 111, subject: 'Physics',
-    text: 'A gas occupies 4 L at 2 atm. At 1 atm (constant T), its volume is:',
-    options: { A: '2 L', B: '4 L', C: '8 L', D: '6 L' },
-    answer: 'C',
-    explanation: 'P₁V₁ = P₂V₂ → 2×4 = 1×V₂ → V₂ = 8 L.',
-  },
-  {
-    id: 112, subject: 'Physics',
-    text: 'The transfer of heat through a vacuum is called:',
-    options: { A: 'Convection', B: 'Conduction', C: 'Radiation', D: 'Evaporation' },
-    answer: 'C',
-    explanation: 'Radiation transfers heat via electromagnetic waves and does not need a medium.',
-  },
-  {
-    id: 113, subject: 'Physics',
-    text: 'A body moving in a circle at constant speed has:',
-    options: { A: 'Constant velocity and zero acceleration', B: 'Changing velocity and centripetal acceleration', C: 'Zero acceleration', D: 'Constant acceleration directed outward' },
-    answer: 'B',
-    explanation: 'Direction changes continuously → velocity changes → centripetal acceleration directed toward centre.',
-  },
-  {
-    id: 114, subject: 'Physics',
-    text: 'The unit of capacitance is:',
-    options: { A: 'Henry', B: 'Ohm', C: 'Farad', D: 'Weber' },
-    answer: 'C',
-    explanation: 'Capacitance is measured in Farads (F). Henry is inductance; Ohm is resistance.',
-  },
-  {
-    id: 115, subject: 'Physics',
-    text: 'Which of the following is an example of nuclear fission?',
-    options: { A: 'Hydrogen bomb', B: 'Uranium-235 splitting in a reactor', C: 'Sun producing energy', D: 'Alpha decay of radium' },
-    answer: 'B',
-    explanation: 'Fission: heavy nucleus splits into smaller ones. U-235 + neutron → fission products + energy.',
-    exception: 'Hydrogen bomb and solar energy involve fusion (light nuclei combining).',
-  },
-  {
-    id: 116, subject: 'Physics',
-    text: 'The half-life of a radioactive substance is 20 days. After 60 days, the fraction remaining is:',
-    options: { A: '1/4', B: '1/6', C: '1/8', D: '1/3' },
-    answer: 'C',
-    explanation: '60 days = 3 half-lives. Fraction = (1/2)³ = 1/8.',
-  },
-  {
-    id: 117, subject: 'Physics',
-    text: 'A convex lens of focal length 10 cm has an object placed 30 cm in front of it. Find the image distance.',
-    options: { A: '15 cm', B: '20 cm', C: '10 cm', D: '30 cm' },
-    answer: 'A',
-    explanation: 'Lens formula: 1/v − 1/u = 1/f. With u = −30, f = +10: 1/v = 1/10 + 1/(−30)? Using real-is-positive: 1/v = 1/f − 1/|u| only works for specific conventions. Standard: 1/v = 1/f + 1/u (u negative): 1/v = 1/10 + 1/(−30) = 3/30 − 1/30 = 2/30. v = 15 cm.',
-    exception: 'Use the sign convention consistently: real object u is negative in the Cartesian convention.',
-  },
-  {
-    id: 118, subject: 'Physics',
-    text: 'Loudness of sound is determined by its:',
-    options: { A: 'Frequency', B: 'Amplitude', C: 'Wavelength', D: 'Speed' },
-    answer: 'B',
-    explanation: 'Loudness corresponds to amplitude (intensity); pitch corresponds to frequency.',
-  },
-  {
-    id: 119, subject: 'Physics',
-    text: 'Which colour of visible light has the highest frequency?',
-    options: { A: 'Red', B: 'Yellow', C: 'Green', D: 'Violet' },
-    answer: 'D',
-    explanation: 'Violet has the shortest wavelength and highest frequency in the visible spectrum.',
-  },
-  {
-    id: 120, subject: 'Physics',
-    text: 'In a photoelectric effect experiment, increasing the intensity of light (same frequency):',
-    options: { A: 'Increases the maximum kinetic energy of emitted electrons', B: 'Increases the number of emitted electrons', C: 'Increases the threshold frequency', D: 'Has no effect' },
-    answer: 'B',
-    explanation: 'Intensity = more photons → more electrons emitted, but KE per electron depends on frequency, not intensity.',
-  },
-  {
-    id: 121, subject: 'Physics',
-    text: 'The SI unit of magnetic flux is:',
-    options: { A: 'Tesla', B: 'Weber', C: 'Gauss', D: 'Ampere' },
-    answer: 'B',
-    explanation: 'Magnetic flux (Φ) is measured in Webers (Wb = V·s). Tesla is the unit of magnetic flux density.',
-  },
-  {
-    id: 122, subject: 'Physics',
-    text: 'Lenz\'s law is a consequence of:',
-    options: { A: 'Conservation of charge', B: 'Conservation of energy', C: 'Newton\'s third law', D: 'Coulomb\'s law' },
-    answer: 'B',
-    explanation: 'Lenz\'s law: induced current opposes change — if it didn\'t, energy would be created from nothing, violating energy conservation.',
-  },
-  {
-    id: 123, subject: 'Physics',
-    text: 'A wire of resistance 8 Ω is stretched to twice its length. Its new resistance is:',
-    options: { A: '16 Ω', B: '32 Ω', C: '4 Ω', D: '64 Ω' },
-    answer: 'B',
-    explanation: 'R = ρL/A. Doubling L halves A (volume constant). New R = ρ(2L)/(A/2) = 4R = 32 Ω.',
-  },
-  {
-    id: 124, subject: 'Physics',
-    text: 'Which of the following correctly states the condition for a body to be in equilibrium?',
-    options: { A: 'Net force is zero only', B: 'Net torque is zero only', C: 'Both net force and net torque are zero', D: 'The body must be stationary' },
-    answer: 'C',
-    explanation: 'Static equilibrium requires ΣF = 0 AND Στ = 0 (no net force and no net torque).',
-  },
-  {
-    id: 125, subject: 'Physics',
-    text: 'The escape velocity of an object from Earth\'s surface is approximately:',
-    options: { A: '7.9 km/s', B: '11.2 km/s', C: '3.0 km/s', D: '9.8 km/s' },
-    answer: 'B',
-    explanation: 'Escape velocity ≈ 11.2 km/s. 7.9 km/s is the orbital velocity at Earth\'s surface.',
-  },
+  { id: 9,
+    text: "Mitosis results in:",
+    options: { A:"Four haploid daughter cells", B:"Two genetically identical diploid daughter cells", C:"Cells with half the chromosome number", D:"Genetic recombination between chromosomes" },
+    answer: "B", subject: 'Biology',
+    explanation: "Mitosis = cell division for growth, repair and asexual reproduction. Produces 2 daughter cells genetically identical to the parent cell with the same chromosome number (diploid). Meiosis produces 4 haploid cells for sexual reproduction." },
 
-  /* ══════════════════════════════════════════════════════════════
-     CHEMISTRY  Q 126 – 160
-     ══════════════════════════════════════════════════════════════ */
-  {
-    id: 126, subject: 'Chemistry',
-    text: 'An element has atomic number 17 and mass number 35. How many neutrons does it have?',
-    options: { A: '17', B: '35', C: '52', D: '18' },
-    answer: 'D',
-    explanation: 'Neutrons = mass number − atomic number = 35 − 17 = 18.',
-  },
-  {
-    id: 127, subject: 'Chemistry',
-    text: 'Which of the following violates Hund\'s rule?',
-    options: { A: '↑↓ ↑ ↑ (2p⁴, pairing before filling)', B: '↑ ↑ ↑ (2p³, all unpaired)', C: '↑↓ ↑↓ (2p⁴ fully paired)', D: '↑ ↑ (2p², singly filled)' },
-    answer: 'A',
-    explanation: 'Hund\'s rule: each orbital is occupied singly before pairing begins. Pairing before all orbitals are singly filled violates it.',
-  },
-  {
-    id: 128, subject: 'Chemistry',
-    text: 'Electronegativity increases across a period because:',
-    options: { A: 'Shielding increases', B: 'Atomic radius increases', C: 'Nuclear charge increases and atomic radius decreases', D: 'Electron affinity decreases' },
-    answer: 'C',
-    explanation: 'More protons attract bonding electrons more strongly; smaller radius puts those electrons closer to the nucleus.',
-  },
-  {
-    id: 129, subject: 'Chemistry',
-    text: 'The shape of a BF₃ molecule is:',
-    options: { A: 'Tetrahedral', B: 'Linear', C: 'Trigonal pyramidal', D: 'Trigonal planar' },
-    answer: 'D',
-    explanation: 'BF₃ has 3 bonding pairs and no lone pairs on B → trigonal planar (120° bond angles).',
-  },
-  {
-    id: 130, subject: 'Chemistry',
-    text: 'The bond angle in water is approximately 104.5° rather than 109.5° because:',
-    options: { A: 'O is more electronegative than H', B: 'Lone pairs repel bonding pairs more than bonding pairs repel each other', C: 'Water is a polar molecule', D: 'Hydrogen bonding reduces the angle' },
-    answer: 'B',
-    explanation: 'VSEPR: lone pair–lone pair > lone pair–bond pair > bond pair–bond pair repulsion compresses the H-O-H angle.',
-  },
-  {
-    id: 131, subject: 'Chemistry',
-    text: 'The molar mass of H₂SO₄ is (H=1, S=32, O=16):',
-    options: { A: '49 g/mol', B: '98 g/mol', C: '64 g/mol', D: '80 g/mol' },
-    answer: 'B',
-    explanation: '2(1) + 32 + 4(16) = 2 + 32 + 64 = 98 g/mol.',
-  },
-  {
-    id: 132, subject: 'Chemistry',
-    text: 'How many moles of atoms are in 24 g of carbon (Ar = 12)?',
-    options: { A: '1', B: '12', C: '2', D: '0.5' },
-    answer: 'C',
-    explanation: 'Moles = mass/Ar = 24/12 = 2 mol.',
-  },
-  {
-    id: 133, subject: 'Chemistry',
-    text: 'pH of a solution is defined as:',
-    options: { A: 'log[H⁺]', B: '−log[OH⁻]', C: '−log[H⁺]', D: 'log[OH⁻]' },
-    answer: 'C',
-    explanation: 'pH = −log₁₀[H⁺]. A higher [H⁺] gives a lower pH.',
-  },
-  {
-    id: 134, subject: 'Chemistry',
-    text: 'The pH of a 0.001 M HCl solution is:',
-    options: { A: '1', B: '2', C: '3', D: '11' },
-    answer: 'C',
-    explanation: 'pH = −log(10⁻³) = 3.',
-  },
-  {
-    id: 135, subject: 'Chemistry',
-    text: 'In a strong acid–strong base titration, the indicator of choice is:',
-    options: { A: 'Starch', B: 'Methyl orange or phenolphthalein (both work)', C: 'Litmus only', D: 'Neither works' },
-    answer: 'B',
-    explanation: 'Equivalence point is at pH 7; both methyl orange and phenolphthalein change colour close enough to pH 7 to be used.',
-  },
-  {
-    id: 136, subject: 'Chemistry',
-    text: 'The Contact process produces:',
-    options: { A: 'Nitric acid', B: 'Ammonia', C: 'Hydrochloric acid', D: 'Sulphuric acid' },
-    answer: 'D',
-    explanation: 'Contact process: SO₂ + ½O₂ → SO₃ (V₂O₅ catalyst) → H₂SO₄.',
-  },
-  {
-    id: 137, subject: 'Chemistry',
-    text: 'The Haber process produces ammonia. The conditions used are:',
-    options: { A: 'Low pressure, high temperature, Pt catalyst', B: 'High pressure (~200 atm), ~450°C, Fe catalyst', C: 'High pressure, low temperature, V₂O₅ catalyst', D: 'Room temperature and pressure, Fe catalyst' },
-    answer: 'B',
-    explanation: 'N₂ + 3H₂ ⇌ 2NH₃. High pressure and moderate temperature (450°C) with iron catalyst optimise yield and rate.',
-  },
-  {
-    id: 138, subject: 'Chemistry',
-    text: 'Le Chatelier\'s principle states that a system at equilibrium, when disturbed, will:',
-    options: { A: 'Always shift to the right', B: 'Shift to counteract the disturbance', C: 'Reach a new equilibrium at higher temperature', D: 'Stop reacting' },
-    answer: 'B',
-    explanation: 'The system shifts in the direction that opposes or reduces the applied change.',
-  },
-  {
-    id: 139, subject: 'Chemistry',
-    text: 'For the reaction 2SO₂ + O₂ ⇌ 2SO₃, increasing pressure will:',
-    options: { A: 'Shift equilibrium left', B: 'Have no effect', C: 'Shift equilibrium right (fewer moles of gas)', D: 'Increase Kc' },
-    answer: 'C',
-    explanation: 'Left side: 3 moles gas; right side: 2 moles gas. Higher pressure favours fewer moles → shifts right.',
-  },
-  {
-    id: 140, subject: 'Chemistry',
-    text: 'Which of the following is the correct definition of oxidation in terms of electrons?',
-    options: { A: 'Gain of electrons', B: 'Loss of protons', C: 'Gain of protons', D: 'Loss of electrons' },
-    answer: 'D',
-    explanation: 'OIL RIG: Oxidation Is Loss (of electrons), Reduction Is Gain.',
-  },
-  {
-    id: 141, subject: 'Chemistry',
-    text: 'The oxidation state of Mn in KMnO₄ is:',
-    options: { A: '+4', B: '+6', C: '+7', D: '+5' },
-    answer: 'C',
-    explanation: 'K(+1) + Mn + 4O(−2) = 0 → 1 + Mn − 8 = 0 → Mn = +7.',
-  },
-  {
-    id: 142, subject: 'Chemistry',
-    text: 'In electrolysis of brine (NaCl solution), what is produced at the cathode?',
-    options: { A: 'Chlorine gas', B: 'Oxygen gas', C: 'Sodium metal', D: 'Hydrogen gas' },
-    answer: 'D',
-    explanation: 'Cathode (negative): H⁺ ions are preferentially discharged → H₂ gas. Na⁺ is not discharged in aqueous solution.',
-  },
-  {
-    id: 143, subject: 'Chemistry',
-    text: 'Which of these is a homologous series?',
-    options: { A: 'CH₄, C₂H₄, C₃H₆', B: 'CH₄, C₂H₆, C₃H₈', C: 'CH₄, C₂H₂, C₃H₄', D: 'C₂H₆, C₃H₄, C₄H₈' },
-    answer: 'B',
-    explanation: 'Alkanes (CₙH₂ₙ₊₂): CH₄, C₂H₆, C₃H₈ — each member differs by CH₂.',
-  },
-  {
-    id: 144, subject: 'Chemistry',
-    text: 'The functional group −COOH is characteristic of:',
-    options: { A: 'Aldehydes', B: 'Carboxylic acids', C: 'Ketones', D: 'Esters' },
-    answer: 'B',
-    explanation: '−COOH is the carboxyl group, defining carboxylic acids.',
-  },
-  {
-    id: 145, subject: 'Chemistry',
-    text: 'What type of reaction is: C₂H₄ + H₂ → C₂H₆?',
-    options: { A: 'Substitution', B: 'Elimination', C: 'Addition', D: 'Condensation' },
-    answer: 'C',
-    explanation: 'Two molecules add across the double bond to form one product — an addition reaction.',
-  },
-  {
-    id: 146, subject: 'Chemistry',
-    text: 'Saponification is the alkaline hydrolysis of:',
-    options: { A: 'Alcohols', B: 'Esters (fats/oils)', C: 'Aldehydes', D: 'Amines' },
-    answer: 'B',
-    explanation: 'Ester + NaOH → sodium carboxylate (soap) + alcohol. This is how soap is made.',
-  },
-  {
-    id: 147, subject: 'Chemistry',
-    text: 'Which of the following gases turns limewater milky?',
-    options: { A: 'O₂', B: 'H₂', C: 'SO₂', D: 'CO₂' },
-    answer: 'D',
-    explanation: 'CO₂ + Ca(OH)₂ → CaCO₃ (white precipitate) + H₂O. This is the standard CO₂ test.',
-  },
-  {
-    id: 148, subject: 'Chemistry',
-    text: 'The empirical formula of a compound is CH₂O and its molar mass is 180 g/mol. Its molecular formula is:',
-    options: { A: 'C₃H₆O₃', B: 'C₄H₈O₄', C: 'C₆H₁₂O₆', D: 'C₂H₄O₂' },
-    answer: 'C',
-    explanation: 'Empirical mass CH₂O = 30. 180/30 = 6. Molecular formula = (CH₂O)₆ = C₆H₁₂O₆ (glucose).',
-  },
-  {
-    id: 149, subject: 'Chemistry',
-    text: 'Which allotrope of carbon conducts electricity?',
-    options: { A: 'Diamond', B: 'Graphite', C: 'Buckminsterfullerene', D: 'Charcoal' },
-    answer: 'B',
-    explanation: 'Graphite has delocalised π electrons between layers → electrical conductor. Diamond has no free electrons.',
-  },
-  {
-    id: 150, subject: 'Chemistry',
-    text: 'A reaction has ΔH = −200 kJ/mol and ΔS = −100 J/mol·K. At what temperature does it become non-spontaneous?',
-    options: { A: '200 K', B: '1000 K', C: '2000 K', D: '500 K' },
-    answer: 'C',
-    explanation: 'ΔG = ΔH − TΔS = 0 at boundary. T = ΔH/ΔS = 200000/100 = 2000 K. Above 2000 K, ΔG > 0.',
-  },
-  {
-    id: 151, subject: 'Chemistry',
-    text: 'Which of the following is a buffer solution?',
-    options: { A: 'NaCl + HCl', B: 'NaOH + HCl (excess NaOH)', C: 'CH₃COOH + CH₃COONa', D: 'HCl + NaCl' },
-    answer: 'C',
-    explanation: 'A buffer contains a weak acid and its conjugate base (or weak base + conjugate acid). CH₃COOH/CH₃COO⁻ is the classic example.',
-  },
-  {
-    id: 152, subject: 'Chemistry',
-    text: 'The rate of a reaction generally increases with temperature because:',
-    options: { A: 'Pressure increases', B: 'More molecules have energy ≥ activation energy', C: 'The activation energy increases', D: 'Catalysts form spontaneously' },
-    answer: 'B',
-    explanation: 'Higher temperature → more molecules exceed Eₐ (Maxwell-Boltzmann) → more successful collisions per unit time.',
-  },
-  {
-    id: 153, subject: 'Chemistry',
-    text: 'In the reaction A + B → C, if doubling [A] quadruples the rate and doubling [B] doubles the rate, the overall order is:',
-    options: { A: '2', B: '3', C: '4', D: '1' },
-    answer: 'B',
-    explanation: 'Order in A = 2 (rate ∝ [A]²); order in B = 1. Overall order = 2 + 1 = 3.',
-  },
-  {
-    id: 154, subject: 'Chemistry',
-    text: 'Elements in the same group of the periodic table have the same:',
-    options: { A: 'Atomic mass', B: 'Number of neutrons', C: 'Number of valence electrons', D: 'Number of electron shells' },
-    answer: 'C',
-    explanation: 'Same group = same valence electron count = similar chemical properties.',
-  },
-  {
-    id: 155, subject: 'Chemistry',
-    text: 'Which gas is used in the manufacture of margarine?',
-    options: { A: 'Oxygen', B: 'Nitrogen', C: 'Hydrogen', D: 'Chlorine' },
-    answer: 'C',
-    explanation: 'Vegetable oils are hardened by catalytic hydrogenation (adding H₂ across C=C double bonds) to make margarine.',
-  },
-  {
-    id: 156, subject: 'Chemistry',
-    text: 'The process of converting glucose to ethanol by yeast is called:',
-    options: { A: 'Hydrolysis', B: 'Fermentation', C: 'Esterification', D: 'Oxidation' },
-    answer: 'B',
-    explanation: 'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ (anaerobic fermentation by yeast enzymes).',
-  },
-  {
-    id: 157, subject: 'Chemistry',
-    text: 'Which of the following is NOT a property of transition metals?',
-    options: { A: 'Variable oxidation states', B: 'Form coloured compounds', C: 'All are liquids at room temperature', D: 'Act as catalysts' },
-    answer: 'C',
-    explanation: 'Only mercury (Hg) is liquid at room temperature among transition metals. The rest are solids.',
-  },
-  {
-    id: 158, subject: 'Chemistry',
-    text: 'The gas law PV/T = constant applies when:',
-    options: { A: 'Only pressure changes', B: 'All three variables change but amount is fixed', C: 'Temperature is constant', D: 'Pressure is constant' },
-    answer: 'B',
-    explanation: 'Combined gas law: P₁V₁/T₁ = P₂V₂/T₂ for a fixed amount of gas with all three variables changing.',
-  },
-  {
-    id: 159, subject: 'Chemistry',
-    text: 'Nylon is an example of:',
-    options: { A: 'Addition polymer', B: 'Natural polymer', C: 'Condensation polymer', D: 'Cross-linked polymer' },
-    answer: 'C',
-    explanation: 'Nylon forms by condensation (loss of water) between diamines and diacids — a condensation polymer.',
-  },
-  {
-    id: 160, subject: 'Chemistry',
-    text: 'Which of the following is used to test for the presence of starch?',
-    options: { A: 'Benedict\'s solution', B: 'Iodine solution', C: 'Fehling\'s solution', D: 'Biuret reagent' },
-    answer: 'B',
-    explanation: 'Iodine solution turns blue-black in the presence of starch. Benedict\'s and Fehling\'s test for reducing sugars.',
-  },
+  { id: 10,
+    text: "Meiosis is described as a reduction division because:",
+    options: { A:"It reduces the size of the cell", B:"The chromosome number is halved — diploid (2n) parent cells produce haploid (n) gametes", C:"It reduces the amount of DNA in each cell to zero", D:"It occurs only in reduced light" },
+    answer: "B", subject: 'Biology',
+    explanation: "Meiosis I separates homologous chromosome pairs, halving the chromosome number. Human body cells are diploid (2n=46); gametes are haploid (n=23). Fertilisation restores the diploid number." },
+
+  { id: 11,
+    text: "According to Mendel's Law of Segregation:",
+    options: { A:"Genes on different chromosomes assort independently", B:"Each individual carries two alleles for each trait; these separate during gamete formation so each gamete carries only one allele", C:"Dominant alleles always suppress recessive alleles", D:"Traits blend together in offspring" },
+    answer: "B", subject: 'Biology',
+    explanation: "Mendel's First Law: allele pairs separate (segregate) during gamete formation. Each gamete receives one allele of each pair. At fertilisation, offspring receive one allele from each parent — restoring the pair." },
+
+  { id: 12,
+    text: "In a monohybrid cross between two heterozygous tall plants (Tt × Tt), the expected phenotypic ratio of offspring is:",
+    options: { A:"1 tall : 1 short", B:"3 tall : 1 short", C:"1 : 2 : 1", D:"All tall" },
+    answer: "B", subject: 'Biology',
+    explanation: "Tt × Tt → TT : 2Tt : tt (genotypic ratio 1:2:1). Since T (tall) is dominant, TT and Tt are both tall. Phenotypic ratio = 3 tall : 1 short. This is Mendel's classic monohybrid result." },
+
+  { id: 13,
+    text: "A man with blood group AB and a woman with blood group O have children. The possible blood groups of the children are:",
+    options: { A:"AB and O only", B:"A and B only", C:"A, B, AB and O", D:"O only" },
+    answer: "B", subject: 'Biology',
+    explanation: "AB (I^A I^B) × OO (ii): gametes from AB are I^A or I^B; gametes from O are all i. Offspring: I^A i (blood group A) or I^B i (blood group B). Only A and B are possible — no AB or O offspring." },
+
+  { id: 14,
+    text: "Sickle cell anaemia is caused by a mutation that results in:",
+    options: { A:"An extra chromosome 21", B:"Substitution of one amino acid (valine for glutamic acid) in the beta-globin chain of haemoglobin", C:"Deletion of the entire haemoglobin gene", D:"A sex-linked recessive mutation on the X chromosome" },
+    answer: "B", subject: 'Biology',
+    explanation: "A single nucleotide substitution (GAG → GTG) causes valine to replace glutamic acid at position 6 of the β-globin chain. The resulting HbS polymerises under low O₂ conditions, distorting red blood cells into a sickle shape." },
+
+  { id: 15,
+    text: "The condition in which an organism has one extra chromosome (2n+1) is called:",
+    options: { A:"Polyploidy", B:"Trisomy", C:"Monosomy", D:"Haploidy" },
+    answer: "B", subject: 'Biology',
+    explanation: "Trisomy = 2n+1 (e.g. Down syndrome = trisomy 21, three copies of chromosome 21). Monosomy = 2n−1. Polyploidy = multiple complete sets of chromosomes. These arise from non-disjunction during meiosis." },
+
+  { id: 16,
+    text: "Which of the following is the correct sequence of the nitrogen cycle?",
+    options: { A:"Nitrogen fixation → nitrification → denitrification → assimilation", B:"Nitrogen fixation → assimilation → ammonification → nitrification → denitrification", C:"Denitrification → nitrification → fixation → assimilation", D:"Ammonification → fixation → nitrification → assimilation" },
+    answer: "B", subject: 'Biology',
+    explanation: "N₂ fixation (Rhizobium) → NH₃/NH₄⁺ assimilation into plant proteins → animals eat plants → death/excretion → ammonification (NH₃) → nitrification (Nitrosomonas: NH₃→NO₂⁻; Nitrobacter: NO₂⁻→NO₃⁻) → denitrification (N₂ back to atmosphere)." },
+
+  { id: 17,
+    text: "In a food chain, the organisms that obtain energy directly from the sun are called:",
+    options: { A:"Primary consumers", B:"Secondary consumers", C:"Producers (autotrophs)", D:"Decomposers" },
+    answer: "C", subject: 'Biology',
+    explanation: "Producers (green plants, algae, cyanobacteria) are autotrophs — they fix solar energy via photosynthesis. Primary consumers (herbivores) eat producers. Energy flows: Producer → Primary consumer → Secondary consumer → Tertiary consumer." },
+
+  { id: 18,
+    text: "The 10% rule in ecology states that:",
+    options: { A:"Only 10% of species survive in any ecosystem", B:"Only about 10% of energy is transferred from one trophic level to the next", C:"Decomposers recycle 10% of all nutrients", D:"Producers use 10% of solar energy" },
+    answer: "B", subject: 'Biology',
+    explanation: "Approximately 90% of energy is lost at each trophic level (as heat, waste, respiration). Only ~10% is available to the next level. This explains why food chains are short (usually 4–5 levels) and why fewer large predators exist than prey." },
+
+  { id: 19,
+    text: "Which of the following is an example of a biotic factor in an ecosystem?",
+    options: { A:"Temperature", B:"Rainfall", C:"Predation", D:"Soil pH" },
+    answer: "C", subject: 'Biology',
+    explanation: "Biotic factors = living components of an ecosystem: predation, competition, parasitism, disease, food availability. Abiotic factors = non-living: temperature, light, water, pH, wind, soil type." },
+
+  { id: 20,
+    text: "The process by which nutrients are returned to the soil from dead organisms is called:",
+    options: { A:"Photosynthesis", B:"Decomposition", C:"Transpiration", D:"Nitrification" },
+    answer: "B", subject: 'Biology',
+    explanation: "Decomposers (bacteria and fungi) break down dead organic matter, releasing nutrients (nitrogen, phosphorus, carbon) back into the soil and atmosphere. Without decomposition, nutrients would remain locked in dead organisms." },
+
+  { id: 21,
+    text: "The human digestive enzyme that begins protein digestion in the stomach is:",
+    options: { A:"Amylase", B:"Lipase", C:"Pepsin", D:"Trypsin" },
+    answer: "C", subject: 'Biology',
+    explanation: "Pepsin (activated from pepsinogen by HCl) is the protease of the stomach. It works optimally at pH 2. Amylase digests starch; lipase digests fats. Trypsin is the pancreatic protease active in the small intestine." },
+
+  { id: 22,
+    text: "Bile is produced by the liver and stored in the gall bladder. Its main digestive function is to:",
+    options: { A:"Chemically digest fats", B:"Emulsify fats — breaking large fat droplets into smaller ones to increase surface area for lipase action", C:"Neutralise stomach acid only", D:"Digest proteins in the duodenum" },
+    answer: "B", subject: 'Biology',
+    explanation: "Bile salts emulsify (physically break up) large fat globules into tiny droplets, dramatically increasing surface area for lipase enzymes. Bile also neutralises stomach acid in the duodenum (alkaline pH optimal for intestinal enzymes)." },
+
+  { id: 23,
+    text: "In humans, gaseous exchange occurs in the:",
+    options: { A:"Trachea", B:"Bronchi", C:"Alveoli", D:"Diaphragm" },
+    answer: "C", subject: 'Biology',
+    explanation: "Alveoli are tiny air sacs in the lungs with walls one cell thick, rich blood supply and moist surfaces — ideal for diffusion of O₂ into blood and CO₂ out. Surface area of human lungs ≈ 70 m²." },
+
+  { id: 24,
+    text: "The transport of water from roots to leaves in plants occurs through the:",
+    options: { A:"Phloem", B:"Xylem", C:"Cortex", D:"Epidermis" },
+    answer: "B", subject: 'Biology',
+    explanation: "Xylem transports water and dissolved mineral salts from roots upward via transpiration pull (cohesion-tension mechanism). Phloem transports organic solutes (sucrose, amino acids) bidirectionally from source to sink." },
+
+  { id: 25,
+    text: "Transpiration is defined as the loss of water vapour from plants, mainly through the:",
+    options: { A:"Roots", B:"Stomata of leaves", C:"Lenticels of stems only", D:"Xylem vessels" },
+    answer: "B", subject: 'Biology',
+    explanation: "~90% of transpiration occurs through stomata (leaf pores). Guard cells control stomatal opening. Transpiration creates the tension that pulls water up through xylem (transpiration stream). Factors: temperature, humidity, wind, light." },
+
+  { id: 26,
+    text: "Which of the following hormones is responsible for the 'fight or flight' response?",
+    options: { A:"Insulin", B:"Oestrogen", C:"Adrenaline (epinephrine)", D:"Thyroxine" },
+    answer: "C", subject: 'Biology',
+    explanation: "Adrenaline (from adrenal medulla) prepares the body for emergency: increases heart rate, dilates pupils, raises blood glucose (glycogen → glucose), diverts blood to muscles. It is released in response to stress, fear or excitement." },
+
+  { id: 27,
+    text: "The hormone responsible for regulating blood glucose levels by promoting its uptake into cells is:",
+    options: { A:"Glucagon", B:"Adrenaline", C:"Insulin", D:"Thyroxine" },
+    answer: "C", subject: 'Biology',
+    explanation: "Insulin (from beta cells of islets of Langerhans in the pancreas) lowers blood glucose: promotes glucose uptake by cells and conversion to glycogen (glycogenesis). Glucagon raises blood glucose (glycogenolysis). Deficiency → diabetes mellitus." },
+
+  { id: 28,
+    text: "Darwin's theory of natural selection proposes that:",
+    options: { A:"Organisms evolve through use and disuse of body parts", B:"Organisms with heritable traits better suited to their environment survive and reproduce more, passing those traits to offspring", C:"Evolution is directed by a conscious force", D:"All members of a species are equally likely to survive" },
+    answer: "B", subject: 'Biology',
+    explanation: "Darwin's mechanism: variation exists in populations; heritable variation affects survival/reproduction; organisms with favourable variants survive and reproduce more (differential reproduction); favourable traits increase in frequency over generations." },
+
+  { id: 29,
+    text: "Which of the following provides EVIDENCE for evolution?",
+    options: { A:"The existence of the Bible", B:"Fossil records, comparative anatomy (homologous structures), comparative embryology and molecular biology (DNA similarities)", C:"The fact that species look different", D:"The existence of extinction only" },
+    answer: "B", subject: 'Biology',
+    explanation: "Evidence for evolution: fossils (transitional forms); homologous structures (same ancestry, different function — e.g. human arm, whale flipper, bat wing); analogous structures; comparative embryology; molecular biology (DNA/protein similarity reflects evolutionary distance)." },
+
+  { id: 30,
+    text: "In the five-kingdom classification system, fungi are placed in their own kingdom because:",
+    options: { A:"They are photosynthetic", B:"They are heterotrophic, have cell walls made of chitin, and reproduce by spores — distinct from plants and animals", C:"They are unicellular only", D:"They perform nitrogen fixation" },
+    answer: "B", subject: 'Biology',
+    explanation: "Fungi are: heterotrophic (absorptive nutrition — secrete enzymes, absorb digested products), cell walls of chitin (not cellulose), reproduce sexually and asexually by spores, mostly multicellular (except yeasts). Distinct from Plantae, Animalia, Protista, Monera." },
+
+  { id: 31,
+    text: "Bacteria are classified in the kingdom Monera because they are:",
+    options: { A:"Multicellular and have a nucleus", B:"Prokaryotic — lacking a membrane-bound nucleus and membrane-bound organelles", C:"Photosynthetic only", D:"Parasitic only" },
+    answer: "B", subject: 'Biology',
+    explanation: "Prokaryotes (Monera: bacteria and cyanobacteria) lack: nuclear membrane, mitochondria, ER, Golgi apparatus. They have: circular DNA, 70S ribosomes, cell wall (peptidoglycan). Eukaryotes (all other kingdoms) have membrane-bound nuclei and organelles." },
+
+  { id: 32,
+    text: "The immune system produces antibodies in response to:",
+    options: { A:"Nutrients in food", B:"Antigens — foreign substances (e.g. on pathogens) that trigger an immune response", C:"Body temperature changes", D:"Hormone signals only" },
+    answer: "B", subject: 'Biology',
+    explanation: "Antigens (proteins/polysaccharides on pathogens) are recognised by B-lymphocytes. B-cells differentiate into plasma cells producing specific antibodies (immunoglobulins) that bind and neutralise the antigen. Memory B-cells provide long-term immunity." },
+
+  { id: 33,
+    text: "Vaccination provides immunity by:",
+    options: { A:"Killing all pathogens in the body immediately", B:"Introducing antigens (killed/weakened pathogens or their components) to stimulate the immune system to produce memory cells without causing disease", C:"Providing ready-made antibodies directly", D:"Strengthening the skin barrier" },
+    answer: "B", subject: 'Biology',
+    explanation: "Vaccines contain antigens that stimulate primary immune response and memory cell formation. On future exposure to the real pathogen, memory cells enable a rapid secondary response — neutralising the pathogen before illness develops." },
+
+  { id: 34,
+    text: "Which of the following is a correct statement about DNA structure?",
+    options: { A:"DNA is single-stranded with uracil as a base", B:"DNA is a double helix with complementary base pairing: A–T and G–C", C:"DNA contains ribose sugar", D:"DNA bases pair as A–G and T–C" },
+    answer: "B", subject: 'Biology',
+    explanation: "Watson and Crick (1953): DNA is a double helix. Bases pair specifically: Adenine–Thymine (2 hydrogen bonds) and Guanine–Cytosine (3 hydrogen bonds). The sugar is deoxyribose. RNA is single-stranded and uses uracil instead of thymine." },
+
+  { id: 35,
+    text: "The process by which genetic information in DNA is used to produce a protein is summarised as:",
+    options: { A:"Replication → translation → transcription", B:"Transcription (DNA → mRNA) → translation (mRNA → protein)", C:"Translation (DNA → protein) → transcription", D:"Replication → transcription → replication" },
+    answer: "B", subject: 'Biology',
+    explanation: "The central dogma of molecular biology: DNA → (transcription) → mRNA → (translation) → protein. Transcription occurs in the nucleus; translation occurs at ribosomes in the cytoplasm. tRNA brings amino acids; codons on mRNA specify each amino acid." }
+
+  /* ══════════════════════════════════════════════════
+     ENGLISH — 55 QUESTIONS
+  ══════════════════════════════════════════════════ */
+
+{ id: 36, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Read Passage A. The phrase 'carrying the world on his shoulders' is an example of:",
+    options: { A:"Simile", B:"Personification", C:"Hyperbole / idiom", D:"Alliteration" },
+    answer: "C", subject: 'English',
+    explanation: "This is a hyperbolic idiom — an exaggeration expressing extreme emotional weight. It is not a simile (no 'like'/'as') and not personification (no human qualities given to a non-human object)." },
+
+{ id: 37, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Why does the narrator list Bepo's qualities before describing his breakdown?",
+    options: { A:"To fulfil a grammar requirement", B:"To make the reader dislike Bepo", C:"To establish the contrast that makes his breakdown so shocking", D:"To show off the author's writing skill" },
+    answer: "C", subject: 'English',
+    explanation: "This is juxtaposition. By first building a vivid picture of Bepo's normal strength, the author makes his collapse far more emotionally powerful — the greater the height, the greater the fall." },
+
+{ id: 38, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The sentence structure 'He opened his mouth. He closed it. He tried again.' mimics:",
+    options: { A:"A list of historical events", B:"The halting, struggling rhythm of Bepo's failed attempts to speak", C:"The author's desire to save space", D:"A grammatical error" },
+    answer: "B", subject: 'English',
+    explanation: "Short staccato sentences reproduce the stop-start of someone trying and failing to speak. The form enacts the content — broken sentences mirror broken composure." },
+
+{ id: 39, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Mrs. Apeh's voice was calm 'though her eyes were not'. This detail suggests she:",
+    options: { A:"Disliked Bepo", B:"Was maintaining professional control while genuinely alarmed", C:"Had planned the incident", D:"Was acting in a school play" },
+    answer: "B", subject: 'English',
+    explanation: "External composure versus internal distress — this shows Mrs. Apeh as a professional who prioritises the school's calm over personal expression. It signals to the reader that the situation is genuinely serious." },
+
+{ id: 40, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The phrase 'the stage he had commanded' uses the word 'commanded' as a:",
+    options: { A:"Literal military term", B:"Metaphor elevating Bepo's leadership to the authority of a general or ruler", C:"Simile comparing Bepo to a soldier", D:"Onomatopoeia" },
+    answer: "B", subject: 'English',
+    explanation: "'Commanded' applies military language to a school assembly stage. This metaphor elevates Bepo's status while making his removal more poignant — a commander being led from his own stage." },
+
+{ id: 41, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The opening of Lekki Headmaster begins with a crisis rather than background information. This narrative technique is called:",
+    options: { A:"Flashback", B:"In medias res — beginning in the middle of dramatic action", C:"Foreshadowing", D:"Exposition" },
+    answer: "B", subject: 'English',
+    explanation: "'In medias res' (Latin: into the middle of things) is beginning a narrative with action already underway. Garba opens with the crisis to hook the reader before explaining its cause." },
+
+{ id: 42, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "Which of the following best describes the mood of Passage A?",
+    options: { A:"Joyful and celebratory", B:"Tense, sombre and unsettling", C:"Angry and confrontational", D:"Peaceful and nostalgic" },
+    answer: "B", subject: 'English',
+    explanation: "Vocabulary such as 'silence', 'shock', 'unwell', 'eyes were not calm' builds a tense and sombre atmosphere. The unusual event of a strong leader weeping publicly creates psychological unease." },
+
+{ id: 43, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The word 'collective' in 'the collective shock of Stardom Schools' most nearly means:",
+    options: { A:"Individually", B:"Shared by the entire group", C:"Gradually building", D:"Historically significant" },
+    answer: "B", subject: 'English',
+    explanation: "'Collective' means belonging to or shared by all members of a group. 'Collective shock' = the shock was felt by everyone present, not just one person." },
+
+{ id: 44, passage: PA, passageTitle: "Lekki Headmaster — Passage A",
+    text: "The best title for Passage A would be:",
+    options: { A:"A Normal Morning at Stardom Schools", B:"The Day the Principal Wept", C:"Mrs. Apeh Takes Charge", D:"The Students' Assembly" },
+    answer: "B", subject: 'English',
+    explanation: "The passage centres entirely on Bepo's unexpected emotional breakdown and its effect on the school. 'The Day the Principal Wept' captures the central dramatic event and its significance." },
+
+{ id: 45, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "Read Passage B. Mr. Dada 'tapped the table with each syllable' while reciting the salary figure. This action conveys:",
+    options: { A:"That he was nervous", B:"Rhetorical emphasis — his body language reinforcing a financial argument", C:"That he was angry at Bepo personally", D:"That he was bored with the conversation" },
+    answer: "B", subject: 'English',
+    explanation: "Tapping each syllable is a physical performance of persuasion. Mr. Dada is making a financial argument and uses gesture to give weight to every single number — a technique of emphasis." },
+
+{ id: 46, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "Bepo's thought that his salary had been 'converted into loyalty, legacy, the satisfaction of knowing each student's name' uses the word 'converted' as:",
+    options: { A:"A financial metaphor — reframing his salary as currency exchanged for intangible wealth", B:"A simile comparing money to loyalty", C:"Personification of loyalty", D:"Hyperbole about his memory" },
+    answer: "A", subject: 'English',
+    explanation: "Garba uses financial vocabulary ('converted') deliberately. Bepo's 'exchange rate' trades money for meaning, critiquing the assumption that financial conversion is the only valid kind." },
+
+{ id: 47, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The phrase 'spoke of the exchange rate with the reverence of men reciting scripture' is a:",
+    options: { A:"Metaphor", B:"Simile comparing financial worship to religious devotion", C:"Alliteration", D:"Onomatopoeia" },
+    answer: "B", subject: 'English',
+    explanation: "This is a simile (using 'with the reverence of'). It compares the colleagues' attitude to money to religious devotion, satirising the 'Japa' mentality that elevates financial migration to almost sacred status." },
+
+{ id: 48, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "Mr. Dada uses the word 'sentiment' dismissively. He implies that sentiment is:",
+    options: { A:"Admirable and worth preserving", B:"Irrational and inferior to financial logic", C:"A technical economic term", D:"A compliment to Bepo's loyalty" },
+    answer: "B", subject: 'English',
+    explanation: "Mr. Dada uses 'sentiment' disparagingly — as if emotional attachment is a weakness. This sets up the novel's central tension: is loyalty irrational, or a different and equally valid kind of wisdom?" },
+
+{ id: 49, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The narrative perspective of Passage B is best described as:",
+    options: { A:"First-person narrator", B:"Third-person limited — external events narrated but Bepo's inner thoughts accessible", C:"Second-person narration", D:"Omniscient narrator with no character viewpoints" },
+    answer: "B", subject: 'English',
+    explanation: "The passage says 'He did not say what he was thinking' — third-person narration with access to Bepo's interior. This is third-person limited — the dominant mode for character-centred literary fiction." },
+
+{ id: 50, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The phrase 'Twenty-three years' standing as its own sentence reinforces:",
+    options: { A:"That Bepo is very old", B:"The enormous weight of time and investment Bepo has made in Stardom", C:"That the school is old", D:"The length of Lagos traffic jams" },
+    answer: "B", subject: 'English',
+    explanation: "A number given its own sentence (rhetorical isolation) forces the reader to feel its weight. Twenty-three years is not just a fact — it is the bedrock of Bepo's entire adult professional identity." },
+
+{ id: 51, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The main idea of Passage B is that:",
+    options: { A:"Teachers in Nigeria are poorly paid", B:"Bepo is being persuaded to leave by colleagues who measure value only in financial terms, though he measures it differently", C:"Mr. Dada is Bepo's enemy", D:"Seri forced Bepo to emigrate" },
+    answer: "B", subject: 'English',
+    explanation: "The passage dramatises the collision between two value systems — the colleagues' financial calculus and Bepo's intangible investments (loyalty, legacy, identity). The central tension is the novel's theme." },
+
+{ id: 52, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The word 'enticement' (Chapter 2 title) most nearly means:",
+    options: { A:"Punishment", B:"A formal invitation", C:"A temptation drawing someone toward something", D:"A warning" },
+    answer: "C", subject: 'English',
+    explanation: "'Enticement' = the act of attracting or tempting. The chapter title frames the UK opportunity as a temptation — something that pulls at Bepo but carries the implication of danger." },
+
+{ id: 53, passage: PB, passageTitle: "Lekki Headmaster — Passage B",
+    text: "The phrase 'something in him refused to call it sensible' implies that Bepo:",
+    options: { A:"Is irrational and needs help", B:"Has a deep instinctive attachment to Stardom that defies purely rational analysis", C:"Does not understand the financial figures", D:"Is afraid of flying to the UK" },
+    answer: "B", subject: 'English',
+    explanation: "The word 'something' is deliberately vague — Garba signals that Bepo's attachment cannot be fully articulated. It is instinctive, pre-rational, and more powerful for being beyond the exchange-rate argument." },
+
+{ id: 54,
+    text: "The 'Japa syndrome' as depicted in 'Lekki Headmaster' refers to:",
+    options: { A:"A tropical disease affecting teachers", B:"The mass emigration of Nigerian professionals seeking better opportunities abroad", C:"A Lagos street slang for laziness", D:"The preference for Japanese electronics" },
+    answer: "B", subject: 'English',
+    explanation: "'Japa' is Yoruba slang meaning 'to flee'. The 'Japa syndrome' describes the wave of skilled Nigerians emigrating to the UK, USA and Canada — the novel dramatises this through Bepo and colleagues." },
+
+{ id: 55,
+    text: "At the end of 'Lekki Headmaster', Bepo:",
+    options: { A:"Successfully settles in the UK", B:"Retires from education entirely", C:"Returns to Stardom Schools, declaring his purpose remains there", D:"Dies before making a decision" },
+    answer: "C", subject: 'English',
+    explanation: "Bepo boards the plane but turns back, returning to Stardom Schools. This resolution affirms the novel's central argument: vocation and belonging are stronger forces than financial logic." },
+
+{ id: 56,
+    text: "The Managing Director of Stardom Schools in 'Lekki Headmaster' is:",
+    options: { A:"Mrs. Grace Apeh", B:"Mrs. Ibidun Gloss", C:"Seri Adewale", D:"Mrs. Ogunwale" },
+    answer: "B", subject: 'English',
+    explanation: "Mrs. Ibidun Gloss is the MD — a strong administrator who deeply values Bepo's contributions. Her wit and emotional response to Bepo's departure humanise the institutional side of the story." },
+
+{ id: 57,
+    text: "The character Jide in 'Lekki Headmaster' is:",
+    options: { A:"Bepo's son", B:"The landlord's grandson, mentored by Bepo", C:"A former student turned colleague", D:"Bepo's younger brother" },
+    answer: "B", subject: 'English',
+    explanation: "Jide is the grandson of Bepo's landlord (Mr. Ogunwale) and a product of Bepo's mentorship. His devastation at Bepo's planned departure illustrates the human cost of brain drain." },
+
+{ id: 58,
+    text: "The idiom 'a snake in the roof' as used in Chapter 5 of 'Lekki Headmaster' means:",
+    options: { A:"A literal snake in the building", B:"A dangerous problem ignored within an organisation that will eventually cause harm", C:"A government spy", D:"Bepo's difficult personality" },
+    answer: "B", subject: 'English',
+    explanation: "Chief Mrs. Bayo uses this idiom to warn that the cooperative fund situation is a hidden threat. Like a snake in a roof, it is dangerous and will cause harm if not addressed." },
+
+{ id: 59,
+    text: "The prefect election conflict in Chapter 8 escalates because Banky:",
+    options: { A:"Cheats by bribing voters", B:"Publicly references Tosh's father's past imprisonment during a school speech", C:"Is caught stealing cooperative funds", D:"Assaults Tosh physically" },
+    answer: "B", subject: 'English',
+    explanation: "Banky's speech insults Tosh by bringing up Chief Didi Ogba's past imprisonment, transforming a student election into a proxy for adult family rivalries." },
+
+{ id: 60,
+    text: "The 'Breath Project' in Chapter 8 of 'Lekki Headmaster' refers to:",
+    options: { A:"An asthma treatment programme", B:"A student invention to build a phone from recycled materials", C:"A breathing exercise for exam stress", D:"A musical performance by the choir" },
+    answer: "B", subject: 'English',
+    explanation: "Bepo's pride in the Invention Club's Breath Project — a phone made from recycled materials — symbolises Nigerian ingenuity and educational possibility. It is one of the things he fears losing by leaving." },
+
+{ id: 61,
+    text: "Kabir Alabi Garba, author of 'Lekki Headmaster', is professionally known as:",
+    options: { A:"A medical doctor", B:"A journalist, author and education advocate", C:"A former minister of education", D:"A former secondary school student" },
+    answer: "B", subject: 'English',
+    explanation: "Kabir Alabi Garba is a seasoned Nigerian journalist and author. His media background shapes the novel's sharp, observational prose and its precise engagement with contemporary Nigerian social issues." },
+
+{ id: 62,
+    text: "The grammatical controversy in Chapter 6 of 'Lekki Headmaster' concerns the sentence:",
+    options: { A:"'Neither the boys nor the girl are present'", B:"'Ade as well as Jide comes early'", C:"'The team are ready to play'", D:"'Each student have a book'" },
+    answer: "B", subject: 'English',
+    explanation: "A parent complains that 'comes' (singular) is wrong after 'Ade as well as Jide'. Bepo defends the teacher: with 'as well as', the verb agrees with the first subject (Ade = singular), so 'comes' is correct." },
+
+{ id: 63,
+    text: "In 'Lekki Headmaster', Bepo's wife Seri and daughters Nike and Kike are already:",
+    options: { A:"In Canada", B:"In the United States", C:"In London, United Kingdom", D:"In Germany" },
+    answer: "C", subject: 'English',
+    explanation: "Seri is already in London and their daughters Nike and Kike are in school there. This makes Bepo the outlier — the family pull toward the UK is real, making his decision to stay all the more resonant." },
+
+  /* ── Targeted: Stress / Phonology ── */,
+
+{ id: 64,
+    text: "The primary stress in 'certificate' falls on the:",
+    options: { A:"First syllable (CER)", B:"Second syllable (TIF)", C:"Third syllable (I)", D:"Fourth syllable (CATE)" },
+    answer: "B", subject: 'English',
+    explanation: "cer-TIF-i-cate: stress falls on the second syllable TIF. A common trap is stressing the first syllable. Think: 'I cer-TIF-y it is a cer-TIF-i-cate.'" },
+
+{ id: 65,
+    text: "In 'She will PROduce fresh results', the word 'produce' is used as a:",
+    options: { A:"Noun (first-syllable stress)", B:"Verb (second-syllable stress)", C:"Adjective", D:"Adverb" },
+    answer: "B", subject: 'English',
+    explanation: "proDUCE (stress on 2nd syllable) = the verb 'to produce/create'. PROduce (stress on 1st syllable) = the noun. The sentence uses a modal + verb, so it is the verb form." },
+
+{ id: 66,
+    text: "Which syllable carries primary stress in 'geography'?",
+    options: { A:"First: GEO", B:"Second: OG", C:"Third: RA", D:"Fourth: PHY" },
+    answer: "B", subject: 'English',
+    explanation: "ge-OG-ra-phy: stress on the second syllable OG. Compare: ge-OG-ra-phy / ge-o-GRAPH-ic (shifts to third in adjective form)." },
+
+{ id: 67,
+    text: "Which syllable carries primary stress in 'underSTAND'?",
+    options: { A:"First: UN", B:"Second: DER", C:"Third: STAND", D:"The word has only two syllables" },
+    answer: "C", subject: 'English',
+    explanation: "un-der-STAND: stress falls on the third syllable STAND. This follows the pattern for many compound verbs where the final syllable carries stress." },
+
+{ id: 68,
+    text: "The word 'export' when used as a NOUN is stressed on which syllable?",
+    options: { A:"Second syllable: PORT", B:"First syllable: EX", C:"Both equally", D:"Neither — it is unstressed" },
+    answer: "B", subject: 'English',
+    explanation: "Noun: EX-port (stress on first). Verb: ex-PORT (stress on second). This noun/verb stress shift pattern also applies to: REcord/reCORD, PERmit/perMIT, INcrease/inCREASE." },
+
+{ id: 69,
+    text: "How many syllables does 'comfortable' have in standard British English?",
+    options: { A:"Five", B:"Three", C:"Four", D:"Two" },
+    answer: "B", subject: 'English',
+    explanation: "In British English: COMF-ta-ble (3 syllables). The second vowel is elided. American English may use 4 syllables. JAMB follows British pronunciation — 3 syllables." },
+
+{ id: 70,
+    text: "How many phonemes are in the word 'church'?",
+    options: { A:"Five", B:"Four", C:"Three", D:"Six" },
+    answer: "C", subject: 'English',
+    explanation: "/tʃ/ + /ɜː/ + /tʃ/ = 3 phonemes. Despite having 6 letters, 'church' has only 3 sounds. Letters ≠ phonemes." },
+
+{ id: 71,
+    text: "Which word has a different vowel sound from the others?",
+    options: { A:"boot", B:"food", C:"blood", D:"mood" },
+    answer: "C", subject: 'English',
+    explanation: "boot /uː/, food /uː/, mood /uː/ — all share the long /uː/ vowel. Blood /blʌd/ has the short /ʌ/ vowel (as in 'cup'). Spelling is misleading here." },
+
+{ id: 72,
+    text: "Which word contains a silent consonant?",
+    options: { A:"brand", B:"kneel", C:"crest", D:"bland" },
+    answer: "B", subject: 'English',
+    explanation: "In 'kneel', the 'k' is silent — pronounced /niːl/. Silent consonant patterns: kn- (kneel, knight, know), wr- (write, wrong), -mb (lamb, climb), gh (night, light)." },
+
+{ id: 73,
+    text: "'REcord' (noun) and 'reCORD' (verb) illustrate the phonological process of:",
+    options: { A:"Assimilation", B:"Functional stress shift — stress placement differentiates word class", C:"Elision", D:"Vowel reduction" },
+    answer: "B", subject: 'English',
+    explanation: "This is functional stress shift — the same spelling changes stress placement based on grammatical role (noun vs verb). Same word, different stress, different function." },
+
+  /* ── Targeted: Grammar ── */,
+
+{ id: 74,
+    text: "Identify the clause type: 'Although she was tired, she continued studying.'",
+    options: { A:"Adverbial clause of time", B:"Adverbial clause of concession", C:"Noun clause", D:"Relative clause" },
+    answer: "B", subject: 'English',
+    explanation: "'Although' introduces a concession — an unexpected contrast. Concession conjunctions: although, though, even though, despite the fact that, while (when meaning 'whereas')." },
+
+{ id: 75,
+    text: "Which sentence contains a dangling modifier?",
+    options: { A:"Running down the street, she dropped her bag.", B:"He found the book on the shelf.", C:"Walking to school, the rain began to fall.", D:"After studying hard, she passed the exam." },
+    answer: "C", subject: 'English',
+    explanation: "'Walking to school' does not logically modify 'the rain' — rain cannot walk. The intended subject (a person) is absent. Correct: 'Walking to school, she was caught in the rain.'" },
+
+{ id: 76,
+    text: "Select the CORRECT sentence:",
+    options: { A:"It is her who called the office.", B:"It is she who called the office.", C:"It was them who came late.", D:"It was him who answered." },
+    answer: "B", subject: 'English',
+    explanation: "After 'It is/was', a subject pronoun is required: she, he, they, I — not her, him, them, me. 'It is she' is correct in formal English." },
+
+{ id: 77,
+    text: "Which sentence uses the apostrophe correctly?",
+    options: { A:"The boy's books were left on the bus.", B:"The boys book's were left on the bus.", C:"The boys' book's were left on the bus.", D:"The boys books were left on the bus." },
+    answer: "A", subject: 'English',
+    explanation: "'The boy's books' = books belonging to one boy. For plural possession: 'the boys' books' (apostrophe after s). No apostrophe is needed on a simple plural noun." },
+
+{ id: 78,
+    text: "Choose the correct reported speech. Direct: 'He said, \"I have finished my work.\"'",
+    options: { A:"He said that he had finished his work.", B:"He said that he has finished his work.", C:"He said that I have finished his work.", D:"He said he finishes his work." },
+    answer: "A", subject: 'English',
+    explanation: "Backshift rule: present perfect ('have finished') → past perfect ('had finished'). Also: 'I' → 'he'; 'my' → 'his'. Full reported form: 'He said that he had finished his work.'" },
+
+{ id: 79,
+    text: "Identify the error: 'Neither the students nor the teacher were present.'",
+    options: { A:"'were' should be 'was' — the verb agrees with the nearest subject 'teacher' (singular)", B:"'Neither...nor' should be 'either...or'", C:"'students' should be 'student'", D:"There is no error" },
+    answer: "A", subject: 'English',
+    explanation: "With neither...nor / either...or, the verb agrees with the NEAREST subject (proximity rule). 'Teacher' (singular) is nearest, so the verb must be 'was'." },
+
+{ id: 80,
+    text: "In 'She said, \"I am going to Lagos tomorrow\"', which changes occur in reported speech?",
+    options: { A:"Only tense changes", B:"Only pronoun changes", C:"'am going' → 'was going'; 'tomorrow' → 'the following day'; 'I' → 'she'", D:"No changes required" },
+    answer: "C", subject: 'English',
+    explanation: "Three changes: tense backshift (present continuous → past continuous), time expression (tomorrow → the following day), and pronoun shift (I → she). Full form: 'She said she was going to Lagos the following day.'" },
+
+{ id: 81,
+    text: "Which of the following contains a NOUN CLAUSE?",
+    options: { A:"The boy who came late was punished.", B:"What he said surprised everyone.", C:"She left before I arrived.", D:"He runs faster than I do." },
+    answer: "B", subject: 'English',
+    explanation: "'What he said' functions as the SUBJECT of the sentence — it is a noun clause. Noun clauses do the job of a noun: subject, object, or complement. 'Who came late' in A is a relative clause." },
+
+{ id: 82,
+    text: "Choose the sentence that correctly uses the SUBJUNCTIVE mood:",
+    options: { A:"If he was the president, things would change.", B:"She wishes she was taller.", C:"I suggest that he studies harder.", D:"It is important that every student be present." },
+    answer: "D", subject: 'English',
+    explanation: "The mandative subjunctive uses the base form of the verb (be, not is/was) after verbs of suggestion/demand: 'It is important that he be...', 'I suggest that she leave...'" },
+
+{ id: 83,
+    text: "The sentence 'The government sought to affect a change in policy' is incorrect because:",
+    options: { A:"'sought' should be 'seeked'", B:"'affect' should be 'effect' — 'to effect a change' means to bring it about", C:"'policy' should be 'policies'", D:"There is no error" },
+    answer: "B", subject: 'English',
+    explanation: "'Effect' as a VERB means to bring about: 'to effect a change' = to implement/cause a change. 'Affect' as a verb means to influence. 'Sought to effect a change' is correct." },
+
+{ id: 84,
+    text: "Identify the rhetorical device: 'O Romeo, Romeo! Wherefore art thou Romeo?'",
+    options: { A:"Anaphora", B:"Apostrophe — directly addressing an absent person", C:"Hyperbole", D:"Synecdoche" },
+    answer: "B", subject: 'English',
+    explanation: "Rhetorical apostrophe = directly addressing an absent, dead, or imaginary person/thing. Juliet addresses Romeo who is not present — this is apostrophe (not the punctuation mark)." },
+
+{ id: 85,
+    text: "Complete the analogy: Composer : Symphony :: Architect : ___",
+    options: { A:"Music", B:"Design", C:"Building", D:"Blueprint" },
+    answer: "C", subject: 'English',
+    explanation: "A composer creates a symphony (the end product). An architect creates a BUILDING — the tangible end product of architectural work. Blueprint is a plan, not the product." },
+
+{ id: 86,
+    text: "The plural of 'criterion' is:",
+    options: { A:"Criterions", B:"Criterias", C:"Criteria", D:"Criterium" },
+    answer: "C", subject: 'English',
+    explanation: "'Criterion' is from Greek. Greek/Latin plurals: criterion → criteria, phenomenon → phenomena, datum → data, medium → media. 'Criterias' is always wrong." },
+
+{ id: 87,
+    text: "Choose the word OPPOSITE in meaning to 'verbose':",
+    options: { A:"Wordy", B:"Eloquent", C:"Laconic", D:"Fluent" },
+    answer: "C", subject: 'English',
+    explanation: "'Verbose' = using too many words. 'Laconic' = using very few words; brief and to the point. Direct antonyms. Eloquent = fluent/persuasive — not opposite to verbose." },
+
+{ id: 88,
+    text: "The phrase 'To add fuel to the fire' means:",
+    options: { A:"To start a cooking fire", B:"To make a bad situation worse by adding more provocation", C:"To provide energy to a process", D:"To warm up a cold relationship" },
+    answer: "B", subject: 'English',
+    explanation: "This idiom means to worsen an already bad situation by introducing more aggravating elements. Example: 'His angry reply only added fuel to the fire.'" },
+
+{ id: 89,
+    text: "Which of the following pairs are HOMOPHONES?",
+    options: { A:"their / there / they're only", B:"to / too / two only", C:"knew / new only", D:"All of the above are homophones" },
+    answer: "D", subject: 'English',
+    explanation: "Homophones = words that sound identical but differ in spelling/meaning. Their/there/they're = /ðeə/. To/too/two = /tuː/. Knew/new = /njuː/. All qualify as homophones." },
+
+{ id: 90,
+    text: "Which sentence uses 'fewer' and 'less' CORRECTLY?",
+    options: { A:"There are less students in the hall today.", B:"She spent fewer money than expected.", C:"There are fewer students and less noise today.", D:"He has less friends but fewer problems." },
+    answer: "C", subject: 'English',
+    explanation: "'Fewer' is for countable nouns (fewer students, fewer books). 'Less' is for uncountable nouns (less noise, less water, less money). Only C applies both rules correctly." },
+
+  /* ══════════════════════════════════════════════════
+     MATHEMATICS — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */,
+
+  /* ══════════════════════════════════════════════════
+     PHYSICS — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */
+
+{ id: 91,
+    text: "A convex lens of focal length 20 cm forms an image of an object placed 60 cm away. The image distance is:",
+    options: { A:"30 cm", B:"20 cm", C:"60 cm", D:"15 cm" },
+    answer: "A", subject: 'Physics',
+    explanation: "1/v = 1/f − 1/|u| = 1/20 − 1/60 = 3/60 − 1/60 = 2/60 → v=30 cm. Real, inverted image." },
+
+{ id: 92,
+    text: "An object is placed 40 cm from a convex lens of focal length 10 cm. The image is:",
+    options: { A:"Virtual and upright at 13.3 cm", B:"Real and inverted at 13.3 cm", C:"Real and inverted at 40 cm", D:"Virtual and erect at 40 cm" },
+    answer: "B", subject: 'Physics',
+    explanation: "1/v = 1/10 − 1/40 = 4/40 − 1/40 = 3/40 → v=13.3 cm. Object beyond F, so image is real and inverted." },
+
+{ id: 93,
+    text: "What is the critical angle for a medium with refractive index 1.5?",
+    options: { A:"30°", B:"41.8°", C:"48.6°", D:"60°" },
+    answer: "B", subject: 'Physics',
+    explanation: "sin c = 1/n = 1/1.5 = 0.667. c = sin⁻¹(0.667) ≈ 41.8°." },
+
+{ id: 94,
+    text: "Total internal reflection requires that light travels:",
+    options: { A:"From a less dense to a denser medium at any angle", B:"From a denser to a less dense medium at or above the critical angle", C:"Along the normal to the boundary", D:"Through a vacuum only" },
+    answer: "B", subject: 'Physics',
+    explanation: "TIR requires: (1) Light travelling from denser to less dense medium; (2) Angle of incidence ≥ critical angle. Both conditions must be met." },
+
+{ id: 95,
+    text: "A convex mirror is used as a rear-view mirror because it:",
+    options: { A:"Magnifies objects behind the car", B:"Always produces a virtual, upright, diminished image giving a wider field of view", C:"Produces real inverted images", D:"Has a longer focal length than concave mirrors" },
+    answer: "B", subject: 'Physics',
+    explanation: "A convex mirror always produces virtual, upright, and diminished images regardless of object position, giving a wider field of view." },
+
+{ id: 96,
+    text: "A uranium-235 nucleus absorbs a neutron and splits into smaller nuclei. This is called:",
+    options: { A:"Radioactive decay", B:"Fusion", C:"Nuclear fission", D:"Beta emission" },
+    answer: "C", subject: 'Physics',
+    explanation: "Nuclear fission: a heavy nucleus splits into two lighter nuclei after absorbing a neutron, releasing large amounts of energy and further neutrons." },
+
+{ id: 97,
+    text: "Nuclear fusion differs from fission in that fusion:",
+    options: { A:"Splits heavy nuclei into lighter ones", B:"Joins light nuclei together to form a heavier nucleus, releasing energy", C:"Requires no energy input", D:"Only occurs in nuclear reactors" },
+    answer: "B", subject: 'Physics',
+    explanation: "Fusion = light nuclei (e.g. hydrogen isotopes) combine to form a heavier nucleus. This is the process powering the sun, requiring extremely high temperature and pressure." },
+
+{ id: 98,
+    text: "A transformer has 500 primary turns and 2500 secondary turns. If the primary voltage is 240 V, the secondary voltage is:",
+    options: { A:"48 V", B:"1200 V", C:"600 V", D:"2400 V" },
+    answer: "B", subject: 'Physics',
+    explanation: "Vs = Vp × (Ns/Np) = 240 × (2500/500) = 240 × 5 = 1200 V. Step-up transformer." },
+
+{ id: 99,
+    text: "A step-down transformer has 1000 primary turns and 50 secondary turns. If primary voltage is 240 V, the secondary voltage is:",
+    options: { A:"4800 V", B:"24 V", C:"12 V", D:"240 V" },
+    answer: "C", subject: 'Physics',
+    explanation: "Vs = 240 × (50/1000) = 12 V. Fewer secondary turns → lower voltage." },
+
+{ id: 100,
+    text: "A 4 kg object moving at 5 m/s collides with a stationary 6 kg object and they stick together. Their combined velocity is:",
+    options: { A:"5 m/s", B:"2 m/s", C:"3 m/s", D:"1.25 m/s" },
+    answer: "B", subject: 'Physics',
+    explanation: "Conservation of momentum: 4×5 = (4+6)×v → 20=10v → v=2 m/s." },
+
+{ id: 101,
+    text: "A 3 kg ball moving at 8 m/s north collides with a 3 kg ball at rest. If the first ball stops, the second ball moves at:",
+    options: { A:"4 m/s north", B:"8 m/s north", C:"16 m/s north", D:"0 m/s" },
+    answer: "B", subject: 'Physics',
+    explanation: "Momentum: 3×8=24 kg·m/s. After: 3×0+3×v=24 → v=8 m/s north. All momentum transferred." },
+
+{ id: 102,
+    text: "The centripetal force on a body of mass 2 kg moving in a circle of radius 0.5 m at 4 m/s is:",
+    options: { A:"16 N", B:"32 N", C:"64 N", D:"8 N" },
+    answer: "C", subject: 'Physics',
+    explanation: "F = mv²/r = (2×16)/0.5 = 32/0.5 = 64 N." },
+
+{ id: 103,
+    text: "A body moving in a circle at constant speed experiences:",
+    options: { A:"No acceleration", B:"Constant velocity", C:"Centripetal acceleration directed toward the centre", D:"Tangential acceleration only" },
+    answer: "C", subject: 'Physics',
+    explanation: "Even at constant speed, circular motion involves continuously changing direction — this constitutes centripetal acceleration = v²/r, directed toward the centre." },
+
+{ id: 104,
+    text: "A wire of resistance 4 Ω is stretched to three times its original length. Its new resistance is:",
+    options: { A:"12 Ω", B:"36 Ω", C:"4 Ω", D:"108 Ω" },
+    answer: "B", subject: 'Physics',
+    explanation: "R ∝ L²/Volume. Tripling L → new R = 9 × original = 9×4 = 36 Ω." },
+
+{ id: 105,
+    text: "A wire of resistance 12 Ω is stretched to twice its length. Its new resistance is:",
+    options: { A:"24 Ω", B:"48 Ω", C:"6 Ω", D:"96 Ω" },
+    answer: "B", subject: 'Physics',
+    explanation: "Doubling length halves cross-section (volume constant). New R = 4 × original = 4×12 = 48 Ω." },
+
+{ id: 106,
+    text: "A ball is thrown upward at 20 m/s. Total time before it returns to the starting point (g = 10 m/s²):",
+    options: { A:"2 s", B:"4 s", C:"1 s", D:"8 s" },
+    answer: "B", subject: 'Physics',
+    explanation: "Time to max height = 20/10 = 2 s. Total time = 2×2 = 4 s." },
+
+{ id: 107,
+    text: "In the photoelectric effect, increasing the FREQUENCY of light (constant intensity) will:",
+    options: { A:"Increase the number of photoelectrons emitted", B:"Increase the kinetic energy of emitted photoelectrons", C:"Have no effect", D:"Decrease the stopping potential" },
+    answer: "B", subject: 'Physics',
+    explanation: "KE = hf − φ. Higher frequency → higher photon energy → greater KE per electron. Intensity affects count; frequency affects energy." },
+
+{ id: 108,
+    text: "In the photoelectric effect, increasing the INTENSITY of light (same frequency) will:",
+    options: { A:"Increase the kinetic energy of photoelectrons", B:"Increase the number of photoelectrons emitted per second", C:"Eject electrons from a metal below threshold", D:"Increase the stopping potential" },
+    answer: "B", subject: 'Physics',
+    explanation: "More photons per second = more electrons ejected per second. KE per electron is unchanged because frequency (energy per photon) is unchanged." },
+
+{ id: 109,
+    text: "The half-life of a radioactive substance is 10 years. After 40 years, the fraction remaining is:",
+    options: { A:"1/8", B:"1/4", C:"1/16", D:"1/32" },
+    answer: "C", subject: 'Physics',
+    explanation: "40 years = 4 half-lives. Fraction = (1/2)⁴ = 1/16." },
+
+{ id: 110,
+    text: "Three resistors of 3 Ω, 6 Ω, and 6 Ω are connected in parallel. The effective resistance is:",
+    options: { A:"15 Ω", B:"1.5 Ω", C:"5 Ω", D:"3 Ω" },
+    answer: "B", subject: 'Physics',
+    explanation: "1/R = 1/3+1/6+1/6 = 2/6+1/6+1/6 = 4/6. R = 1.5 Ω." },
+
+{ id: 111,
+    text: "For a body to be in static equilibrium, which two conditions must BOTH be satisfied?",
+    options: { A:"Net force = 0 and net torque = 0", B:"Net velocity = 0 and net force = 0", C:"Net acceleration = 0 and constant speed", D:"Net momentum = 0 and constant mass" },
+    answer: "A", subject: 'Physics',
+    explanation: "ΣF=0 (no translational acceleration) AND Στ=0 (no rotational acceleration). Both required simultaneously." },
+
+{ id: 112,
+    text: "Lenz's law states that the direction of an induced EMF is such that it:",
+    options: { A:"Always flows clockwise", B:"Amplifies the change in flux that caused it", C:"Opposes the change in magnetic flux that produced it", D:"Is perpendicular to the magnetic field" },
+    answer: "C", subject: 'Physics',
+    explanation: "Lenz's law: the induced current opposes the change in flux that caused the induction — a consequence of energy conservation." },
+
+{ id: 113,
+    text: "A barometer measures:",
+    options: { A:"Wind speed", B:"Atmospheric pressure", C:"Humidity", D:"Temperature" },
+    answer: "B", subject: 'Physics',
+    explanation: "A barometer measures atmospheric pressure. Standard atmospheric pressure = 760 mmHg = 101,325 Pa." },
+
+{ id: 114,
+    text: "When a gas is compressed at constant temperature, its pressure:",
+    options: { A:"Decreases proportionally", B:"Remains constant", C:"Increases inversely as volume decreases (Boyle's Law)", D:"Increases only if temperature rises" },
+    answer: "C", subject: 'Physics',
+    explanation: "Boyle's Law: PV = constant at constant T. Reducing V increases P proportionally." },
+
+{ id: 115,
+    text: "The process by which a nucleus spontaneously emits an electron is:",
+    options: { A:"Alpha decay", B:"Beta-minus decay", C:"Gamma decay", D:"Nuclear fission" },
+    answer: "B", subject: 'Physics',
+    explanation: "Beta-minus (β⁻) decay: a neutron converts to a proton, emitting an electron (beta particle) and antineutrino. Atomic number increases by 1." },
+
+{ id: 116,
+    text: "The frequency of a wave is 250 Hz and its wavelength is 1.4 m. Its speed is:",
+    options: { A:"178.6 m/s", B:"350 m/s", C:"175 m/s", D:"250 m/s" },
+    answer: "B", subject: 'Physics',
+    explanation: "v = fλ = 250 × 1.4 = 350 m/s." },
+
+{ id: 117,
+    text: "In which medium does light travel fastest?",
+    options: { A:"Water", B:"Glass", C:"Vacuum", D:"Air" },
+    answer: "C", subject: 'Physics',
+    explanation: "Light travels fastest in a vacuum at c = 3×10⁸ m/s. Any material medium slows light down." },
+
+{ id: 118,
+    text: "Which colour of visible light has the longest wavelength?",
+    options: { A:"Violet", B:"Blue", C:"Green", D:"Red" },
+    answer: "D", subject: 'Physics',
+    explanation: "Visible spectrum longest → shortest: Red (~700nm) → ... → Violet (~400nm). Red has the longest wavelength and lowest frequency." },
+
+{ id: 119,
+    text: "An object is dropped from rest and falls for 3 seconds (g = 10 m/s²). Its velocity is:",
+    options: { A:"10 m/s", B:"20 m/s", C:"30 m/s", D:"15 m/s" },
+    answer: "C", subject: 'Physics',
+    explanation: "v = u+gt = 0+10×3 = 30 m/s." },
+
+{ id: 120,
+    text: "Heat transfer through a vacuum occurs by:",
+    options: { A:"Convection", B:"Conduction", C:"Both conduction and convection", D:"Radiation" },
+    answer: "D", subject: 'Physics',
+    explanation: "Conduction and convection require matter. Radiation (electromagnetic waves) is the only mechanism that transfers heat through a vacuum." },
+
+{ id: 121,
+    text: "The escape velocity from Earth's surface is approximately:",
+    options: { A:"7.9 km/s", B:"11.2 km/s", C:"3.0×10⁸ m/s", D:"9.8 km/s" },
+    answer: "B", subject: 'Physics',
+    explanation: "Escape velocity = √(2gR) ≈ 11,200 m/s = 11.2 km/s. (7.9 km/s is orbital velocity.)" },
+
+{ id: 122,
+    text: "The loudness of sound is determined by its:",
+    options: { A:"Frequency", B:"Amplitude", C:"Wavelength", D:"Speed" },
+    answer: "B", subject: 'Physics',
+    explanation: "Loudness is determined by amplitude of the sound wave. Frequency determines pitch." },
+
+{ id: 123,
+    text: "The SI unit of magnetic flux density is:",
+    options: { A:"Weber (Wb)", B:"Tesla (T)", C:"Henry (H)", D:"Gauss (G)" },
+    answer: "B", subject: 'Physics',
+    explanation: "Magnetic flux density B is measured in Tesla (T). 1 T = 1 Wb/m²." },
+
+{ id: 124,
+    text: "The unit of capacitance is:",
+    options: { A:"Ohm (Ω)", B:"Farad (F)", C:"Henry (H)", D:"Coulomb (C)" },
+    answer: "B", subject: 'Physics',
+    explanation: "Capacitance C = Q/V is measured in Farads (F). 1 F = 1 C/V." },
+
+{ id: 125,
+    text: "A convex lens forms a real image when the object is placed:",
+    options: { A:"Between the lens and the focal point", B:"At the focal point", C:"Beyond the focal point", D:"At any position" },
+    answer: "C", subject: 'Physics',
+    explanation: "Object between F and lens → virtual, upright, magnified. Object AT F → no image (parallel rays). Object BEYOND F → real, inverted." },
+
+  /* ══════════════════════════════════════════════════
+     CHEMISTRY — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */,
+
+  /* ══════════════════════════════════════════════════
+     CHEMISTRY — 35 QUESTIONS
+  ══════════════════════════════════════════════════ */
+
+{ id: 126,
+    text: "Which of the following is an acidic buffer solution?",
+    options: { A:"NaOH + HCl", B:"NH₃ + NH₄Cl", C:"CH₃COOH + CH₃COONa", D:"NaCl + H₂O" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Acidic buffer = weak acid + conjugate base salt. CH₃COOH (weak acid) + CH₃COONa (sodium ethanoate, conjugate base) is the classic acetate buffer." },
+
+{ id: 127,
+    text: "Which of the following is a basic buffer?",
+    options: { A:"HCl + NaCl", B:"NH₃ + NH₄Cl", C:"CH₃COOH + HCl", D:"NaOH + NaCl" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Basic buffer = weak base + conjugate acid salt. NH₃ (weak base) + NH₄Cl (ammonium chloride, conjugate acid salt) — maintains pH above 7." },
+
+{ id: 128,
+    text: "The shape of PCl₃ (3 bonding pairs, 1 lone pair) is:",
+    options: { A:"Trigonal planar", B:"Linear", C:"Trigonal pyramidal", D:"Tetrahedral" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "PCl₃: 4 electron pairs (3 bonding + 1 lone). Lone pair repels bonding pairs below 109.5° → trigonal pyramidal shape." },
+
+{ id: 129,
+    text: "The shape of CO₂ (2 double bonds, no lone pairs on carbon) is:",
+    options: { A:"Bent/angular", B:"Linear", C:"Trigonal planar", D:"Tetrahedral" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "CO₂: 2 bonding regions, 0 lone pairs → linear (180° bond angle). VSEPR: 2 electron domains → linear." },
+
+{ id: 130,
+    text: "The oxidation state of Cr in K₂Cr₂O₇ is:",
+    options: { A:"2+", B:"4+", C:"6+", D:"7+" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "2(+1)+2(Cr)+7(−2)=0 → 2+2Cr−14=0 → Cr=+6." },
+
+{ id: 131,
+    text: "The oxidation state of Mn in MnO₄⁻ is:",
+    options: { A:"4+", B:"5+", C:"7+", D:"6+" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Mn+4(−2)=−1 → Mn−8=−1 → Mn=+7. The permanganate ion contains Mn in its highest common oxidation state." },
+
+{ id: 132,
+    text: "What is produced at the ANODE during electrolysis of brine?",
+    options: { A:"Hydrogen gas", B:"Oxygen gas", C:"Chlorine gas", D:"Sodium metal" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "At the anode (+), Cl⁻ ions are preferentially discharged in concentrated brine: 2Cl⁻ → Cl₂ + 2e⁻." },
+
+{ id: 133,
+    text: "During electrolysis of dilute H₂SO₄, what is produced at the CATHODE?",
+    options: { A:"Oxygen", B:"Sulphur dioxide", C:"Hydrogen", D:"Sulphuric acid" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "At the cathode (−): 2H⁺ + 2e⁻ → H₂. Hydrogen gas is produced at the cathode." },
+
+{ id: 134,
+    text: "For the equilibrium N₂ + 3H₂ ⇌ 2NH₃, the expression for Kc is:",
+    options: { A:"[N₂][H₂]³/[NH₃]²", B:"[NH₃]²/([N₂][H₂]³)", C:"[NH₃]/([N₂][H₂])", D:"2[NH₃]/([N₂]+3[H₂])" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Kc = [products]^n/[reactants]^n = [NH₃]²/([N₂][H₂]³)." },
+
+{ id: 135,
+    text: "For the reaction 2SO₂ + O₂ ⇌ 2SO₃, what is the effect of REMOVING SO₃?",
+    options: { A:"Equilibrium shifts left", B:"Equilibrium shifts right — more SO₃ produced to replace what was removed", C:"No effect; Kc changes", D:"The reaction stops" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Le Chatelier's principle: removing a product shifts equilibrium to the right to restore balance." },
+
+{ id: 136,
+    text: "In the Contact process, moderate temperature (450°C) rather than very high temperature is used because:",
+    options: { A:"The catalyst only works at 450°C", B:"Higher T is too fast and uncontrollable", C:"The forward reaction is exothermic — higher T shifts equilibrium left, reducing SO₃ yield; 450°C balances yield and rate", D:"Lower temperatures produce purer SO₃" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "2SO₂+O₂⇌2SO₃ is exothermic. Higher T → less SO₃ (equilibrium shifts left). 450°C is the industrial compromise: adequate yield at commercially viable rate." },
+
+{ id: 137,
+    text: "The Haber process operates at high pressure because:",
+    options: { A:"High pressure makes the catalyst work better", B:"N₂+3H₂→2NH₃ has fewer moles of gas on the right — high pressure favours fewer moles", C:"High pressure reduces the temperature needed", D:"Ammonia is unstable at low pressures" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "4 moles reactant gas → 2 moles product. Le Chatelier: increasing pressure shifts equilibrium toward fewer gas moles (right) → more NH₃." },
+
+{ id: 138,
+    text: "A reaction has ΔH = −200 kJ/mol and ΔS = −100 J/mol·K. At what temperature does ΔG become positive (non-spontaneous)?",
+    options: { A:"Above 200 K", B:"Below 2000 K", C:"Above 2000 K", D:"Always spontaneous" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "ΔG=ΔH−TΔS=0 at crossover. T=200,000/100=2000 K. Above 2000 K: −TΔS term dominates (positive, since ΔS negative) → ΔG>0." },
+
+{ id: 139,
+    text: "Nylon-6,6 is formed by condensation polymerisation between:",
+    options: { A:"Ethene monomers only", B:"Hexanedioic acid and 1,6-diaminohexane", C:"Glucose units linked by glycosidic bonds", D:"Amino acids only" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Nylon-6,6: condensation between hexanedioic acid (adipic acid) and 1,6-diaminohexane, releasing water with each amide (−CONH−) bond." },
+
+{ id: 140,
+    text: "Polythene (polyethylene) is an example of what type of polymerisation?",
+    options: { A:"Condensation polymerisation", B:"Hydrolysis polymerisation", C:"Addition polymerisation", D:"Saponification" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Addition polymerisation: ethene (CH₂=CH₂) adds across double bonds. No small molecule eliminated. nCH₂=CH₂ → (−CH₂−CH₂−)ₙ" },
+
+{ id: 141,
+    text: "The reaction C₂H₂ + 2H₂ → C₂H₆ is an example of:",
+    options: { A:"Elimination", B:"Substitution", C:"Oxidation", D:"Catalytic addition" },
+    answer: "D", subject: 'Chemistry',
+    explanation: "Hydrogen adds across the triple bond of ethyne. Catalytic addition (Ni or Pt catalyst). C₂H₂ + H₂ → C₂H₄; then C₂H₄ + H₂ → C₂H₆." },
+
+{ id: 142,
+    text: "Saponification produces:",
+    options: { A:"An ester and water", B:"A sodium salt of a fatty acid (soap) + glycerol", C:"An amine and an alcohol", D:"A polymer and a small molecule" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Saponification = alkaline hydrolysis of a fat. Triglyceride + NaOH → sodium salts of fatty acids (soap) + glycerol." },
+
+{ id: 143,
+    text: "The Contact process is used to manufacture:",
+    options: { A:"Ammonia", B:"Nitric acid", C:"Chlorine", D:"Sulphuric acid" },
+    answer: "D", subject: 'Chemistry',
+    explanation: "Contact process: SO₂ + ½O₂ ⇌ SO₃ (V₂O₅ catalyst, 450°C) → H₂SO₄. Used to manufacture sulphuric acid industrially." },
+
+{ id: 144,
+    text: "In the reaction 2A + B → C, if doubling [A] quadruples the rate, the order with respect to A is:",
+    options: { A:"First order", B:"Second order", C:"Zero order", D:"Third order" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Doubling [A] quadruples rate: 2² = 4 → second order with respect to A." },
+
+{ id: 145,
+    text: "If doubling [B] doubles the rate in the reaction above, the OVERALL reaction order is:",
+    options: { A:"2nd order", B:"3rd order", C:"1st order", D:"4th order" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Order A=2, order B=1. Overall order = 2+1 = 3." },
+
+{ id: 146,
+    text: "In the reaction Fe³⁺ + e⁻ → Fe²⁺, the iron ion is:",
+    options: { A:"Oxidised", B:"Reduced (gains an electron)", C:"Neither oxidised nor reduced", D:"Acting as a reducing agent" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Fe³⁺ gains an electron → Fe²⁺. Gaining electrons = reduction. OIL RIG: Oxidation Is Loss, Reduction Is Gain." },
+
+{ id: 147,
+    text: "Oxidation in terms of electrons is defined as:",
+    options: { A:"Gain of electrons", B:"Gain of oxygen only", C:"Loss of electrons", D:"Decrease in oxidation state" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Oxidation = Loss of electrons. Reduction = Gain of electrons. OIL RIG." },
+
+{ id: 148,
+    text: "How many moles of CO₂ are produced when 3 moles of C₃H₈ are completely combusted?",
+    options: { A:"6 mol", B:"9 mol", C:"3 mol", D:"12 mol" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "C₃H₈+5O₂→3CO₂+4H₂O. 1 mol C₃H₈→3 mol CO₂. So 3 mol→9 mol CO₂." },
+
+{ id: 149,
+    text: "Electronegativity increases across a period because:",
+    options: { A:"Atomic radius increases", B:"The number of electron shells increases", C:"Nuclear charge increases while atomic radius decreases — stronger pull on bonding electrons", D:"Metallic character increases" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Across a period: nuclear charge increases, shielding roughly constant, radius decreases → stronger attraction on bonding electrons → higher electronegativity." },
+
+{ id: 150,
+    text: "Which allotrope of carbon conducts electricity and is used in electrodes?",
+    options: { A:"Diamond", B:"Graphite", C:"Buckminsterfullerene", D:"Amorphous carbon" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Graphite: each carbon forms 3 covalent bonds in layers. The 4th electron is delocalised → free electrons → electrical conductivity." },
+
+{ id: 151,
+    text: "The rate of a chemical reaction generally increases with temperature because:",
+    options: { A:"Reactant molecules become heavier", B:"More molecules have energy ≥ activation energy — more successful collisions per unit time", C:"The activation energy increases", D:"Bonds break more slowly at higher temperatures" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Higher T → more molecules exceed activation energy → more successful collisions per unit time → faster reaction." },
+
+{ id: 152,
+    text: "Which of the following gases turns limewater milky?",
+    options: { A:"O₂", B:"H₂", C:"SO₂", D:"CO₂" },
+    answer: "D", subject: 'Chemistry',
+    explanation: "CO₂ + Ca(OH)₂ → CaCO₃↓ + H₂O. White precipitate of CaCO₃ turns limewater milky — standard test for CO₂." },
+
+{ id: 153,
+    text: "Iodine solution is used to test for the presence of:",
+    options: { A:"Glucose", B:"Protein", C:"Starch", D:"Lipids" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Iodine solution turns blue-black in presence of starch. Iodine molecules fit inside the helical coils of amylose, causing the colour change." },
+
+{ id: 154,
+    text: "Which reagent tests for REDUCING SUGARS?",
+    options: { A:"Iodine solution", B:"Fehling's or Benedict's solution", C:"Biuret reagent", D:"Tollens' reagent only" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "Benedict's and Fehling's both contain Cu²⁺. A reducing sugar reduces Cu²⁺ → Cu⁺ (Cu₂O), giving brick-red precipitate on heating." },
+
+{ id: 155,
+    text: "Hydrogenation of vegetable oils uses which gas?",
+    options: { A:"Oxygen", B:"Carbon dioxide", C:"Nitrogen", D:"Hydrogen" },
+    answer: "D", subject: 'Chemistry',
+    explanation: "Unsaturated oils + H₂ (Ni catalyst, ~180°C) → saturated/partially saturated fats. Converts liquid oils to solid fats (margarine)." },
+
+{ id: 156,
+    text: "The functional group −COOH is the defining group of:",
+    options: { A:"Alcohols", B:"Esters", C:"Carboxylic acids", D:"Aldehydes" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "−OH=alcohol, −COOH=carboxylic acid, −COO−=ester, −CHO=aldehyde, −CO−=ketone, −NH₂=amine." },
+
+{ id: 157,
+    text: "The functional group of an ESTER is:",
+    options: { A:"−OH", B:"−COOH", C:"−COO−", D:"−CHO" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Esters contain the −COO− linkage (−C(=O)−O−). Formed from carboxylic acid + alcohol with loss of water." },
+
+{ id: 158,
+    text: "The gas law PV/T = constant applies when:",
+    options: { A:"Pressure is constant", B:"The amount of gas (number of moles) is constant", C:"Temperature is constant", D:"Volume is constant" },
+    answer: "B", subject: 'Chemistry',
+    explanation: "PV/T = nR. This is constant when n (moles) is fixed." },
+
+{ id: 159,
+    text: "Which of the following is a condensation polymer?",
+    options: { A:"Polyethylene", B:"Polypropylene", C:"Polystyrene", D:"Nylon" },
+    answer: "D", subject: 'Chemistry',
+    explanation: "Condensation polymers form by eliminating a small molecule (water) with each bond. Nylon (amide bonds) is a condensation polymer. A, B, C are addition polymers." },
+
+{ id: 160,
+    text: "Elements in the same GROUP of the periodic table have the same:",
+    options: { A:"Number of electron shells", B:"Atomic mass", C:"Number of valence electrons", D:"Atomic number" },
+    answer: "C", subject: 'Chemistry',
+    explanation: "Same group = same number of valence electrons → similar chemical properties. Group I: 1 valence electron; Group VII: 7 valence electrons." }
+
 ];
+
 </script>
 
 <!-- Fixed Header -->
@@ -1058,7 +1034,7 @@ const QUESTIONS = [
                 <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">160</span></div>
             </div>
         </div>
-
+        
         <div class="quiz-timer-container" id="quizTimerContainer">
             <div class="timer-progress-ring">
                 <svg viewBox="0 0 60 60">
@@ -1123,8 +1099,7 @@ const QUESTIONS = [
     </aside>
 
     <main class="quiz-main">
-
-        <!-- Passage panel — rendered by quiz-app.js when q.passage is set; invisible otherwise -->
+      <!-- Passage panel — rendered by quiz-app.js when q.passage is set; invisible otherwise -->
         <div class="passage-panel hidden" id="passagePanel">
             <div class="passage-header">
                 <span class="passage-label"><i class="fas fa-book-open"></i> Read</span>
@@ -1151,7 +1126,7 @@ const QUESTIONS = [
             </div>
         </div>
 
-        <div class="quiz-navigation">
+<div class="quiz-navigation">
             <button class="btn btn-secondary" id="prevBtn" disabled>
                 <i class="fas fa-arrow-left"></i> Previous
             </button>
@@ -1243,19 +1218,19 @@ const QUESTIONS = [
     </div>
 </div>
 
-
 <script src="quiz-app.js"></script>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     PASSAGE PANEL DRIVER
-     quiz-app.js is untouched. This script drives the #passagePanel
-     that is already declared in the HTML above. It watches
-     #questionNumber (always updated by quiz-app.js on every render)
-     via MutationObserver, reads the current question straight from
-     the QUESTIONS array, and shows/hides the panel accordingly.
-     No fetch. No routing. HTML for HTML things.
-════════════════════════════════════════════════════════════════ -->
-<script>
+<
+!--═══════════════════════════════════════════════════════════════
+PASSAGE PANEL DRIVER
+quiz - app.js is untouched.This script drives the #passagePanel
+that is already declared in the HTML above.It watches
+#questionNumber(always updated by quiz - app.js on every render)
+via MutationObserver, reads the current question straight from
+the QUESTIONS array, and shows / hides the panel accordingly.
+No fetch.No routing.HTML
+for HTML things.════════════════════════════════════════════════════════════════-- >
+  <script>
 (function () {
   const panel      = document.getElementById('passagePanel');
   const titleEl    = document.getElementById('passageTitle');
@@ -1306,6 +1281,7 @@ const QUESTIONS = [
   syncPassage(); // run once on load
 })();
 </script>
+
 
 
 </body>
