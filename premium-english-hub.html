@@ -575,26 +575,41 @@
   </div>
 </div>
 
-<script src="premium-auth.js"></script>
 <script>
-  /* Gate this page to english session */
-  PremiumGate.require('english');
-
-  /* PDF modal */
-  function showPdfModal() {
-    document.getElementById('pdf-modal').removeAttribute('hidden');
-  }
-  function hidePdfModal() {
-    document.getElementById('pdf-modal').setAttribute('hidden', '');
-  }
-  /* Close on overlay click */
-  document.getElementById('pdf-modal').addEventListener('click', function(e) {
-    if (e.target === this) hidePdfModal();
-  });
-  /* Close on Escape */
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') hidePdfModal();
-  });
+'use strict';
+const SK='ga_premium_session';
+function loadSession(){
+  try{
+    const raw=sessionStorage.getItem(SK);
+    if(!raw)return null;
+    const s=JSON.parse(raw);
+    if(Date.now()>s.expires){sessionStorage.removeItem(SK);return null;}
+    return s;
+  }catch{return null;}
+}
+function injectWatermark(name){
+  const wm=document.createElement('div');
+  wm.setAttribute('aria-hidden','true');
+  const tile=name+' · GrantApp AI · ';
+  let html='';
+  for(let i=0;i<14;i++) html+='<span>'+tile.repeat(8)+'</span>';
+  wm.innerHTML=html;
+  Object.assign(wm.style,{position:'fixed',inset:'0',zIndex:'9999',pointerEvents:'none',overflow:'hidden',display:'flex',flexDirection:'column',gap:'2.5rem',padding:'1rem',transform:'rotate(-22deg) scale(1.4)',transformOrigin:'center center',opacity:'0.028',fontFamily:"'DM Mono',monospace",fontSize:'0.75rem',fontWeight:'500',color:'#f0eff4',letterSpacing:'0.06em',whiteSpace:'nowrap',userSelect:'none',WebkitUserSelect:'none'});
+  document.body.appendChild(wm);
+}
+function personalise(name,subject){
+  document.querySelectorAll('[data-premium-greeting]').forEach(el=>{el.textContent='Hey, '+name;el.removeAttribute('hidden');});
+  document.querySelectorAll('[data-premium-name]').forEach(el=>{el.textContent=name;});
+}
+const session=loadSession();
+if(!session||session.subject!=='english'){sessionStorage.removeItem(SK);window.location.href='premium-auth.html';}
+else{document.addEventListener('DOMContentLoaded',()=>{injectWatermark(session.name);personalise(session.name,session.subject);});}
+function showPdfModal(){document.getElementById('pdf-modal').removeAttribute('hidden');}
+function hidePdfModal(){document.getElementById('pdf-modal').setAttribute('hidden','');}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('pdf-modal').addEventListener('click',function(e){if(e.target===this)hidePdfModal();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')hidePdfModal();});
+});
 </script>
 
 </body>

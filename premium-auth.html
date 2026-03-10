@@ -6,308 +6,159 @@
   <title>GrantApp AI — Premium Access</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:         #0a0a0f;
-      --surface:    #111118;
-      --surface-2:  #18181f;
-      --border:     #1e1e2e;
-      --border-2:   #2a2a3a;
-      --text:       #f0eff4;
-      --muted:      #7a7a8c;
-      --accent:     #f59e0b;
-      --accent-dim: rgba(245,158,11,0.12);
-      --red:        #ef4444;
-      --red-dim:    rgba(239,68,68,0.10);
+      --bg:#0a0a0f; --surface:#111118; --surface-2:#18181f;
+      --border:#1e1e2e; --border-2:#2a2a3a; --text:#f0eff4; --muted:#7a7a8c;
+      --accent:#f59e0b; --accent-dim:rgba(245,158,11,0.12);
+      --red:#ef4444; --red-dim:rgba(239,68,68,0.10);
     }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    /* Noise grain overlay */
-    body::after {
-      content: ''; position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 999; opacity: 0.4;
-    }
-
-    /* Ambient glow */
-    .glow {
-      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
-      width: 800px; height: 500px;
-      background: radial-gradient(ellipse, rgba(245,158,11,0.06) 0%, transparent 70%);
-      pointer-events: none; z-index: 0;
-    }
-
-    /* Layout */
-    .page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1.25rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Card */
-    .auth-card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-    }
-
-    .auth-card-top {
-      padding: 2rem 2rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-
-    .auth-logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.35rem;
-      letter-spacing: -0.02em;
-      color: var(--text);
-      text-decoration: none;
-      display: inline-block;
-      margin-bottom: 1.5rem;
-    }
-    .auth-logo span { color: var(--accent); }
-
-    .auth-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border: 1px solid rgba(245,158,11,0.25);
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      margin-bottom: 1.5rem;
-    }
-    .auth-badge::before {
-      content: '';
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: blink 2s ease-in-out infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-    .auth-heading {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 0.5rem;
-    }
-
-    .auth-sub {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    /* Form body */
-    .auth-body {
-      padding: 1.75rem 2rem 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .field-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-      display: block;
-    }
-
-    .password-wrap {
-      position: relative;
-    }
-
-    #premium-password-input {
-      width: 100%;
-      padding: 0.8rem 3rem 0.8rem 1rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border-2);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.95rem;
-      letter-spacing: 0.04em;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    #premium-password-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
-    }
-    #premium-password-input[aria-invalid="true"] {
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px var(--red-dim);
-    }
-
-    /* Toggle visibility button */
-    .btn-toggle-pw {
-      position: absolute;
-      right: 0.75rem; top: 50%;
-      transform: translateY(-50%);
-      background: none; border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 0.85rem;
-      padding: 0.25rem;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-    .btn-toggle-pw:hover { color: var(--text); }
-
-    /* Error */
-    #premium-auth-error {
-      font-size: 0.82rem;
-      color: #fca5a5;
-      background: var(--red-dim);
-      border: 1px solid rgba(239,68,68,0.2);
-      border-radius: 8px;
-      padding: 0.65rem 0.85rem;
-      line-height: 1.55;
-    }
-
-    /* Submit */
-    #premium-auth-btn {
-      width: 100%;
-      padding: 0.85rem;
-      background: var(--accent);
-      color: #000;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 0.92rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 0.25rem;
-    }
-    #premium-auth-btn:hover:not(:disabled) {
-      opacity: 0.88;
-      transform: translateY(-1px);
-    }
-    #premium-auth-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Spinner */
-    #premium-auth-spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(0,0,0,0.2);
-      border-top-color: #000;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Footer note */
-    .auth-footer-note {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-
-    [hidden] { display: none !important; }
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+    .glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(245,158,11,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+    .page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.25rem;position:relative;z-index:1;}
+    .auth-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+    .auth-top{padding:2rem 2rem 1.5rem;border-bottom:1px solid var(--border);text-align:center;}
+    .auth-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:-0.02em;color:var(--text);text-decoration:none;display:inline-block;margin-bottom:1.5rem;}
+    .auth-logo span{color:var(--accent);}
+    .auth-badge{display:inline-flex;align-items:center;gap:0.4rem;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(245,158,11,0.25);padding:0.3rem 0.75rem;border-radius:999px;margin-bottom:1.5rem;}
+    .auth-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);animation:blink 2s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+    .auth-heading{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.5rem;}
+    .auth-sub{font-size:0.85rem;color:var(--muted);line-height:1.65;}
+    .auth-body{padding:1.75rem 2rem 2rem;display:flex;flex-direction:column;gap:1rem;}
+    .field-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;display:block;}
+    .pw-wrap{position:relative;}
+    #pw-input{width:100%;padding:0.8rem 3rem 0.8rem 1rem;background:var(--surface-2);border:1px solid var(--border-2);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.95rem;letter-spacing:0.04em;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+    #pw-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,158,11,0.1);}
+    #pw-input.err{border-color:var(--red);box-shadow:0 0 0 3px var(--red-dim);}
+    .toggle-pw{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;padding:0.25rem;line-height:1;transition:color 0.2s;}
+    .toggle-pw:hover{color:var(--text);}
+    #err-msg{font-size:0.82rem;color:#fca5a5;background:var(--red-dim);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:0.65rem 0.85rem;line-height:1.55;display:none;}
+    #err-msg.on{display:block;}
+    #auth-btn{width:100%;padding:0.85rem;background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s,transform 0.15s;display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:0.25rem;}
+    #auth-btn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px);}
+    #auth-btn:disabled{opacity:0.5;cursor:not-allowed;}
+    .spin{width:16px;height:16px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;display:none;}
+    .spin.on{display:block;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .foot-note{text-align:center;margin-top:1.5rem;font-size:0.75rem;color:var(--muted);font-family:'DM Mono',monospace;}
   </style>
 </head>
 <body>
-
 <div class="glow"></div>
-
 <div class="page">
   <div class="auth-card">
-
-    <div class="auth-card-top">
+    <div class="auth-top">
       <a href="index.html" class="auth-logo">Grant<span>App</span> AI</a>
-      <div>
-        <div class="auth-badge">Premium Access</div>
-      </div>
+      <div><div class="auth-badge">Premium Access</div></div>
       <h1 class="auth-heading">Welcome back.</h1>
       <p class="auth-sub">Enter your personal access password to continue to your study space.</p>
     </div>
-
     <div class="auth-body">
-      <!-- No <form> tag per doctrine. Event-driven only. -->
-
       <div>
-        <label class="field-label" for="premium-password-input">Access Password</label>
-        <div class="password-wrap">
-          <input
-            type="password"
-            id="premium-password-input"
-            autocomplete="current-password"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            placeholder="your-access-password"
-          >
-          <button class="btn-toggle-pw" id="btn-toggle-pw" type="button" aria-label="Show password">
-            👁
-          </button>
+        <label class="field-label" for="pw-input">Access Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="pw-input" autocomplete="current-password" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="your-access-password">
+          <button class="toggle-pw" id="toggle-btn" type="button" aria-label="Show password">👁</button>
         </div>
       </div>
-
-      <p id="premium-auth-error" hidden></p>
-
-      <button id="premium-auth-btn" type="button">
-        <span id="premium-auth-spinner" hidden></span>
-        <span>Enter My Space</span>
+      <div id="err-msg"></div>
+      <button id="auth-btn" type="button">
+        <div class="spin" id="spin"></div>
+        <span id="btn-label">Enter My Space</span>
       </button>
     </div>
-
   </div>
-
-  <p class="auth-footer-note">Your session lasts 3 hours. Keep this link private.</p>
+  <p class="foot-note">Your session lasts 3 hours. Keep this link private.</p>
 </div>
 
-<script src="premium-auth.js"></script>
 <script>
-  /* Toggle password visibility */
-  const toggleBtn = document.getElementById('btn-toggle-pw');
-  const pwInput   = document.getElementById('premium-password-input');
-  toggleBtn.addEventListener('click', () => {
-    const isHidden = pwInput.type === 'password';
-    pwInput.type   = isHidden ? 'text' : 'password';
-    toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
-    toggleBtn.textContent = isHidden ? '🙈' : '👁';
-  });
-</script>
+'use strict';
 
+const REGISTRY = {
+  "2a0a29655a718f08c7d570690a97baba2efd24a9ab0aff058a6b1e96f8cafed3":{name:"Conve",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "3c186654c515264f131d68cff2f780daf4ea10158383f17f102eb2e41eef9a52":{name:"Conve",subject:"english",hub:"premium-english-hub.html"},
+  "52325707193ccf20a538d87234a8ed17260df970d580665cab8cda029a83cdc7":{name:"Kaosara",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "d99fce23ebebe0fd7f03553cff47aedfe34b908c25311110577d964038328876":{name:"Kaosara",subject:"english",hub:"premium-english-hub.html"},
+  "e32f4d7152cd507caa3b0c58081936f3189059f34b89115dffdb39852c541618":{name:"Habibat",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "26a8f01afaa022662df7269b575993d62deb879768582ac9e63d57068680968f":{name:"Habibat",subject:"english",hub:"premium-english-hub.html"},
+  "b0ce2a7c2f3539c0e1f52e48ba4a00159504f553ac11fe03c76bee3fa70e12eb":{name:"Oyin",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "7035c13955b75382010c0d0601caa07d30fab3967f6ccd5c816e3b855e74644b":{name:"Oyin",subject:"english",hub:"premium-english-hub.html"},
+  "05d9d182d4b7d22cd42fe87e4d92b93f6ae0a5bb494066058220f1d2cd78c4a2":{name:"Dorcas",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "d64ab31897783c56a4d4b45bb9921256fca9ba0a25519e1112a9afaf883e7674":{name:"Dorcas",subject:"english",hub:"premium-english-hub.html"},
+  "d1deca157a6e62522cf0b60a5d2cb1da19c4357e23836b6dbcc925132a365873":{name:"Famous",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "7df210ce678bba5e2025afe6389f0e9f24bbca1c4fae7f616535f6d82ed83b39":{name:"Famous",subject:"english",hub:"premium-english-hub.html"},
+  "36dc8e24107b582d3cf5e10dd30c1d42b97b0edb4217783068541f8ca08912b4":{name:"Obasesam",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "d058f59e92ac68bc8210d39adc813153d7bf0dfdf4fc9f7d090d218ba77db232":{name:"Obasesam",subject:"english",hub:"premium-english-hub.html"},
+  "b7833bfa0b89ef6c04fbdfb7741f58b9fdb8d6cfd910f76af1d7ef0c9e485080":{name:"Prosper",subject:"chemistry",hub:"premium-chemistry-hub.html"},
+  "3d6519d11f3ac93bd37f760f0e79303e924ac7a0d05d3904cff42d3c953a8dfc":{name:"Prosper",subject:"english",hub:"premium-english-hub.html"}
+};
+
+const SK = 'ga_premium_session';
+const TTL = 3 * 60 * 60 * 1000;
+
+function saveSession(r){ sessionStorage.setItem(SK, JSON.stringify({...r, expires: Date.now()+TTL})); }
+function loadSession(){
+  try{
+    const raw = sessionStorage.getItem(SK);
+    if(!raw) return null;
+    const s = JSON.parse(raw);
+    if(Date.now() > s.expires){ sessionStorage.removeItem(SK); return null; }
+    return s;
+  }catch{ return null; }
+}
+
+async function sha256(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* Redirect if already logged in */
+const existing = loadSession();
+if(existing) window.location.href = existing.hub;
+
+const pwInput  = document.getElementById('pw-input');
+const authBtn  = document.getElementById('auth-btn');
+const errMsg   = document.getElementById('err-msg');
+const spin     = document.getElementById('spin');
+const btnLabel = document.getElementById('btn-label');
+const toggleBtn= document.getElementById('toggle-btn');
+
+function showErr(msg){ errMsg.textContent=msg; errMsg.classList.add('on'); pwInput.classList.add('err'); }
+function clearErr(){ errMsg.classList.remove('on'); pwInput.classList.remove('err'); }
+
+async function attempt(){
+  const pw = pwInput.value.trim();
+  if(!pw){ showErr('Please enter your access password.'); return; }
+  clearErr();
+  authBtn.disabled=true; spin.classList.add('on'); btnLabel.textContent='Checking…';
+
+  const hash   = await sha256(pw);
+  const record = REGISTRY[hash];
+
+  spin.classList.remove('on'); authBtn.disabled=false; btnLabel.textContent='Enter My Space';
+
+  if(!record){
+    showErr("That password doesn't look right. Double-check and try again.");
+    pwInput.select();
+    return;
+  }
+  saveSession(record);
+  window.location.href = record.hub;
+}
+
+authBtn.addEventListener('click', attempt);
+pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') attempt(); });
+pwInput.addEventListener('input', clearErr);
+toggleBtn.addEventListener('click', ()=>{
+  const h = pwInput.type==='password';
+  pwInput.type = h?'text':'password';
+  toggleBtn.setAttribute('aria-label', h?'Hide password':'Show password');
+  toggleBtn.textContent = h?'🙈':'👁';
+});
+</script>
 </body>
 </html>
