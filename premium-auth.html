@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrantApp AI — Premium Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0a0a0f;
+      --surface:    #111118;
+      --surface-2:  #18181f;
+      --border:     #1e1e2e;
+      --border-2:   #2a2a3a;
+      --text:       #f0eff4;
+      --muted:      #7a7a8c;
+      --accent:     #f59e0b;
+      --accent-dim: rgba(245,158,11,0.12);
+      --red:        #ef4444;
+      --red-dim:    rgba(239,68,68,0.10);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Noise grain overlay */
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.4;
+    }
+
+    /* Ambient glow */
+    .glow {
+      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse, rgba(245,158,11,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Layout */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Card */
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    .auth-card-top {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .auth-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+    .auth-logo span { color: var(--accent); }
+
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(245,158,11,0.25);
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+    .auth-badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .auth-heading {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* Form body */
+    .auth-body {
+      padding: 1.75rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .field-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .password-wrap {
+      position: relative;
+    }
+
+    #premium-password-input {
+      width: 100%;
+      padding: 0.8rem 3rem 0.8rem 1rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border-2);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #premium-password-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+    }
+    #premium-password-input[aria-invalid="true"] {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-dim);
+    }
+
+    /* Toggle visibility button */
+    .btn-toggle-pw {
+      position: absolute;
+      right: 0.75rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0.25rem;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .btn-toggle-pw:hover { color: var(--text); }
+
+    /* Error */
+    #premium-auth-error {
+      font-size: 0.82rem;
+      color: #fca5a5;
+      background: var(--red-dim);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      line-height: 1.55;
+    }
+
+    /* Submit */
+    #premium-auth-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    #premium-auth-btn:hover:not(:disabled) {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+    #premium-auth-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Spinner */
+    #premium-auth-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Footer note */
+    .auth-footer-note {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="glow"></div>
+
+<div class="page">
+  <div class="auth-card">
+
+    <div class="auth-card-top">
+      <a href="index.html" class="auth-logo">Grant<span>App</span> AI</a>
+      <div>
+        <div class="auth-badge">Premium Access</div>
+      </div>
+      <h1 class="auth-heading">Welcome back.</h1>
+      <p class="auth-sub">Enter your personal access password to continue to your study space.</p>
+    </div>
+
+    <div class="auth-body">
+      <!-- No <form> tag per doctrine. Event-driven only. -->
+
+      <div>
+        <label class="field-label" for="premium-password-input">Access Password</label>
+        <div class="password-wrap">
+          <input
+            type="password"
+            id="premium-password-input"
+            autocomplete="current-password"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="your-access-password"
+          >
+          <button class="btn-toggle-pw" id="btn-toggle-pw" type="button" aria-label="Show password">
+            👁
+          </button>
+        </div>
+      </div>
+
+      <p id="premium-auth-error" hidden></p>
+
+      <button id="premium-auth-btn" type="button">
+        <span id="premium-auth-spinner" hidden></span>
+        <span>Enter My Space</span>
+      </button>
+    </div>
+
+  </div>
+
+  <p class="auth-footer-note">Your session lasts 3 hours. Keep this link private.</p>
+</div>
+
+<script src="premium-auth.js"></script>
+<script>
+  /* Toggle password visibility */
+  const toggleBtn = document.getElementById('btn-toggle-pw');
+  const pwInput   = document.getElementById('premium-password-input');
+  toggleBtn.addEventListener('click', () => {
+    const isHidden = pwInput.type === 'password';
+    pwInput.type   = isHidden ? 'text' : 'password';
+    toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    toggleBtn.textContent = isHidden ? '🙈' : '👁';
+  });
+</script>
+
+</body>
+</html>

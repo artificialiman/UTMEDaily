@@ -6,26 +6,22 @@
     <title>Coming Soon — GrantApp AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg: #0a0a0f;
-            --surface: #111118;
-            --surface-2: #16161f;
-            --border: #1e1e2e;
-            --border-bright: #2a2a3e;
-            --text: #f0eff4;
-            --muted: #7a7a8c;
-            --accent: #f59e0b;
-            --accent-dim: rgba(245,158,11,0.12);
-            --accent-glow: rgba(245,158,11,0.25);
-            --green: #10b981;
-            --green-dim: rgba(16,185,129,0.12);
+            --bg:         #0a0a0f;
+            --surface:    #111118;
+            --surface-2:  #16161f;
+            --border:     #1e1e2e;
+            --text:       #f0eff4;
+            --muted:      #7a7a8c;
+            --muted-2:    #4a4a5c;
+            --accent:     #f59e0b;
+            --accent-dim: rgba(245,158,11,0.1);
+            --accent-glow:rgba(245,158,11,0.22);
         }
-
-        html { scroll-behavior: smooth; }
 
         body {
             background: var(--bg);
@@ -34,381 +30,76 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
             overflow-x: hidden;
         }
 
-        /* ── GRID BACKGROUND ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
-            background-size: 64px 64px;
-            pointer-events: none;
-            z-index: 0;
+        body::after {
+            content: ''; position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 999; opacity: 0.4;
         }
 
-        /* ── NAV ── */
-        nav {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.25rem 2rem;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: rgba(10,10,15,0.85);
-            backdrop-filter: blur(16px);
-            z-index: 100;
-        }
-
-        .brand {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.25rem;
-            color: var(--text);
-            text-decoration: none;
-            letter-spacing: -0.02em;
-        }
+        /* NAV */
+        nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); background: rgba(10,10,15,0.92); backdrop-filter: blur(14px); }
+        .brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
         .brand span { color: var(--accent); }
+        .back-link { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); text-decoration: none; border: 1px solid var(--border); padding: 0.3rem 0.7rem; border-radius: 4px; transition: color 0.2s, border-color 0.2s; }
+        .back-link:hover { color: var(--text); border-color: var(--muted-2); }
 
-        .back-home {
-            font-size: 0.8rem;
-            color: var(--muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: color 0.2s;
-        }
-        .back-home:hover { color: var(--text); }
-        .back-home::before { content: '←'; }
+        /* MAIN */
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem 2rem; text-align: center; position: relative; }
 
-        /* ── MAIN ── */
-        main {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 600px;
-            padding: 5rem 2rem 4rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-        }
+        .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%); opacity: 0.35; pointer-events: none; }
 
-        /* ── GLOW ORB ── */
-        .orb {
-            position: absolute;
-            top: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 320px;
-            height: 320px;
-            background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            filter: blur(40px);
-        }
+        .orb { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -60%); width: 800px; height: 500px; background: radial-gradient(ellipse, rgba(245,158,11,0.06) 0%, transparent 70%); pointer-events: none; }
 
-        /* ── BADGE ── */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-family: 'Syne', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--accent);
-            border: 1px solid rgba(245,158,11,0.3);
-            background: var(--accent-dim);
-            padding: 0.35rem 0.85rem;
-            border-radius: 999px;
-            margin-bottom: 2rem;
-        }
+        .content { position: relative; z-index: 1; max-width: 580px; }
 
-        .badge-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
+        /* DROP TAG */
+        .drop-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent-dim); background: var(--accent-dim); padding: 0.3rem 0.8rem; border-radius: 999px; margin-bottom: 2.25rem; }
+        .drop-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse-dot 2.5s ease-in-out infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(.65)} }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.7); }
-        }
+        /* HEADLINE */
+        h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.0; margin-bottom: 1.5rem; }
+        h1 em { font-style: normal; background: linear-gradient(135deg, var(--accent) 0%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-        /* ── HEADING ── */
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2.2rem, 6vw, 3.5rem);
-            font-weight: 800;
-            line-height: 1.08;
-            letter-spacing: -0.04em;
-            margin-bottom: 1.25rem;
-        }
+        .sub { font-size: 1.05rem; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 3.5rem; max-width: 460px; margin-left: auto; margin-right: auto; }
 
-        h1 em {
-            font-style: normal;
-            background: linear-gradient(135deg, var(--accent) 0%, #f97316 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        /* WHAT'S DROPPING — hype cards */
+        .drop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 3.5rem; text-align: left; }
 
-        .sub {
-            font-size: 1rem;
-            color: var(--muted);
-            line-height: 1.75;
-            max-width: 440px;
-            margin: 0 auto 3rem;
-        }
+        .drop-card { background: var(--surface); border: 1px solid var(--border); border-radius: 0.85rem; padding: 1.25rem; transition: border-color 0.2s; }
+        .drop-card:hover { border-color: var(--accent-dim); }
 
-        /* ── FORM CARD ── */
-        .form-card {
-            width: 100%;
-            background: var(--surface);
-            border: 1px solid var(--border-bright);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            margin-bottom: 2.5rem;
-            position: relative;
-            overflow: hidden;
-        }
+        .drop-card-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+        .drop-card-title { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
+        .drop-card-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
 
-        .form-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(245,158,11,0.4), transparent);
-        }
+        /* PROMISE STRIP */
+        .promise { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem 1.75rem; margin-bottom: 3rem; text-align: left; border-left: 3px solid var(--accent); }
+        .promise-text { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: -0.015em; line-height: 1.5; color: var(--text); margin-bottom: 0.5rem; }
+        .promise-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
 
-        .form-label {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-            display: block;
-            margin-bottom: 0.5rem;
-            text-align: left;
-        }
+        /* CTA */
+        .cta-group { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
 
-        .form-row {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
+        .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent); color: #000; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; padding: 0.85rem 1.6rem; border-radius: 8px; text-decoration: none; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
+        .btn-primary:hover { background: #fbbf24; transform: translateY(-2px); box-shadow: 0 6px 24px var(--accent-glow); }
 
-        .form-input {
-            width: 100%;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 0.85rem 1rem;
-            color: var(--text);
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
+        .btn-ghost { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; color: var(--muted); font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem; padding: 0.85rem 1.6rem; border-radius: 8px; border: 1px solid var(--border); text-decoration: none; transition: color 0.2s, border-color 0.2s, transform 0.15s; }
+        .btn-ghost:hover { color: var(--text); border-color: var(--muted-2); transform: translateY(-2px); }
 
-        .form-input::placeholder { color: var(--muted); }
+        /* FOOTER */
+        footer { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
+        .footer-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); text-decoration: none; }
+        .footer-brand span { color: var(--accent); }
+        .footer-copy { font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--muted-2); }
 
-        .form-input:focus {
-            border-color: rgba(245,158,11,0.5);
-            box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
-        }
-
-        /* ── EXAM SELECTOR ── */
-        .exam-label {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-            display: block;
-            margin-bottom: 0.75rem;
-            text-align: left;
-        }
-
-        .exam-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .chip {
-            font-size: 0.78rem;
-            padding: 0.35rem 0.85rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            background: transparent;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            transition: all 0.15s;
-            user-select: none;
-        }
-
-        .chip:hover {
-            border-color: var(--border-bright);
-            color: var(--text);
-        }
-
-        .chip.selected {
-            background: var(--accent-dim);
-            border-color: rgba(245,158,11,0.4);
-            color: var(--accent);
-        }
-
-        /* ── SUBMIT BUTTON ── */
-        .btn-notify {
-            width: 100%;
-            background: var(--accent);
-            color: #0a0a0f;
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.9rem 1.5rem;
-            font-family: 'Syne', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-notify:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(245,158,11,0.25);
-        }
-
-        .btn-notify:active { transform: translateY(0); }
-
-        .btn-notify.loading { opacity: 0.7; pointer-events: none; }
-
-        /* ── SUCCESS STATE ── */
-        .success-state {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 0 0.5rem;
-        }
-
-        .success-state.visible { display: flex; }
-        .form-content.hidden { display: none; }
-
-        .success-icon {
-            width: 52px;
-            height: 52px;
-            background: var(--green-dim);
-            border: 1px solid rgba(16,185,129,0.25);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-        }
-
-        .success-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: var(--green);
-        }
-
-        .success-sub {
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        /* ── WHATSAPP CTA ── */
-        .wa-cta {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 3rem;
-        }
-
-        .btn-wa {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            color: var(--text);
-            background: var(--surface);
-            border: 1px solid var(--border-bright);
-            border-radius: 0.75rem;
-            padding: 0.65rem 1.1rem;
-            font-size: 0.82rem;
-            font-family: 'DM Sans', sans-serif;
-            transition: border-color 0.2s, transform 0.15s;
-        }
-
-        .btn-wa:hover {
-            border-color: #25d366;
-            transform: translateY(-2px);
-        }
-
-        .btn-wa svg {
-            width: 16px;
-            height: 16px;
-            fill: #25d366;
-            flex-shrink: 0;
-        }
-
-        /* ── BACK LINK ── */
-        .go-home {
-            font-size: 0.82rem;
-            color: var(--muted);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            border: 1px solid var(--border);
-            padding: 0.55rem 1.1rem;
-            border-radius: 0.75rem;
-            transition: border-color 0.2s, color 0.2s;
-        }
-
-        .go-home:hover { border-color: var(--border-bright); color: var(--text); }
-
-        /* ── FOOTER ── */
-        footer {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            text-align: center;
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--border);
-            color: var(--muted);
-            font-size: 0.78rem;
-        }
-
-        footer span { color: var(--accent); }
-
-        /* ── RESPONSIVE ── */
-        @media (min-width: 480px) {
-            .form-row { flex-direction: row; }
+        @media (max-width: 520px) {
+            .drop-grid { grid-template-columns: 1fr; }
+            .cta-group { flex-direction: column; }
+            .btn-primary, .btn-ghost { justify-content: center; }
         }
     </style>
 </head>
@@ -416,116 +107,67 @@
 
 <nav>
     <a href="index.html" class="brand">Grant<span>App</span> AI</a>
-    <a href="index.html" class="back-home">Back to Home</a>
+    <a href="index.html" class="back-link">← All Exams</a>
 </nav>
 
 <main>
+    <div class="grid-bg"></div>
     <div class="orb"></div>
 
-    <div class="badge">
-        <span class="badge-dot"></span>
-        In Development
-    </div>
+    <div class="content">
 
-    <h1>Something <em>big</em><br>is coming.</h1>
-
-    <p class="sub">
-        We're building this section right now. Drop your details and we'll notify you the moment it goes live — you'll be among the first in.
-    </p>
-
-    <div class="form-card">
-        <div class="form-content" id="formContent">
-            <div class="form-row">
-                <div style="flex:1">
-                    <label class="form-label" for="nameInput">Your Name</label>
-                    <input class="form-input" id="nameInput" type="text" placeholder="Ada Okonkwo" autocomplete="name">
-                </div>
-                <div style="flex:1">
-                    <label class="form-label" for="phoneInput">WhatsApp Number</label>
-                    <input class="form-input" id="phoneInput" type="tel" placeholder="+234 800 000 0000" autocomplete="tel">
-                </div>
-            </div>
-
-            <span class="exam-label">What are you preparing for?</span>
-            <div class="exam-chips" id="examChips">
-                <span class="chip" data-val="JAMB">JAMB / UTME</span>
-                <span class="chip" data-val="WASSCE">WASSCE</span>
-                <span class="chip" data-val="AP">AP Exams</span>
-                <span class="chip" data-val="SAT">SAT</span>
-                <span class="chip" data-val="10K">10K Mastery</span>
-                <span class="chip" data-val="Other">Other</span>
-            </div>
-
-            <button class="btn-notify" id="notifyBtn" onclick="handleSubmit()">
-                Notify Me When It's Ready →
-            </button>
+        <div class="drop-tag">
+            <span class="drop-dot"></span>
+            Next Drop
         </div>
 
-        <div class="success-state" id="successState">
-            <div class="success-icon">✓</div>
-            <div class="success-title">You're on the list.</div>
-            <div class="success-sub" id="successMsg">We'll reach you on WhatsApp the moment this goes live.</div>
+        <h1>Something<br><em>big</em> is coming.</h1>
+
+        <p class="sub">We're building the next track right now — same obsession over quality, same real past questions, same explanations that actually teach you something.</p>
+
+        <!-- WHAT'S DROPPING -->
+        <div class="drop-grid">
+            <div class="drop-card">
+                <div class="drop-card-icon">📝</div>
+                <div class="drop-card-title">Real past questions</div>
+                <div class="drop-card-desc">Not made up. Not recycled from the internet. Sourced, verified, and ready.</div>
+            </div>
+            <div class="drop-card">
+                <div class="drop-card-icon">⏱</div>
+                <div class="drop-card-title">Timed sessions</div>
+                <div class="drop-card-desc">Practice the way the real exam feels — with a clock running.</div>
+            </div>
+            <div class="drop-card">
+                <div class="drop-card-icon">💡</div>
+                <div class="drop-card-title">Explanations that teach</div>
+                <div class="drop-card-desc">Every answer comes with a breakdown. You'll understand it, not just memorise it.</div>
+            </div>
+            <div class="drop-card">
+                <div class="drop-card-icon">📄</div>
+                <div class="drop-card-title">Your PDF, always</div>
+                <div class="drop-card-desc">Walk away with a score report you can actually keep and share.</div>
+            </div>
         </div>
+
+        <!-- PROMISE -->
+        <div class="promise">
+            <div class="promise-text">Every question on GrantApp AI is answered by the owner before it reaches you.</div>
+            <div class="promise-sub">If it's not ready to teach from, it doesn't ship. That's not a policy — it's how this was built from day one.</div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-group">
+            <a href="jamb.html" class="btn-primary">Practice JAMB now →</a>
+            <a href="index.html" class="btn-ghost">← Back to all exams</a>
+        </div>
+
     </div>
-
-    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1.25rem;">
-        Or join our community now while you wait
-    </p>
-
-    <div class="wa-cta">
-        <a class="btn-wa" href="https://chat.whatsapp.com/BVloVed0PIDIbojLeRMQCU?mode=gi_t" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            Join the Group
-        </a>
-        <a class="btn-wa" href="https://whatsapp.com/channel/0029VbCMrEVIyPtLYUrc7I3K" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            Follow the Channel
-        </a>
-    </div>
-
-    <a href="index.html" class="go-home">← Back to GrantApp</a>
 </main>
 
 <footer>
-    © 2025 <span>GrantApp AI</span> · Africa's best matriculation exam prep
+    <a href="index.html" class="footer-brand">Grant<span>App</span> AI</a>
+    <span class="footer-copy">© 2026 GrantApp AI</span>
 </footer>
-
-<script>
-    // Chip toggle
-    document.querySelectorAll('.chip').forEach(chip => {
-        chip.addEventListener('click', () => chip.classList.toggle('selected'));
-    });
-
-    function handleSubmit() {
-        const name  = document.getElementById('nameInput').value.trim();
-        const phone = document.getElementById('phoneInput').value.trim();
-        const exams = [...document.querySelectorAll('.chip.selected')].map(c => c.dataset.val);
-
-        if (!name || !phone) {
-            document.getElementById('nameInput').focus();
-            document.getElementById('nameInput').style.borderColor = 'rgba(245,158,11,0.6)';
-            setTimeout(() => document.getElementById('nameInput').style.borderColor = '', 1500);
-            return;
-        }
-
-        // Build WhatsApp pre-fill message → sends contact to admin
-        const examList = exams.length ? exams.join(', ') : 'Not specified';
-        const msg = encodeURIComponent(
-            `Hi GrantApp AI 👋\nI want to be notified when the new section is live.\n\nName: ${name}\nExam: ${examList}`
-        );
-
-        // Show success immediately, then open WhatsApp
-        document.getElementById('formContent').classList.add('hidden');
-        document.getElementById('successMsg').textContent =
-            `We'll reach you on WhatsApp soon, ${name.split(' ')[0]}.`;
-        document.getElementById('successState').classList.add('visible');
-
-        // Small delay so user sees confirmation before redirect
-        setTimeout(() => {
-            window.open(`https://wa.me/2348000000000?text=${msg}`, '_blank');
-        }, 800);
-    }
-</script>
 
 </body>
 </html>
