@@ -392,9 +392,119 @@
       .score-strip { grid-template-columns: repeat(2,1fr); }
       .hdr-title { font-size: 13px; }
     }
+
+    /* ── AUTH GATE ── */
+    #auth-gate {
+      position: fixed; inset: 0; z-index: 99999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    #auth-gate.unlocked { display: none; }
+
+    .gate-card {
+      width: 100%; max-width: 400px;
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .gate-top {
+      padding: 1.75rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--sep);
+      text-align: center;
+    }
+    .gate-brand {
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem; display: block;
+    }
+    .gate-title {
+      font-family: var(--sans); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.35rem; letter-spacing: -0.02em;
+    }
+    .gate-sub {
+      font-size: 0.82rem; color: var(--ter); line-height: 1.6;
+    }
+    .gate-body {
+      padding: 1.5rem 2rem 2rem;
+      display: flex; flex-direction: column; gap: 0.9rem;
+    }
+    .gate-label {
+      font-family: var(--mono); font-size: 0.62rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--ter); margin-bottom: 0.35rem; display: block;
+    }
+    .gate-pw-wrap { position: relative; }
+    #gate-input {
+      width: 100%; padding: 0.8rem 3rem 0.8rem 1rem;
+      background: var(--card2); border: 1px solid var(--sep);
+      border-radius: 10px; color: var(--text);
+      font-family: var(--mono); font-size: 0.9rem;
+      letter-spacing: 0.04em; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #gate-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
+    #gate-input.err { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+    .gate-toggle {
+      position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--ter);
+      cursor: pointer; font-size: 0.85rem; padding: 0.25rem; line-height: 1;
+    }
+    #gate-err {
+      font-size: 0.8rem; color: #fca5a5;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 8px; padding: 0.6rem 0.8rem;
+      line-height: 1.5; display: none;
+    }
+    #gate-err.on { display: block; }
+    #gate-btn {
+      width: 100%; padding: 0.85rem;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-weight: 700; font-size: 0.9rem;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s; margin-top: 0.25rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    #gate-btn:hover:not(:disabled) { opacity: 0.88; }
+    #gate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .gate-spin {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(0,0,0,0.2); border-top-color: #000;
+      border-radius: 50%; animation: gspin 0.7s linear infinite;
+      display: none; flex-shrink: 0;
+    }
+    .gate-spin.on { display: block; }
+    @keyframes gspin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
+
+<!-- ── AUTH GATE ── -->
+<div id="auth-gate">
+  <div class="gate-card">
+    <div class="gate-top">
+      <span class="gate-brand">GrantApp AI · Premium</span>
+      <div class="gate-title">Chemistry — Paper 1</div>
+      <div class="gate-sub">Enter your access password to begin.</div>
+    </div>
+    <div class="gate-body">
+      <div>
+        <label class="gate-label" for="gate-input">Access Password</label>
+        <div class="gate-pw-wrap">
+          <input type="password" id="gate-input" autocomplete="current-password" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="your-access-password">
+          <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">👁</button>
+        </div>
+      </div>
+      <div id="gate-err"></div>
+      <button id="gate-btn" type="button">
+        <div class="gate-spin" id="gate-spin"></div>
+        <span id="gate-btn-label">Unlock Paper</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- print-only header (hidden on screen) -->
 <div id="print-header" style="display:none">
@@ -483,23 +593,26 @@
 <script>
 'use strict';
 
-/* ── SESSION: watermark + greeting ── */
+/* ── AUTH GATE ── */
 (function() {
-  var SK = 'ga_premium_session';
-  var TTL = 3 * 60 * 60 * 1000;
-  function loadSession() {
-    try {
-      var raw = sessionStorage.getItem(SK);
-      if (!raw) return null;
-      var s = JSON.parse(raw);
-      if (Date.now() > s.expires) { sessionStorage.removeItem(SK); return null; }
-      return s;
-    } catch(e) { return null; }
+  'use strict';
+
+  var REGISTRY = {
+    "2a0a29655a718f08c7d570690a97baba2efd24a9ab0aff058a6b1e96f8cafed3": "Conve",
+    "52325707193ccf20a538d87234a8ed17260df970d580665cab8cda029a83cdc7": "Kaosara",
+    "e32f4d7152cd507caa3b0c58081936f3189059f34b89115dffdb39852c541618": "Habibat",
+    "b0ce2a7c2f3539c0e1f52e48ba4a00159504f553ac11fe03c76bee3fa70e12eb": "Oyin",
+    "05d9d182d4b7d22cd42fe87e4d92b93f6ae0a5bb494066058220f1d2cd78c4a2": "Dorcas",
+    "d1deca157a6e62522cf0b60a5d2cb1da19c4357e23836b6dbcc925132a365873": "Famous",
+    "36dc8e24107b582d3cf5e10dd30c1d42b97b0edb4217783068541f8ca08912b4": "Obasesam",
+    "b7833bfa0b89ef6c04fbdfb7741f58b9fdb8d6cfd910f76af1d7ef0c9e485080": "Prosper"
+  };
+
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
   }
 
-  var session = loadSession();
-
-  /* inject watermark */
   function injectWatermark(name) {
     var wm = document.getElementById('watermark');
     var tile = name + ' · GrantApp AI · ';
@@ -510,20 +623,54 @@
     wm.innerHTML = html;
   }
 
-  if (session && session.name) {
-    injectWatermark(session.name);
+  function unlock(name) {
+    document.getElementById('auth-gate').classList.add('unlocked');
+    injectWatermark(name);
     var greet = document.getElementById('greeting');
-    greet.textContent = 'Hey, ' + session.name;
+    greet.textContent = 'Hey, ' + name;
     greet.style.display = 'block';
-    /* print header student name */
-    document.getElementById('print-student-name').textContent = 'Student: ' + session.name;
-  } else {
-    /* No session — still works, watermark blank */
-    injectWatermark('GrantApp AI');
+    document.getElementById('print-student-name').textContent = 'Student: ' + name;
+    document.getElementById('print-date').textContent =
+      'Printed: ' + new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
   }
 
-  document.getElementById('print-date').textContent =
-    'Printed: ' + new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var inp     = document.getElementById('gate-input');
+  var btn     = document.getElementById('gate-btn');
+  var errEl   = document.getElementById('gate-err');
+  var spinEl  = document.getElementById('gate-spin');
+  var lblEl   = document.getElementById('gate-btn-label');
+  var togEl   = document.getElementById('gate-toggle');
+
+  function showErr(msg) { errEl.textContent = msg; errEl.classList.add('on'); inp.classList.add('err'); }
+  function clearErr()   { errEl.classList.remove('on'); inp.classList.remove('err'); }
+
+  async function attempt() {
+    var pw = inp.value.trim();
+    if (!pw) { showErr('Please enter your access password.'); return; }
+    clearErr();
+    btn.disabled = true; spinEl.classList.add('on'); lblEl.textContent = 'Checking…';
+
+    var hash = await sha256(pw);
+    var name = REGISTRY[hash];
+
+    spinEl.classList.remove('on'); btn.disabled = false; lblEl.textContent = 'Unlock Paper';
+
+    if (!name) {
+      showErr("That password doesn't look right. Try again.");
+      inp.select();
+      return;
+    }
+    unlock(name);
+  }
+
+  btn.addEventListener('click', attempt);
+  inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') attempt(); });
+  inp.addEventListener('input', clearErr);
+  togEl.addEventListener('click', function() {
+    var hide = inp.type === 'password';
+    inp.type = hide ? 'text' : 'password';
+    togEl.textContent = hide ? '🙈' : '👁';
+  });
 })();
 
 /* ── QUESTIONS ── */
