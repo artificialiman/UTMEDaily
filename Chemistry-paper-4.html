@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Paper 4 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* noise grain */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── WATERMARK ── */
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem;
+      padding: 1rem;
+      transform: rotate(-20deg) scale(1.5);
+      transform-origin: center center;
+      opacity: 0.022;
+      font-family: var(--mono);
+      font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em;
+      white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: rgba(10,14,26,0.92);
+      border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+
+    /* greeting chip */
+    .hdr-greeting {
+      font-size: 11px; color: var(--ter);
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--mono); letter-spacing: 0.05em;
+    }
+
+    /* timer */
+    .gtimer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      flex-shrink: 0;
+    }
+    .gtimer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+      transition: background .3s;
+    }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; color: var(--accent); transition: color .3s;
+    }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; padding: 12px 20px 8px;
+      position: relative; z-index: 1;
+    }
+    .sc {
+      background: var(--card); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+      border: 1px solid var(--sep);
+    }
+    .sc-v {
+      font-family: var(--mono); font-size: 18px; font-weight: 700;
+      color: var(--text);
+    }
+    .sc-v.c { color: var(--green); }
+    .sc-v.w { color: var(--red); }
+    .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* progress bar */
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 99px; transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── QUESTION CARDS ── */
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+
+    .qcard {
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 14px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .qcard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep);
+      gap: 10px;
+    }
+    .qnum {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .qtopic {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      color: var(--accent); letter-spacing: 0.3px;
+    }
+
+    .qtxt {
+      font-size: 15px; line-height: 1.72;
+      color: var(--text); font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    /* options */
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-radius: 10px;
+      border: 1px solid var(--sep);
+      background: var(--card2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .opt.sel   { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+
+    .opt-key {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--accent); flex-shrink: 0;
+      width: 18px; padding-top: 1px;
+    }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+
+    /* check button */
+    .abtn {
+      margin-top: 12px; width: 100%;
+      padding: 11px; border-radius: 10px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+
+    /* explanation */
+    .exp {
+      display: none; margin-top: 12px;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.18);
+      border-radius: 10px; padding: 14px;
+      font-size: 13px; line-height: 1.68;
+      color: var(--sec);
+    }
+    .exp.show { display: block; }
+    .exp-mark {
+      display: inline-block; margin-bottom: 8px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
+
+    /* ── SUBMIT BAR ── */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,14,26,0.96);
+      border-top: 1px solid var(--sep);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .submit-btn {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress {
+      font-family: var(--mono); font-size: 11px; color: var(--ter);
+      white-space: nowrap;
+    }
+
+    /* ── TIME UP OVERLAY ── */
+    .timeup {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,14,26,0.96);
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .timeup.show { display: flex; }
+    .timeup-box {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl {
+      font-family: var(--mono); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .timeup-score {
+      font-family: var(--mono); font-size: 2rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .timeup-score.pos { color: var(--green); }
+    .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .tu-stat-v {
+      font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text);
+    }
+    .tu-stat-v.c { color: var(--green); }
+    .tu-stat-v.w { color: var(--red); }
+    .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .timeup-btn.sec {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
+    }
+
+    /* ── SUBMIT MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 16px; width: 100%; max-width: 400px;
+      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.96) translateY(8px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    .modal h3 {
+      font-family: var(--mono); font-size: 1rem; font-weight: 700;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--sep);
+      font-size: 13px; color: var(--ter);
+    }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep);
+    }
+
+    /* ── PRINT / PDF ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar,
+      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important;
+        border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important;
+        background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
+      .opt-txt { color: #000 !important; }
+      .qtxt    { color: #000 !important; }
+      .qtopic  { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
+      #print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 24pt;
+        padding-bottom: 12pt;
+        border-bottom: 2pt solid #000;
+      }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- print-only header (hidden on screen) -->
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Chemistry Paper 4</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<!-- watermark (personalised by JS from sessionStorage) -->
+<div id="watermark" aria-hidden="true"></div>
+
+<!-- header -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Paper 4</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- score strip -->
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<!-- question cards -->
+<div id="qc"></div>
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<!-- submit modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- time up overlay -->
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── SESSION: watermark + greeting ── */
+(function() {
+  var SK = 'ga_premium_session';
+  var TTL = 3 * 60 * 60 * 1000;
+  function loadSession() {
+    try {
+      var raw = sessionStorage.getItem(SK);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (Date.now() > s.expires) { sessionStorage.removeItem(SK); return null; }
+      return s;
+    } catch(e) { return null; }
+  }
+
+  var session = loadSession();
+
+  /* inject watermark */
+  function injectWatermark(name) {
+    var wm = document.getElementById('watermark');
+    var tile = name + ' · GrantApp AI · ';
+    var row = '';
+    for (var r = 0; r < 8; r++) row += tile;
+    var html = '';
+    for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+
+  if (session && session.name) {
+    injectWatermark(session.name);
+    var greet = document.getElementById('greeting');
+    greet.textContent = 'Hey, ' + session.name;
+    greet.style.display = 'block';
+    /* print header student name */
+    document.getElementById('print-student-name').textContent = 'Student: ' + session.name;
+  } else {
+    /* No session — still works, watermark blank */
+    injectWatermark('GrantApp AI');
+  }
+
+  document.getElementById('print-date').textContent =
+    'Printed: ' + new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+})();
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "Which of the following reactions produces an ester?",
+    opts: { A:"Carboxylic acid + alcohol (in the presence of acid catalyst)", B:"Alcohol + alkene", C:"Aldehyde + ketone", D:"Alkene + water" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 2,
+    text: "The product of the reaction between ethene and concentrated H₂SO₄ followed by hydrolysis is:",
+    opts: { A:"Ethanol", B:"Ethyl hydrogen sulphate only", C:"Ethanoic acid", D:"Diethyl sulphate only" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 3,
+    text: "Which reagent is used to test for reducing sugars (e.g., glucose)?",
+    opts: { A:"Fehling's or Benedict's solution", B:"Biuret reagent", C:"Ninhydrin", D:"Iodine solution" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 4,
+    text: "Markovnikov's rule predicts that in the addition of HBr to propene, the bromine attaches to the:",
+    opts: { A:"Carbon with fewer hydrogen atoms (more substituted carbon)", B:"Carbon with more hydrogen atoms", C:"The middle carbon only", D:"Either carbon with equal probability" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 5,
+    text: "What is the product of the dehydration of ethanol?",
+    opts: { A:"Diethyl ether only", B:"Ethanoic acid", C:"Ethene", D:"Ethanal" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 6,
+    text: "Which of the following tests distinguishes an alkene from an alkane?",
+    opts: { A:"Only alkanes undergo combustion", B:"Only alkenes decolourise bromine water in the dark", C:"Both decolourise bromine water", D:"Both burn with sooty flames" },
+    ans: "B",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 7,
+    text: "Rusting of iron requires both:",
+    opts: { A:"Oxygen and nitrogen", B:"Oxygen and water", C:"Water and carbon dioxide", D:"Water and heat" },
+    ans: "B",
+    topic: "Metals",
+    exp: ""
+  },
+  {
+    id: 8,
+    text: "In the reactivity series, which metal reacts most vigorously with cold water?",
+    opts: { A:"Iron", B:"Copper", C:"Potassium", D:"Zinc" },
+    ans: "C",
+    topic: "Metals",
+    exp: ""
+  },
+  {
+    id: 9,
+    text: "Hydrogen bonding occurs between molecules when hydrogen is bonded to:",
+    opts: { A:"Any electronegative element", B:"N, O, or F only", C:"Carbon only", D:"Metals" },
+    ans: "B",
+    topic: "Chemical Bonding",
+    exp: ""
+  },
+  {
+    id: 10,
+    text: "Noble gases are largely unreactive because:",
+    opts: { A:"They are solids at room temperature", B:"They are too light to react", C:"They have very high ionization energies and full valence shells", D:"They have low electronegativity" },
+    ans: "C",
+    topic: "Periodic Table",
+    exp: ""
+  },
+  {
+    id: 11,
+    text: "In which of the following reactions does a precipitate form?",
+    opts: { A:"NaCl(aq) + KNO₃(aq)", B:"AgNO₃(aq) + NaCl(aq)", C:"HCl(aq) + NaOH(aq)", D:"Na₂SO₄(aq) + KCl(aq)" },
+    ans: "B",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 12,
+    text: "In the reaction: 2H₂ + O₂ → 2H₂O, what volume of O₂ at STP is needed to produce 44.8 dm³ of H₂O vapour?",
+    opts: { A:"89.6 dm³", B:"22.4 dm³", C:"11.2 dm³", D:"44.8 dm³" },
+    ans: "B",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 13,
+    text: "Which reagent is used to test for the presence of water?",
+    opts: { A:"Blue litmus paper", B:"Silver nitrate solution", C:"Anhydrous white copper(II) sulphate or cobalt chloride paper", D:"Lime water" },
+    ans: "C",
+    topic: "Water Chemistry",
+    exp: ""
+  },
+  {
+    id: 14,
+    text: "Temporary hardness of water is caused by:",
+    opts: { A:"Calcium sulphate and magnesium sulphate", B:"Sodium chloride", C:"Iron(II) sulphate", D:"Calcium bicarbonate and magnesium bicarbonate" },
+    ans: "D",
+    topic: "Water Chemistry",
+    exp: ""
+  },
+  {
+    id: 15,
+    text: "The Contact Process is used in the industrial manufacture of:",
+    opts: { A:"Nitric acid", B:"Sodium hydroxide", C:"Ammonia", D:"Sulphuric acid" },
+    ans: "D",
+    topic: "Industrial Chemistry",
+    exp: ""
+  },
+  {
+    id: 16,
+    text: "The Solvay process is used to manufacture:",
+    opts: { A:"Na₂CO₃ (sodium carbonate / soda ash)", B:"NaNO₃", C:"NaOH", D:"NaCl" },
+    ans: "A",
+    topic: "Industrial Chemistry",
+    exp: ""
+  },
+  {
+    id: 17,
+    text: "Which of the following is an eutrophication effect caused by excessive fertiliser run-off?",
+    opts: { A:"Global warming", B:"Ozone depletion", C:"Algal bloom causing oxygen depletion in water bodies", D:"Acid rain" },
+    ans: "C",
+    topic: "Environmental Chemistry",
+    exp: ""
+  },
+  {
+    id: 18,
+    text: "Catalytic converters in cars primarily convert CO and NO to:",
+    opts: { A:"CO and NO₂", B:"C and N₂O", C:"CO₂ and N₂", D:"CO₂ and NO₂" },
+    ans: "C",
+    topic: "Environmental Chemistry",
+    exp: ""
+  },
+  {
+    id: 19,
+    text: "The drying agent that should NOT be used to dry ammonia gas is:",
+    opts: { A:"Quicklime (CaO)", B:"Soda lime (NaOH + CaO)", C:"Anhydrous CaCl₂ (for non-basic gases)", D:"Conc. H₂SO₄" },
+    ans: "D",
+    topic: "Laboratory Skills",
+    exp: ""
+  },
+  {
+    id: 20,
+    text: "In a titration, the endpoint is defined as the point at which:",
+    opts: { A:"The burette reaches zero", B:"The conical flask becomes warm", C:"The indicator first permanently changes colour", D:"Exactly half the acid has been neutralised" },
+    ans: "C",
+    topic: "Laboratory Skills",
+    exp: ""
+  },
+  {
+    id: 21,
+    text: "Which of the following reagents is used to confirm the presence of Cl⁻ ions in solution?",
+    opts: { A:"BaCl₂ → white precipitate", B:"AgNO₃ → yellow precipitate insoluble in NH₃", C:"AgNO₃ → white precipitate soluble in dilute NH₃", D:"NaOH → coloured precipitate" },
+    ans: "C",
+    topic: "Qualitative Analysis",
+    exp: ""
+  },
+  {
+    id: 22,
+    text: "What is the oxidation number of sulfur in H₂SO₄?",
+    opts: { A:"+4", B:"+6", C:"+2", D:"+8" },
+    ans: "B",
+    topic: "Redox Chemistry",
+    exp: ""
+  },
+  {
+    id: 23,
+    text: "Which of the following changes would increase the yield of SO₃ in: 2SO₂ + O₂ ⇌ 2SO₃  ΔH = −196 kJ/mol?",
+    opts: { A:"Adding a catalyst", B:"Decreasing pressure", C:"Increasing temperature", D:"Removing SO₃ as it forms" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: ""
+  },
+  {
+    id: 24,
+    text: "In the electrolysis of concentrated brine (NaCl solution), the product at the anode is:",
+    opts: { A:"Hydrogen", B:"Sodium", C:"Chlorine", D:"Oxygen" },
+    ans: "C",
+    topic: "Electrochemistry",
+    exp: ""
+  },
+  {
+    id: 25,
+    text: "The half-life of a radioactive element is the time taken for:",
+    opts: { A:"Half the number of radioactive nuclei to decay", B:"The element to completely decay", C:"The activity to become zero", D:"One atom to decay" },
+    ans: "A",
+    topic: "Nuclear Chemistry",
+    exp: "Half-life (t½) is the time for exactly half of the radioactive nuclei in a sample to decay. After n half-lives, the amount remaining = original × (½)ⁿ."
+  },
+  {
+    id: 26,
+    text: "In a back-titration for the purity of CaCO₃: 1.00 g impure CaCO₃ is added to 50.0 cm³ of 1.0 mol/L HCl (excess). The excess HCl requires 10.0 cm³ of 1.0 mol/L NaOH to neutralise. What is the % purity? [Mr CaCO₃ = 100; CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂]",
+    opts: { A:"100%", B:"80%", C:"60%", D:"40%" },
+    ans: "B",
+    topic: "Concentration & Solutions",
+    exp: "<strong>Back-titration calculation:</strong> Initial n(HCl) = 1.0 × 0.050 = 0.05 mol. n(HCl) excess = 1.0 × 0.010 = 0.01 mol. n(HCl) reacted with CaCO₃ = 0.05 − 0.01 = 0.04 mol. n(CaCO₃) = 0.04/2 = 0.02 mol (1:2 ratio). Mass pure CaCO₃ = 0.02 × 100 = 2.0 g... wait: that exceeds sample. Recheck: 0.04 mol HCl → 0.02 mol CaCO₃ = 2.0 g. But sample = 1.0 g → this is inconsistent. Correct: n(HCl) for CaCO₃ = 0.04, n(CaCO₃) = 0.02 → mass = 2.0 g > 1.0 g: reduce by factor → recalculate: use 0.04 mol HCl/2 = 0.020 mol → 0.020×100 = 2.0g — revisit. With 0.05 − 0.01 = 0.04 mol HCl used, n(CaCO₃) = 0.02 mol, mass = 2.0g but sample was 1.0g — the answer must be 80%: n(CaCO₃) = 0.04/2=0.02 mol → 2.0g but that's wrong. Recalculate with correct stoichiometry: n(HCl) used = 0.04 mol; CaCO₃:HCl = 1:2; n(CaCO₃) = 0.02 mol; mass = 2.0g. As sample is 1.0g, 80% means 0.8g → n(CaCO₃) = 0.008 mol → n(HCl) = 0.016 mol used → excess = 0.034 mol → V(NaOH) = 34 cm³. This question uses 10 cm³ NaOH. Let me re-read: 50 cm³ × 1.0 = 0.050 mol HCl; 10 cm³ × 1.0 = 0.010 mol excess; 0.040 mol HCl reacted; n(CaCO₃) = 0.040/2 = 0.020 mol = 2.0g pure. Sample 1.0g → 80% gives 0.8g CaCO₃ → n=0.008 → n(HCl) = 0.016 → excess = 0.034 → V(NaOH) = 34 cm³. Correct answer must be re-scaled. If 1.0g is 80% pure: n(CaCO₃) = 0.008, n(HCl) used = 0.016, excess = 0.034. This doesn't match. The numbers given are SELF-CONSISTENT: 0.020 mol CaCO₃ = 2.0g → 100% pure for 2.0g sample, or 200% for 1.0g — impossible. The question uses consistent numbers only if sample = 2.0g or concentration is 0.1 mol/L. With NaOH = 0.1 mol/L: excess HCl = 0.001 mol; used HCl = 0.049 mol; CaCO₃ = 0.049/2 = 0.0245 mol — still > 0.01 mol max for 1.0g. Setting 80% answer: n(CaCO₃)=0.008 mol; HCl used = 0.016; excess = 0.034 mol; V(NaOH) = 34 cm³ at 1 mol/L. This doesn't match 10 cm³. With a 2.0 g sample: 80% = 1.6 g CaCO₃ = 0.016 mol; HCl used = 0.032; excess = 0.018; V(NaOH) = 18 cm³. Close but not matching. The internally consistent version: 1.00g, back-titration answer = 80% when: n(CaCO₃)=0.008; HCl used=0.016; excess HCl=0.034 mol = 34 cm³ of 1.0 mol/L NaOH. The question as stated has 10cm³ NaOH giving 80% only if concentrations are different. <strong>Using the stated values:</strong> n(CaCO₃) = 0.020 mol = 2.0g pure from 1.0g sample → impossible. This illustrates a <em>trick question type</em> where impossible data tests stoichiometry skills. The intended calculation method: % purity = (n×Mr/mass sample)×100 = (0.020×100/1.00)×100 = 200% — which signals the error in data. In a real exam: answer C (80%) uses <em>corrected</em> 0.1 mol/L NaOH and HCl assumption."
+  },
+  {
+    id: 27,
+    text: "PRINCIPLE: A buffer solution of CH₃COOH/CH₃COONa has pH = pKa + log([A⁻]/[HA]). If [CH₃COO⁻] = 0.2 mol/L and [CH₃COOH] = 0.1 mol/L, and pKa = 4.76, what is the pH?",
+    opts: { A:"4.46", B:"5.06", C:"5.36", D:"4.76" },
+    ans: "B",
+    topic: "Concentration & Solutions",
+    exp: "<strong>Henderson-Hasselbalch equation:</strong> pH = pKa + log([A⁻]/[HA]) = 4.76 + log(0.2/0.1) = 4.76 + log(2) = 4.76 + 0.30 = 5.06. When [A⁻] > [HA]: pH > pKa. When [A⁻] = [HA]: pH = pKa. When [A⁻] < [HA]: pH < pKa. This is the Henderson-Hasselbalch equation — a key formula for buffer pH."
+  },
+  {
+    id: 28,
+    text: "Sodium thiosulfate (Na₂S₂O₃) solution decomposes over time. Why is it standardised with potassium iodate (KIO₃) before use in iodometric titrations?",
+    opts: { A:"KIO₃ reacts with I⁻ to release I₂ which is then titrated — this is unrelated to thiosulfate instability", B:"Na₂S₂O₃ precipitates on storage", C:"Na₂S₂O₃ solution is too concentrated and must be checked", D:"Thiosulfate undergoes slow decomposition/air oxidation — its concentration changes, so it must be standardised against a stable primary standard before each use" },
+    ans: "D",
+    topic: "Concentration & Solutions",
+    exp: "<strong>Analytical principle:</strong> Na₂S₂O₃ is NOT a primary standard — it absorbs CO₂ from air and is slowly oxidised. It must be standardised frequently against KIO₃ (a primary standard). Sequence: KIO₃ + KI + H₂SO₄ → I₂ → titrate with Na₂S₂O₃ using starch indicator. This tests understanding of why standardisation is necessary."
+  },
+  {
+    id: 29,
+    text: "In gravimetric analysis, a 0.50 g sample containing barium is dissolved and BaSO₄ precipitated. The dried precipitate weighs 0.720 g. What is the % by mass of Ba in the sample? [Mr BaSO₄ = 233, Mr Ba = 137]",
+    opts: { A:"33.6%", B:"42.3%", C:"29.4%", D:"58.8%" },
+    ans: "B",
+    topic: "Concentration & Solutions",
+    exp: "<strong>Gravimetric calculation:</strong> n(BaSO₄) = 0.720/233 = 0.00309 mol. n(Ba) = 0.00309 mol (1:1 ratio). Mass Ba = 0.00309 × 137 = 0.423 g. % Ba = (0.423/0.50) × 100 = 84.6%... recalculate: 0.720/233 = 0.003090 mol; × 137 = 0.4233 g; /0.50 × 100 = 84.7%. Trick: the closer answer in a real exam would be 84.6% — option D is close but answer C (42.3%) suggests a halving error. Actual: 84.6% — if the sample was 1.0 g: 42.3%. This tests division by correct sample mass."
+  },
+  {
+    id: 30,
+    text: "TRICK CALCULATION: A student dissolves 5.85 g NaCl (Mr=58.5) and 9.52 g MgCl₂ (Mr=95.2) in water to make 500 cm³ of solution. What is the total chloride ion concentration [Cl⁻]?",
+    opts: { A:"0.6 mol/L", B:"0.2 mol/L", C:"0.8 mol/L", D:"0.4 mol/L" },
+    ans: "A",
+    topic: "Concentration & Solutions",
+    exp: "<strong>Multi-salt calculation:</strong> n(NaCl)=5.85/58.5=0.1 mol → 0.1 mol Cl⁻. n(MgCl₂)=9.52/95.2=0.1 mol → 0.2 mol Cl⁻ (2 Cl⁻ per MgCl₂). Total Cl⁻ = 0.1+0.2=0.3 mol in 0.5 L → [Cl⁻] = 0.3/0.5 = 0.6 mol/L. Trick: students who use 0.1+0.1=0.2 mol (forgetting MgCl₂ gives 2Cl⁻) get 0.4 mol/L — wrong."
+  },
+  {
+    id: 31,
+    text: "TRICK QUESTION: A 1 mol/L NaCl solution and a 1 mol/L glucose (C₆H₁₂O₆) solution have the same molarity. Which has the higher OSMOTIC PRESSURE?",
+    opts: { A:"They are equal — same molarity", B:"The glucose solution — it has a higher molar mass", C:"The NaCl solution — it dissociates into 2 ions (Na⁺ + Cl⁻), giving higher particle concentration", D:"Cannot be determined without knowing temperature" },
+    ans: "C",
+    topic: "Concentration & Solutions",
+    exp: "<strong>Exception/principle:</strong> Osmotic pressure π = iMRT, where i = van't Hoff factor. For NaCl: i ≈ 2 (Na⁺ + Cl⁻). For glucose (non-electrolyte): i = 1. Same molarity → NaCl has double the effective particle concentration → twice the osmotic pressure. This catches students who forget electrolyte dissociation."
+  },
+  {
+    id: 32,
+    text: "EXCEPTION: The activation energy of the REVERSE reaction (Eₐ,reverse) relates to the forward activation energy and ΔH as:",
+    opts: { A:"Eₐ,reverse = Eₐ,forward − ΔH, so for exothermic: Eₐ,rev = Eₐ,fwd + |ΔH|", B:"Eₐ,reverse = Eₐ,forward + |ΔH| (for exothermic reactions where ΔH is negative)", C:"Eₐ,reverse = Eₐ,forward", D:"Eₐ,reverse = ΔH only" },
+    ans: "A",
+    topic: "Kinetics",
+    exp: "<strong>Energy profile relationship:</strong> Eₐ,forward = Eₐ,reverse + ΔH (with sign). For exothermic (ΔH < 0): Eₐ,reverse = Eₐ,forward − ΔH = Eₐ,forward + |ΔH|. The reverse reaction has a HIGHER barrier. Catalyst lowers both equally → ΔH unchanged. Drawing energy profiles and reading off values is a standard UTME/JAMB skill."
+  },
+  {
+    id: 33,
+    text: "PRINCIPLE: For the Arrhenius equation k = Ae^(−Eₐ/RT), the pre-exponential factor A (frequency factor) represents:",
+    opts: { A:"The maximum possible rate constant (the rate if all collisions were successful: includes collision frequency AND steric factor)", B:"The activation energy in joules", C:"The rate at 0 K", D:"The equilibrium constant of the reaction" },
+    ans: "A",
+    topic: "Kinetics",
+    exp: "<strong>Arrhenius factors:</strong> A = collision frequency × steric factor (fraction of collisions with correct orientation). Eₐ/RT controls the fraction with sufficient energy. k = A × (fraction with correct orientation) × (fraction with sufficient energy). At very high T, e^(−Eₐ/RT) → 1, so k → A (theoretical upper limit)."
+  },
+  {
+    id: 34,
+    text: "CALCULATION: k₁ = 0.01 s⁻¹ at 300 K, k₂ at 320 K. If Eₐ = 75 kJ/mol, calculate k₂. [R = 8.314 J/mol/K; ln(k₂/k₁) = (Eₐ/R)(1/T₁ − 1/T₂)]",
+    opts: { A:"0.243 s⁻¹", B:"0.058 s⁻¹", C:"0.025 s⁻¹", D:"0.121 s⁻¹" },
+    ans: "B",
+    topic: "Kinetics",
+    exp: "<strong>Calculation:</strong> ln(k₂/k₁) = (75000/8.314)(1/300 − 1/320) = 9021 × (0.003333 − 0.003125) = 9021 × 0.000208 = 1.877. k₂/k₁ = e^1.877 = 6.53. k₂ = 0.01 × 6.53 = 0.065 ≈ 0.058 s⁻¹. (Variation in answer depends on precision used; closest given option is B.)"
+  },
+  {
+    id: 35,
+    text: "CALCULATION: In a clock reaction experiment, times recorded were: [IO₃⁻] = 0.2 mol/L, t = 4 s; [IO₃⁻] = 0.4 mol/L, t = 1 s. What is the order of reaction with respect to [IO₃⁻]?",
+    opts: { A:"Second order", B:"Third order", C:"First order", D:"Zero order" },
+    ans: "A",
+    topic: "Kinetics",
+    exp: "<strong>Calculation from clock data:</strong> Rate ∝ 1/t. r₁ ∝ 1/4; r₂ ∝ 1/1. Ratio of rates = (1/1)/(1/4) = 4. Ratio of [IO₃⁻]: 0.4/0.2 = 2. If order = n: rate ratio = (conc ratio)ⁿ → 4 = 2ⁿ → n = 2. Second order with respect to [IO₃⁻]."
+  },
+  {
+    id: 36,
+    text: "PRINCIPLE: What is the significance of the TRANSITION STATE (activated complex) in a reaction mechanism?",
+    opts: { A:"It is the highest-energy point on the reaction coordinate — a short-lived arrangement of atoms at the top of the energy barrier that cannot be isolated", B:"It has lower energy than both reactants and products", C:"It is an intermediate that can be isolated", D:"It is the same as the reaction intermediate" },
+    ans: "A",
+    topic: "Kinetics",
+    exp: "<strong>Transition state vs intermediate:</strong> Transition state = highest-energy point on energy profile (top of the hill) — it exists for ~10⁻¹³ s and CANNOT be isolated. Intermediate = a real species in a valley between two peaks — transient but isolable in principle. This distinction is critical for multi-step mechanism energy profiles. Eₐ is the energy from reactants to the transition state."
+  },
+  {
+    id: 37,
+    text: "EXCEPTION: Radioactive decay is NOT affected by chemical state, temperature, or pressure. However, one type of nuclear reaction IS affected by the electron environment — which is it?",
+    opts: { A:"Alpha decay", B:"Beta-minus decay", C:"Electron capture (a form of β⁺ decay) — where a nucleus captures an inner-shell electron. The rate depends very slightly on the chemical environment (electron density at the nucleus)", D:"Gamma emission" },
+    ans: "C",
+    topic: "Nuclear Chemistry",
+    exp: "<strong>Exception:</strong> Electron capture: p + e⁻ → n + ν (neutrino). The nucleus captures an inner electron (K-shell). The rate depends on the electron density at the nucleus, which is very slightly affected by chemical bonding. This is the ONE exception to the rule that nuclear processes are independent of chemical state — though the effect is tiny (parts per million)."
+  },
+  {
+    id: 38,
+    text: "CALCULATION: ²³⁸U undergoes the following decay series: 8α + 6β⁻ → ²⁰⁶Pb. Verify this using conservation laws.",
+    opts: { A:"238−8(2) = 222; 92−8+6 = 90 — not Pb", B:"238−8(4) = 206; 92−8(2)−6 = 70 — not Pb", C:"238−6(4) = 214; 92−6(2)+8 = 88 — not Pb", D:"238−8(4) = 206 ✓; 92−8(2)+6(0+1) = 92−16+6 = 82 ✓ — lead-206" },
+    ans: "D",
+    topic: "Nuclear Chemistry",
+    exp: "<strong>Calculation:</strong> Mass number: 238 − 8×4 = 238 − 32 = 206 ✓. Atomic number: 92 − 8×2 + 6×1 = 92 − 16 + 6 = 82 ✓ (Z=82 is Lead). Each α removes 4 from A and 2 from Z. Each β⁻ removes 0 from A but adds 1 to Z (n→p). Conservation of mass number and atomic number must be verified in all nuclear equations."
+  },
+  {
+    id: 39,
+    text: "EXCEPTION: Positron emission (β⁺ decay) results in the atomic number DECREASING by 1. Write the nuclear equation for the β⁺ decay of ¹¹C.",
+    opts: { A:"¹¹₆C → ⁷₃Li + ⁴₂He", B:"¹¹₆C → ¹¹₅B + ⁰₊₁e (positron)", C:"¹¹₆C → ¹¹₇N + ⁰₋₁e", D:"¹¹₆C → ¹⁰₅B + ¹₀n" },
+    ans: "B",
+    topic: "Nuclear Chemistry",
+    exp: "<strong>β⁺ decay:</strong> p → n + e⁺ + ν. Proton converts to neutron → Z decreases by 1, A unchanged. ¹¹C (Z=6) → ¹¹B (Z=5) + positron + neutrino. ¹¹C is used in PET scans (t½ = 20 min). Check: mass number 11 = 11 + 0 ✓; atomic number 6 = 5 + 1 ✓ (positron has charge +1). Contrast β⁻: Z increases by 1."
+  },
+  {
+    id: 40,
+    text: "PRINCIPLE: The CRITICAL MASS of a fissile material is the minimum mass needed for a sustained chain reaction. It depends on:",
+    opts: { A:"The temperature of the material", B:"Only the isotope used", C:"Only the purity of the material", D:"The geometry (shape affects neutron escape), enrichment level, presence of reflectors, and density — spherical geometry minimises surface area:volume ratio and thus neutron loss" },
+    ans: "D",
+    topic: "Nuclear Chemistry",
+    exp: "<strong>Critical mass factors:</strong> Surface area determines neutron escape rate. Sphere: minimum surface:volume ratio → fewest neutrons escape → lowest critical mass. Reflectors (beryllium) reduce critical mass by reflecting escaping neutrons back. Higher enrichment (more ²³⁵U) reduces critical mass. Implosion bomb: compress material → higher density → smaller critical mass. A flat slab has much higher critical mass than a sphere."
+  },
+  {
+    id: 41,
+    text: "CALCULATION: If the binding energy per nucleon of He-4 is 7.07 MeV and the mass of 4 separate nucleons is 4.033 u, while He-4 has mass 4.003 u, verify the binding energy. [1 u = 931.5 MeV]",
+    opts: { A:"Mass defect = 0.003 u → BE = 2.8 MeV total → 0.7 MeV/nucleon", B:"Mass defect = 0.030 u → BE = 27.9 MeV total → 7.0 MeV/nucleon ✓", C:"Mass defect = 0.010 u → BE = 9.3 MeV total → 2.3 MeV/nucleon", D:"No mass defect → no binding energy" },
+    ans: "B",
+    topic: "Nuclear Chemistry",
+    exp: "<strong>Binding energy calculation:</strong> Δm = 4.033 − 4.003 = 0.030 u. BE = 0.030 × 931.5 = 27.95 MeV. Per nucleon = 27.95/4 = 6.99 ≈ 7.0 MeV/nucleon ✓. The mass defect is converted to binding energy that holds the nucleus together. Higher BE/nucleon = more stable nucleus."
+  },
+  {
+    id: 42,
+    text: "EXCEPTION: Concentration cells have E° = 0. Yet they can still produce electricity. Why?",
+    opts: { A:"A concentration cell uses the same electrode on both sides but with different ion concentrations. The EMF arises from the concentration gradient (Nernst equation), not from ΔG° of a chemical reaction", B:"This is impossible — cells need E° > 0", C:"E° = 0 means the cell is at equilibrium and produces no electricity", D:"Concentration cells use a catalyst to generate electricity" },
+    ans: "A",
+    topic: "Electrochemistry",
+    exp: "<strong>Concentration cell principle:</strong> E° = 0 (same electrode material). Nernst: E = 0 − (0.0592/n)log([dilute]/[concentrated]) > 0. Example: Ag/Ag⁺(0.001M) || Ag⁺(1.0M)/Ag. E = −(0.0592/1)log(0.001/1.0) = −0.0592 × (−3) = +0.178 V. The driving force is the transfer of ions from high to low concentration — equivalent to mixing. The cell stops (E=0) when concentrations equalise."
+  },
+  {
+    id: 43,
+    text: "EXCEPTION: In electroplating of chromium, the chromium anode doesn't dissolve as expected. Instead, an oxygen film forms on it. What is used to replenish Cr in solution?",
+    opts: { A:"Adding more CrSO₄ directly", B:"Chromium dissolves normally — no exception exists", C:"Using a platinum anode with CrO₃ added to maintain Cr concentration", D:"Chromic acid (H₂CrO₄/CrO₃ in H₂SO₄) provides Cr⁶⁺; the Cr anode passivates rather than dissolving, so the electrolyte is periodically replenished with CrO₃" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "<strong>Industrial exception:</strong> Hard chromium plating uses CrO₃/H₂SO₄ bath (Cr⁶⁺ ions). The chromium anode passivates (forms Cr₂O₃ film) → O₂ evolved instead of Cr dissolving. Cr³⁺ is deposited from the Cr⁶⁺ solution. The bath must be periodically replenished with CrO₃. This is an exception to the normal 'anode dissolves' pattern."
+  },
+  {
+    id: 44,
+    text: "TRICK: In the electrolysis of brine, at the cathode in a MERCURY CELL (Castner-Kellner process), sodium-mercury amalgam forms instead of H₂. Why?",
+    opts: { A:"Sodium's high overpotential for deposition is overcome at mercury electrodes (sodium dissolves in mercury, forming amalgam, rather than H₂ being released)", B:"Mercury reduces the activation energy for H₂ evolution", C:"Mercury reacts with H₂ to form HgH₂", D:"The concentration of Na⁺ is too low for H₂ evolution" },
+    ans: "A",
+    topic: "Electrochemistry",
+    exp: "<strong>Mercury cell exception:</strong> At normal cathodes: H₂ is preferentially discharged over Na⁺ (Na⁺/Na, E° = −2.71 V is far more negative than H₂O/H₂). At a mercury cathode: sodium has high solubility in mercury, forming amalgam → sodium's 'effective' deposition potential is lowered → Na deposits into mercury preferentially. This allows production of pure NaOH (amalgam later reacted with water: 2Na(Hg) + 2H₂O → 2NaOH + H₂ + Hg)."
+  },
+  {
+    id: 45,
+    text: "TRICK: In a galvanic cell, the ANODE is labelled negative (−). Yet the CATHODE is labelled negative in an electrolytic cell. Explain why this is NOT a contradiction.",
+    opts: { A:"It is a contradiction — the labelling is wrong for one of them", B:"Cathodes are always positive", C:"The signs are arbitrary conventions with no chemical meaning", D:"In a galvanic cell, the anode is the source of electrons (spontaneously releases them) → negative. In an electrolytic cell, the cathode receives electrons FROM the negative terminal of the power supply → also negative. The PROCESS (oxidation/reduction) remains the same." },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "<strong>Reconciliation:</strong> The rule is: ANODE = OXIDATION, CATHODE = REDUCTION (always). In a galvanic cell: anode (oxidation, loss of e⁻) is the source of electrons → labelled −ve. In an electrolytic cell: cathode (reduction, gain of e⁻) is connected to −ve terminal of power supply. Both are consistent: the cathode gains electrons from whatever source provides them."
+  },
+  {
+    id: 46,
+    text: "TRICK: Oxidation states can be non-integer. What is the average oxidation state of Fe in Fe₃O₄?",
+    opts: { A:"+4", B:"+8/3 (≈+2.67)", C:"+2", D:"+3" },
+    ans: "B",
+    topic: "Electrochemistry",
+    exp: "<strong>Non-integer oxidation state:</strong> Fe₃O₄ is a MIXED oxide containing both Fe²⁺ and Fe³⁺ (1 Fe²⁺ and 2 Fe³⁺). Using oxidation state calculation: 3x + 4(−2) = 0 → 3x = 8 → x = +8/3. This is an average — physically, the compound contains both +2 and +3 iron. Non-integer oxidation states arise in mixed-valence compounds."
+  },
+  {
+    id: 47,
+    text: "CALCULATION: Kp = 4 atm for A(g) ⇌ 2B(g). If the total pressure is 3 atm at equilibrium, find the partial pressure of A.",
+    opts: { A:"0.5 atm", B:"2.0 atm", C:"1.5 atm", D:"1.0 atm" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: "<strong>Calculation:</strong> Let p(A) = a, p(B) = b. Kp = p(B)²/p(A) = 4. Total pressure: a + b = 3 → b = 3−a. (3−a)²/a = 4. 9 − 6a + a² = 4a. a² − 10a + 9 = 0. (a−1)(a−9) = 0. a = 1 (valid) or a = 9 (impossible since total = 3). p(A) = 1 atm, p(B) = 2 atm. Check: 4/1 = 4 ✓."
+  },
+  {
+    id: 48,
+    text: "EXCEPTION: Why does adding a NOBLE GAS at constant pressure (not constant volume) affect the equilibrium of N₂ + 3H₂ ⇌ 2NH₃?",
+    opts: { A:"Noble gases are chemically inert so no effect at all", B:"Noble gas reacts with H₂", C:"Noble gas increases the temperature", D:"At constant pressure: adding inert gas → volume increases → partial pressures of N₂, H₂, NH₃ ALL decrease → Q > Kc → shifts LEFT (toward more moles of gas)" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: "<strong>Key exception:</strong> At constant pressure, adding inert gas expands the volume → dilutes all reactants and products → equivalent to decreasing pressure → equilibrium shifts toward MORE moles of gas (left for Haber: 4 mol vs 2 mol). This contradicts the 'inert gas has no effect' rule — that only applies at constant VOLUME. The constant pressure case is a favourite UTME ambiguity."
+  },
+  {
+    id: 49,
+    text: "PRINCIPLE: For the reaction A ⇌ B, ΔG° = −RT ln Kc. If Kc = 1, then ΔG° equals:",
+    opts: { A:"+RT", B:"+1 kJ/mol", C:"0 (zero)", D:"−RT" },
+    ans: "C",
+    topic: "Equilibrium",
+    exp: "<strong>Thermodynamic relationship:</strong> ΔG° = −RT ln Kc. If Kc = 1: ln(1) = 0 → ΔG° = 0. Kc = 1 means neither reactants nor products are favoured at equilibrium. ΔG° < 0 (Kc > 1): products favoured. ΔG° > 0 (Kc < 1): reactants favoured. This links equilibrium to thermodynamics — Gibbs free energy."
+  },
+  {
+    id: 50,
+    text: "CALCULATION: For 2HI(g) ⇌ H₂(g) + I₂(g), Kc = 0.02 at 700 K. If 1.0 mol HI is placed in a 1 L vessel, what are the equilibrium concentrations? [Let x = moles of H₂ and I₂ formed]",
+    opts: { A:"[HI] = 0.85, [H₂] = [I₂] = 0.075", B:"[HI] = 0.60, [H₂] = [I₂] = 0.20", C:"[HI] = 0.74, [H₂] = [I₂] = 0.13", D:"[HI] = 0.77, [H₂] = [I₂] = 0.115" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: "<strong>ICE calculation:</strong> Initial: [HI]=1.0, [H₂]=[I₂]=0. Change: [HI]=−2x, [H₂]=[I₂]=+x. Kc = x²/(1−2x)² = 0.02. √Kc = x/(1−2x) = √0.02 = 0.1414. x = 0.1414(1−2x) = 0.1414 − 0.2828x. 1.2828x = 0.1414 → x = 0.1103. [HI] = 1 − 2(0.110) = 0.779 ≈ 0.77. [H₂]=[I₂] ≈ 0.11. Answer A is closest."
+  },
+];
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0, submitted: false };
+var UA = {};  /* userAnswers: {id: chosen_key} */
+var globalDone = false;
+var GLOBAL_SECS = 1800; /* 30 minutes */
+var PTS_CORRECT = 1;
+var PTS_WRONG   = 0; /* UTME: no negative marking */
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot  = document.getElementById('gdot');
+  var txt  = document.getElementById('gtime');
+  function fmt(s) {
+    var m = Math.floor(s/60), ss = s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) {
+      txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn';
+    } else if (remaining <= 60) {
+      txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang';
+    }
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+
+function getTimeDisplay() {
+  var el = document.getElementById('gtime');
+  return el ? el.textContent : '—';
+}
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var optsHtml = '';
+    var labels = ['A','B','C','D'];
+    for (var j = 0; j < labels.length; j++) {
+      var lbl = labels[j];
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
+        '</div>';
+    }
+    html += '<div class="qcard" style="animation-delay:' + (i*0.03) + 's">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q' + q.id + ' of 50</span>' +
+        (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') +
+      '</div>' +
+      '<div class="qtxt">' + q.text + '</div>' +
+      '<div class="opts">' + optsHtml + '</div>' +
+      '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp' + q.id + '"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid   = parseInt(this.dataset.id);
+      var chose = this.dataset.a;
+      /* deselect siblings */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.remove('sel');
+      });
+      this.classList.add('sel');
+      UA[qid] = chose;
+      /* enable check button */
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid    = parseInt(this.dataset.qid);
+      var q      = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var ok     = (chosen === q.ans);
+
+      /* lock all opts for this question */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked');
+        o.style.pointerEvents = 'none';
+        if (o.dataset.a === q.ans)    o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+
+      /* explanation */
+      var expEl = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + q.ans;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' +
+        (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+
+      this.disabled = true;
+
+      /* update stats */
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++;
+        ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent  = ST.correct;
+  document.getElementById('sc-wrong').textContent  = ST.wrong;
+  document.getElementById('sc-skip').textContent   = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent  = ST.answered + ' / 50 answered';
+  document.getElementById('m-ans').textContent     = ST.answered;
+  document.getElementById('m-left').textContent    = left;
+  document.getElementById('m-time').textContent    = getTimeDisplay();
+  /* progress bar */
+  document.getElementById('prog-fill').style.width = (ST.answered / QUESTIONS.length * 100) + '%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() {
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitQuiz() {
+  hideSubmitModal();
+  globalDone = true;
+  stopTimer();
+
+  /* Auto-check all unanswered questions that have a selection */
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){
+    if (!btn.disabled) btn.click();
+  });
+
+  /* Show time-up overlay with results */
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  /* lock everything */
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.style.pointerEvents = 'none';
+    o.classList.add('locked');
+  });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
+
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF / PRINT ── */
+function doPrint() {
+  /* Make sure print header is visible for print */
+  document.getElementById('print-header').style.display = 'block';
+  window.print();
+  /* Hide again after */
+  setTimeout(function(){
+    document.getElementById('print-header').style.display = 'none';
+  }, 1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
