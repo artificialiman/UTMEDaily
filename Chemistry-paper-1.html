@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Paper 1 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* noise grain */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── WATERMARK ── */
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem;
+      padding: 1rem;
+      transform: rotate(-20deg) scale(1.5);
+      transform-origin: center center;
+      opacity: 0.022;
+      font-family: var(--mono);
+      font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em;
+      white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: rgba(10,14,26,0.92);
+      border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+
+    /* greeting chip */
+    .hdr-greeting {
+      font-size: 11px; color: var(--ter);
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--mono); letter-spacing: 0.05em;
+    }
+
+    /* timer */
+    .gtimer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      flex-shrink: 0;
+    }
+    .gtimer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+      transition: background .3s;
+    }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; color: var(--accent); transition: color .3s;
+    }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; padding: 12px 20px 8px;
+      position: relative; z-index: 1;
+    }
+    .sc {
+      background: var(--card); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+      border: 1px solid var(--sep);
+    }
+    .sc-v {
+      font-family: var(--mono); font-size: 18px; font-weight: 700;
+      color: var(--text);
+    }
+    .sc-v.c { color: var(--green); }
+    .sc-v.w { color: var(--red); }
+    .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* progress bar */
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 99px; transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── QUESTION CARDS ── */
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+
+    .qcard {
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 14px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .qcard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep);
+      gap: 10px;
+    }
+    .qnum {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .qtopic {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      color: var(--accent); letter-spacing: 0.3px;
+    }
+
+    .qtxt {
+      font-size: 15px; line-height: 1.72;
+      color: var(--text); font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    /* options */
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-radius: 10px;
+      border: 1px solid var(--sep);
+      background: var(--card2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .opt.sel   { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+
+    .opt-key {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--accent); flex-shrink: 0;
+      width: 18px; padding-top: 1px;
+    }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+
+    /* check button */
+    .abtn {
+      margin-top: 12px; width: 100%;
+      padding: 11px; border-radius: 10px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+
+    /* explanation */
+    .exp {
+      display: none; margin-top: 12px;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.18);
+      border-radius: 10px; padding: 14px;
+      font-size: 13px; line-height: 1.68;
+      color: var(--sec);
+    }
+    .exp.show { display: block; }
+    .exp-mark {
+      display: inline-block; margin-bottom: 8px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
+
+    /* ── SUBMIT BAR ── */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,14,26,0.96);
+      border-top: 1px solid var(--sep);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .submit-btn {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress {
+      font-family: var(--mono); font-size: 11px; color: var(--ter);
+      white-space: nowrap;
+    }
+
+    /* ── TIME UP OVERLAY ── */
+    .timeup {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,14,26,0.96);
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .timeup.show { display: flex; }
+    .timeup-box {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl {
+      font-family: var(--mono); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .timeup-score {
+      font-family: var(--mono); font-size: 2rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .timeup-score.pos { color: var(--green); }
+    .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .tu-stat-v {
+      font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text);
+    }
+    .tu-stat-v.c { color: var(--green); }
+    .tu-stat-v.w { color: var(--red); }
+    .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .timeup-btn.sec {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
+    }
+
+    /* ── SUBMIT MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 16px; width: 100%; max-width: 400px;
+      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.96) translateY(8px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    .modal h3 {
+      font-family: var(--mono); font-size: 1rem; font-weight: 700;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--sep);
+      font-size: 13px; color: var(--ter);
+    }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep);
+    }
+
+    /* ── PRINT / PDF ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar,
+      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important;
+        border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important;
+        background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
+      .opt-txt { color: #000 !important; }
+      .qtxt    { color: #000 !important; }
+      .qtopic  { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
+      #print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 24pt;
+        padding-bottom: 12pt;
+        border-bottom: 2pt solid #000;
+      }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- print-only header (hidden on screen) -->
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Chemistry Paper 1</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<!-- watermark (personalised by JS from sessionStorage) -->
+<div id="watermark" aria-hidden="true"></div>
+
+<!-- header -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Paper 1</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- score strip -->
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<!-- question cards -->
+<div id="qc"></div>
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<!-- submit modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- time up overlay -->
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── SESSION: watermark + greeting ── */
+(function() {
+  var SK = 'ga_premium_session';
+  var TTL = 3 * 60 * 60 * 1000;
+  function loadSession() {
+    try {
+      var raw = sessionStorage.getItem(SK);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (Date.now() > s.expires) { sessionStorage.removeItem(SK); return null; }
+      return s;
+    } catch(e) { return null; }
+  }
+
+  var session = loadSession();
+
+  /* inject watermark */
+  function injectWatermark(name) {
+    var wm = document.getElementById('watermark');
+    var tile = name + ' · GrantApp AI · ';
+    var row = '';
+    for (var r = 0; r < 8; r++) row += tile;
+    var html = '';
+    for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+
+  if (session && session.name) {
+    injectWatermark(session.name);
+    var greet = document.getElementById('greeting');
+    greet.textContent = 'Hey, ' + session.name;
+    greet.style.display = 'block';
+    /* print header student name */
+    document.getElementById('print-student-name').textContent = 'Student: ' + session.name;
+  } else {
+    /* No session — still works, watermark blank */
+    injectWatermark('GrantApp AI');
+  }
+
+  document.getElementById('print-date').textContent =
+    'Printed: ' + new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+})();
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "An element has atomic number 17 and mass number 35. How many neutrons does it have?",
+    opts: { A:"18", B:"52", C:"35", D:"17" },
+    ans: "A",
+    topic: "Atomic Structure",
+    exp: "Neutrons = Mass number − Atomic number = 35 − 17 = 18."
+  },
+  {
+    id: 2,
+    text: "The number of neutrons in an atom of ⁴⁰₂₀Ca is:",
+    opts: { A:"20", B:"60", C:"80", D:"40" },
+    ans: "A",
+    topic: "Atomic Structure",
+    exp: "Neutrons = Mass number − Atomic number = 40 − 20 = 20."
+  },
+  {
+    id: 3,
+    text: "How many electrons can the third shell (n = 3) hold?",
+    opts: { A:"10", B:"18", C:"8", D:"32" },
+    ans: "B",
+    topic: "Atomic Structure",
+    exp: ""
+  },
+  {
+    id: 4,
+    text: "The shape of a water molecule (H₂O) is:",
+    opts: { A:"V-shaped (bent)", B:"Linear", C:"Trigonal planar", D:"Tetrahedral" },
+    ans: "A",
+    topic: "Chemical Bonding",
+    exp: ""
+  },
+  {
+    id: 5,
+    text: "Which property is characteristic of ionic compounds?",
+    opts: { A:"Insoluble in polar solvents", B:"Low melting point", C:"Low boiling point", D:"Conduct electricity when dissolved in water" },
+    ans: "D",
+    topic: "Chemical Bonding",
+    exp: ""
+  },
+  {
+    id: 6,
+    text: "Metallic bonding is described as:",
+    opts: { A:"Transfer of electrons from one metal to another", B:"Sharing of electron pairs between metal atoms", C:"Electrostatic attraction between positive metal ions and a 'sea' of delocalised electrons", D:"Covalent bonds between metal atoms" },
+    ans: "C",
+    topic: "Chemical Bonding",
+    exp: "In metals, the outer electrons become delocalised, forming a 'sea' of free electrons surrounding a lattice of positive ions. This accounts for electrical conductivity, malleability, and high melting points of metals."
+  },
+  {
+    id: 7,
+    text: "Which of the following has the highest electronegativity?",
+    opts: { A:"Nitrogen", B:"Chlorine", C:"Fluorine", D:"Oxygen" },
+    ans: "C",
+    topic: "Periodic Table",
+    exp: "Fluorine has the highest electronegativity (4.0 on the Pauling scale) of all elements. Electronegativity increases across a period and up a group."
+  },
+  {
+    id: 8,
+    text: "As you move across Period 3 from left to right, atomic radius generally:",
+    opts: { A:"Remains constant", B:"Decreases", C:"First increases then decreases", D:"Increases" },
+    ans: "B",
+    topic: "Periodic Table",
+    exp: ""
+  },
+  {
+    id: 9,
+    text: "Which is NOT an assumption of the kinetic theory of gases?",
+    opts: { A:"Gas molecules attract each other strongly", B:"Gas molecules have negligible volume", C:"Average KE is proportional to temperature", D:"Collisions are elastic" },
+    ans: "A",
+    topic: "Gas Laws",
+    exp: "..."
+  },
+  {
+    id: 10,
+    text: "Which of the following gases deviates most from ideal gas behaviour?",
+    opts: { A:"O₂", B:"He", C:"H₂", D:"NH₃" },
+    ans: "D",
+    topic: "Gas Laws",
+    exp: ""
+  },
+  {
+    id: 11,
+    text: "Gay-Lussac's Law states that at constant volume, the pressure of a fixed mass of gas is:",
+    opts: { A:"Independent of temperature", B:"Inversely proportional to temperature", C:"Directly proportional to temperature (in Kelvin)", D:"Proportional to the square of temperature" },
+    ans: "C",
+    topic: "Gas Laws",
+    exp: ""
+  },
+  {
+    id: 12,
+    text: "The empirical formula of a compound with 40% C, 6.7% H and 53.3% O is:",
+    opts: { A:"C₂H₂O", B:"CH₃O", C:"C₂H₄O", D:"CH₂O" },
+    ans: "D",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 13,
+    text: "In a volumetric analysis, 20 cm³ of H₂SO₄ was neutralised by 25 cm³ of 0.4 mol/dm³ NaOH. What is the concentration of H₂SO₄?",
+    opts: { A:"0.2 mol/dm³", B:"0.1 mol/dm³", C:"0.5 mol/dm³", D:"0.25 mol/dm³" },
+    ans: "D",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 14,
+    text: "How many moles are in 44 g of CO₂? (C=12, O=16)",
+    opts: { A:"1", B:"0.5", C:"4", D:"2" },
+    ans: "A",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 15,
+    text: "Osmosis is defined as the movement of solvent molecules through a semi-permeable membrane from:",
+    opts: { A:"High temperature to low temperature", B:"High pressure to low pressure", C:"Low solute concentration to high solute concentration", D:"High solute concentration to low solute concentration" },
+    ans: "C",
+    topic: "Solutions",
+    exp: "Osmosis is the net movement of water (solvent) molecules from a region of lower solute concentration (higher water potential) to higher solute concentration (lower water potential) through a semi-permeable membrane."
+  },
+  {
+    id: 16,
+    text: "Which of the following best describes a colloid?",
+    opts: { A:"A suspension where particles settle on standing", B:"A mixture with dispersed particles of 1–1000 nm that do not settle", C:"A pure substance with two phases", D:"A true solution with particle size < 1 nm" },
+    ans: "B",
+    topic: "Solutions",
+    exp: ""
+  },
+  {
+    id: 17,
+    text: "Washing soda (Na₂CO₃·10H₂O) is classified as a:",
+    opts: { A:"Normal salt", B:"Anhydrous salt", C:"Acid salt", D:"Hydrated salt (crystallohydrate)" },
+    ans: "D",
+    topic: "Acids Bases Salts",
+    exp: "Washing soda is Na₂CO₃·10H₂O — a normal salt (not acid salt) that contains 10 molecules of water of crystallisation. Heating it drives off the water, giving anhydrous Na₂CO₃."
+  },
+  {
+    id: 18,
+    text: "Which gas is produced when sodium carbonate reacts with dilute hydrochloric acid?",
+    opts: { A:"Hydrogen", B:"Carbon dioxide", C:"Chlorine", D:"Oxygen" },
+    ans: "B",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 19,
+    text: "According to the Brønsted-Lowry theory, an acid is a substance that:",
+    opts: { A:"Produces OH⁻ ions in solution", B:"Accepts a pair of electrons", C:"Produces H₂O when neutralized", D:"Donates a proton (H⁺)" },
+    ans: "D",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 20,
+    text: "The pH of a 0.001 mol/dm³ HCl solution is:",
+    opts: { A:"3", B:"4", C:"2", D:"1" },
+    ans: "A",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 21,
+    text: "What mass of copper is deposited when a current of 2 A flows for 965 seconds through CuSO₄ solution? (Cu=64, F=96500)",
+    opts: { A:"0.64 g", B:"0.32 g", C:"1.28 g", D:"2.56 g" },
+    ans: "A",
+    topic: "Electrochemistry",
+    exp: ""
+  },
+  {
+    id: 22,
+    text: "Which of the following is used as the electrolyte in the Hall-Héroult process for extracting aluminium?",
+    opts: { A:"Molten Al₂O₃ (alumina)", B:"Molten Al₂O₃ dissolved in cryolite", C:"Aqueous Al₂(SO₄)₃", D:"Molten AlCl₃" },
+    ans: "B",
+    topic: "Electrochemistry",
+    exp: ""
+  },
+  {
+    id: 23,
+    text: "Which of the following solutions will conduct electricity best?",
+    opts: { A:"Glucose solution", B:"Distilled water", C:"NaCl solution", D:"Sugar solution" },
+    ans: "C",
+    topic: "Electrochemistry",
+    exp: "Electrical conductivity requires free-moving ions. NaCl solution contains Na⁺ and Cl⁻ ions and is a strong electrolyte. Distilled water has virtually no ions; glucose and sugar are non-electrolytes (covalent compounds)."
+  },
+  {
+    id: 24,
+    text: "Which of the following is the strongest oxidising agent?",
+    opts: { A:"Cl₂", B:"Br₂", C:"F₂", D:"I₂" },
+    ans: "C",
+    topic: "Redox Chemistry",
+    exp: ""
+  },
+  {
+    id: 25,
+    text: "In a standard electrochemical cell, the cathode is where:",
+    opts: { A:"The salt bridge is", B:"Electrons are produced", C:"Oxidation occurs", D:"Reduction occurs" },
+    ans: "D",
+    topic: "Redox Chemistry",
+    exp: "RED CAT — REDuction occurs at the CAThode. AN OX — ANOde = OXidation."
+  },
+  {
+    id: 26,
+    text: "Which of the following reactions is a disproportionation reaction?",
+    opts: { A:"Cl₂ + 2NaOH → NaCl + NaClO + H₂O", B:"Fe + CuSO₄ → FeSO₄ + Cu", C:"2HCl → H₂ + Cl₂", D:"2Na + Cl₂ → 2NaCl" },
+    ans: "A",
+    topic: "Redox Chemistry",
+    exp: ""
+  },
+  {
+    id: 27,
+    text: "Which of the following factors does NOT affect the rate of a chemical reaction?",
+    opts: { A:"Enthalpy change", B:"Pressure (for gases)", C:"Temperature", D:"Catalyst" },
+    ans: "A",
+    topic: "Kinetics",
+    exp: ""
+  },
+  {
+    id: 28,
+    text: "A reaction is said to be second order if the rate:",
+    opts: { A:"Triples when concentration doubles", B:"Quadruples when concentration doubles", C:"Doubles when concentration doubles", D:"Is constant and independent of concentration" },
+    ans: "B",
+    topic: "Kinetics",
+    exp: ""
+  },
+  {
+    id: 29,
+    text: "The activation energy of a reaction can be determined from the graph of:",
+    opts: { A:"Concentration vs time", B:"Pressure vs volume", C:"ln(k) vs 1/T", D:"Rate vs temperature" },
+    ans: "C",
+    topic: "Kinetics",
+    exp: ""
+  },
+  {
+    id: 30,
+    text: "According to Le Chatelier's Principle, if the temperature of an exothermic reaction at equilibrium is increased, the equilibrium will:",
+    opts: { A:"Shift to the right to produce more products", B:"Remain unchanged", C:"Shift to the left to produce more reactants", D:"Shift right then left" },
+    ans: "C",
+    topic: "Equilibrium",
+    exp: ""
+  },
+  {
+    id: 31,
+    text: "In the Haber process: N₂ + 3H₂ ⇌ 2NH₃ (ΔH = −92 kJ/mol), which conditions favour maximum yield of NH₃?",
+    opts: { A:"High temperature, high pressure", B:"High temperature, low pressure", C:"Low temperature, low pressure", D:"Low temperature, high pressure" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: ""
+  },
+  {
+    id: 32,
+    text: "Adding a catalyst to a system at equilibrium will:",
+    opts: { A:"Shift equilibrium to the left", B:"Not change the position of equilibrium but reach it faster", C:"Shift equilibrium to the right", D:"Increase the value of Kc" },
+    ans: "B",
+    topic: "Equilibrium",
+    exp: "A catalyst lowers the activation energy of both the forward and reverse reactions equally. It does not change Kc or the equilibrium position — it only speeds up how quickly equilibrium is reached."
+  },
+  {
+    id: 33,
+    text: "Hess's Law states that the enthalpy change of a reaction:",
+    opts: { A:"Equals the activation energy", B:"Is independent of the pathway taken", C:"Depends on the temperature at which it is measured", D:"Is always negative for spontaneous reactions" },
+    ans: "B",
+    topic: "Energetics",
+    exp: ""
+  },
+  {
+    id: 34,
+    text: "Which of the following is an endothermic process?",
+    opts: { A:"Dissolution of NaOH in water", B:"Condensation of steam", C:"Evaporation of water", D:"Neutralisation of HCl with NaOH" },
+    ans: "C",
+    topic: "Energetics",
+    exp: ""
+  },
+  {
+    id: 35,
+    text: "Which organic compound is produced when ethene reacts with steam (H₂O) in the presence of a catalyst?",
+    opts: { A:"Ethane", B:"Ethanal", C:"Ethanoic acid", D:"Ethanol" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 36,
+    text: "The functional group present in ethanol (C₂H₅OH) is:",
+    opts: { A:"Carboxyl group (–COOH)", B:"Amino group (–NH₂)", C:"Hydroxyl group (–OH)", D:"Carbonyl group (C=O)" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: "Alcohols are characterised by the –OH (hydroxyl) group. Ethanol = CH₃CH₂OH."
+  },
+  {
+    id: 37,
+    text: "Hydrolysis of an ester with alkali produces:",
+    opts: { A:"Two carboxylic acids", B:"Carboxylic acid and alkene", C:"Aldehyde and water", D:"Salt of carboxylic acid (carboxylate) and alcohol" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 38,
+    text: "Which of the following is the product of the complete oxidation of a primary alcohol?",
+    opts: { A:"Ketone", B:"Ether", C:"Carboxylic acid", D:"Aldehyde" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 39,
+    text: "Which of the following is the correct IUPAC name for CH₃CH(CH₃)CH₂CH₃?",
+    opts: { A:"3-methylbutane", B:"Isobutane", C:"2-methylbutane", D:"2-methylpropane" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 40,
+    text: "What type of reaction do alkenes undergo with bromine water?",
+    opts: { A:"Substitution", B:"Combustion", C:"Elimination", D:"Addition" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 41,
+    text: "Nylon is an example of a:",
+    opts: { A:"Rubber", B:"Condensation polymer", C:"Addition polymer", D:"Natural polymer" },
+    ans: "B",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 42,
+    text: "Which of the following compounds shows geometric (cis-trans) isomerism?",
+    opts: { A:"CH₃CH=CHCH₃", B:"CH₃CH₂CH₃", C:"CH₂=CH₂", D:"CH₄" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 43,
+    text: "Which of the following metals can be found native (uncombined) in nature?",
+    opts: { A:"Gold", B:"Sodium", C:"Aluminium", D:"Calcium" },
+    ans: "A",
+    topic: "Metals",
+    exp: "Very unreactive metals like gold (Au), platinum (Pt), and silver (Ag) occur naturally in the elemental state. Reactive metals (Na, Ca, Al) occur only as compounds."
+  },
+  {
+    id: 44,
+    text: "The process of converting iron to steel involves:",
+    opts: { A:"Electrolyzing iron ore", B:"Removing excess carbon and impurities from pig iron", C:"Adding more carbon to iron", D:"Mixing iron with sodium" },
+    ans: "B",
+    topic: "Metals",
+    exp: "Pig iron from the blast furnace contains ~4% carbon and impurities, making it brittle. Steel is made by blowing oxygen through molten pig iron (Basic Oxygen Process) to reduce carbon to 0.1–1.5%, giving a tougher alloy."
+  },
+  {
+    id: 45,
+    text: "Stainless steel is an alloy of iron containing mainly:",
+    opts: { A:"Iron and tin", B:"Iron, carbon, and chromium", C:"Iron and copper", D:"Iron and zinc" },
+    ans: "B",
+    topic: "Metals",
+    exp: "Stainless steel contains iron, carbon (~0.1%), and chromium (~18%), plus sometimes nickel. The chromium forms a protective Cr₂O₃ oxide layer on the surface, preventing corrosion."
+  },
+  {
+    id: 46,
+    text: "Which gas turns lime water milky?",
+    opts: { A:"CO₂", B:"SO₂", C:"CO", D:"NO₂" },
+    ans: "A",
+    topic: "Non-metals",
+    exp: ""
+  },
+  {
+    id: 47,
+    text: "Which allotrope of carbon is the hardest natural substance?",
+    opts: { A:"Carbon black", B:"Fullerene", C:"Graphite", D:"Diamond" },
+    ans: "D",
+    topic: "Non-metals",
+    exp: ""
+  },
+  {
+    id: 48,
+    text: "Nuclear fission involves:",
+    opts: { A:"A heavy nucleus splitting into two smaller nuclei with release of energy", B:"A nucleus emitting alpha particles only", C:"Electrons being absorbed by the nucleus", D:"Two light nuclei combining to form a heavier one" },
+    ans: "A",
+    topic: "Nuclear Chemistry",
+    exp: ""
+  },
+  {
+    id: 49,
+    text: "In beta (β⁻) decay, a neutron in the nucleus is converted to:",
+    opts: { A:"A proton + alpha particle", B:"A proton + an electron emitted from nucleus", C:"A proton + gamma ray only", D:"Two protons" },
+    ans: "B",
+    topic: "Nuclear Chemistry",
+    exp: ""
+  },
+  {
+    id: 50,
+    text: "Acid rain has a pH below:",
+    opts: { A:"4", B:"5.6", C:"7", D:"6" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "Normal rain is slightly acidic (pH ~5.6) due to dissolved CO₂ forming carbonic acid. Acid rain is defined as rain with pH below 5.6, caused by SO₂ and NOₓ from burning fossil fuels reacting with water to form H₂SO₃/H₂SO₄ and HNO₃."
+  },
+];
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0, submitted: false };
+var UA = {};  /* userAnswers: {id: chosen_key} */
+var globalDone = false;
+var GLOBAL_SECS = 1800; /* 30 minutes */
+var PTS_CORRECT = 1;
+var PTS_WRONG   = 0; /* UTME: no negative marking */
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot  = document.getElementById('gdot');
+  var txt  = document.getElementById('gtime');
+  function fmt(s) {
+    var m = Math.floor(s/60), ss = s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) {
+      txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn';
+    } else if (remaining <= 60) {
+      txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang';
+    }
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+
+function getTimeDisplay() {
+  var el = document.getElementById('gtime');
+  return el ? el.textContent : '—';
+}
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var optsHtml = '';
+    var labels = ['A','B','C','D'];
+    for (var j = 0; j < labels.length; j++) {
+      var lbl = labels[j];
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
+        '</div>';
+    }
+    html += '<div class="qcard" style="animation-delay:' + (i*0.03) + 's">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q' + q.id + ' of 50</span>' +
+        (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') +
+      '</div>' +
+      '<div class="qtxt">' + q.text + '</div>' +
+      '<div class="opts">' + optsHtml + '</div>' +
+      '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp' + q.id + '"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid   = parseInt(this.dataset.id);
+      var chose = this.dataset.a;
+      /* deselect siblings */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.remove('sel');
+      });
+      this.classList.add('sel');
+      UA[qid] = chose;
+      /* enable check button */
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid    = parseInt(this.dataset.qid);
+      var q      = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var ok     = (chosen === q.ans);
+
+      /* lock all opts for this question */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked');
+        o.style.pointerEvents = 'none';
+        if (o.dataset.a === q.ans)    o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+
+      /* explanation */
+      var expEl = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + q.ans;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' +
+        (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+
+      this.disabled = true;
+
+      /* update stats */
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++;
+        ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent  = ST.correct;
+  document.getElementById('sc-wrong').textContent  = ST.wrong;
+  document.getElementById('sc-skip').textContent   = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent  = ST.answered + ' / 50 answered';
+  document.getElementById('m-ans').textContent     = ST.answered;
+  document.getElementById('m-left').textContent    = left;
+  document.getElementById('m-time').textContent    = getTimeDisplay();
+  /* progress bar */
+  document.getElementById('prog-fill').style.width = (ST.answered / QUESTIONS.length * 100) + '%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() {
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitQuiz() {
+  hideSubmitModal();
+  globalDone = true;
+  stopTimer();
+
+  /* Auto-check all unanswered questions that have a selection */
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){
+    if (!btn.disabled) btn.click();
+  });
+
+  /* Show time-up overlay with results */
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  /* lock everything */
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.style.pointerEvents = 'none';
+    o.classList.add('locked');
+  });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
+
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF / PRINT ── */
+function doPrint() {
+  /* Make sure print header is visible for print */
+  document.getElementById('print-header').style.display = 'block';
+  window.print();
+  /* Hide again after */
+  setTimeout(function(){
+    document.getElementById('print-header').style.display = 'none';
+  }, 1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>

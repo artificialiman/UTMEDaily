@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Paper 2 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* noise grain */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── WATERMARK ── */
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem;
+      padding: 1rem;
+      transform: rotate(-20deg) scale(1.5);
+      transform-origin: center center;
+      opacity: 0.022;
+      font-family: var(--mono);
+      font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em;
+      white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: rgba(10,14,26,0.92);
+      border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+
+    /* greeting chip */
+    .hdr-greeting {
+      font-size: 11px; color: var(--ter);
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--mono); letter-spacing: 0.05em;
+    }
+
+    /* timer */
+    .gtimer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      flex-shrink: 0;
+    }
+    .gtimer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+      transition: background .3s;
+    }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; color: var(--accent); transition: color .3s;
+    }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; padding: 12px 20px 8px;
+      position: relative; z-index: 1;
+    }
+    .sc {
+      background: var(--card); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+      border: 1px solid var(--sep);
+    }
+    .sc-v {
+      font-family: var(--mono); font-size: 18px; font-weight: 700;
+      color: var(--text);
+    }
+    .sc-v.c { color: var(--green); }
+    .sc-v.w { color: var(--red); }
+    .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* progress bar */
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 99px; transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── QUESTION CARDS ── */
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+
+    .qcard {
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 14px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .qcard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep);
+      gap: 10px;
+    }
+    .qnum {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .qtopic {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      color: var(--accent); letter-spacing: 0.3px;
+    }
+
+    .qtxt {
+      font-size: 15px; line-height: 1.72;
+      color: var(--text); font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    /* options */
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-radius: 10px;
+      border: 1px solid var(--sep);
+      background: var(--card2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .opt.sel   { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+
+    .opt-key {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--accent); flex-shrink: 0;
+      width: 18px; padding-top: 1px;
+    }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+
+    /* check button */
+    .abtn {
+      margin-top: 12px; width: 100%;
+      padding: 11px; border-radius: 10px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+
+    /* explanation */
+    .exp {
+      display: none; margin-top: 12px;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.18);
+      border-radius: 10px; padding: 14px;
+      font-size: 13px; line-height: 1.68;
+      color: var(--sec);
+    }
+    .exp.show { display: block; }
+    .exp-mark {
+      display: inline-block; margin-bottom: 8px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
+
+    /* ── SUBMIT BAR ── */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,14,26,0.96);
+      border-top: 1px solid var(--sep);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .submit-btn {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress {
+      font-family: var(--mono); font-size: 11px; color: var(--ter);
+      white-space: nowrap;
+    }
+
+    /* ── TIME UP OVERLAY ── */
+    .timeup {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,14,26,0.96);
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .timeup.show { display: flex; }
+    .timeup-box {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl {
+      font-family: var(--mono); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .timeup-score {
+      font-family: var(--mono); font-size: 2rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .timeup-score.pos { color: var(--green); }
+    .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .tu-stat-v {
+      font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text);
+    }
+    .tu-stat-v.c { color: var(--green); }
+    .tu-stat-v.w { color: var(--red); }
+    .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .timeup-btn.sec {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
+    }
+
+    /* ── SUBMIT MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 16px; width: 100%; max-width: 400px;
+      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.96) translateY(8px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    .modal h3 {
+      font-family: var(--mono); font-size: 1rem; font-weight: 700;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--sep);
+      font-size: 13px; color: var(--ter);
+    }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep);
+    }
+
+    /* ── PRINT / PDF ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar,
+      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important;
+        border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important;
+        background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
+      .opt-txt { color: #000 !important; }
+      .qtxt    { color: #000 !important; }
+      .qtopic  { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
+      #print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 24pt;
+        padding-bottom: 12pt;
+        border-bottom: 2pt solid #000;
+      }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- print-only header (hidden on screen) -->
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Chemistry Paper 2</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<!-- watermark (personalised by JS from sessionStorage) -->
+<div id="watermark" aria-hidden="true"></div>
+
+<!-- header -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Paper 2</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- score strip -->
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<!-- question cards -->
+<div id="qc"></div>
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<!-- submit modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- time up overlay -->
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── SESSION: watermark + greeting ── */
+(function() {
+  var SK = 'ga_premium_session';
+  var TTL = 3 * 60 * 60 * 1000;
+  function loadSession() {
+    try {
+      var raw = sessionStorage.getItem(SK);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (Date.now() > s.expires) { sessionStorage.removeItem(SK); return null; }
+      return s;
+    } catch(e) { return null; }
+  }
+
+  var session = loadSession();
+
+  /* inject watermark */
+  function injectWatermark(name) {
+    var wm = document.getElementById('watermark');
+    var tile = name + ' · GrantApp AI · ';
+    var row = '';
+    for (var r = 0; r < 8; r++) row += tile;
+    var html = '';
+    for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+
+  if (session && session.name) {
+    injectWatermark(session.name);
+    var greet = document.getElementById('greeting');
+    greet.textContent = 'Hey, ' + session.name;
+    greet.style.display = 'block';
+    /* print header student name */
+    document.getElementById('print-student-name').textContent = 'Student: ' + session.name;
+  } else {
+    /* No session — still works, watermark blank */
+    injectWatermark('GrantApp AI');
+  }
+
+  document.getElementById('print-date').textContent =
+    'Printed: ' + new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+})();
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "The general formula for alkenes is:",
+    opts: { A:"CₙH₂ₙ₋₂", B:"CₙH₂ₙ₊₂", C:"CₙHₙ", D:"CₙH₂ₙ" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 2,
+    text: "Which of the following is a reaction of alkanes with chlorine in UV light?",
+    opts: { A:"Addition reaction", B:"Nucleophilic substitution", C:"Free radical substitution", D:"Elimination reaction" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 3,
+    text: "Fehling's solution is used to distinguish between:",
+    opts: { A:"Alcohols and ethers", B:"Carboxylic acids and esters", C:"Aldehydes and ketones", D:"Alkanes and alkenes" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 4,
+    text: "The process of cracking long-chain hydrocarbons produces:",
+    opts: { A:"Only alkenes", B:"Only alkanes", C:"Shorter chain alkanes and alkenes", D:"Aromatic compounds only" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: "Cracking (thermal or catalytic) breaks long-chain alkanes into shorter alkanes and alkenes. This is important in the petroleum industry to convert less useful heavy fractions into high-demand fuels and feedstocks."
+  },
+  {
+    id: 5,
+    text: "What is the IUPAC name of CH₃COOC₂H₅?",
+    opts: { A:"Methyl ethanoate", B:"Ethyl methanoate", C:"Propyl methanoate", D:"Ethyl ethanoate" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 6,
+    text: "Benzene undergoes electrophilic substitution rather than addition because:",
+    opts: { A:"It is not reactive enough for addition", B:"It contains no C=C double bonds", C:"It only reacts with Lewis acids", D:"Addition would destroy the stable aromatic π-electron system" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "Benzene's six π-electrons are delocalised around the ring, providing exceptional stability (~150 kJ/mol resonance energy). Addition would disrupt this stabilised system. Substitution maintains aromaticity, so it is strongly preferred."
+  },
+  {
+    id: 7,
+    text: "The fermentation of glucose produces:",
+    opts: { A:"Methanol and CO₂", B:"Ethanol and O₂", C:"Propanol and water", D:"Ethanol and CO₂" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: ""
+  },
+  {
+    id: 8,
+    text: "In a neutralisation reaction, 25 cm³ of 0.1 mol/dm³ HCl is titrated against NaOH. What volume of 0.1 mol/dm³ NaOH is required?",
+    opts: { A:"12.5 cm³", B:"25 cm³", C:"50 cm³", D:"100 cm³" },
+    ans: "B",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 9,
+    text: "Which indicator would be most suitable for a titration between a strong acid and a weak base?",
+    opts: { A:"Methyl orange (pH 3.1–4.4)", B:"Phenolphthalein (pH 8.3–10)", C:"Universal indicator", D:"Litmus (pH 6–8)" },
+    ans: "A",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 10,
+    text: "Which of the following aqueous solutions has the lowest pH?",
+    opts: { A:"0.1 mol/dm³ CH₃COOH", B:"0.1 mol/dm³ HCl", C:"0.1 mol/dm³ Na₂CO₃", D:"0.1 mol/dm³ NaCl" },
+    ans: "B",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 11,
+    text: "The process by which a salt is formed from the direct combination of a metal and a non-metal is called:",
+    opts: { A:"Synthesis / direct combination", B:"Neutralisation", C:"Thermal decomposition", D:"Precipitation" },
+    ans: "A",
+    topic: "Acids Bases Salts",
+    exp: ""
+  },
+  {
+    id: 12,
+    text: "The percentage by mass of nitrogen in urea CO(NH₂)₂ is: (C=12, O=16, N=14, H=1)",
+    opts: { A:"53.3%", B:"46.7%", C:"23.3%", D:"33.3%" },
+    ans: "B",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 13,
+    text: "How many molecules are in 0.5 mol of water? (Avogadro's number = 6.02 × 10²³)",
+    opts: { A:"3.01 × 10²³", B:"6.02 × 10²³", C:"1.20 × 10²⁴", D:"1.50 × 10²³" },
+    ans: "A",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 14,
+    text: "The molecular formula of a compound with empirical formula CH₂O and molar mass 60 g/mol is: (C=12, H=1, O=16)",
+    opts: { A:"CH₂O", B:"C₃H₆O₃", C:"C₄H₈O₄", D:"C₂H₄O₂" },
+    ans: "D",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 15,
+    text: "The concentration of a solution containing 4 g of NaOH in 500 cm³ of solution is: (Na=23, O=16, H=1)",
+    opts: { A:"0.2 mol/dm³", B:"0.1 mol/dm³", C:"0.4 mol/dm³", D:"0.8 mol/dm³" },
+    ans: "A",
+    topic: "Mole Concept",
+    exp: ""
+  },
+  {
+    id: 16,
+    text: "Which of the following has the highest boiling point?",
+    opts: { A:"NH₃", B:"H₂O", C:"HF", D:"CH₄" },
+    ans: "B",
+    topic: "Chemical Bonding",
+    exp: ""
+  },
+  {
+    id: 17,
+    text: "Which of the following molecules has a coordinate (dative) covalent bond?",
+    opts: { A:"NH₄⁺", B:"H₂O", C:"NaCl", D:"CO₂" },
+    ans: "A",
+    topic: "Chemical Bonding",
+    exp: ""
+  },
+  {
+    id: 18,
+    text: "Which of the following is the correct order of increasing bond strength?",
+    opts: { A:"C=C < C–C < C≡C", B:"C–C = C=C = C≡C", C:"C–C < C=C < C≡C", D:"C≡C < C=C < C–C" },
+    ans: "C",
+    topic: "Chemical Bonding",
+    exp: ""
+  },
+  {
+    id: 19,
+    text: "Which of the following correctly describes the solubility trend of Group II hydroxides down the group?",
+    opts: { A:"Solubility increases", B:"Solubility first increases then decreases", C:"Solubility decreases", D:"Solubility remains constant" },
+    ans: "A",
+    topic: "Periodic Table",
+    exp: ""
+  },
+  {
+    id: 20,
+    text: "The element with the highest melting point among Period 3 elements is:",
+    opts: { A:"Al", B:"Na", C:"Si", D:"P" },
+    ans: "C",
+    topic: "Periodic Table",
+    exp: "Silicon has a giant covalent lattice structure with strong covalent bonds in all directions, giving it the highest melting point in Period 3 (~1414°C). Metals (Na, Mg, Al) have lower MPs, and non-metals after Si are molecular (low MPs)."
+  },
+  {
+    id: 21,
+    text: "Which of the following pairs are isoelectronic (have the same number of electrons)?",
+    opts: { A:"O²⁻ and S²⁻", B:"Na⁺ and K⁺", C:"Na⁺ and Mg²⁺", D:"Cl⁻ and Br⁻" },
+    ans: "C",
+    topic: "Periodic Table",
+    exp: ""
+  },
+  {
+    id: 22,
+    text: "Dalton's Law of Partial Pressures states that the total pressure of a gas mixture equals:",
+    opts: { A:"The pressure of the lightest gas", B:"The sum of the partial pressures of all component gases", C:"The pressure of the most abundant gas", D:"The average of all partial pressures" },
+    ans: "B",
+    topic: "Gas Laws",
+    exp: ""
+  },
+  {
+    id: 23,
+    text: "A gas occupies 500 cm³ at 27°C and 1 atm. What volume does it occupy at 127°C and 1 atm?",
+    opts: { A:"750 cm³", B:"666.7 cm³", C:"250 cm³", D:"1000 cm³" },
+    ans: "B",
+    topic: "Gas Laws",
+    exp: ""
+  },
+  {
+    id: 24,
+    text: "Boyle's Law states that at constant temperature, the pressure of a gas is:",
+    opts: { A:"Directly proportional to volume", B:"Independent of volume", C:"Directly proportional to temperature", D:"Inversely proportional to volume" },
+    ans: "D",
+    topic: "Gas Laws",
+    exp: ""
+  },
+  {
+    id: 25,
+    text: "In electrolysis, oxidation occurs at the:",
+    opts: { A:"Electrolyte", B:"Cell casing", C:"Cathode", D:"Anode" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: ""
+  },
+  {
+    id: 26,
+    text: "The standard electrode potential E° for a cell is related to the Gibbs free energy by:",
+    opts: { A:"ΔG° = −nFE°", B:"ΔG° = E° / nF", C:"ΔG° = nFE°", D:"ΔG° = nRT ln(E°)" },
+    ans: "A",
+    topic: "Electrochemistry",
+    exp: ""
+  },
+  {
+    id: 27,
+    text: "During the electrolysis of dilute H₂SO₄, the gas produced at the cathode is:",
+    opts: { A:"Sulfur dioxide", B:"Oxygen", C:"Hydrogen", D:"Sulfur trioxide" },
+    ans: "C",
+    topic: "Electrochemistry",
+    exp: ""
+  },
+  {
+    id: 28,
+    text: "Which quantum number determines the shape of an orbital?",
+    opts: { A:"Azimuthal quantum number (l)", B:"Magnetic quantum number (mₗ)", C:"Principal quantum number (n)", D:"Spin quantum number (ms)" },
+    ans: "A",
+    topic: "Atomic Structure",
+    exp: ""
+  },
+  {
+    id: 29,
+    text: "The electronic configuration of a chloride ion (Cl⁻) is:",
+    opts: { A:"2,7,8", B:"2,8,8", C:"2,8,9", D:"2,8,7" },
+    ans: "B",
+    topic: "Atomic Structure",
+    exp: ""
+  },
+  {
+    id: 30,
+    text: "The Aufbau principle states that electrons:",
+    opts: { A:"Fill available orbitals one at a time before pairing", B:"Occupy higher energy orbitals before lower ones", C:"Fill the lowest available energy orbital first", D:"Can have the same four quantum numbers" },
+    ans: "C",
+    topic: "Atomic Structure",
+    exp: ""
+  },
+  {
+    id: 31,
+    text: "To confirm the presence of SO₄²⁻ ions, you would add:",
+    opts: { A:"Universal indicator", B:"Dilute HCl then AgNO₃", C:"NaOH solution", D:"Dilute HCl then BaCl₂ → white precipitate insoluble in HCl" },
+    ans: "D",
+    topic: "Qualitative Analysis",
+    exp: ""
+  },
+  {
+    id: 32,
+    text: "A gas that relights a glowing splint is:",
+    opts: { A:"Carbon dioxide", B:"Oxygen", C:"Hydrogen", D:"Nitrogen" },
+    ans: "B",
+    topic: "Qualitative Analysis",
+    exp: ""
+  },
+  {
+    id: 33,
+    text: "A white precipitate soluble in excess NaOH is produced. The cation present is most likely:",
+    opts: { A:"Cu²⁺", B:"Al³⁺", C:"Fe³⁺", D:"Ca²⁺" },
+    ans: "B",
+    topic: "Qualitative Analysis",
+    exp: ""
+  },
+  {
+    id: 34,
+    text: "The bond dissociation energy is the energy required to:",
+    opts: { A:"Form one mole of a specific bond", B:"Break one mole of a specific bond in the gaseous state", C:"Melt one mole of a compound", D:"Vaporise one mole of a compound" },
+    ans: "B",
+    topic: "Energetics",
+    exp: "Bond dissociation energy (BDE) is always endothermic (+ΔH) — it requires energy to break bonds. Bond formation is exothermic. Approximate ΔH_rxn = Σ(bonds broken) − Σ(bonds formed)."
+  },
+  {
+    id: 35,
+    text: "A reaction with a negative ΔH and a positive ΔS will:",
+    opts: { A:"Always be spontaneous at all temperatures", B:"Only be spontaneous at high temperatures", C:"Only be spontaneous at low temperatures", D:"Never be spontaneous" },
+    ans: "A",
+    topic: "Energetics",
+    exp: ""
+  },
+  {
+    id: 36,
+    text: "Henry's Law states that the solubility of a gas in a liquid is:",
+    opts: { A:"Equal to the mole fraction of the gas", B:"Directly proportional to the partial pressure of the gas above the liquid", C:"Inversely proportional to the temperature", D:"Independent of pressure" },
+    ans: "B",
+    topic: "Solutions",
+    exp: ""
+  },
+  {
+    id: 37,
+    text: "Raoult's Law states that the vapour pressure of a solution is:",
+    opts: { A:"Independent of solute concentration", B:"Proportional to the mole fraction of the solute", C:"Greater than the vapour pressure of the pure solvent", D:"Equal to the vapour pressure of the pure solvent multiplied by the mole fraction of solvent" },
+    ans: "D",
+    topic: "Solutions",
+    exp: ""
+  },
+  {
+    id: 38,
+    text: "The oxidation state of Cr in K₂Cr₂O₇ is:",
+    opts: { A:"+6", B:"+4", C:"+7", D:"+3" },
+    ans: "A",
+    topic: "Redox Chemistry",
+    exp: ""
+  },
+  {
+    id: 39,
+    text: "In the reaction: Fe²⁺ + Ce⁴⁺ → Fe³⁺ + Ce³⁺, the reducing agent is:",
+    opts: { A:"Fe³⁺", B:"Ce³⁺", C:"Ce⁴⁺", D:"Fe²⁺" },
+    ans: "D",
+    topic: "Redox Chemistry",
+    exp: ""
+  },
+  {
+    id: 40,
+    text: "Alpha particles are composed of:",
+    opts: { A:"High-energy photons", B:"One proton and one neutron", C:"Two protons and two neutrons (helium nucleus)", D:"High-energy electrons" },
+    ans: "C",
+    topic: "Nuclear Chemistry",
+    exp: ""
+  },
+  {
+    id: 41,
+    text: "Which type of radioactive decay results in no change in mass number or atomic number?",
+    opts: { A:"Gamma decay", B:"Neutron emission", C:"Beta decay", D:"Alpha decay" },
+    ans: "A",
+    topic: "Nuclear Chemistry",
+    exp: "Gamma (γ) radiation is electromagnetic radiation emitted when a nucleus moves from an excited to a ground state. It involves no change in atomic number or mass number — just energy release."
+  },
+  {
+    id: 42,
+    text: "Which greenhouse gas is primarily responsible for global warming from human activities?",
+    opts: { A:"Noble gases", B:"Oxygen (O₂)", C:"Carbon dioxide (CO₂)", D:"Nitrogen (N₂)" },
+    ans: "C",
+    topic: "Environmental Chemistry",
+    exp: "CO₂ is the primary greenhouse gas from human activities (burning fossil fuels, deforestation). CH₄ and N₂O are also important. Greenhouse gases trap infrared radiation from Earth's surface."
+  },
+  {
+    id: 43,
+    text: "Which of the following is the primary cause of ozone layer depletion?",
+    opts: { A:"Methane", B:"Nitrogen gas", C:"Chlorofluorocarbons (CFCs)", D:"Carbon dioxide" },
+    ans: "C",
+    topic: "Environmental Chemistry",
+    exp: ""
+  },
+  {
+    id: 44,
+    text: "Which piece of apparatus is used to measure volumes of liquid precisely in a titration?",
+    opts: { A:"Beaker", B:"Burette", C:"Test tube", D:"Conical flask" },
+    ans: "B",
+    topic: "Laboratory Skills",
+    exp: ""
+  },
+  {
+    id: 45,
+    text: "In paper chromatography, the component of a mixture that travels farthest from the baseline has:",
+    opts: { A:"The greatest affinity for the stationary phase", B:"The greatest affinity for the mobile phase", C:"The lowest solubility", D:"The highest molecular mass" },
+    ans: "B",
+    topic: "Laboratory Skills",
+    exp: ""
+  },
+  {
+    id: 46,
+    text: "For a reaction with rate = k[A]¹[B]², what is the overall order?",
+    opts: { A:"2", B:"1", C:"4", D:"3" },
+    ans: "D",
+    topic: "Kinetics",
+    exp: "Overall order = sum of all individual orders = 1 + 2 = 3 (third order)."
+  },
+  {
+    id: 47,
+    text: "The rate-determining step of a multi-step mechanism is the:",
+    opts: { A:"Slowest step", B:"Fastest step", C:"Last step", D:"First step always" },
+    ans: "A",
+    topic: "Kinetics",
+    exp: "The rate-determining step (RDS) is the slowest step in the mechanism — it acts like a bottleneck. The overall rate of reaction equals the rate of the RDS, and the rate law is determined by the molecularity of the RDS."
+  },
+  {
+    id: 48,
+    text: "For the reaction: PCl₅ ⇌ PCl₃ + Cl₂, the equilibrium constant expression Kc is:",
+    opts: { A:"[PCl₅] / ([PCl₃] + [Cl₂])", B:"[PCl₅] / [PCl₃][Cl₂]", C:"[PCl₃] + [Cl₂] / [PCl₅]", D:"[PCl₃][Cl₂] / [PCl₅]" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: ""
+  },
+  {
+    id: 49,
+    text: "A reaction has the equilibrium constant Kc = 1000 at 25°C. This means the reaction:",
+    opts: { A:"Has equal concentrations of reactants and products", B:"Strongly favours the reactants", C:"Strongly favours the products", D:"Does not reach equilibrium" },
+    ans: "C",
+    topic: "Equilibrium",
+    exp: ""
+  },
+  {
+    id: 50,
+    text: "Brass is an alloy of:",
+    opts: { A:"Copper and zinc", B:"Zinc and tin", C:"Iron and copper", D:"Copper and tin" },
+    ans: "A",
+    topic: "Metals",
+    exp: ""
+  },
+];
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0, submitted: false };
+var UA = {};  /* userAnswers: {id: chosen_key} */
+var globalDone = false;
+var GLOBAL_SECS = 1800; /* 30 minutes */
+var PTS_CORRECT = 1;
+var PTS_WRONG   = 0; /* UTME: no negative marking */
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot  = document.getElementById('gdot');
+  var txt  = document.getElementById('gtime');
+  function fmt(s) {
+    var m = Math.floor(s/60), ss = s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) {
+      txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn';
+    } else if (remaining <= 60) {
+      txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang';
+    }
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+
+function getTimeDisplay() {
+  var el = document.getElementById('gtime');
+  return el ? el.textContent : '—';
+}
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var optsHtml = '';
+    var labels = ['A','B','C','D'];
+    for (var j = 0; j < labels.length; j++) {
+      var lbl = labels[j];
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
+        '</div>';
+    }
+    html += '<div class="qcard" style="animation-delay:' + (i*0.03) + 's">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q' + q.id + ' of 50</span>' +
+        (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') +
+      '</div>' +
+      '<div class="qtxt">' + q.text + '</div>' +
+      '<div class="opts">' + optsHtml + '</div>' +
+      '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp' + q.id + '"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid   = parseInt(this.dataset.id);
+      var chose = this.dataset.a;
+      /* deselect siblings */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.remove('sel');
+      });
+      this.classList.add('sel');
+      UA[qid] = chose;
+      /* enable check button */
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid    = parseInt(this.dataset.qid);
+      var q      = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var ok     = (chosen === q.ans);
+
+      /* lock all opts for this question */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked');
+        o.style.pointerEvents = 'none';
+        if (o.dataset.a === q.ans)    o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+
+      /* explanation */
+      var expEl = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + q.ans;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' +
+        (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+
+      this.disabled = true;
+
+      /* update stats */
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++;
+        ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent  = ST.correct;
+  document.getElementById('sc-wrong').textContent  = ST.wrong;
+  document.getElementById('sc-skip').textContent   = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent  = ST.answered + ' / 50 answered';
+  document.getElementById('m-ans').textContent     = ST.answered;
+  document.getElementById('m-left').textContent    = left;
+  document.getElementById('m-time').textContent    = getTimeDisplay();
+  /* progress bar */
+  document.getElementById('prog-fill').style.width = (ST.answered / QUESTIONS.length * 100) + '%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() {
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitQuiz() {
+  hideSubmitModal();
+  globalDone = true;
+  stopTimer();
+
+  /* Auto-check all unanswered questions that have a selection */
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){
+    if (!btn.disabled) btn.click();
+  });
+
+  /* Show time-up overlay with results */
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  /* lock everything */
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.style.pointerEvents = 'none';
+    o.classList.add('locked');
+  });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
+
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF / PRINT ── */
+function doPrint() {
+  /* Make sure print header is visible for print */
+  document.getElementById('print-header').style.display = 'block';
+  window.print();
+  /* Hide again after */
+  setTimeout(function(){
+    document.getElementById('print-header').style.display = 'none';
+  }, 1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
