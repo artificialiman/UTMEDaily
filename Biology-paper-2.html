@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Biology — Paper 2 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* noise grain */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── WATERMARK ── */
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem;
+      padding: 1rem;
+      transform: rotate(-20deg) scale(1.5);
+      transform-origin: center center;
+      opacity: 0.022;
+      font-family: var(--mono);
+      font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em;
+      white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: rgba(10,14,26,0.92);
+      border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+
+    /* greeting chip */
+    .hdr-greeting {
+      font-size: 11px; color: var(--ter);
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--mono); letter-spacing: 0.05em;
+    }
+
+    /* timer */
+    .gtimer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      flex-shrink: 0;
+    }
+    .gtimer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+      transition: background .3s;
+    }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; color: var(--accent); transition: color .3s;
+    }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; padding: 12px 20px 8px;
+      position: relative; z-index: 1;
+    }
+    .sc {
+      background: var(--card); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+      border: 1px solid var(--sep);
+    }
+    .sc-v {
+      font-family: var(--mono); font-size: 18px; font-weight: 700;
+      color: var(--text);
+    }
+    .sc-v.c { color: var(--green); }
+    .sc-v.w { color: var(--red); }
+    .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* progress bar */
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 99px; transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── QUESTION CARDS ── */
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+
+    .qcard {
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 14px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .qcard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep);
+      gap: 10px;
+    }
+    .qnum {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .qtopic {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      color: var(--accent); letter-spacing: 0.3px;
+    }
+
+    .qtxt {
+      font-size: 15px; line-height: 1.72;
+      color: var(--text); font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    /* options */
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-radius: 10px;
+      border: 1px solid var(--sep);
+      background: var(--card2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .opt.sel   { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+
+    .opt-key {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--accent); flex-shrink: 0;
+      width: 18px; padding-top: 1px;
+    }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+
+    /* check button */
+    .abtn {
+      margin-top: 12px; width: 100%;
+      padding: 11px; border-radius: 10px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+
+    /* explanation */
+    .exp {
+      display: none; margin-top: 12px;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.18);
+      border-radius: 10px; padding: 14px;
+      font-size: 13px; line-height: 1.68;
+      color: var(--sec);
+    }
+    .exp.show { display: block; }
+    .exp-mark {
+      display: inline-block; margin-bottom: 8px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
+
+    /* ── SUBMIT BAR ── */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,14,26,0.96);
+      border-top: 1px solid var(--sep);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .submit-btn {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress {
+      font-family: var(--mono); font-size: 11px; color: var(--ter);
+      white-space: nowrap;
+    }
+
+    /* ── TIME UP OVERLAY ── */
+    .timeup {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,14,26,0.96);
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .timeup.show { display: flex; }
+    .timeup-box {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl {
+      font-family: var(--mono); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .timeup-score {
+      font-family: var(--mono); font-size: 2rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .timeup-score.pos { color: var(--green); }
+    .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .tu-stat-v {
+      font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text);
+    }
+    .tu-stat-v.c { color: var(--green); }
+    .tu-stat-v.w { color: var(--red); }
+    .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .timeup-btn.sec {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
+    }
+
+    /* ── SUBMIT MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 16px; width: 100%; max-width: 400px;
+      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.96) translateY(8px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    .modal h3 {
+      font-family: var(--mono); font-size: 1rem; font-weight: 700;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--sep);
+      font-size: 13px; color: var(--ter);
+    }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep);
+    }
+
+    /* ── PRINT / PDF ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar,
+      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important;
+        border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important;
+        background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
+      .opt-txt { color: #000 !important; }
+      .qtxt    { color: #000 !important; }
+      .qtopic  { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
+      #print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 24pt;
+        padding-bottom: 12pt;
+        border-bottom: 2pt solid #000;
+      }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  
+/* ── AUTH GATE ── */
+#auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
+#auth-gate.unlocked { display:none; }
+.gate-box { background:var(--surface,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+.gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#6e8efb);margin-bottom:1rem; }
+.gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
+.gate-sub { font-size:0.85rem;color:var(--muted,#8b949e);margin:0 0 1.5rem; }
+.gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
+.gate-input:focus { border-color:var(--accent,#6e8efb); }
+.gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
+.gate-btn { width:100%;padding:0.8rem;background:var(--accent,#6e8efb);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:0.5rem; }
+.gate-btn:hover { opacity:0.88; }
+</style>
+</head>
+<body>
+
+<!-- print-only header (hidden on screen) -->
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Biology Paper 2</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<!-- watermark (personalised by JS from sessionStorage) -->
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Biology · Paper 2</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password">
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<!-- header -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Biology · Paper 2</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- score strip -->
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<!-- question cards -->
+<div id="qc"></div>
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<!-- submit modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- time up overlay -->
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH GATE ── */
+(function() {
+  var REGISTRY = {
+      "ae3ed76a8adeb51864da0d183981073ed1cde4dcb6f208584a0352c74d75eb9b": "Conve",
+      "6d6842a89276c807b1f18f7f4cf8f3504055cee31fd2781e805f104ad473134c": "Kaosara",
+      "433ebd2bd162216c4fb905761177dda0895e7cb2296a37493a4d564904d55b87": "Habibat",
+      "20addb4d515a6f91bc2c1e8072724e37b7104308bf93dcc399836ef438dc402d": "Oyin",
+      "29245fbdaaa9f53126ffc6e04bc93abb1b68bbc7a1ade97533b2c9ab3de443b2": "Dorcas",
+      "deda11cb25de151c9458aca6146aacd3a739fad7a405c262eaa74c70e8f8b568": "Famous",
+      "ffe5a0418d35416f619bcfbae14af3cbf89111f9ee5ec1ae5311a0edaf33001b": "Obasesam",
+      "d14ca0e9b96082a0bccb5d8facee9ea1c1e51fbb90cdeb53f45fafb81ad23d77": "Prosper",
+      "763ad3378c8f6f148075fb119e3f9fbe0be5e94de35f15bad16485081d148582": "Temi",
+      "9c42e13e303bd8f44e709368ac68109fe0c77c727e8ae9a2dc5697be0e3d8ad3": "Murphy",
+      "07d344f500954d778c000e2bf7ecafd810a4a1ca3b8ac632afbf740897d01637": "Improve",
+      "513c3f5bf5d2079f1b8cf727c080b09a79c91874556b6278314833f5c444fb9b": "Benz",
+      "e5d134ef7359e2b397dc1935730988f6525db657ad36cdec62463026a17f7a74": "Silent"
+    };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
+      }
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+  });
+})();
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "During transcription, which molecule serves as the template for mRNA synthesis?",
+    opts: { A:"tRN", B:"rRNA", C:"mRNA", D:"DNA" },
+    ans: "D",
+    topic: "Genetics",
+    exp: "During transcription, RNA polymerase reads the antisense (template) strand of DNA and synthesises a complementary mRNA strand. The DNA double helix unwinds locally and one strand acts as the template."
+  },
+  {
+    id: 2,
+    text: "A dihybrid cross between AaBb × AaBb produces offspring in the ratio:",
+    opts: { A:"9:3:3:1", B:"3:1", C:"1:2:1", D:"1:1:1:1" },
+    ans: "A",
+    topic: "Genetics",
+    exp: "When two genes assort independently, AaBb × AaBb gives the classic 9:3:3:1 ratio — 9 (A_B_) : 3 (A_bb) : 3 (aaB_) : 1 (aabb). This demonstrates Mendel's law of independent assortment."
+  },
+  {
+    id: 3,
+    text: "Which RNA type carries amino acids to the ribosome during translation?",
+    opts: { A:"Messenger RNA (mRNA", B:"Ribosomal RNA (rRNA)", C:"Micro RNA (miRNA)", D:"Transfer RNA (tRNA)" },
+    ans: "D",
+    topic: "Genetics",
+    exp: "Transfer RNA (tRNA) carries specific amino acids to the ribosome during translation. Each tRNA has an anticodon complementary to a codon on mRNA, and carries the corresponding amino acid at its 3' end."
+  },
+  {
+    id: 4,
+    text: "Sickle cell anaemia is an example of:",
+    opts: { A:"A chromosomal disorderxxxxxxxxx", B:"Codominance only", C:"X-linked recessive", D:"Autosomal recessive inheritance" },
+    ans: "D",
+    topic: "Genetics",
+    exp: "Sickle cell anaemia is caused by a point mutation in the β-globin gene on chromosome 11 (autosomal). It is recessive — only homozygous individuals (HbSHbS) have the disease. Carriers (HbAHbS) show codominance in blood tests."
+  },
+  {
+    id: 5,
+    text: "The Hardy-Weinberg equation p² + 2pq + q² = 1 is used to:",
+    opts: { A:"Determine allele frequencies in populations", B:"Calculate mutation rates in populations gas", C:"Predict chromosome number after meiosis", D:"Measure the rate of natural selection" },
+    ans: "A",
+    topic: "Genetics",
+    exp: "The Hardy-Weinberg principle describes allele and genotype frequencies in a non-evolving population. p² = frequency of AA, 2pq = frequency of Aa, q² = frequency of aa. Deviations indicate evolutionary forces at work."
+  },
+  {
+    id: 6,
+    text: "Gene linkage occurs when two genes are located:",
+    opts: { A:"On the same chromosome", B:"On different chromosomes entirely", C:"At the same locus exactly", D:"On sex chromosomes onl" },
+    ans: "A",
+    topic: "Genetics",
+    exp: "Linked genes are located on the same chromosome and tend to be inherited together, violating Mendel's law of independent assortment. The closer together two genes are, the less likely crossing over will separate them."
+  },
+  {
+    id: 7,
+    text: "If a colourblind man (X^h Y) marries a carrier woman (X^H X^h), the probability of their daughter being colourblind is:",
+    opts: { A:"50% of daughters", B:"0% (impossible)", C:"25% of daughters", D:"100% of daughters" },
+    ans: "A",
+    topic: "Genetics",
+    exp: "Cross: X^h Y × X^H X^h. Daughters: X^H X^h (carrier) or X^h X^h (colourblind). 50% of daughters are colourblind. Sons: X^H Y (normal) or X^h Y (colourblind) — 50% of sons affected."
+  },
+  {
+    id: 8,
+    text: "Which of the following correctly describes a test cross?",
+    opts: { A:"Crossing F1 with F2 offspring", B:"Crossing two homozygous dominant plants", C:"Crossing an unknown genotype with homozygous recessive", D:"Crossing two heterozygous parents togetherxxxxxxxxxxxx" },
+    ans: "C",
+    topic: "Genetics",
+    exp: "A test cross involves crossing an individual of unknown genotype with a homozygous recessive (aa). If any recessive offspring appear, the unknown was heterozygous. All dominant offspring means the unknown was homozygous dominant."
+  },
+  {
+    id: 9,
+    text: "The Central Dogma of molecular biology states that information flows:",
+    opts: { A:"RNA → DNA → Protein", B:"Protein → DNA → RNA", C:"DNA → RNA → Protein", D:"DNA → Protein → RNA" },
+    ans: "C",
+    topic: "Genetics",
+    exp: "The Central Dogma (Crick, 1958): DNA is transcribed into mRNA, which is translated into protein. Information flows DNA → RNA → Protein. Reverse transcriptase in retroviruses can reverse transcribe RNA back to DNA."
+  },
+  {
+    id: 10,
+    text: "Turner syndrome (45, X) is caused by:",
+    opts: { A:"Non-disjunction giving monosomy X", B:"Trisomy of the X chromosome", C:"A point mutation on X chromosomex", D:"Deletion of the Y chromosome arm" },
+    ans: "A",
+    topic: "Genetics",
+    exp: "Turner syndrome results from non-disjunction during meiosis, producing an egg or sperm with no sex chromosome. The resulting zygote has 45 chromosomes with only one X (45, X0). Affected individuals are phenotypically female."
+  },
+  {
+    id: 11,
+    text: "The term 'biodiversity' refers to:",
+    opts: { A:"Variety of life at genetic, species, ecosystem levels", B:"The number of individuals in a populationxxxxxxxxxxxx", C:"The total biomass of an ecosystem", D:"The number of producers in a habitat" },
+    ans: "A",
+    topic: "Ecology",
+    exp: "Biodiversity encompasses three levels: genetic diversity (variation within species), species diversity (number and evenness of species), and ecosystem diversity (variety of habitats and communities). It is essential for ecosystem resilience."
+  },
+  {
+    id: 12,
+    text: "Which of the following best describes a food web?",
+    opts: { A:"Interconnected food chains showing feeding relationships", B:"A single path of energy flow through an ecosystemxxxxxxx", C:"A diagram of all organisms at one trophic level", D:"A chart of producer biomass per unit area" },
+    ans: "A",
+    topic: "Ecology",
+    exp: "A food web shows the complex, interconnected feeding relationships in an ecosystem — multiple food chains linked together. It more accurately represents real ecosystems than a single food chain."
+  },
+  {
+    id: 13,
+    text: "The carbon cycle returns CO₂ to the atmosphere mainly through:",
+    opts: { A:"Photosynthesis by green plants", B:"Nitrogen fixation by bacteria", C:"Transpiration from leaf surfaces", D:"Respiration and decomposition" },
+    ans: "D",
+    topic: "Ecology",
+    exp: "CO₂ is returned to the atmosphere through cellular respiration (by all organisms) and decomposition (by bacteria and fungi breaking down dead organic matter). Combustion of fossil fuels also releases CO₂ rapidly."
+  },
+  {
+    id: 14,
+    text: "Eutrophication of water bodies is caused by excessive:",
+    opts: { A:"Nitrates and phosphates from fertilisers", B:"Carbon dioxide dissolving in water", C:"Heavy metals from industrial effluentxxx", D:"Plastic waste entering the water" },
+    ans: "A",
+    topic: "Ecology",
+    exp: "Eutrophication: excess nitrates and phosphates (from agricultural runoff) cause algal blooms. Algae block sunlight; when algae die, decomposers consume oxygen (BOD rises), causing oxygen depletion and fish death."
+  },
+  {
+    id: 15,
+    text: "Mutualism is a relationship where:",
+    opts: { A:"One species benefits while the other is harmed", B:"One benefits while the other is unaffected", C:"Both species benefit from the relationship", D:"Both species are harmed by the interaction" },
+    ans: "C",
+    topic: "Ecology",
+    exp: "Mutualism: both species benefit (+/+). Examples: nitrogen-fixing Rhizobium bacteria in legume root nodules (plant gets nitrogen, bacteria get carbon), and mycorrhizal fungi with plant roots. Commensalism: one benefits, other unaffected."
+  },
+  {
+    id: 16,
+    text: "The ozone layer in the stratosphere is important because it:",
+    opts: { A:"Absorbs harmful ultraviolet radiation", B:"Traps heat to warm the Earth", C:"Provides oxygen for respiration", D:"Regulates global water vapour levelsx" },
+    ans: "A",
+    topic: "Ecology",
+    exp: "The ozone layer (O₃) in the stratosphere absorbs harmful UV-B and UV-C radiation from the sun. Without it, increased UV exposure would cause more skin cancer, cataracts, and damage to aquatic ecosystems."
+  },
+  {
+    id: 17,
+    text: "Succession that begins on bare rock with no soil is called:",
+    opts: { A:"Prisere (primary succession)", B:"Secondary successionxxxxxxxx", C:"Seral community", D:"Climax community" },
+    ans: "A",
+    topic: "Ecology",
+    exp: "Primary succession (prisere) starts from bare, lifeless substrate (e.g. bare rock, new volcanic island). Pioneer species (lichens, mosses) colonise first, gradually building soil that allows more complex communities to establish."
+  },
+  {
+    id: 18,
+    text: "A mark-recapture method is used to estimate:",
+    opts: { A:"Population size of a mobile species", B:"Species richness in an area", C:"Biomass at each trophic level", D:"Rate of energy transfer between lev" },
+    ans: "A",
+    topic: "Ecology",
+    exp: "Lincoln-Petersen mark-recapture: capture animals, mark and release, recapture later. Population estimate = (first catch × second catch) / number marked in second catch. Best for mobile animals (fish, birds) where direct counting is impossible."
+  },
+  {
+    id: 19,
+    text: "Which of the following human activities most directly reduces biodiversity?",
+    opts: { A:"Habitat destruction and deforestation", B:"Wind energy generation", C:"Hydroelectric power generationxxxxxxx", D:"Population census activities" },
+    ans: "A",
+    topic: "Ecology",
+    exp: "Habitat destruction (deforestation, urbanisation, drainage of wetlands) is the leading cause of biodiversity loss worldwide. It eliminates species' homes and food sources directly and causes population fragmentation."
+  },
+  {
+    id: 20,
+    text: "Which of the following is the site of the light-dependent reactions of photosynthesis?",
+    opts: { A:"Thylakoid membranes", B:"Stroma of chloropla", C:"Cytoplasm of the cell", D:"Outer chloroplast membrane" },
+    ans: "A",
+    topic: "Cell Biology",
+    exp: "Light-dependent reactions occur in the thylakoid membranes (grana) of chloroplasts, where photosystems I and II capture light energy to produce ATP, NADPH, and oxygen (via water splitting)."
+  },
+  {
+    id: 21,
+    text: "The net gain of ATP molecules from glycolysis (per glucose molecule) is:",
+    opts: { A:"38 ATP molecule", B:"36 ATP molecules", C:"34 ATP molecules", D:"2 ATP molecules" },
+    ans: "D",
+    topic: "Cell Biology",
+    exp: "Glycolysis produces 4 ATP but uses 2 ATP, giving a net gain of 2 ATP per glucose molecule. It also produces 2 NADH and 2 pyruvate. Glycolysis occurs in the cytoplasm and doesn't require oxygen."
+  },
+  {
+    id: 22,
+    text: "Which process requires oxygen to produce ATP?",
+    opts: { A:"Glycolysis", B:"Fermentation", C:"Aerobic respiration", D:"Anaerobic respirati" },
+    ans: "C",
+    topic: "Cell Biology",
+    exp: "Aerobic respiration requires oxygen as the final electron acceptor in the electron transport chain. It produces ~36-38 ATP per glucose. Glycolysis and fermentation are anaerobic — they do not require oxygen."
+  },
+  {
+    id: 23,
+    text: "Active transport differs from diffusion in that active transport:",
+    opts: { A:"Moves substances down a concentration gradient", B:"Requires no carrier proteins at all gas", C:"Uses ATP and moves against the gradient", D:"Only moves water molecules across membranes" },
+    ans: "C",
+    topic: "Cell Biology",
+    exp: "Active transport uses ATP energy and carrier proteins to move substances against their concentration gradient (from low to high concentration). This allows cells to accumulate nutrients or remove wastes even against concentration gradients."
+  },
+  {
+    id: 24,
+    text: "Crossing over during meiosis occurs at:",
+    opts: { A:"Metaphase ", B:"Telophase I", C:"Anaphase II", D:"Prophase I" },
+    ans: "D",
+    topic: "Cell Biology",
+    exp: "Crossing over (chiasma formation) occurs during prophase I of meiosis when homologous chromosomes pair up (synapsis) as bivalents. Non-sister chromatids exchange segments, increasing genetic variation in gametes."
+  },
+  {
+    id: 25,
+    text: "The Krebs cycle takes place in the:",
+    opts: { A:"Cytoplasm", B:"Thylakoid membranexx", C:"Mitochondrial matrix", D:"Inner mitochondrial membrane" },
+    ans: "C",
+    topic: "Cell Biology",
+    exp: "The Krebs (citric acid) cycle occurs in the mitochondrial matrix. Acetyl-CoA combines with oxaloacetate to form citrate; CO₂ is released and NADH/FADH₂ are produced to feed the electron transport chain."
+  },
+  {
+    id: 26,
+    text: "Which of the following correctly describes facilitated diffusion?",
+    opts: { A:"Requires ATP to move substances", B:"Moves substances against concentration gradient", C:"Uses carrier or channel proteins, no ATP", D:"Only transports lipid-soluble moleculesx" },
+    ans: "C",
+    topic: "Cell Biology",
+    exp: "Facilitated diffusion uses specific channel or carrier proteins to allow substances to move down their concentration gradient across the membrane. No ATP is required — it is a passive process. Examples: glucose transporters, ion channels."
+  },
+  {
+    id: 27,
+    text: "In lactic acid fermentation (in muscle cells), pyruvate is converted to:",
+    opts: { A:"Ethanol and CO₂", B:"Acetyl-CoA", C:"Glucose and water gas", D:"Lactic acid (lactate)" },
+    ans: "D",
+    topic: "Cell Biology",
+    exp: "In anaerobic conditions, muscle cells convert pyruvate to lactate (lactic acid) to regenerate NAD⁺, allowing glycolysis to continue. This causes muscle fatigue. In yeast, anaerobic fermentation produces ethanol and CO₂ instead."
+  },
+  {
+    id: 28,
+    text: "The sino-atrial node (SAN) in the heart is responsible for:",
+    opts: { A:"Preventing backflow of blood", B:"Initiating the heartbeat (pacemaker)", C:"Carrying impulses to Purkinje fibres", D:"Separating oxygenated and deoxygenated blood" },
+    ans: "B",
+    topic: "Animal Biology",
+    exp: "The sino-atrial node (SAN) in the right atrium wall is the heart's natural pacemaker. It generates electrical impulses that spread across the atria, causing them to contract, then via the AVN to the ventricles."
+  },
+  {
+    id: 29,
+    text: "Gas exchange in the lungs occurs across the walls of:",
+    opts: { A:"Bronchi", B:"Trachea", C:"Alveoli", D:"Bronchioles" },
+    ans: "C",
+    topic: "Animal Biology",
+    exp: "Alveoli are tiny air sacs in the lungs with walls one cell thick (simple squamous epithelium), surrounded by a dense capillary network. Their enormous surface area (~70 m²), thin walls, and moist surface maximise gas exchange."
+  },
+  {
+    id: 30,
+    text: "The role of insulin in blood glucose regulation is to:",
+    opts: { A:"Stimulate glycogen breakdown in liver", B:"Increase blood glucose concentration", C:"Convert glycogen to glucose for release", D:"Lower blood glucose by promoting uptake" },
+    ans: "D",
+    topic: "Animal Biology",
+    exp: "Insulin (from β-cells of the pancreas) lowers blood glucose by stimulating uptake of glucose into cells, promoting glycogen synthesis in the liver (glycogenesis), and inhibiting gluconeogenesis. Glucagon does the opposite."
+  },
+  {
+    id: 31,
+    text: "Haemoglobin's oxygen dissociation curve shifts to the right in the presence of:",
+    opts: { A:"Lower temperature", B:"Higher pH (less CO₂)", C:"Increased CO₂ (Bohr effect)", D:"Decreased 2,3-BPG levelsxxx" },
+    ans: "C",
+    topic: "Animal Biology",
+    exp: "The Bohr effect: increased CO₂ (and resultant lower pH) causes haemoglobin to release oxygen more readily, shifting the curve right. This is beneficial in respiring tissues where CO₂ is high and O₂ delivery is needed most."
+  },
+  {
+    id: 32,
+    text: "Which part of the nephron is primarily responsible for selective reabsorption?",
+    opts: { A:"Bowman's capsulexxxxxxxxxx", B:"Proximal convoluted tubule", C:"Collecting duct", D:"Loop of Henle" },
+    ans: "B",
+    topic: "Animal Biology",
+    exp: "The proximal convoluted tubule (PCT) reabsorbs ~65-70% of filtrate, including all glucose, amino acids, most water and salts. Reabsorption here is active (Na⁺/K⁺ ATPase) and passive (osmosis, diffusion)."
+  },
+  {
+    id: 33,
+    text: "Which component of blood is responsible for clotting?",
+    opts: { A:"Erythrocytes (red blood ", B:"Lymphocytes", C:"Platelets (thrombocytes)", D:"Neutrophils" },
+    ans: "C",
+    topic: "Animal Biology",
+    exp: "Platelets (thrombocytes) are small cell fragments that aggregate at wound sites and release clotting factors. They initiate the clotting cascade, leading to fibrin mesh formation that seals the wound and prevents blood loss."
+  },
+  {
+    id: 34,
+    text: "The reflex arc sequence for a spinal reflex is:",
+    opts: { A:"Effector → Sensory neurone → CNS → Motor neurone → Receptor", B:"Receptor → Sensory neurone → Relay neurone → Motor neurone → Effector", C:"Receptor → Motor neurone → Brain → Sensory neurone → Effectorxxxxxxxx", D:"Effector → Relay neurone → Brain → Sensory neurone → Receptor" },
+    ans: "B",
+    topic: "Animal Biology",
+    exp: "Reflex arc: receptor (detects stimulus) → sensory neurone → relay neurone (in spinal cord) → motor neurone → effector (muscle or gland). Reflexes are fast, automatic, and bypass conscious brain processing."
+  },
+  {
+    id: 35,
+    text: "Auxin (IAA) causes phototropism by:",
+    opts: { A:"Inhibiting cell division on lit side", B:"Causing equal growth on both sides", C:"Accumulating on shaded side causing elongation", D:"Breaking down chlorophyll on lit sidexxxxxxxxx" },
+    ans: "C",
+    topic: "Plant Biology",
+    exp: "In phototropism, auxin migrates to the shaded side of the shoot tip. Higher auxin concentration on the dark side causes greater cell elongation there, bending the shoot towards the light source."
+  },
+  {
+    id: 36,
+    text: "Which of the following is the correct equation for photosynthesis?",
+    opts: { A:"C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATPxx", B:"6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂", C:"6O₂ + C₆H₁₂O₆ → 6CO₂ + 6H₂O", D:"6CO₂ + 12H₂O → C₆H₁₂O₆ + 6H₂O + 6O₂" },
+    ans: "D",
+    topic: "Plant Biology",
+    exp: "The full equation: 6CO₂ + 12H₂O → C₆H₁₂O₆ + 6H₂O + 6O₂ (using light energy). The 12H₂O on the left accounts for water split in photolysis; 6H₂O is released as a product. Option B is simplified but less precise."
+  },
+  {
+    id: 37,
+    text: "Translocation of organic solutes in plants occurs through:",
+    opts: { A:"Xylem vessels", B:"Phloem sieve tubes", C:"Stomatal pores", D:"Root hair cellsxxx" },
+    ans: "B",
+    topic: "Plant Biology",
+    exp: "Phloem (sieve tubes and companion cells) transports dissolved organic solutes (mainly sucrose) from source (photosynthetic leaves) to sink (roots, fruits, growing tips) by pressure flow (mass flow hypothesis)."
+  },
+  {
+    id: 38,
+    text: "The germination of seeds requires:",
+    opts: { A:"Light and mineral salts always", B:"Water, oxygen, and suitable temperature", C:"Soil with high humus content", D:"Carbon dioxide and high humidityxxxxxxx" },
+    ans: "B",
+    topic: "Plant Biology",
+    exp: "Seed germination requires: water (activates enzymes, softens seed coat), oxygen (for aerobic respiration), and suitable temperature (for enzyme activity). Light is NOT required for most seeds — they can germinate in darkness."
+  },
+  {
+    id: 39,
+    text: "Root hair cells are adapted for absorption by having:",
+    opts: { A:"Thick waxy cuticle on surface", B:"Long thin extension increasing surface area", C:"Chloroplasts for energy production", D:"Lignified walls for structural support only" },
+    ans: "B",
+    topic: "Plant Biology",
+    exp: "Root hair cells have long, thin projections (root hairs) that greatly increase the surface area available for absorption of water and mineral ions. They have a thin, permeable cell wall and large vacuole to aid osmosis."
+  },
+  {
+    id: 40,
+    text: "Gibberellins in plants are responsible for:",
+    opts: { A:"Inhibiting stem elongationxxxxxxxxxxxxxxxxxxxxxx", B:"Promoting fruit ripening", C:"Causing leaf abscission", D:"Stimulating stem elongation and seed germination" },
+    ans: "D",
+    topic: "Plant Biology",
+    exp: "Gibberellins (GAs) promote stem elongation, seed germination (by activating amylase to digest starch in endosperm), and fruit development. They are used commercially to produce larger seedless grapes."
+  },
+  {
+    id: 41,
+    text: "Industrial melanism in the peppered moth is an example of:",
+    opts: { A:"Genetic drift", B:"Directional natural selection", C:"Stabilising selectionxxxxxxxx", D:"Disruptive selection" },
+    ans: "B",
+    topic: "Evolution",
+    exp: "Industrial melanism: pollution darkened tree bark, making pale moths more visible to predators. Dark (melanic) moths had better camouflage and survived better. Natural selection acted directionally, increasing the frequency of dark alleles."
+  },
+  {
+    id: 42,
+    text: "Homologous structures in different species suggest:",
+    opts: { A:"Convergent evolution", B:"Analogous adaptations", C:"Common ancestry (divergent evolution)", D:"Identical ecological nichesxxxxxxxxxx" },
+    ans: "C",
+    topic: "Evolution",
+    exp: "Homologous structures (e.g. pentadactyl limb in mammals, birds, reptiles) have the same basic structure but different functions. They suggest common ancestry (divergent evolution) — same structure adapted to different environments over time."
+  },
+  {
+    id: 43,
+    text: "Viruses are not classified as living organisms because they:",
+    opts: { A:"Are too small to be seen", B:"Cannot carry out metabolism independently", C:"Do not contain nucleic acidsxxxxxxxxxxxxx", D:"Cannot reproduce at all" },
+    ans: "B",
+    topic: "Classification",
+    exp: "Viruses are considered non-living because they cannot carry out metabolism, grow, or reproduce independently — they require a host cell's machinery. They do contain nucleic acids (DNA or RNA) but lack ribosomes, cytoplasm, and membranes."
+  },
+  {
+    id: 44,
+    text: "Which characteristic is used to distinguish between monocots and dicots?",
+    opts: { A:"Presence or absence of chlorophyll", B:"Number of seed leaves (cotyledons)", C:"Type of vascular tissue present", D:"Method of pollination used" },
+    ans: "B",
+    topic: "Classification",
+    exp: "Monocots have one cotyledon (seed leaf); dicots have two. Other differences: monocots have parallel leaf veins, fibrous roots, and flower parts in 3s; dicots have net veins, tap roots, and flower parts in 4s or 5s."
+  },
+  {
+    id: 45,
+    text: "The enzyme that digests starch in the mouth is:",
+    opts: { A:"Pepsin", B:"Lipase", C:"Salivary amylase", D:"Trypsinxxxxxxxxx" },
+    ans: "C",
+    topic: "Nutrition",
+    exp: "Salivary amylase (ptyalin) is secreted by salivary glands and begins the digestion of starch (polysaccharide) into maltose (disaccharide) in the mouth. The process continues in the small intestine with pancreatic amylase."
+  },
+  {
+    id: 46,
+    text: "Kwashiorkor is a nutritional deficiency disease caused by:",
+    opts: { A:"Lack of vitamin C in diet", B:"Insufficient carbohydrate intake only", C:"Deficiency of iron in the diet", D:"Severe protein deficiency in children" },
+    ans: "D",
+    topic: "Nutrition",
+    exp: "Kwashiorkor results from severe protein deficiency, particularly in young children. Symptoms include oedema (fluid accumulation), distended abdomen, depigmented hair, muscle wasting, and poor growth. Common in regions where staple foods are low in protein."
+  },
+  {
+    id: 47,
+    text: "Scurvy is caused by a deficiency of:",
+    opts: { A:"Vitamin D", B:"Vitamin A", C:"Vitamin C (ascorbic acid)", D:"Vitamin B12xxxxxxxxxxxxxx" },
+    ans: "C",
+    topic: "Nutrition",
+    exp: "Scurvy results from vitamin C (ascorbic acid) deficiency. Vitamin C is essential for collagen synthesis. Without it, blood vessels weaken (bleeding gums, bruising), wounds fail to heal, and teeth loosen. Historically affected sailors on long voyages."
+  },
+  {
+    id: 48,
+    text: "In plants, double fertilisation is characteristic of:",
+    opts: { A:"Gymnosperms only", B:"Angiosperms (flowering plants)", C:"Bryophytes and mosses", D:"Ferns and pteridophytesxxxxxxx" },
+    ans: "B",
+    topic: "Reproduction",
+    exp: "Double fertilisation is unique to angiosperms. One sperm fertilises the egg (forming the zygote/embryo); the other fuses with two polar nuclei (forming the triploid endosperm — the seed's food store). This is absent in gymnosperms."
+  },
+  {
+    id: 49,
+    text: "The placenta in mammals serves to:",
+    opts: { A:"Store nutrients for the mother only", B:"Produce the amniotic fluid entirely", C:"Separate maternal and foetal blood completelyxxxxxxxxx", D:"Exchange nutrients and gases between mother and foetus" },
+    ans: "D",
+    topic: "Reproduction",
+    exp: "The placenta allows exchange of oxygen, nutrients, and waste between maternal and foetal blood without direct mixing. It also produces hormones (hCG, progesterone) and acts as a barrier to some pathogens (though not all)."
+  },
+  {
+    id: 50,
+    text: "Which organ is primarily responsible for the excretion of bile pigments?",
+    opts: { A:"Kidneys", B:"Lungs", C:"Skin", D:"Liver" },
+    ans: "D",
+    topic: "Excretion",
+    exp: "The liver breaks down haemoglobin from old red blood cells into bile pigments (bilirubin and biliverdin). These are secreted into bile and excreted via the gut in faeces, giving them their brown colour."
+  }
+];
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0, submitted: false };
+var UA = {};  /* userAnswers: {id: chosen_key} */
+var globalDone = false;
+var GLOBAL_SECS = 1800; /* 30 minutes */
+var PTS_CORRECT = 1;
+var PTS_WRONG   = 0; /* UTME: no negative marking */
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot  = document.getElementById('gdot');
+  var txt  = document.getElementById('gtime');
+  function fmt(s) {
+    var m = Math.floor(s/60), ss = s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) {
+      txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn';
+    } else if (remaining <= 60) {
+      txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang';
+    }
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+
+function getTimeDisplay() {
+  var el = document.getElementById('gtime');
+  return el ? el.textContent : '—';
+}
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var optsHtml = '';
+    var labels = ['A','B','C','D'];
+    for (var j = 0; j < labels.length; j++) {
+      var lbl = labels[j];
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
+        '</div>';
+    }
+    html += '<div class="qcard" style="animation-delay:' + (i*0.03) + 's">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q' + q.id + ' of 50</span>' +
+        (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') +
+      '</div>' +
+      '<div class="qtxt">' + q.text + '</div>' +
+      '<div class="opts">' + optsHtml + '</div>' +
+      '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp' + q.id + '"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid   = parseInt(this.dataset.id);
+      var chose = this.dataset.a;
+      /* deselect siblings */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.remove('sel');
+      });
+      this.classList.add('sel');
+      UA[qid] = chose;
+      /* enable check button */
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid    = parseInt(this.dataset.qid);
+      var q      = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var ok     = (chosen === q.ans);
+
+      /* lock all opts for this question */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked');
+        o.style.pointerEvents = 'none';
+        if (o.dataset.a === q.ans)    o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+
+      /* explanation */
+      var expEl = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + q.ans;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' +
+        (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+
+      this.disabled = true;
+
+      /* update stats */
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++;
+        ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent  = ST.correct;
+  document.getElementById('sc-wrong').textContent  = ST.wrong;
+  document.getElementById('sc-skip').textContent   = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent  = ST.answered + ' / 50 answered';
+  document.getElementById('m-ans').textContent     = ST.answered;
+  document.getElementById('m-left').textContent    = left;
+  document.getElementById('m-time').textContent    = getTimeDisplay();
+  /* progress bar */
+  document.getElementById('prog-fill').style.width = (ST.answered / QUESTIONS.length * 100) + '%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() {
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitQuiz() {
+  hideSubmitModal();
+  globalDone = true;
+  stopTimer();
+
+  /* Auto-check all unanswered questions that have a selection */
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){
+    if (!btn.disabled) btn.click();
+  });
+
+  /* Show time-up overlay with results */
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  /* lock everything */
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.style.pointerEvents = 'none';
+    o.classList.add('locked');
+  });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
+
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF / PRINT ── */
+function doPrint() {
+  /* Make sure print header is visible for print */
+  document.getElementById('print-header').style.display = 'block';
+  window.print();
+  /* Hide again after */
+  setTimeout(function(){
+    document.getElementById('print-header').style.display = 'none';
+  }, 1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
