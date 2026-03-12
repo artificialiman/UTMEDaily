@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Lekki Headmaster — Paper 2 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* noise grain */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── WATERMARK ── */
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem;
+      padding: 1rem;
+      transform: rotate(-20deg) scale(1.5);
+      transform-origin: center center;
+      opacity: 0.022;
+      font-family: var(--mono);
+      font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em;
+      white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: rgba(10,14,26,0.92);
+      border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+
+    /* greeting chip */
+    .hdr-greeting {
+      font-size: 11px; color: var(--ter);
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--mono); letter-spacing: 0.05em;
+    }
+
+    /* timer */
+    .gtimer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      flex-shrink: 0;
+    }
+    .gtimer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+      transition: background .3s;
+    }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; color: var(--accent); transition: color .3s;
+    }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; padding: 12px 20px 8px;
+      position: relative; z-index: 1;
+    }
+    .sc {
+      background: var(--card); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+      border: 1px solid var(--sep);
+    }
+    .sc-v {
+      font-family: var(--mono); font-size: 18px; font-weight: 700;
+      color: var(--text);
+    }
+    .sc-v.c { color: var(--green); }
+    .sc-v.w { color: var(--red); }
+    .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* progress bar */
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 99px; transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── QUESTION CARDS ── */
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+
+    .qcard {
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 14px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .qcard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep);
+      gap: 10px;
+    }
+    .qnum {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .qtopic {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      color: var(--accent); letter-spacing: 0.3px;
+    }
+
+    .qtxt {
+      font-size: 15px; line-height: 1.72;
+      color: var(--text); font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    /* options */
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-radius: 10px;
+      border: 1px solid var(--sep);
+      background: var(--card2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .opt.sel   { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+
+    .opt-key {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--accent); flex-shrink: 0;
+      width: 18px; padding-top: 1px;
+    }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+
+    /* check button */
+    .abtn {
+      margin-top: 12px; width: 100%;
+      padding: 11px; border-radius: 10px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+
+    /* explanation */
+    .exp {
+      display: none; margin-top: 12px;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.18);
+      border-radius: 10px; padding: 14px;
+      font-size: 13px; line-height: 1.68;
+      color: var(--sec);
+    }
+    .exp.show { display: block; }
+    .exp-mark {
+      display: inline-block; margin-bottom: 8px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
+
+    /* ── SUBMIT BAR ── */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,14,26,0.96);
+      border-top: 1px solid var(--sep);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .submit-btn {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress {
+      font-family: var(--mono); font-size: 11px; color: var(--ter);
+      white-space: nowrap;
+    }
+
+    /* ── TIME UP OVERLAY ── */
+    .timeup {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,14,26,0.96);
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .timeup.show { display: flex; }
+    .timeup-box {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl {
+      font-family: var(--mono); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .timeup-score {
+      font-family: var(--mono); font-size: 2rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .timeup-score.pos { color: var(--green); }
+    .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .tu-stat-v {
+      font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text);
+    }
+    .tu-stat-v.c { color: var(--green); }
+    .tu-stat-v.w { color: var(--red); }
+    .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .timeup-btn.sec {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
+    }
+
+    /* ── SUBMIT MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 16px; width: 100%; max-width: 400px;
+      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.96) translateY(8px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    .modal h3 {
+      font-family: var(--mono); font-size: 1rem; font-weight: 700;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--sep);
+      font-size: 13px; color: var(--ter);
+    }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep);
+    }
+
+    /* ── PRINT / PDF ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar,
+      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important;
+        border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important;
+        background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
+      .opt-txt { color: #000 !important; }
+      .qtxt    { color: #000 !important; }
+      .qtopic  { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
+      #print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 24pt;
+        padding-bottom: 12pt;
+        border-bottom: 2pt solid #000;
+      }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  
+/* ── AUTH GATE ── */
+#auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
+#auth-gate.unlocked { display:none; }
+.gate-box { background:var(--surface,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+.gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#6e8efb);margin-bottom:1rem; }
+.gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
+.gate-sub { font-size:0.85rem;color:var(--muted,#8b949e);margin:0 0 1.5rem; }
+.gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
+.gate-input:focus { border-color:var(--accent,#6e8efb); }
+.gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
+.gate-btn { width:100%;padding:0.8rem;background:var(--accent,#6e8efb);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:0.5rem; }
+.gate-btn:hover { opacity:0.88; }
+.gate-pw-wrap { position:relative; margin-bottom:0.5rem; }
+.gate-toggle { position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(232,237,245,0.45);cursor:pointer;font-size:0.9rem;padding:0.25rem;line-height:1; }
+</style>
+</head>
+<body>
+
+<!-- print-only header (hidden on screen) -->
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Lekki Headmaster Paper 1</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<!-- watermark (personalised by JS from sessionStorage) -->
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Lekki Headmaster — Paper 2</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <div class="gate-pw-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password" style="margin-bottom:0;padding-right:2.75rem;">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<!-- header -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Lekki Headmaster — Paper 2</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- score strip -->
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<!-- question cards -->
+<div id="qc"></div>
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<!-- submit modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- time up overlay -->
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH GATE ── */
+(function() {
+  var REGISTRY = {
+      "842c20ed1f9fcce50117bcd6ae5244b3f07f70ce8fcc5a45e7a1925ee01656ce": "Conve",
+      "069fb099f967bc1f273f274475110be3d54e16c93cdc87f3e302b51423c988cc": "Kaosara",
+      "920cc6b7192a8be39cf6e5653db15dd860a2620415d9ee77fd3b21e308d8c9d0": "Habibat",
+      "cf009eb9d5405f70a472957faa16cb6a0933b3f07558570a31bece587d8fbcb8": "Oyin",
+      "fc2ef0dfd14b62a28df76de37af5eaa6e1512b8815b57ef96d9af12c506245a3": "Dorcas",
+      "54bcc6a62675166b1c8fbf3b70f13b0de306e733354b7c4ee7e2c2b6f49a3fe8": "Famous",
+      "00d3080303ed6caa15431b0601f1b14dcc7a13cb700c9a6ed0060cb2f4283b4e": "Obasesam",
+      "3ab8f55c530c2954eb64c11437da4680ad541b8e5874a08f870c69ffb3be4583": "Prosper",
+      "0d5194c057da5d3d5f9edcaa7c201e3706a6d9bfbb2d3a9084e94da087d19a7e": "Temi",
+      "232f90c23ecfd6d32b867787d24aed0b3a83b0fbd0d21e728344a8d29a1a75aa": "Murphy",
+      "3ffeeda46259789a3769146ae56289f9816e8133ed0014b707cb4bd57ffb1b2e": "Improve",
+      "88a4b5ba3c4856326a3269e0a1f2935c55249f567b9d2a178b80f59961c7a2ee": "Benz",
+      "7071d59e712bd4a0c5c242a424b603563f7213eed8772071fd986f7bfa0d1794": "Silent",
+      "6920d61d9bdbaed8df8735c72b3206b27a1d1d9cf55b87f048dee09d928a33fe": "Ada",
+      "cfa671d2f44c11457d209789cc6c5476f2c74d77a62ac00026233f508699106c": "Emeka",
+      "86b9ff4ed1fce86806ccdfdea01ebc740037a40082b8b46c017d9555140e00c2": "Funmi",
+      "626ceafdd6c6b74a2c82b2029afe20d3ee065d5f931cb861dc770f3d3349f969": "Gbemi",
+      "c60bd1ba4a19a4c71c4a8cbe94c05099a85b09f45fd0a184d0365e0b1ecf6a45": "Hassan",
+      "4fa28b27f74cf4d75a041210e55ae43147f4cb1cf697c5853212ce799d88046e": "Ifeanyi",
+      "21924dbbf07ffa856de8e1b1d0f15cc5700895de219d6f7ca3e8d45295f3ad3f": "Jumoke"
+    };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
+      }
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password';
+      inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
+  });
+})();
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+  {
+    id:1, text:"What is the setting of 'The Lekki Headmaster'?",
+    opts:{A:"Abuja and Kaduna",B:"Port Harcourt and Warri",C:"Lagos, primarily Lekki and Badagry",D:"Ibadan and Abeokuta"},
+    ans:"C", topic:"About the Novel",
+    exp:"The novel is primarily set in Lagos, Nigeria — at Stardom Schools in Lekki, and with significant scenes in Badagry (Point of No Return, Heritage Slave Museum) and Ibadan (passport renewal). It captures contemporary Nigerian urban life."
+  },
+  {
+    id:2, text:"Who founded Stardom Schools before Mrs. Ibidun Gloss became MD?",
+    opts:{A:"Mrs. Solape Bayo",B:"Chief David Aje",C:"Mr. Ogunwale",D:"Chief Didi Ogba"},
+    ans:"B", topic:"Characters",
+    exp:"Stardom Schools was founded by Chief David Aje, the late father of Mrs. Ibidun Gloss. He is described as a no-nonsense man who waited eight extra days for Bepo to resume — an act uncharacteristic of his personality, showing how much he valued Bepo as a teacher."
+  },
+  {
+    id:3, text:"What did Chief David Aje say about Bepo that showed his high regard for him?",
+    opts:{A:"'He is the best principal in all of Lagos'",B:"'He will make a great businessman someday'",C:"'There is an essential teacher in the guy'",D:"'He is worth twice his salary'"},
+    ans:"C", topic:"Characters",
+    exp:"Chief David Aje said 'There is an essential teacher in the guy' when referring to Bepo, and he waited eight extra days — something uncharacteristic of the strict founder — for Bepo to resume his post. This reflects Bepo's exceptional qualities as an educator."
+  },
+  {
+    id:4, text:"What is the name of the school where Bepo worked before Stardom, where he witnessed the ritual?",
+    opts:{A:"Fruitful Future Schools",B:"Heritage Academy",C:"Royal Schools",D:"Beesway Group of Schools"},
+    ans:"D", topic:"Plot",
+    exp:"Bepo previously worked at Beesway Group of Schools under Director Mr. Egi Meko. He tried (unsuccessfully) to correct the grammatical error in the school's name — 'Group of School' instead of 'Group of Schools' — and later witnessed the illegal cow burial that prompted his departure."
+  },
+  {
+    id:5, text:"What was the grammatical error in the name of Bepo's former school, Beesway?",
+    opts:{A:"'Beesway' should be 'Beeswax'",B:"The name should have been 'Beesway Academy' not 'Beesway Group'",C:"'Group of School' should have been 'Group of Schools'",D:"'Beesway' was misspelled throughout all official documents"},
+    ans:"C", topic:"Plot/Grammar",
+    exp:"In Chapter 7 ('Ritualists'), Bepo tried unsuccessfully to convince Director Meko to correct 'Group of School' (singular) to 'Group of Schools' (plural) in the school's official name — a grammatical error the director stubbornly refused to fix."
+  },
+  {
+    id:6, text:"What was Fruitful Future, the school that Bepo co-founded?",
+    opts:{A:"A government secondary school in Lekki",B:"A neighbourhood school Bepo helped found, where he encountered a ritual-practicing parent",C:"A school for physically challenged children",D:"The name of Stardom Schools before rebranding"},
+    ans:"B", topic:"Plot",
+    exp:"Fruitful Future was a neighbourhood school Bepo once co-founded. It is where he encountered Mr. Ogo, a parent who offered to perform rituals to increase the school's enrolment. Ogo was later seen on TV having murdered a woman who consulted him for a fertility ritual."
+  },
+  {
+    id:7, text:"What does Seri advise Bepo to pack when travelling to the UK?",
+    opts:{A:"His teaching certificates and degrees only",B:"Nigerian food items like iru (locust beans), egusi, and dry snail",C:"Warm clothing and Nigerian traditional attire",D:"Books and teaching materials for UK students"},
+    ans:"B", topic:"Characters/Culture",
+    exp:"Seri's practical advice to Bepo is to pack light on clothes but bring Nigerian food items — specifically iru (locust beans used as seasoning), egusi (melon seeds for soup), and dry snail — reflecting the Nigerian diaspora's effort to maintain food culture abroad."
+  },
+  {
+    id:8, text:"What is 'iru' as mentioned in the novel?",
+    opts:{A:"A Yoruba word for migration abroad",B:"Locust beans used as a seasoning in Nigerian cuisine",C:"A type of fish sold at the Epe Fish Market",D:"A traditional Yoruba greeting"},
+    ans:"B", topic:"Vocabulary",
+    exp:"Iru is locust beans — a fermented condiment used extensively in Yoruba and West African cooking to add deep, pungent flavour to soups and stews. Seri requests Bepo bring it because it is either unavailable or expensive in the UK."
+  },
+  {
+    id:9, text:"What is a 'domiciliary cheque' as referenced when the MD gives Bepo his farewell gift?",
+    opts:{A:"A cheque that can only be cashed at the issuing branch",B:"A cheque drawn on a foreign currency account (such as US dollars)",C:"A certified cheque requiring two signatories",D:"A personal cheque written without a bank account"},
+    ans:"B", topic:"Vocabulary",
+    exp:"A domiciliary (dom) cheque is drawn on a foreign currency account — in this case a dollar-denominated account. The MD presents Bepo with a $10,000 domiciliary cheque, meaning he receives US dollars rather than naira — a significantly more valuable farewell gift."
+  },
+  {
+    id:10, text:"What is NIN and why did it cause Bepo problems in Chapter 10?",
+    opts:{A:"National Insurance Number — rejected by UK immigration",B:"Nigerian Internet Network — crashed during his flight booking",C:"National Identity Number — network glitches delayed its validation by three weeks, nearly making him miss his travel date",D:"National Immigration Notice — sent late by the passport office"},
+    ans:"C", topic:"Vocabulary/Plot",
+    exp:"NIN stands for National Identity Number. In Chapter 10, Bepo needed to validate his NIN at the office for his passport renewal, but persistent network glitches delayed validation by three weeks, almost causing him to miss his travel date — highlighting Nigeria's infrastructure challenges."
+  },
+  {
+    id:11, text:"Which football players from humble Lagos backgrounds does Bepo mention to inspire students in Ajegunle?",
+    opts:{A:"Jay-Jay Okafor and Rashidi Yekini",B:"Austin Jay-Jay Okocha and Nwankwo Kanu",C:"Odion Ighalo and Victor Osimhen",D:"Mikel Obi and Emmanuel Emenike"},
+    ans:"C", topic:"Characters/Culture",
+    exp:"In Chapter 9, during a visit to Ajegunle, Bepo tells students: 'Being born in a place like this does not condemn one to a life of penury.' He cites Odion Ighalo and Victor Osimhen — both Nigerian footballers who rose from humble Lagos beginnings to international stardom."
+  },
+  {
+    id:12, text:"Which poet's work about Ibadan does Bepo recall during his passport renewal trip?",
+    opts:{A:"Wole Soyinka",B:"Christopher Okigbo",C:"Chinua Achebe",D:"J.P. Clark"},
+    ans:"D", topic:"Literary References",
+    exp:"In Chapter 10, while passing through Ibadan, Bepo recalls J.P. Clark's poem 'Ibadan' — describing the city as 'running splash of rust and gold...flung and scattered among seven hills like broken china in the sun.' The poem reflects Ibadan's unchanged character despite Nigeria's modernisation."
+  },
+  {
+    id:13, text:"What does the novel say about the religious organisations along the Lagos-Ibadan Expressway?",
+    opts:{A:"They cause traffic by blocking the expressway for vigils",B:"Bepo observes major religious camps: RCCG, MFM, Deeper Life, and NASFAT along the route",C:"They provide free food and shelter to travellers",D:"The expressway was built through their land"},
+    ans:"B", topic:"Setting/Culture",
+    exp:"In Chapter 10, Bepo observes major Nigerian religious organisations' headquarters along the Lagos-Ibadan Expressway: RCCG (Redeemed Christian Church of God), MFM (Mountain of Fire and Miracles), Deeper Life, and NASFAT — reflecting the prominence of religious institutions in Nigerian life."
+  },
+  {
+    id:14, text:"What does Kemi (the landlord's granddaughter) say to Bepo at the airport that captures the cultural moment?",
+    opts:{A:"'Daddy, please don't go!'",B:"'Will you come back for Christmas?'",C:"'You want to Japa!'",D:"'Bring me chocolate from London!'"},
+    ans:"C", topic:"Plot/Vocabulary",
+    exp:"Kemi's innocent exclamation — 'You want to Japa!' — as Bepo is driven to the airport is one of the novel's memorable moments. It captures how deeply the 'Japa' phenomenon has permeated Nigerian culture, even reaching the vocabulary of young children."
+  },
+  {
+    id:15, text:"What does Bepo say when he returns to Stardom on Monday?",
+    opts:{A:"'I have decided to take a sabbatical in Nigeria before going to London'",B:"'I am back! I am here! I didn't go! I'm not going again! My heart is here!'",C:"'London was not what I expected, so I returned'",D:"'I forgot my certificates and had to come back'"},
+    ans:"B", topic:"Plot",
+    exp:"In the novel's triumphant final scene, Bepo appears at Stardom's gate shouting: 'I am back! I am here! I didn't go! I'm not going again! My heart is here!' Students carry him on their shoulders, celebrating what becomes a symbol of choosing patriotism over personal gain."
+  },
+  {
+    id:16, text:"How did Stardom Schools restructure fees to increase boarding students?",
+    opts:{A:"They eliminated all fees for the boarding house entirely",B:"They lowered boarding fees from ₦250,000 to ₦165,000, then raised 'Excursion and Other Items' fees by ₦93,000, moving 80% to boarding",C:"They introduced a scholarship for students who paid boarding fees",D:"They pressured parents to sign contracts requiring three years of boarding"},
+    ans:"B", topic:"Plot",
+    exp:"Chapter 1 reveals Stardom's clever fee restructuring: boarding house fees were reduced from ₦250,000 to ₦165,000, making it attractive. However, 'Excursion and Other Items' fees were simultaneously raised by ₦93,000 — resulting in 80% of students joining the boarding house. The school benefited financially while parents felt they were paying less."
+  },
+  {
+    id:17, text:"What restrictions did the MD impose on the cooperative society after discovering staff cars?",
+    opts:{A:"The cooperative was dissolved immediately",B:"No loans above ₦250,000 and all loans must be approved by the MD",C:"Staff could only borrow from external banks in future",D:"Loans were limited to ₦100,000 and restricted to medical emergencies"},
+    ans:"B", topic:"Plot",
+    exp:"In Chapter 5 ('Snake in the Roof'), after the MD's mother compares the cooperative's wealth to 'hanging a snake in the roof,' new restrictions are imposed: loan limits of ₦250,000 (down from higher amounts) and the requirement that all loans must receive MD approval."
+  },
+  {
+    id:18, text:"What does Chief Mrs. Solape Bayo mean by 'snake in the roof' when referring to the cooperative?",
+    opts:{A:"That the cooperative money was stolen by staff",B:"That the cooperative represents a hidden danger — staff could become too powerful and start a rival school",C:"That a literal snake was found in the school building",D:"That the cooperative's funds were being invested in risky ventures"},
+    ans:"B", topic:"Plot/Symbolism",
+    exp:"Chief Mrs. Solape Bayo (the board chairman) uses the proverb 'snake in the roof' to warn that the cooperative society's large accumulated funds (₦95 million with ₦50 million in loans) represent a hidden threat — empowered staff might unite and establish a competing school."
+  },
+  {
+    id:19, text:"How much money did the school cooperative have, and how much in outstanding loans?",
+    opts:{A:"₦50 million saved and ₦95 million in loans",B:"₦95 million saved and ₦50 million in outstanding loans",C:"₦20 million saved and ₦10 million in loans",D:"₦150 million saved and ₦30 million in loans"},
+    ans:"B", topic:"Plot",
+    exp:"In Chapter 5, when the MD investigates the cooperative, it is revealed that the cooperative society has accumulated ₦95 million in savings, with ₦50 million currently outstanding in loans to staff members — amounts large enough to alarm the MD and her mother."
+  },
+  {
+    id:20, text:"What is significant about the excursion to Banana Island and Ajegunle mentioned in Chapter 9?",
+    opts:{A:"Students visited these areas to study environmental pollution",B:"Bepo contrasts the extreme wealth of Banana Island with the poverty of Ajegunle to teach students about inequality and possibility",C:"These were the only affordable excursion sites in Lagos",D:"Students conducted science experiments at both locations"},
+    ans:"B", topic:"Themes/Setting",
+    exp:"By visiting both Banana Island (Lagos's most exclusive neighbourhood) and Ajegunle (one of Lagos's most impoverished areas), Bepo provides students with a powerful lesson in contrasts. He tells Ajegunle students they are not condemned by their circumstances — embodying his belief in education as a social equaliser."
+  },
+  {
+    id:21, text:"What does Bepo's relationship with Jide (his landlord's grandson) reveal about his character?",
+    opts:{A:"That Bepo is strict and charges money for private lessons",B:"That he teaches only students from wealthy families",C:"That his commitment to education extends beyond school — he teaches Jide elocution and African history for free at weekends",D:"That Bepo neglects his own family for other people's children"},
+    ans:"C", topic:"Characters/Themes",
+    exp:"Bepo teaches his landlord Mr. Ogunwale's grandson Jide elocution and African history at weekends — for free, and outside school hours. This reveals that teaching for Bepo is not merely a job but a vocation that extends into his personal life."
+  },
+  {
+    id:22, text:"What is the Owu Waterfalls and why is it significant?",
+    opts:{A:"A sacred waterfall visited by Bepo on a religious pilgrimage",B:"A waterfall in Ekiti State, the tallest in Nigeria at 150 meters",C:"West Africa's highest waterfall at 120 meters — one of the excursion destinations Bepo took students to",D:"A waterfall in Ibadan that inspired J.P. Clark's poem"},
+    ans:"C", topic:"Setting/Culture",
+    exp:"Owu Waterfalls, standing at 120 meters, is the highest waterfall in West Africa. Bepo included it in Stardom's excursion programme, along with Ikogosi Warm Springs, Erin Ijesha Waterfalls, Gurara Falls, Yankari Games Reserve, and other Nigerian natural and historical landmarks."
+  },
+  {
+    id:23, text:"What does the dedication of 'The Lekki Headmaster' read?",
+    opts:{A:"'To all Nigerians who chose to stay and build the nation'",B:"'To all teachers committed to the cause of sound education. You are truly the real builders of the nation!'",C:"'To my family — the source of my inspiration'",D:"'To all JAMB candidates — study hard and succeed'"},
+    ans:"B", topic:"About the Novel",
+    exp:"The novel's dedication states: 'This book is dedicated to all teachers committed to the cause of sound education. You are truly the real builders of the nation!' This dedication encapsulates one of the novel's most important themes — the nobility and importance of teaching."
+  },
+  {
+    id:24, text:"What was the previous JAMB Use of English novel that 'The Lekki Headmaster' replaced?",
+    opts:{A:"Things Fall Apart by Chinua Achebe",B:"The Palm Wine Drinkard by Amos Tutuola",C:"Season of Anomy by Wole Soyinka",D:"The Life Changer by Khadija Abubakar Jalli"},
+    ans:"D", topic:"About the Novel",
+    exp:"The Lekki Headmaster replaced The Life Changer by Khadija Abubakar Jalli as the JAMB Use of English reading text for the 2025/2026 UTME, as part of JAMB's effort to refresh study materials and expose candidates to diverse literary works addressing current Nigerian realities."
+  },
+  {
+    id:25, text:"What is the Yankari Games Reserve, mentioned among Stardom's excursion destinations?",
+    opts:{A:"A game reserve in Lagos State known for its marine wildlife",B:"A botanical garden in Abuja used for environmental studies",C:"A wildlife reserve in Bauchi State, one of Nigeria's most significant national parks",D:"A private safari park established by Stardom Schools"},
+    ans:"C", topic:"Culture/Setting",
+    exp:"Yankari Games Reserve is one of Nigeria's most significant wildlife reserves, located in Bauchi State in northeastern Nigeria. It is home to diverse wildlife including elephants, hippos, baboons, and the warm-water Wikki Springs. Bepo included it in Stardom's excursion itinerary to broaden students' knowledge of Nigeria."
+  },
+  {
+    id:26, text:"What is the significance of the Badagry Point of No Return to the novel's central theme?",
+    opts:{A:"It shows where Bepo was born and grew up",B:"It connects historical slavery to modern migration, suggesting both involve Africans leaving their homeland possibly permanently",C:"It is where Bepo is supposed to catch his flight to London",D:"It represents the administrative boundary between Lagos and Ogun States"},
+    ans:"B", topic:"Themes/Symbolism",
+    exp:"The Point of No Return in Badagry — where enslaved Africans passed before boarding slave ships — is used as a powerful metaphor. The novel draws a parallel between historical forced migration (slavery) and modern voluntary migration ('japa'), challenging whether Nigerians are repeating a kind of self-imposed exodus."
+  },
+  {
+    id:27, text:"What did Bepo's past experience with a financial embarrassment reveal about his economic background?",
+    opts:{A:"He once embezzled school funds and was convicted",B:"He once spent his tenants' electricity money and was publicly humiliated with cassava flour by Iya Mathew",C:"He declared bankruptcy after co-founding Fruitful Future",D:"He borrowed money from colleagues that he never repaid"},
+    ans:"B", topic:"Characters/Plot",
+    exp:"In Chapter 6, Bepo's own financial history is revealed: he once spent tenants' electricity money and was publicly humiliated when Iya Mathew poured cassava flour on him as punishment. This shows Bepo's economic vulnerability despite being a dedicated educator — adding depth and relatability to his character."
+  },
+  {
+    id:28, text:"What does the novel reveal about the relationship between elite private schools and their teachers' welfare?",
+    opts:{A:"Elite schools pay their teachers very generously, ensuring comfortable lives",B:"Teachers at elite schools like Stardom cannot afford to send their own children there, even with staff discounts",C:"All Stardom teachers receive free education for their children",D:"Private school teachers earn triple what government school teachers earn"},
+    ans:"B", topic:"Themes",
+    exp:"The novel highlights the irony that teachers who educate elite children cannot afford the same education for their own children. Even with a 50% staff discount after 7 years of service, Fafore would still pay ₦250,000 per child annually — exposing inequality within the private education system."
+  },
+  {
+    id:29, text:"What is an 'Englisher' as corrected by Bepo in his interaction with Director Meko?",
+    opts:{A:"A person who writes English for a living",B:"A derogatory term for someone who speaks only English",C:"A person who translates from a foreign language into English — a real dictionary word",D:"A slang term for British nationals in Nigeria"},
+    ans:"C", topic:"Vocabulary/Grammar",
+    exp:"When Director Meko questions the word 'Englisher,' Bepo corrects him by explaining that it is a real dictionary word meaning a person who translates from a foreign language into English. This episode showcases Bepo's command of the English language and his willingness to stand for what is correct."
+  },
+  {
+    id:30, text:"What happened to Hope's marriage during his migration experience?",
+    opts:{A:"He and his wife prospered and bought a house in the UK",B:"His wife abandoned him mid-studies abroad",C:"He sent for his wife from Nigeria and she joined him successfully",D:"He divorced his UK wife and returned to his Nigerian wife"},
+    ans:"B", topic:"Plot",
+    exp:"Hope's cautionary migration tale, shared in Chapter 3, reveals that his wife abandoned him in the middle of his studies abroad — leaving him stranded and alone in a foreign country. His story is one of several that temper Bepo's excitement about relocation."
+  },
+  {
+    id:31, text:"What is Bepo's planned retirement age and what business did he consider afterwards?",
+    opts:{A:"60 years old — he planned to become a pastor",B:"65 years old — he planned to run a hotel",C:"55 years old — he planned to start a school or a transportation business in Nigeria",D:"50 years old — he planned to travel the world"},
+    ans:"C", topic:"Characters",
+    exp:"Bepo had planned to retire at 55 and start a business venture in Nigeria — either opening a school or starting a transportation business. However, economic hurdles from past failures, including the co-founded neighbourhood school Fruitful Future, made him uncertain about his post-retirement plans."
+  },
+  {
+    id:32, text:"What does Mr. Audu joke when told about Bepo's opportunity to go to the UK?",
+    opts:{A:"'I would write a letter of recommendation for him immediately'",B:"'I would have been on the plane last year!'",C:"'I would head to the airport right now, even if it were to Afghanistan'",D:"'That is too much money — something must be wrong'"},
+    ans:"C", topic:"Characters",
+    exp:"Mr. Audu's characteristic humour is on display when he jokes that he would head to the airport immediately with a visa 'even if it were to Afghanistan' — mocking the idea that anyone could hesitate over such a financially lucrative opportunity, while also showing the general attitude toward migration among Bepo's colleagues."
+  },
+  {
+    id:33, text:"Why does the novel title its first chapter 'Dusk' and its last chapter '...Dawn'?",
+    opts:{A:"The events literally happen at dusk and dawn",B:"Dusk represents the darkness of Bepo's tearful breakdown and near-departure; Dawn represents the hope of his return and renewal of purpose",C:"Dusk is when the school closes and Dawn is when it opens",D:"These are names of events in the farewell ceremony"},
+    ans:"B", topic:"Literary Devices",
+    exp:"The chapter titles are symbolic. 'Dusk' (Chapter 1) represents darkness, uncertainty, and Bepo's emotional breakdown. '...Dawn' (Chapter 12) represents a new beginning, hope, and Bepo's triumphant return. The ellipsis in '...Dawn' suggests a long night between the two — encompassing the entire novel."
+  },
+  {
+    id:34, text:"What theme does Bepo's dream of being directed onto a slave ship at the airport primarily illustrate?",
+    opts:{A:"Bepo's fear of flying",B:"The danger of modern air travel",C:"The connection between modern migration and historical slavery — both representing departure from one's African identity",D:"Bepo's concern about UK immigration officers"},
+    ans:"C", topic:"Themes/Symbolism",
+    exp:"Bepo's airport dream — where a white man commands him to 'Enter!' a slave ship — powerfully symbolises the novel's central argument: that modern voluntary migration ('japa') echoes the historical forced migration of the slave trade. His scream of 'Noooo!' represents a rejection of both."
+  },
+  {
+    id:35, text:"What does the novel say about the brain drain's effect on Nigeria?",
+    opts:{A:"Brain drain has no measurable effect on Nigeria's development",B:"It only affects Nigeria positively through remittances sent home",C:"Migration of Nigeria's best talents weakens institutions while not guaranteeing personal success abroad",D:"The government welcomes brain drain to reduce unemployment"},
+    ans:"C", topic:"Themes",
+    exp:"Through Bepo's dilemma and various migration stories, the novel critiques brain drain: institutions lose their best people, and the migrants themselves do not always find the success they seek (as Akindele's and Hope's stories show). Bepo's return embodies the argument that staying home to build Nigeria is equally noble."
+  },
+  {
+    id:36, text:"In what way does the novel portray Bepo as a champion of cultural heritage?",
+    opts:{A:"He writes books about Yoruba traditions",B:"He insists students speak only indigenous languages at school",C:"He exposes students to Nigeria's natural wonders, historical sites, and cultural performances through educational excursions",D:"He refuses to teach English literature in favour of African texts only"},
+    ans:"C", topic:"Themes/Characters",
+    exp:"Bepo's dedication to Nigeria's cultural heritage is expressed through his extensive excursion programme, taking students to waterfalls, the Badagry slave port, the National War Museum in Umuahia, Sungbo Eredo, and Banana Island vs. Ajegunle — building pride in Nigerian identity and knowledge of the country's history."
+  },
+  {
+    id:37, text:"What does the proverb 'Kullum ta barawo, rana daya ta mai kaya' mean?",
+    opts:{A:"Every traveller returns home eventually",B:"A child that respects elders will go far",C:"Every day is for the thief; one day is for the owner",D:"He who runs away lives to fight another day"},
+    ans:"C", topic:"Literary Devices/Vocabulary",
+    exp:"The Hausa proverb 'Kullum ta barawo, rana daya ta mai kaya' translates to 'Every day is for the thief; one day is for the owner.' It reflects the inevitability of justice — a theme applicable to corruption in the education system and to the moral dilemmas characters face."
+  },
+  {
+    id:38, text:"What does the proverb 'Oja Oyingbo ko mo'p' enikan o wa'' mean and where is Oyingbo?",
+    opts:{A:"'The Oshodi market doesn't close on Sundays' — a market in Abuja",B:"'The Oyingbo market never notices when someone doesn't show up' — a market area in Lagos",C:"'The Balogun market always makes a profit' — a market in Ibadan",D:"'The Dugbe market has room for everyone' — a market in Kano"},
+    ans:"B", topic:"Literary Devices/Vocabulary",
+    exp:"The Yoruba proverb 'Oja Oyingbo ko mo'p' enikan o wa'' means 'The Oyingbo market never notices when someone doesn't show up.' Oyingbo is a busy commercial area in Lagos. The proverb suggests life continues regardless of individual departures — used to reflect on the continuity of Stardom Schools without Bepo."
+  },
+  {
+    id:39, text:"How does the novel portray the subjunctive mood in English grammar?",
+    opts:{A:"As an outdated grammatical rule no longer applicable in modern English",B:"As a mood used for hypothetical situations, explaining why singular verbs follow 'as well as', 'together with', and 'alongside'",C:"As a mood used only in formal written English, not in speech",D:"As a rule that applies only to questions, not statements"},
+    ans:"B", topic:"Grammar",
+    exp:"The subjunctive mood is used for hypothetical, non-factual, or parenthetical constructions. Bepo uses this to explain why 'Ade as well as Jide comes' is correct: the phrase 'as well as Jide' is parenthetical (not a true compound subject), so the verb agrees only with the main subject 'Ade' — taking the singular form 'comes.'"
+  },
+  {
+    id:40, text:"What does Seri's occupation as a nurse in the UK contribute to the family's economic argument for migration?",
+    opts:{A:"It means the family is already wealthy and doesn't need Bepo's income",B:"It shows the family can survive without Bepo relocating",C:"Her earnings of £10,000 per month, combined with Bepo's potential £3,600, make the financial case for migration overwhelming",D:"It creates tension because nurses earn more than teachers in Nigeria"},
+    ans:"C", topic:"Plot/Themes",
+    exp:"Seri earns approximately £10,000 monthly as a nurse in the UK. Combined with Bepo's potential £3,600 teaching salary, colleagues calculate the family could earn 'a whooping gbemu of more than ₦17 million monthly' — making Bepo's hesitation economically inexplicable to those who prioritise money over purpose."
+  },
+  {
+    id:41, text:"What is 'gbemu' as used in the novel?",
+    opts:{A:"A Nigerian slang word meaning a large sum of money",B:"A type of traditional Nigerian drum",C:"A Yoruba term for excessive pride",D:"A slang term for passport"},
+    ans:"A", topic:"Vocabulary",
+    exp:"'Gbemu' is Nigerian slang for a large amount of money. In the novel, colleagues calculate that Seri and Bepo combined could earn 'a whooping gbemu of more than ₦17 million monthly' in the UK — using the slang to emphasise just how large the figure is relative to Nigerian standards."
+  },
+  {
+    id:42, text:"What does the novel reveal about the Ikogosi Warm Springs?",
+    opts:{A:"It is where Bepo proposed to Seri",B:"It is a burial site for Yoruba kings",C:"It is one of the natural wonders Stardom students visited on excursion",D:"It is the location of a refugee camp in Ekiti"},
+    ans:"C", topic:"Setting/Culture",
+    exp:"Ikogosi Warm Springs in Ekiti State is one of Nigeria's unique natural attractions — famous for the point where a warm spring and a cold spring meet side by side. It was one of the exciting excursion destinations Bepo arranged for Stardom students as part of his commitment to showcasing Nigeria's wonders."
+  },
+  {
+    id:43, text:"What literary device is primarily used when the novel describes Bepo's 'brown rusted roofs of Ibadan' recollection?",
+    opts:{A:"Personification — giving the roofs human qualities",B:"Intertextuality — referencing J.P. Clark's poem 'Ibadan' within the novel",C:"Onomatopoeia — imitating the sound of rain on rooftops",D:"Apostrophe — addressing Ibadan directly as a character"},
+    ans:"B", topic:"Literary Devices",
+    exp:"The reference to 'brown rusted roofs of Ibadan' is an example of intertextuality — the novel directly quotes or references J.P. Clark's famous poem 'Ibadan' within the narrative. This adds literary depth and connects the novel to Nigeria's broader literary tradition."
+  },
+  {
+    id:44, text:"What does the novel suggest about how to build a successful school, as expressed by Bepo?",
+    opts:{A:"Invest in modern technology and social media marketing",B:"Success comes from experienced teachers who are well paid, a conducive environment, and an inspiring curriculum",C:"Enroll only students from wealthy families who can pay high fees",D:"Hire foreign teachers to give the school international credibility"},
+    ans:"B", topic:"Themes",
+    exp:"When confronting Mr. Ogo's offer of rituals for school growth, Bepo articulates his educational philosophy: success in education comes from 'experienced teachers who are well paid, an environment conducive to learning, and an inspiring curriculum' — not shortcuts or superstition."
+  },
+  {
+    id:45, text:"What is the National War Museum in Umuahia and why did Bepo take students there?",
+    opts:{A:"A museum commemorating World War II in eastern Nigeria",B:"A museum dedicated to Nigeria's military history including the Civil War — visited to educate students on national history",C:"A museum about traditional Igbo warfare techniques",D:"A training facility for Nigeria's military cadets"},
+    ans:"B", topic:"Culture/Setting",
+    exp:"The National War Museum in Umuahia, Abia State, houses artefacts from the Nigerian Civil War (Biafra War, 1967–1970) and other military history. Bepo includes it in excursions to ensure students understand Nigeria's painful history and the importance of unity and peace."
+  },
+  {
+    id:46, text:"What relationship does the novel draw between teaching and nation-building?",
+    opts:{A:"That teachers are obstructing Nigeria's development with outdated methods",B:"That nation-building requires foreign-trained educators only",C:"That teachers are 'truly the real builders of the nation' — the primary architects of societal progress",D:"That politicians are the true builders while teachers merely support them"},
+    ans:"C", topic:"Themes",
+    exp:"The novel consistently portrays teaching as the foundation of national development. The dedication, Bepo's actions, and the entire narrative arc argue that committed teachers who stay to educate future generations are 'truly the real builders of the nation' — making Bepo's decision to return all the more powerful."
+  },
+  {
+    id:47, text:"What does the Erin Ijesha (Olumirin) Waterfalls represent in Bepo's excursion programme?",
+    opts:{A:"A sacred site for Yoruba traditional religion",B:"A waterfall that only runs during the rainy season",C:"One of Nigeria's scenic natural attractions visited to build students' pride in and knowledge of their country",D:"The location of Stardom Schools' annual camp"},
+    ans:"C", topic:"Culture/Setting",
+    exp:"The Erin Ijesha (Olumirin) Waterfalls in Osun State, with its seven levels of cascading water, is one of Nigeria's scenic natural wonders. Bepo includes it among the destinations to show students the beauty of their own country — part of his broader goal of building patriotism and national identity."
+  },
+  {
+    id:48, text:"How does the novel use irony in Bepo's elaborate farewell?",
+    opts:{A:"The farewell is ironic because Bepo had already secretly returned before it took place",B:"The three-day celebration with a football match, debate, cultural performances, and a $10,000 gift is rendered ironic when Bepo never actually leaves",C:"The irony is that only students attended while staff boycotted the farewell",D:"It is ironic because Bepo was actually being fired, not leaving voluntarily"},
+    ans:"B", topic:"Literary Devices",
+    exp:"The elaborate farewell — spanning three days with a football match, debate, cultural performances, comedy skits, and a $10,000 departing gift — becomes deeply ironic when Bepo returns Monday morning having never boarded the plane. All that celebration was for a departure that never happened."
+  },
+  {
+    id:49, text:"What does the novel imply about the phrase 'if you say education is too expensive, try ignorance'?",
+    opts:{A:"It is a saying Bepo uses to mock parents who complain about fees",B:"It is a famous quote attributed to Mrs. Ibidun Gloss",C:"It is one of Bepo's trademark sayings, reflecting his deep belief in the value of education",D:"It is a government slogan promoted by the Ministry of Education"},
+    ans:"C", topic:"Characters/Themes",
+    exp:"'If you say education is too expensive, try ignorance!' is one of Bepo's trademark sayings — a version of a famous educational aphorism. It encapsulates his unshakeable belief in the transformative power of education and his passion for the teaching profession."
+  },
+  {
+    id:50, text:"What does the novel ultimately say about the tension between family obligations and professional calling?",
+    opts:{A:"Family must always come first — Bepo was wrong to return",B:"Professional calling should always override family responsibilities",C:"True partnership should accommodate both spouses' callings without demanding one person sacrifice everything",D:"Economic survival is the only valid basis for life decisions"},
+    ans:"C", topic:"Themes",
+    exp:"The novel does not demonise Seri or dismiss family obligations. Rather, it suggests that true marriage should accommodate both partners' callings. Bepo's return is not presented as a rejection of his family but as the discovery that his identity as a teacher in Nigeria cannot be surgically removed without destroying who he is."
+  }
+];
+
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0, submitted: false };
+var UA = {};  /* userAnswers: {id: chosen_key} */
+var globalDone = false;
+var GLOBAL_SECS = 1800; /* 30 minutes */
+var PTS_CORRECT = 1;
+var PTS_WRONG   = 0; /* UTME: no negative marking */
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot  = document.getElementById('gdot');
+  var txt  = document.getElementById('gtime');
+  function fmt(s) {
+    var m = Math.floor(s/60), ss = s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) {
+      txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn';
+    } else if (remaining <= 60) {
+      txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang';
+    }
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+
+function getTimeDisplay() {
+  var el = document.getElementById('gtime');
+  return el ? el.textContent : '—';
+}
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var optsHtml = '';
+    var labels = ['A','B','C','D'];
+    for (var j = 0; j < labels.length; j++) {
+      var lbl = labels[j];
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
+        '</div>';
+    }
+    html += '<div class="qcard" style="animation-delay:' + (i*0.03) + 's">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q' + q.id + ' of 50</span>' +
+        (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') +
+      '</div>' +
+      '<div class="qtxt">' + q.text + '</div>' +
+      '<div class="opts">' + optsHtml + '</div>' +
+      '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp' + q.id + '"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid   = parseInt(this.dataset.id);
+      var chose = this.dataset.a;
+      /* deselect siblings */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.remove('sel');
+      });
+      this.classList.add('sel');
+      UA[qid] = chose;
+      /* enable check button */
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid    = parseInt(this.dataset.qid);
+      var q      = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var ok     = (chosen === q.ans);
+
+      /* lock all opts for this question */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked');
+        o.style.pointerEvents = 'none';
+        if (o.dataset.a === q.ans)    o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+
+      /* explanation */
+      var expEl = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + q.ans;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' +
+        (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+
+      this.disabled = true;
+
+      /* update stats */
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++;
+        ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent  = ST.correct;
+  document.getElementById('sc-wrong').textContent  = ST.wrong;
+  document.getElementById('sc-skip').textContent   = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent  = ST.answered + ' / 50 answered';
+  document.getElementById('m-ans').textContent     = ST.answered;
+  document.getElementById('m-left').textContent    = left;
+  document.getElementById('m-time').textContent    = getTimeDisplay();
+  /* progress bar */
+  document.getElementById('prog-fill').style.width = (ST.answered / QUESTIONS.length * 100) + '%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() {
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitQuiz() {
+  hideSubmitModal();
+  globalDone = true;
+  stopTimer();
+
+  /* Auto-check all unanswered questions that have a selection */
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){
+    if (!btn.disabled) btn.click();
+  });
+
+  /* Show time-up overlay with results */
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  /* lock everything */
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.style.pointerEvents = 'none';
+    o.classList.add('locked');
+  });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
+
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF / PRINT ── */
+function doPrint() {
+  /* Make sure print header is visible for print */
+  document.getElementById('print-header').style.display = 'block';
+  window.print();
+  /* Hide again after */
+  setTimeout(function(){
+    document.getElementById('print-header').style.display = 'none';
+  }, 1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
