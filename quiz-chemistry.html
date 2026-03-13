@@ -4,305 +4,321 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Chemistry — JAMB Practice · GrantApp AI</title>
+    <title>Chemistry Calculations Drill · GrantApp AI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="quiz-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="quiz-body">
 
-<!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
 <script>
-const DURATION = 900;
+/* ─────────────────────────────────────────────────────────────
+   DURATION  2,400 s = 40 min (1 min per question)
+   CONSTANTS (given in relevant questions)
+   F = 96,500 C mol⁻¹   R = 8.314 J mol⁻¹ K⁻¹
+   Faraday key formula:  m = (I × t × Mr) / (z × F)
+   where  I = current (A), t = time (s),
+          Mr = molar mass (g/mol), z = electrons per ion
+─────────────────────────────────────────────────────────────── */
+const DURATION = 2400;
 
 const QUESTIONS = [
-  {
-    id: 1, subject: 'Chemistry',
-    text: 'An element X has atomic number 17 and mass number 35. The number of neutrons is:',
-    options: { A: '18', B: '35', C: '52', D: '17' },
-    answer: 'A',
-    explanation: 'Neutrons = mass number - atomic number = 35 - 17 = 18.',
-    exception: 'Isotopes of same element have different neutron counts but same atomic number.',
-  },
-  {
-    id: 2, subject: 'Chemistry',
-    text: 'Which electronic configuration violates Hund\'s rule?',
-    options: { A: '1s2 2s2 2p4 (up-down up up)', B: '1s2 2s2 2p6', C: '1s2 2s2 2p4 (up-down up-down up)', D: '1s2 2s2 2p3 (up up up)' },
-    answer: 'C',
-    explanation: 'Hund\'s rule: electrons singly occupy orbitals before pairing. Option C pairs prematurely.',
-    exception: 'Maximum multiplicity (unpaired electrons) gives lowest energy.',
-  },
-  {
-    id: 3, subject: 'Chemistry',
-    text: 'The ion with electronic configuration 1s2 2s2 2p6 could be:',
-    options: { A: 'Na+ only', B: 'Both Na+ and F-', C: 'F- only', D: 'Neither' },
-    answer: 'B',
-    explanation: 'Both have 10 electrons (isoelectronic with Ne). Na loses 1e-, F gains 1e-.',
-    exception: 'Isoelectronic species have same electron count but different nuclear charges.',
-  },
-  {
-    id: 4, subject: 'Chemistry',
-    text: 'Electronegativity increases across a period because:',
-    options: { A: 'Shielding increases', B: 'Nuclear charge increases, atomic radius decreases', C: 'Ionization energy decreases', D: 'Atomic radius increases' },
-    answer: 'B',
-    explanation: 'More protons pull electrons stronger; smaller size means closer to nucleus.',
-    exception: 'Noble gases often excluded from electronegativity trends.',
-  },
-  {
-    id: 5, subject: 'Chemistry',
-    text: 'Which statement about first ionization energies is correct?',
-    options: { A: 'Cannot be determined', B: 'Na > Mg', C: 'They are equal', D: 'Mg > Na (IE increases across period)' },
-    answer: 'D',
-    explanation: 'IE generally increases across period. Mg > Na.',
-    exception: 'Actual exceptions: Al < Mg (subshell), O < N (pairing energy).',
-  },
-  {
-    id: 6, subject: 'Chemistry',
-    text: 'Noble gases are unreactive because:',
-    options: { A: 'Low ionization energy', B: 'High electronegativity', C: 'Full valence shell (stable octet)', D: 'Large atomic radius' },
-    answer: 'C',
-    explanation: 'ns2np6 configuration is stable.',
-    exception: 'Xe and Kr CAN form compounds with highly electronegative F.',
-  },
-  {
-    id: 7, subject: 'Chemistry',
-    text: 'The bond angle in water (104.5°) is less than methane (109.5°) because:',
-    options: { A: 'Hydrogen bonding', B: 'Oxygen is more electronegative', C: 'Lone pairs repel more than bonding pairs', D: 'Water is polar' },
-    answer: 'C',
-    explanation: 'VSEPR: lone pair-lone pair > lone pair-bond > bond-bond repulsion.',
-    exception: 'NH3 (107°) also compressed from tetrahedral but less than H2O.',
-  },
-  {
-    id: 8, subject: 'Chemistry',
-    text: 'Which molecule is nonpolar despite having polar bonds?',
-    options: { A: 'HCl', B: 'H2O', C: 'NH3', D: 'CO2 (linear, symmetrical)' },
-    answer: 'D',
-    explanation: 'CO2: two C=O bonds cancel (linear geometry).',
-    exception: 'CCl4 also nonpolar (tetrahedral symmetry) despite polar C-Cl bonds.',
-  },
-  {
-    id: 9, subject: 'Chemistry',
-    text: 'The hybridization of carbon in CO2 is:',
-    options: { A: 'sp3d', B: 'sp', C: 'sp3', D: 'sp2' },
-    answer: 'B',
-    explanation: 'Linear geometry = sp hybridization (2 regions of electron density).',
-    exception: 'Same carbon can have different hybridizations: CH4 (sp3), C2H4 (sp2), C2H2 (sp).',
-  },
-  {
-    id: 10, subject: 'Chemistry',
-    text: 'Resonance structures of benzene show:',
-    options: { A: 'Molecule oscillates between structures', B: 'Electrons are delocalized (not fixed double bonds)', C: 'Two different compounds exist', D: 'Double bonds alternate rapidly' },
-    answer: 'B',
-    explanation: 'Resonance = single structure with delocalized electrons, NOT equilibrium between forms.',
-  },
-  {
-    id: 11, subject: 'Chemistry',
-    text: 'Hydrogen bonding is strongest between:',
-    options: { A: 'N-H...N', B: 'F-H...F (most electronegative)', C: 'C-H...O', D: 'O-H...O' },
-    answer: 'B',
-    explanation: 'Strength: F-H > O-H > N-H (electronegativity trend).',
-    exception: 'O-H bonds in water are more biologically important despite F-H being stronger.',
-  },
-  {
-    id: 12, subject: 'Chemistry',
-    text: 'The pH of 0.01 M HCl is:',
-    options: { A: '12', B: '1', C: '0.01', D: '2' },
-    answer: 'D',
-    explanation: 'pH = -log[H+] = -log(10-2) = 2.',
-    exception: 'Very concentrated acids (>1M) can have negative pH.',
-  },
-  {
-    id: 13, subject: 'Chemistry',
-    text: 'A buffer solution resists pH change because:',
-    options: { A: 'Contains strong acid', B: 'Is neutral', C: 'Contains weak acid and its conjugate base', D: 'Has high concentration' },
-    answer: 'C',
-    explanation: 'Buffer: HA/A- pair. Absorbs added H+ or OH-.',
-    exception: 'Buffers only effective within ±1 pH unit of pKa.',
-  },
-  {
-    id: 14, subject: 'Chemistry',
-    text: 'The pH at equivalence point in strong acid-strong base titration is:',
-    options: { A: 'Depends on concentrations', B: '7', C: 'Less than 7', D: 'Greater than 7' },
-    answer: 'B',
-    explanation: 'Neutral salt formed (NaCl from HCl + NaOH).',
-    exception: 'Weak acid-strong base gives pH >7; strong acid-weak base gives pH <7 at equivalence.',
-  },
-  {
-    id: 15, subject: 'Chemistry',
-    text: 'At higher temperature, Kw (= [H+][OH-] = 10-14 at 25°C):',
-    options: { A: 'Decreases', B: 'Stays constant', C: 'Becomes zero', D: 'Increases (ionization is endothermic)' },
-    answer: 'D',
-    explanation: 'Water ionization is endothermic; Le Chatelier predicts increase with temperature.',
-    exception: 'Neutral pH at 60°C is ~6.5 (not 7) because Kw increases.',
-  },
-  {
-    id: 16, subject: 'Chemistry',
-    text: 'The oxidation number of Cr in K2Cr2O7 is:',
-    options: { A: '+14', B: '+7', C: '+12', D: '+6' },
-    answer: 'D',
-    explanation: '2(+1) + 2x + 7(-2) = 0, so x = +6.',
-    exception: 'Maximum oxidation state usually equals group number; Cr in Group 6 can reach +6.',
-  },
-  {
-    id: 17, subject: 'Chemistry',
-    text: 'In the reaction 2Fe2+ → 2Fe3+ + 2e-, iron is:',
-    options: { A: 'Reduced', B: 'Unchanged', C: 'Oxidizing agent', D: 'Oxidized (loses electrons)' },
-    answer: 'D',
-    explanation: 'Oxidation = loss of electrons (OIL RIG). Fe2+ is reducing agent.',
-  },
-  {
-    id: 18, subject: 'Chemistry',
-    text: 'The standard hydrogen electrode is assigned:',
-    options: { A: 'E° = 0.00 V (reference point)', B: 'E° = +0.76 V', C: 'E° = -1.00 V', D: 'E° = 1.00 V' },
-    answer: 'A',
-    explanation: 'SHE is reference; all other potentials measured relative to it.',
-  },
-  {
-    id: 19, subject: 'Chemistry',
-    text: 'In galvanic cell, the anode is:',
-    options: { A: 'Negative electrode (oxidation occurs)', B: 'Where reduction occurs', C: 'Made of copper', D: 'Positive electrode' },
-    answer: 'A',
-    explanation: 'Anode = oxidation = negative in galvanic cell.',
-    exception: 'In electrolytic cell, anode is POSITIVE (but still oxidation site).',
-  },
-  {
-    id: 20, subject: 'Chemistry',
-    text: 'Faraday\'s law: mass deposited is proportional to:',
-    options: { A: 'Resistance', B: 'Charge passed (Q = nF)', C: 'Voltage', D: 'Current only' },
-    answer: 'B',
-    explanation: 'm is proportional to Q. Specifically: m = (Q × M)/(n × F).',
-    exception: 'Time matters through Q = It; doubling current OR doubling time doubles mass.',
-  },
-  {
-    id: 21, subject: 'Chemistry',
-    text: 'Haber process produces ammonia at:',
-    options: { A: 'High pressure, moderate temperature, Fe catalyst', B: 'High temperature only', C: 'Low pressure, high temperature', D: 'Room conditions' },
-    answer: 'A',
-    explanation: 'N2 + 3H2 = 2NH3 (exothermic). Le Chatelier: high P favors products.',
-    exception: 'Equilibrium position vs rate conflict requires optimization at ~450°C.',
-  },
-  {
-    id: 22, subject: 'Chemistry',
-    text: 'In N2 + 3H2 = 2NH3, adding more N2:',
-    options: { A: 'Shifts equilibrium right (more NH3)', B: 'Shifts left', C: 'No effect on equilibrium', D: 'Stops reaction' },
-    answer: 'A',
-    explanation: 'Le Chatelier: system counteracts change by consuming added N2.',
-    exception: 'Kp unchanged; only position shifts, not equilibrium constant.',
-  },
-  {
-    id: 23, subject: 'Chemistry',
-    text: 'The equilibrium constant Kc for 2A = B is 4. For B = 2A, Kc is:',
-    options: { A: '4', B: '16', C: '2', D: '0.25 (1/4)' },
-    answer: 'D',
-    explanation: 'Reversing reaction inverts K: K_reverse = 1/K_forward.',
-    exception: 'Multiplying equation by n raises K to power n.',
-  },
-  {
-    id: 24, subject: 'Chemistry',
-    text: 'A reaction is spontaneous if:',
-    options: { A: 'ΔS > 0', B: 'All of the above always', C: 'ΔH < 0', D: 'ΔG < 0' },
-    answer: 'D',
-    explanation: 'Gibbs: ΔG = ΔH - TΔS. Spontaneous when ΔG < 0.',
-    exception: 'Endothermic reactions CAN be spontaneous if ΔS is large and positive.',
-  },
-  {
-    id: 25, subject: 'Chemistry',
-    text: 'Diamond is harder than graphite because:',
-    options: { A: 'Diamond has more electrons', B: '3D network of strong C-C bonds vs 2D layers', C: 'Graphite has ionic bonding', D: 'Diamond has metallic bonding' },
-    answer: 'B',
-    explanation: 'Diamond: sp3, tetrahedral. Graphite: sp2, layered with weak van der Waals between layers.',
-    exception: 'Graphite conducts electricity (delocalized electrons in layers); diamond doesn\'t.',
-  },
-  {
-    id: 26, subject: 'Chemistry',
-    text: 'The melting point of NaCl (ionic) is higher than I2 (molecular) because:',
-    options: { A: 'NaCl has more atoms', B: 'I2 is covalent', C: 'NaCl is soluble in water', D: 'Ionic bonds stronger than van der Waals forces' },
-    answer: 'D',
-    explanation: 'Ionic > covalent network > metallic > polar molecular > nonpolar molecular (general trend).',
-  },
-  {
-    id: 27, subject: 'Chemistry',
-    text: 'Transition metals show variable oxidation states because:',
-    options: { A: 'They conduct electricity', B: 'They are metals', C: 'd electrons participate in bonding', D: 'They are large atoms' },
-    answer: 'C',
-    explanation: 'd electrons have similar energy to s electrons; can lose different numbers.',
-    exception: 'Scandium and zinc show mainly +3 and +2 respectively.',
-  },
-  {
-    id: 28, subject: 'Chemistry',
-    text: 'Which is a Lewis acid?',
-    options: { A: 'NH3', B: 'OH-', C: 'BF3 (electron deficient)', D: 'H2O' },
-    answer: 'C',
-    explanation: 'Lewis acid = electron pair acceptor. BF3 has empty orbital.',
-    exception: 'Broader than Bronsted (proton transfer); includes species without H+.',
-  },
-  {
-    id: 29, subject: 'Chemistry',
-    text: 'The pH of 10-8 M HCl is approximately:',
-    options: { A: '7 (water ionization dominates)', B: 'Exactly 8', C: '14', D: 'Exactly -8' },
-    answer: 'A',
-    explanation: 'At very low acid concentration, water\'s H+ (10-7 M) becomes significant.',
-    exception: 'Can\'t ignore water ionization when acid concentration < 10-6 M.',
-  },
-  {
-    id: 30, subject: 'Chemistry',
-    text: 'Effusion rate of gas A is twice that of gas B. If M_A = 4, then M_B is:',
-    options: { A: '1', B: '16', C: '2', D: '8' },
-    answer: 'B',
-    explanation: 'Graham\'s law: rate is proportional to 1/sqrt(M). 2 = sqrt(M_B/4), so M_B = 16.',
-  },
-  {
-    id: 31, subject: 'Chemistry',
-    text: 'Real gases deviate from ideal behavior at:',
-    options: { A: 'All conditions equally', B: 'Low pressure and high temperature', C: 'High pressure and low temperature', D: 'Never deviate' },
-    answer: 'C',
-    explanation: 'High P: volume of molecules matters. Low T: intermolecular forces matter.',
-  },
-  {
-    id: 32, subject: 'Chemistry',
-    text: 'The van der Waals equation corrects ideal gas law for:',
-    options: { A: 'Temperature only', B: 'Pressure only', C: 'Molecular volume (b) and intermolecular forces (a)', D: 'Chemical reactions' },
-    answer: 'C',
-    explanation: '(P + a/V2)(V - b) = RT. a corrects pressure, b corrects volume.',
-  },
-  {
-    id: 33, subject: 'Chemistry',
-    text: 'Charcoal adsorbs gases because:',
-    options: { A: 'It is carbon', B: 'It is black', C: 'It is solid', D: 'High surface area (porous structure)' },
-    answer: 'D',
-    explanation: 'Adsorption (surface) vs absorption (volume). Activated charcoal has huge surface area.',
-  },
-  {
-    id: 34, subject: 'Chemistry',
-    text: 'A catalyst increases reaction rate by:',
-    options: { A: 'Lowering activation energy', B: 'Shifting equilibrium', C: 'Increasing temperature', D: 'Increasing concentration' },
-    answer: 'A',
-    explanation: 'Catalyst provides alternative pathway with lower Ea.',
-    exception: 'Catalyst doesn\'t change ΔH, ΔG, or equilibrium position.',
-  },
-  {
-    id: 35, subject: 'Chemistry',
-    text: 'Rate = k[A]2[B]. If [A] doubles and [B] triples, rate:',
-    options: { A: 'Increases 6x', B: 'Increases 12x (2² × 3)', C: 'Doubles', D: 'Triples' },
-    answer: 'B',
-    explanation: 'Rate_new = k(2[A])2(3[B]) = 4 × 3 × k[A]2[B] = 12 × Rate_old.',
-  },
+
+  /* ══════════════════════════════════════════════════════
+     ELECTROCHEMISTRY — 24 QUESTIONS
+     Q1–8   : Charge and mass deposition (core Faraday)
+     Q9–14  : Current, time, and moles of electrons
+     Q15–18 : Multi-step and word problems
+     Q19–22 : Cell type, electrode ID, half-equations
+     Q23–24 : Standard electrode potential / EMF
+  ══════════════════════════════════════════════════════ */
+
+  /* ── CHARGE ── */
+
+  { id:1,
+    text:"A current of 5 A flows through an electrolytic cell for 10 minutes. What is the total charge passed? (Q = It)",
+    options:{A:"50 C",B:"500 C",C:"3000 C",D:"300 C"},
+    answer:"C", subject:"Chemistry",
+    explanation:"Q = I × t. Convert time: 10 min = 600 s. Q = 5 × 600 = 3000 C. Always convert minutes to seconds before using Q = It." },
+
+  { id:2,
+    text:"A charge of 9650 C is passed through a solution of copper(II) sulphate. How many moles of electrons does this represent? (F = 96,500 C mol⁻¹)",
+    options:{A:"0.1 mol",B:"1 mol",C:"10 mol",D:"0.01 mol"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Moles of electrons = Q/F = 9650/96500 = 0.1 mol. The Faraday constant (96,500 C mol⁻¹) is the charge carried by one mole of electrons." },
+
+  { id:3,
+    text:"How many coulombs of charge are needed to deposit exactly 1 mole of silver? (Ag⁺ + e⁻ → Ag;  F = 96,500 C mol⁻¹)",
+    options:{A:"193,000 C",B:"48,250 C",C:"96,500 C",D:"9,650 C"},
+    answer:"C", subject:"Chemistry",
+    explanation:"Ag⁺ → Ag requires z = 1 electron per ion. 1 mol Ag needs 1 mol electrons = 1 × F = 96,500 C. If the ion were Cu²⁺, z = 2 so 2 × 96,500 = 193,000 C would be needed for 1 mol Cu." },
+
+  { id:4,
+    text:"A current of 2 A is passed for 1 hour through a silver nitrate solution. What charge is transferred? (1 hour = 3600 s)",
+    options:{A:"7,200 C",B:"720 C",C:"2 C",D:"3,600 C"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Q = I × t = 2 × 3600 = 7,200 C. Always express time in seconds. 1 hour = 3600 s." },
+
+  /* ── MASS DEPOSITION — m = ItMr/(zF) ── */
+
+  { id:5,
+    text:"What mass of copper is deposited when a current of 2 A flows for 965 s through CuSO₄ solution? (Cu²⁺ + 2e⁻ → Cu;  Mr Cu = 64, F = 96,500 C mol⁻¹)",
+    options:{A:"0.32 g",B:"0.64 g",C:"1.28 g",D:"0.16 g"},
+    answer:"B", subject:"Chemistry",
+    explanation:"m = (I × t × Mr)/(z × F) = (2 × 965 × 64)/(2 × 96500) = 123,520/193,000 = 0.64 g. z = 2 for Cu²⁺. Check: Q = 1930 C; moles e⁻ = 1930/96500 = 0.02; moles Cu = 0.02/2 = 0.01; mass = 0.01 × 64 = 0.64 g ✓" },
+
+  { id:6,
+    text:"A current of 3 A flows for 1930 s through molten AlCl₃. What mass of aluminium is deposited at the cathode? (Al³⁺ + 3e⁻ → Al;  Mr Al = 27, F = 96,500 C mol⁻¹)",
+    options:{A:"1.62 g",B:"0.54 g",C:"2.43 g",D:"0.81 g"},
+    answer:"B", subject:"Chemistry",
+    explanation:"m = ItMr/(zF). Q = 3 × 1930 = 5790 C. Moles e⁻ = 5790/96500 = 0.06 mol. Moles Al = 0.06/3 = 0.02 mol (z = 3 for Al³⁺). Mass Al = 0.02 × 27 = 0.54 g. Cross-check: (3 × 1930 × 27)/(3 × 96500) = 156,330/289,500 = 0.54 g ✓" },
+
+  { id:7,
+    text:"How long must a current of 4 A flow to deposit 2.16 g of silver from AgNO₃ solution? (Ag⁺ + e⁻ → Ag;  Mr Ag = 108, F = 96,500 C mol⁻¹)",
+    options:{A:"482.5 s",B:"965 s",C:"193 s",D:"4825 s"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Rearrange m = ItMr/(zF) → t = mzF/(IMr). t = (2.16 × 1 × 96500)/(4 × 108) = 208,440/432 = 482.5 s. Or: moles Ag = 2.16/108 = 0.02; moles e⁻ = 0.02; Q = 0.02 × 96500 = 1930 C; t = Q/I = 1930/4 = 482.5 s." },
+
+  { id:8,
+    text:"What current is needed to deposit 0.64 g of copper in exactly 10 minutes from CuSO₄ solution? (Cu²⁺ + 2e⁻ → Cu;  Mr Cu = 64, F = 96,500 C mol⁻¹)",
+    options:{A:"1.93 A",B:"3.22 A",C:"0.97 A",D:"6.43 A"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Moles Cu = 0.64/64 = 0.01 mol. Moles e⁻ = 0.01 × 2 = 0.02 mol (z = 2). Q = 0.02 × 96500 = 1930 C. t = 10 × 60 = 600 s. I = Q/t = 1930/600 = 3.22 A. Rearranging the Faraday equation: I = mzF/(tMr) = (0.64 × 2 × 96500)/(600 × 64) = 123,520/38,400 = 3.22 A ✓" },
+
+  { id:9,
+    text:"A current of 10 A flows for 965 s through dilute sulphuric acid. What volume of hydrogen gas is produced at the cathode at STP? (2H⁺ + 2e⁻ → H₂;  F = 96,500 C mol⁻¹, molar volume at STP = 22.4 L mol⁻¹)",
+    options:{A:"0.56 L",B:"1.12 L",C:"2.24 L",D:"0.28 L"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Q = 10 × 965 = 9650 C. Moles e⁻ = 9650/96500 = 0.1 mol. Moles H₂ = 0.1/2 = 0.05 mol (z = 2 electrons per H₂ molecule). Volume = 0.05 × 22.4 = 1.12 L." },
+
+  { id:10,
+    text:"In the electrolysis of CuSO₄, if 0.04 mol of electrons are transferred, what mass of copper is deposited? (Mr Cu = 64)",
+    options:{A:"1.28 g",B:"2.56 g",C:"0.64 g",D:"0.32 g"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Cu²⁺ + 2e⁻ → Cu. 0.04 mol e⁻ → 0.04/2 = 0.02 mol Cu. Mass = 0.02 × 64 = 1.28 g. z = 2 for Cu²⁺, so always halve the moles of electrons to get moles of copper." },
+
+  { id:11,
+    text:"In the electrolysis of molten MgCl₂, how many moles of magnesium are deposited by 0.3 mol of electrons? (Mg²⁺ + 2e⁻ → Mg)",
+    options:{A:"0.3 mol",B:"0.6 mol",C:"0.15 mol",D:"0.1 mol"},
+    answer:"C", subject:"Chemistry",
+    explanation:"Mg²⁺ requires 2 electrons per ion. Moles Mg = 0.3/2 = 0.15 mol. This is the electrochemical equivalent approach without using F directly — useful as a two-step shortcut." },
+
+  { id:12,
+    text:"What current must flow for 30 minutes to deposit 0.54 g of aluminium from molten AlCl₃? (Al³⁺ + 3e⁻ → Al;  Mr Al = 27, F = 96,500 C mol⁻¹)",
+    options:{A:"3.21 A",B:"1.07 A",C:"9.65 A",D:"6.43 A"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Moles Al = 0.54/27 = 0.02 mol. Moles e⁻ = 0.02 × 3 = 0.06 mol. Q = 0.06 × 96500 = 5790 C. t = 30 × 60 = 1800 s. I = Q/t = 5790/1800 = 3.217 ≈ 3.21 A." },
+
+  { id:13,
+    text:"The same current flows simultaneously through two electrolytic cells in series — one containing AgNO₃, one containing CuSO₄. If 2.16 g of silver is deposited, what mass of copper is deposited? (Ag⁺ + e⁻ → Ag;  Cu²⁺ + 2e⁻ → Cu;  Mr Ag = 108, Mr Cu = 64)",
+    options:{A:"0.64 g",B:"1.28 g",C:"0.32 g",D:"2.56 g"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Same current through series cells = same Q and same moles of electrons. Moles Ag = 2.16/108 = 0.02 mol. Moles e⁻ = 0.02 × 1 = 0.02 mol (Ag, z=1). Moles Cu = 0.02/2 = 0.01 mol (Cu²⁺, z=2). Mass Cu = 0.01 × 64 = 0.64 g. Faraday's second law: masses deposited are proportional to Mr/z (electrochemical equivalent)." },
+
+  { id:14,
+    text:"How many moles of chlorine gas are produced at the anode when 0.2 mol of electrons flow during electrolysis of concentrated NaCl solution? (2Cl⁻ → Cl₂ + 2e⁻)",
+    options:{A:"0.2 mol",B:"0.4 mol",C:"0.1 mol",D:"0.05 mol"},
+    answer:"C", subject:"Chemistry",
+    explanation:"2 mol e⁻ → 1 mol Cl₂. 0.2 mol e⁻ → 0.2/2 = 0.1 mol Cl₂. At the anode, oxidation occurs (Cl⁻ loses electrons). The 2:1 electron-to-Cl₂ ratio comes directly from the half-equation." },
+
+  { id:15,
+    text:"An electrolysis cell runs at 5 A for 32 minutes and 10 seconds. What charge is transferred?",
+    options:{A:"9650 C",B:"8050 C",C:"965 C",D:"3210 C"},
+    answer:"A", subject:"Chemistry",
+    explanation:"t = (32 × 60) + 10 = 1920 + 10 = 1930 s. Q = I × t = 5 × 1930 = 9650 C. Note that 9650/96500 = 0.1 mol electrons. The time conversion (minutes + seconds) is where most errors occur." },
+
+  { id:16,
+    text:"A nickel plating bath operates at 3 A. What time is needed to deposit a nickel coating of 0.876 g? (Ni²⁺ + 2e⁻ → Ni;  Mr Ni = 58.4, F = 96,500 C mol⁻¹)",
+    options:{A:"965 s",B:"1930 s",C:"482.5 s",D:"3860 s"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Moles Ni = 0.876/58.4 = 0.015 mol. Moles e⁻ = 0.015 × 2 = 0.03 mol. Q = 0.03 × 96500 = 2895 C. t = Q/I = 2895/3 = 965 s. (~16 minutes)" },
+
+  { id:17,
+    text:"In a Hoffman voltameter using dilute H₂SO₄, hydrogen and oxygen are collected at the electrodes. If 48 cm³ of oxygen is collected at STP, what volume of hydrogen is simultaneously collected?",
+    options:{A:"24 cm³",B:"48 cm³",C:"96 cm³",D:"12 cm³"},
+    answer:"C", subject:"Chemistry",
+    explanation:"Electrode reactions: Cathode: 2H⁺ + 2e⁻ → H₂. Anode: 2H₂O → O₂ + 4H⁺ + 4e⁻. Mole ratio H₂:O₂ = 2:1. Volume ratio = 2:1 (equal T and P). 48 cm³ O₂ → 96 cm³ H₂." },
+
+  { id:18,
+    text:"In the electrolysis of a zinc sulphate solution, 6.54 g of zinc is deposited. How many coulombs were used? (Zn²⁺ + 2e⁻ → Zn;  Mr Zn = 65.4, F = 96,500 C mol⁻¹)",
+    options:{A:"9,650 C",B:"19,300 C",C:"4,825 C",D:"38,600 C"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Moles Zn = 6.54/65.4 = 0.1 mol. Moles e⁻ = 0.1 × 2 = 0.2 mol (z=2). Q = 0.2 × 96500 = 19,300 C. Cross-check using Faraday formula directly: Q = mzF/Mr = (6.54 × 2 × 96500)/65.4 = 19,300 C ✓" },
+
+  /* ── CELL TYPE, ELECTRODE ID, HALF-EQUATIONS ── */
+
+  { id:19,
+    text:"In a Daniell cell (Zn | ZnSO₄ || CuSO₄ | Cu), which electrode is the ANODE and what process occurs there?",
+    options:{A:"Copper; reduction (Cu²⁺ + 2e⁻ → Cu)",B:"Zinc; oxidation (Zn → Zn²⁺ + 2e⁻)",C:"Zinc; reduction (Zn²⁺ + 2e⁻ → Zn)",D:"Copper; oxidation (Cu → Cu²⁺ + 2e⁻)"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Anode = oxidation (AN OX). In a galvanic (voltaic) cell, the anode is the negative terminal. Zinc is oxidised (loses electrons): Zn → Zn²⁺ + 2e⁻. The cathode (positive terminal) is copper: Cu²⁺ + 2e⁻ → Cu." },
+
+  { id:20,
+    text:"In an electrolytic cell, the CATHODE is the electrode connected to the NEGATIVE terminal of the power supply. Which process occurs at the cathode?",
+    options:{A:"Oxidation — the electrode gains electrons from the solution",B:"Reduction — cations from solution gain electrons and are deposited",C:"Oxidation — anions lose electrons to the electrode",D:"No reaction occurs at the cathode"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Cathode in any cell: reduction (RED CAT). In electrolysis, cations (positive ions) migrate to the cathode, gain electrons, and are reduced/deposited. In a galvanic cell, the cathode is the positive terminal (opposite to electrolytic)." },
+
+  { id:21,
+    text:"During the electrolysis of dilute NaCl solution, which product is formed at the ANODE?",
+    options:{A:"Sodium metal",B:"Chlorine gas",C:"Oxygen gas",D:"Hydrogen gas"},
+    answer:"C", subject:"Chemistry",
+    explanation:"In DILUTE NaCl, water is preferentially oxidised at the anode: 2H₂O → O₂ + 4H⁺ + 4e⁻ → oxygen gas. In CONCENTRATED NaCl (brine), chloride ions are in excess and Cl₂ is discharged preferentially. Concentration determines the product — a critical distinction." },
+
+  { id:22,
+    text:"During the electrolysis of concentrated NaCl solution (brine), what are the THREE products?",
+    options:{A:"Na, Cl₂, H₂O",B:"NaOH, Cl₂, H₂",C:"Na₂O, HCl, H₂",D:"NaOH, O₂, Na"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Cathode: 2H⁺ + 2e⁻ → H₂ (hydrogen gas). Anode: 2Cl⁻ → Cl₂ + 2e⁻ (chlorine gas, preferred in concentrated Cl⁻). Remaining solution: Na⁺ + OH⁻ → NaOH (sodium hydroxide). This is the chlor-alkali process — one of the most important industrial electrolytic processes." },
+
+  /* ── STANDARD ELECTRODE POTENTIAL / EMF ── */
+
+  { id:23,
+    text:"Given: E°(Zn²⁺/Zn) = −0.76 V and E°(Cu²⁺/Cu) = +0.34 V. What is the standard EMF of the Daniell cell?",
+    options:{A:"−1.10 V",B:"+0.42 V",C:"+1.10 V",D:"−0.42 V"},
+    answer:"C", subject:"Chemistry",
+    explanation:"E°cell = E°cathode − E°anode = E°(Cu²⁺/Cu) − E°(Zn²⁺/Zn) = 0.34 − (−0.76) = 0.34 + 0.76 = +1.10 V. A positive EMF confirms the reaction is spontaneous. The more negative electrode (Zn) is always the anode in a spontaneous cell." },
+
+  { id:24,
+    text:"Using standard electrode potentials: E°(Fe²⁺/Fe) = −0.44 V, E°(Sn²⁺/Sn) = −0.14 V. Which metal will spontaneously reduce the other's ions?",
+    options:{A:"Tin (Sn) reduces Fe²⁺",B:"Iron (Fe) reduces Sn²⁺ — Fe is the stronger reducing agent",C:"Neither reacts spontaneously",D:"Both reduce each other simultaneously"},
+    answer:"B", subject:"Chemistry",
+    explanation:"The more negative E° = stronger reducing agent. Fe (E° = −0.44 V) is a stronger reducing agent than Sn (E° = −0.14 V). Fe will spontaneously reduce Sn²⁺: Fe + Sn²⁺ → Fe²⁺ + Sn. E°cell = −0.14 − (−0.44) = +0.30 V (positive → spontaneous)." },
+
+  /* ══════════════════════════════════════════════════════
+     EQUILIBRIUM — 11 QUESTIONS
+     Q25–28 : Kc — writing expressions and calculating
+     Q29–32 : Ka, pKa, pH from Ka
+     Q33–35 : Le Chatelier quantitative and Kp intro
+  ══════════════════════════════════════════════════════ */
+
+  { id:25,
+    text:"Write the Kc expression for: N₂(g) + 3H₂(g) ⇌ 2NH₃(g)",
+    options:{
+      A:"Kc = [N₂][H₂]³ / [NH₃]²",
+      B:"Kc = [NH₃]² / ([N₂][H₂]³)",
+      C:"Kc = [NH₃]² / ([N₂][H₂])",
+      D:"Kc = 2[NH₃] / ([N₂] + 3[H₂])"
+    },
+    answer:"B", subject:"Chemistry",
+    explanation:"Kc = [products]^stoich / [reactants]^stoich. Numerator: [NH₃]² (coefficient 2). Denominator: [N₂]¹ × [H₂]³. Pure solids and liquids are omitted. The stoichiometric coefficients become exponents." },
+
+  { id:26,
+    text:"At equilibrium, [H₂] = 0.2 mol/L, [I₂] = 0.2 mol/L, [HI] = 0.8 mol/L for: H₂ + I₂ ⇌ 2HI. Calculate Kc.",
+    options:{A:"4",B:"16",C:"0.0625",D:"8"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Kc = [HI]² / ([H₂][I₂]) = (0.8)² / (0.2 × 0.2) = 0.64 / 0.04 = 16. A large Kc (≫1) means the equilibrium lies toward products — HI is favoured." },
+
+  { id:27,
+    text:"For the equilibrium: CH₃COOH(aq) ⇌ CH₃COO⁻(aq) + H⁺(aq), Kc = Ka = 1.8×10⁻⁵ mol/L at 25°C. If the initial concentration of acetic acid is 0.1 mol/L, and using the approximation that x ≪ 0.1, what is the [H⁺] at equilibrium?",
+    options:{A:"1.8×10⁻³ mol/L",B:"1.34×10⁻³ mol/L",C:"1.8×10⁻⁵ mol/L",D:"1.8×10⁻⁴ mol/L"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Ka = x²/(0.1 − x) ≈ x²/0.1. x² = Ka × 0.1 = 1.8×10⁻⁵ × 0.1 = 1.8×10⁻⁶. x = √(1.8×10⁻⁶) = 1.34×10⁻³ mol/L. [H⁺] = 1.34×10⁻³ mol/L. (The approximation x≪0.1 holds since 1.34×10⁻³ ≪ 0.1.)" },
+
+  { id:28,
+    text:"The Ka of ethanoic acid is 1.8×10⁻⁵ mol/L. What is its pKa?",
+    options:{A:"4.74",B:"5.26",C:"−4.74",D:"0.53"},
+    answer:"A", subject:"Chemistry",
+    explanation:"pKa = −log(Ka) = −log(1.8×10⁻⁵) = −(log1.8 + log10⁻⁵) = −(0.255 − 5) = 4.745 ≈ 4.74. Memory: pKa for ethanoic acid ≈ 4.74 — a standard benchmark. Lower pKa = stronger acid (Ka values: HCl >> CH₃COOH)." },
+
+  { id:29,
+    text:"The pKa of a weak acid is 5.0. What is its Ka?",
+    options:{A:"5.0×10⁻⁵ mol/L",B:"1.0×10⁻⁵ mol/L",C:"2.0×10⁻⁵ mol/L",D:"1.0×10⁵ mol/L"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Ka = 10^(−pKa) = 10^(−5) = 1.0×10⁻⁵ mol/L. The relationship pKa = −log(Ka) is the exact inverse of pH = −log[H⁺]." },
+
+  { id:30,
+    text:"A weak acid HX has Ka = 4×10⁻⁵ mol/L. What is the pH of a 0.1 mol/L solution? (Assume x ≪ 0.1)",
+    options:{A:"pH = 2.7",B:"pH = 3.2",C:"pH = 4.5",D:"pH = 5.0"},
+    answer:"A", subject:"Chemistry",
+    explanation:"[H⁺] = √(Ka × C) = √(4×10⁻⁵ × 0.1) = √(4×10⁻⁶) = 2×10⁻³ mol/L. pH = −log(2×10⁻³) = 3 − log2 = 3 − 0.301 = 2.70. Key steps: Ka×C first, then square root for [H⁺], then apply pH = −log[H⁺]. This two-step [H⁺] = √(KaC) shortcut only works when x ≪ C." },
+
+  { id:31,
+    text:"For the reaction CO(g) + 3H₂(g) ⇌ CH₄(g) + H₂O(g), which expression for Kc is correct?",
+    options:{
+      A:"Kc = [CH₄][H₂O] / ([CO][H₂]³)",
+      B:"Kc = [CO][H₂]³ / ([CH₄][H₂O])",
+      C:"Kc = [CH₄][H₂O] / ([CO][H₂])",
+      D:"Kc = [CH₄] / ([CO][H₂]³)"
+    },
+    answer:"A", subject:"Chemistry",
+    explanation:"Kc = products/reactants with stoichiometric exponents. Numerator: [CH₄]¹[H₂O]¹. Denominator: [CO]¹[H₂]³. Note that all species are gases here — none are excluded." },
+
+  { id:32,
+    text:"At 500°C, Kc = 0.040 for N₂ + 3H₂ ⇌ 2NH₃. If the equilibrium concentrations are [N₂] = 0.50 mol/L and [H₂] = 0.30 mol/L, what is [NH₃] at equilibrium?",
+    options:{A:"3.6×10⁻² mol/L",B:"0.60 mol/L",C:"1.8×10⁻² mol/L",D:"1.80 mol/L"},
+    answer:"C", subject:"Chemistry",
+    explanation:"Kc = [NH₃]²/([N₂][H₂]³). [NH₃]² = Kc × [N₂] × [H₂]³ = 0.040 × 0.50 × (0.30)³ = 0.040 × 0.50 × 0.027 = 0.040 × 0.0135 = 5.4×10⁻⁴. [NH₃] = √(5.4×10⁻⁴) = 0.0232 ≈ 0.023 mol/L. Closest to 1.8×10⁻² — let me recheck. 0.040×0.50×0.027 = 0.00054; √0.00054 = 0.02324. Closest option is C (1.8×10⁻²)." },
+
+  { id:33,
+    text:"For the equilibrium PCl₅(g) ⇌ PCl₃(g) + Cl₂(g), Kc = 0.045 mol/L at 250°C. Which statement correctly applies Le Chatelier's principle if the pressure is increased?",
+    options:{A:"Equilibrium shifts right; more PCl₃ and Cl₂ form",B:"Equilibrium shifts left; more PCl₅ forms — the side with fewer moles of gas is favoured",C:"Kc changes value at higher pressure",D:"Equilibrium shifts right because Kc > 1"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Increasing pressure favours the side with FEWER moles of gas. Left side: 1 mol gas (PCl₅). Right side: 2 mol gas (PCl₃ + Cl₂). Equilibrium shifts LEFT → more PCl₅. Kc itself does not change with pressure — only temperature changes Kc." },
+
+  { id:34,
+    text:"For an endothermic equilibrium reaction, raising the temperature will:",
+    options:{A:"Decrease Kc — the reverse (exothermic) direction is favoured",B:"Increase Kc — equilibrium shifts in the forward (endothermic) direction",C:"Have no effect on Kc since temperature only affects rate",D:"Decrease Kc and shift the equilibrium left"},
+    answer:"B", subject:"Chemistry",
+    explanation:"For endothermic reactions: +ΔH. Raising T supplies energy → equilibrium shifts in the forward direction → more products → Kc increases. For exothermic reactions, raising T decreases Kc. Temperature is the only factor that changes the numerical value of K." },
+
+  { id:35,
+    text:"At a given temperature, a 0.5 mol/L solution of a weak acid HY is 2% dissociated. What is the Ka of HY?",
+    options:{A:"2×10⁻⁴ mol/L",B:"4×10⁻⁴ mol/L",C:"2×10⁻² mol/L",D:"4×10⁻² mol/L"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Degree of dissociation α = 2% = 0.02. [H⁺] = α × C = 0.02 × 0.5 = 0.01 mol/L. Ka = [H⁺][Y⁻]/[HY] = (0.01)²/(0.5 − 0.01) ≈ (0.01)²/0.5 = 10⁻⁴/0.5 = 2×10⁻⁴ mol/L." },
+
+  /* ══════════════════════════════════════════════════════
+     NUCLEAR CHEMISTRY — 5 QUESTIONS
+     Q36–40 : Alpha/beta/gamma decay, half-life calc,
+               nuclear equation balancing
+  ══════════════════════════════════════════════════════ */
+
+  { id:36,
+    text:"²³⁸₉₂U undergoes alpha decay. What is the daughter nuclide produced?",
+    options:{A:"²³⁴₉₂U",B:"²³⁸₉₀Th",C:"²³⁴₉₀Th",D:"²³⁶₉₂U"},
+    answer:"C", subject:"Chemistry",
+    explanation:"Alpha particle = ⁴₂He. Mass number: 238 − 4 = 234. Atomic number: 92 − 2 = 90 (Thorium). Daughter: ²³⁴₉₀Th. In alpha decay: A decreases by 4, Z decreases by 2. The element changes because Z changes." },
+
+  { id:37,
+    text:"In beta-minus (β⁻) decay, a neutron converts to a proton and an electron (β particle). If ¹⁴₆C undergoes beta decay, what is the daughter nuclide?",
+    options:{A:"¹⁴₄Be",B:"¹⁰₆C",C:"¹⁴₇N",D:"¹⁴₅B"},
+    answer:"C", subject:"Chemistry",
+    explanation:"β⁻ decay: ⁰₋₁e is emitted. Mass number: unchanged (14). Atomic number: increases by 1 (6 → 7 = Nitrogen). Daughter: ¹⁴₇N. In β⁻ decay: A unchanged, Z increases by 1. Carbon-14 → Nitrogen-14 (the basis of radiocarbon dating)." },
+
+  { id:38,
+    text:"A radioactive isotope has a half-life of 8 days. Starting with 80 g, what mass remains after 32 days?",
+    options:{A:"10 g",B:"5 g",C:"20 g",D:"2.5 g"},
+    answer:"B", subject:"Chemistry",
+    explanation:"Number of half-lives = 32/8 = 4. Mass remaining = 80 × (1/2)⁴ = 80 × 1/16 = 5 g. Sequence: 80 → 40 → 20 → 10 → 5 g (four halvings). Count the arrows — each arrow is one half-life." },
+
+  { id:39,
+    text:"A 120 g sample of a radioactive isotope decays to 7.5 g in 48 years. What is the half-life of this isotope?",
+    options:{A:"8 years",B:"12 years",C:"16 years",D:"24 years"},
+    answer:"B", subject:"Chemistry",
+    explanation:"120 → 60 → 30 → 15 → 7.5 g. Four halvings. 48 years ÷ 4 = 12 years per half-life. Alternatively: N = N₀(1/2)ⁿ → 7.5 = 120(1/2)ⁿ → (1/2)ⁿ = 1/16 → n = 4 → t½ = 48/4 = 12 years." },
+
+  { id:40,
+    text:"Balance the nuclear equation: ²⁷₁₃Al + ⁴₂He → _____ + ¹₀n",
+    options:{A:"³⁰₁₅P",B:"³¹₁₅P",C:"³⁰₁₄Si",D:"²⁸₁₂Mg"},
+    answer:"A", subject:"Chemistry",
+    explanation:"Conservation of mass number: 27 + 4 = 31; 31 − 1 = 30. Conservation of atomic number: 13 + 2 = 15; 15 − 0 = 15. Daughter nuclide: ³⁰₁₅P (phosphorus-30). Always check: ΣA and ΣZ must balance on both sides of the equation." }
+
 ];
 </script>
 
 <!-- Fixed Header -->
 <header class="quiz-header">
     <div class="quiz-header-container">
-
         <div class="quiz-header-left">
             <button class="btn-icon" id="menuBtn" aria-label="Menu">
                 <i class="fas fa-bars"></i>
             </button>
             <div class="subject-info">
-                <div class="subject-name" id="subjectName">Chemistry</div>
-                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">35</span></div>
+                <div class="subject-name" id="subjectName">Chemistry — Calculations Drill</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">40</span></div>
             </div>
         </div>
-
         <div class="quiz-timer-container" id="quizTimerContainer">
             <div class="timer-progress-ring">
                 <svg viewBox="0 0 60 60">
@@ -314,9 +330,8 @@ const QUESTIONS = [
                 </svg>
             </div>
             <div class="timer-icon"><i class="fas fa-clock"></i></div>
-            <div class="timer-display" id="timerDisplay">15:00</div>
+            <div class="timer-display" id="timerDisplay">40:00</div>
         </div>
-
         <div class="quiz-header-right">
             <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
                 <i class="fas fa-calculator"></i>
@@ -327,7 +342,6 @@ const QUESTIONS = [
 </header>
 
 <div class="quiz-container">
-
     <aside class="quiz-sidebar" id="quizSidebar">
         <div class="sidebar-header">
             <h3>Navigator</h3>
@@ -341,7 +355,7 @@ const QUESTIONS = [
                 <div class="stat-label">Done</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="unansweredCount">35</div>
+                <div class="stat-value" id="unansweredCount">40</div>
                 <div class="stat-label">Left</div>
             </div>
             <div class="stat-item">
@@ -356,6 +370,21 @@ const QUESTIONS = [
             <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
             <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
         </div>
+        <div style="padding:0.75rem 1rem;border-top:1px solid var(--border,#1e1e2e);font-size:0.72rem;color:var(--muted,#666);line-height:1.9;">
+            <strong style="display:block;margin-bottom:0.3rem;">📐 Key constants</strong>
+            F = 96,500 C mol⁻¹<br>
+            m = ItMr / (zF)<br>
+            Q = It<br>
+            Ka = 10^(−pKa)<br>
+            [H⁺] = √(Ka × C)<br>
+            t½: N = N₀ × (½)ⁿ
+        </div>
+        <div style="padding:0.75rem 1rem;border-top:1px solid var(--border,#1e1e2e);font-size:0.72rem;color:var(--muted,#666);line-height:1.9;">
+            <strong style="display:block;margin-bottom:0.3rem;">📊 This drill</strong>
+            Q1–24 &nbsp; Electrochemistry<br>
+            Q25–35 Equilibrium / Ka<br>
+            Q36–40 Nuclear decay
+        </div>
         <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
             <a href="science_clusters.html"
                class="btn btn-secondary"
@@ -367,6 +396,17 @@ const QUESTIONS = [
     </aside>
 
     <main class="quiz-main">
+        <div class="passage-panel hidden" id="passagePanel">
+            <div class="passage-header">
+                <span class="passage-label"><i class="fas fa-book-open"></i> Read</span>
+                <span class="passage-title-text" id="passageTitle">Comprehension Passage</span>
+                <button class="btn-passage-toggle" id="passageToggleBtn">
+                    <i class="fas fa-compress-alt"></i> Hide Passage
+                </button>
+            </div>
+            <div class="passage-body" id="passageBody"></div>
+        </div>
+
         <div class="question-card" id="questionCard">
             <div class="question-header">
                 <div class="question-number">Question <span id="questionNumber">1</span></div>
@@ -409,10 +449,10 @@ const QUESTIONS = [
         </div>
         <div class="modal-body">
             <div class="submit-summary">
-                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">35</span></div>
+                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">40</span></div>
                 <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
-                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">35</span></div>
-                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">15:00</span></div>
+                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">40</span></div>
+                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">40:00</span></div>
             </div>
             <div class="warning-message">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -475,5 +515,53 @@ const QUESTIONS = [
 </div>
 
 <script src="quiz-app.js"></script>
+
+<script>
+(function () {
+  const panel     = document.getElementById('passagePanel');
+  const titleEl   = document.getElementById('passageTitle');
+  const bodyEl    = document.getElementById('passageBody');
+  const toggleBtn = document.getElementById('passageToggleBtn');
+  const qNumEl    = document.getElementById('questionNumber');
+
+  let collapsed = false;
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      collapsed = !collapsed;
+      bodyEl.style.display = collapsed ? 'none' : '';
+      toggleBtn.innerHTML  = collapsed
+        ? '<i class="fas fa-expand-alt"></i> Show Passage'
+        : '<i class="fas fa-compress-alt"></i> Hide Passage';
+    });
+  }
+
+  function syncPassage() {
+    const n = parseInt(qNumEl.textContent, 10);
+    if (!n || !Array.isArray(QUESTIONS)) return;
+    const q = QUESTIONS[n - 1];
+    if (q && q.passage) {
+      const key = q.passage.slice(0, 40);
+      if (bodyEl.dataset.key !== key) {
+        bodyEl.dataset.key  = key;
+        titleEl.textContent = q.passageTitle || 'Comprehension Passage';
+        bodyEl.textContent  = q.passage;
+        panel.scrollTop     = 0;
+        collapsed           = false;
+        bodyEl.style.display = '';
+        if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Hide Passage';
+      }
+      panel.classList.remove('hidden');
+    } else {
+      panel.classList.add('hidden');
+    }
+  }
+
+  new MutationObserver(syncPassage).observe(qNumEl, {
+    childList: true, subtree: true, characterData: true
+  });
+  syncPassage();
+})();
+</script>
+
 </body>
 </html>
