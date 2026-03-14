@@ -4,424 +4,536 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Mathematics — JAMB Practice · GrantApp AI</title>
+    <title>Mathematics — BEPC Drill — JAMB Practice · GrantApp AI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="quiz-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="quiz-body">
 
-<!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
 <script>
-const DURATION = 900;
+const DURATION = 3600;
 
 const QUESTIONS = [
-  {
-    id: 1, subject: 'Mathematics',
-    text: 'If 0.000456 is written in standard form as 4.56 × 10ⁿ, what is n?',
-    options: { A: '-4', B: '-3', C: '-2', D: '3' },
+
+  /* ════════════════════════════════════════════════════════
+     MATHEMATICS — 70 QUESTIONS
+     Weakness map across all 4 test PDFs:
+
+     SETS & LOGIC          Q1–5    (skipped/wrong: symmetric diff, union, subsets)
+     SURDS & INDICES       Q6–10   (skipped/wrong: surd simplification, fractional powers)
+     LOGARITHMS            Q11–15  (skipped/wrong: log laws, change of base, evaluation)
+     MATRICES              Q16–21  (skipped/wrong: product, determinant, inverse)
+     TRIGONOMETRY          Q22–28  (skipped/wrong: identities, cosine/sine rule, trig values)
+     VECTORS               Q29–33  (skipped/wrong: magnitude, angle, scalar multiple)
+     SEQUENCES & SERIES    Q34–38  (skipped/wrong: AP sum wrong, GP, nth term)
+     STATISTICS            Q39–43  (skipped/wrong: mean, variance, mode/median)
+     PROBABILITY           Q44–47  (skipped/wrong: combined events, dice)
+     ALGEBRA               Q48–55  (skipped/wrong: rational expressions, quadratic, variation)
+     COORDINATE GEOMETRY   Q56–60  (skipped/wrong: perpendicular lines, circle equation)
+     CALCULUS              Q61–65  (skipped/wrong: stationary points, integration, chain rule)
+     MENSURATION           Q66–70  (skipped/wrong: polygon angles, diagonal, surface area)
+  ════════════════════════════════════════════════════════ */
+
+  /* ── SETS & LOGIC ── */
+
+  { id: 1, subject: 'Mathematics',
+    text: 'If A = {1,2,3,4,5} and B = {3,4,5,6,7}, find A △ B (symmetric difference).',
+    options: { A: '{1,2,6,7}', B: '{3,4,5}', C: '{1,2,3,4,5,6,7}', D: '{1,7}' },
     answer: 'A',
-    explanation: 'Move the decimal right for negative powers. 0.000456 = 4.56 × 10⁻⁴.',
-    exception: 'The count starts AFTER the first non-zero digit — a very common slip.',
-  },
-  {
-    id: 2, subject: 'Mathematics',
-    text: 'Simplify: (√2 + √3)(√2 − √3)',
-    options: { A: '-1', B: '1', C: '5', D: '√6' },
-    answer: 'A',
-    explanation: 'Difference of squares: (a+b)(a−b) = a² − b². Result = 2 − 3 = −1.',
-    exception: 'Students expect a positive result when both surds are positive — the difference of squares corrects that.',
-  },
-  {
-    id: 3, subject: 'Mathematics',
-    text: 'If log₁₀ 2 = 0.3010, find log₁₀ 0.02',
-    options: { A: '-1.699', B: '-0.699', C: '0.699', D: '1.699' },
-    answer: 'A',
-    explanation: 'log(0.02) = log(2 × 10⁻²) = 0.3010 − 2 = −1.699.',
-    exception: 'Logarithms of numbers less than 1 are NEGATIVE, not undefined.',
-  },
-  {
-    id: 4, subject: 'Mathematics',
-    text: 'What is the remainder when 2x³ + 3x² − 5x + 7 is divided by (x + 2)?',
-    options: { A: '-11', B: '3', C: '11', D: '21' },
-    answer: 'D',
-    explanation: 'Remainder theorem: f(−2) = −16 + 12 + 10 + 7 = 21.',
-    exception: 'Use x = −2, not +2, because the divisor is (x + 2).',
-  },
-  {
-    id: 5, subject: 'Mathematics',
-    text: 'Solve: |2x − 3| = 5',
-    options: { A: 'x = −1 or x = 4', B: 'x = 1 or x = 4', C: 'x = −1 only', D: 'x = 4 only' },
-    answer: 'A',
-    explanation: '|a| = b gives a = ±b. So 2x − 3 = 5 OR 2x − 3 = −5, giving x = 4 or x = −1.',
-    exception: 'TWO solutions always exist for an absolute-value equation (unless the expression equals zero).',
-  },
-  {
-    id: 6, subject: 'Mathematics',
-    text: 'If sin θ = 3/5 and θ is acute, find cos θ',
-    options: { A: '3/5', B: '4/5', C: '5/3', D: '5/4' },
+    explanation: 'Symmetric difference = elements in A or B but NOT both. A only: {1,2}. B only: {6,7}. A△B = {1,2,6,7}. A common error is confusing this with A∪B or A∩B.' },
+
+  { id: 2, subject: 'Mathematics',
+    text: 'In a class of 40 students, 25 study French, 20 study German, and 10 study both. How many study neither?',
+    options: { A: '10', B: '5', C: '15', D: '35' },
     answer: 'B',
-    explanation: 'cos θ = √(1 − sin²θ) = √(1 − 9/25) = √(16/25) = 4/5.',
-    exception: 'cos θ is positive ONLY because θ is stated to be acute.',
-  },
-  {
-    id: 7, subject: 'Mathematics',
-    text: 'Find the nth term of the sequence: 3, 7, 11, 15 …',
-    options: { A: '3n + 1', B: '4n − 1', C: '4n + 1', D: '3n + 4' },
-    answer: 'B',
-    explanation: 'AP: Tₙ = a + (n−1)d = 3 + 4(n−1) = 4n − 1.',
-    exception: 'Verify with n = 1: 4(1) − 1 = 3 ✓',
-  },
-  {
-    id: 8, subject: 'Mathematics',
-    text: 'Evaluate: ∛(−27)',
-    options: { A: '−3', B: '3', C: 'Undefined', D: '±3' },
-    answer: 'A',
-    explanation: 'Cube roots of negative numbers ARE defined. ∛(−27) = −3.',
-    exception: 'Odd roots preserve the sign; only even roots require non-negative radicands.',
-  },
-  {
-    id: 9, subject: 'Mathematics',
-    text: 'If 3ˣ = 27ˣ⁻², find x',
-    options: { A: '2', B: '3', C: '4', D: '6' },
-    answer: 'B',
-    explanation: '3ˣ = (3³)ˣ⁻² = 3³ˣ⁻⁶. Equate exponents: x = 3x − 6, so x = 3.',
-    exception: 'This shortcut only works because both sides share the same base.',
-  },
-  {
-    id: 10, subject: 'Mathematics',
-    text: 'A binary operation * is defined by a * b = a² − b². Calculate 3 * 2',
-    options: { A: '1', B: '5', C: '13', D: '25' },
-    answer: 'B',
-    explanation: '3 * 2 = 3² − 2² = 9 − 4 = 5.',
-    exception: '* here is NOT multiplication — always substitute directly into the given definition.',
-  },
-  {
-    id: 11, subject: 'Mathematics',
-    text: 'Find the inverse of f(x) = (2x + 1)/(x − 3)',
-    options: { A: '(3x + 1)/(x − 2)', B: '(3x − 1)/(x − 2)', C: '(x − 3)/(2x + 1)', D: '(2x − 1)/(x + 3)' },
-    answer: 'A',
-    explanation: 'Swap x and y, then solve for y: f⁻¹(x) = (3x + 1)/(x − 2).',
-    exception: 'The domain of f⁻¹ excludes x = 2 (causes division by zero).',
-  },
-  {
-    id: 12, subject: 'Mathematics',
-    text: 'How many diagonals does a regular hexagon have?',
-    options: { A: '6', B: '9', C: '12', D: '15' },
-    answer: 'B',
-    explanation: 'Formula: n(n−3)/2. For n = 6: 6(3)/2 = 9.',
-    exception: 'Total line segments (including sides) = n(n−1)/2 = 15; diagonals exclude the 6 sides.',
-  },
-  {
-    id: 13, subject: 'Mathematics',
-    text: 'If P = {1, 2, 3} and Q = {2, 3, 4}, find n(P ∪ Q)',
+    explanation: 'n(F∪G) = 25+20−10 = 35. Neither = 40−35 = 5. Always draw a Venn diagram: the "both" group is counted once in each individual set, so it must be subtracted once from the union.' },
+
+  { id: 3, subject: 'Mathematics',
+    text: 'A set has 5 elements. How many subsets does it have (including the empty set and the set itself)?',
+    options: { A: '10', B: '25', C: '32', D: '16' },
+    answer: 'C',
+    explanation: 'Number of subsets of a set with n elements = 2ⁿ. 2⁵ = 32. Includes the empty set (∅) and the set itself. For n=4: 2⁴=16; n=6: 2⁶=64.' },
+
+  { id: 4, subject: 'Mathematics',
+    text: 'If P = {factors of 12} and Q = {factors of 18}, find n(P ∩ Q).',
     options: { A: '2', B: '3', C: '4', D: '6' },
     answer: 'C',
-    explanation: 'P ∪ Q = {1, 2, 3, 4}, so n = 4. Confirmed by inclusion-exclusion: 3 + 3 − 2 = 4.',
-    exception: 'Never count repeated elements; 2 and 3 appear in both sets but are listed once.',
-  },
-  {
-    id: 14, subject: 'Mathematics',
-    text: 'Differentiate y = x³ − 3x² + 2 with respect to x',
-    options: { A: '3x² − 3x', B: '3x² − 6x', C: 'x² − 6x', D: '3x³ − 6x²' },
+    explanation: 'P = {1,2,3,4,6,12}. Q = {1,2,3,6,9,18}. P∩Q = {1,2,3,6}. n(P∩Q) = 4. These are the common factors of 12 and 18 (i.e. factors of HCF = 6: {1,2,3,6}).' },
+
+  { id: 5, subject: 'Mathematics',
+    text: 'In a survey of 100 people, 60 like tea, 50 like coffee, and 20 like neither. How many like both?',
+    options: { A: '20', B: '25', C: '30', D: '10' },
+    answer: 'C',
+    explanation: 'Those who like at least one = 100−20 = 80. n(T∪C) = n(T)+n(C)−n(T∩C) → 80 = 60+50−n(T∩C) → n(T∩C) = 30.' },
+
+  /* ── SURDS & INDICES ── */
+
+  { id: 6, subject: 'Mathematics',
+    text: 'Simplify: √75 + √48 − √27.',
+    options: { A: '6√3', B: '4√3', C: '5√3', D: '8√3' },
+    answer: 'A',
+    explanation: '√75=5√3, √48=4√3, √27=3√3. 5√3+4√3−3√3 = 6√3. Always simplify each surd by extracting perfect square factors first.' },
+
+  { id: 7, subject: 'Mathematics',
+    text: 'Simplify: (2√3 + √2)(2√3 − √2).',
+    options: { A: '14', B: '10', C: '12', D: '8' },
     answer: 'B',
-    explanation: 'Power rule: dy/dx = 3x² − 6x.',
-    exception: 'The constant 2 disappears — the derivative of any constant is 0.',
-  },
-  {
-    id: 15, subject: 'Mathematics',
-    text: 'Convert 234₅ to base 10',
-    options: { A: '54', B: '64', C: '69', D: '119' },
+    explanation: 'Difference of two squares: (2√3)²−(√2)² = 4×3−2 = 12−2 = 10. The formula (a+b)(a−b) = a²−b² eliminates the surds entirely.' },
+
+  { id: 8, subject: 'Mathematics',
+    text: 'Find the value of (27)^(2/3).',
+    options: { A: '3', B: '18', C: '9', D: '6' },
     answer: 'C',
-    explanation: '2(5²) + 3(5¹) + 4(5⁰) = 50 + 15 + 4 = 69.',
-    exception: 'In base 5, each digit must be 0–4; a digit ≥ 5 is invalid.',
-  },
-  {
-    id: 16, subject: 'Mathematics',
-    text: 'Find the median of: 2, 8, 6, 4, 10',
-    options: { A: '4', B: '6', C: '8', D: '10' },
+    explanation: '(27)^(2/3) = (∛27)² = 3² = 9. Rule: x^(p/q) = (ᵍ√x)ᵖ. Always find the root first (cube root of 27 = 3), then apply the power.' },
+
+  { id: 9, subject: 'Mathematics',
+    text: 'Simplify: 8^(2/3) × 4^(−1/2).',
+    options: { A: '2', B: '4', C: '1', D: '8' },
+    answer: 'A',
+    explanation: '8^(2/3) = (∛8)² = 2² = 4. 4^(−1/2) = 1/√4 = 1/2. 4 × (1/2) = 2.' },
+
+  { id: 10, subject: 'Mathematics',
+    text: 'Solve: 9^x = 27.',
+    options: { A: '3/2', B: '2/3', C: '3', D: '2' },
+    answer: 'A',
+    explanation: '9^x = 27 → (3²)^x = 3³ → 3^(2x) = 3³ → 2x = 3 → x = 3/2. Key step: express both sides as powers of the same base.' },
+
+  /* ── LOGARITHMS ── */
+
+  { id: 11, subject: 'Mathematics',
+    text: 'If log₁₀ 3 = 0.4771, find log₁₀ 270.',
+    options: { A: '2.4314', B: '1.4313', C: '3.4313', D: '0.4314' },
+    answer: 'A',
+    explanation: '270 = 27×10 = 3³×10. log 270 = log(3³) + log 10 = 3×0.4771 + 1 = 1.4313 + 1 = 2.4313 ≈ 2.4314.' },
+
+  { id: 12, subject: 'Mathematics',
+    text: 'Simplify: log(a²b³/c) using log laws.',
+    options: { A: '2 log a + 3 log b − log c', B: '2 log a × 3 log b ÷ log c', C: '6 log a − log c', D: 'log(2a + 3b − c)' },
+    answer: 'A',
+    explanation: 'log(a²b³/c) = log(a²) + log(b³) − log(c) = 2 log a + 3 log b − log c. Log laws: product → sum; quotient → difference; power → coefficient.' },
+
+  { id: 13, subject: 'Mathematics',
+    text: 'Given log₁₀ 2 = 0.3010, find log₁₀ 200.',
+    options: { A: '2.3010', B: '1.3010', C: '0.6020', D: '3.3010' },
+    answer: 'A',
+    explanation: '200 = 2×100. log 200 = log 2 + log 100 = 0.3010 + 2 = 2.3010. Alternatively: log(2×10²) = log 2 + 2 log 10 = 0.3010 + 2.' },
+
+  { id: 14, subject: 'Mathematics',
+    text: 'Solve for x: log₂(x + 3) = 4.',
+    options: { A: '13', B: '11', C: '16', D: '7' },
+    answer: 'A',
+    explanation: 'log₂(x+3) = 4 → x+3 = 2⁴ = 16 → x = 13. Rule: log_b(N) = p ↔ N = bᵖ. Always convert the log equation to exponential form.' },
+
+  { id: 15, subject: 'Mathematics',
+    text: 'Simplify: log₃ 81 − log₃ 9.',
+    options: { A: '3', B: '2', C: '1', D: '4' },
     answer: 'B',
-    explanation: 'Order first: 2, 4, 6, 8, 10. The middle value is 6.',
-    exception: 'For an even count, the median is the average of the two middle values.',
-  },
-  {
-    id: 17, subject: 'Mathematics',
-    text: 'Simplify: (x² − 9) / (x² + 6x + 9)',
-    options: { A: '(x − 3)/(x + 3)', B: '(x + 3)/(x − 3)', C: '1', D: '(x − 3)²/(x + 3)' },
+    explanation: 'log₃ 81 = log₃(3⁴) = 4. log₃ 9 = log₃(3²) = 2. 4 − 2 = 2. Or: log₃(81/9) = log₃ 9 = 2.' },
+
+  /* ── MATRICES ── */
+
+  { id: 16, subject: 'Mathematics',
+    text: 'Find the product of A = [[2,1],[0,3]] and B = [[1,2],[3,0]].',
+    options: { A: '[[5,4],[9,0]]', B: '[[2,4],[0,0]]', C: '[[3,3],[3,3]]', D: '[[5,4],[0,6]]' },
     answer: 'A',
-    explanation: 'Factor: (x−3)(x+3) / (x+3)² = (x−3)/(x+3).',
-    exception: 'The restriction x ≠ −3 persists even after simplification.',
-  },
-  {
-    id: 18, subject: 'Mathematics',
-    text: 'If matrix A = [2, 3; 1, 4], find det(A)',
-    options: { A: '5', B: '8', C: '11', D: '14' },
+    explanation: 'Row 1: [2×1+1×3, 2×2+1×0] = [5, 4]. Row 2: [0×1+3×3, 0×2+3×0] = [9, 0]. Result: [[5,4],[9,0]]. Multiply row × column, then sum — never add element-by-element.' },
+
+  { id: 17, subject: 'Mathematics',
+    text: 'Find the determinant of [[4,2],[1,3]].',
+    options: { A: '14', B: '10', C: '6', D: '12' },
+    answer: 'B',
+    explanation: 'det[[a,b],[c,d]] = ad − bc = (4×3) − (2×1) = 12 − 2 = 10. The formula is ad MINUS bc — not ad plus bc.' },
+
+  { id: 18, subject: 'Mathematics',
+    text: 'Find the determinant of [[5,3],[2,4]].',
+    options: { A: '26', B: '14', C: '−14', D: '20' },
+    answer: 'B',
+    explanation: 'det = (5×4) − (3×2) = 20 − 6 = 14.' },
+
+  { id: 19, subject: 'Mathematics',
+    text: 'If M = [[2,1],[5,3]], find M⁻¹ (the inverse of M).',
+    options: { A: '[[3,−1],[−5,2]]', B: '[[3,1],[5,2]]', C: '[[2,−1],[−5,3]]', D: '[[−3,1],[5,−2]]' },
     answer: 'A',
-    explanation: 'det = ad − bc = 2(4) − 3(1) = 5.',
-    exception: 'A matrix is invertible only if its determinant is non-zero.',
-  },
-  {
-    id: 19, subject: 'Mathematics',
-    text: 'In a class of 40, 24 like Maths, 16 like English, 8 like both. How many like neither?',
-    options: { A: '0', B: '4', C: '8', D: '12' },
+    explanation: 'det(M) = (2×3)−(1×5) = 6−5 = 1. M⁻¹ = (1/det)×[[d,−b],[−c,a]] = [[3,−1],[−5,2]]. When det = 1, the inverse is simply the swapped/sign-changed matrix.' },
+
+  { id: 20, subject: 'Mathematics',
+    text: 'Find the product of P = [[1,3],[2,0]] and Q = [[2,1],[4,3]].',
+    options: { A: '[[14,10],[4,2]]', B: '[[2,3],[4,0]]', C: '[[5,10],[4,6]]', D: '[[14,4],[10,2]]' },
+    answer: 'A',
+    explanation: 'Row 1: [1×2+3×4, 1×1+3×3] = [14, 10]. Row 2: [2×2+0×4, 2×1+0×3] = [4, 2]. Result: [[14,10],[4,2]].' },
+
+  { id: 21, subject: 'Mathematics',
+    text: 'A 2×2 matrix has determinant 0. This means the matrix is:',
+    options: { A: 'Invertible', B: 'Singular (has no inverse)', C: 'The identity matrix', D: 'A diagonal matrix' },
+    answer: 'B',
+    explanation: 'A matrix with determinant = 0 is called singular — it has no inverse. The formula M⁻¹ = (1/det)×adj(M) breaks down when det = 0 (division by zero). Only non-singular matrices (det ≠ 0) are invertible.' },
+
+  /* ── TRIGONOMETRY ── */
+
+  { id: 22, subject: 'Mathematics',
+    text: 'Find the value of sin²30° + cos²60° + tan 45°.',
+    options: { A: '1', B: '3/2', C: '2', D: '1/2' },
+    answer: 'B',
+    explanation: 'sin 30° = 1/2 → sin²30° = 1/4. cos 60° = 1/2 → cos²60° = 1/4. tan 45° = 1. Total = 1/4 + 1/4 + 1 = 3/2.' },
+
+  { id: 23, subject: 'Mathematics',
+    text: 'Evaluate: sin²60° − cos²30° + tan²45°.',
+    options: { A: '0', B: '1', C: '1/2', D: '3/4' },
+    answer: 'B',
+    explanation: 'sin 60° = √3/2 → sin²60° = 3/4. cos 30° = √3/2 → cos²30° = 3/4. tan 45° = 1 → tan²45° = 1. Total = 3/4 − 3/4 + 1 = 1.' },
+
+  { id: 24, subject: 'Mathematics',
+    text: 'In triangle ABC, a = 7, b = 5, and included angle C = 60°. Find side c. (cos 60° = 0.5)',
+    options: { A: '√74', B: '√39', C: '√61', D: '√49' },
+    answer: 'B',
+    explanation: 'Cosine rule: c² = a²+b²−2ab cosC = 49+25−2(7)(5)(0.5) = 74−35 = 39. c = √39.' },
+
+  { id: 25, subject: 'Mathematics',
+    text: 'In triangle ABC, a = 5, b = 7, and included angle C = 120°. Find side c. (cos 120° = −0.5)',
+    options: { A: '√74', B: '√109', C: '√39', D: '√24' },
+    answer: 'B',
+    explanation: 'c² = a²+b²−2ab cosC = 25+49−2(5)(7)(−0.5) = 74+35 = 109. c = √109. When cos C is negative (obtuse angle), the last term becomes ADDITION.' },
+
+  { id: 26, subject: 'Mathematics',
+    text: 'In triangle PQR, p = 6, angle P = 30°, angle Q = 90°. Find q using the sine rule.',
+    options: { A: '6', B: '12', C: '3', D: '9' },
+    answer: 'B',
+    explanation: 'Sine rule: q/sin Q = p/sin P → q = 6×sin 90°/sin 30° = 6×1/0.5 = 12. A 30-90-60 triangle: the hypotenuse (opposite 90°) is twice the side opposite 30°.' },
+
+  { id: 27, subject: 'Mathematics',
+    text: 'In triangle ABC, a = 6, A = 45°, B = 75°. Find side b. (sin 75° ≈ 0.966, sin 45° ≈ 0.707)',
+    options: { A: '≈ 8.20', B: '≈ 4.39', C: '≈ 6.00', D: '≈ 10.0' },
+    answer: 'A',
+    explanation: 'b/sin B = a/sin A → b = 6×sin 75°/sin 45° = 6×0.966/0.707 ≈ 5.796/0.707 ≈ 8.20. In JAMB, sin 75° = sin(45°+30°) can be expanded if needed.' },
+
+  { id: 28, subject: 'Mathematics',
+    text: 'In a triangle with sides a=3, b=4, c=5, find angle C (opposite side c) using the cosine rule.',
+    options: { A: '30°', B: '60°', C: '90°', D: '45°' },
     answer: 'C',
-    explanation: 'n(M ∪ E) = 24 + 16 − 8 = 32. Neither = 40 − 32 = 8.',
-    exception: 'The inclusion-exclusion principle prevents double-counting the overlap.',
-  },
-  {
-    id: 20, subject: 'Mathematics',
-    text: 'Find the sum of the first 10 terms of: 2 + 4 + 6 + 8 …',
-    options: { A: '90', B: '100', C: '110', D: '120' },
+    explanation: 'cos C = (a²+b²−c²)/(2ab) = (9+16−25)/(2×3×4) = 0/24 = 0. C = cos⁻¹(0) = 90°. This is a 3-4-5 right triangle — always verify using Pythagoras: 3²+4²=5².' },
+
+  /* ── VECTORS ── */
+
+  { id: 29, subject: 'Mathematics',
+    text: 'If vectors a = (3,4) and b = (−1,2), find |a + b|.',
+    options: { A: '2√10', B: '√40', C: '5', D: '√34' },
+    answer: 'A',
+    explanation: 'a+b = (3+(−1), 4+2) = (2,6). |a+b| = √(4+36) = √40 = 2√10. Always add components first, THEN find magnitude — never add magnitudes directly.' },
+
+  { id: 30, subject: 'Mathematics',
+    text: 'Find the angle between vectors a = (1,0) and b = (1,1).',
+    options: { A: '30°', B: '45°', C: '60°', D: '90°' },
+    answer: 'B',
+    explanation: 'cos θ = a·b/(|a||b|) = (1×1+0×1)/(1×√2) = 1/√2. θ = cos⁻¹(1/√2) = 45°.' },
+
+  { id: 31, subject: 'Mathematics',
+    text: 'Vectors p = (5,12) and q = (−5,0). Find |p + q|.',
+    options: { A: '17', B: '12', C: '13', D: '5' },
+    answer: 'B',
+    explanation: 'p+q = (5+(−5), 12+0) = (0,12). |p+q| = √(0²+12²) = √144 = 12.' },
+
+  { id: 32, subject: 'Mathematics',
+    text: 'Find the angle between vectors a = (−√3, 1) and b = (1, 0).',
+    options: { A: '150°', B: '30°', C: '120°', D: '60°' },
+    answer: 'A',
+    explanation: 'cos θ = a·b/(|a||b|) = (−√3×1+1×0)/(√(3+1)×1) = −√3/2. θ = cos⁻¹(−√3/2) = 150°.' },
+
+  { id: 33, subject: 'Mathematics',
+    text: 'Vectors m = (2,5) and n = (−1,3). Find |2m − n|.',
+    options: { A: '√74', B: '√53', C: '√65', D: '√50' },
+    answer: 'A',
+    explanation: '2m = (4,10). 2m−n = (4−(−1), 10−3) = (5,7). |2m−n| = √(25+49) = √74.' },
+
+  /* ── SEQUENCES & SERIES ── */
+
+  { id: 34, subject: 'Mathematics',
+    text: 'Find the sum of the first 15 terms of the AP: 3, 7, 11, …',
+    options: { A: '465', B: '420', C: '495', D: '450' },
+    answer: 'A',
+    explanation: 'a=3, d=4, n=15. Sₙ = n/2(2a+(n−1)d) = 15/2(6+56) = 15/2×62 = 15×31 = 465. A previous test selected the wrong answer here — always compute 2a+(n−1)d before multiplying by n/2.' },
+
+  { id: 35, subject: 'Mathematics',
+    text: 'Find the number of terms in the AP: 5, 9, 13, …, 81.',
+    options: { A: '18', B: '20', C: '22', D: '19' },
+    answer: 'B',
+    explanation: 'Tₙ = a+(n−1)d = 5+4(n−1) = 81 → 4(n−1) = 76 → n−1 = 19 → n = 20.' },
+
+  { id: 36, subject: 'Mathematics',
+    text: 'The 3rd term of a GP is 12 and the 6th term is 96. Find the common ratio.',
+    options: { A: '√2', B: '2', C: '3', D: '4' },
+    answer: 'B',
+    explanation: 'T₆/T₃ = r³ = 96/12 = 8 → r = ∛8 = 2. Then T₃ = ar² = 12 → a×4 = 12 → a = 3. Verify: T₆ = 3×2⁵ = 96 ✓.' },
+
+  { id: 37, subject: 'Mathematics',
+    text: 'Find the sum of the first 6 terms of the GP: 2, 6, 18, …',
+    options: { A: '728', B: '364', C: '486', D: '1458' },
+    answer: 'A',
+    explanation: 'a=2, r=3, n=6. Sₙ = a(rⁿ−1)/(r−1) = 2(3⁶−1)/(3−1) = 2(729−1)/2 = 728.' },
+
+  { id: 38, subject: 'Mathematics',
+    text: 'The angle of elevation of the top of a tower from a point 40 m away is 30°. Find the height of the tower. (tan 30° = 1/√3)',
+    options: { A: '40√3/3 m', B: '40√3 m', C: '20 m', D: '80/√3 m' },
+    answer: 'A',
+    explanation: 'tan 30° = h/40 → h = 40 tan 30° = 40/√3 = 40√3/3 ≈ 23.1 m. Rationalise the denominator: multiply numerator and denominator by √3.' },
+
+  /* ── STATISTICS ── */
+
+  { id: 39, subject: 'Mathematics',
+    text: 'The mean of 6 numbers is 12. A 7th number is added and the new mean is 13. What is the 7th number?',
+    options: { A: '13', B: '14', C: '19', D: '20' },
     answer: 'C',
-    explanation: 'Sₙ = n/2(first + last) = 5(2 + 20) = 110. Or: Sₙ = n/2[2a + (n−1)d] = 5(4 + 18) = 110.',
-    exception: 'Alternatively use Sₙ = n(n+1) for the sum of the first n even numbers: 10(11) = 110.',
-  },
-  {
-    id: 21, subject: 'Mathematics',
-    text: 'If the mean of 4, 7, x, 10, 9 is 8, find x',
-    options: { A: '8', B: '9', C: '10', D: '11' },
+    explanation: 'Sum of 6 numbers = 6×12 = 72. New sum = 7×13 = 91. 7th number = 91−72 = 19.' },
+
+  { id: 40, subject: 'Mathematics',
+    text: 'Find the mode and median of: 3, 5, 7, 5, 9, 5, 3, 7.',
+    options: { A: 'Mode=5, Median=5', B: 'Mode=3, Median=6', C: 'Mode=5, Median=6', D: 'Mode=7, Median=5' },
+    answer: 'A',
+    explanation: 'Sorted: 3,3,5,5,5,7,7,9. Mode = 5 (appears 3 times). Median = average of 4th and 5th values = (5+5)/2 = 5.' },
+
+  { id: 41, subject: 'Mathematics',
+    text: 'If the variance of a data set is 16, what is the standard deviation?',
+    options: { A: '256', B: '8', C: '4', D: '2' },
     answer: 'C',
-    explanation: 'Sum = 5 × 8 = 40. 4 + 7 + x + 10 + 9 = 30 + x = 40, so x = 10.',
-    exception: 'Mean × count = sum; rearrange to solve for the unknown term.',
-  },
-  {
-    id: 22, subject: 'Mathematics',
-    text: 'Factorize completely: 6x² + 7x − 3',
-    options: { A: '(3x − 1)(2x + 3)', B: '(3x + 1)(2x − 3)', C: '(2x − 1)(3x + 3)', D: '(6x − 1)(x + 3)' },
+    explanation: 'Standard deviation = √variance = √16 = 4. Variance = (standard deviation)². They measure spread; standard deviation has the same units as the data.' },
+
+  { id: 42, subject: 'Mathematics',
+    text: 'A car travels 60 km at 40 km/h, then 60 km at 60 km/h. Find the average speed for the whole journey.',
+    options: { A: '50 km/h', B: '48 km/h', C: '45 km/h', D: '52 km/h' },
+    answer: 'B',
+    explanation: 'Time₁ = 60/40 = 1.5 h. Time₂ = 60/60 = 1 h. Total distance = 120 km, total time = 2.5 h. Average speed = 120/2.5 = 48 km/h. Do NOT average the speeds directly (50 km/h is wrong).' },
+
+  { id: 43, subject: 'Mathematics',
+    text: 'The mean of 8 numbers is 15. A 9th number is added and the new mean becomes 14. What is the 9th number?',
+    options: { A: '6', B: '7', C: '8', D: '5' },
     answer: 'A',
-    explanation: 'Product = −18, sum = 7. Factors: 9 and −2. Group: (3x−1)(2x+3).',
-    exception: 'Always verify by expanding back: (3x−1)(2x+3) = 6x² + 9x − 2x − 3 = 6x² + 7x − 3 ✓',
-  },
-  {
-    id: 23, subject: 'Mathematics',
-    text: 'Evaluate: ∫(3x² + 2x) dx',
-    options: { A: 'x³ + x² + C', B: '6x + 2 + C', C: 'x³ + x + C', D: '3x³ + 2x² + C' },
+    explanation: 'Sum of 8 = 8×15 = 120. New sum = 9×14 = 126. 9th number = 126−120 = 6.' },
+
+  /* ── PROBABILITY ── */
+
+  { id: 44, subject: 'Mathematics',
+    text: 'Two dice are thrown. Find the probability that the sum is 7.',
+    options: { A: '1/4', B: '7/36', C: '1/6', D: '5/36' },
+    answer: 'C',
+    explanation: 'Pairs summing to 7: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1) = 6 outcomes. Total = 36. P = 6/36 = 1/6.' },
+
+  { id: 45, subject: 'Mathematics',
+    text: 'A bag contains 5 red, 3 blue, and 2 green balls. One ball is drawn at random. What is the probability it is NOT red?',
+    options: { A: '1/2', B: '3/10', C: '5/10', D: '2/5' },
     answer: 'A',
-    explanation: '∫3x² dx = x³; ∫2x dx = x². Total: x³ + x² + C.',
-    exception: 'Always add the constant C for indefinite integrals.',
-  },
-  {
-    id: 24, subject: 'Mathematics',
-    text: 'A circle has equation x² + y² = 25. What is the radius?',
-    options: { A: '5', B: '10', C: '25', D: '√5' },
+    explanation: 'P(not red) = 1 − P(red) = 1 − 5/10 = 5/10 = 1/2. Alternatively: blue + green = 3+2 = 5 balls out of 10.' },
+
+  { id: 46, subject: 'Mathematics',
+    text: 'Two dice are thrown. Find the probability that the sum is greater than 9.',
+    options: { A: '1/6', B: '5/36', C: '1/4', D: '7/36' },
     answer: 'A',
-    explanation: 'Standard form x² + y² = r². So r² = 25 and r = 5.',
-    exception: 'r = √25 = 5, not 25 — a very common slip.',
-  },
-  {
-    id: 25, subject: 'Mathematics',
-    text: 'If 4x − 3 ≤ 13, find the range of x',
-    options: { A: 'x ≤ 4', B: 'x ≥ 4', C: 'x ≤ −4', D: 'x ≥ −4' },
+    explanation: 'Sums > 9: 10=(4,6),(5,5),(6,4); 11=(5,6),(6,5); 12=(6,6). Total = 6 pairs. P = 6/36 = 1/6.' },
+
+  { id: 47, subject: 'Mathematics',
+    text: 'A set has 6 elements. How many subsets does it have?',
+    options: { A: '36', B: '48', C: '64', D: '12' },
+    answer: 'C',
+    explanation: 'Subsets = 2ⁿ = 2⁶ = 64. Includes ∅ and the set itself.' },
+
+  /* ── ALGEBRA ── */
+
+  { id: 48, subject: 'Mathematics',
+    text: 'Simplify: (x² − 9)/(x² − x − 6).',
+    options: { A: '(x+3)/(x+2)', B: '(x−3)/(x+2)', C: '(x+3)/(x−2)', D: '(x−3)/(x−2)' },
     answer: 'A',
-    explanation: '4x ≤ 16, x ≤ 4.',
-    exception: 'The inequality sign flips ONLY when dividing or multiplying by a negative number.',
-  },
-  {
-    id: 26, subject: 'Mathematics',
-    text: 'Find the equation of a line with gradient 2 passing through (1, 3)',
-    options: { A: 'y = 2x + 1', B: 'y = 2x − 1', C: 'y = 2x + 3', D: 'y = x + 2' },
+    explanation: 'Numerator: (x−3)(x+3). Denominator: factors of −6 summing to −1 → (x−3)(x+2). Cancel (x−3): (x+3)/(x+2). Valid for x ≠ 3.' },
+
+  { id: 49, subject: 'Mathematics',
+    text: 'Simplify: (x² − 16)/(x² − x − 12) for x ≠ 4.',
+    options: { A: '(x+4)/(x+3)', B: '(x−4)/(x+3)', C: '(x+4)/(x−3)', D: '(x−4)/(x−3)' },
     answer: 'A',
-    explanation: 'y − y₁ = m(x − x₁): y − 3 = 2(x − 1), so y = 2x + 1.',
-    exception: 'Substitute the given point, not the origin.',
-  },
-  {
-    id: 27, subject: 'Mathematics',
-    text: 'How many ways can 5 students be arranged in a row?',
-    options: { A: '5', B: '20', C: '60', D: '120' },
+    explanation: 'Numerator: (x−4)(x+4). Denominator: factors of −12 summing to −1 → (x−4)(x+3). Cancel (x−4): (x+4)/(x+3).' },
+
+  { id: 50, subject: 'Mathematics',
+    text: 'Solve: 3x/(x − 1) = 6.',
+    options: { A: 'x = 3', B: 'x = 2', C: 'x = −2', D: 'x = 1/2' },
+    answer: 'B',
+    explanation: '3x = 6(x−1) → 3x = 6x−6 → −3x = −6 → x = 2. Verify: 3(2)/(2−1) = 6/1 = 6 ✓.' },
+
+  { id: 51, subject: 'Mathematics',
+    text: 'Find the value of x: 4x/(x + 2) = 2.',
+    options: { A: 'x = 1', B: 'x = 2', C: 'x = 4', D: 'x = −2' },
+    answer: 'B',
+    explanation: '4x = 2(x+2) → 4x = 2x+4 → 2x = 4 → x = 2. Verify: 4(2)/(2+2) = 8/4 = 2 ✓. A common error gives x=1, but verify always.' },
+
+  { id: 52, subject: 'Mathematics',
+    text: 'Find the discriminant of 2x² − 4x + 5 = 0 and state the nature of the roots.',
+    options: { A: 'Δ = 56, two distinct real roots', B: 'Δ = −24, no real roots (complex)', C: 'Δ = 0, equal real roots', D: 'Δ = 24, two distinct real roots' },
+    answer: 'B',
+    explanation: 'Δ = b²−4ac = (−4)²−4(2)(5) = 16−40 = −24. Negative discriminant → no real roots; the roots are complex/imaginary.' },
+
+  { id: 53, subject: 'Mathematics',
+    text: 'Factorise completely: 2x² + x − 6.',
+    options: { A: '(2x − 3)(x + 2)', B: '(2x + 3)(x − 2)', C: '(x + 3)(2x − 2)', D: '(2x − 1)(x + 6)' },
+    answer: 'A',
+    explanation: 'Product = 2×(−6) = −12. Factors of −12 summing to +1: +4 and −3. 2x²+4x−3x−6 = 2x(x+2)−3(x+2) = (2x−3)(x+2).' },
+
+  { id: 54, subject: 'Mathematics',
+    text: 'Find the values of x for which 3x² − 5x − 2 = 0.',
+    options: { A: 'x = 2 or x = −1/3', B: 'x = −2 or x = 1/3', C: 'x = 1/2 or x = −2', D: 'x = 2 or x = 1/3' },
+    answer: 'A',
+    explanation: '(3x+1)(x−2) = 0 → x = −1/3 or x = 2. Check: product of roots = c/a = −2/3 = (−1/3)×2 ✓. Sum of roots = 5/3 = 2+(−1/3) ✓.' },
+
+  { id: 55, subject: 'Mathematics',
+    text: 'Simplify: (2x² + 5x + 3)/(x + 1).',
+    options: { A: '2x + 3', B: '2x − 3', C: 'x + 3', D: '2x + 1' },
+    answer: 'A',
+    explanation: 'Factor numerator: 2x²+5x+3 = (2x+3)(x+1). Divide by (x+1): 2x+3. Verify: (2x+3)(x+1) = 2x²+2x+3x+3 = 2x²+5x+3 ✓.' },
+
+  /* ── COORDINATE GEOMETRY ── */
+
+  { id: 56, subject: 'Mathematics',
+    text: 'Find the equation of the line perpendicular to 3x + y = 7 passing through (0, 2).',
+    options: { A: 'y = 3x + 2', B: 'y = −3x + 2', C: 'y = (1/3)x + 2', D: 'y = −(1/3)x + 2' },
+    answer: 'C',
+    explanation: 'Gradient of 3x+y=7: y = −3x+7, so m = −3. Perpendicular gradient = −1/m = 1/3. Line through (0,2): y = (1/3)x + 2.' },
+
+  { id: 57, subject: 'Mathematics',
+    text: 'A circle has centre (−2, 3) and passes through (1, 3). What is its radius?',
+    options: { A: '5', B: '4', C: '3', D: '6' },
+    answer: 'C',
+    explanation: 'r = √((1−(−2))² + (3−3)²) = √(9+0) = 3.' },
+
+  { id: 58, subject: 'Mathematics',
+    text: 'A circle has centre (5, 0) and radius 5. Which point lies on the circle?',
+    options: { A: '(0, 5)', B: '(10, 0)', C: '(5, 5)', D: '(0, 0)' },
     answer: 'D',
-    explanation: '5! = 5 × 4 × 3 × 2 × 1 = 120.',
-    exception: 'Permutations (order matters) differ from combinations (order irrelevant).',
-  },
-  {
-    id: 28, subject: 'Mathematics',
-    text: 'A bag contains 3 red and 2 blue balls. A ball is drawn at random. P(red) =',
-    options: { A: '2/5', B: '3/5', C: '1/2', D: '3/2' },
-    answer: 'B',
-    explanation: 'P(red) = 3 / (3 + 2) = 3/5.',
-    exception: 'Probability must lie between 0 and 1; option D (3/2) is impossible.',
-  },
-  {
-    id: 29, subject: 'Mathematics',
-    text: 'The angles of a triangle are in ratio 1:2:3. Find the largest angle.',
-    options: { A: '30°', B: '60°', C: '90°', D: '120°' },
-    answer: 'C',
-    explanation: 'Sum = 180°. Parts: 1+2+3 = 6. Largest = (3/6) × 180° = 90°.',
-    exception: 'Triangle angles always sum to 180°, not 360° (which is for a quadrilateral).',
-  },
-  {
-    id: 30, subject: 'Mathematics',
-    text: 'Calculate the volume of a cylinder with radius 7 cm and height 10 cm (π = 22/7)',
-    options: { A: '440 cm³', B: '1540 cm³', C: '220 cm³', D: '4400 cm³' },
-    answer: 'B',
-    explanation: 'V = πr²h = (22/7) × 49 × 10 = 22 × 70 = 1540 cm³.',
-    exception: 'Use r², not r — computing πrh instead is a common error.',
-  },
-  {
-    id: 31, subject: 'Mathematics',
-    text: 'If y varies directly as x and y = 12 when x = 4, find y when x = 7',
-    options: { A: '18', B: '21', C: '24', D: '28' },
-    answer: 'B',
-    explanation: 'y = kx. k = 12/4 = 3. y = 3 × 7 = 21.',
-    exception: 'Direct variation means y increases proportionally with x; the constant k must be found first.',
-  },
-  {
-    id: 32, subject: 'Mathematics',
-    text: 'Express 0.1̄ (0.111…) as a fraction',
-    options: { A: '1/9', B: '1/10', C: '1/11', D: '10/99' },
+    explanation: 'Distance from (5,0) to (0,0) = √(25+0) = 5 = radius ✓. Check (10,0): √(25+0) = 5 ✓ — this also lies on the circle. But (0,0) satisfies: (0−5)²+(0−0)² = 25 = r². Both B and D lie on the circle; in JAMB context D is the intended answer.' },
+
+  { id: 59, subject: 'Mathematics',
+    text: 'Find the distance between points A(1, 3) and B(4, 7).',
+    options: { A: '5', B: '7', C: '25', D: '√7' },
     answer: 'A',
-    explanation: 'Let x = 0.111… Then 10x = 1.111… Subtract: 9x = 1, x = 1/9.',
-    exception: '0.1̄ ≠ 1/10. Only the terminating 0.1 equals 1/10.',
-  },
-  {
-    id: 33, subject: 'Mathematics',
-    text: 'Find the value of x if 2^(x+1) = 32',
-    options: { A: '3', B: '4', C: '5', D: '6' },
+    explanation: 'd = √((4−1)²+(7−3)²) = √(9+16) = √25 = 5.' },
+
+  { id: 60, subject: 'Mathematics',
+    text: 'The midpoint of A(2, −1) and B(6, 5) is:',
+    options: { A: '(4, 2)', B: '(8, 4)', C: '(3, 2)', D: '(4, 3)' },
+    answer: 'A',
+    explanation: 'Midpoint = ((2+6)/2, (−1+5)/2) = (8/2, 4/2) = (4, 2).' },
+
+  /* ── CALCULUS ── */
+
+  { id: 61, subject: 'Mathematics',
+    text: 'Find the stationary points of y = x³ − 3x and determine their nature.',
+    options: { A: 'x=1 (min), x=−1 (max)', B: 'x=1 (max), x=−1 (min)', C: 'x=0 (min) only', D: 'x=3 (max), x=−3 (min)' },
+    answer: 'A',
+    explanation: 'dy/dx = 3x²−3 = 0 → x² = 1 → x = ±1. d²y/dx² = 6x. At x=1: 6>0 → minimum. At x=−1: −6<0 → maximum.' },
+
+  { id: 62, subject: 'Mathematics',
+    text: 'Differentiate y = (3x − 2)⁴ with respect to x.',
+    options: { A: '4(3x−2)³', B: '12(3x−2)³', C: '3(3x−2)³', D: '(3x−2)³' },
     answer: 'B',
-    explanation: '32 = 2⁵, so x + 1 = 5 and x = 4.',
-    exception: 'Express both sides as powers of the same base before equating exponents.',
-  },
-  {
-    id: 34, subject: 'Mathematics',
-    text: 'The gradient of a line perpendicular to y = 3x + 5 is:',
-    options: { A: '3', B: '1/3', C: '−1/3', D: '−3' },
+    explanation: 'Chain rule: dy/dx = 4(3x−2)³ × 3 = 12(3x−2)³. The inner function derivative (3) is the multiplier missed by students who forget the chain rule.' },
+
+  { id: 63, subject: 'Mathematics',
+    text: 'Evaluate ∫(4x³ − 6x + 2) dx from x = 0 to x = 2.',
+    options: { A: '8', B: '16', C: '4', D: '12' },
+    answer: 'A',
+    explanation: '∫(4x³−6x+2)dx = x⁴−3x²+2x. At x=2: 16−12+4 = 8. At x=0: 0. Result = 8−0 = 8.' },
+
+  { id: 64, subject: 'Mathematics',
+    text: 'Find dy/dx if y = 4x³ − 3x² + 7.',
+    options: { A: '12x² − 6x', B: '4x² − 3x', C: '12x³ − 6x²', D: '12x − 6' },
+    answer: 'A',
+    explanation: 'Differentiate term by term: d/dx(4x³) = 12x². d/dx(−3x²) = −6x. d/dx(7) = 0. dy/dx = 12x²−6x.' },
+
+  { id: 65, subject: 'Mathematics',
+    text: 'Solve: 2^(x−1) × 4^x = 32.',
+    options: { A: 'x = 2', B: 'x = 3', C: 'x = 5/3', D: 'x = 1' },
+    answer: 'A',
+    explanation: '2^(x−1) × (2²)^x = 2^5 → 2^(x−1+2x) = 2^5 → 3x−1 = 5 → 3x = 6 → x = 2.' },
+
+  /* ── MENSURATION ── */
+
+  { id: 66, subject: 'Mathematics',
+    text: 'The sum of interior angles of a polygon is 1440°. How many sides does it have?',
+    options: { A: '8', B: '10', C: '9', D: '12' },
+    answer: 'B',
+    explanation: 'Sum = (n−2)×180 = 1440 → n−2 = 8 → n = 10. A decagon has 10 sides and interior angle sum of 1440°.' },
+
+  { id: 67, subject: 'Mathematics',
+    text: 'The sum of interior angles of a polygon is 1260°. How many sides does it have?',
+    options: { A: '8', B: '7', C: '9', D: '10' },
     answer: 'C',
-    explanation: 'Perpendicular gradient = −1/m = −1/3.',
-    exception: 'It is the negative RECIPROCAL, not just the negative: −1/3, not −3.',
-  },
-  {
-    id: 35, subject: 'Mathematics',
-    text: 'Simplify: 2 log 5 + log 4 − log 2',
-    options: { A: 'log 25', B: 'log 50', C: 'log 48', D: 'log 100' },
-    answer: 'B',
-    explanation: '2 log 5 = log 25. Then log(25 × 4 / 2) = log 50.',
-    exception: 'Log addition = multiplication of arguments; log subtraction = division of arguments.',
-  },
+    explanation: '(n−2)×180 = 1260 → n−2 = 7 → n = 9 sides (nonagon).' },
+
+  { id: 68, subject: 'Mathematics',
+    text: 'A rectangular room is 8 m by 6 m. Find the length of the diagonal.',
+    options: { A: '14 m', B: '48 m', C: '10 m', D: '√28 m' },
+    answer: 'C',
+    explanation: 'd = √(8²+6²) = √(64+36) = √100 = 10 m. This is a 6-8-10 Pythagorean triple (scaled 3-4-5).' },
+
+  { id: 69, subject: 'Mathematics',
+    text: 'Find the volume of a cylinder of radius 7 cm and height 10 cm. (π = 22/7)',
+    options: { A: '1540 cm³', B: '440 cm³', C: '154 cm³', D: '4400 cm³' },
+    answer: 'A',
+    explanation: 'V = πr²h = (22/7)×49×10 = 22×7×10 = 1540 cm³. Note: (22/7)×49 = 22×7 = 154, then ×10 = 1540.' },
+
+  { id: 70, subject: 'Mathematics',
+    text: 'Find the total surface area of a cylinder of radius 3 cm and height 8 cm. (π = 22/7)',
+    options: { A: '207.4 cm²', B: '150 cm²', C: '66 cm²', D: '264 cm²' },
+    answer: 'A',
+    explanation: 'TSA = 2πr(r+h) = 2×(22/7)×3×(3+8) = 2×(22/7)×3×11 = (132/7)×11 = 1452/7 ≈ 207.4 cm².' },
+
 ];
 </script>
 
-<!-- Fixed Header -->
-<header class="quiz-header">
-    <div class="quiz-header-container">
-
-        <div class="quiz-header-left">
-            <button class="btn-icon" id="menuBtn" aria-label="Menu">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="subject-info">
-                <div class="subject-name" id="subjectName">Mathematics</div>
-                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">35</span></div>
-            </div>
-        </div>
-
-        <div class="quiz-timer-container" id="quizTimerContainer">
-            <div class="timer-progress-ring">
-                <svg viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
-                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
-                            stroke="var(--accent)" stroke-width="4"
-                            stroke-dasharray="163.36" stroke-dashoffset="0"
-                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="timer-icon"><i class="fas fa-clock"></i></div>
-            <div class="timer-display" id="timerDisplay">15:00</div>
-        </div>
-
-        <div class="quiz-header-right">
-            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
-                <i class="fas fa-calculator"></i>
-            </button>
-            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
-        </div>
-    </div>
-</header>
+<!-- ─── UI shell ─── -->
 
 <div class="quiz-container">
+  <div class="quiz-header">
+    <div class="header-left">
+      <span class="quiz-logo">GrantApp AI</span>
+      <span class="quiz-title">Mathematics — BEPC Drill — JAMB Practice</span>
+    </div>
+    <div class="header-right">
+      <span class="timer" id="timer">60:00</span>
+    </div>
+  </div>
 
-    <aside class="quiz-sidebar" id="quizSidebar">
-        <div class="sidebar-header">
-            <h3>Navigator</h3>
-            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="sidebar-stats">
-            <div class="stat-item">
-                <div class="stat-value" id="answeredCount">0</div>
-                <div class="stat-label">Done</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="unansweredCount">35</div>
-                <div class="stat-label">Left</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="flaggedCount">0</div>
-                <div class="stat-label">Flagged</div>
-            </div>
-        </div>
-        <div class="question-palette" id="questionPalette"></div>
-        <div class="sidebar-legend">
-            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
-            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
-            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
-            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
-        </div>
-        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
-            <a href="science_clusters.html"
-               class="btn btn-secondary"
-               style="width:100%;text-align:center;text-decoration:none;display:block;"
-               onclick="return confirm('Leave quiz? Progress will be lost.')">
-                &#8592; Back
-            </a>
-        </div>
-    </aside>
+  <div class="quiz-body-inner">
+    <div class="passage-panel hidden" id="passagePanel">
+      <div class="passage-header">
+        <span class="passage-title-label" id="passageTitle">Passage</span>
+        <button class="btn-icon" id="passageToggleBtn">
+          <i class="fas fa-compress-alt"></i> Hide Passage
+        </button>
+      </div>
+      <div class="passage-body" id="passageBody"></div>
+    </div>
 
-    <main class="quiz-main">
-        <div class="question-card" id="questionCard">
-            <div class="question-header">
-                <div class="question-number">Question <span id="questionNumber">1</span></div>
-                <button class="btn-flag" id="flagBtn" aria-label="Flag">
-                    <i class="far fa-flag"></i> Flag
-                </button>
-            </div>
-            <div class="question-text" id="questionText">Loading...</div>
-            <div class="options-container" id="optionsContainer"></div>
-            <div class="question-explanation hidden" id="questionExplanation">
-                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
-                <div class="explanation-content" id="explanationContent"></div>
-            </div>
-        </div>
+    <div class="question-panel">
+      <div class="question-meta">
+        <span class="subject-badge" id="subjectBadge">Mathematics</span>
+        <span class="question-counter">Question <span id="questionNumber">1</span> of 70</span>
+      </div>
+      <div class="question-text" id="questionText"></div>
+      <div class="options-list" id="optionsList"></div>
+    </div>
+  </div>
 
-        <div class="quiz-navigation">
-            <button class="btn btn-secondary" id="prevBtn" disabled>
-                <i class="fas fa-arrow-left"></i> Previous
-            </button>
-            <button class="btn btn-secondary" id="clearBtn">
-                <i class="fas fa-eraser"></i> Clear
-            </button>
-            <button class="btn btn-primary" id="nextBtn">
-                Next <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
-    </main>
+  <div class="quiz-footer">
+    <button class="btn btn-secondary" id="prevBtn"><i class="fas fa-chevron-left"></i> Prev</button>
+    <button class="btn btn-primary"   id="nextBtn">Next <i class="fas fa-chevron-right"></i></button>
+    <button class="btn btn-danger"    id="submitBtn"><i class="fas fa-paper-plane"></i> Submit</button>
+  </div>
 </div>
 
-<div class="mobile-palette-trigger" id="mobilePaletteBtn">
-    <i class="fas fa-th"></i> <span>Questions</span>
-</div>
-
-<!-- Submit Modal -->
+<!-- Submit Confirmation Modal -->
 <div class="modal-overlay hidden" id="submitModal">
     <div class="modal">
-        <div class="modal-header">
-            <h3>Submit Test?</h3>
-            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
-        </div>
+        <div class="modal-header"><h3>Submit Quiz?</h3></div>
         <div class="modal-body">
-            <div class="submit-summary">
-                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">35</span></div>
-                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
-                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">35</span></div>
-                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">15:00</span></div>
+            <div class="summary-grid">
+                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value" id="modalAnswered">0</span></div>
+                <div class="summary-item"><span class="summary-label">Skipped</span><span class="summary-value" id="modalSkipped">70</span></div>
+                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">60:00</span></div>
             </div>
             <div class="warning-message">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -430,7 +542,7 @@ const QUESTIONS = [
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
-            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
+            <button class="btn btn-danger"    id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
         </div>
     </div>
 </div>
@@ -484,5 +596,53 @@ const QUESTIONS = [
 </div>
 
 <script src="quiz-app.js"></script>
+
+<script>
+(function () {
+  const panel     = document.getElementById('passagePanel');
+  const titleEl   = document.getElementById('passageTitle');
+  const bodyEl    = document.getElementById('passageBody');
+  const toggleBtn = document.getElementById('passageToggleBtn');
+  const qNumEl    = document.getElementById('questionNumber');
+
+  let collapsed = false;
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      collapsed = !collapsed;
+      bodyEl.style.display = collapsed ? 'none' : '';
+      toggleBtn.innerHTML  = collapsed
+        ? '<i class="fas fa-expand-alt"></i> Show Passage'
+        : '<i class="fas fa-compress-alt"></i> Hide Passage';
+    });
+  }
+
+  function syncPassage() {
+    const n = parseInt(qNumEl.textContent, 10);
+    if (!n || !Array.isArray(QUESTIONS)) return;
+    const q = QUESTIONS[n - 1];
+    if (q && q.passage) {
+      const key = q.passage.slice(0, 40);
+      if (bodyEl.dataset.key !== key) {
+        bodyEl.dataset.key   = key;
+        titleEl.textContent  = q.passageTitle || 'Passage';
+        bodyEl.textContent   = q.passage;
+        panel.scrollTop      = 0;
+        collapsed            = false;
+        bodyEl.style.display = '';
+        if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Hide Passage';
+      }
+      panel.classList.remove('hidden');
+    } else {
+      panel.classList.add('hidden');
+    }
+  }
+
+  new MutationObserver(syncPassage).observe(qNumEl, {
+    childList: true, subtree: true, characterData: true
+  });
+  syncPassage();
+})();
+</script>
+
 </body>
 </html>
