@@ -1,554 +1,1171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Chemistry Calculations Drill · GrantApp AI</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="stylesheet" href="quiz-styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Paper 6 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* noise grain */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── WATERMARK ── */
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem;
+      padding: 1rem;
+      transform: rotate(-20deg) scale(1.5);
+      transform-origin: center center;
+      opacity: 0.022;
+      font-family: var(--mono);
+      font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em;
+      white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: rgba(10,14,26,0.92);
+      border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+
+    /* greeting chip */
+    .hdr-greeting {
+      font-size: 11px; color: var(--ter);
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--mono); letter-spacing: 0.05em;
+    }
+
+    /* timer */
+    .gtimer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      flex-shrink: 0;
+    }
+    .gtimer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+      transition: background .3s;
+    }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; color: var(--accent); transition: color .3s;
+    }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; padding: 12px 20px 8px;
+      position: relative; z-index: 1;
+    }
+    .sc {
+      background: var(--card); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+      border: 1px solid var(--sep);
+    }
+    .sc-v {
+      font-family: var(--mono); font-size: 18px; font-weight: 700;
+      color: var(--text);
+    }
+    .sc-v.c { color: var(--green); }
+    .sc-v.w { color: var(--red); }
+    .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* progress bar */
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 99px; transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── QUESTION CARDS ── */
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+
+    .qcard {
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 14px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .qcard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep);
+      gap: 10px;
+    }
+    .qnum {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .qtopic {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.18);
+      color: var(--accent); letter-spacing: 0.3px;
+    }
+
+    .qtxt {
+      font-size: 15px; line-height: 1.72;
+      color: var(--text); font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    /* options */
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-radius: 10px;
+      border: 1px solid var(--sep);
+      background: var(--card2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .opt.sel   { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+
+    .opt-key {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--accent); flex-shrink: 0;
+      width: 18px; padding-top: 1px;
+    }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+
+    /* check button */
+    .abtn {
+      margin-top: 12px; width: 100%;
+      padding: 11px; border-radius: 10px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+
+    /* explanation */
+    .exp {
+      display: none; margin-top: 12px;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.18);
+      border-radius: 10px; padding: 14px;
+      font-size: 13px; line-height: 1.68;
+      color: var(--sec);
+    }
+    .exp.show { display: block; }
+    .exp-mark {
+      display: inline-block; margin-bottom: 8px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
+
+    /* ── SUBMIT BAR ── */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,14,26,0.96);
+      border-top: 1px solid var(--sep);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .submit-btn {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress {
+      font-family: var(--mono); font-size: 11px; color: var(--ter);
+      white-space: nowrap;
+    }
+
+    /* ── TIME UP OVERLAY ── */
+    .timeup {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,14,26,0.96);
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .timeup.show { display: flex; }
+    .timeup-box {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl {
+      font-family: var(--mono); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .timeup-score {
+      font-family: var(--mono); font-size: 2rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .timeup-score.pos { color: var(--green); }
+    .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .tu-stat-v {
+      font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text);
+    }
+    .tu-stat-v.c { color: var(--green); }
+    .tu-stat-v.w { color: var(--red); }
+    .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #000;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .timeup-btn.sec {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
+    }
+
+    /* ── SUBMIT MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 16px; width: 100%; max-width: 400px;
+      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.96) translateY(8px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    .modal h3 {
+      font-family: var(--mono); font-size: 1rem; font-weight: 700;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--sep);
+      font-size: 13px; color: var(--ter);
+    }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep);
+    }
+
+    /* ── PRINT / PDF ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar,
+      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important;
+        border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important;
+        background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
+      .opt-txt { color: #000 !important; }
+      .qtxt    { color: #000 !important; }
+      .qtopic  { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
+      #print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 24pt;
+        padding-bottom: 12pt;
+        border-bottom: 2pt solid #000;
+      }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  
+/* ── AUTH GATE ── */
+#auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
+#auth-gate.unlocked { display:none; }
+.gate-box { background:var(--surface,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+.gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#6e8efb);margin-bottom:1rem; }
+.gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
+.gate-sub { font-size:0.85rem;color:var(--muted,#8b949e);margin:0 0 1.5rem; }
+.gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
+.gate-input:focus { border-color:var(--accent,#6e8efb); }
+.gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
+.gate-btn { width:100%;padding:0.8rem;background:var(--accent,#6e8efb);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:0.5rem; }
+.gate-btn:hover { opacity:0.88; }
+</style>
 </head>
-<body class="quiz-body">
+<body>
 
-<script>
-/* ─────────────────────────────────────────────────────────────
-   DURATION  2,400 s = 40 min (1 min per question)
-   CONSTANTS (given in relevant questions)
-   F = 96,500 C mol⁻¹   R = 8.314 J mol⁻¹ K⁻¹
-   Faraday key formula:  m = (I × t × Mr) / (z × F)
-   where  I = current (A), t = time (s),
-          Mr = molar mass (g/mol), z = electrons per ion
-─────────────────────────────────────────────────────────────── */
-const DURATION = 2400;
+<!-- print-only header (hidden on screen) -->
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Chemistry Paper 6</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
 
-const QUESTIONS = [
+<!-- watermark (personalised by JS from sessionStorage) -->
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Chemistry · Paper 6</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password">
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
 
-  /* ══════════════════════════════════════════════════════
-     ELECTROCHEMISTRY — 24 QUESTIONS
-     Q1–8   : Charge and mass deposition (core Faraday)
-     Q9–14  : Current, time, and moles of electrons
-     Q15–18 : Multi-step and word problems
-     Q19–22 : Cell type, electrode ID, half-equations
-     Q23–24 : Standard electrode potential / EMF
-  ══════════════════════════════════════════════════════ */
+<div id="watermark" aria-hidden="true"></div>
 
-  /* ── CHARGE ── */
-
-  { id:1,
-    text:"A current of 5 A flows through an electrolytic cell for 10 minutes. What is the total charge passed? (Q = It)",
-    options:{A:"50 C",B:"500 C",C:"3000 C",D:"300 C"},
-    answer:"C", subject:"Chemistry",
-    explanation:"Q = I × t. Convert time: 10 min = 600 s. Q = 5 × 600 = 3000 C. Always convert minutes to seconds before using Q = It." },
-
-  { id:2,
-    text:"A charge of 9650 C is passed through a solution of copper(II) sulphate. How many moles of electrons does this represent? (F = 96,500 C mol⁻¹)",
-    options:{A:"0.1 mol",B:"1 mol",C:"10 mol",D:"0.01 mol"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Moles of electrons = Q/F = 9650/96500 = 0.1 mol. The Faraday constant (96,500 C mol⁻¹) is the charge carried by one mole of electrons." },
-
-  { id:3,
-    text:"How many coulombs of charge are needed to deposit exactly 1 mole of silver? (Ag⁺ + e⁻ → Ag;  F = 96,500 C mol⁻¹)",
-    options:{A:"193,000 C",B:"48,250 C",C:"96,500 C",D:"9,650 C"},
-    answer:"C", subject:"Chemistry",
-    explanation:"Ag⁺ → Ag requires z = 1 electron per ion. 1 mol Ag needs 1 mol electrons = 1 × F = 96,500 C. If the ion were Cu²⁺, z = 2 so 2 × 96,500 = 193,000 C would be needed for 1 mol Cu." },
-
-  { id:4,
-    text:"A current of 2 A is passed for 1 hour through a silver nitrate solution. What charge is transferred? (1 hour = 3600 s)",
-    options:{A:"7,200 C",B:"720 C",C:"2 C",D:"3,600 C"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Q = I × t = 2 × 3600 = 7,200 C. Always express time in seconds. 1 hour = 3600 s." },
-
-  /* ── MASS DEPOSITION — m = ItMr/(zF) ── */
-
-  { id:5,
-    text:"What mass of copper is deposited when a current of 2 A flows for 965 s through CuSO₄ solution? (Cu²⁺ + 2e⁻ → Cu;  Mr Cu = 64, F = 96,500 C mol⁻¹)",
-    options:{A:"0.32 g",B:"0.64 g",C:"1.28 g",D:"0.16 g"},
-    answer:"B", subject:"Chemistry",
-    explanation:"m = (I × t × Mr)/(z × F) = (2 × 965 × 64)/(2 × 96500) = 123,520/193,000 = 0.64 g. z = 2 for Cu²⁺. Check: Q = 1930 C; moles e⁻ = 1930/96500 = 0.02; moles Cu = 0.02/2 = 0.01; mass = 0.01 × 64 = 0.64 g ✓" },
-
-  { id:6,
-    text:"A current of 3 A flows for 1930 s through molten AlCl₃. What mass of aluminium is deposited at the cathode? (Al³⁺ + 3e⁻ → Al;  Mr Al = 27, F = 96,500 C mol⁻¹)",
-    options:{A:"1.62 g",B:"0.54 g",C:"2.43 g",D:"0.81 g"},
-    answer:"B", subject:"Chemistry",
-    explanation:"m = ItMr/(zF). Q = 3 × 1930 = 5790 C. Moles e⁻ = 5790/96500 = 0.06 mol. Moles Al = 0.06/3 = 0.02 mol (z = 3 for Al³⁺). Mass Al = 0.02 × 27 = 0.54 g. Cross-check: (3 × 1930 × 27)/(3 × 96500) = 156,330/289,500 = 0.54 g ✓" },
-
-  { id:7,
-    text:"How long must a current of 4 A flow to deposit 2.16 g of silver from AgNO₃ solution? (Ag⁺ + e⁻ → Ag;  Mr Ag = 108, F = 96,500 C mol⁻¹)",
-    options:{A:"482.5 s",B:"965 s",C:"193 s",D:"4825 s"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Rearrange m = ItMr/(zF) → t = mzF/(IMr). t = (2.16 × 1 × 96500)/(4 × 108) = 208,440/432 = 482.5 s. Or: moles Ag = 2.16/108 = 0.02; moles e⁻ = 0.02; Q = 0.02 × 96500 = 1930 C; t = Q/I = 1930/4 = 482.5 s." },
-
-  { id:8,
-    text:"What current is needed to deposit 0.64 g of copper in exactly 10 minutes from CuSO₄ solution? (Cu²⁺ + 2e⁻ → Cu;  Mr Cu = 64, F = 96,500 C mol⁻¹)",
-    options:{A:"1.93 A",B:"3.22 A",C:"0.97 A",D:"6.43 A"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Moles Cu = 0.64/64 = 0.01 mol. Moles e⁻ = 0.01 × 2 = 0.02 mol (z = 2). Q = 0.02 × 96500 = 1930 C. t = 10 × 60 = 600 s. I = Q/t = 1930/600 = 3.22 A. Rearranging the Faraday equation: I = mzF/(tMr) = (0.64 × 2 × 96500)/(600 × 64) = 123,520/38,400 = 3.22 A ✓" },
-
-  { id:9,
-    text:"A current of 10 A flows for 965 s through dilute sulphuric acid. What volume of hydrogen gas is produced at the cathode at STP? (2H⁺ + 2e⁻ → H₂;  F = 96,500 C mol⁻¹, molar volume at STP = 22.4 L mol⁻¹)",
-    options:{A:"0.56 L",B:"1.12 L",C:"2.24 L",D:"0.28 L"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Q = 10 × 965 = 9650 C. Moles e⁻ = 9650/96500 = 0.1 mol. Moles H₂ = 0.1/2 = 0.05 mol (z = 2 electrons per H₂ molecule). Volume = 0.05 × 22.4 = 1.12 L." },
-
-  { id:10,
-    text:"In the electrolysis of CuSO₄, if 0.04 mol of electrons are transferred, what mass of copper is deposited? (Mr Cu = 64)",
-    options:{A:"1.28 g",B:"2.56 g",C:"0.64 g",D:"0.32 g"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Cu²⁺ + 2e⁻ → Cu. 0.04 mol e⁻ → 0.04/2 = 0.02 mol Cu. Mass = 0.02 × 64 = 1.28 g. z = 2 for Cu²⁺, so always halve the moles of electrons to get moles of copper." },
-
-  { id:11,
-    text:"In the electrolysis of molten MgCl₂, how many moles of magnesium are deposited by 0.3 mol of electrons? (Mg²⁺ + 2e⁻ → Mg)",
-    options:{A:"0.3 mol",B:"0.6 mol",C:"0.15 mol",D:"0.1 mol"},
-    answer:"C", subject:"Chemistry",
-    explanation:"Mg²⁺ requires 2 electrons per ion. Moles Mg = 0.3/2 = 0.15 mol. This is the electrochemical equivalent approach without using F directly — useful as a two-step shortcut." },
-
-  { id:12,
-    text:"What current must flow for 30 minutes to deposit 0.54 g of aluminium from molten AlCl₃? (Al³⁺ + 3e⁻ → Al;  Mr Al = 27, F = 96,500 C mol⁻¹)",
-    options:{A:"3.21 A",B:"1.07 A",C:"9.65 A",D:"6.43 A"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Moles Al = 0.54/27 = 0.02 mol. Moles e⁻ = 0.02 × 3 = 0.06 mol. Q = 0.06 × 96500 = 5790 C. t = 30 × 60 = 1800 s. I = Q/t = 5790/1800 = 3.217 ≈ 3.21 A." },
-
-  { id:13,
-    text:"The same current flows simultaneously through two electrolytic cells in series — one containing AgNO₃, one containing CuSO₄. If 2.16 g of silver is deposited, what mass of copper is deposited? (Ag⁺ + e⁻ → Ag;  Cu²⁺ + 2e⁻ → Cu;  Mr Ag = 108, Mr Cu = 64)",
-    options:{A:"0.64 g",B:"1.28 g",C:"0.32 g",D:"2.56 g"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Same current through series cells = same Q and same moles of electrons. Moles Ag = 2.16/108 = 0.02 mol. Moles e⁻ = 0.02 × 1 = 0.02 mol (Ag, z=1). Moles Cu = 0.02/2 = 0.01 mol (Cu²⁺, z=2). Mass Cu = 0.01 × 64 = 0.64 g. Faraday's second law: masses deposited are proportional to Mr/z (electrochemical equivalent)." },
-
-  { id:14,
-    text:"How many moles of chlorine gas are produced at the anode when 0.2 mol of electrons flow during electrolysis of concentrated NaCl solution? (2Cl⁻ → Cl₂ + 2e⁻)",
-    options:{A:"0.2 mol",B:"0.4 mol",C:"0.1 mol",D:"0.05 mol"},
-    answer:"C", subject:"Chemistry",
-    explanation:"2 mol e⁻ → 1 mol Cl₂. 0.2 mol e⁻ → 0.2/2 = 0.1 mol Cl₂. At the anode, oxidation occurs (Cl⁻ loses electrons). The 2:1 electron-to-Cl₂ ratio comes directly from the half-equation." },
-
-  { id:15,
-    text:"An electrolysis cell runs at 5 A for 32 minutes and 10 seconds. What charge is transferred?",
-    options:{A:"9650 C",B:"8050 C",C:"965 C",D:"3210 C"},
-    answer:"A", subject:"Chemistry",
-    explanation:"t = (32 × 60) + 10 = 1920 + 10 = 1930 s. Q = I × t = 5 × 1930 = 9650 C. Note that 9650/96500 = 0.1 mol electrons. The time conversion (minutes + seconds) is where most errors occur." },
-
-  { id:16,
-    text:"A nickel plating bath operates at 3 A. What time is needed to deposit a nickel coating of 0.876 g? (Ni²⁺ + 2e⁻ → Ni;  Mr Ni = 58.4, F = 96,500 C mol⁻¹)",
-    options:{A:"965 s",B:"1930 s",C:"482.5 s",D:"3860 s"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Moles Ni = 0.876/58.4 = 0.015 mol. Moles e⁻ = 0.015 × 2 = 0.03 mol. Q = 0.03 × 96500 = 2895 C. t = Q/I = 2895/3 = 965 s. (~16 minutes)" },
-
-  { id:17,
-    text:"In a Hoffman voltameter using dilute H₂SO₄, hydrogen and oxygen are collected at the electrodes. If 48 cm³ of oxygen is collected at STP, what volume of hydrogen is simultaneously collected?",
-    options:{A:"24 cm³",B:"48 cm³",C:"96 cm³",D:"12 cm³"},
-    answer:"C", subject:"Chemistry",
-    explanation:"Electrode reactions: Cathode: 2H⁺ + 2e⁻ → H₂. Anode: 2H₂O → O₂ + 4H⁺ + 4e⁻. Mole ratio H₂:O₂ = 2:1. Volume ratio = 2:1 (equal T and P). 48 cm³ O₂ → 96 cm³ H₂." },
-
-  { id:18,
-    text:"In the electrolysis of a zinc sulphate solution, 6.54 g of zinc is deposited. How many coulombs were used? (Zn²⁺ + 2e⁻ → Zn;  Mr Zn = 65.4, F = 96,500 C mol⁻¹)",
-    options:{A:"9,650 C",B:"19,300 C",C:"4,825 C",D:"38,600 C"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Moles Zn = 6.54/65.4 = 0.1 mol. Moles e⁻ = 0.1 × 2 = 0.2 mol (z=2). Q = 0.2 × 96500 = 19,300 C. Cross-check using Faraday formula directly: Q = mzF/Mr = (6.54 × 2 × 96500)/65.4 = 19,300 C ✓" },
-
-  /* ── CELL TYPE, ELECTRODE ID, HALF-EQUATIONS ── */
-
-  { id:19,
-    text:"In a Daniell cell (Zn | ZnSO₄ || CuSO₄ | Cu), which electrode is the ANODE and what process occurs there?",
-    options:{A:"Copper; reduction (Cu²⁺ + 2e⁻ → Cu)",B:"Zinc; oxidation (Zn → Zn²⁺ + 2e⁻)",C:"Zinc; reduction (Zn²⁺ + 2e⁻ → Zn)",D:"Copper; oxidation (Cu → Cu²⁺ + 2e⁻)"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Anode = oxidation (AN OX). In a galvanic (voltaic) cell, the anode is the negative terminal. Zinc is oxidised (loses electrons): Zn → Zn²⁺ + 2e⁻. The cathode (positive terminal) is copper: Cu²⁺ + 2e⁻ → Cu." },
-
-  { id:20,
-    text:"In an electrolytic cell, the CATHODE is the electrode connected to the NEGATIVE terminal of the power supply. Which process occurs at the cathode?",
-    options:{A:"Oxidation — the electrode gains electrons from the solution",B:"Reduction — cations from solution gain electrons and are deposited",C:"Oxidation — anions lose electrons to the electrode",D:"No reaction occurs at the cathode"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Cathode in any cell: reduction (RED CAT). In electrolysis, cations (positive ions) migrate to the cathode, gain electrons, and are reduced/deposited. In a galvanic cell, the cathode is the positive terminal (opposite to electrolytic)." },
-
-  { id:21,
-    text:"During the electrolysis of dilute NaCl solution, which product is formed at the ANODE?",
-    options:{A:"Sodium metal",B:"Chlorine gas",C:"Oxygen gas",D:"Hydrogen gas"},
-    answer:"C", subject:"Chemistry",
-    explanation:"In DILUTE NaCl, water is preferentially oxidised at the anode: 2H₂O → O₂ + 4H⁺ + 4e⁻ → oxygen gas. In CONCENTRATED NaCl (brine), chloride ions are in excess and Cl₂ is discharged preferentially. Concentration determines the product — a critical distinction." },
-
-  { id:22,
-    text:"During the electrolysis of concentrated NaCl solution (brine), what are the THREE products?",
-    options:{A:"Na, Cl₂, H₂O",B:"NaOH, Cl₂, H₂",C:"Na₂O, HCl, H₂",D:"NaOH, O₂, Na"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Cathode: 2H⁺ + 2e⁻ → H₂ (hydrogen gas). Anode: 2Cl⁻ → Cl₂ + 2e⁻ (chlorine gas, preferred in concentrated Cl⁻). Remaining solution: Na⁺ + OH⁻ → NaOH (sodium hydroxide). This is the chlor-alkali process — one of the most important industrial electrolytic processes." },
-
-  /* ── STANDARD ELECTRODE POTENTIAL / EMF ── */
-
-  { id:23,
-    text:"Given: E°(Zn²⁺/Zn) = −0.76 V and E°(Cu²⁺/Cu) = +0.34 V. What is the standard EMF of the Daniell cell?",
-    options:{A:"−1.10 V",B:"+0.42 V",C:"+1.10 V",D:"−0.42 V"},
-    answer:"C", subject:"Chemistry",
-    explanation:"E°cell = E°cathode − E°anode = E°(Cu²⁺/Cu) − E°(Zn²⁺/Zn) = 0.34 − (−0.76) = 0.34 + 0.76 = +1.10 V. A positive EMF confirms the reaction is spontaneous. The more negative electrode (Zn) is always the anode in a spontaneous cell." },
-
-  { id:24,
-    text:"Using standard electrode potentials: E°(Fe²⁺/Fe) = −0.44 V, E°(Sn²⁺/Sn) = −0.14 V. Which metal will spontaneously reduce the other's ions?",
-    options:{A:"Tin (Sn) reduces Fe²⁺",B:"Iron (Fe) reduces Sn²⁺ — Fe is the stronger reducing agent",C:"Neither reacts spontaneously",D:"Both reduce each other simultaneously"},
-    answer:"B", subject:"Chemistry",
-    explanation:"The more negative E° = stronger reducing agent. Fe (E° = −0.44 V) is a stronger reducing agent than Sn (E° = −0.14 V). Fe will spontaneously reduce Sn²⁺: Fe + Sn²⁺ → Fe²⁺ + Sn. E°cell = −0.14 − (−0.44) = +0.30 V (positive → spontaneous)." },
-
-  /* ══════════════════════════════════════════════════════
-     EQUILIBRIUM — 11 QUESTIONS
-     Q25–28 : Kc — writing expressions and calculating
-     Q29–32 : Ka, pKa, pH from Ka
-     Q33–35 : Le Chatelier quantitative and Kp intro
-  ══════════════════════════════════════════════════════ */
-
-  { id:25,
-    text:"Write the Kc expression for: N₂(g) + 3H₂(g) ⇌ 2NH₃(g)",
-    options:{
-      A:"Kc = [N₂][H₂]³ / [NH₃]²",
-      B:"Kc = [NH₃]² / ([N₂][H₂]³)",
-      C:"Kc = [NH₃]² / ([N₂][H₂])",
-      D:"Kc = 2[NH₃] / ([N₂] + 3[H₂])"
-    },
-    answer:"B", subject:"Chemistry",
-    explanation:"Kc = [products]^stoich / [reactants]^stoich. Numerator: [NH₃]² (coefficient 2). Denominator: [N₂]¹ × [H₂]³. Pure solids and liquids are omitted. The stoichiometric coefficients become exponents." },
-
-  { id:26,
-    text:"At equilibrium, [H₂] = 0.2 mol/L, [I₂] = 0.2 mol/L, [HI] = 0.8 mol/L for: H₂ + I₂ ⇌ 2HI. Calculate Kc.",
-    options:{A:"4",B:"16",C:"0.0625",D:"8"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Kc = [HI]² / ([H₂][I₂]) = (0.8)² / (0.2 × 0.2) = 0.64 / 0.04 = 16. A large Kc (≫1) means the equilibrium lies toward products — HI is favoured." },
-
-  { id:27,
-    text:"For the equilibrium: CH₃COOH(aq) ⇌ CH₃COO⁻(aq) + H⁺(aq), Kc = Ka = 1.8×10⁻⁵ mol/L at 25°C. If the initial concentration of acetic acid is 0.1 mol/L, and using the approximation that x ≪ 0.1, what is the [H⁺] at equilibrium?",
-    options:{A:"1.8×10⁻³ mol/L",B:"1.34×10⁻³ mol/L",C:"1.8×10⁻⁵ mol/L",D:"1.8×10⁻⁴ mol/L"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Ka = x²/(0.1 − x) ≈ x²/0.1. x² = Ka × 0.1 = 1.8×10⁻⁵ × 0.1 = 1.8×10⁻⁶. x = √(1.8×10⁻⁶) = 1.34×10⁻³ mol/L. [H⁺] = 1.34×10⁻³ mol/L. (The approximation x≪0.1 holds since 1.34×10⁻³ ≪ 0.1.)" },
-
-  { id:28,
-    text:"The Ka of ethanoic acid is 1.8×10⁻⁵ mol/L. What is its pKa?",
-    options:{A:"4.74",B:"5.26",C:"−4.74",D:"0.53"},
-    answer:"A", subject:"Chemistry",
-    explanation:"pKa = −log(Ka) = −log(1.8×10⁻⁵) = −(log1.8 + log10⁻⁵) = −(0.255 − 5) = 4.745 ≈ 4.74. Memory: pKa for ethanoic acid ≈ 4.74 — a standard benchmark. Lower pKa = stronger acid (Ka values: HCl >> CH₃COOH)." },
-
-  { id:29,
-    text:"The pKa of a weak acid is 5.0. What is its Ka?",
-    options:{A:"5.0×10⁻⁵ mol/L",B:"1.0×10⁻⁵ mol/L",C:"2.0×10⁻⁵ mol/L",D:"1.0×10⁵ mol/L"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Ka = 10^(−pKa) = 10^(−5) = 1.0×10⁻⁵ mol/L. The relationship pKa = −log(Ka) is the exact inverse of pH = −log[H⁺]." },
-
-  { id:30,
-    text:"A weak acid HX has Ka = 4×10⁻⁵ mol/L. What is the pH of a 0.1 mol/L solution? (Assume x ≪ 0.1)",
-    options:{A:"pH = 2.7",B:"pH = 3.2",C:"pH = 4.5",D:"pH = 5.0"},
-    answer:"A", subject:"Chemistry",
-    explanation:"[H⁺] = √(Ka × C) = √(4×10⁻⁵ × 0.1) = √(4×10⁻⁶) = 2×10⁻³ mol/L. pH = −log(2×10⁻³) = 3 − log2 = 3 − 0.301 = 2.70. Key steps: Ka×C first, then square root for [H⁺], then apply pH = −log[H⁺]. This two-step [H⁺] = √(KaC) shortcut only works when x ≪ C." },
-
-  { id:31,
-    text:"For the reaction CO(g) + 3H₂(g) ⇌ CH₄(g) + H₂O(g), which expression for Kc is correct?",
-    options:{
-      A:"Kc = [CH₄][H₂O] / ([CO][H₂]³)",
-      B:"Kc = [CO][H₂]³ / ([CH₄][H₂O])",
-      C:"Kc = [CH₄][H₂O] / ([CO][H₂])",
-      D:"Kc = [CH₄] / ([CO][H₂]³)"
-    },
-    answer:"A", subject:"Chemistry",
-    explanation:"Kc = products/reactants with stoichiometric exponents. Numerator: [CH₄]¹[H₂O]¹. Denominator: [CO]¹[H₂]³. Note that all species are gases here — none are excluded." },
-
-  { id:32,
-    text:"At 500°C, Kc = 0.040 for N₂ + 3H₂ ⇌ 2NH₃. If the equilibrium concentrations are [N₂] = 0.50 mol/L and [H₂] = 0.30 mol/L, what is [NH₃] at equilibrium?",
-    options:{A:"3.6×10⁻² mol/L",B:"0.60 mol/L",C:"1.8×10⁻² mol/L",D:"1.80 mol/L"},
-    answer:"C", subject:"Chemistry",
-    explanation:"Kc = [NH₃]²/([N₂][H₂]³). [NH₃]² = Kc × [N₂] × [H₂]³ = 0.040 × 0.50 × (0.30)³ = 0.040 × 0.50 × 0.027 = 0.040 × 0.0135 = 5.4×10⁻⁴. [NH₃] = √(5.4×10⁻⁴) = 0.0232 ≈ 0.023 mol/L. Closest to 1.8×10⁻² — let me recheck. 0.040×0.50×0.027 = 0.00054; √0.00054 = 0.02324. Closest option is C (1.8×10⁻²)." },
-
-  { id:33,
-    text:"For the equilibrium PCl₅(g) ⇌ PCl₃(g) + Cl₂(g), Kc = 0.045 mol/L at 250°C. Which statement correctly applies Le Chatelier's principle if the pressure is increased?",
-    options:{A:"Equilibrium shifts right; more PCl₃ and Cl₂ form",B:"Equilibrium shifts left; more PCl₅ forms — the side with fewer moles of gas is favoured",C:"Kc changes value at higher pressure",D:"Equilibrium shifts right because Kc > 1"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Increasing pressure favours the side with FEWER moles of gas. Left side: 1 mol gas (PCl₅). Right side: 2 mol gas (PCl₃ + Cl₂). Equilibrium shifts LEFT → more PCl₅. Kc itself does not change with pressure — only temperature changes Kc." },
-
-  { id:34,
-    text:"For an endothermic equilibrium reaction, raising the temperature will:",
-    options:{A:"Decrease Kc — the reverse (exothermic) direction is favoured",B:"Increase Kc — equilibrium shifts in the forward (endothermic) direction",C:"Have no effect on Kc since temperature only affects rate",D:"Decrease Kc and shift the equilibrium left"},
-    answer:"B", subject:"Chemistry",
-    explanation:"For endothermic reactions: +ΔH. Raising T supplies energy → equilibrium shifts in the forward direction → more products → Kc increases. For exothermic reactions, raising T decreases Kc. Temperature is the only factor that changes the numerical value of K." },
-
-  { id:35,
-    text:"At a given temperature, a 0.5 mol/L solution of a weak acid HY is 2% dissociated. What is the Ka of HY?",
-    options:{A:"2×10⁻⁴ mol/L",B:"4×10⁻⁴ mol/L",C:"2×10⁻² mol/L",D:"4×10⁻² mol/L"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Degree of dissociation α = 2% = 0.02. [H⁺] = α × C = 0.02 × 0.5 = 0.01 mol/L. Ka = [H⁺][Y⁻]/[HY] = (0.01)²/(0.5 − 0.01) ≈ (0.01)²/0.5 = 10⁻⁴/0.5 = 2×10⁻⁴ mol/L." },
-
-  /* ══════════════════════════════════════════════════════
-     NUCLEAR CHEMISTRY — 5 QUESTIONS
-     Q36–40 : Alpha/beta/gamma decay, half-life calc,
-               nuclear equation balancing
-  ══════════════════════════════════════════════════════ */
-
-  { id:36,
-    text:"²³⁸₉₂U undergoes alpha decay. What is the daughter nuclide produced?",
-    options:{A:"²³⁴₉₂U",B:"²³⁸₉₀Th",C:"²³⁴₉₀Th",D:"²³⁶₉₂U"},
-    answer:"C", subject:"Chemistry",
-    explanation:"Alpha particle = ⁴₂He. Mass number: 238 − 4 = 234. Atomic number: 92 − 2 = 90 (Thorium). Daughter: ²³⁴₉₀Th. In alpha decay: A decreases by 4, Z decreases by 2. The element changes because Z changes." },
-
-  { id:37,
-    text:"In beta-minus (β⁻) decay, a neutron converts to a proton and an electron (β particle). If ¹⁴₆C undergoes beta decay, what is the daughter nuclide?",
-    options:{A:"¹⁴₄Be",B:"¹⁰₆C",C:"¹⁴₇N",D:"¹⁴₅B"},
-    answer:"C", subject:"Chemistry",
-    explanation:"β⁻ decay: ⁰₋₁e is emitted. Mass number: unchanged (14). Atomic number: increases by 1 (6 → 7 = Nitrogen). Daughter: ¹⁴₇N. In β⁻ decay: A unchanged, Z increases by 1. Carbon-14 → Nitrogen-14 (the basis of radiocarbon dating)." },
-
-  { id:38,
-    text:"A radioactive isotope has a half-life of 8 days. Starting with 80 g, what mass remains after 32 days?",
-    options:{A:"10 g",B:"5 g",C:"20 g",D:"2.5 g"},
-    answer:"B", subject:"Chemistry",
-    explanation:"Number of half-lives = 32/8 = 4. Mass remaining = 80 × (1/2)⁴ = 80 × 1/16 = 5 g. Sequence: 80 → 40 → 20 → 10 → 5 g (four halvings). Count the arrows — each arrow is one half-life." },
-
-  { id:39,
-    text:"A 120 g sample of a radioactive isotope decays to 7.5 g in 48 years. What is the half-life of this isotope?",
-    options:{A:"8 years",B:"12 years",C:"16 years",D:"24 years"},
-    answer:"B", subject:"Chemistry",
-    explanation:"120 → 60 → 30 → 15 → 7.5 g. Four halvings. 48 years ÷ 4 = 12 years per half-life. Alternatively: N = N₀(1/2)ⁿ → 7.5 = 120(1/2)ⁿ → (1/2)ⁿ = 1/16 → n = 4 → t½ = 48/4 = 12 years." },
-
-  { id:40,
-    text:"Balance the nuclear equation: ²⁷₁₃Al + ⁴₂He → _____ + ¹₀n",
-    options:{A:"³⁰₁₅P",B:"³¹₁₅P",C:"³⁰₁₄Si",D:"²⁸₁₂Mg"},
-    answer:"A", subject:"Chemistry",
-    explanation:"Conservation of mass number: 27 + 4 = 31; 31 − 1 = 30. Conservation of atomic number: 13 + 2 = 15; 15 − 0 = 15. Daughter nuclide: ³⁰₁₅P (phosphorus-30). Always check: ΣA and ΣZ must balance on both sides of the equation." }
-
-];
-</script>
-
-<!-- Fixed Header -->
-<header class="quiz-header">
-    <div class="quiz-header-container">
-        <div class="quiz-header-left">
-            <button class="btn-icon" id="menuBtn" aria-label="Menu">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="subject-info">
-                <div class="subject-name" id="subjectName">Chemistry — Calculations Drill</div>
-                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">40</span></div>
-            </div>
-        </div>
-        <div class="quiz-timer-container" id="quizTimerContainer">
-            <div class="timer-progress-ring">
-                <svg viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
-                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
-                            stroke="var(--accent)" stroke-width="4"
-                            stroke-dasharray="163.36" stroke-dashoffset="0"
-                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="timer-icon"><i class="fas fa-clock"></i></div>
-            <div class="timer-display" id="timerDisplay">40:00</div>
-        </div>
-        <div class="quiz-header-right">
-            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
-                <i class="fas fa-calculator"></i>
-            </button>
-            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
-        </div>
+<!-- header -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Paper 6</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
     </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
 </header>
 
-<div class="quiz-container">
-    <aside class="quiz-sidebar" id="quizSidebar">
-        <div class="sidebar-header">
-            <h3>Navigator</h3>
-            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="sidebar-stats">
-            <div class="stat-item">
-                <div class="stat-value" id="answeredCount">0</div>
-                <div class="stat-label">Done</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="unansweredCount">40</div>
-                <div class="stat-label">Left</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="flaggedCount">0</div>
-                <div class="stat-label">Flagged</div>
-            </div>
-        </div>
-        <div class="question-palette" id="questionPalette"></div>
-        <div class="sidebar-legend">
-            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
-            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
-            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
-            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
-        </div>
-
-
-        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
-            <a href="science_clusters.html"
-               class="btn btn-secondary"
-               style="width:100%;text-align:center;text-decoration:none;display:block;"
-               onclick="return confirm('Leave quiz? Progress will be lost.')">
-                &#8592; Back
-            </a>
-        </div>
-    </aside>
-
-    <main class="quiz-main">
-        <div class="passage-panel hidden" id="passagePanel">
-            <div class="passage-header">
-                <span class="passage-label"><i class="fas fa-book-open"></i> Read</span>
-                <span class="passage-title-text" id="passageTitle">Comprehension Passage</span>
-                <button class="btn-passage-toggle" id="passageToggleBtn">
-                    <i class="fas fa-compress-alt"></i> Hide Passage
-                </button>
-            </div>
-            <div class="passage-body" id="passageBody"></div>
-        </div>
-
-        <div class="question-card" id="questionCard">
-            <div class="question-header">
-                <div class="question-number">Question <span id="questionNumber">1</span></div>
-                <button class="btn-flag" id="flagBtn" aria-label="Flag">
-                    <i class="far fa-flag"></i> Flag
-                </button>
-            </div>
-            <div class="question-text" id="questionText">Loading...</div>
-            <div class="options-container" id="optionsContainer"></div>
-            <div class="question-explanation hidden" id="questionExplanation">
-                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
-                <div class="explanation-content" id="explanationContent"></div>
-            </div>
-        </div>
-
-        <div class="quiz-navigation">
-            <button class="btn btn-secondary" id="prevBtn" disabled>
-                <i class="fas fa-arrow-left"></i> Previous
-            </button>
-            <button class="btn btn-secondary" id="clearBtn">
-                <i class="fas fa-eraser"></i> Clear
-            </button>
-            <button class="btn btn-primary" id="nextBtn">
-                Next <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
-    </main>
+<!-- score strip -->
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
 </div>
 
-<div class="mobile-palette-trigger" id="mobilePaletteBtn">
-    <i class="fas fa-th"></i> <span>Questions</span>
+<!-- question cards -->
+<div id="qc"></div>
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
 </div>
 
-<!-- Submit Modal -->
-<div class="modal-overlay hidden" id="submitModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3>Submit Test?</h3>
-            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="submit-summary">
-                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">40</span></div>
-                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
-                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">40</span></div>
-                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">40:00</span></div>
-            </div>
-            <div class="warning-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>You cannot change answers after submission.</span>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
-            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
-        </div>
+<!-- submit modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
     </div>
+  </div>
 </div>
 
-<!-- Time Up Modal -->
-<div class="modal-overlay hidden" id="timeUpModal">
-    <div class="modal">
-        <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
-        <div class="modal-body">
-            <p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" id="viewResultsBtn">View Results</button>
-        </div>
+<!-- time up overlay -->
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
     </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
 </div>
-
-<!-- Calculator Modal -->
-<div class="modal-overlay hidden" id="calculatorModal">
-    <div class="modal calculator-modal">
-        <div class="modal-header">
-            <h3>Calculator</h3>
-            <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="calculator">
-                <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
-                <div class="calculator-buttons">
-                    <button class="calc-btn" data-action="clear">C</button>
-                    <button class="calc-btn" data-action="delete">&#8592;</button>
-                    <button class="calc-btn" data-action="divide">&#247;</button>
-                    <button class="calc-btn" data-action="multiply">&#215;</button>
-                    <button class="calc-btn" data-value="7">7</button>
-                    <button class="calc-btn" data-value="8">8</button>
-                    <button class="calc-btn" data-value="9">9</button>
-                    <button class="calc-btn" data-action="subtract">&#8722;</button>
-                    <button class="calc-btn" data-value="4">4</button>
-                    <button class="calc-btn" data-value="5">5</button>
-                    <button class="calc-btn" data-value="6">6</button>
-                    <button class="calc-btn" data-action="add">+</button>
-                    <button class="calc-btn" data-value="1">1</button>
-                    <button class="calc-btn" data-value="2">2</button>
-                    <button class="calc-btn" data-value="3">3</button>
-                    <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
-                    <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
-                    <button class="calc-btn" data-value=".">.</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="quiz-app.js"></script>
 
 <script>
-(function () {
-  const panel     = document.getElementById('passagePanel');
-  const titleEl   = document.getElementById('passageTitle');
-  const bodyEl    = document.getElementById('passageBody');
-  const toggleBtn = document.getElementById('passageToggleBtn');
-  const qNumEl    = document.getElementById('questionNumber');
+'use strict';
 
-  let collapsed = false;
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', function () {
-      collapsed = !collapsed;
-      bodyEl.style.display = collapsed ? 'none' : '';
-      toggleBtn.innerHTML  = collapsed
-        ? '<i class="fas fa-expand-alt"></i> Show Passage'
-        : '<i class="fas fa-compress-alt"></i> Hide Passage';
-    });
+/* ── AUTH GATE ── */
+(function() {
+  var REGISTRY = {
+      "2a0a29655a718f08c7d570690a97baba2efd24a9ab0aff058a6b1e96f8cafed3": "Conve",
+      "52325707193ccf20a538d87234a8ed17260df970d580665cab8cda029a83cdc7": "Kaosara",
+      "e32f4d7152cd507caa3b0c58081936f3189059f34b89115dffdb39852c541618": "Habibat",
+      "b0ce2a7c2f3539c0e1f52e48ba4a00159504f553ac11fe03c76bee3fa70e12eb": "Oyin",
+      "05d9d182d4b7d22cd42fe87e4d92b93f6ae0a5bb494066058220f1d2cd78c4a2": "Dorcas",
+      "d1deca157a6e62522cf0b60a5d2cb1da19c4357e23836b6dbcc925132a365873": "Famous",
+      "36dc8e24107b582d3cf5e10dd30c1d42b97b0edb4217783068541f8ca08912b4": "Obasesam",
+      "b7833bfa0b89ef6c04fbdfb7741f58b9fdb8d6cfd910f76af1d7ef0c9e485080": "Prosper"
+    };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
-
-  function syncPassage() {
-    const n = parseInt(qNumEl.textContent, 10);
-    if (!n || !Array.isArray(QUESTIONS)) return;
-    const q = QUESTIONS[n - 1];
-    if (q && q.passage) {
-      const key = q.passage.slice(0, 40);
-      if (bodyEl.dataset.key !== key) {
-        bodyEl.dataset.key  = key;
-        titleEl.textContent = q.passageTitle || 'Comprehension Passage';
-        bodyEl.textContent  = q.passage;
-        panel.scrollTop     = 0;
-        collapsed           = false;
-        bodyEl.style.display = '';
-        if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Hide Passage';
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
       }
-      panel.classList.remove('hidden');
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
     } else {
-      panel.classList.add('hidden');
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
     }
-  }
-
-  new MutationObserver(syncPassage).observe(qNumEl, {
-    childList: true, subtree: true, characterData: true
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
   });
-  syncPassage();
 })();
-</script>
 
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "Which of the following is an aromatic compound?",
+    opts: { A:"Cyclohexane", B:"Hexanex", C:"Cyclohexene", D:"Benzene" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "Benzene (C₆H₆) is aromatic — it has a cyclic, planar structure with 6 delocalised π electrons satisfying Hückel's rule (4n+2, n=1). Cyclohexane and hexane are aliphatic; cyclohexene is not aromatic."
+  },
+  {
+    id: 2,
+    text: "The degree of unsaturation (DoU) of C₆H₆ is:",
+    opts: { A:"DoU = 2", B:"DoU = 3", C:"DoU = 4", D:"DoU = 1" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: "DoU = (2C + 2 − H)/2 = (12 + 2 − 6)/2 = 8/2 = 4. This accounts for 3 double bonds and 1 ring (or equivalently, the benzene ring with 3 degrees from the ring + 3 from the double bonds but counted as 4 in the DoU formula)."
+  },
+  {
+    id: 3,
+    text: "Which of the following describes a nucleophile?",
+    opts: { A:"An electron pair accep", B:"A species that donates protons", C:"A species with no electrons", D:"An electron pair donor" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "A nucleophile ('nucleus lover') is an electron-pair donor that attacks electron-deficient centres. Examples: OH⁻, NH₃, CN⁻, H₂O. Electrophiles are electron-pair acceptors."
+  },
+  {
+    id: 4,
+    text: "Markovnikov's rule states that in addition of HX to an alkene, X⁻ adds to the carbon:",
+    opts: { A:"With fewer hydrogen atoms", B:"With more hydrogen atomsx", C:"At the terminal position only", D:"Only if a catalyst present" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "Markovnikov's rule: in addition of HX across an asymmetric C=C, the H adds to the carbon already bearing more H atoms (the more substituted carbon gets X). This is because the more stable (more substituted) carbocation intermediate forms."
+  },
+  {
+    id: 5,
+    text: "Which of the following gives a positive Tollens' test (silver mirror)?",
+    opts: { A:"Propanone", B:"Propanoic acid", C:"Ethanol", D:"Ethanal" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "Tollens' reagent ([Ag(NH₃)₂]⁺) oxidises aldehydes to carboxylic acids, depositing a silver mirror: RCHO + 2[Ag(NH₃)₂]⁺ + OH⁻ → RCOO⁻ + 2Ag + ... Ketones (propanone) do not react."
+  },
+  {
+    id: 6,
+    text: "What type of reaction occurs when CH₃Br reacts with NaOH(aq)?",
+    opts: { A:"Nucleophilic substitution", B:"Radical substitution", C:"Electrophilic additionxxx", D:"Elimination reaction" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "OH⁻ is a nucleophile that attacks the electrophilic carbon bearing Br: CH₃Br + OH⁻ → CH₃OH + Br⁻. This is an SN2 nucleophilic substitution reaction (bimolecular)."
+  },
+  {
+    id: 7,
+    text: "Carboxylic acids react with Na₂CO₃ to produce:",
+    opts: { A:"CO₂, water, and a carboxylate salt", B:"Hydrogen gas and salt", C:"An ester and water formedxxxxxxxxx", D:"CO₂ and an alkene" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "2RCOOH + Na₂CO₃ → 2RCOONa + H₂O + CO₂. The reaction of a carboxylic acid with a carbonate produces a salt (carboxylate), water, and carbon dioxide gas (effervescence observed)."
+  },
+  {
+    id: 8,
+    text: "Which of the following is a secondary amine?",
+    opts: { A:"CH₃NH₂", B:"NH₃", C:"(CH₃)₃Nx", D:"(CH₃)₂NH" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "A secondary amine has two alkyl/aryl groups on nitrogen: (CH₃)₂NH (dimethylamine). CH₃NH₂ is primary (one group); (CH₃)₃N is tertiary (three groups); NH₃ is not an amine."
+  },
+  {
+    id: 9,
+    text: "The hydration of ethene to produce ethanol requires:",
+    opts: { A:"Conc. H₂SO₄ catalyst, steam, 300°C", B:"NaOH catalyst and waterxxxxxxxxxxx", C:"Yeast and sugar at 37°C", D:"UV light and water only" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "Industrial hydration: CH₂=CH₂ + H₂O → CH₃CH₂OH. Uses concentrated H₃PO₄ (or H₂SO₄) as catalyst, steam at ~300°C and 60–70 atm. This gives a continuous, high-purity product."
+  },
+  {
+    id: 10,
+    text: "What is the molar mass of Ca(NO₃)₂? (Ca=40, N=14, O=16)",
+    opts: { A:"102 g/mol", B:"164 g/mol", C:"132 g/mol", D:"148 g/mol" },
+    ans: "B",
+    topic: "Mole Concept",
+    exp: "Ca(NO₃)₂: Ca=40, 2×N=28, 6×O=96. Total = 40+28+96 = 164 g/mol."
+  },
+  {
+    id: 11,
+    text: "25 cm³ of 0.2 mol/dm³ H₂SO₄ reacts with NaOH. Moles of H₂SO₄ used are:",
+    opts: { A:"0.005 mol", B:"0.050 mol", C:"0.025 mol", D:"0.010 mol" },
+    ans: "A",
+    topic: "Mole Concept",
+    exp: "Moles = concentration × volume (in dm³) = 0.2 × (25/1000) = 0.2 × 0.025 = 0.005 mol H₂SO₄."
+  },
+  {
+    id: 12,
+    text: "What volume of 0.5 mol/dm³ HCl contains 0.1 mol of HCl?",
+    opts: { A:"50 cm³", B:"500 cm³", C:"250 cm³", D:"200 cm³" },
+    ans: "D",
+    topic: "Mole Concept",
+    exp: "Volume = moles/concentration = 0.1/0.5 = 0.2 dm³ = 200 cm³."
+  },
+  {
+    id: 13,
+    text: "The percentage yield of a reaction that gives 18 g of product when 30 g is expected is:",
+    opts: { A:"50%", B:"70%", C:"80%", D:"60%" },
+    ans: "D",
+    topic: "Mole Concept",
+    exp: "% yield = (actual yield / theoretical yield) × 100 = (18/30) × 100 = 60%."
+  },
+  {
+    id: 14,
+    text: "In the reaction Fe₂O₃ + 3CO → 2Fe + 3CO₂, what mass of Fe is produced from 160 g of Fe₂O₃? (Fe=56, O=16)",
+    opts: { A:"56 g iron", B:"168 g iron", C:"112 g iron", D:"224 g iron" },
+    ans: "C",
+    topic: "Mole Concept",
+    exp: "Molar mass Fe₂O₃ = 160 g/mol. Moles Fe₂O₃ = 160/160 = 1 mol. From ratio 1:2, moles Fe = 2 mol. Mass = 2 × 56 = 112 g."
+  },
+  {
+    id: 15,
+    text: "Avogadro's number is best defined as:",
+    opts: { A:"6.02 × 10²³ particles per mole", B:"Number of molecules in 22.4 dm³", C:"6.02 × 10²³ particles per gram", D:"Number of atoms in 1 g H₂" },
+    ans: "A",
+    topic: "Mole Concept",
+    exp: "Avogadro's number (Nₐ = 6.02 × 10²³ mol⁻¹) is the number of elementary particles (atoms, molecules, ions) in one mole of substance, regardless of what that substance is."
+  },
+  {
+    id: 16,
+    text: "According to Lewis theory, a base is a substance that:",
+    opts: { A:"Donates a proton to an acid", B:"Accepts a proton from acid", C:"Donates an electron pair", D:"Accepts an electron pair" },
+    ans: "C",
+    topic: "Acids Bases Salts",
+    exp: "Lewis theory: a base is an electron-pair donor; an acid is an electron-pair acceptor. This is the broadest acid-base definition, extending beyond proton transfer to include coordination chemistry."
+  },
+  {
+    id: 17,
+    text: "What is the [OH⁻] of a solution with pH = 11 at 25°C?",
+    opts: { A:"1 × 10⁻³ mol/dm³", B:"1 × 10⁻¹¹ mol/dm³", C:"1 × 10⁻¹ mol/dm³", D:"1 × 10⁻² mol/dm³" },
+    ans: "A",
+    topic: "Acids Bases Salts",
+    exp: "pH + pOH = 14, so pOH = 14 − 11 = 3. [OH⁻] = 10⁻³ mol/dm³. Alternatively: Kw = [H⁺][OH⁻] = 10⁻¹⁴, [H⁺] = 10⁻¹¹, [OH⁻] = 10⁻¹⁴/10⁻¹¹ = 10⁻³."
+  },
+  {
+    id: 18,
+    text: "A buffer solution of pH 4.74 is prepared using ethanoic acid (pKₐ = 4.74) and sodium ethanoate. The ratio [CH₃COO⁻]/[CH₃COOH] is:",
+    opts: { A:"10:1 ratio", B:"1:10 ratio", C:"1:1 ratio", D:"5:1 ratio" },
+    ans: "C",
+    topic: "Acids Bases Salts",
+    exp: "Henderson-Hasselbalch: pH = pKₐ + log([A⁻]/[HA]). When pH = pKₐ, log([A⁻]/[HA]) = 0, so [A⁻]/[HA] = 1:1. Equal concentrations of acid and conjugate base."
+  },
+  {
+    id: 19,
+    text: "Which of the following is an amphoteric substance?",
+    opts: { A:"NaOH solution", B:"HCl solutio", C:"Water (H₂O)", D:"Na₂CO₃ solution" },
+    ans: "C",
+    topic: "Acids Bases Salts",
+    exp: "An amphoteric substance can act as either an acid or a base. Water: as acid: H₂O → H⁺ + OH⁻; as base: H₂O + H⁺ → H₃O⁺. Al(OH)₃ and Al₂O₃ are also amphoteric."
+  },
+  {
+    id: 20,
+    text: "The Ka of a weak acid HA at 25°C is 1.8 × 10⁻⁵. Its pKₐ is approximately:",
+    opts: { A:"pKa = 4.74", B:"pKa = 5.74", C:"pKa = 3.74", D:"pKa = 7.00" },
+    ans: "A",
+    topic: "Acids Bases Salts",
+    exp: "pKₐ = −log(Kₐ) = −log(1.8 × 10⁻⁵) = −(log 1.8 + log 10⁻⁵) = −(0.26 − 5) = 4.74. This is ethanoic acid's pKₐ."
+  },
+  {
+    id: 21,
+    text: "For N₂O₄(g) ⇌ 2NO₂(g), if Kc = 4.6 × 10⁻³ at 25°C, the equilibrium favours:",
+    opts: { A:"Products (NO₂) stronglyxx", B:"Products only at high pressure", C:"Neither side at all", D:"Reactants (N₂O₄) strongly" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: "Kc = 4.6 × 10⁻³ << 1. A small Kc means the equilibrium lies far to the left, strongly favouring the reactants (N₂O₄). Very little dissociation occurs at 25°C."
+  },
+  {
+    id: 22,
+    text: "The solubility product (Ksp) of AgCl = 1.8 × 10⁻¹⁰ mol²/dm⁶. Its molar solubility is:",
+    opts: { A:"1.34 × 10⁻⁵ mol/dm³", B:"9.00 × 10⁻¹¹ mol/dm", C:"1.80 × 10⁻¹⁰ mol/dm³", D:"3.24 × 10⁻²⁰ mol/dm³" },
+    ans: "A",
+    topic: "Equilibrium",
+    exp: "AgCl ⇌ Ag⁺ + Cl⁻. If solubility = s, then Ksp = s². s = √(1.8×10⁻¹⁰) = 1.34×10⁻⁵ mol/dm³."
+  },
+  {
+    id: 23,
+    text: "Le Chatelier's principle predicts that increasing pressure on 2SO₂(g) + O₂(g) ⇌ 2SO₃(g) will:",
+    opts: { A:"Shift equilibrium to left sidex", B:"Have no effect on position", C:"Decrease the rate of reaction", D:"Shift equilibrium to right side" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: "Left has 3 moles gas (2+1), right has 2. Increasing pressure favours the side with fewer gas moles → shifts right, increasing SO₃ yield. This is exploited in the Contact Process."
+  },
+  {
+    id: 24,
+    text: "The rate of a reaction typically doubles for every 10°C rise in temperature. This is explained by:",
+    opts: { A:"More molecules exceeding activation energy", B:"Decreased activation energy only", C:"Increased frequency of all collisions only", D:"Increased pressure of the system" },
+    ans: "A",
+    topic: "Equilibrium",
+    exp: "Temperature increases kinetic energy. A 10°C rise roughly doubles the fraction of molecules with energy ≥ activation energy (Eₐ), as described by the Maxwell–Boltzmann distribution and Arrhenius equation."
+  },
+  {
+    id: 25,
+    text: "In the Contact Process for making H₂SO₄, SO₃ is absorbed in concentrated H₂SO₄ rather than water because:",
+    opts: { A:"Water is too expensive industrially", B:"SO₃ does not react with water", C:"Direct addition gives uncontrollable acid mist", D:"H₂SO₄ is a better absorbing solvent onlyxxxxxx" },
+    ans: "C",
+    topic: "Equilibrium",
+    exp: "SO₃ + H₂O → H₂SO₄ is highly exothermic and produces an unmanageable acid mist if water is used directly. Absorbing SO₃ in concentrated H₂SO₄ forms oleum (H₂S₂O₇), which is then carefully diluted."
+  },
+  {
+    id: 26,
+    text: "The standard electrode potential of Zn²⁺/Zn is −0.76 V and Cu²⁺/Cu is +0.34 V. EMF of the Daniell cell is:",
+    opts: { A:"+1.10 V", B:"−1.10 V", C:"+0.42 V", D:"+0.76 V" },
+    ans: "A",
+    topic: "Electrochemistry",
+    exp: "E°cell = E°cathode − E°anode = E°(Cu²⁺/Cu) − E°(Zn²⁺/Zn) = 0.34 − (−0.76) = +1.10 V. Positive EMF confirms the cell reaction is spontaneous."
+  },
+  {
+    id: 27,
+    text: "During the electrolysis of concentrated NaCl solution, what is produced at the anode?",
+    opts: { A:"Oxygen gas", B:"Sodium metal", C:"Hydrogen gas", D:"Chlorine gas" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "In concentrated NaCl, Cl⁻ is preferentially discharged at the anode (oxidised): 2Cl⁻ → Cl₂ + 2e⁻. At the cathode, H⁺ from water is reduced: 2H⁺ + 2e⁻ → H₂. NaOH remains in solution."
+  },
+  {
+    id: 28,
+    text: "What mass of silver deposits when 9650 C of charge passes through AgNO₃ solution? (Ag=108, F=96500 C)",
+    opts: { A:"5.4 g silverx", B:"54 g silver", C:"108 g silver", D:"10.8 g silver" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "Ag⁺ + e⁻ → Ag (1 electron per Ag). Moles e⁻ = Q/F = 9650/96500 = 0.1 mol. Moles Ag = 0.1 mol. Mass = 0.1 × 108 = 10.8 g."
+  },
+  {
+    id: 29,
+    text: "A positive standard electrode potential (E°) indicates the half-cell:",
+    opts: { A:"Is a good reducing agent", B:"Strongly prefers oxidation", C:"Has a tendency to be reduced", D:"Will act as an anode alwaysx" },
+    ans: "C",
+    topic: "Electrochemistry",
+    exp: "A positive E° means the species is easily reduced (gains electrons readily) compared to the standard hydrogen electrode. High positive E° = strong oxidising agent. Negative E° = tendency to be oxidised (reducing agent)."
+  },
+  {
+    id: 30,
+    text: "In the electrolysis of dilute H₂SO₄, the volume ratio of gas at cathode to anode is:",
+    opts: { A:"1:2 (H₂:O₂)", B:"1:1 (H₂:O₂)", C:"3:1 (H₂:O₂)", D:"2:1 (H₂:O₂)" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "Cathode: 4H⁺ + 4e⁻ → 2H₂. Anode: 2H₂O → O₂ + 4H⁺ + 4e⁻. For every 4 electrons: 2 mol H₂ and 1 mol O₂ produced. Volume ratio H₂:O₂ = 2:1."
+  },
+  {
+    id: 31,
+    text: "The energy of a photon is given by E = hf. If f = 6 × 10¹⁴ Hz and h = 6.63 × 10⁻³⁴ J·s, E is:",
+    opts: { A:"3.98 × 10⁻¹⁹ J", B:"6.63 × 10⁻³⁴ J", C:"1.10 × 10⁻⁴⁸ J", D:"9.95 × 10⁻¹⁹ J" },
+    ans: "A",
+    topic: "Atomic Structure",
+    exp: "E = hf = 6.63×10⁻³⁴ × 6×10¹⁴ = 39.78×10⁻²⁰ = 3.978×10⁻¹⁹ J ≈ 3.98×10⁻¹⁹ J. This is in the visible light range."
+  },
+  {
+    id: 32,
+    text: "Which of the following ions has the electron configuration of a noble gas?",
+    opts: { A:"Cl⁻ ion", B:"Cu²⁺ io", C:"Fe²⁺ ion", D:"Cr³⁺ ion" },
+    ans: "A",
+    topic: "Atomic Structure",
+    exp: "Cl (Z=17) has configuration 2,8,7. Cl⁻ gains one electron: 2,8,8 — the configuration of argon (noble gas). Fe²⁺, Cu²⁺, and Cr³⁺ have partially filled d orbitals and don't match noble gas configurations."
+  },
+  {
+    id: 33,
+    text: "The bond angle in BF₃ is 120° because BF₃ has:",
+    opts: { A:"3 bonding pairs and 1 lone pair", B:"3 bonding pairs, no lone pairs", C:"2 bonding pairs and 2 lone pairs", D:"4 bonding pairs, no lone pairs" },
+    ans: "B",
+    topic: "Chemical Bonding",
+    exp: "Boron in BF₃ has only 3 bonding pairs and no lone pairs (trigonal planar geometry). With no lone pair repulsion, all three bond pairs are equivalent, giving a 120° bond angle."
+  },
+  {
+    id: 34,
+    text: "Which of the following has the strongest intermolecular forces?",
+    opts: { A:"CH₄ molecule", B:"HCl molecule", C:"H₂O molecule", D:"NH₃ molecule" },
+    ans: "C",
+    topic: "Chemical Bonding",
+    exp: "H₂O has the strongest hydrogen bonding because oxygen is the most electronegative atom that forms H-bonds (after F), and has two lone pairs plus two O–H bonds. This gives water an anomalously high boiling point (100°C)."
+  },
+  {
+    id: 35,
+    text: "A sigma (σ) bond is formed by:",
+    opts: { A:"Lateral overlap of p orbitals", B:"End-on overlap of orbitals", C:"Overlap of d and f orbital", D:"Ionic transfer of electrons" },
+    ans: "B",
+    topic: "Chemical Bonding",
+    exp: "A σ bond forms by end-on (axial) overlap of orbitals along the internuclear axis (s-s, s-p, or p-p). Electron density is concentrated between the nuclei. All single bonds are σ bonds."
+  },
+  {
+    id: 36,
+    text: "2.0 mol of an ideal gas at 27°C occupies what volume at 1 atm? (R = 0.082 L·atm/mol·K)",
+    opts: { A:"49.2 dm³", B:"22.4 dm³", C:"24.6 dm³", D:"44.8 dm³" },
+    ans: "A",
+    topic: "Gas Laws",
+    exp: "PV = nRT → V = nRT/P = 2.0 × 0.082 × 300 / 1 = 49.2 L = 49.2 dm³. (T = 27+273 = 300 K)"
+  },
+  {
+    id: 37,
+    text: "Which gas law describes the relationship between volume and amount (moles) at constant T and P?",
+    opts: { A:"Boyle's Law", B:"Graham's Law", C:"Charles's Lawx", D:"Avogadro's Law" },
+    ans: "D",
+    topic: "Gas Laws",
+    exp: "Avogadro's Law: at constant temperature and pressure, equal volumes of all gases contain equal numbers of molecules. V ∝ n — volume is directly proportional to the number of moles."
+  },
+  {
+    id: 38,
+    text: "The ratio of diffusion rates of H₂ (M=2) and O₂ (M=32) by Graham's Law is:",
+    opts: { A:"H₂ is 2× faster than O₂", B:"H₂ is 8× faster than O₂", C:"H₂ is 16× faster than O₂", D:"H₂ is 4× faster than O₂" },
+    ans: "D",
+    topic: "Gas Laws",
+    exp: "Graham's Law: r₁/r₂ = √(M₂/M₁) = √(32/2) = √16 = 4. H₂ diffuses 4 times faster than O₂."
+  },
+  {
+    id: 39,
+    text: "Real gases deviate most from ideal behaviour at:",
+    opts: { A:"High temperature and low pressure", B:"Low temperature and high pressure", C:"Low temperature and low pressure", D:"High temperature and high pressure" },
+    ans: "B",
+    topic: "Gas Laws",
+    exp: "Real gases deviate most from ideal behaviour at low temperature (molecules slow down; intermolecular attractions become significant) and high pressure (molecular volume becomes non-negligible compared to container volume)."
+  },
+  {
+    id: 40,
+    text: "The element with the highest first ionisation energy in Period 2 is:",
+    opts: { A:"Oxyg", B:"Neon", C:"Nitrogen", D:"Fluorine" },
+    ans: "B",
+    topic: "Periodic Table",
+    exp: "Neon (noble gas) has the highest first ionisation energy in Period 2 due to its stable, complete electron shell (2,8). Despite the general increase across the period, neon's full shell makes it hardest to ionise."
+  },
+  {
+    id: 41,
+    text: "Which of the following is a property of Group I (alkali) metals?",
+    opts: { A:"High density and melting pointxxxxxx", B:"React violently with water giving H₂", C:"Form coloured compounds always", D:"Have multiple oxidation states" },
+    ans: "B",
+    topic: "Periodic Table",
+    exp: "Alkali metals react vigorously with water: 2M + 2H₂O → 2MOH + H₂. Reactivity increases down the group (Li < Na < K < Rb < Cs). They have low density, low melting points, and only +1 oxidation state."
+  },
+  {
+    id: 42,
+    text: "The diagonal relationship in the periodic table is best shown between:",
+    opts: { A:"Na and Mg across period", B:"Li and Mg diagonally placed", C:"B and Si diagonally placed", D:"Be and Al diagonally placed" },
+    ans: "D",
+    topic: "Periodic Table",
+    exp: "The diagonal relationship: Be (Period 2, Group II) and Al (Period 3, Group III) have similar charge density and show similar chemistry. Both form amphoteric oxides, are extracted by electrolysis, and form covalent compounds."
+  },
+  {
+    id: 43,
+    text: "The standard enthalpy of formation of H₂O(l) is the enthalpy change when:",
+    opts: { A:"1 mol H₂O decomposes to H₂ and O₂xxxxxx", B:"H₂O(l) dissolves in excess water", C:"1 mol H₂O(l) forms from H₂(g) and O₂(g)", D:"H₂O(g) condenses to form H₂O(l)" },
+    ans: "C",
+    topic: "Energetics",
+    exp: "Standard enthalpy of formation (ΔH°f) is the enthalpy change when 1 mole of compound forms from its elements in their standard states: H₂(g) + ½O₂(g) → H₂O(l). For elements in standard state, ΔH°f = 0."
+  },
+  {
+    id: 44,
+    text: "A Born-Haber cycle is used to calculate:",
+    opts: { A:"Activation energy of a reaction", B:"Lattice energy of an ionic solid", C:"Gibbs free energy of a solution", D:"Rate constant of ionic reactions" },
+    ans: "B",
+    topic: "Energetics",
+    exp: "The Born-Haber cycle applies Hess's Law to ionic compounds, using measurable enthalpies (atomisation, ionisation, electron affinity) to calculate the otherwise unmeasurable lattice energy of an ionic solid."
+  },
+  {
+    id: 45,
+    text: "Which of the following processes is endothermic?",
+    opts: { A:"Condensation of steam to liquid", B:"Decomposition of CaCO₃ to CaO", C:"Combustion of methane gas", D:"Neutralisation of HCl by NaOH" },
+    ans: "B",
+    topic: "Energetics",
+    exp: "CaCO₃ → CaO + CO₂ is endothermic (ΔH = +178 kJ/mol) — heat must be supplied to break the carbonate. Combustion, condensation, and neutralisation are all exothermic processes."
+  },
+  {
+    id: 46,
+    text: "Aluminium is extracted by electrolysis rather than carbon reduction because:",
+    opts: { A:"Aluminium is too reactive for electrolysisxxxxxxxxxxxx", B:"Al₂O₃ has a very high melting point only", C:"Al is more reactive than carbon, so C cannot reduce it", D:"Carbon reduction gives impure aluminium" },
+    ans: "C",
+    topic: "Metals",
+    exp: "Aluminium is more reactive than carbon in the reactivity series. Carbon cannot reduce Al₂O₃ at economically viable temperatures. Electrolysis of molten Al₂O₃ (dissolved in cryolite) is used instead."
+  },
+  {
+    id: 47,
+    text: "The rusting of iron requires the presence of both:",
+    opts: { A:"CO₂ and nitrogen", B:"Water and oxygen", C:"Chlorine and moisture", D:"Acid and sunlight only" },
+    ans: "B",
+    topic: "Metals",
+    exp: "Rusting (oxidation of iron to Fe₂O₃·xH₂O) requires both water and oxygen. Neither alone is sufficient. Salt water speeds up rusting by acting as an electrolyte but is not essential."
+  },
+  {
+    id: 48,
+    text: "In the Haber process, nitrogen is obtained from:",
+    opts: { A:"Fractional distillation of air", B:"Decomposition of ammonia gas", C:"Electrolysis of liquid nitroge", D:"Reaction of NOₓ with alkali" },
+    ans: "A",
+    topic: "Non-metals",
+    exp: "Nitrogen (78% of air) is obtained industrially by fractional distillation of liquid air, which also yields oxygen (21%) and argon. The nitrogen is used directly in the Haber process with hydrogen."
+  },
+  {
+    id: 49,
+    text: "A precipitate that dissolves in excess NH₃ solution but not in excess NaOH indicates the presence of:",
+    opts: { A:"Fe³⁺ ion", B:"Cu²⁺ ion", C:"Al³⁺ ion", D:"Pb²⁺ ion" },
+    ans: "B",
+    topic: "Qualitative Analysis",
+    exp: "Cu²⁺ + 2OH⁻ → Cu(OH)₂ (blue precipitate). In excess NH₃: Cu(OH)₂ + 4NH₃ → [Cu(NH₃)₄]²⁺ + 2OH⁻ (deep blue complex). Al(OH)₃ dissolves in excess NaOH (not NH₃); Fe(OH)₃ dissolves in neither."
+  },
+  {
+    id: 50,
+    text: "The half-life of a radioactive isotope is 20 years. What fraction remains after 60 years?",
+    opts: { A:"1/4 remains", B:"1/16 remains", C:"1/2 remains", D:"1/8 remains" },
+    ans: "D",
+    topic: "Nuclear Chemistry",
+    exp: "Number of half-lives = 60/20 = 3. Fraction remaining = (1/2)³ = 1/8. After each half-life the amount halves: 1 → 1/2 → 1/4 → 1/8."
+  }
+];
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0, submitted: false };
+var UA = {};  /* userAnswers: {id: chosen_key} */
+var globalDone = false;
+var GLOBAL_SECS = 1800; /* 30 minutes */
+var PTS_CORRECT = 1;
+var PTS_WRONG   = 0; /* UTME: no negative marking */
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot  = document.getElementById('gdot');
+  var txt  = document.getElementById('gtime');
+  function fmt(s) {
+    var m = Math.floor(s/60), ss = s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) {
+      txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn';
+    } else if (remaining <= 60) {
+      txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang';
+    }
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+
+function getTimeDisplay() {
+  var el = document.getElementById('gtime');
+  return el ? el.textContent : '—';
+}
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var optsHtml = '';
+    var labels = ['A','B','C','D'];
+    for (var j = 0; j < labels.length; j++) {
+      var lbl = labels[j];
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
+        '</div>';
+    }
+    html += '<div class="qcard" style="animation-delay:' + (i*0.03) + 's">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q' + q.id + ' of 50</span>' +
+        (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') +
+      '</div>' +
+      '<div class="qtxt">' + q.text + '</div>' +
+      '<div class="opts">' + optsHtml + '</div>' +
+      '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp' + q.id + '"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid   = parseInt(this.dataset.id);
+      var chose = this.dataset.a;
+      /* deselect siblings */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.remove('sel');
+      });
+      this.classList.add('sel');
+      UA[qid] = chose;
+      /* enable check button */
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid    = parseInt(this.dataset.qid);
+      var q      = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var ok     = (chosen === q.ans);
+
+      /* lock all opts for this question */
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked');
+        o.style.pointerEvents = 'none';
+        if (o.dataset.a === q.ans)    o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+
+      /* explanation */
+      var expEl = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + q.ans;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' +
+        (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+
+      this.disabled = true;
+
+      /* update stats */
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++;
+        ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent  = ST.correct;
+  document.getElementById('sc-wrong').textContent  = ST.wrong;
+  document.getElementById('sc-skip').textContent   = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent  = ST.answered + ' / 50 answered';
+  document.getElementById('m-ans').textContent     = ST.answered;
+  document.getElementById('m-left').textContent    = left;
+  document.getElementById('m-time').textContent    = getTimeDisplay();
+  /* progress bar */
+  document.getElementById('prog-fill').style.width = (ST.answered / QUESTIONS.length * 100) + '%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() {
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitQuiz() {
+  hideSubmitModal();
+  globalDone = true;
+  stopTimer();
+
+  /* Auto-check all unanswered questions that have a selection */
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){
+    if (!btn.disabled) btn.click();
+  });
+
+  /* Show time-up overlay with results */
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  /* lock everything */
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.style.pointerEvents = 'none';
+    o.classList.add('locked');
+  });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
+
+  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF / PRINT ── */
+function doPrint() {
+  /* Make sure print header is visible for print */
+  document.getElementById('print-header').style.display = 'block';
+  window.print();
+  /* Hide again after */
+  setTimeout(function(){
+    document.getElementById('print-header').style.display = 'none';
+  }, 1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
 </body>
 </html>
