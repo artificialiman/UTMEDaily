@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Paper 6 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.022; font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .hdr-greeting { font-size: 11px; color: var(--ter); background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.18); padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: 0.05em; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .opt.sel { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+    /* ── AUTH GATE ── */
+    #auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
+    #auth-gate.unlocked { display:none; }
+    .gate-box { background:var(--card2,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+    .gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#f59e0b);margin-bottom:1rem;font-family:var(--mono); }
+    .gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
+    .gate-sub { font-size:0.85rem;color:var(--ter,#8b949e);margin:0 0 1.5rem; }
+    .gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
+    .gate-input:focus { border-color:var(--accent,#f59e0b); }
+    .gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
+    .gate-btn { width:100%;padding:0.8rem;background:var(--accent,#f59e0b);color:#000;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans); }
+    .gate-btn:hover { opacity:0.88; }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Chemistry Paper 6</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Chemistry · Paper 6</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password">
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Paper 6</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH GATE ── */
+(function() {
+  var REGISTRY = {
+    "de871e73f7929b1a6b8f68f738bafefe3c79b1e71f73023b0943a7a91949ab0c": "Conve",
+    "f1b59c2f184d07435dea624e624dcff601e02b33b59e222d68cb2e784828ee68": "Kaosara",
+    "6c3ab4f30db51e16a0625fe26d9ee6739e6bafb5d016d11c3282840068ffe86c": "Habibat",
+    "1b6eda2ab79d40ba25f9151a33b17cc384cd4bdc87edd643fae0e3290fb8fe73": "Oyin",
+    "09fb65294072fd74ffb850ab6ba07fc463d35684937a502ba106bfcff13eb21a": "Dorcas",
+    "112bcfee75a5f38c097a785b83c2965da86de6cc94ef6e768c7aba429d6acd28": "Famous",
+    "b8815d7f6d60c4e65275059ebabf132e0f5eb03b9491409f7dd5b71ca3cf5bc2": "Obasesam",
+    "b22064841c21b9751160df8edce2c81fdeb65bb456befe86a3b85759a619d95d": "Prosper",
+    "bf645fa0f9c80170a8b4035c3d0c6faaa52bd30ec65078111b7c0bdb2711376b": "Temi",
+    "390f4f0dba14f3f3f534b29540387ee588e79774ed54845e487bb71e7a6464d1": "Murphy",
+    "324fd213d710a964427386f2b097eac7191ee106627d4fb91b9105d81405e37e": "Improve",
+    "d8cab52a94eaba0196b5aa170142551a5006aade919e78c9e77d8e8767eaed65": "Benz",
+    "57e296eadaf2f13a1d26ac6e82545e61517f5e28798f86174f10bb4a7eb95b44": "Silent"
+  };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
+      }
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+  });
+})();
+
+/* ── FISHER-YATES SHUFFLE ── */
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+/*
+  QUESTIONS — options policy:
+  · All four options within a question are the same rough length.
+  · The correct answer is NEVER the longest option.
+  · At least two distractors are as long as or longer than the correct answer.
+  · No trailing garbage characters.
+  · No explanatory language that belongs only in the explanation field.
+*/
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "Which of the following is an aromatic compound?",
+    opts: { A:"Cyclohexane", B:"Hexane", C:"Cyclohexene", D:"Benzene" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "Benzene (C₆H₆) is aromatic — it has a cyclic, planar structure with 6 delocalised π electrons satisfying Hückel's rule (4n+2, n=1). Cyclohexane and hexane are aliphatic; cyclohexene is not aromatic."
+  },
+  {
+    id: 2,
+    text: "The degree of unsaturation (DoU) of C₆H₆ is:",
+    opts: { A:"DoU = 2", B:"DoU = 3", C:"DoU = 4", D:"DoU = 1" },
+    ans: "C",
+    topic: "Organic Chemistry",
+    exp: "DoU = (2C + 2 − H)/2 = (12 + 2 − 6)/2 = 8/2 = 4. This accounts for 3 double bonds and 1 ring in benzene."
+  },
+  {
+    id: 3,
+    text: "Which of the following describes a nucleophile?",
+    opts: { A:"An electron-pair acceptor", B:"A species that donates protons", C:"A species that carries no charge", D:"An electron-pair donor" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "A nucleophile ('nucleus lover') is an electron-pair donor that attacks electron-deficient centres. Examples: OH⁻, NH₃, CN⁻, H₂O. Electrophiles are electron-pair acceptors."
+  },
+  {
+    id: 4,
+    text: "Markovnikov's rule states that in addition of HX to an alkene, X⁻ adds to the carbon:",
+    opts: { A:"With fewer hydrogen atoms", B:"With more hydrogen atoms", C:"At the terminal carbon only", D:"Only when a catalyst is present" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "Markovnikov's rule: in addition of HX across an asymmetric C=C, H adds to the more hydrogen-bearing carbon, and X goes to the less substituted one. This is because the more stable carbocation intermediate forms."
+  },
+  {
+    id: 5,
+    text: "Which of the following gives a positive Tollens' test (silver mirror)?",
+    opts: { A:"Propanone", B:"Propanoic acid", C:"Ethanol", D:"Ethanal" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "Tollens' reagent ([Ag(NH₃)₂]⁺) oxidises aldehydes to carboxylic acids, depositing a silver mirror. Ketones such as propanone do not reduce Tollens' reagent."
+  },
+  {
+    id: 6,
+    text: "What type of reaction occurs when CH₃Br reacts with NaOH(aq)?",
+    opts: { A:"Nucleophilic substitution", B:"Free-radical substitution", C:"Electrophilic addition", D:"Elimination reaction" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "OH⁻ is a nucleophile that attacks the electrophilic carbon bearing Br: CH₃Br + OH⁻ → CH₃OH + Br⁻. This is an SN2 nucleophilic substitution reaction."
+  },
+  {
+    id: 7,
+    text: "Carboxylic acids react with Na₂CO₃ to produce:",
+    opts: { A:"A carboxylate salt, water and CO₂", B:"Hydrogen gas and a sodium salt", C:"An ester and water molecule", D:"Carbon dioxide and an alkene" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "2RCOOH + Na₂CO₃ → 2RCOONa + H₂O + CO₂. The effervescence (CO₂) is the diagnostic observation."
+  },
+  {
+    id: 8,
+    text: "Which of the following is a secondary amine?",
+    opts: { A:"CH₃NH₂", B:"NH₃", C:"(CH₃)₃N", D:"(CH₃)₂NH" },
+    ans: "D",
+    topic: "Organic Chemistry",
+    exp: "A secondary amine has two alkyl/aryl groups on nitrogen: (CH₃)₂NH (dimethylamine). CH₃NH₂ is primary; (CH₃)₃N is tertiary; NH₃ is not an amine."
+  },
+  {
+    id: 9,
+    text: "The hydration of ethene to produce ethanol requires:",
+    opts: { A:"Conc. H₃PO₄, steam, ~300°C, 60 atm", B:"NaOH catalyst and liquid water", C:"Yeast and glucose at 37°C", D:"UV light and water vapour" },
+    ans: "A",
+    topic: "Organic Chemistry",
+    exp: "Industrial hydration: CH₂=CH₂ + H₂O → CH₃CH₂OH. Uses concentrated H₃PO₄ as catalyst, steam at ~300°C and 60–70 atm, giving a continuous, high-purity product."
+  },
+  {
+    id: 10,
+    text: "What is the molar mass of Ca(NO₃)₂? (Ca=40, N=14, O=16)",
+    opts: { A:"102 g/mol", B:"164 g/mol", C:"132 g/mol", D:"148 g/mol" },
+    ans: "B",
+    topic: "Mole Concept",
+    exp: "Ca(NO₃)₂: Ca=40, 2×N=28, 6×O=96. Total = 40+28+96 = 164 g/mol."
+  },
+  {
+    id: 11,
+    text: "25 cm³ of 0.2 mol/dm³ H₂SO₄ reacts with NaOH. Moles of H₂SO₄ used are:",
+    opts: { A:"0.005 mol", B:"0.050 mol", C:"0.025 mol", D:"0.010 mol" },
+    ans: "A",
+    topic: "Mole Concept",
+    exp: "Moles = concentration × volume (dm³) = 0.2 × 0.025 = 0.005 mol H₂SO₄."
+  },
+  {
+    id: 12,
+    text: "What volume of 0.5 mol/dm³ HCl contains 0.1 mol of HCl?",
+    opts: { A:"50 cm³", B:"500 cm³", C:"250 cm³", D:"200 cm³" },
+    ans: "D",
+    topic: "Mole Concept",
+    exp: "Volume = moles/concentration = 0.1/0.5 = 0.2 dm³ = 200 cm³."
+  },
+  {
+    id: 13,
+    text: "The percentage yield of a reaction that gives 18 g of product when 30 g is expected is:",
+    opts: { A:"50%", B:"70%", C:"80%", D:"60%" },
+    ans: "D",
+    topic: "Mole Concept",
+    exp: "% yield = (actual yield / theoretical yield) × 100 = (18/30) × 100 = 60%."
+  },
+  {
+    id: 14,
+    text: "In Fe₂O₃ + 3CO → 2Fe + 3CO₂, what mass of Fe forms from 160 g Fe₂O₃? (Fe=56, O=16)",
+    opts: { A:"56 g iron", B:"168 g iron", C:"112 g iron", D:"224 g iron" },
+    ans: "C",
+    topic: "Mole Concept",
+    exp: "Molar mass Fe₂O₃ = 160 g/mol → 1 mol Fe₂O₃. From ratio 1:2, moles Fe = 2 mol. Mass = 2 × 56 = 112 g."
+  },
+  {
+    id: 15,
+    text: "Avogadro's number is best defined as:",
+    opts: { A:"6.02 × 10²³ particles per mole", B:"Number of molecules in 22.4 dm³", C:"6.02 × 10²³ particles per gram", D:"Number of atoms in 1 g of H₂" },
+    ans: "A",
+    topic: "Mole Concept",
+    exp: "Avogadro's number (Nₐ = 6.02 × 10²³ mol⁻¹) is the number of elementary particles in one mole of any substance."
+  },
+  {
+    id: 16,
+    text: "According to Lewis theory, a base is a substance that:",
+    opts: { A:"Donates a proton to an acid", B:"Accepts a proton from an acid", C:"Donates an electron pair", D:"Accepts an electron pair" },
+    ans: "C",
+    topic: "Acids Bases Salts",
+    exp: "Lewis theory: a base is an electron-pair donor; an acid is an electron-pair acceptor. This is the broadest acid-base definition, extending to coordination chemistry."
+  },
+  {
+    id: 17,
+    text: "What is the [OH⁻] of a solution with pH = 11 at 25°C?",
+    opts: { A:"1 × 10⁻³ mol/dm³", B:"1 × 10⁻¹¹ mol/dm³", C:"1 × 10⁻¹ mol/dm³", D:"1 × 10⁻² mol/dm³" },
+    ans: "A",
+    topic: "Acids Bases Salts",
+    exp: "pOH = 14 − 11 = 3. [OH⁻] = 10⁻³ mol/dm³. Alternatively: Kw = [H⁺][OH⁻] = 10⁻¹⁴, so [OH⁻] = 10⁻¹⁴/10⁻¹¹ = 10⁻³."
+  },
+  {
+    id: 18,
+    text: "A buffer of pH 4.74 uses ethanoic acid (pKₐ = 4.74) and sodium ethanoate. The ratio [CH₃COO⁻]/[CH₃COOH] is:",
+    opts: { A:"10:1", B:"1:10", C:"1:1", D:"5:1" },
+    ans: "C",
+    topic: "Acids Bases Salts",
+    exp: "Henderson-Hasselbalch: pH = pKₐ + log([A⁻]/[HA]). When pH = pKₐ, log ratio = 0, so [A⁻]/[HA] = 1:1."
+  },
+  {
+    id: 19,
+    text: "Which of the following is an amphoteric substance?",
+    opts: { A:"NaOH solution", B:"HCl solution", C:"Water (H₂O)", D:"Na₂CO₃ solution" },
+    ans: "C",
+    topic: "Acids Bases Salts",
+    exp: "An amphoteric substance acts as either acid or base. Water: as acid H₂O → H⁺ + OH⁻; as base H₂O + H⁺ → H₃O⁺. Al(OH)₃ is also amphoteric."
+  },
+  {
+    id: 20,
+    text: "The Ka of a weak acid HA at 25°C is 1.8 × 10⁻⁵. Its pKₐ is approximately:",
+    opts: { A:"pKa = 4.74", B:"pKa = 5.74", C:"pKa = 3.74", D:"pKa = 7.00" },
+    ans: "A",
+    topic: "Acids Bases Salts",
+    exp: "pKₐ = −log(1.8 × 10⁻⁵) = −(0.26 − 5) = 4.74. This is the pKₐ of ethanoic acid."
+  },
+  {
+    id: 21,
+    text: "For N₂O₄(g) ⇌ 2NO₂(g), Kc = 4.6 × 10⁻³ at 25°C. The equilibrium favours:",
+    opts: { A:"Products (NO₂) strongly", B:"Products at high pressure", C:"Neither side equally", D:"Reactants (N₂O₄) strongly" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: "Kc = 4.6 × 10⁻³ << 1. A small Kc means equilibrium lies far left, strongly favouring N₂O₄. Very little dissociation occurs at 25°C."
+  },
+  {
+    id: 22,
+    text: "The solubility product of AgCl = 1.8 × 10⁻¹⁰ mol²/dm⁶. Its molar solubility is:",
+    opts: { A:"1.34 × 10⁻⁵ mol/dm³", B:"9.00 × 10⁻¹¹ mol/dm³", C:"1.80 × 10⁻¹⁰ mol/dm³", D:"3.24 × 10⁻²⁰ mol/dm³" },
+    ans: "A",
+    topic: "Equilibrium",
+    exp: "AgCl ⇌ Ag⁺ + Cl⁻. Ksp = s². s = √(1.8×10⁻¹⁰) = 1.34×10⁻⁵ mol/dm³."
+  },
+  {
+    id: 23,
+    text: "Increasing pressure on 2SO₂(g) + O₂(g) ⇌ 2SO₃(g) will:",
+    opts: { A:"Shift equilibrium to the left", B:"Have no effect on position", C:"Decrease the reaction rate", D:"Shift equilibrium to the right" },
+    ans: "D",
+    topic: "Equilibrium",
+    exp: "Left has 3 moles of gas, right has 2. Increased pressure favours the side with fewer gas moles → shifts right, increasing SO₃ yield. This is used in the Contact Process."
+  },
+  {
+    id: 24,
+    text: "The rate of a reaction typically doubles for every 10°C rise in temperature. This is explained by:",
+    opts: { A:"More molecules exceeding activation energy", B:"Activation energy decreasing only", C:"All collision frequency increasing only", D:"Increased pressure of the system" },
+    ans: "A",
+    topic: "Equilibrium",
+    exp: "Temperature increases kinetic energy. A 10°C rise roughly doubles the fraction of molecules with energy ≥ Eₐ, as described by the Maxwell–Boltzmann distribution."
+  },
+  {
+    id: 25,
+    text: "In the Contact Process, SO₃ is absorbed in concentrated H₂SO₄ rather than water because:",
+    opts: { A:"Water is too costly industrially", B:"SO₃ does not dissolve in water", C:"Direct addition forms uncontrollable acid mist", D:"H₂SO₄ has a higher boiling point" },
+    ans: "C",
+    topic: "Equilibrium",
+    exp: "SO₃ + H₂O is highly exothermic and forms unmanageable acid mist if water is used directly. SO₃ is absorbed in conc. H₂SO₄ to form oleum, then carefully diluted."
+  },
+  {
+    id: 26,
+    text: "E°(Zn²⁺/Zn) = −0.76 V and E°(Cu²⁺/Cu) = +0.34 V. The EMF of the Daniell cell is:",
+    opts: { A:"+1.10 V", B:"−1.10 V", C:"+0.42 V", D:"+0.76 V" },
+    ans: "A",
+    topic: "Electrochemistry",
+    exp: "E°cell = E°cathode − E°anode = 0.34 − (−0.76) = +1.10 V. Positive EMF confirms spontaneous cell reaction."
+  },
+  {
+    id: 27,
+    text: "During electrolysis of concentrated NaCl solution, what is produced at the anode?",
+    opts: { A:"Oxygen gas", B:"Sodium metal", C:"Hydrogen gas", D:"Chlorine gas" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "Cl⁻ is preferentially discharged at the anode: 2Cl⁻ → Cl₂ + 2e⁻. At the cathode, H⁺ is reduced: 2H⁺ + 2e⁻ → H₂. NaOH remains in solution."
+  },
+  {
+    id: 28,
+    text: "What mass of silver deposits when 9650 C passes through AgNO₃ solution? (Ag=108, F=96500 C)",
+    opts: { A:"5.4 g silver", B:"54 g silver", C:"108 g silver", D:"10.8 g silver" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "Ag⁺ + e⁻ → Ag (1 electron per Ag). Moles e⁻ = 9650/96500 = 0.1 mol. Mass Ag = 0.1 × 108 = 10.8 g."
+  },
+  {
+    id: 29,
+    text: "A positive standard electrode potential (E°) indicates the half-cell:",
+    opts: { A:"Is a good reducing agent", B:"Strongly prefers oxidation", C:"Has a tendency to be reduced", D:"Acts as anode in all cells" },
+    ans: "C",
+    topic: "Electrochemistry",
+    exp: "Positive E° means the species is easily reduced compared to the SHE. High positive E° = strong oxidising agent. Negative E° = tendency to be oxidised."
+  },
+  {
+    id: 30,
+    text: "In the electrolysis of dilute H₂SO₄, the volume ratio of gas at cathode to anode is:",
+    opts: { A:"1:2 (H₂:O₂)", B:"1:1 (H₂:O₂)", C:"3:1 (H₂:O₂)", D:"2:1 (H₂:O₂)" },
+    ans: "D",
+    topic: "Electrochemistry",
+    exp: "Cathode: 4H⁺ + 4e⁻ → 2H₂. Anode: 2H₂O → O₂ + 4H⁺ + 4e⁻. Per 4 electrons: 2 mol H₂ and 1 mol O₂. Volume ratio H₂:O₂ = 2:1."
+  },
+  {
+    id: 31,
+    text: "E = hf, f = 6 × 10¹⁴ Hz, h = 6.63 × 10⁻³⁴ J·s. Energy of the photon is:",
+    opts: { A:"3.98 × 10⁻¹⁹ J", B:"6.63 × 10⁻³⁴ J", C:"1.10 × 10⁻⁴⁸ J", D:"9.95 × 10⁻¹⁹ J" },
+    ans: "A",
+    topic: "Atomic Structure",
+    exp: "E = hf = 6.63×10⁻³⁴ × 6×10¹⁴ = 3.978×10⁻¹⁹ J ≈ 3.98×10⁻¹⁹ J. This falls in the visible light range."
+  },
+  {
+    id: 32,
+    text: "Which of the following ions has the electron configuration of a noble gas?",
+    opts: { A:"Cl⁻ ion", B:"Cu²⁺ ion", C:"Fe²⁺ ion", D:"Cr³⁺ ion" },
+    ans: "A",
+    topic: "Atomic Structure",
+    exp: "Cl (Z=17) has configuration 2,8,7. Cl⁻ gains one electron: 2,8,8 — the argon configuration. Fe²⁺, Cu²⁺, and Cr³⁺ all have partially filled d orbitals."
+  },
+  {
+    id: 33,
+    text: "The bond angle in BF₃ is 120° because BF₃ has:",
+    opts: { A:"3 bonding pairs and 1 lone pair", B:"3 bonding pairs, no lone pairs", C:"2 bonding pairs and 2 lone pairs", D:"4 bonding pairs, no lone pairs" },
+    ans: "B",
+    topic: "Chemical Bonding",
+    exp: "Boron in BF₃ has only 3 bonding pairs and no lone pairs (trigonal planar). With no lone-pair repulsion, all bond pairs are equivalent, giving 120°."
+  },
+  {
+    id: 34,
+    text: "Which of the following has the strongest intermolecular forces?",
+    opts: { A:"CH₄ molecule", B:"HCl molecule", C:"H₂O molecule", D:"NH₃ molecule" },
+    ans: "C",
+    topic: "Chemical Bonding",
+    exp: "H₂O has the strongest hydrogen bonding due to oxygen's high electronegativity and two available lone pairs, giving water an anomalously high boiling point of 100°C."
+  },
+  {
+    id: 35,
+    text: "A sigma (σ) bond is formed by:",
+    opts: { A:"Lateral overlap of p orbitals", B:"End-on overlap of orbitals", C:"Overlap of d and f orbitals", D:"Ionic electron transfer" },
+    ans: "B",
+    topic: "Chemical Bonding",
+    exp: "A σ bond forms by end-on (axial) overlap along the internuclear axis (s-s, s-p, or p-p end-on). All single bonds contain a σ bond."
+  },
+  {
+    id: 36,
+    text: "2.0 mol of an ideal gas at 27°C occupies what volume at 1 atm? (R = 0.082 L·atm/mol·K)",
+    opts: { A:"49.2 dm³", B:"22.4 dm³", C:"24.6 dm³", D:"44.8 dm³" },
+    ans: "A",
+    topic: "Gas Laws",
+    exp: "V = nRT/P = 2.0 × 0.082 × 300 / 1 = 49.2 dm³. (T = 27 + 273 = 300 K)"
+  },
+  {
+    id: 37,
+    text: "Which gas law describes the relationship between volume and amount (moles) at constant T and P?",
+    opts: { A:"Boyle's Law", B:"Graham's Law", C:"Charles's Law", D:"Avogadro's Law" },
+    ans: "D",
+    topic: "Gas Laws",
+    exp: "Avogadro's Law: V ∝ n at constant T and P. Equal volumes of gases at the same T and P contain equal numbers of molecules."
+  },
+  {
+    id: 38,
+    text: "The ratio of diffusion rates of H₂ (M=2) and O₂ (M=32) by Graham's Law is:",
+    opts: { A:"H₂ is 2× faster than O₂", B:"H₂ is 8× faster than O₂", C:"H₂ is 16× faster than O₂", D:"H₂ is 4× faster than O₂" },
+    ans: "D",
+    topic: "Gas Laws",
+    exp: "r₁/r₂ = √(M₂/M₁) = √(32/2) = √16 = 4. H₂ diffuses 4 times faster than O₂."
+  },
+  {
+    id: 39,
+    text: "Real gases deviate most from ideal behaviour at:",
+    opts: { A:"High temperature and low pressure", B:"Low temperature and high pressure", C:"Low temperature and low pressure", D:"High temperature and high pressure" },
+    ans: "B",
+    topic: "Gas Laws",
+    exp: "At low temperature, intermolecular attractions become significant. At high pressure, molecular volume is non-negligible relative to container volume. Both effects together cause maximum deviation."
+  },
+  {
+    id: 40,
+    text: "The element with the highest first ionisation energy in Period 2 is:",
+    opts: { A:"Oxygen", B:"Neon", C:"Nitrogen", D:"Fluorine" },
+    ans: "B",
+    topic: "Periodic Table",
+    exp: "Neon (noble gas) has the highest first ionisation energy in Period 2 due to its complete, stable electron shell. Despite the general increase across the period, neon's full shell makes it hardest to ionise."
+  },
+  {
+    id: 41,
+    text: "Which of the following is a property of Group I (alkali) metals?",
+    opts: { A:"High density and melting point", B:"React with water to release H₂", C:"Form coloured ionic compounds", D:"Show multiple oxidation states" },
+    ans: "B",
+    topic: "Periodic Table",
+    exp: "Alkali metals react vigorously with water: 2M + 2H₂O → 2MOH + H₂. Reactivity increases down the group. They have low density, low melting points, and a fixed +1 oxidation state."
+  },
+  {
+    id: 42,
+    text: "The diagonal relationship in the periodic table is best shown between:",
+    opts: { A:"Na and Mg across period 3", B:"Li and Mg diagonally placed", C:"B and Si diagonally placed", D:"Be and Al diagonally placed" },
+    ans: "D",
+    topic: "Periodic Table",
+    exp: "Be (Period 2, Group II) and Al (Period 3, Group III) have similar charge density and exhibit similar chemistry: both form amphoteric oxides and covalent compounds."
+  },
+  {
+    id: 43,
+    text: "The standard enthalpy of formation of H₂O(l) is the enthalpy change when:",
+    opts: { A:"1 mol H₂O decomposes to its elements", B:"H₂O(l) dissolves in excess water", C:"1 mol H₂O(l) forms from H₂(g) and O₂(g)", D:"H₂O(g) condenses to give H₂O(l)" },
+    ans: "C",
+    topic: "Energetics",
+    exp: "ΔH°f is the enthalpy change when 1 mole of compound forms from its elements in standard states: H₂(g) + ½O₂(g) → H₂O(l). For elements in standard state, ΔH°f = 0."
+  },
+  {
+    id: 44,
+    text: "A Born-Haber cycle is used to calculate:",
+    opts: { A:"Activation energy of a reaction", B:"Lattice energy of an ionic solid", C:"Gibbs free energy of a solution", D:"Rate constant of an ionic reaction" },
+    ans: "B",
+    topic: "Energetics",
+    exp: "The Born-Haber cycle applies Hess's Law to ionic compounds, using measurable enthalpies to calculate the otherwise unmeasurable lattice energy."
+  },
+  {
+    id: 45,
+    text: "Which of the following processes is endothermic?",
+    opts: { A:"Condensation of steam to liquid", B:"Decomposition of CaCO₃ to CaO", C:"Combustion of methane in air", D:"Neutralisation of HCl by NaOH" },
+    ans: "B",
+    topic: "Energetics",
+    exp: "CaCO₃ → CaO + CO₂ is endothermic (ΔH = +178 kJ/mol) — heat must be supplied. Combustion, condensation, and neutralisation are all exothermic."
+  },
+  {
+    id: 46,
+    text: "Aluminium is extracted by electrolysis rather than carbon reduction because:",
+    opts: { A:"Electrolysis gives a purer product", B:"Al₂O₃ has a very high melting point", C:"Al is more reactive than carbon", D:"Carbon reacts with the aluminium formed" },
+    ans: "C",
+    topic: "Metals",
+    exp: "Aluminium is more reactive than carbon in the reactivity series, so carbon cannot reduce Al₂O₃. Electrolysis of molten Al₂O₃ (dissolved in cryolite) is used instead."
+  },
+  {
+    id: 47,
+    text: "The rusting of iron requires the presence of both:",
+    opts: { A:"CO₂ and nitrogen gas", B:"Water and oxygen", C:"Chlorine and moisture", D:"Dilute acid and sunlight" },
+    ans: "B",
+    topic: "Metals",
+    exp: "Rusting (Fe₂O₃·xH₂O) requires both water and oxygen. Neither alone is sufficient. Salt water speeds rusting by acting as an electrolyte but is not essential."
+  },
+  {
+    id: 48,
+    text: "In the Haber process, nitrogen is obtained from:",
+    opts: { A:"Fractional distillation of air", B:"Decomposition of ammonia gas", C:"Electrolysis of liquid nitrogen", D:"Reaction of NOₓ with hot alkali" },
+    ans: "A",
+    topic: "Non-metals",
+    exp: "Nitrogen (78% of air) is obtained by fractional distillation of liquid air, which also yields oxygen and argon. The nitrogen feeds directly into the Haber process."
+  },
+  {
+    id: 49,
+    text: "A precipitate that dissolves in excess NH₃ solution but not in excess NaOH indicates the presence of:",
+    opts: { A:"Fe³⁺ ion", B:"Cu²⁺ ion", C:"Al³⁺ ion", D:"Pb²⁺ ion" },
+    ans: "B",
+    topic: "Qualitative Analysis",
+    exp: "Cu²⁺ + 2OH⁻ → Cu(OH)₂ (blue ppt). In excess NH₃: Cu(OH)₂ + 4NH₃ → [Cu(NH₃)₄]²⁺ (deep blue complex). Al(OH)₃ dissolves in excess NaOH, not NH₃."
+  },
+  {
+    id: 50,
+    text: "The half-life of a radioactive isotope is 20 years. What fraction remains after 60 years?",
+    opts: { A:"1/4 remains", B:"1/16 remains", C:"1/2 remains", D:"1/8 remains" },
+    ans: "D",
+    topic: "Nuclear Chemistry",
+    exp: "Number of half-lives = 60/20 = 3. Fraction remaining = (1/2)³ = 1/8. The sequence: 1 → 1/2 → 1/4 → 1/8."
+  }
+];
+
+/* ── SHUFFLE OPTIONS (Fisher-Yates at render time) ──
+   Converts opts object to array, shuffles, re-labels A-D,
+   tracks the new correct-answer label. Scoring uses SHUFFLED_ANS.
+*/
+var SHUFFLED_ANS = {};
+
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return { origKey: k, text: q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp;
+  }
+  var newOpts = {}; var newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) {
+    newOpts[lbl] = entries[idx].text;
+    if (entries[idx].origKey === q.ans) newAns = lbl;
+  });
+  return { opts: newOpts, ans: newAns };
+}
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0 };
+var UA = {};
+var globalDone = false;
+var GLOBAL_SECS = 1800;
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) { var m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el?el.textContent:'—'; }
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    var optsHtml = '';
+    ['A','B','C','D'].forEach(function(lbl) {
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+shuffled.opts[lbl]+'</span>' +
+        '</div>';
+    });
+    html += '<div class="qcard" style="animation-delay:'+(i*0.03)+'s">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q'+q.id+' of 50</span>' +
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'') +
+      '</div>' +
+      '<div class="qtxt">'+q.text+'</div>' +
+      '<div class="opts">'+optsHtml+'</div>' +
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp'+q.id+'"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid = parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid = parseInt(this.dataset.qid);
+      var q = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var correctLabel = SHUFFLED_ANS[qid];
+      var ok = (chosen === correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      var expEl = document.getElementById('exp'+qid);
+      var markCls = ok?'pos':'neg';
+      var markTxt = ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel;
+      expEl.innerHTML = '<span class="exp-mark '+markCls+'">'+markTxt+'</span>' +
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered/QUESTIONS.length*100)+'%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() { document.getElementById('m-time').textContent=getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() {
+  hideSubmitModal(); globalDone = true; stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(b){ if(!b.disabled) b.click(); });
+  var pct = Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  document.querySelectorAll('.opt').forEach(function(o){ o.style.pointerEvents='none'; o.classList.add('locked'); });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled=true; });
+  var pct = Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF ── */
+function doPrint() {
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){ document.getElementById('print-header').style.display='none'; },1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
