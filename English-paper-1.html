@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>English — Paper 1 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #f59e0b;
+      --accent2:#d97706;
+      --warn:   #F59E0B;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --blue:   #3b82f6;
+      --blue2:  #2563eb;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── AUTH GATE ── */
+    #gate {
+      position: fixed; inset: 0; z-index: 9000;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #gate.gone { display: none; }
+    .gate-box {
+      background: var(--card);
+      border: 1px solid var(--sep);
+      border-radius: 20px;
+      padding: 36px 28px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .gate-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--blue); margin-bottom: 6px;
+    }
+    .gate-title {
+      font-family: var(--mono); font-size: 1.2rem; font-weight: 700;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .gate-sub {
+      font-size: 12px; color: var(--ter); margin-bottom: 28px;
+    }
+    .gate-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--ter); margin-bottom: 6px;
+    }
+    .gate-input {
+      width: 100%; padding: 13px 16px;
+      background: var(--card2); border: 1px solid var(--sep);
+      border-radius: 10px; color: var(--text);
+      font-family: var(--mono); font-size: 14px;
+      outline: none; margin-bottom: 10px;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .gate-input:focus { border-color: rgba(59,130,246,0.5); }
+    .gate-input.err  { border-color: var(--red); }
+    .gate-btn {
+      width: 100%; padding: 13px;
+      background: var(--blue); color: #fff;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s; margin-top: 4px;
+    }
+    .gate-btn:hover { opacity: 0.88; }
+    .gate-err {
+      font-size: 12px; color: var(--red);
+      font-family: var(--mono); margin-top: 8px;
+      min-height: 18px; letter-spacing: 0.02em;
+    }
+    .gate-attempts {
+      font-size: 11px; color: var(--ter);
+      text-align: center; margin-top: 16px;
+    }
+
+    /* ── WATERMARK ── */
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.8rem;
+      padding: 1rem;
+      transform: rotate(-20deg) scale(1.5);
+      transform-origin: center center;
+      opacity: 0.022;
+      font-family: var(--mono);
+      font-size: 0.72rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.08em;
+      white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: rgba(10,14,26,0.92);
+      border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue);
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .hdr-greeting {
+      font-size: 11px; color: var(--ter);
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.18);
+      padding: 3px 10px; border-radius: 999px;
+      font-family: var(--mono); letter-spacing: 0.05em;
+    }
+    .gtimer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      flex-shrink: 0;
+    }
+    .gtimer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue); flex-shrink: 0;
+      transition: background .3s;
+    }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      letter-spacing: 1px; color: var(--blue); transition: color .3s;
+    }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; padding: 12px 20px 8px;
+      position: relative; z-index: 1;
+    }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); }
+    .sc-v.w { color: var(--red); }
+    .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue2), var(--blue));
+      border-radius: 99px; transition: width 0.4s ease; width: 0%;
+    }
+
+    /* ── QUESTION CARDS ── */
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: var(--r); padding: 20px; margin-bottom: 14px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .qcard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--sep); gap: 10px;
+    }
+    .qnum {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .qtopic {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      color: var(--blue); letter-spacing: 0.3px;
+    }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-radius: 10px;
+      border: 1px solid var(--sep); background: var(--card2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .opt:hover:not(.locked) { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.05); }
+    .opt.sel   { border-color: rgba(59,130,246,0.5); background: rgba(59,130,246,0.08); }
+    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--blue); flex-shrink: 0; width: 18px; padding-top: 1px;
+    }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--blue); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn {
+      margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px;
+      background: var(--blue); color: #fff;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp {
+      display: none; margin-top: 12px;
+      background: rgba(59,130,246,0.06);
+      border: 1px solid rgba(59,130,246,0.18);
+      border-radius: 10px; padding: 14px;
+      font-size: 13px; line-height: 1.68; color: var(--sec);
+    }
+    .exp.show { display: block; }
+    .exp-mark {
+      display: inline-block; margin-bottom: 8px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+
+    /* ── SUBMIT BAR ── */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index: 200; backdrop-filter: blur(16px);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .submit-btn {
+      flex: 1; padding: 13px; background: var(--blue); color: #fff;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+
+    /* ── TIME UP / RESULTS OVERLAY ── */
+    .timeup {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,14,26,0.96);
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .timeup.show { display: flex; }
+    .timeup-box {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); }
+    .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); }
+    .tu-stat-v.w { color: var(--red); }
+    .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn {
+      width: 100%; padding: 13px; background: var(--blue); color: #fff;
+      font-family: var(--sans); font-size: 14px; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer; margin-bottom: 8px;
+    }
+    .timeup-btn.sec {
+      background: transparent; color: var(--ter);
+      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
+    }
+
+    /* ── SUBMIT MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--sep);
+      border-radius: 16px; width: 100%; max-width: 400px;
+      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.96) translateY(8px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--sep);
+      font-size: 13px; color: var(--ter);
+    }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .modal-btn.primary { background: var(--blue); color: #fff; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+
+    /* ── PRINT ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, #gate, .hdr, .gtimer, .submit-bar,
+      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f0f7ff !important; border: 1px solid #bfdbfe !important; color: #1e3a5f !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #eff6ff !important; border-color: #3b82f6 !important; }
+      .opt-txt { color: #000 !important; }
+      .qtxt    { color: #000 !important; }
+      .qtopic  { background: #eff6ff !important; color: #1d4ed8 !important; border-color: #93c5fd !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-brand">GrantApp AI · Premium</div>
+    <div class="gate-title">English — Paper 1</div>
+    <div class="gate-sub">UTME 2026 · 50 Questions · 30 Minutes</div>
+    <div class="gate-label">Access password</div>
+    <input class="gate-input" id="gate-pw" type="password" placeholder="••••••••••••" autocomplete="off">
+    <div class="gate-err" id="gate-err"></div>
+    <button class="gate-btn" onclick="gateSubmit()">Enter →</button>
+    <div class="gate-attempts" id="gate-att"></div>
+  </div>
+</div>
+
+<!-- print-only header -->
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — English Paper 1</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<!-- watermark -->
+<div id="watermark" aria-hidden="true"></div>
+
+<!-- header -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">English · Paper 1</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- score strip -->
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<!-- question cards -->
+<div id="qc"></div>
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<!-- submit modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- time up overlay -->
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH ── */
+var VALID = {
+  'con-eng-pp7p3k': 'Conve',
+  'kao-eng-ghirbf': 'Kaosara',
+  'hab-eng-r1ozjj': 'Habibat',
+  'oyi-eng-ee0vtf': 'Oyin',
+  'dor-eng-9z7mca': 'Dorcas',
+  'fam-eng-qx85sx': 'Famous',
+  'oba-eng-4o7dzg': 'Obasesam',
+  'pro-eng-zhs8wq': 'Prosper',
+  'tem-eng-05rs9h': 'Temi',
+  'mur-eng-cf4inh': 'Murphy',
+  'abu-eng-m3kx9z': 'Abu Ene',
+  'are-eng-k4vz2m': 'Aremu',
+  'ttl-eng-q3bx7m': 'Taiwo T.'
+};
+
+var attempts = 0;
+var MAX_ATT  = 5;
+
+function gateSubmit() {
+  var pw  = document.getElementById('gate-pw').value.trim();
+  var err = document.getElementById('gate-err');
+  var att = document.getElementById('gate-att');
+
+  if (!pw) {
+    document.getElementById('gate-pw').classList.add('err');
+    err.textContent = 'Enter your password.'; return;
+  }
+
+  attempts++;
+  var name = VALID[pw];
+  if (name) {
+    document.getElementById('gate').classList.add('gone');
+    injectWatermark(name);
+    var greet = document.getElementById('greeting');
+    greet.textContent = 'Hey, ' + name;
+    greet.style.display = 'block';
+    document.getElementById('print-student-name').textContent = 'Student: ' + name;
+    startTimer();
+  } else {
+    document.getElementById('gate-pw').classList.add('err');
+    var left = MAX_ATT - attempts;
+    if (left <= 0) {
+      err.textContent = 'Too many failed attempts.';
+      document.querySelector('.gate-btn').disabled = true;
+      document.getElementById('gate-pw').disabled  = true;
+    } else {
+      err.textContent = 'Incorrect password.';
+      att.textContent = left + ' attempt' + (left === 1 ? '' : 's') + ' remaining.';
+    }
+  }
+}
+
+document.getElementById('gate-pw').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') gateSubmit();
+});
+
+/* ── WATERMARK ── */
+function injectWatermark(name) {
+  var wm   = document.getElementById('watermark');
+  var tile = name + ' · GrantApp AI · ';
+  var row  = '';
+  for (var r = 0; r < 8; r++) row += tile;
+  var html = '';
+  for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+  wm.innerHTML = html;
+}
+
+document.getElementById('print-date').textContent =
+  'Printed: ' + new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+
+  /* ── ORAL ENGLISH: Vowels & Consonants (Q1–8) ── */
+  {
+    id:1, topic:'Oral English',
+    text:'Which word contains the vowel sound /ɜː/ as in "bird"?',
+    opts:{A:'heart',B:'heard',C:'haired',D:'hoard'},
+    ans:'B',
+    exp:'"Heard" = /hɜːd/ — the /ɜː/ central long vowel. "Heart" = /ɑː/, "haired" = /eə/, "hoard" = /ɔː/. All four vowels differ despite similar spelling.'
+  },
+  {
+    id:2, topic:'Oral English',
+    text:'The word "through" contains how many phonemes?',
+    opts:{A:'7',B:'5',C:'4',D:'3'},
+    ans:'D',
+    exp:'"Through" = /θ/ /r/ /uː/ — three sounds. Seven letters compress into three phonemes: "th"=/θ/, "r"=/r/, "ough"=/uː/. Letters and phonemes are not the same.'
+  },
+  {
+    id:3, topic:'Oral English',
+    text:'Identify the word in which the underlined letters represent the sound /ʃ/.',
+    opts:{A:'ch-air',B:'ma-ch-ine',C:'ch-urch',D:'ch-eese'},
+    ans:'B',
+    exp:'"Machine" has "ch" pronounced /ʃ/ (French origin). "Chair," "church," and "cheese" all use /tʃ/, the affricate. This is a standard JAMB phoneme-spelling trap.'
+  },
+  {
+    id:4, topic:'Oral English',
+    text:'Which of the following pairs are NOT homophones?',
+    opts:{A:'bare / bear',B:'steak / stake',C:'peal / peel',D:'quite / quiet'},
+    ans:'D',
+    exp:'"Quite" /kwaɪt/ and "quiet" /kwaɪət/ are not homophones — "quiet" has two syllables. The other three pairs are genuine homophones with identical pronunciations.'
+  },
+  {
+    id:5, topic:'Oral English',
+    text:'In which word is the final consonant silent?',
+    opts:{A:'comb',B:'lamp',C:'risk',D:'bond'},
+    ans:'A',
+    exp:'"Comb" = /kəʊm/ — the final "b" is silent. The "mb" cluster at word-end always silences the b: thumb, lamb, dumb, climb.'
+  },
+  {
+    id:6, topic:'Oral English',
+    text:'The word "photography" is correctly stressed on the:',
+    opts:{A:'first syllable: PHO-tog-ra-phy',B:'second syllable: pho-TOG-ra-phy',C:'third syllable: pho-tog-RA-phy',D:'fourth syllable: pho-tog-ra-PHY'},
+    ans:'B',
+    exp:'"Photography" = pho-TOG-ra-phy. Primary stress falls on the second syllable. Compare: PHO-to-graph (stress shifts with suffix). This stress-shift pattern is heavily tested by JAMB.'
+  },
+  {
+    id:7, topic:'Oral English',
+    text:'When "record" is used as a VERB, the stress falls on the:',
+    opts:{A:'first syllable: RE-cord',B:'second syllable: re-CORD',C:'both syllables equally',D:'neither — stress is irrelevant for verbs'},
+    ans:'B',
+    exp:'Classic noun/verb stress shift: noun = RE-cord, verb = re-CORD. Same pattern: PROtest/proTEST, PERmit/perMIT, REFund/reFUND.'
+  },
+  {
+    id:8, topic:'Oral English',
+    text:'Which word contains a diphthong?',
+    opts:{A:'bed',B:'boot',C:'boy',D:'barn'},
+    ans:'C',
+    exp:'"Boy" = /bɔɪ/ — a diphthong (glide from /ɔ/ to /ɪ/). "Bed" = /e/, "boot" = /uː/, "barn" = /ɑː/ are all pure (monophthong) vowels.'
+  },
+
+  /* ── ORAL ENGLISH: Stress & Intonation (Q9–12) ── */
+  {
+    id:9, topic:'Oral English',
+    text:'Which of the following words has its primary stress on the THIRD syllable?',
+    opts:{A:'comfortable',B:'education',C:'geography',D:'territory'},
+    ans:'B',
+    exp:'"Education" = ed-u-CA-tion. Stress falls on syllable 3. "Comfortable" = COM-fort-able (1st), "geography" = ge-OG-ra-phy (2nd), "territory" = TER-ri-to-ry (1st).'
+  },
+  {
+    id:10, topic:'Oral English',
+    text:'How many syllables does the word "immediately" have?',
+    opts:{A:'4',B:'6',C:'3',D:'5'},
+    ans:'D',
+    exp:'"Immediately" = im-me-di-ate-ly = 5 syllables. Students often collapse "di-ate" into one syllable in speech, giving 4. The written word has 5 distinct syllable nuclei.'
+  },
+  {
+    id:11, topic:'Oral English',
+    text:'A rising intonation at the end of a statement in English typically signals:',
+    opts:{A:'a completed thought with no expectation of a response',B:'certainty and confidence in the information stated',C:'doubt, incompleteness, or an implicit question',D:'anger or emotional intensity in the speaker'},
+    ans:'C',
+    exp:'Rising intonation on a statement signals uncertainty, incompleteness, or turns it into an implied question. Falling intonation marks finality and certainty.'
+  },
+  {
+    id:12, topic:'Oral English',
+    text:'Which of the following correctly illustrates the concept of assimilation in spoken English?',
+    opts:{A:'"library" pronounced as "lie-bree"',B:'"ten boys" pronounced as "tem boys"',C:'"comfortable" pronounced as "cumftable"',D:'"February" pronounced as "Feb-yoo-ary"'},
+    ans:'B',
+    exp:'Assimilation: /n/ in "ten" becomes /m/ before the bilabial /b/ of "boys" — the nasal assimilates to the place of articulation of the following consonant. This is regressive assimilation.'
+  },
+
+  /* ── LEXIS & STRUCTURE: Concord (Q13–18) ── */
+  {
+    id:13, topic:'Concord',
+    text:'Choose the option that correctly completes the sentence: "The committee _____ divided in its opinion on the matter."',
+    opts:{A:'were',B:'has been',C:'is',D:'have been'},
+    ans:'C',
+    exp:'"Committee" is a collective noun treated as singular in British English when acting as one body. "The committee is" — singular verb. If members act individually, "were" is used.'
+  },
+  {
+    id:14, topic:'Concord',
+    text:'"Neither the students nor the teacher _____ able to explain the anomaly."',
+    opts:{A:'were',B:'has been',C:'are',D:'was'},
+    ans:'D',
+    exp:'With "neither...nor," the verb agrees with the subject closest to it — "the teacher" (singular). "Was" is correct. This is the proximity rule.'
+  },
+  {
+    id:15, topic:'Concord',
+    text:'"She is one of those teachers who _____ always prepared."',
+    opts:{A:'is',B:'was',C:'are',D:'were'},
+    ans:'C',
+    exp:'The relative clause "who are always prepared" refers to "those teachers" (plural antecedent), not to "she." The verb must agree with the plural: "are." This is the classic "one of those who" trap.'
+  },
+  {
+    id:16, topic:'Concord',
+    text:'"The news from the various fronts _____ not encouraging."',
+    opts:{A:'are',B:'were',C:'have been',D:'is'},
+    ans:'D',
+    exp:'"News" is an uncountable noun — always singular despite ending in s. "The news is." Similarly: physics, economics, mathematics, measles — all take singular verbs.'
+  },
+  {
+    id:17, topic:'Concord',
+    text:'"Twenty naira _____ not enough to buy a sachet of water these days."',
+    opts:{A:'are',B:'were',C:'is',D:'have been'},
+    ans:'C',
+    exp:'A sum of money treated as a single unit takes a singular verb. "Twenty naira is" — the amount is viewed as one unit, not twenty separate coins.'
+  },
+  {
+    id:18, topic:'Concord',
+    text:'"The jury _____ still deliberating on the verdict after three days."',
+    opts:{A:'is',B:'are',C:'has',D:'were'},
+    ans:'B',
+    exp:'In British English, collective nouns like "jury" can take a plural verb when the members are considered individually. "The jury are" signals that individual jurors are deliberating. Both "is" and "are" exist in context — JAMB typically accepts "are" here for British convention.'
+  },
+
+  /* ── LEXIS & STRUCTURE: Tenses & Structures (Q19–24) ── */
+  {
+    id:19, topic:'Sentence Structure',
+    text:'Identify the sentence that correctly uses the subjunctive mood.',
+    opts:{A:'I suggest that he goes to the hospital.',B:'I suggest that he go to the hospital.',C:'I suggest that he will go to the hospital.',D:'I suggest that he had gone to the hospital.'},
+    ans:'B',
+    exp:'The mandative subjunctive uses the base form without inflection: "he go" not "he goes." Triggered by verbs of suggestion, demand, requirement: suggest, insist, recommend, demand.'
+  },
+  {
+    id:20, topic:'Sentence Structure',
+    text:'Choose the option that correctly fills the gap: "By the time the ambulance arrived, the patient _____."',
+    opts:{A:'already died',B:'has already died',C:'had already died',D:'was already dying'},
+    ans:'C',
+    exp:'Past perfect ("had died") is used for an action completed before another past event. The ambulance arriving is the reference point — the death occurred before it. "Had already died" is correct.'
+  },
+  {
+    id:21, topic:'Sentence Structure',
+    text:'Which sentence contains a dangling modifier?',
+    opts:{A:'Running to catch the bus, she dropped her bag.',B:'Exhausted after the journey, the bed looked very inviting.',C:'Having revised all night, she passed the examination.',D:'After reading the letter, he immediately called his lawyer.'},
+    ans:'B',
+    exp:'"Exhausted after the journey" dangles — the implied subject is a person, but the main clause subject is "the bed," which cannot be exhausted. The modifier is attached to the wrong noun.'
+  },
+  {
+    id:22, topic:'Sentence Structure',
+    text:'Choose the correct option: "If I _____ you, I would not accept the offer."',
+    opts:{A:'am',B:'was',C:'were',D:'had been'},
+    ans:'C',
+    exp:'The second conditional uses "were" (not "was") in formal/educated English for all persons: "If I were you." This is the subjunctive in a hypothetical condition. "Was" is colloquially common but formally incorrect.'
+  },
+  {
+    id:23, topic:'Sentence Structure',
+    text:'Select the sentence with correct use of the apostrophe.',
+    opts:{A:"The childrens' books were scattered across the floor.",B:"The children's books were scattered across the floor.",C:"The childrens books were scattered across the floor.",D:"The children's' books were scattered across the floor."},
+    ans:'B',
+    exp:'"Children" is an irregular plural (not ending in s), so the possessive is children\'s — apostrophe before the s. Regular plurals ending in s take the apostrophe after: boys\', teachers\'.'
+  },
+  {
+    id:24, topic:'Sentence Structure',
+    text:'"The data _____ been submitted to the research committee for analysis."',
+    opts:{A:'has',B:'is',C:'was',D:'have'},
+    ans:'D',
+    exp:'"Data" is the plural of "datum." In formal academic English, data takes a plural verb: "the data have." JAMB consistently follows formal convention on this classical Latin plural.'
+  },
+
+  /* ── VOCABULARY (Q25–34) ── */
+  {
+    id:25, topic:'Vocabulary',
+    text:'The word "melancholy" most nearly means:',
+    opts:{A:'excessive cheerfulness and hyperactivity',B:'a deep, persistent feeling of sadness',C:'a confused state of emotional indifference',D:'intense anger directed at a specific person'},
+    ans:'B',
+    exp:'"Melancholy" describes a deep, pensive sadness, often without a specific cause. From Greek "melan" (black) + "khole" (bile) — the black bile humour was thought to cause depression.'
+  },
+  {
+    id:26, topic:'Vocabulary',
+    text:'Choose the word that is closest in meaning to "ephemeral".',
+    opts:{A:'lasting and enduring beyond its original context',B:'existing or lasting only a very short time',C:'recurring at irregular intervals over a long period',D:'difficult to describe or define with precision'},
+    ans:'B',
+    exp:'"Ephemeral" = short-lived, transient. From Greek "ephemeros" (lasting a day). Examples: ephemeral trends, ephemeral pleasures. Antonym: permanent, enduring.'
+  },
+  {
+    id:27, topic:'Vocabulary',
+    text:'Select the option that best explains the word "sycophant".',
+    opts:{A:'a person who challenges authority and refuses instruction',B:'a person who uses flattery to gain favour from the powerful',C:'a person who remains neutral in a dispute between others',D:'a person with exceptional ability in a particular skill'},
+    ans:'B',
+    exp:'A sycophant is a self-seeking, servile flatterer — one who uses excessive compliments to gain advantage. Synonyms: flatterer, toady, yes-man.'
+  },
+  {
+    id:28, topic:'Vocabulary',
+    text:'The antonym of "verbose" is:',
+    opts:{A:'garrulous',B:'loquacious',C:'terse',D:'eloquent'},
+    ans:'C',
+    exp:'"Verbose" = using more words than necessary. Its antonym is "terse" = brief and to the point. "Garrulous" and "loquacious" are near-synonyms of verbose. "Eloquent" means expressive — not the opposite.'
+  },
+  {
+    id:29, topic:'Vocabulary',
+    text:'Which word correctly completes the sentence? "The politician\'s _____ promises failed to convince the electorate."',
+    opts:{A:'candid',B:'magnanimous',C:'spurious',D:'tacit'},
+    ans:'C',
+    exp:'"Spurious" = not genuine, false, or based on faulty reasoning. The sentence requires a word meaning fake or hollow promises. "Candid" = frank; "magnanimous" = generous; "tacit" = unspoken.'
+  },
+  {
+    id:30, topic:'Vocabulary',
+    text:'Choose the word most opposite in meaning to "magnanimous".',
+    opts:{A:'generous',B:'petty',C:'courageous',D:'noble'},
+    ans:'B',
+    exp:'"Magnanimous" = generous in forgiving, noble in spirit. Its antonym is "petty" = small-minded, ungenerous, focused on trivial matters.'
+  },
+  {
+    id:31, topic:'Vocabulary',
+    text:'"Obsequious" behaviour is best described as:',
+    opts:{A:'stubbornly refusing to yield to authority or instruction',B:'excessively compliant and eager to please or serve',C:'openly hostile and confrontational in social settings',D:'thoughtful and deliberate in making important decisions'},
+    ans:'B',
+    exp:'"Obsequious" = servile, fawning, excessively deferential. Related to "sycophant." Both describe people who flatter and comply to gain favour — but sycophancy emphasises flattery; obsequiousness emphasises compliance.'
+  },
+  {
+    id:32, topic:'Vocabulary',
+    text:'Select the option that correctly explains "equivocate".',
+    opts:{A:'to state something precisely and without ambiguity',B:'to treat two competing arguments with equal weight',C:'to use deliberately vague language to avoid commitment',D:'to express strong disagreement with an established position'},
+    ans:'C',
+    exp:'"Equivocate" = to speak ambiguously to avoid committing to a clear position. Related: "equivocal" (ambiguous). Politicians equivocate when directly questioned. Antonym: "be unequivocal."'
+  },
+  {
+    id:33, topic:'Vocabulary',
+    text:'The word "perfidious" is closest in meaning to:',
+    opts:{A:'treacherous and disloyal',B:'extremely poor and destitute',C:'unusually gifted and talented',D:'unnecessarily wordy and long-winded'},
+    ans:'A',
+    exp:'"Perfidious" = guilty of betrayal, treacherous. From Latin "perfidia" (faithlessness). "Perfidious Albion" is a historical phrase used to describe Britain as untrustworthy.'
+  },
+  {
+    id:34, topic:'Vocabulary',
+    text:'"Perspicacious" most nearly means:',
+    opts:{A:'physically imposing and intimidating',B:'morally upright and incorruptible',C:'having keen insight and sharp judgement',D:'excessively transparent and easily understood'},
+    ans:'C',
+    exp:'"Perspicacious" = having a ready insight; astute. From Latin "perspicere" (to see through clearly). Not to be confused with "perspicuous" (clearly expressed).'
+  },
+
+  /* ── IDIOMS & PHRASAL VERBS (Q35–42) ── */
+  {
+    id:35, topic:'Idioms',
+    text:'"To beat around the bush" means to:',
+    opts:{A:'work extremely hard to achieve a difficult objective',B:'avoid coming to the main point of a discussion',C:'search carefully through a dense and difficult area',D:'make a loud noise to attract the attention of others'},
+    ans:'B',
+    exp:'To "beat around the bush" is to approach a topic indirectly, avoiding the main point. JAMB regularly tests this idiom. Antonym behaviour: "get straight to the point."'
+  },
+  {
+    id:36, topic:'Idioms',
+    text:'"She let the cat out of the bag." This means she:',
+    opts:{A:'released an animal she had been keeping as a secret',B:'accidentally revealed a secret or surprise',C:'made a careless and costly error in public',D:'behaved in a cowardly manner at a critical moment'},
+    ans:'B',
+    exp:'To "let the cat out of the bag" means to accidentally disclose a secret, especially a surprise. One of the most tested English idioms in UTME.'
+  },
+  {
+    id:37, topic:'Idioms',
+    text:'"The project is still on the back burner." This means the project is:',
+    opts:{A:'making rapid and visible progress toward completion',B:'facing serious opposition from key stakeholders',C:'temporarily postponed and given low priority',D:'being closely monitored for signs of failure'},
+    ans:'C',
+    exp:'"On the back burner" = given low priority; temporarily shelved. From cooking — the back burner is used for things that simmer slowly while attention goes elsewhere.'
+  },
+  {
+    id:38, topic:'Idioms',
+    text:'The expression "a wolf in sheep\'s clothing" describes:',
+    opts:{A:'a timid person who becomes aggressive when provoked',B:'a dangerous or dishonest person pretending to be harmless',C:'an experienced person disguising their true level of skill',D:'a person who changes their behaviour depending on the audience'},
+    ans:'B',
+    exp:'A "wolf in sheep\'s clothing" is someone who appears innocent or friendly but is actually dangerous or deceptive. Biblical in origin (Matthew 7:15). One of JAMB\'s most repeated idioms.'
+  },
+  {
+    id:39, topic:'Idioms',
+    text:'"To burn one\'s bridges" means to:',
+    opts:{A:'destroy evidence of a previous action to avoid detection',B:'make a decision that permanently closes off future options',C:'work tirelessly until all available resources are exhausted',D:'aggressively pursue a target regardless of the consequences'},
+    ans:'B',
+    exp:'To "burn one\'s bridges" means to take an irreversible action that destroys future possibilities or relationships. Military origin: burning a bridge after crossing prevents retreat.'
+  },
+  {
+    id:40, topic:'Phrasal Verbs',
+    text:'"The committee decided to call off the meeting." The phrasal verb "call off" means to:',
+    opts:{A:'postpone indefinitely to a later date',B:'cancel something that was planned',C:'summon someone to attend urgently',D:'conclude and formally bring to an end'},
+    ans:'B',
+    exp:'"Call off" = to cancel. Distinguish from: "call up" (summon/draft), "call on" (visit/request), "call for" (demand), "call off" (cancel).'
+  },
+  {
+    id:41, topic:'Phrasal Verbs',
+    text:'"The inspector asked them to account for the missing funds." "Account for" here means to:',
+    opts:{A:'pay back money owed to an institution or authority',B:'provide a satisfactory explanation for something',C:'formally record a transaction in the financial register',D:'accept responsibility and offer an apology to those affected'},
+    ans:'B',
+    exp:'"Account for" = to explain or justify. "Account for the missing funds" = explain why they are missing. Not the same as paying them back.'
+  },
+  {
+    id:42, topic:'Phrasal Verbs',
+    text:'"He had to contend with several problems simultaneously." "Contend with" means to:',
+    opts:{A:'carefully avoid or circumvent a series of obstacles',B:'argue against a strongly held opposing position',C:'struggle to deal with something difficult',D:'compete directly against someone in a formal contest'},
+    ans:'C',
+    exp:'"Contend with" = to deal with or struggle against something challenging. "She had to contend with poverty and discrimination" — she faced and struggled with both.'
+  },
+
+  /* ── FIGURES OF SPEECH (Q43–47) ── */
+  {
+    id:43, topic:'Figures of Speech',
+    text:'"The stars winked at us through the clouds." This is an example of:',
+    opts:{A:'metaphor',B:'hyperbole',C:'personification',D:'simile'},
+    ans:'C',
+    exp:'Personification attributes a human action ("winked") to a non-human thing (stars). A metaphor would directly equate them; a simile would use "like" or "as"; hyperbole would exaggerate.'
+  },
+  {
+    id:44, topic:'Figures of Speech',
+    text:'"His words were like daggers to her heart." This sentence contains a:',
+    opts:{A:'personification',B:'simile',C:'metaphor',D:'oxymoron'},
+    ans:'B',
+    exp:'The comparison uses "like" — the explicit marker of a simile. A metaphor would say "his words were daggers" (direct equation, no "like" or "as").'
+  },
+  {
+    id:45, topic:'Figures of Speech',
+    text:'"Ask not what your country can do for you — ask what you can do for your country." The rhetorical device used here is:',
+    opts:{A:'anaphora',B:'antithesis',C:'chiasmus',D:'epistrophe'},
+    ans:'C',
+    exp:'Chiasmus: the grammatical structure reverses in the second clause (A→B becomes B→A). "Country/you" inverts to "you/country." The crossing of elements gives it its name (Greek: χ, chi).'
+  },
+  {
+    id:46, topic:'Figures of Speech',
+    text:'"I have told you a million times to stop." This is an example of:',
+    opts:{A:'litotes',B:'euphemism',C:'hyperbole',D:'irony'},
+    ans:'C',
+    exp:'Hyperbole = deliberate and obvious exaggeration for effect. "A million times" is not literal — it emphasises extreme frustration. JAMB tests this as one of its most common figures of speech.'
+  },
+  {
+    id:47, topic:'Figures of Speech',
+    text:'"The pen is mightier than the sword." This figure of speech is:',
+    opts:{A:'simile',B:'metonymy',C:'synecdoche',D:'metaphor'},
+    ans:'D',
+    exp:'A metaphor directly equates two unlike things: "pen" (writing/persuasion) is equated to "sword" (military force) without "like" or "as." There is no part-for-whole or associated thing (which would be synecdoche/metonymy).'
+  },
+
+  /* ── COMPREHENSION-STYLE / REGISTER (Q48–50) ── */
+  {
+    id:48, topic:'Lexis & Structure',
+    text:'"The workers threatened to down tools if their demands were not met." "Down tools" means to:',
+    opts:{A:'damage and sabotage equipment on the factory floor',B:'discard and permanently abandon their working instruments',C:'stop working as a form of industrial protest',D:'work more slowly than usual to reduce productivity'},
+    ans:'C',
+    exp:'"Down tools" = to stop working, especially as a protest or strike action. It is an idiom from industrial relations. Distinct from a "go-slow" (deliberate slow pace) or "sabotage" (deliberate damage).'
+  },
+  {
+    id:49, topic:'Lexis & Structure',
+    text:'Choose the option that best replaces the underlined expression: "The chairman was at loggerheads with the board over the proposed merger."',
+    opts:{A:'in full agreement',B:'in serious disagreement',C:'in formal consultation',D:'in complete ignorance'},
+    ans:'B',
+    exp:'"At loggerheads" = in strong disagreement or conflict. Historical: loggerheads were heavy iron tools used in conflict. The expression now means persistent, heated disagreement.'
+  },
+  {
+    id:50, topic:'Lexis & Structure',
+    text:'Which of the following is grammatically correct?',
+    opts:{
+      A:'Inspite of the rain, the match continued.',
+      B:'In spite of the rain, the match continued.',
+      C:'Despite of the rain, the match continued.',
+      D:'Inspite the rain, the match continued.'
+    },
+    ans:'B',
+    exp:'"In spite of" is always written as three words — never "inspite of." "Despite" takes no "of": "Despite the rain" (not "despite of"). These are among the most commonly tested preposition errors in UTME.'
+  }
+
+];
+
+/* ── STATE ── */
+var ST = { correct:0, wrong:0, answered:0, submitted:false };
+var UA = {};
+var globalDone = false;
+var GLOBAL_SECS = 1800;
+var timerInterval = null;
+
+/* ── TIMER ── */
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) {
+    var m = Math.floor(s/60), ss = s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) {
+      txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn';
+    } else if (remaining <= 60) {
+      txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang';
+    }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el?el.textContent:'—'; }
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i=0; i<QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var optsHtml = '';
+    var labels = ['A','B','C','D'];
+    for (var j=0; j<labels.length; j++) {
+      var lbl = labels[j];
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
+        '</div>';
+    }
+    html += '<div class="qcard" style="animation-delay:'+(i*0.025)+'s">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q'+(i+1)+' of 50</span>' +
+        (q.topic ? '<span class="qtopic">'+q.topic+'</span>' : '') +
+      '</div>' +
+      '<div class="qtxt">'+q.text+'</div>' +
+      '<div class="opts">'+optsHtml+'</div>' +
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp'+q.id+'"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid=parseInt(this.dataset.id), chose=this.dataset.a;
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid]=chose;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled=false;
+    });
+  });
+
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){ return x.id===qid; });
+      var chosen=UA[qid], ok=(chosen===q.ans);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked'); o.style.pointerEvents='none';
+        if (o.dataset.a===q.ans) o.classList.add('ok');
+        else if (o.dataset.a===chosen) o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      var markCls=ok?'pos':'neg';
+      var markTxt=ok?'✓ Correct':'✗ Incorrect — correct answer: '+q.ans;
+      expEl.innerHTML='<span class="exp-mark '+markCls+'">'+markTxt+'</span>'+
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled=true;
+      if (!ST.answeredIds) ST.answeredIds=new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left=QUESTIONS.length-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() {
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+
+function submitQuiz() {
+  hideSubmitModal(); globalDone=true; stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){ if(!btn.disabled) btn.click(); });
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';
+  scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){ o.style.pointerEvents='none'; o.classList.add('locked'); });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled=true; });
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';
+  scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF ── */
+function doPrint() {
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){ document.getElementById('print-header').style.display='none'; },1000);
+}
+
+/* ── INIT ── */
+render();
+/* Timer starts only after successful auth — see gateSubmit() */
+</script>
+</body>
+</html>

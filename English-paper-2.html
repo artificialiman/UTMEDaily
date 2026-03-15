@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>English — Paper 2 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A;--card:#111827;--card2:#161E2E;--text:#E8EDF5;
+      --sec:rgba(232,237,245,0.75);--ter:rgba(232,237,245,0.45);
+      --accent:#f59e0b;--accent2:#d97706;--warn:#F59E0B;--red:#EF4444;
+      --green:#10B981;--blue:#3b82f6;--blue2:#2563eb;
+      --sep:rgba(255,255,255,0.08);--hov:rgba(255,255,255,0.05);
+      --r:14px;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5;}
+    #gate{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;}
+    #gate.gone{display:none;}
+    .gate-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,0.6);}
+    .gate-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;}
+    .gate-title{font-family:var(--mono);font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+    .gate-sub{font-size:12px;color:var(--ter);margin-bottom:28px;}
+    .gate-label{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--ter);margin-bottom:6px;}
+    .gate-input{width:100%;padding:13px 16px;background:var(--card2);border:1px solid var(--sep);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:10px;transition:border-color 0.2s;-webkit-appearance:none;}
+    .gate-input:focus{border-color:rgba(59,130,246,0.5);}
+    .gate-input.err{border-color:var(--red);}
+    .gate-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
+    .gate-btn:hover{opacity:0.88;}
+    .gate-err{font-size:12px;color:var(--red);font-family:var(--mono);margin-top:8px;min-height:18px;letter-spacing:0.02em;}
+    .gate-attempts{font-size:11px;color:var(--ter);text-align:center;margin-top:16px;}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.8rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.022;font-family:var(--mono);font-size:0.72rem;font-weight:700;color:#f0eff4;letter-spacing:0.08em;white-space:nowrap;user-select:none;-webkit-user-select:none;}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .hdr-left{display:flex;flex-direction:column;gap:2px;}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text);}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px;}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em;}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);flex-shrink:0;}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;transition:background .3s;}
+    .gtimer-dot.warn{background:var(--warn);}
+    .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite;}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--blue);transition:color .3s;}
+    .gtimer-txt.warn{color:var(--warn);}
+    .gtimer-txt.dang{color:var(--red);}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1;}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep);}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);}
+    .sc-v.c{color:var(--green);}
+    .sc-v.w{color:var(--red);}
+    .sc-v.s{color:var(--ter);}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1;}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden;}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue));border-radius:99px;transition:width 0.4s ease;width:0%;}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1;}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px;}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.08em;text-transform:uppercase;}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--blue);letter-spacing:0.3px;}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px;}
+    .opts{display:flex;flex-direction:column;gap:8px;}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s;}
+    .opt:hover:not(.locked){border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.05);}
+    .opt.sel{border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.08);}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08);}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08);}
+    .opt.locked{cursor:default;}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--blue);flex-shrink:0;width:18px;padding-top:1px;}
+    .opt.ok .opt-key{color:var(--green);}
+    .opt.no .opt-key{color:var(--red);}
+    .opt.sel .opt-key{color:var(--blue);}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55;}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em;}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px);}
+    .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none;}
+    .exp{display:none;margin-top:12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec);}
+    .exp.show{display:block;}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green);}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red);}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center;}
+    .submit-btn{flex:1;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s;}
+    .submit-btn:hover{opacity:0.88;}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap;}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+    .timeup.show{display:flex;}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6);}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px;}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px;}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px;}
+    .timeup-score.pos{color:var(--green);}
+    .timeup-score.neg{color:var(--red);}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px;}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text);}
+    .tu-stat-v.c{color:var(--green);}
+    .tu-stat-v.w{color:var(--red);}
+    .tu-stat-v.s{color:var(--ter);}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px;}
+    .timeup-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px;}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px;}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease;}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text);}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter);}
+    .modal-row b{color:var(--text);font-family:var(--mono);}
+    .modal-btns{display:flex;gap:8px;margin-top:20px;}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s;}
+    .modal-btn.primary{background:var(--blue);color:#fff;}
+    .modal-btn.primary:hover{opacity:0.88;}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep);}
+    @media print{
+      body{background:#fff!important;color:#000!important;font-size:12pt;}
+      body::before,#watermark,#gate,.hdr,.gtimer,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none!important;}
+      .exp{display:block!important;background:#f0f7ff!important;border:1px solid #bfdbfe!important;color:#1e3a5f!important;}
+      .qcard{break-inside:avoid;border:1px solid #ddd!important;background:#fff!important;margin-bottom:20pt;page-break-inside:avoid;}
+      .opt{border:1px solid #ccc!important;background:#fff!important;}
+      .opt.ok{background:#e6f9f0!important;border-color:#10b981!important;}
+      .opt.no{background:#fef2f2!important;border-color:#ef4444!important;}
+      .opt.sel{background:#eff6ff!important;border-color:#3b82f6!important;}
+      .opt-txt,.qtxt{color:#000!important;}
+      .qtopic{background:#eff6ff!important;color:#1d4ed8!important;border-color:#93c5fd!important;}
+      #print-header{display:block!important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000;}
+      #print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt;}
+      #print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt;}
+      #print-header .ph-student{font-size:13pt;font-weight:700;color:#000;}
+    }
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr);}.hdr-title{font-size:13px;}}
+  </style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-brand">GrantApp AI · Premium</div>
+    <div class="gate-title">English — Paper 2</div>
+    <div class="gate-sub">UTME 2026 · 50 Questions · 30 Minutes</div>
+    <div class="gate-label">Access password</div>
+    <input class="gate-input" id="gate-pw" type="password" placeholder="••••••••••••" autocomplete="off">
+    <div class="gate-err" id="gate-err"></div>
+    <button class="gate-btn" onclick="gateSubmit()">Enter →</button>
+    <div class="gate-attempts" id="gate-att"></div>
+  </div>
+</div>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — English Paper 2</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">English · Paper 2</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);" title="Download PDF">⬇ PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+var VALID = {
+  'con-eng-pp7p3k':'Conve',
+  'kao-eng-ghirbf':'Kaosara',
+  'hab-eng-r1ozjj':'Habibat',
+  'oyi-eng-ee0vtf':'Oyin',
+  'dor-eng-9z7mca':'Dorcas',
+  'fam-eng-qx85sx':'Famous',
+  'oba-eng-4o7dzg':'Obasesam',
+  'pro-eng-zhs8wq':'Prosper',
+  'tem-eng-05rs9h':'Temi',
+  'mur-eng-cf4inh':'Murphy',
+  'abu-eng-m3kx9z':'Abu Ene',
+  'are-eng-k4vz2m':'Aremu',
+  'ttl-eng-q3bx7m':'Taiwo T.'
+};
+
+var attempts=0, MAX_ATT=5;
+
+function gateSubmit(){
+  var pw=document.getElementById('gate-pw').value.trim();
+  var err=document.getElementById('gate-err');
+  var att=document.getElementById('gate-att');
+  if(!pw){document.getElementById('gate-pw').classList.add('err');err.textContent='Enter your password.';return;}
+  attempts++;
+  var name=VALID[pw];
+  if(name){
+    document.getElementById('gate').classList.add('gone');
+    injectWatermark(name);
+    var greet=document.getElementById('greeting');
+    greet.textContent='Hey, '+name;greet.style.display='block';
+    document.getElementById('print-student-name').textContent='Student: '+name;
+    startTimer();
+  } else {
+    document.getElementById('gate-pw').classList.add('err');
+    var left=MAX_ATT-attempts;
+    if(left<=0){err.textContent='Too many failed attempts.';document.querySelector('.gate-btn').disabled=true;document.getElementById('gate-pw').disabled=true;}
+    else{err.textContent='Incorrect password.';att.textContent=left+' attempt'+(left===1?'':'s')+' remaining.';}
+  }
+}
+document.getElementById('gate-pw').addEventListener('keydown',function(e){if(e.key==='Enter')gateSubmit();});
+
+function injectWatermark(name){
+  var wm=document.getElementById('watermark');
+  var tile=name+' · GrantApp AI · ';
+  var row='';for(var r=0;r<8;r++)row+=tile;
+  var html='';for(var i=0;i<14;i++)html+='<span>'+row+'</span>';
+  wm.innerHTML=html;
+}
+document.getElementById('print-date').textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+const QUESTIONS = [
+
+  /* ── ORAL ENGLISH: Connected Speech & Consonants (Q1–8) ── */
+  {id:1,topic:'Oral English',
+   text:'Which of the following words contains the phoneme /dʒ/ as in "judge"?',
+   opts:{A:'yacht',B:'gear',C:'genre',D:'gentle'},
+   ans:'D',
+   exp:'"Gentle" = /dʒentl/ — the "g" before "e" produces /dʒ/. "Yacht" = /j/, "gear" = /ɡ/ (hard g), "genre" = /ʒ/ (French-origin voiced fricative, not the affricate /dʒ/).'},
+
+  {id:2,topic:'Oral English',
+   text:'Elision in spoken English refers to:',
+   opts:{A:'the lengthening of vowel sounds in stressed syllables',B:'the addition of an extra sound between two vowels',C:'the omission of a sound or syllable in rapid speech',D:'the change of one consonant sound to match an adjacent one'},
+   ans:'C',
+   exp:'Elision = dropping a sound in connected speech. Examples: "next day" → "nex\' day" (/t/ dropped); "last night" → "las\' night." Distinct from assimilation (sound change) and liaison (sound linking).'},
+
+  {id:3,topic:'Oral English',
+   text:'In the phrase "an apple," the /n/ sound is carried from "an" into "apple." This is an example of:',
+   opts:{A:'elision',B:'assimilation',C:'liaison',D:'juncture'},
+   ans:'C',
+   exp:'Liaison = linking a final consonant to the initial vowel of the next word in connected speech. "An apple" = /ə næpl/. The /n/ links smoothly to "apple." This prevents a glottal stop between words.'},
+
+  {id:4,topic:'Oral English',
+   text:'The word "psychology" begins with which sound?',
+   opts:{A:'/p/',B:'/ps/',C:'/s/',D:'/sɑɪ/'},
+   ans:'C',
+   exp:'"Psychology" = /saɪˈkɒlədʒi/ — the initial "p" is silent. The word begins with /s/. Silent initial consonants before "s": psychology, psychiatry, pterodactyl.'},
+
+  {id:5,topic:'Oral English',
+   text:'Which pair of words are minimal pairs (differing by exactly one phoneme)?',
+   opts:{A:'ship / sheep',B:'cat / car',C:'thin / than',D:'both A and C'},
+   ans:'D',
+   exp:'"Ship" /ʃɪp/ vs "sheep" /ʃiːp/ — differ only in the vowel. "Thin" /θɪn/ vs "than" /ðæn/ — differ only in the initial consonant (/θ/ vs /ð/). Both are minimal pairs.'},
+
+  {id:6,topic:'Oral English',
+   text:'The primary stress in "ceremony" falls on the:',
+   opts:{A:'second syllable: ce-RE-mo-ny',B:'third syllable: ce-re-MO-ny',C:'fourth syllable: ce-re-mo-NY',D:'first syllable: CE-re-mo-ny'},
+   ans:'D',
+   exp:'"Ceremony" = CE-re-mo-ny. Stress on syllable 1. Compare: "ceremonial" = ce-re-MO-ni-al (stress shifts to syllable 3 with the suffix). Classic JAMB stress shift pattern.'},
+
+  {id:7,topic:'Oral English',
+   text:'Which word contains the vowel sound /æ/ as in "cat"?',
+   opts:{A:'calm',B:'came',C:'cash',D:'care'},
+   ans:'C',
+   exp:'"Cash" = /kæʃ/ — contains /æ/, the short front open vowel. "Calm" = /ɑː/, "came" = /eɪ/ (diphthong), "care" = /eə/ (diphthong). All four are distinct vowel sounds.'},
+
+  {id:8,topic:'Oral English',
+   text:'Identify the word with a silent consonant cluster at the beginning.',
+   opts:{A:'knight',B:'gnaw',C:'wrong',D:'pneumonia'},
+   ans:'D',
+   exp:'"Pneumonia" = /njuːˈməʊniə/ — both "p" and "n" are present but only the /n/ is sounded; the "p" is silent. Or strictly: initial /p/ is silent, word begins with /n/. "Knight" has silent k, "gnaw" has silent g, "wrong" has silent w — but only "pneumonia" begins with a silent consonant before another consonant.'},
+
+  /* ── CONCORD: Advanced (Q9–14) ── */
+  {id:9,topic:'Concord',
+   text:'"Both the principal and the vice-principal _____ invited to the ceremony."',
+   opts:{A:'was',B:'is',C:'were',D:'has been'},
+   ans:'C',
+   exp:'"Both...and" joins two subjects and always takes a plural verb. "Both X and Y were." This differs from "either...or" and "neither...nor" which use the proximity rule.'},
+
+  {id:10,topic:'Concord',
+   text:'"Three-quarters of the students _____ absent on the day of the examination."',
+   opts:{A:'was',B:'is',C:'has been',D:'were'},
+   ans:'D',
+   exp:'With fractions, the verb agrees with the noun after "of." "Three-quarters of the students" — "students" is plural, so "were." If it were "three-quarters of the water," the verb would be singular.'},
+
+  {id:11,topic:'Concord',
+   text:'"The President, together with his ministers, _____ attending the summit in Abuja."',
+   opts:{A:'are',B:'were',C:'is',D:'have been'},
+   ans:'C',
+   exp:'"Together with," "along with," "as well as" are not conjunctions — they do not create plural subjects. The verb agrees with the main subject: "The President is." The phrase in commas is parenthetical.'},
+
+  {id:12,topic:'Concord',
+   text:'"Every student and every teacher _____ expected to attend the assembly."',
+   opts:{A:'are',B:'were',C:'is',D:'have been'},
+   ans:'C',
+   exp:'"Every" always takes a singular verb, even when joining two nouns: "Every student and every teacher is." Compare: "All students and teachers are."'},
+
+  {id:13,topic:'Concord',
+   text:'"The rich _____ not always happy." Choose the correct verb.',
+   opts:{A:'is',B:'was',C:'are',D:'has been'},
+   ans:'C',
+   exp:'"The rich" refers to rich people as a class — a plural concept. "The + adjective" used as a noun for a class takes a plural verb: the poor are, the young are, the elderly are.'},
+
+  {id:14,topic:'Concord',
+   text:'"Mathematics _____ my favourite subject at secondary school."',
+   opts:{A:'were',B:'have been',C:'are',D:'was'},
+   ans:'D',
+   exp:'Academic disciplines ending in -ics (mathematics, physics, economics, statistics) take singular verbs when referring to the subject as a whole: "Mathematics was." Plural only when referring to specific activities.'},
+
+  /* ── SENTENCE STRUCTURE: Reported Speech & Clauses (Q15–22) ── */
+  {id:15,topic:'Reported Speech',
+   text:'Convert to indirect speech: The manager said, "I will sign the contract tomorrow."',
+   opts:{
+     A:'The manager said that he would sign the contract the following day.',
+     B:'The manager said that he will sign the contract tomorrow.',
+     C:'The manager said that he signed the contract the next day.',
+     D:'The manager told that he would sign the contract tomorrow.'
+   },
+   ans:'A',
+   exp:'Backshift: "will" → "would." Time shift: "tomorrow" → "the following day." Pronoun shift: "I" → "he." "Said" (no object) is correct — "told" requires an object ("told me/him").'},
+
+  {id:16,topic:'Reported Speech',
+   text:'The teacher asked, "Have you submitted your assignment?" Convert to indirect speech.',
+   opts:{
+     A:'The teacher asked if I had submitted my assignment.',
+     B:'The teacher asked if you have submitted your assignment.',
+     C:'The teacher asked whether I submitted my assignment.',
+     D:'The teacher asked did I submit my assignment.'
+   },
+   ans:'A',
+   exp:'Yes/no questions use "if" or "whether" in indirect speech. Backshift: "have submitted" → "had submitted." Pronoun shift: "you/your" → "I/my." No question word order in reported questions.'},
+
+  {id:17,topic:'Sentence Structure',
+   text:'Identify the type of clause underlined: "The woman [who won the award] is my aunt."',
+   opts:{A:'adverbial clause of reason',B:'nominal relative clause',C:'defining relative clause',D:'non-defining relative clause'},
+   ans:'C',
+   exp:'A defining (restrictive) relative clause identifies which person is meant — remove it and the sentence loses its specific meaning. No commas = defining. "Non-defining" uses commas and adds extra information.'},
+
+  {id:18,topic:'Sentence Structure',
+   text:'Choose the correct option: "_____ he studies hard, he will pass the examination."',
+   opts:{A:'Unless',B:'Although',C:'Despite',D:'However'},
+   ans:'A',
+   exp:'"Unless" = if not. "Unless he studies hard" = "if he does not study hard." The sentence implies a conditional threat: failure is the consequence of not studying. "Although" would require a contrasting main clause.'},
+
+  {id:19,topic:'Sentence Structure',
+   text:'Which sentence correctly uses a gerund as the subject?',
+   opts:{
+     A:'To swim every morning is his routine.',
+     B:'Swimming every morning keeps him fit.',
+     C:'He swims every morning for his health.',
+     D:'Every morning, he is swimming in the pool.'
+   },
+   ans:'B',
+   exp:'A gerund is a verb ending in -ing used as a noun. In B, "Swimming" is the subject of the sentence — it is a gerund. A uses an infinitive phrase as subject, which is also grammatical but is not a gerund.'},
+
+  {id:20,topic:'Sentence Structure',
+   text:'"Having finished the report, the laptop was switched off." This sentence is faulty because:',
+   opts:{
+     A:'the passive voice cannot follow a participial phrase',
+     B:'the participial phrase dangles — the laptop did not finish the report',
+     C:'the past participle "finished" is incorrectly formed',
+     D:'the sentence lacks a direct object after "switched off"'
+   },
+   ans:'B',
+   exp:'The participial phrase "Having finished the report" implies a human subject — but the main clause subject is "the laptop," which cannot finish a report. This is a dangling participle, the same error type as a dangling modifier.'},
+
+  {id:21,topic:'Sentence Structure',
+   text:'Choose the sentence that correctly uses the third conditional.',
+   opts:{
+     A:'If he studies, he will pass.',
+     B:'If he studied, he would pass.',
+     C:'If he had studied, he would have passed.',
+     D:'If he studies, he would pass.'
+   },
+   ans:'C',
+   exp:'Third conditional = past hypothetical: if + past perfect, would have + past participle. It refers to an unreal past situation and its imagined past result. A=1st, B=2nd, D=mixed/incorrect.'},
+
+  {id:22,topic:'Sentence Structure',
+   text:'"The book was interesting" converted to active voice with an appropriate subject is:',
+   opts:{
+     A:'Someone interested the book.',
+     B:'I found the book interesting.',
+     C:'The book interested me.',
+     D:'The book is what interested me.'
+   },
+   ans:'C',
+   exp:'"The book interested me" converts the stative passive construction into an active sentence where "the book" acts as subject of an active verb. "Interested" functions as a transitive verb here, not a passive participle.'},
+
+  /* ── VOCABULARY: High-Frequency UTME Words (Q23–34) ── */
+  {id:23,topic:'Vocabulary',
+   text:'The word "phlegmatic" most nearly means:',
+   opts:{A:'easily excited and enthusiastic',B:'calm and unemotional in temperament',C:'excessively talkative and sociable',D:'prone to sudden outbursts of anger'},
+   ans:'B',
+   exp:'"Phlegmatic" = calm, sluggish, not easily excited. From the phlegm humour associated with calmness. The four temperaments: sanguine (cheerful), choleric (hot-tempered), melancholic (sad), phlegmatic (calm).'},
+
+  {id:24,topic:'Vocabulary',
+   text:'Choose the option that best replaces the word "reticent" in context.',
+   opts:{A:'talkative',B:'reserved',C:'aggressive',D:'confused'},
+   ans:'B',
+   exp:'"Reticent" = not revealing one\'s thoughts or feelings readily; reserved. Often confused with "reluctant" (unwilling to do something) — they are not synonyms.'},
+
+  {id:25,topic:'Vocabulary',
+   text:'A "dilettante" is best described as:',
+   opts:{A:'a highly trained expert in a narrow technical field',B:'a person who dabbles in a subject without serious commitment',C:'a person who collects rare and valuable objects professionally',D:'a skilled performer who entertains large audiences'},
+   ans:'B',
+   exp:'"Dilettante" = a person who cultivates an area of interest superficially. From Italian "dilettare" (to delight). Not a professional or serious student — a dabbler.'},
+
+  {id:26,topic:'Vocabulary',
+   text:'"Inimical" most nearly means:',
+   opts:{A:'friendly and encouraging toward a cause',B:'unfamiliar and difficult to understand',C:'harmful or hostile to something',D:'impossible to imitate or reproduce'},
+   ans:'C',
+   exp:'"Inimical" = tending to obstruct or harm; hostile. "Conditions inimical to growth." Related to "enemy" (Latin: inimicus). Not to be confused with "inimitable" (impossible to imitate).'},
+
+  {id:27,topic:'Vocabulary',
+   text:'"Laconic" speech is characterised by:',
+   opts:{A:'excessive length and unnecessary detail',B:'clarity and technical precision',C:'brevity and conciseness of expression',D:'emotional intensity and rhetorical force'},
+   ans:'C',
+   exp:'"Laconic" = using very few words. From the Laconians (Spartans), known for terse speech. Antonym: verbose, garrulous. The famous laconic reply: when asked to surrender, the Spartan general replied "If."'},
+
+  {id:28,topic:'Vocabulary',
+   text:'The word "panacea" refers to:',
+   opts:{A:'a severe and spreading disease affecting many people',B:'a solution believed to cure all problems or diseases',C:'a formal agreement between two opposing parties',D:'a substance that intensifies the effects of another drug'},
+   ans:'B',
+   exp:'"Panacea" = a cure for all ills or a solution to all problems. From Greek: "pan" (all) + "akos" (remedy). Often used critically: "There is no panacea for poverty."'},
+
+  {id:29,topic:'Vocabulary',
+   text:'Choose the word closest in meaning to "truculent".',
+   opts:{A:'eager to argue or fight',B:'reluctant and slow to act',C:'submissive and easily led',D:'silent and withdrawn in manner'},
+   ans:'A',
+   exp:'"Truculent" = eager or quick to argue or fight; aggressively defiant. "A truculent attitude." Synonyms: belligerent, pugnacious, combative.'},
+
+  {id:30,topic:'Vocabulary',
+   text:'"Fastidious" behaviour is best described as:',
+   opts:{A:'reckless and careless about consequences',B:'very attentive to detail and difficult to please',C:'generous and willing to share with others freely',D:'slow and deliberate in making important decisions'},
+   ans:'B',
+   exp:'"Fastidious" = very attentive to accuracy and detail; hard to please. "A fastidious editor." Can also mean overly concerned with cleanliness. Synonyms: meticulous, scrupulous, exacting.'},
+
+  {id:31,topic:'Vocabulary',
+   text:'Which of the following words means "to officially cancel or make void"?',
+   opts:{A:'abrogate',B:'adjudicate',C:'promulgate',D:'abdicate'},
+   ans:'A',
+   exp:'"Abrogate" = to formally repeal or abolish a law, agreement, or practice. "The treaty was abrogated." Compare: "abdicate" (give up a throne/responsibility), "promulgate" (make a law known publicly).'},
+
+  {id:32,topic:'Vocabulary',
+   text:'"Loquacious" is to "taciturn" as "timid" is to:',
+   opts:{A:'meek',B:'brave',C:'cautious',D:'nervous'},
+   ans:'B',
+   exp:'"Loquacious" (talkative) is the opposite of "taciturn" (silent). Applying the same antonym logic: "timid" (lacking courage) is the opposite of "brave." This is an analogy question — the relationship is antonymy.'},
+
+  {id:33,topic:'Vocabulary',
+   text:'The word "vicarious" in "She felt vicarious pleasure watching her son succeed" means:',
+   opts:{A:'intense and personal',B:'experienced through another person\'s actions',C:'unexpected and surprising in its timing',D:'shared equally between two or more people'},
+   ans:'B',
+   exp:'"Vicarious" = experienced imaginatively through the feelings or actions of another person. "Vicarious pleasure/thrill/suffering." The experience is second-hand, not direct.'},
+
+  {id:34,topic:'Vocabulary',
+   text:'Choose the option that correctly explains the word "ostentatious".',
+   opts:{A:'marked by careful restraint and quiet dignity',B:'characterised by a showy display intended to impress',C:'showing deep and genuine concern for others\' welfare',D:'demonstrating exceptional skill and technical mastery'},
+   ans:'B',
+   exp:'"Ostentatious" = characterised by vulgar or pretentious display; designed to impress. "Ostentatious jewellery." Antonym: modest, understated. Synonyms: showy, flamboyant, pretentious.'},
+
+  /* ── IDIOMS & PHRASAL VERBS (Q35–42) ── */
+  {id:35,topic:'Idioms',
+   text:'"To throw in the towel" means to:',
+   opts:{A:'launch a surprise attack on an unsuspecting opponent',B:'accept defeat and stop trying',C:'make a last desperate effort before giving up',D:'formally challenge someone to a competition'},
+   ans:'B',
+   exp:'From boxing — throwing a towel into the ring signals surrender. "To throw in the towel" = to give up, admit defeat. Synonyms: concede, capitulate, surrender.'},
+
+  {id:36,topic:'Idioms',
+   text:'"The ball is in your court." This expression means:',
+   opts:{A:'the situation requires physical rather than verbal action',B:'it is now your responsibility to take the next action',C:'you have won the argument decisively',D:'the decision has already been made without your input'},
+   ans:'B',
+   exp:'From tennis — when the ball is in your court, it is your turn to act. "The ball is in your court" = the next move or decision is yours.'},
+
+  {id:37,topic:'Idioms',
+   text:'"She has a chip on her shoulder." This means she:',
+   opts:{A:'carries a great deal of unnecessary physical baggage',B:'has a persistent grievance and is easily offended',C:'is physically imposing and difficult to challenge',D:'has an unfair advantage over her competitors'},
+   ans:'B',
+   exp:'To have "a chip on one\'s shoulder" = to be resentful about a perceived past injustice; to be easily provoked. Origin: the practice of placing a chip of wood on one\'s shoulder and daring others to knock it off.'},
+
+  {id:38,topic:'Idioms',
+   text:'"To bite off more than you can chew" means to:',
+   opts:{A:'eat too quickly without properly tasting the food',B:'agree to do more than you are capable of handling',C:'refuse an offer that would have been beneficial to you',D:'make a decision without considering all the consequences'},
+   ans:'B',
+   exp:'To "bite off more than you can chew" = to take on a task that is too big or difficult to handle. It describes overcommitting or overestimating one\'s ability.'},
+
+  {id:39,topic:'Phrasal Verbs',
+   text:'"The committee decided to look into the matter of missing funds." "Look into" means to:',
+   opts:{A:'observe carefully from a distance',B:'examine or investigate',C:'ignore and overlook deliberately',D:'report formally to a higher authority'},
+   ans:'B',
+   exp:'"Look into" = to investigate or examine. "The police are looking into the incident." Distinct from: "look after" (care for), "look up" (search for / visit), "look down on" (despise).'},
+
+  {id:40,topic:'Phrasal Verbs',
+   text:'"The negotiations broke down after three days of talks." "Broke down" here means:',
+   opts:{A:'ended successfully with a final agreement',B:'were suspended temporarily pending further consultation',C:'failed completely and came to nothing',D:'became more complex and difficult to resolve'},
+   ans:'C',
+   exp:'"Break down" = to fail completely, collapse. Applied to negotiations, machines, relationships, health. "The car broke down." "The marriage broke down." Distinct from "break off" (stop temporarily).'},
+
+  {id:41,topic:'Phrasal Verbs',
+   text:'"He had to make do with the little resources available." "Make do" means to:',
+   opts:{A:'produce something from inadequate materials',B:'manage with what is available despite it being insufficient',C:'make a formal decision after careful consideration',D:'compensate someone for a loss or inconvenience suffered'},
+   ans:'B',
+   exp:'"Make do" = to manage with whatever is available, even if not ideal. "We had to make do without electricity for three days." Related: "make do and mend" (wartime British economy slogan).'},
+
+  {id:42,topic:'Phrasal Verbs',
+   text:'"The CEO decided to step down from her position." "Step down" means to:',
+   opts:{A:'move to a more senior role in the organisation',B:'temporarily reduce responsibilities during a crisis',C:'resign or withdraw from a position of authority',D:'formally delegate duties to a designated successor'},
+   ans:'C',
+   exp:'"Step down" = to resign from a position, especially one of authority or leadership. Synonyms: stand down, resign, abdicate. Distinct from "step aside" (move temporarily to allow another).'},
+
+  /* ── FIGURES OF SPEECH (Q43–47) ── */
+  {id:43,topic:'Figures of Speech',
+   text:'"The thunder grumbled across the sky." This is an example of:',
+   opts:{A:'simile',B:'hyperbole',C:'onomatopoeia',D:'personification'},
+   ans:'D',
+   exp:'"Grumbled" is a human action attributed to thunder — personification. Note: "grumbled" is also onomatopoeic, but the primary figure here is personification (a non-human entity performing a human action). JAMB prioritises the figure that gives meaning, not sound.'},
+
+  {id:44,topic:'Figures of Speech',
+   text:'"I have a thousand things to do today." This sentence contains:',
+   opts:{A:'metonymy',B:'litotes',C:'hyperbole',D:'synecdoche'},
+   ans:'C',
+   exp:'Hyperbole = deliberate exaggeration for emphasis. "A thousand things" is not literally true. Litotes would understate: "I have a few things to do" (meaning many). Not metonymy or synecdoche (those involve substituting related concepts).'},
+
+  {id:45,topic:'Figures of Speech',
+   text:'"The pen is mightier than the sword" uses the pen and the sword as examples of:',
+   opts:{A:'metaphor — pen equals sword directly',B:'synecdoche — parts represent wholes of their kinds',C:'simile — pen is compared to the sword using "than"',D:'metonymy — pen and sword stand for writing and military force'},
+   ans:'D',
+   exp:'Metonymy = substituting something associated with a concept for the concept itself. "Pen" stands for writing/intellect; "sword" stands for military power. Not synecdoche (which uses part-for-whole of the same category).'},
+
+  {id:46,topic:'Figures of Speech',
+   text:'"It was the best of times, it was the worst of times." This is an example of:',
+   opts:{A:'chiasmus',B:'paradox',C:'oxymoron',D:'antithesis'},
+   ans:'D',
+   exp:'Antithesis = placing contrasting ideas in a balanced, parallel structure. "Best" is directly contrasted with "worst" in the same syntactic pattern. Paradox would be one self-contradictory statement; oxymoron is a two-word contradiction.'},
+
+  {id:47,topic:'Figures of Speech',
+   text:'"She sold her soul for success." This is an example of:',
+   opts:{A:'allusion',B:'irony',C:'metaphor',D:'allegory'},
+   ans:'C',
+   exp:'A metaphor directly identifies one thing with another. "Sold her soul" equates her integrity/values with a commodity that can be traded — without "like" or "as." Not an allusion unless reference to a specific text is intended.'},
+
+  /* ── REGISTER, GRAMMAR & USAGE (Q48–50) ── */
+  {id:48,topic:'Lexis & Structure',
+   text:'Choose the sentence that is grammatically correct.',
+   opts:{
+     A:'Between you and I, the plan will not work.',
+     B:'Between you and me, the plan will not work.',
+     C:'Between you and myself, the plan will not work.',
+     D:'Between yourself and me, the plan will not work.'
+   },
+   ans:'B',
+   exp:'"Between" is a preposition — it must be followed by object pronouns: "me," "him," "her," "us," "them." "Between you and I" is the most common hypercorrection in English. "Myself" is a reflexive/intensive pronoun — not used as the object of a preposition.'},
+
+  {id:49,topic:'Lexis & Structure',
+   text:'"He is different _____ his brother in every way."',
+   opts:{A:'to',B:'than',C:'with',D:'from'},
+   ans:'D',
+   exp:'"Different from" is the standard British English construction. "Different than" is American English. "Different to" is informal British. JAMB follows formal British standard: "different from."'},
+
+  {id:50,topic:'Lexis & Structure',
+   text:'Which of the following sentences contains a tautology?',
+   opts:{
+     A:'She arrived before the scheduled time.',
+     B:'The end result was disappointing to everyone.',
+     C:'He submitted the report ahead of schedule.',
+     D:'The committee deferred the decision to a later date.'
+   },
+   ans:'B',
+   exp:'"End result" is a tautology — "result" already implies the end of a process. Other common tautologies: "free gift," "past history," "return back," "close proximity." A tautology says the same thing twice unnecessarily.'}
+
+];
+
+/* ── STATE ── */
+var ST={correct:0,wrong:0,answered:0,submitted:false};
+var UA={};
+var globalDone=false;
+var GLOBAL_SECS=1800;
+var timerInterval=null;
+
+function startTimer(){
+  var remaining=GLOBAL_SECS;
+  var dot=document.getElementById('gdot');
+  var txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;
+    txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}
+    if(remaining<=0){clearInterval(timerInterval);timeUp();}
+  },1000);
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—';}
+
+function render(){
+  var container=document.getElementById('qc');
+  var html='';
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i];
+    var optsHtml='';
+    var labels=['A','B','C','D'];
+    for(var j=0;j<labels.length;j++){
+      var lbl=labels[j];
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">'+
+        '<span class="opt-key">'+lbl+'.</span>'+
+        '<span class="opt-txt">'+q.opts[lbl]+'</span>'+
+        '</div>';
+    }
+    html+='<div class="qcard" style="animation-delay:'+(i*0.025)+'s">'+
+      '<div class="qcard-top">'+
+        '<span class="qnum">Q'+(i+1)+' of 50</span>'+
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+
+      '</div>'+
+      '<div class="qtxt">'+q.text+'</div>'+
+      '<div class="opts">'+optsHtml+'</div>'+
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>'+
+      '<div class="exp" id="exp'+q.id+'"></div>'+
+      '</div>';
+  }
+  container.innerHTML=html;
+  attachListeners();
+}
+
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id),chose=this.dataset.a;
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel');});
+      this.classList.add('sel');
+      UA[qid]=chose;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if(btn)btn.disabled=false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid;});
+      var chosen=UA[qid],ok=(chosen===q.ans);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===q.ans)o.classList.add('ok');
+        else if(o.dataset.a===chosen)o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      expEl.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+(ok?'✓ Correct':'✗ Incorrect — correct answer: '+q.ans)+'</span>'+
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled=true;
+      if(!ST.answeredIds)ST.answeredIds=new Set();
+      if(!ST.answeredIds.has(qid)){
+        ST.answered++;ST.answeredIds.add(qid);
+        if(ok)ST.correct++;else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats(){
+  var left=QUESTIONS.length-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%';
+}
+
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){if(!btn.disabled)btn.click();});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function doPrint(){
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('print-header').style.display='none';},1000);
+}
+
+render();
+</script>
+</body>
+</html>
