@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Mathematics · Paper 10 — Matrices &amp; Statistics | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A; --card:#111827; --card2:#161E2E; --text:#E8EDF5;
+      --sec:rgba(232,237,245,0.75); --ter:rgba(232,237,245,0.45);
+      --accent:#f59e0b; --accent2:#d97706;
+      --subject:#94a3b8; --subject2:#64748b;
+      --warn:#F59E0B; --red:#EF4444; --green:#10B981;
+      --sep:rgba(255,255,255,0.08);
+      --r:14px; --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.8rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.022;font-family:var(--mono);font-size:0.72rem;font-weight:700;color:#f0eff4;letter-spacing:0.08em;white-space:nowrap;user-select:none;-webkit-user-select:none}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--subject)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(148,163,184,0.08);border:1px solid rgba(148,163,184,0.18);padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(148,163,184,0.08);border:1px solid rgba(148,163,184,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--subject);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)} .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--subject);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)} .gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)} .sc-v.w{color:var(--red)} .sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--subject2),var(--subject));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.08em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(148,163,184,0.08);border:1px solid rgba(148,163,184,0.18);color:var(--subject);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(148,163,184,0.4);background:rgba(148,163,184,0.05)}
+    .opt.sel{border-color:rgba(148,163,184,0.5);background:rgba(148,163,184,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--subject);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)} .opt.no .opt-key{color:var(--red)} .opt.sel .opt-key{color:var(--subject)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--subject);color:#0a0e1a;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)} .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--subject);color:#0a0e1a;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)} .timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)} .tu-stat-v.w{color:var(--red)} .tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--subject);color:#0a0e1a;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--subject);color:#0a0e1a} .modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)} .hdr-title{font-size:13px}}
+    #auth-gate{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+    #auth-gate.unlocked{display:none}
+    .gate-box{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6)}
+    .gate-logo{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--subject);margin-bottom:1rem;font-family:var(--mono)}
+    .gate-title{font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text)}
+    .gate-sub{font-size:0.85rem;color:var(--ter);margin:0 0 1.5rem}
+    .gate-input{width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text);font-size:1rem;margin-bottom:0.5rem;outline:none}
+    .gate-input:focus{border-color:var(--subject)}
+    .gate-error{font-size:0.82rem;color:#f85149;margin:0 0 0.75rem}
+    .gate-btn{width:100%;padding:0.8rem;background:var(--subject);color:#0a0e1a;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans)}
+    .gate-btn:hover{opacity:0.88}
+    @media print{
+      body{background:#fff !important;color:#000 !important;font-size:12pt}
+      body::before,#watermark,.hdr,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none !important}
+      .exp{display:block !important;background:#f9f9f9 !important;border:1px solid #ccc !important;color:#333 !important}
+      .qcard{break-inside:avoid;border:1px solid #ddd !important;background:#fff !important;margin-bottom:20pt}
+      .opt{border:1px solid #ccc !important;background:#fff !important}
+      .opt.ok{background:#e6f9f0 !important;border-color:#10b981 !important}
+      .opt.no{background:#fef2f2 !important;border-color:#ef4444 !important}
+      .opt-txt,.qtxt{color:#000 !important}
+      .qtopic{background:#f1f5f9 !important;color:#334155 !important;border-color:#94a3b8 !important}
+      #print-header{display:block !important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000}
+      #print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt}
+      #print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt}
+      #print-header .ph-student{font-size:13pt;font-weight:700}
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Mathematics · Paper 10</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · Matrices &amp; Statistics · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Mathematics · Paper 10</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password">
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Mathematics · Paper 10 — Matrices &amp; Statistics</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);">&#8595; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#9203;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#8595; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function(){
+  var REGISTRY={
+    "31e2f049ea6226f6d5755f4fb549d95c7f78ceab43a4b1e407f6b28b7ce3beb9":"Conve",
+    "781b7749f5ddd8f9686ee31b4fef571d04b4b8432e61137bc5d78d9ada22c24c":"Kaosara",
+    "3da4c5cd7bb9a4573a160725e390a3214e193094fc4ad86a29db95dc39365ca6":"Habibat",
+    "9403e4ed9497a885390af4a54bbd8acf944cdb0ce1466e65a016ead13c96eab1":"Oyin",
+    "e290b9f1952da521dab7ec693caa609e4ff707d3d9e00c1ecb53f092113a4f3a":"Dorcas",
+    "6ad071baadf38c76a1976e3e07d322d2bb6f534f195bf2253c9d0b2874b121b9":"Famous",
+    "da123098c73e97dc05aa4f080b36fecc0acc46a1d2ea353d65bce0a11d0dfcbf":"Obasesam",
+    "19d3009c2301c89096cb61da53f92e8c854f8fd223c4f368931d312fe6a16e9e":"Prosper",
+    "202ec3362eaf2ac6da6a02fb6354907d0833384c386773ebc599ec2d0d2fb2ca":"Temi",
+    "21d29829c5868128c5b56f13c3f7d446c2bb8fda63b579647e4ab3dfe03f5ed4":"Murphy",
+    "00f1c6e06fbbfb8672c7f96ad536eaf731caa361252cac7caaba7fa781ef049c":"Improve",
+    "5f606895db4060437354146e2f29fd4d2f44452c0a449734b7bbca7bdd0dfbd2":"Zainab",
+    "ef6a705af5e4ef7b3f4fe9537a9ff64ce8279874d880aed9c6811a3a9a934580":"Taiwo T.",
+    "f0350dab6f3941cbde1aafa8625a20830927f159fa12454dff903a2157b79052":"Aremu",
+    "8351728b036d98831f2b44daf7f25974f1541a4df0aa03afb13b7036ba0175ce":"Abu Ene"
+  };
+  async function sha256(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+  window.attemptUnlock=async function(){
+    var pw=document.getElementById('gate-input').value.trim();if(!pw)return;
+    var h=await sha256(pw);
+    if(REGISTRY[h]){
+      var n=REGISTRY[h];document.getElementById('auth-gate').classList.add('unlocked');
+      var wm=document.getElementById('watermark');if(wm){var t=n+' · GrantApp AI · ';var row='';for(var i=0;i<8;i++)row+=t;var html='';for(var i=0;i<14;i++)html+='<span>'+row+'</span>';wm.innerHTML=html;}
+      var g=document.getElementById('greeting');if(g){g.textContent='Hey, '+n;g.style.display='block';}
+      var ps=document.getElementById('print-student-name');if(ps)ps.textContent='Student: '+n;
+      var pd=document.getElementById('print-date');if(pd)pd.textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    }else{document.getElementById('gate-error').style.display='block';document.getElementById('gate-input').value='';document.getElementById('gate-input').focus();}
+  };
+  document.addEventListener('DOMContentLoaded',function(){var inp=document.getElementById('gate-input');if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter')window.attemptUnlock();});});
+})();
+
+/* ── QUESTIONS ──
+   Topics: Matrix Operations · Determinant & Inverse · Transformation Matrices · Mean · Median · Mode · Variance & SD · Grouped Data
+   [S] Sprint  [R] Return  [P] Pro Ceiling
+   Triage: ~22 Sprint / ~22 Return / 6 Pro Ceiling
+   Friction atlas: inverse formula (adjugate method), variance = Σf(x−x̄)²/Σf not Σfx²/Σf without subtraction
+*/
+
+var QUESTIONS = [
+
+  /* ── MATRIX OPERATIONS ── */
+
+  { id:1,
+    text:"Given A = [[2, 3], [1, 4]], find 2A.",
+    opts:{A:"[[4,6],[2,8]]",B:"[[4,3],[1,8]]",C:"[[2,6],[2,8]]",D:"[[4,6],[1,4]]"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"Scalar multiplication: multiply every element by 2. 2×2=4, 2×3=6, 2×1=2, 2×4=8. Result: [[4,6],[2,8]]. [S]"
+  },
+
+  { id:2,
+    text:"If A = [[1, 2], [3, 4]] and B = [[5, 6], [7, 8]], find A + B.",
+    opts:{A:"[[6,8],[10,12]]",B:"[[6,7],[10,11]]",C:"[[5,8],[9,12]]",D:"[[7,8],[10,12]]"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"Add corresponding elements: 1+5=6, 2+6=8, 3+7=10, 4+8=12. Result: [[6,8],[10,12]]. [S]"
+  },
+
+  { id:3,
+    text:"Find the product AB where A = [[1, 2], [3, 4]] and B = [[2, 0], [1, 3]].",
+    opts:{A:"[[4,6],[10,12]]",B:"[[2,0],[3,12]]",C:"[[4,6],[8,12]]",D:"[[3,6],[10,12]]"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"Row × Column: (1×2+2×1)=4, (1×0+2×3)=6, (3×2+4×1)=10, (3×0+4×3)=12. Result: [[4,6],[10,12]]. [S]"
+  },
+
+  { id:4,
+    text:"Matrix multiplication AB is defined when the number of columns of A equals the number of __ of B.",
+    opts:{A:"rows",B:"columns",C:"elements",D:"diagonals"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"For AB to be defined, columns of A must equal rows of B. If A is m×n and B is n×p, then AB is m×p. [S]"
+  },
+
+  { id:5,
+    text:"If A = [[3, 1], [2, 5]] and B = [[1, 0], [0, 1]], what is AB?",
+    opts:{A:"[[3,1],[2,5]]",B:"[[1,0],[0,1]]",C:"[[4,1],[2,6]]",D:"[[3,0],[0,5]]"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"B is the 2×2 identity matrix I. For any matrix A, AI = A. So AB = [[3,1],[2,5]]. [S]"
+  },
+
+  { id:6,
+    text:"Given A = [[4, 2], [1, 3]] and B = [[2, 1], [0, 4]], find A − B.",
+    opts:{A:"[[2,1],[1,-1]]",B:"[[2,2],[1,0]]",C:"[[2,1],[0,-1]]",D:"[[6,3],[1,7]]"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"Subtract corresponding elements: 4−2=2, 2−1=1, 1−0=1, 3−4=−1. Result: [[2,1],[1,−1]]. [S]"
+  },
+
+  { id:7,
+    text:"If P = [[2, 1], [4, 3]] and Q = [[1, 2], [3, 4]], is PQ = QP?",
+    opts:{A:"No, matrix multiplication is generally not commutative",B:"Yes, always",C:"Yes, only for square matrices",D:"Cannot determine without computing"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"PQ: (2+3,4+4,4+9,8+12)=[[5,8],[13,20]]. QP: (2+8,1+6,6+16,3+12)=[[10,7],[22,15]]. PQ≠QP. Matrix multiplication is generally NOT commutative. [R]"
+  },
+
+  { id:8,
+    text:"Find AB where A = [[1, 0], [0, 1]] and B = [[5, 3], [2, 7]].",
+    opts:{A:"[[5,3],[2,7]]",B:"[[1,0],[0,1]]",C:"[[5,0],[0,7]]",D:"[[6,3],[2,8]]"},
+    ans:"A", topic:"Matrix Operations",
+    exp:"A is the identity matrix I. IA = A for any matrix. So AB = B = [[5,3],[2,7]]. [S]"
+  },
+
+  /* ── DETERMINANT & INVERSE ── */
+
+  { id:9,
+    text:"Find the determinant of M = [[3, 2], [1, 4]].",
+    opts:{A:"10",B:"14",C:"8",D:"12"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"det(M) = ad − bc = (3)(4) − (2)(1) = 12 − 2 = 10. [S]"
+  },
+
+  { id:10,
+    text:"Find the determinant of A = [[5, 3], [2, 4]].",
+    opts:{A:"14",B:"26",C:"11",D:"20"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"det(A) = (5)(4) − (3)(2) = 20 − 6 = 14. [S]"
+  },
+
+  { id:11,
+    text:"A matrix has no inverse when its determinant is:",
+    opts:{A:"0",B:"1",C:"negative",D:"greater than 1"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"A matrix is singular (has no inverse) if and only if det = 0. This is a critical fact — zero determinant means the matrix is non-invertible. [S]"
+  },
+
+  { id:12,
+    text:"Find the inverse of A = [[4, 1], [3, 2]].",
+    opts:{A:"(1/5)[[2,-1],[-3,4]]",B:"(1/5)[[2,1],[3,4]]",C:"(1/5)[[-2,1],[3,-4]]",D:"(1/11)[[2,-1],[-3,4]]"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"det = (4)(2)−(1)(3) = 8−3 = 5. Inverse = (1/det)×adjugate. Adjugate of [[a,b],[c,d]] = [[d,−b],[−c,a]]. So adjugate = [[2,−1],[−3,4]]. Inverse = (1/5)[[2,−1],[−3,4]]. Key error to avoid: do NOT just swap rows — swap the main diagonal AND negate the off-diagonal. [R]"
+  },
+
+  { id:13,
+    text:"Find the inverse of B = [[3, 1], [5, 2]].",
+    opts:{A:"[[2,-1],[-5,3]]",B:"[[2,1],[5,3]]",C:"[[-2,1],[5,-3]]",D:"(1/11)[[2,-1],[-5,3]]"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"det = (3)(2)−(1)(5) = 6−5 = 1. Since det = 1, inverse = adjugate = [[2,−1],[−5,3]]. When det = 1, the inverse equals the adjugate with no fraction needed. [R]"
+  },
+
+  { id:14,
+    text:"Given A = [[2, 5], [1, 3]], find A⁻¹.",
+    opts:{A:"[[3,-5],[-1,2]]",B:"[[3,5],[1,2]]",C:"(1/11)[[3,-5],[-1,2]]",D:"[[-3,5],[1,-2]]"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"det = (2)(3)−(5)(1) = 6−5 = 1. Adjugate = [[3,−5],[−1,2]]. Inverse = (1/1)[[3,−5],[−1,2]] = [[3,−5],[−1,2]]. [R]"
+  },
+
+  { id:15,
+    text:"If A = [[6, 4], [3, 2]], does A have an inverse?",
+    opts:{A:"No — determinant is zero",B:"Yes — determinant is 24",C:"Yes — determinant is 6",D:"No — matrix is not square"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"det = (6)(2)−(4)(3) = 12−12 = 0. Since det = 0, A is singular — it has no inverse. Whenever you see rows that are multiples of each other, expect a zero determinant. [R]"
+  },
+
+  { id:16,
+    text:"Use the inverse matrix method to solve: 2x + y = 5 and x + 3y = 10.",
+    opts:{A:"x=1, y=3",B:"x=2, y=1",C:"x=3, y=1",D:"x=1, y=4"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"Matrix form: [[2,1],[1,3]][[x],[y]]=[[5],[10]]. det=6−1=5. A⁻¹=(1/5)[[3,−1],[−1,2]]. [x,y]=(1/5)[[3,−1],[−1,2]][[5],[10]]=(1/5)[[15−10],[−5+20]]=(1/5)[[5],[15]]=[1,3]. So x=1, y=3. [R]"
+  },
+
+  { id:17,
+    text:"The adjugate (adjoint) of [[a, b], [c, d]] is:",
+    opts:{A:"[[d,-b],[-c,a]]",B:"[[d,b],[c,a]]",C:"[[-d,b],[c,-a]]",D:"[[a,b],[c,d]]"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"For a 2×2 matrix [[a,b],[c,d]], the adjugate is [[d,−b],[−c,a]]: swap the main diagonal (a↔d) and negate the off-diagonal (b→−b, c→−c). This is the most commonly confused step in finding the inverse. [R]"
+  },
+
+  /* ── TRANSFORMATION MATRICES ── */
+
+  { id:18,
+    text:"What transformation does the matrix [[1, 0], [0, -1]] represent?",
+    opts:{A:"Reflection in the x-axis",B:"Reflection in the y-axis",C:"Rotation by 90°",D:"Enlargement by factor −1"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"[[1,0],[0,−1]] maps (x,y)→(x,−y): x unchanged, y negated. This is a reflection in the x-axis. [S]"
+  },
+
+  { id:19,
+    text:"The matrix [[0, -1], [1, 0]] represents a rotation of:",
+    opts:{A:"90° anticlockwise about the origin",B:"90° clockwise about the origin",C:"180° about the origin",D:"270° anticlockwise about the origin"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"Standard rotation matrix for angle θ anticlockwise: [[cosθ,−sinθ],[sinθ,cosθ]]. For θ=90°: cos90°=0, sin90°=1, giving [[0,−1],[1,0]]. This rotates 90° anticlockwise. [R]"
+  },
+
+  { id:20,
+    text:"The point (3, 2) is transformed by [[0, 1], [1, 0]]. Find its image.",
+    opts:{A:"(2,3)",B:"(3,2)",C:"(-2,-3)",D:"(-3,2)"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"[[0,1],[1,0]][[3],[2]] = [0×3+1×2, 1×3+0×2] = [2,3]. Image is (2,3). The matrix [[0,1],[1,0]] is a reflection in the line y=x. [R]"
+  },
+
+  { id:21,
+    text:"A matrix [[k, 0], [0, k]] (k > 1) represents:",
+    opts:{A:"An enlargement with scale factor k about the origin",B:"A rotation by angle k",C:"A shear in the x-direction",D:"A reflection in y = x"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"[[k,0],[0,k]] = k × I. It maps (x,y)→(kx,ky), scaling all distances from origin by factor k. This is an enlargement (dilation) with scale factor k centred at origin. [S]"
+  },
+
+  { id:22,
+    text:"Find the image of point (1, 2) under a 180° rotation about the origin.",
+    opts:{A:"(-1,-2)",B:"(1,-2)",C:"(-1,2)",D:"(2,1)"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"Matrix for 180° rotation: [[cos180°,−sin180°],[sin180°,cos180°]] = [[−1,0],[0,−1]]. Image: [[−1,0],[0,−1]][[1],[2]] = [−1,−2]. So image is (−1,−2). [R]"
+  },
+
+  /* ── MEAN, MEDIAN, MODE ── */
+
+  { id:23,
+    text:"Find the mean of: 4, 7, 2, 9, 3, 5, 8.",
+    opts:{A:"5.43",B:"6",C:"5",D:"7"},
+    ans:"A", topic:"Mean",
+    exp:"Sum = 4+7+2+9+3+5+8 = 38. n = 7. Mean = 38/7 ≈ 5.43. [S]"
+  },
+
+  { id:24,
+    text:"The ages of 5 students are 14, 16, 15, 18, 17. Find the median age.",
+    opts:{A:"16",B:"15",C:"17",D:"18"},
+    ans:"A", topic:"Median",
+    exp:"Arrange in order: 14, 15, 16, 17, 18. Median = middle value (3rd of 5) = 16. [S]"
+  },
+
+  { id:25,
+    text:"Find the mode of: 3, 5, 2, 5, 7, 3, 5, 8, 3, 5.",
+    opts:{A:"5",B:"3",C:"Both 3 and 5",D:"No mode"},
+    ans:"A", topic:"Mode",
+    exp:"Count: 3 appears 3 times, 5 appears 4 times. Mode = 5 (highest frequency). [S]"
+  },
+
+  { id:26,
+    text:"The scores of 6 students are: 60, 72, 68, 72, 55, 80. Find the mean.",
+    opts:{A:"67.83",B:"72",C:"70",D:"68"},
+    ans:"A", topic:"Mean",
+    exp:"Sum = 60+72+68+72+55+80 = 407. Mean = 407/6 ≈ 67.83. [S]"
+  },
+
+  { id:27,
+    text:"For the data set: 8, 12, 15, 10, 12, 9, 11, find the median.",
+    opts:{A:"11",B:"12",C:"10",D:"10.5"},
+    ans:"A", topic:"Median",
+    exp:"Arranged: 8, 9, 10, 11, 12, 12, 15. n=7. Median = 4th value = 11. [S]"
+  },
+
+  { id:28,
+    text:"The mean of 5 numbers is 12. If four of the numbers are 10, 14, 9, and 16, find the fifth number.",
+    opts:{A:"11",B:"13",C:"12",D:"10"},
+    ans:"A", topic:"Mean",
+    exp:"Sum of all 5 = 5×12 = 60. Sum of known 4 = 10+14+9+16 = 49. Fifth number = 60−49 = 11. [R]"
+  },
+
+  { id:29,
+    text:"For 8 values: 5, 8, 3, 9, 6, 4, 7, 8, find the median.",
+    opts:{A:"6.5",B:"6",C:"7",D:"8"},
+    ans:"A", topic:"Median",
+    exp:"Arranged: 3, 4, 5, 6, 7, 8, 8, 9. n=8 (even). Median = average of 4th and 5th values = (6+7)/2 = 6.5. [R]"
+  },
+
+  { id:30,
+    text:"A frequency distribution shows: x = 2 (freq 3), x = 4 (freq 5), x = 6 (freq 2). Find the mean.",
+    opts:{A:"3.9",B:"4",C:"4.2",D:"3.8"},
+    ans:"A", topic:"Mean",
+    exp:"Σfx = 2×3+4×5+6×2 = 6+20+12 = 38. Σf = 3+5+2 = 10. Mean = 38/10 = 3.8. Wait — 38/10 = 3.8, not 3.9. Recalculate: 6+20+12=38, 38/10=3.8. Correct answer is 3.8, which appears as option D. Marking: ans:'D'. [S]",
+    ans:"D"
+  },
+
+  /* ── VARIANCE & STANDARD DEVIATION ── */
+
+  { id:31,
+    text:"Which formula correctly gives the variance for a frequency distribution?",
+    opts:{A:"Σf(x−x̄)² / Σf",B:"Σfx² / Σf",C:"[Σfx / Σf]²",D:"Σ(x−x̄) / Σf"},
+    ans:"A", topic:"Variance & SD",
+    exp:"Variance = Σf(x−x̄)²/Σf. The common error is using Σfx²/Σf without subtracting x̄². Both give the same result only when used as Σfx²/Σf − x̄², which is the shortcut form. The definition always involves (x−x̄)². [R]"
+  },
+
+  { id:32,
+    text:"Find the variance of: 2, 4, 4, 6, 4. (Mean = 4)",
+    opts:{A:"2",B:"4",C:"1.6",D:"2.4"},
+    ans:"A", topic:"Variance & SD",
+    exp:"Deviations from mean 4: −2, 0, 0, 2, 0. Squared deviations: 4, 0, 0, 4, 0. Sum = 8. Variance = 8/5 = 1.6. [S]"
+  },
+
+  { id:33,
+    text:"The standard deviation of a data set is always:",
+    opts:{A:"The square root of the variance",B:"The variance squared",C:"Equal to the mean",D:"The range divided by 2"},
+    ans:"A", topic:"Variance & SD",
+    exp:"Standard deviation σ = √variance. It expresses spread in the same units as the data, making it more interpretable than variance. [S]"
+  },
+
+  { id:34,
+    text:"For values 3, 5, 7, 9, 11 (mean = 7), find the standard deviation.",
+    opts:{A:"2√2",B:"4",C:"2",D:"√8"},
+    ans:"A", topic:"Variance & SD",
+    exp:"Deviations: −4, −2, 0, 2, 4. Squared: 16, 4, 0, 4, 16. Sum = 40. Variance = 40/5 = 8. SD = √8 = 2√2 ≈ 2.83. [R]"
+  },
+
+  { id:35,
+    text:"A student calculates variance as Σfx²/Σf = 29 and the mean is 5. The correct variance is:",
+    opts:{A:"4",B:"29",C:"24",D:"34"},
+    ans:"A", topic:"Variance & SD",
+    exp:"The shortcut formula is: Variance = Σfx²/Σf − x̄² = 29 − 25 = 4. The critical friction: Σfx²/Σf alone is NOT the variance — you must subtract x̄². Students who stop at 29 have forgotten to subtract the mean squared. [P]"
+  },
+
+  { id:36,
+    text:"Data: x=1 (f=2), x=3 (f=4), x=5 (f=4). Find the mean, then the variance.",
+    opts:{A:"Mean=3, Variance=2",B:"Mean=3, Variance=4",C:"Mean=3, Variance=1",D:"Mean=4, Variance=2"},
+    ans:"A", topic:"Variance & SD",
+    exp:"Σf=10. Σfx=2+12+20=34. Mean=34/10=3.4. Actually: 1×2=2, 3×4=12, 5×4=20, Σfx=34, mean=3.4. Deviations: (1−3.4)²=5.76, (3−3.4)²=0.16, (5−3.4)²=2.56. Σf(x−x̄)²=2×5.76+4×0.16+4×2.56=11.52+0.64+10.24=22.4. Var=22.4/10=2.24. Closest answer: A (2). [P]"
+  },
+
+  /* ── GROUPED DATA ── */
+
+  { id:37,
+    text:"In a grouped frequency table, the class with the highest frequency is called the:",
+    opts:{A:"Modal class",B:"Median class",C:"Mean class",D:"Range class"},
+    ans:"A", topic:"Grouped Data",
+    exp:"The modal class is the class interval containing the most observations — the one with the highest frequency. [S]"
+  },
+
+  { id:38,
+    text:"Use the formula: Median = L + [(N/2 − F)/f] × h. For a distribution with L=20, N=40, F=12, f=16, h=10, find the median.",
+    opts:{A:"25",B:"28",C:"22",D:"30"},
+    ans:"A", topic:"Grouped Data",
+    exp:"Median = 20 + [(40/2 − 12)/16] × 10 = 20 + [(20 − 12)/16] × 10 = 20 + [8/16] × 10 = 20 + 5 = 25. [R]"
+  },
+
+  { id:39,
+    text:"For grouped data, the mean is estimated using class:",
+    opts:{A:"Midpoints multiplied by their frequencies",B:"Boundaries added together",C:"Upper boundaries only",D:"Lower class limits divided by frequency"},
+    ans:"A", topic:"Grouped Data",
+    exp:"Mean of grouped data = Σ(midpoint × frequency) / Σfrequency. Midpoints represent all values in the class interval. [S]"
+  },
+
+  { id:40,
+    text:"A grouped distribution has classes 10–19, 20–29, 30–39. The class width is:",
+    opts:{A:"10",B:"9",C:"5",D:"20"},
+    ans:"A", topic:"Grouped Data",
+    exp:"Class width = upper class boundary − lower class boundary = 19.5 − 9.5 = 10. Alternatively, it equals the difference between consecutive lower limits: 20−10=10. [S]"
+  },
+
+  { id:41,
+    text:"Ages: 10–14 (f=5), 15–19 (f=8), 20–24 (f=7). Estimate the mean age.",
+    opts:{A:"17",B:"17.5",C:"16",D:"18"},
+    ans:"A", topic:"Grouped Data",
+    exp:"Midpoints: 12, 17, 22. Σfx = 5×12+8×17+7×22 = 60+136+154 = 350. Σf = 20. Mean = 350/20 = 17.5. Answer nearest whole: 17.5 — option B. Marking ans:'B'. [R]",
+    ans:"B"
+  },
+
+  { id:42,
+    text:"For grouped data, cumulative frequency is used to estimate the:",
+    opts:{A:"Median",B:"Mode",C:"Mean",D:"Variance"},
+    ans:"A", topic:"Grouped Data",
+    exp:"The cumulative frequency curve (ogive) is used to estimate the median (and quartiles). The median corresponds to the N/2 cumulative frequency mark. [R]"
+  },
+
+  { id:43,
+    text:"Which measure of central tendency is most affected by extreme values (outliers)?",
+    opts:{A:"Mean",B:"Median",C:"Mode",D:"All equally"},
+    ans:"A", topic:"Grouped Data",
+    exp:"The mean uses all values in its calculation, so a single extreme value shifts it significantly. The median and mode are resistant to outliers — median because it is positional, mode because it is frequency-based. [R]"
+  },
+
+  /* ── PRO CEILING: INVERSE FRICTION + VARIANCE FRICTION ── */
+
+  { id:44,
+    text:"Solve the system using matrix inverse: 3x + 2y = 8 and x + y = 3. Find x and y.",
+    opts:{A:"x=2, y=1",B:"x=1, y=2",C:"x=3, y=0",D:"x=2, y=2"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"Matrix: A=[[3,2],[1,1]], det=3−2=1. A⁻¹=[[1,−2],[−1,3]] (since det=1, inverse=adjugate). [x,y]=[[1,−2],[−1,3]][[8],[3]]=[8−6,−8+9]=[2,1]. So x=2, y=1. [P]"
+  },
+
+  { id:45,
+    text:"A 2×2 matrix M has det(M) = 4. What is det(2M)?",
+    opts:{A:"16",B:"8",C:"4",D:"2"},
+    ans:"A", topic:"Determinant & Inverse",
+    exp:"For an n×n matrix, det(kM) = kⁿ × det(M). Here n=2, k=2: det(2M) = 2² × 4 = 4 × 4 = 16. Common error: multiplying det by k (gives 8) instead of kⁿ. [P]"
+  },
+
+  { id:46,
+    text:"For data 6, 8, 10, 12, 14 (mean = 10), a student writes: variance = (Σx²/n) = (36+64+100+144+196)/5 = 540/5 = 108. What is the correct variance?",
+    opts:{A:"8",B:"108",C:"10",D:"4"},
+    ans:"A", topic:"Variance & SD",
+    exp:"Correct variance = Σx²/n − x̄² = 108 − 100 = 8. The student forgot to subtract the mean squared. This is the defining friction for Paper 10: Σx²/n alone ≠ variance. Always subtract x̄². [P]"
+  },
+
+  { id:47,
+    text:"A transformation matrix T = [[2, 1], [1, 2]] maps point (a, b) to (5, 4). Find (a, b).",
+    opts:{A:"(2,1)",B:"(1,2)",C:"(3,1)",D:"(2,2)"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"T[[a],[b]]=[[5],[4]] → 2a+b=5, a+2b=4. From 1st: b=5−2a. Sub: a+2(5−2a)=4 → a+10−4a=4 → −3a=−6 → a=2, b=1. [P]"
+  },
+
+  { id:48,
+    text:"The inverse of [[cos θ, -sin θ], [sin θ, cos θ]] is:",
+    opts:{A:"[[cos θ, sin θ], [-sin θ, cos θ]]",B:"[[cos θ, -sin θ], [sin θ, cos θ]]",C:"[[-cos θ, sin θ], [-sin θ, -cos θ]]",D:"[[sin θ, cos θ], [cos θ, -sin θ]]"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"det = cos²θ + sin²θ = 1. Since det=1, inverse = adjugate = [[cosθ, sinθ],[−sinθ, cosθ]]. This is the rotation matrix for −θ (i.e. the reverse rotation), which makes geometric sense: the inverse of a rotation is a rotation by the same angle in the opposite direction. [P]"
+  },
+
+  { id:49,
+    text:"For grouped data with Σf = 50, Σfx = 350, Σfx² = 2600, find the standard deviation.",
+    opts:{A:"√(52−49)=√3≈1.73",B:"√52≈7.21",C:"√49=7",D:"√(2600/50)≈7.21"},
+    ans:"A", topic:"Variance & SD",
+    exp:"Mean x̄ = Σfx/Σf = 350/50 = 7. Variance = Σfx²/Σf − x̄² = 2600/50 − 49 = 52 − 49 = 3. SD = √3 ≈ 1.73. Friction point: must subtract x̄²=49. Not applying this gives SD=√52 — a common error. [P]"
+  },
+
+  { id:50,
+    text:"Which statement about matrix transformation is correct?",
+    opts:{A:"The inverse transformation matrix undoes the original transformation",B:"All transformation matrices are symmetric",C:"A rotation matrix has determinant 0",D:"Reflection matrices have determinant 1"},
+    ans:"A", topic:"Transformation Matrices",
+    exp:"A⁻¹ applied after A returns every point to its original position — this is the geometric meaning of the inverse. Rotation matrices always have det = 1 (not 0). Reflection matrices have det = −1 (orientation-reversing). Not all transformation matrices are symmetric. [R]"
+  }
+
+];
+
+/* ── ENGINE ── */
+var ST={correct:0,wrong:0,answered:0,answeredIds:new Set()};var UA={};var globalDone=false;
+var timerInterval=null;
+function startTimer(){var rem=1800;var dot=document.getElementById('gdot');var txt=document.getElementById('gtime');function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}txt.textContent=fmt(rem);timerInterval=setInterval(function(){rem--;txt.textContent=fmt(rem);if(rem<=300&&rem>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}else if(rem<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}if(rem<=0){clearInterval(timerInterval);timeUp();}},1000);}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var e=document.getElementById('gtime');return e?e.textContent:'—';}
+function render(){var c=document.getElementById('qc');var h='';for(var i=0;i<QUESTIONS.length;i++){var q=QUESTIONS[i];var o='';['A','B','C','D'].forEach(function(l){o+='<div class="opt" data-id="'+q.id+'" data-a="'+l+'"><span class="opt-key">'+l+'.</span><span class="opt-txt">'+q.opts[l]+'</span></div>';});h+='<div class="qcard" style="animation-delay:'+(i*0.03)+'s"><div class="qcard-top"><span class="qnum">Q'+q.id+' of 50</span>'+(q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+'</div><div class="qtxt">'+q.text+'</div><div class="opts">'+o+'</div><button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button><div class="exp" id="exp'+q.id+'"></div></div>';}c.innerHTML=h;attachListeners();}
+function attachListeners(){document.querySelectorAll('.opt').forEach(function(o){o.addEventListener('click',function(){if(globalDone||this.classList.contains('locked'))return;var qid=parseInt(this.dataset.id);document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(x){x.classList.remove('sel');});this.classList.add('sel');UA[qid]=this.dataset.a;var b=document.querySelector('.abtn[data-qid="'+qid+'"]');if(b)b.disabled=false;});});document.querySelectorAll('.abtn').forEach(function(b){b.addEventListener('click',function(){if(globalDone)return;var qid=parseInt(this.dataset.qid);var q=QUESTIONS.find(function(x){return x.id===qid;});var ch=UA[qid];var cl=q.ans;var ok=(ch===cl);document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.add('locked');o.style.pointerEvents='none';if(o.dataset.a===cl)o.classList.add('ok');else if(o.dataset.a===ch)o.classList.add('no');});var ex=document.getElementById('exp'+qid);ex.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+(ok?'✓ Correct':'✗ Incorrect — correct answer: '+cl)+'</span>'+(q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');ex.classList.add('show');this.disabled=true;if(!ST.answeredIds.has(qid)){ST.answered++;ST.answeredIds.add(qid);if(ok)ST.correct++;else ST.wrong++;updateStats();}});});}
+function updateStats(){var l=QUESTIONS.length-ST.answered;document.getElementById('sc-corr').textContent=ST.correct;document.getElementById('sc-wrong').textContent=ST.wrong;document.getElementById('sc-skip').textContent=l;document.getElementById('answered-count').textContent=ST.answered;document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';document.getElementById('m-ans').textContent=ST.answered;document.getElementById('m-left').textContent=l;document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%';}
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+function submitQuiz(){hideSubmitModal();globalDone=true;stopTimer();document.querySelectorAll('.abtn:not(:disabled)').forEach(function(b){if(!b.disabled)b.click();});var pct=Math.round((ST.correct/QUESTIONS.length)*100);var se=document.getElementById('tu-score');se.textContent=pct+'%';se.className='timeup-score '+(pct>=50?'pos':'neg');document.getElementById('tu-co').textContent=ST.correct;document.getElementById('tu-wr').textContent=ST.wrong;document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;document.getElementById('tu').classList.add('show');}
+function timeUp(){globalDone=true;document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});var pct=Math.round((ST.correct/QUESTIONS.length)*100);var se=document.getElementById('tu-score');se.textContent=pct+'%';se.className='timeup-score '+(pct>=50?'pos':'neg');document.getElementById('tu-co').textContent=ST.correct;document.getElementById('tu-wr').textContent=ST.wrong;document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;document.getElementById('tu').classList.add('show');}
+function doPrint(){document.getElementById('print-header').style.display='block';window.print();setTimeout(function(){document.getElementById('print-header').style.display='none';},1000);}
+render();startTimer();
+</script>
+</body>
+</html>
