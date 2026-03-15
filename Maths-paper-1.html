@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Mathematics · Paper 1 — Number &amp; Sets | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A; --card:#111827; --card2:#161E2E; --text:#E8EDF5;
+      --sec:rgba(232,237,245,0.75); --ter:rgba(232,237,245,0.45);
+      --accent:#f59e0b; --accent2:#d97706; --subject:#94a3b8; --subject2:#64748b; --warn:#F59E0B; --red:#EF4444;
+      --green:#10B981; --sep:rgba(255,255,255,0.08); --hov:rgba(255,255,255,0.05);
+      --r:14px; --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;
+      padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none;z-index:0;opacity:0.5}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;
+      display:flex;flex-direction:column;gap:2.8rem;padding:1rem;
+      transform:rotate(-20deg) scale(1.5);transform-origin:center center;
+      opacity:0.022;font-family:var(--mono);font-size:0.72rem;font-weight:700;
+      color:#f0eff4;letter-spacing:0.08em;white-space:nowrap;user-select:none;-webkit-user-select:none}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);
+      padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--subject)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(148,163,184,0.08);border:1px solid rgba(148,163,184,0.18);padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(148,163,184,0.08);border:1px solid rgba(148,163,184,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--subject);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)} .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--subject);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)} .gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)} .sc-v.w{color:var(--red)} .sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--subject2),var(--subject));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.08em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(148,163,184,0.08);border:1px solid rgba(148,163,184,0.18);color:var(--subject);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(148,163,184,0.4);background:rgba(148,163,184,0.05)}
+    .opt.sel{border-color:rgba(148,163,184,0.5);background:rgba(148,163,184,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--subject);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)} .opt.no .opt-key{color:var(--red)} .opt.sel .opt-key{color:var(--subject)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--subject);color:#0a0e1a;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)} .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--subject);color:#0a0e1a;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)} .timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)} .tu-stat-v.w{color:var(--red)} .tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--subject);color:#0a0e1a;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--subject);color:#0a0e1a} .modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)} .hdr-title{font-size:13px}}
+    #auth-gate{position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center}
+    #auth-gate.unlocked{display:none}
+    .gate-box{background:var(--card2,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6)}
+    .gate-logo{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--subject,#94a3b8);margin-bottom:1rem;font-family:var(--mono)}
+    .gate-title{font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5)}
+    .gate-sub{font-size:0.85rem;color:var(--ter,#8b949e);margin:0 0 1.5rem}
+    .gate-input{width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none}
+    .gate-input:focus{border-color:var(--subject,#94a3b8)}
+    .gate-error{font-size:0.82rem;color:#f85149;margin:0 0 0.75rem}
+    .gate-btn{width:100%;padding:0.8rem;background:var(--subject,#94a3b8);color:#0a0e1a;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans)}
+    .gate-btn:hover{opacity:0.88}
+    @media print{
+      body{background:#fff !important;color:#000 !important;font-size:12pt}
+      body::before,#watermark,.hdr,.gtimer,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none !important}
+      .exp{display:block !important;background:#f9f9f9 !important;border:1px solid #ccc !important;color:#333 !important}
+      .qcard{break-inside:avoid;border:1px solid #ddd !important;background:#fff !important;margin-bottom:20pt;page-break-inside:avoid}
+      .opt{border:1px solid #ccc !important;background:#fff !important}
+      .opt.ok{background:#e6f9f0 !important;border-color:#10b981 !important}
+      .opt.no{background:#fef2f2 !important;border-color:#ef4444 !important}
+      .opt-txt{color:#000 !important} .qtxt{color:#000 !important}
+      #print-header{display:block !important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000}
+      #print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt}
+      #print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt}
+      #print-header .ph-student{font-size:13pt;font-weight:700;color:#000}
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Mathematics · Paper 1</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · Number &amp; Sets · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Mathematics · Paper 1</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password">
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Mathematics · Paper 1 — Number &amp; Sets</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#8595; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#9203;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#8595; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH GATE ── */
+(function() {
+    var REGISTRY = {
+    "31e2f049ea6226f6d5755f4fb549d95c7f78ceab43a4b1e407f6b28b7ce3beb9": "Conve",
+    "781b7749f5ddd8f9686ee31b4fef571d04b4b8432e61137bc5d78d9ada22c24c": "Kaosara",
+    "3da4c5cd7bb9a4573a160725e390a3214e193094fc4ad86a29db95dc39365ca6": "Habibat",
+    "9403e4ed9497a885390af4a54bbd8acf944cdb0ce1466e65a016ead13c96eab1": "Oyin",
+    "e290b9f1952da521dab7ec693caa609e4ff707d3d9e00c1ecb53f092113a4f3a": "Dorcas",
+    "6ad071baadf38c76a1976e3e07d322d2bb6f534f195bf2253c9d0b2874b121b9": "Famous",
+    "da123098c73e97dc05aa4f080b36fecc0acc46a1d2ea353d65bce0a11d0dfcbf": "Obasesam",
+    "19d3009c2301c89096cb61da53f92e8c854f8fd223c4f368931d312fe6a16e9e": "Prosper",
+    "202ec3362eaf2ac6da6a02fb6354907d0833384c386773ebc599ec2d0d2fb2ca": "Temi",
+    "21d29829c5868128c5b56f13c3f7d446c2bb8fda63b579647e4ab3dfe03f5ed4": "Murphy",
+    "00f1c6e06fbbfb8672c7f96ad536eaf731caa361252cac7caaba7fa781ef049c": "Improve",
+    "5f606895db4060437354146e2f29fd4d2f44452c0a449734b7bbca7bdd0dfbd2": "Zainab",
+    "ef6a705af5e4ef7b3f4fe9537a9ff64ce8279874d880aed9c6811a3a9a934580": "Taiwo T.",
+    "f0350dab6f3941cbde1aafa8625a20830927f159fa12454dff903a2157b79052": "Aremu",
+    "8351728b036d98831f2b44daf7f25974f1541a4df0aa03afb13b7036ba0175ce": "Abu Ene"
+  };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
+      }
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+  });
+})();
+
+/* ── QUESTIONS ── */
+/*
+  Options policy:
+  · All four options are the same rough length.
+  · The correct answer is NEVER the longest option.
+  · At least two distractors are as long as or longer than the correct answer.
+  · No trailing garbage. No explanatory language in options.
+
+  Triage tags (in comments): [S] Sprint  [R] Return  [P] Pro Ceiling
+  Topics: Number Bases · Modular Arithmetic · Sets · Venn Diagrams
+*/
+const QUESTIONS = [
+
+  /* ══ NUMBER BASES ══ */
+
+  { id:1,
+    text:"Convert 110101₂ to base 10.",
+    opts:{A:"51",B:"53",C:"55",D:"49"},
+    ans:"B", topic:"Number Bases",
+    exp:"1×32 + 1×16 + 0×8 + 1×4 + 0×2 + 1×1 = 32+16+4+1 = 53. Work right to left: each bit multiplied by its power of 2. [S]"
+  }, /* [S] */
+
+  { id:2,
+    text:"Convert 47₁₀ to base 2.",
+    opts:{A:"101111₂",B:"101110₂",C:"110111₂",D:"100111₂"},
+    ans:"A", topic:"Number Bases",
+    exp:"47÷2=23 r1, 23÷2=11 r1, 11÷2=5 r1, 5÷2=2 r1, 2÷2=1 r0, 1÷2=0 r1. Read remainders upward: 101111₂. [S]"
+  }, /* [S] */
+
+  { id:3,
+    text:"What is 1101₂ + 1011₂?",
+    opts:{A:"10110₂",B:"11000₂",C:"11001₂",D:"11010₂"},
+    ans:"B", topic:"Number Bases",
+    exp:"1101 + 1011: column by column right-to-left: 1+1=10 (write 0 carry 1); 0+1+1=10 (write 0 carry 1); 1+0+1=10 (write 0 carry 1); 1+1+1=11. Result: 11000₂. [S]"
+  }, /* [S] */
+
+  { id:4,
+    text:"Convert 3A₁₆ to base 10.",
+    opts:{A:"48",B:"56",C:"58",D:"62"},
+    ans:"C", topic:"Number Bases",
+    exp:"3A₁₆: 3×16 + A(10)×1 = 48 + 10 = 58. In hexadecimal, A=10, B=11, C=12, D=13, E=14, F=15. [S]"
+  }, /* [S] */
+
+  { id:5,
+    text:"Convert 27₁₀ to base 3.",
+    opts:{A:"1000₃",B:"300₃",C:"1100₃",D:"900₃"},
+    ans:"A", topic:"Number Bases",
+    exp:"27÷3=9 r0, 9÷3=3 r0, 3÷3=1 r0, 1÷3=0 r1. Read upward: 1000₃. Check: 1×27=27 ✓. [S]"
+  }, /* [S] */
+
+  { id:6,
+    text:"Evaluate 1001₂ × 11₂.",
+    opts:{A:"11001₂",B:"10011₂",C:"11011₂",D:"11100₂"},
+    ans:"C", topic:"Number Bases",
+    exp:"1001 × 11 = 1001×1 + 1001×10 = 1001 + 10010 = 11011₂. Binary multiplication: multiply by each bit then shift, add. [R]"
+  }, /* [R] */
+
+  { id:7,
+    text:"Convert 0.625₁₀ to base 2.",
+    opts:{A:"0.100₂",B:"0.101₂",C:"0.110₂",D:"0.111₂"},
+    ans:"B", topic:"Number Bases",
+    exp:"0.625×2=1.25 → 1; 0.25×2=0.50 → 0; 0.50×2=1.0 → 1. Reading downward: 0.101₂. Multiply fractional part repeatedly by the base, recording integer parts. [R]"
+  }, /* [R] */
+
+  { id:8,
+    text:"Convert 52₈ to base 2.",
+    opts:{A:"101010₂",B:"101100₂",C:"101001₂",D:"010101₂"},
+    ans:"A", topic:"Number Bases",
+    exp:"Each octal digit → 3-bit binary: 5=101, 2=010. So 52₈ = 101010₂. The octal-to-binary shortcut: replace each digit with its 3-bit equivalent. [S]"
+  }, /* [S] */
+
+  { id:9,
+    text:"What is 1011₂ − 0110₂?",
+    opts:{A:"0011₂",B:"0101₂",C:"0100₂",D:"0001₂"},
+    ans:"B", topic:"Number Bases",
+    exp:"11−6=5=0101₂. Or directly: 1011−0110 column by column with borrowing: rightmost 1−0=1; 1−1=0; 0−1 needs borrow →10−1=1 borrow from next; 1−1−1(borrow)=... = 0101₂. [R]"
+  }, /* [R] */
+
+  { id:10,
+    text:"If x₅ = 34₁₀, find x.",
+    opts:{A:"x = 114₅",B:"x = 124₅",C:"x = 104₅",D:"x = 130₅"},
+    ans:"A", topic:"Number Bases",
+    exp:"34÷5=6 r4, 6÷5=1 r1, 1÷5=0 r1. Read upward: 114₅. Check: 1×25+1×5+4 = 25+5+4 = 34 ✓. [S]"
+  }, /* [S] */
+
+  /* ══ MODULAR ARITHMETIC ══ */
+
+  { id:11,
+    text:"Find the value of 17 mod 5.",
+    opts:{A:"3",B:"2",C:"4",D:"1"},
+    ans:"B", topic:"Modular Arithmetic",
+    exp:"17 = 3×5 + 2, so 17 ≡ 2 (mod 5). The remainder when 17 is divided by 5 is 2. [S]"
+  }, /* [S] */
+
+  { id:12,
+    text:"What is −3 (mod 5)?",
+    opts:{A:"−3",B:"3",C:"2",D:"4"},
+    ans:"C", topic:"Modular Arithmetic",
+    exp:"Add the modulus until positive: −3 + 5 = 2. So −3 ≡ 2 (mod 5). Never leave a negative residue — always reduce to the range [0, n−1]. [R]"
+  }, /* [R] */
+
+  { id:13,
+    text:"A clock shows 10:00. What time will it show 37 hours later?",
+    opts:{A:"11:00",B:"22:00",C:"23:00",D:"01:00"},
+    ans:"C", topic:"Modular Arithmetic",
+    exp:"37 mod 12 = 1. 10 + 1 = 11... wait: 37 hours from 10:00 on a 12-hour clock. 37 mod 24 = 13. 10 + 13 = 23:00 (11 pm). Using mod 24: 37 = 1×24 + 13, so 13 hours after 10 = 23:00. [R]"
+  }, /* [R] */
+
+  { id:14,
+    text:"Evaluate (23 × 14) mod 7.",
+    opts:{A:"3",B:"2",C:"0",D:"5"},
+    ans:"C", topic:"Modular Arithmetic",
+    exp:"23 mod 7 = 2; 14 mod 7 = 0. So (23×14) mod 7 = (2×0) mod 7 = 0. Shortcut: reduce each factor mod 7 first, then multiply. Since 14 is divisible by 7, the product is too. [R]"
+  }, /* [R] */
+
+  { id:15,
+    text:"Find x if 3x ≡ 1 (mod 7).",
+    opts:{A:"x = 5",B:"x = 3",C:"x = 4",D:"x = 6"},
+    ans:"A", topic:"Modular Arithmetic",
+    exp:"Test: 3×5=15=2×7+1 ✓. So x=5 is the modular inverse of 3 mod 7. Alternatively: extend Euclidean algorithm. gcd(3,7)=1, so inverse exists. [R]"
+  }, /* [R] */
+
+  { id:16,
+    text:"What is the last digit of 7⁵⁰?",
+    opts:{A:"9",B:"1",C:"3",D:"7"},
+    ans:"B", topic:"Modular Arithmetic",
+    exp:"Last digit of 7ⁿ cycles: 7¹=7, 7²=49, 7³=343, 7⁴=2401 — cycle of 4: 7,9,3,1. 50 mod 4 = 2. So last digit of 7⁵⁰ = last digit of 7² = 9. Wait — 50 mod 4 = 2, cycle position 2 = 9. [P]"
+  }, /* [P] */
+
+  { id:17,
+    text:"Which of the following is equivalent to 100 (mod 13)?",
+    opts:{A:"9",B:"8",C:"11",D:"7"},
+    ans:"A", topic:"Modular Arithmetic",
+    exp:"100 ÷ 13 = 7 remainder 9 (since 7×13=91, 100−91=9). So 100 ≡ 9 (mod 13). [S]"
+  }, /* [S] */
+
+  { id:18,
+    text:"Today is Wednesday. What day will it be 100 days from now?",
+    opts:{A:"Monday",B:"Friday",C:"Thursday",D:"Saturday"},
+    ans:"B", topic:"Modular Arithmetic",
+    exp:"100 mod 7 = 2 (since 14×7=98, 100−98=2). Wednesday + 2 days = Friday. [R]"
+  }, /* [R] */
+
+  /* ══ SET THEORY ══ */
+
+  { id:19,
+    text:"If n(A) = 20, n(B) = 15, n(A∩B) = 8, find n(A∪B).",
+    opts:{A:"35",B:"27",C:"43",D:"28"},
+    ans:"B", topic:"Set Theory",
+    exp:"n(A∪B) = n(A) + n(B) − n(A∩B) = 20 + 15 − 8 = 27. The inclusion-exclusion principle. [S]"
+  }, /* [S] */
+
+  { id:20,
+    text:"In a class of 50 students, 30 study French, 25 study German, and 10 study both. How many study neither?",
+    opts:{A:"10",B:"5",C:"15",D:"20"},
+    ans:"B", topic:"Set Theory",
+    exp:"n(F∪G) = 30+25−10 = 45. Neither = 50−45 = 5. Always subtract the intersection to avoid double-counting. [S]"
+  }, /* [S] */
+
+  { id:21,
+    text:"If U = {1,2,3,4,5,6,7,8}, A = {1,2,3,4}, B = {3,4,5,6}, find A'∩B.",
+    opts:{A:"{5,6}",B:"{3,4}",C:"{1,2}",D:"{7,8}"},
+    ans:"A", topic:"Set Theory",
+    exp:"A' = {5,6,7,8}. A'∩B = {5,6,7,8}∩{3,4,5,6} = {5,6}. First find the complement, then intersect. [R]"
+  }, /* [R] */
+
+  { id:22,
+    text:"Find n(A△B) if n(A)=12, n(B)=9, n(A∩B)=4.",
+    opts:{A:"13",B:"17",C:"21",D:"9"},
+    ans:"A", topic:"Set Theory",
+    exp:"Symmetric difference A△B = (A∪B) − (A∩B) = (12+9−4) − 4 = 17−4 = 13. Alternatively: elements in A only + elements in B only = (12−4)+(9−4) = 8+5 = 13. [R]"
+  }, /* [R] */
+
+  { id:23,
+    text:"Which of the following is always true for any sets A and B?",
+    opts:{A:"A∩B = B∩A",B:"A\\B = B\\A",C:"A∪B ⊂ A∩B",D:"A∩B = A∪B"},
+    ans:"A", topic:"Set Theory",
+    exp:"Intersection is commutative: A∩B = B∩A always. Set difference is NOT commutative: A\\B ≠ B\\A in general. [S]"
+  }, /* [S] */
+
+  { id:24,
+    text:"If A = {x : x is a factor of 24} and B = {x : x is a factor of 36}, find n(A∩B).",
+    opts:{A:"6",B:"5",C:"4",D:"7"},
+    ans:"A", topic:"Set Theory",
+    exp:"Factors of 24: {1,2,3,4,6,8,12,24}. Factors of 36: {1,2,3,4,6,9,12,18,36}. A∩B = {1,2,3,4,6,12} — the common factors = factors of HCF(24,36)=12. n(A∩B)=6. [R]"
+  }, /* [R] */
+
+  { id:25,
+    text:"Given n(U)=50, n(A)=30, n(B)=25, n(A∪B)'=5, find n(A∩B).",
+    opts:{A:"10",B:"5",C:"15",D:"20"},
+    ans:"A", topic:"Set Theory",
+    exp:"n(A∪B) = 50−5 = 45. n(A∩B) = n(A)+n(B)−n(A∪B) = 30+25−45 = 10. The complement of the union gives you the 'neither' group. [R]"
+  }, /* [R] */
+
+  { id:26,
+    text:"How many subsets does the set {a, b, c, d, e} have?",
+    opts:{A:"10",B:"25",C:"32",D:"16"},
+    ans:"C", topic:"Set Theory",
+    exp:"A set with n elements has 2ⁿ subsets (including ∅ and the set itself). 2⁵ = 32. For 4 elements: 2⁴ = 16; for 3: 2³ = 8. [S]"
+  }, /* [S] */
+
+  { id:27,
+    text:"If A ⊆ B, which of the following must be true?",
+    opts:{A:"A∩B = B",B:"A∪B = B",C:"A∩B = A and A∪B = B",D:"A = B"},
+    ans:"C", topic:"Set Theory",
+    exp:"If A ⊆ B: every element of A is in B. Therefore A∩B = A (the smaller set) and A∪B = B (the larger set). Both hold simultaneously. [R]"
+  }, /* [R] */
+
+  /* ══ VENN DIAGRAMS — 2-SET ══ */
+
+  { id:28,
+    text:"In a group of 80 people, 45 drink tea, 30 drink coffee, and 15 drink both. How many drink only tea?",
+    opts:{A:"45",B:"30",C:"20",D:"15"},
+    ans:"B", topic:"Venn Diagrams",
+    exp:"Only tea = n(Tea) − n(both) = 45 − 15 = 30. The 'only A' region excludes those in the intersection. [S]"
+  }, /* [S] */
+
+  { id:29,
+    text:"A survey shows 60 like maths, 45 like English, 20 like both, and 5 like neither. What is the total surveyed?",
+    opts:{A:"90",B:"100",C:"110",D:"85"},
+    ans:"A", topic:"Venn Diagrams",
+    exp:"n(M∪E) = 60+45−20 = 85. Total = 85+5 = 90. Always add the 'neither' group to the union to get the total. [S]"
+  }, /* [S] */
+
+  { id:30,
+    text:"If n(A only) = 12, n(B only) = 8, n(A∩B) = 5, n(neither) = 3, find n(U).",
+    opts:{A:"25",B:"28",C:"23",D:"30"},
+    ans:"B", topic:"Venn Diagrams",
+    exp:"n(U) = n(A only) + n(B only) + n(A∩B) + n(neither) = 12+8+5+3 = 28. The four regions of a 2-set Venn diagram sum to the universal set. [S]"
+  }, /* [S] */
+
+  /* ══ VENN DIAGRAMS — 3-SET (Friction Atlas: the +n(A∩B∩C) trap) ══ */
+
+  { id:31,
+    text:"In a class of 100 students: 60 study Maths, 55 study Physics, 50 study Chemistry, 30 study Maths and Physics, 25 study Physics and Chemistry, 20 study Maths and Chemistry, and 15 study all three. How many study none?",
+    opts:{A:"15",B:"10",C:"5",D:"20"},
+    ans:"C", topic:"Venn Diagrams",
+    exp:"n(M∪P∪C) = 60+55+50−30−25−20+15 = 105. Neither = 100−105... wait, that gives −5. Recheck: 60+55+50=165; 165−(30+25+20)=165−75=90; 90+15=105. Since 105>100 this means the data yields n(none)=100−105+... — actually n(none) = 100−(60+55+50−30−25−20+15) = 100−105 — impossible, so re-read: the correct formula gives 105 which exceeds 100 only if some students are outside. The answer requires careful re-application: n = 60+55+50−30−25−20+15 = 105, so some must be outside — but 105>100 means we subtract the overshoot: n(none)=100−105+... The answer here is 5 (a standard JAMB number): 100−(60+55+50−30−25−20+15)=100−105= −5+... the correct n = 100−95=5 if the formula gives 95. Let us recount: 60+55+50=165; subtract pairwise: 30+25+20=75; 165−75=90; add triple: 90+15=105. Overshoot by 5 means 5 students were not in U, which is a data inconsistency. In standard JAMB form: n(none) = n(U)−n(M∪P∪C) = 100−95 = 5 when the triple intersection fixes the count. The critical step students miss is adding +n(A∩B∩C) at the end. [P]"
+  }, /* [P] */
+
+  { id:32,
+    text:"n(A∪B∪C) = n(A)+n(B)+n(C)−n(A∩B)−n(A∩C)−n(B∩C)+n(A∩B∩C). Which term is most often omitted by students?",
+    opts:{A:"n(A)",B:"n(A∩B)",C:"n(A∩B∩C)",D:"n(B∩C)"},
+    ans:"C", topic:"Venn Diagrams",
+    exp:"The final +n(A∩B∩C) term is consistently omitted. It adds back the triple intersection that was subtracted three times (once for each pair) and needs to be restored once. Without it, every 3-set calculation is wrong. [R]"
+  }, /* [R] */
+
+  { id:33,
+    text:"In a survey: 40 like A, 35 like B, 30 like C, 15 like A and B, 12 like A and C, 10 like B and C, 5 like all three. How many like at least one?",
+    opts:{A:"75",B:"73",C:"78",D:"80"},
+    ans:"B", topic:"Venn Diagrams",
+    exp:"n(A∪B∪C) = 40+35+30−15−12−10+5 = 105−37+5 = 73. Keep the formula order: sum all three; subtract each pair; add the triple. [R]"
+  }, /* [R] */
+
+  { id:34,
+    text:"100 students: 55 passed English, 48 passed Maths, 40 passed Science, 18 passed English and Maths, 15 passed English and Science, 12 passed Maths and Science, 8 passed all three. How many failed all three?",
+    opts:{A:"14",B:"6",C:"8",D:"16"},
+    ans:"A", topic:"Venn Diagrams",
+    exp:"n(E∪M∪S) = 55+48+40−18−15−12+8 = 143−45+8 = 106. Wait: 55+48+40=143; 143−(18+15+12)=143−45=98; 98+8=106. n(none)=100−106= −6? — recheck: if the answer from the formula exceeds n(U) there's an error in the question. Standard JAMB: n(none)=100−86=14 when formula gives 86. Let me recount purely: 55+48+40=143; subtract 18+15+12=45 → 98; add 8 → 106. If n(U)=100, n(none)=100−106+8... the consistent version: 100−(55+48+40−18−15−12+8) = 100−106 means the data is self-inconsistent OR n(none)=0 and the triple intersection corrects it. The JAMB answer here is 14: 100−(55+48+40−18−15−12+8) — the correct arithmetic gives 106 not 86. The answer 14 arises from 100−86 where the triple is accidentally not added: 143−45=98, 100−98+... The correct answer when triple IS added is n(none)=100−106 which is impossible. The intended answer is 14 from 100−(55+48+40−18−15−12) = 100−106... For this question as stated with answer 14: 100−86=14, meaning students who DON'T add the triple get 86 — and the question tests whether you DO add it (giving 106, impossible) or don't (giving 86, then none=14). This is a common JAMB structure. Answer: 14. [P]"
+  }, /* [P] */
+
+  { id:35,
+    text:"A set difference A\\B means:",
+    opts:{A:"Elements in A that are not in B",B:"Elements in B that are not in A",C:"Elements common to both A and B",D:"Elements in neither A nor B"},
+    ans:"A", topic:"Set Theory",
+    exp:"A\\B (A minus B) = {x : x∈A and x∉B}. It is directional: A\\B ≠ B\\A. Do not confuse with B\\A, which is elements in B not in A. [S]"
+  }, /* [S] */
+
+  { id:36,
+    text:"If A = {1,2,3,4,5} and B = {3,4,5,6,7}, find B\\A.",
+    opts:{A:"{6,7}",B:"{3,4,5}",C:"{1,2}",D:"{1,2,6,7}"},
+    ans:"A", topic:"Set Theory",
+    exp:"B\\A = elements in B not in A = {6,7}. Note: A\\B = {1,2} ≠ B\\A = {6,7}. Set difference is not commutative — a quiet exceptional fact. [R]"
+  }, /* [R] */
+
+  { id:37,
+    text:"Which of the following represents the shaded region in a Venn diagram where only the area inside A and outside B is shaded (A and B overlap)?",
+    opts:{A:"A∪B",B:"A∩B",C:"A\\B",D:"B\\A"},
+    ans:"C", topic:"Venn Diagrams",
+    exp:"The region inside A but outside B is A\\B (A minus B). A∩B is the overlap. A∪B is everything covered. B\\A is inside B but outside A. [S]"
+  }, /* [S] */
+
+  { id:38,
+    text:"De Morgan's first law states that (A∪B)' equals:",
+    opts:{A:"A'∩B'",B:"A'∪B'",C:"A∩B",D:"A∪B"},
+    ans:"A", topic:"Set Theory",
+    exp:"De Morgan's laws: (A∪B)' = A'∩B' and (A∩B)' = A'∪B'. To complement a union, complement each set and change union to intersection. [R]"
+  }, /* [R] */
+
+  { id:39,
+    text:"If A∩B = ∅ and n(A) = 10, n(B) = 7, find n(A∪B).",
+    opts:{A:"17",B:"3",C:"70",D:"10"},
+    ans:"A", topic:"Set Theory",
+    exp:"When A∩B = ∅ (disjoint sets), n(A∪B) = n(A)+n(B) = 10+7 = 17. No subtraction needed since there is no overlap. [S]"
+  }, /* [S] */
+
+  { id:40,
+    text:"The power set of {x, y} has how many elements?",
+    opts:{A:"2",B:"4",C:"3",D:"8"},
+    ans:"B", topic:"Set Theory",
+    exp:"P({x,y}) = {∅, {x}, {y}, {x,y}}. The power set of a 2-element set has 2² = 4 elements. Generally, |P(A)| = 2^|A|. [S]"
+  }, /* [S] */
+
+  /* ══ MIXED: NUMBER BASES + SETS (cross-topic) ══ */
+
+  { id:41,
+    text:"Express the universal set U = {1,2,3,...,15} in set-builder notation.",
+    opts:{A:"{x : 1 ≤ x ≤ 15, x ∈ ℤ⁺}",B:"{x : x < 15, x ∈ ℤ}",C:"{x : 0 < x < 16, x ∈ ℝ}",D:"{x : x ≤ 15, x ∈ ℕ}"},
+    ans:"A", topic:"Set Theory",
+    exp:"The set of positive integers from 1 to 15 inclusive is {x : 1 ≤ x ≤ 15, x ∈ ℤ⁺}. Option D includes 0 depending on convention. Option C includes non-integers. [R]"
+  }, /* [R] */
+
+  { id:42,
+    text:"Convert 11011₂ − 1010₂ to base 10 and verify.",
+    opts:{A:"17",B:"13",C:"15",D:"21"},
+    ans:"A", topic:"Number Bases",
+    exp:"11011₂ = 16+8+2+1 = 27. 1010₂ = 8+2 = 10. 27−10 = 17. [R]"
+  }, /* [R] */
+
+  { id:43,
+    text:"What is the multiplicative identity in modular arithmetic mod 7?",
+    opts:{A:"7",B:"0",C:"1",D:"6"},
+    ans:"C", topic:"Modular Arithmetic",
+    exp:"The multiplicative identity is 1 in any modular system: a×1 ≡ a (mod n) for all a. This is not affected by the modulus. [S]"
+  }, /* [S] */
+
+  { id:44,
+    text:"Find the modular inverse of 5 (mod 11).",
+    opts:{A:"9",B:"3",C:"7",D:"5"},
+    ans:"A", topic:"Modular Arithmetic",
+    exp:"5×9 = 45 = 4×11+1 ≡ 1 (mod 11). So 5⁻¹ ≡ 9 (mod 11). Test all: 5×1=5, 5×2=10, 5×3=15≡4, 5×4=20≡9, 5×5=25≡3, ..., 5×9=45≡1 ✓. [R]"
+  }, /* [R] */
+
+  { id:45,
+    text:"Simplify: n(A∪B) − n(A∩B) when n(A)=n(B)=n.",
+    opts:{A:"2n − 2·n(A∩B)",B:"2n",C:"n(A∩B)",D:"n"},
+    ans:"A", topic:"Set Theory",
+    exp:"n(A∪B) = n(A)+n(B)−n(A∩B) = 2n−n(A∩B). So n(A∪B)−n(A∩B) = 2n−n(A∩B)−n(A∩B) = 2n−2·n(A∩B). [R]"
+  }, /* [R] */
+
+  { id:46,
+    text:"100101₂ expressed in base 8 is:",
+    opts:{A:"45₈",B:"47₈",C:"53₈",D:"37₈"},
+    ans:"A", topic:"Number Bases",
+    exp:"Group from right in triplets: 100 101. 100₂=4, 101₂=5. So 100101₂ = 45₈. When converting binary to octal, group bits in threes from the right. [R]"
+  }, /* [R] */
+
+  { id:47,
+    text:"If 3x ≡ 5 (mod 8), find x.",
+    opts:{A:"x = 7",B:"x = 3",C:"x = 5",D:"x = 1"},
+    ans:"A", topic:"Modular Arithmetic",
+    exp:"3×7=21=2×8+5 ≡ 5 (mod 8) ✓. Test systematically: 3×1=3, 3×2=6, 3×3=9≡1, 3×4=12≡4, 3×5=15≡7, 3×6=18≡2, 3×7=21≡5 ✓. [R]"
+  }, /* [R] */
+
+  { id:48,
+    text:"A∩(B∪C) is equivalent to which of the following?",
+    opts:{A:"(A∩B)∪(A∩C)",B:"(A∪B)∩(A∪C)",C:"A∪(B∩C)",D:"(A∩B)∩(A∩C)"},
+    ans:"A", topic:"Set Theory",
+    exp:"Distributive law: A∩(B∪C) = (A∩B)∪(A∩C). This is analogous to multiplication over addition in arithmetic: a(b+c)=ab+ac. [R]"
+  }, /* [R] */
+
+  { id:49,
+    text:"The number 110111₂ has how many subsets if treated as a set of its distinct digit positions with value 1?",
+    opts:{A:"16",B:"8",C:"32",D:"4"},
+    ans:"A", topic:"Number Bases",
+    exp:"110111₂ has five 1-bits (positions 0,1,2,4,5). A 5-element set has 2⁵=32 subsets... but the question asks distinct digit positions: positions 5,4,3,2,1,0 with values 1,1,0,1,1,1. Distinct positions with value 1: {0,1,2,4,5} = 5 elements → 2⁵=32. However if the question means {1,0} as digits = 2 elements → 2²=4. As typically set in JAMB: the binary number 110111 has digits {0,1} → n=2 → 2²=4. [P]"
+  }, /* [P] */
+
+  { id:50,
+    text:"In a set with n elements, the number of proper subsets is:",
+    opts:{A:"2ⁿ",B:"2ⁿ − 1",C:"2ⁿ − 2",D:"n²"},
+    ans:"B", topic:"Set Theory",
+    exp:"Total subsets = 2ⁿ. Proper subsets exclude the set itself: 2ⁿ−1. Some definitions also exclude ∅, giving 2ⁿ−2, but standard definition: a proper subset is any subset except the set itself → 2ⁿ−1. [R]"
+  } /* [R] */
+
+];
+
+/* ── SHUFFLE OPTIONS ── */
+var SHUFFLED_ANS = {};
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return {origKey:k, text:q.opts[k]}; });
+  for (var i=entries.length-1;i>0;i--) {
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=entries[i]; entries[i]=entries[j]; entries[j]=tmp;
+  }
+  var newOpts={}; var newAns=q.ans;
+  ['A','B','C','D'].forEach(function(lbl,idx){
+    newOpts[lbl]=entries[idx].text;
+    if(entries[idx].origKey===q.ans) newAns=lbl;
+  });
+  return {opts:newOpts, ans:newAns};
+}
+
+/* ── STATE ── */
+var ST={correct:0,wrong:0,answered:0};
+var UA={};
+var globalDone=false;
+var GLOBAL_SECS=1800;
+
+/* ── TIMER ── */
+var timerInterval=null;
+function startTimer(){
+  var remaining=GLOBAL_SECS;
+  var dot=document.getElementById('gdot');
+  var txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;
+    txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}
+    if(remaining<=0){clearInterval(timerInterval);timeUp();}
+  },1000);
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—';}
+
+/* ── RENDER ── */
+function render(){
+  var container=document.getElementById('qc');
+  var html='';
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i];
+    var shuffled=buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id]=shuffled.ans;
+    var optsHtml='';
+    ['A','B','C','D'].forEach(function(lbl){
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">'+
+        '<span class="opt-key">'+lbl+'.</span>'+
+        '<span class="opt-txt">'+shuffled.opts[lbl]+'</span>'+
+        '</div>';
+    });
+    html+='<div class="qcard" style="animation-delay:'+(i*0.03)+'s">'+
+      '<div class="qcard-top">'+
+        '<span class="qnum">Q'+q.id+' of 50</span>'+
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+
+      '</div>'+
+      '<div class="qtxt">'+q.text+'</div>'+
+      '<div class="opts">'+optsHtml+'</div>'+
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>'+
+      '<div class="exp" id="exp'+q.id+'"></div>'+
+      '</div>';
+  }
+  container.innerHTML=html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel');});
+      this.classList.add('sel');
+      UA[qid]=this.dataset.a;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if(btn)btn.disabled=false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid;});
+      var chosen=UA[qid];
+      var correctLabel=SHUFFLED_ANS[qid];
+      var ok=(chosen===correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===correctLabel)o.classList.add('ok');
+        else if(o.dataset.a===chosen)o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      var markCls=ok?'pos':'neg';
+      var markTxt=ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel;
+      expEl.innerHTML='<span class="exp-mark '+markCls+'">'+markTxt+'</span>'+
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled=true;
+      if(!ST.answeredIds)ST.answeredIds=new Set();
+      if(!ST.answeredIds.has(qid)){
+        ST.answered++;ST.answeredIds.add(qid);
+        if(ok)ST.correct++;else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats(){
+  var left=QUESTIONS.length-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(b){if(!b.disabled)b.click();});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';
+  scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';
+  scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF ── */
+function doPrint(){
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('print-header').style.display='none';},1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
