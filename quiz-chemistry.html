@@ -1,1171 +1,1109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Chemistry — Paper 6 | GrantApp AI</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:     #0A0E1A;
-      --card:   #111827;
-      --card2:  #161E2E;
-      --text:   #E8EDF5;
-      --sec:    rgba(232,237,245,0.75);
-      --ter:    rgba(232,237,245,0.45);
-      --accent: #f59e0b;
-      --accent2:#d97706;
-      --warn:   #F59E0B;
-      --red:    #EF4444;
-      --green:  #10B981;
-      --sep:    rgba(255,255,255,0.08);
-      --hov:    rgba(255,255,255,0.05);
-      --r:      14px;
-      --mono:   'Space Mono', monospace;
-      --sans:   'DM Sans', sans-serif;
-    }
-
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
-    body {
-      font-family: var(--sans);
-      font-size: 16px;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.5;
-      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    /* noise grain */
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0; opacity: 0.5;
-    }
-
-    /* ── WATERMARK ── */
-    #watermark {
-      position: fixed; inset: 0; z-index: 9999;
-      pointer-events: none; overflow: hidden;
-      display: flex; flex-direction: column; gap: 2.8rem;
-      padding: 1rem;
-      transform: rotate(-20deg) scale(1.5);
-      transform-origin: center center;
-      opacity: 0.022;
-      font-family: var(--mono);
-      font-size: 0.72rem; font-weight: 700;
-      color: #f0eff4; letter-spacing: 0.08em;
-      white-space: nowrap;
-      user-select: none; -webkit-user-select: none;
-    }
-
-    /* ── HEADER ── */
-    .hdr {
-      background: rgba(10,14,26,0.92);
-      border-bottom: 1px solid var(--sep);
-      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
-      position: sticky; top: 0; z-index: 100;
-      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    }
-    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-
-    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
-    .hdr-brand {
-      font-family: var(--mono); font-size: 11px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
-    }
-    .hdr-title {
-      font-family: var(--mono); font-size: 15px; font-weight: 700;
-      letter-spacing: -0.3px; color: var(--text);
-    }
-    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
-
-    /* greeting chip */
-    .hdr-greeting {
-      font-size: 11px; color: var(--ter);
-      background: rgba(245,158,11,0.08);
-      border: 1px solid rgba(245,158,11,0.18);
-      padding: 3px 10px; border-radius: 999px;
-      font-family: var(--mono); letter-spacing: 0.05em;
-    }
-
-    /* timer */
-    .gtimer {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 14px; border-radius: 20px;
-      background: rgba(245,158,11,0.08);
-      border: 1px solid rgba(245,158,11,0.2);
-      flex-shrink: 0;
-    }
-    .gtimer-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent); flex-shrink: 0;
-      transition: background .3s;
-    }
-    .gtimer-dot.warn { background: var(--warn); }
-    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
-    .gtimer-txt {
-      font-family: var(--mono); font-size: 15px; font-weight: 700;
-      letter-spacing: 1px; color: var(--accent); transition: color .3s;
-    }
-    .gtimer-txt.warn { color: var(--warn); }
-    .gtimer-txt.dang { color: var(--red); }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-    /* ── SCORE STRIP ── */
-    .score-strip {
-      display: grid; grid-template-columns: repeat(4,1fr);
-      gap: 8px; padding: 12px 20px 8px;
-      position: relative; z-index: 1;
-    }
-    .sc {
-      background: var(--card); border-radius: 10px;
-      padding: 10px 8px; text-align: center;
-      border: 1px solid var(--sep);
-    }
-    .sc-v {
-      font-family: var(--mono); font-size: 18px; font-weight: 700;
-      color: var(--text);
-    }
-    .sc-v.c { color: var(--green); }
-    .sc-v.w { color: var(--red); }
-    .sc-v.s { color: var(--ter); }
-    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    /* progress bar */
-    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
-    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
-    .prog-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      border-radius: 99px; transition: width 0.4s ease;
-      width: 0%;
-    }
-
-    /* ── QUESTION CARDS ── */
-    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
-
-    .qcard {
-      background: var(--card);
-      border: 1px solid var(--sep);
-      border-radius: var(--r);
-      padding: 20px;
-      margin-bottom: 14px;
-      animation: fadeUp 0.3s ease both;
-    }
-    @keyframes fadeUp {
-      from { opacity:0; transform: translateY(12px); }
-      to   { opacity:1; transform: translateY(0); }
-    }
-
-    .qcard-top {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px; padding-bottom: 12px;
-      border-bottom: 1px solid var(--sep);
-      gap: 10px;
-    }
-    .qnum {
-      font-family: var(--mono); font-size: 11px; font-weight: 700;
-      color: var(--ter); letter-spacing: 0.08em; text-transform: uppercase;
-    }
-    .qtopic {
-      font-size: 10px; font-weight: 600;
-      padding: 3px 9px; border-radius: 99px;
-      background: rgba(245,158,11,0.08);
-      border: 1px solid rgba(245,158,11,0.18);
-      color: var(--accent); letter-spacing: 0.3px;
-    }
-
-    .qtxt {
-      font-size: 15px; line-height: 1.72;
-      color: var(--text); font-weight: 400;
-      margin-bottom: 16px;
-    }
-
-    /* options */
-    .opts { display: flex; flex-direction: column; gap: 8px; }
-
-    .opt {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 13px 16px; border-radius: 10px;
-      border: 1px solid var(--sep);
-      background: var(--card2);
-      cursor: pointer; transition: all 0.15s;
-    }
-    .opt:hover:not(.locked) { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
-    .opt.sel   { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); }
-    .opt.ok    { border-color: var(--green); background: rgba(16,185,129,0.08); }
-    .opt.no    { border-color: var(--red);   background: rgba(239,68,68,0.08); }
-    .opt.locked { cursor: default; }
-
-    .opt-key {
-      font-family: var(--mono); font-size: 11px; font-weight: 700;
-      color: var(--accent); flex-shrink: 0;
-      width: 18px; padding-top: 1px;
-    }
-    .opt.ok  .opt-key { color: var(--green); }
-    .opt.no  .opt-key { color: var(--red); }
-    .opt.sel .opt-key { color: var(--accent); }
-
-    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
-
-    /* check button */
-    .abtn {
-      margin-top: 12px; width: 100%;
-      padding: 11px; border-radius: 10px;
-      background: var(--accent); color: #000;
-      font-family: var(--sans); font-size: 13px; font-weight: 700;
-      border: none; cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
-      letter-spacing: 0.02em;
-    }
-    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
-
-    /* explanation */
-    .exp {
-      display: none; margin-top: 12px;
-      background: rgba(16,185,129,0.06);
-      border: 1px solid rgba(16,185,129,0.18);
-      border-radius: 10px; padding: 14px;
-      font-size: 13px; line-height: 1.68;
-      color: var(--sec);
-    }
-    .exp.show { display: block; }
-    .exp-mark {
-      display: inline-block; margin-bottom: 8px;
-      font-family: var(--mono); font-size: 12px; font-weight: 700;
-      padding: 3px 10px; border-radius: 6px;
-    }
-    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
-    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
-    .exp-mark.nt  { background: rgba(245,158,11,0.12); color: var(--accent); }
-
-    /* ── SUBMIT BAR ── */
-    .submit-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(10,14,26,0.96);
-      border-top: 1px solid var(--sep);
-      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
-      z-index: 200;
-      backdrop-filter: blur(16px);
-      display: flex; gap: 10px; align-items: center;
-    }
-    .submit-btn {
-      flex: 1; padding: 13px;
-      background: var(--accent); color: #000;
-      font-family: var(--sans); font-size: 14px; font-weight: 700;
-      border: none; border-radius: 10px; cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .submit-btn:hover { opacity: 0.88; }
-    .submit-progress {
-      font-family: var(--mono); font-size: 11px; color: var(--ter);
-      white-space: nowrap;
-    }
-
-    /* ── TIME UP OVERLAY ── */
-    .timeup {
-      position: fixed; inset: 0; z-index: 5000;
-      background: rgba(10,14,26,0.96);
-      display: none; align-items: center; justify-content: center;
-      backdrop-filter: blur(8px);
-    }
-    .timeup.show { display: flex; }
-    .timeup-box {
-      background: var(--card); border: 1px solid var(--sep);
-      border-radius: 20px; padding: 36px 32px;
-      text-align: center; max-width: 360px; width: 90%;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
-    }
-    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .timeup-ttl {
-      font-family: var(--mono); font-size: 1.3rem; font-weight: 700;
-      color: var(--text); margin-bottom: 8px;
-    }
-    .timeup-score {
-      font-family: var(--mono); font-size: 2rem; font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .timeup-score.pos { color: var(--green); }
-    .timeup-score.neg { color: var(--red); }
-    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
-    .timeup-stats {
-      display: grid; grid-template-columns: repeat(3,1fr);
-      gap: 8px; margin-bottom: 20px;
-    }
-    .tu-stat-v {
-      font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text);
-    }
-    .tu-stat-v.c { color: var(--green); }
-    .tu-stat-v.w { color: var(--red); }
-    .tu-stat-v.s { color: var(--ter); }
-    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
-    .timeup-btn {
-      width: 100%; padding: 13px;
-      background: var(--accent); color: #000;
-      font-family: var(--sans); font-size: 14px; font-weight: 700;
-      border: none; border-radius: 10px; cursor: pointer;
-      margin-bottom: 8px;
-    }
-    .timeup-btn.sec {
-      background: transparent; color: var(--ter);
-      border: 1px solid var(--sep); font-weight: 400; font-size: 13px;
-    }
-
-    /* ── SUBMIT MODAL ── */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 4000;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-      display: none; align-items: center; justify-content: center;
-      padding: 1rem;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal {
-      background: var(--card); border: 1px solid var(--sep);
-      border-radius: 16px; width: 100%; max-width: 400px;
-      padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5);
-      animation: modalIn 0.2s ease;
-    }
-    @keyframes modalIn {
-      from { opacity:0; transform: scale(0.96) translateY(8px); }
-      to   { opacity:1; transform: scale(1) translateY(0); }
-    }
-    .modal h3 {
-      font-family: var(--mono); font-size: 1rem; font-weight: 700;
-      margin-bottom: 16px; color: var(--text);
-    }
-    .modal-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 0; border-bottom: 1px solid var(--sep);
-      font-size: 13px; color: var(--ter);
-    }
-    .modal-row b { color: var(--text); font-family: var(--mono); }
-    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
-    .modal-btn {
-      flex: 1; padding: 11px; border-radius: 10px;
-      font-family: var(--sans); font-size: 13px; font-weight: 700;
-      border: none; cursor: pointer; transition: opacity 0.2s;
-    }
-    .modal-btn.primary { background: var(--accent); color: #000; }
-    .modal-btn.primary:hover { opacity: 0.88; }
-    .modal-btn.ghost {
-      background: transparent; color: var(--ter);
-      border: 1px solid var(--sep);
-    }
-
-    /* ── PRINT / PDF ── */
-    @media print {
-      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
-      body::before, #watermark, .hdr, .gtimer, .submit-bar,
-      .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
-      .exp { display: block !important; background: #f9f9f9 !important;
-        border: 1px solid #ccc !important; color: #333 !important; }
-      .qcard { break-inside: avoid; border: 1px solid #ddd !important;
-        background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
-      .opt { border: 1px solid #ccc !important; background: #fff !important; }
-      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
-      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
-      .opt.sel { background: #fffbeb !important; border-color: #f59e0b !important; }
-      .opt-txt { color: #000 !important; }
-      .qtxt    { color: #000 !important; }
-      .qtopic  { background: #fffbeb !important; color: #92400e !important; border-color: #f59e0b !important; }
-      #print-header {
-        display: block !important;
-        text-align: center;
-        margin-bottom: 24pt;
-        padding-bottom: 12pt;
-        border-bottom: 2pt solid #000;
-      }
-      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
-      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
-      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 480px) {
-      .score-strip { grid-template-columns: repeat(2,1fr); }
-      .hdr-title { font-size: 13px; }
-    }
-  
-/* ── AUTH GATE ── */
-#auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
-#auth-gate.unlocked { display:none; }
-.gate-box { background:var(--surface,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
-.gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#6e8efb);margin-bottom:1rem; }
-.gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
-.gate-sub { font-size:0.85rem;color:var(--muted,#8b949e);margin:0 0 1.5rem; }
-.gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
-.gate-input:focus { border-color:var(--accent,#6e8efb); }
-.gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
-.gate-btn { width:100%;padding:0.8rem;background:var(--accent,#6e8efb);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:0.5rem; }
-.gate-btn:hover { opacity:0.88; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Chemistry — MEPC — JAMB Practice · GrantApp AI</title>
+    <link rel="stylesheet" href="quiz-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-
-<!-- print-only header (hidden on screen) -->
-<div id="print-header" style="display:none">
-  <h1>GrantApp AI — Chemistry Paper 6</h1>
-  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
-  <p class="ph-student" id="print-student-name"></p>
-  <p class="ph-meta" id="print-date"></p>
-</div>
-
-<!-- watermark (personalised by JS from sessionStorage) -->
-<div id="auth-gate">
-  <div class="gate-box">
-    <div class="gate-logo">GrantApp AI</div>
-    <h2 class="gate-title">Chemistry · Paper 6</h2>
-    <p class="gate-sub">Enter your access password to continue</p>
-    <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password">
-    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
-    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
-  </div>
-</div>
-
-<div id="watermark" aria-hidden="true"></div>
-
-<!-- header -->
-<header class="hdr">
-  <div class="hdr-row">
-    <div class="hdr-left">
-      <span class="hdr-brand">GrantApp AI</span>
-      <span class="hdr-title">Chemistry · Paper 6</span>
-      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-      <span class="hdr-greeting" id="greeting" style="display:none"></span>
-      <div class="gtimer" id="gtimer">
-        <div class="gtimer-dot" id="gdot"></div>
-        <span class="gtimer-txt" id="gtime">30:00</span>
-      </div>
-    </div>
-  </div>
-</header>
-
-<!-- score strip -->
-<div class="score-strip">
-  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
-  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
-  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
-  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
-</div>
-<div class="prog-wrap">
-  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
-</div>
-
-<!-- question cards -->
-<div id="qc"></div>
-
-<!-- submit bar -->
-<div class="submit-bar">
-  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
-  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
-  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
-    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
-    title="Download PDF">⬇ PDF</button>
-</div>
-
-<!-- submit modal -->
-<div class="modal-overlay" id="submit-modal">
-  <div class="modal">
-    <h3>Submit Quiz?</h3>
-    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
-    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
-    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
-    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
-    <div class="modal-btns">
-      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
-      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
-    </div>
-  </div>
-</div>
-
-<!-- time up overlay -->
-<div class="timeup" id="tu">
-  <div class="timeup-box">
-    <div class="timeup-icon">⏱</div>
-    <div class="timeup-ttl">Time's Up!</div>
-    <div class="timeup-score" id="tu-score">—</div>
-    <div class="timeup-sub">Your answers are locked in. Review below.</div>
-    <div class="timeup-stats">
-      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
-      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
-      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
-    </div>
-    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
-    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
-  </div>
-</div>
+<body class="quiz-body">
 
 <script>
-'use strict';
+const DURATION = 2700;
 
-/* ── AUTH GATE ── */
-(function() {
-  var REGISTRY = {
-      "2a0a29655a718f08c7d570690a97baba2efd24a9ab0aff058a6b1e96f8cafed3": "Conve",
-      "52325707193ccf20a538d87234a8ed17260df970d580665cab8cda029a83cdc7": "Kaosara",
-      "e32f4d7152cd507caa3b0c58081936f3189059f34b89115dffdb39852c541618": "Habibat",
-      "b0ce2a7c2f3539c0e1f52e48ba4a00159504f553ac11fe03c76bee3fa70e12eb": "Oyin",
-      "05d9d182d4b7d22cd42fe87e4d92b93f6ae0a5bb494066058220f1d2cd78c4a2": "Dorcas",
-      "d1deca157a6e62522cf0b60a5d2cb1da19c4357e23836b6dbcc925132a365873": "Famous",
-      "36dc8e24107b582d3cf5e10dd30c1d42b97b0edb4217783068541f8ca08912b4": "Obasesam",
-      "b7833bfa0b89ef6c04fbdfb7741f58b9fdb8d6cfd910f76af1d7ef0c9e485080": "Prosper"
-    };
-  async function sha256(str) {
-    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-  window.attemptUnlock = async function() {
-    var pw = document.getElementById('gate-input').value.trim();
-    if (!pw) return;
-    var hash = await sha256(pw);
-    if (REGISTRY[hash]) {
-      var name = REGISTRY[hash];
-      document.getElementById('auth-gate').classList.add('unlocked');
-      var wm = document.getElementById('watermark');
-      if (wm) {
-        var tile = name + ' · GrantApp AI · ';
-        var row = ''; for (var r=0;r<8;r++) row += tile;
-        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
-        wm.innerHTML = html;
-      }
-      var greet = document.getElementById('greeting');
-      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
-      var psn = document.getElementById('print-student-name');
-      if (psn) psn.textContent = 'Student: ' + name;
-      var pd = document.getElementById('print-date');
-      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    } else {
-      document.getElementById('gate-error').style.display = 'block';
-      document.getElementById('gate-input').value = '';
-      document.getElementById('gate-input').focus();
-    }
-  };
-  document.addEventListener('DOMContentLoaded', function() {
-    var inp = document.getElementById('gate-input');
-    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
-  });
-})();
+/* ════════════════════════════════════════════════════════════
+   CHEMISTRY — MEPC
+   Q1  – Q10  : Electrolysis & Faraday
+   Q11 – Q20  : Gas Laws & PVT
+   Q21 – Q30  : Equilibrium, K-values & pH
+   Q31 – Q40  : Acids, Bases & Salts
+   Q41 – Q60  : Organic Chemistry
+   Q61 – Q72  : Atomic Structure, Hybridisation & Periodicity
+   Q73 – Q80  : Oxidation & Reduction
+════════════════════════════════════════════════════════════ */
 
-/* ── QUESTIONS ── */
 const QUESTIONS = [
+
+/* ─────────────────────────────────────────────────────────
+   ELECTROLYSIS & FARADAY  Q1 – Q10
+───────────────────────────────────────────────────────── */
   {
-    id: 1,
-    text: "Which of the following is an aromatic compound?",
-    opts: { A:"Cyclohexane", B:"Hexanex", C:"Cyclohexene", D:"Benzene" },
-    ans: "D",
-    topic: "Organic Chemistry",
-    exp: "Benzene (C₆H₆) is aromatic — it has a cyclic, planar structure with 6 delocalised π electrons satisfying Hückel's rule (4n+2, n=1). Cyclohexane and hexane are aliphatic; cyclohexene is not aromatic."
+    id: 1, subject: 'Chemistry',
+    text: 'If 10.8 g of silver is deposited in a silver coulometer, the quantity of electricity passed is: (Ag = 108, F = 96500 C/mol)',
+    options: {
+      A: '9650 C',
+      B: '4825 C',
+      C: '19300 C',
+      D: '965 C',
+    },
+    answer: 'A',
+    explanation: 'n(Ag) = 10.8/108 = 0.1 mol. Ag⁺ + e⁻ → Ag, so n = 1. Q = nF = 0.1 × 96500 = 9650 C.',
+    // Level:3, Taxonomy:Mathematical, Tag:faraday-first-law, Triage:Return
   },
   {
-    id: 2,
-    text: "The degree of unsaturation (DoU) of C₆H₆ is:",
-    opts: { A:"DoU = 2", B:"DoU = 3", C:"DoU = 4", D:"DoU = 1" },
-    ans: "C",
-    topic: "Organic Chemistry",
-    exp: "DoU = (2C + 2 − H)/2 = (12 + 2 − 6)/2 = 8/2 = 4. This accounts for 3 double bonds and 1 ring (or equivalently, the benzene ring with 3 degrees from the ring + 3 from the double bonds but counted as 4 in the DoU formula)."
+    id: 2, subject: 'Chemistry',
+    text: 'A silver coulometer connected in series deposits 10.8 g of silver. The volume of oxygen liberated at the anode of the series cell at STP is: (Ag = 108, F = 96500, GMV = 22400 cm³/mol)',
+    options: {
+      A: '2240 cm³',
+      B: '1120 cm³',
+      C: '280 cm³',
+      D: '560 cm³',
+    },
+    answer: 'D',
+    explanation: 'Q = 9650 C. n(e⁻) = 0.1 mol. Anode: 2H₂O → O₂ + 4H⁺ + 4e⁻, so n(O₂) = 0.1/4 = 0.025 mol. V = 0.025 × 22400 = 560 cm³.',
+    // Level:4, Taxonomy:Mathematical, Tag:coulometer-oxygen, Triage:Return
   },
   {
-    id: 3,
-    text: "Which of the following describes a nucleophile?",
-    opts: { A:"An electron pair accep", B:"A species that donates protons", C:"A species with no electrons", D:"An electron pair donor" },
-    ans: "D",
-    topic: "Organic Chemistry",
-    exp: "A nucleophile ('nucleus lover') is an electron-pair donor that attacks electron-deficient centres. Examples: OH⁻, NH₃, CN⁻, H₂O. Electrophiles are electron-pair acceptors."
+    id: 3, subject: 'Chemistry',
+    text: 'What volume of oxygen, measured at STP, is liberated when 96.50 coulombs of electricity is passed through acidulated water? (F = 96500 C/mol, GMV = 22400 cm³/mol)',
+    options: {
+      A: '2.24 cm³',
+      B: '5.6 cm³',
+      C: '11.2 cm³',
+      D: '22.4 cm³',
+    },
+    answer: 'B',
+    explanation: 'n(e⁻) = 96.50/96500 = 0.001 mol. n(O₂) = 0.001/4 = 0.00025 mol. V = 0.00025 × 22400 = 5.6 cm³.',
+    // Level:4, Taxonomy:Mathematical, Tag:electrolysis-oxygen-volume, Triage:Return
   },
   {
-    id: 4,
-    text: "Markovnikov's rule states that in addition of HX to an alkene, X⁻ adds to the carbon:",
-    opts: { A:"With fewer hydrogen atoms", B:"With more hydrogen atomsx", C:"At the terminal position only", D:"Only if a catalyst present" },
-    ans: "A",
-    topic: "Organic Chemistry",
-    exp: "Markovnikov's rule: in addition of HX across an asymmetric C=C, the H adds to the carbon already bearing more H atoms (the more substituted carbon gets X). This is because the more stable (more substituted) carbocation intermediate forms."
+    id: 4, subject: 'Chemistry',
+    text: 'A current of 1.5 A was passed for 4.00 hours through a molten tin salt. If 13.3 g of tin was deposited, the oxidation state of tin in the salt is: (Sn = 119, F = 96500)',
+    options: {
+      A: '+4',
+      B: '+1',
+      C: '+2',
+      D: '+3',
+    },
+    answer: 'C',
+    explanation: 'Q = 1.5 × 4 × 3600 = 21600 C. n(e⁻) = 21600/96500 ≈ 0.224 mol. n(Sn) = 13.3/119 ≈ 0.112 mol. n = 0.224/0.112 = 2, so oxidation state = +2.',
+    // Level:5, Taxonomy:Mathematical, Tag:oxidation-state-from-deposition, Triage:Pro-Ceiling
   },
   {
-    id: 5,
-    text: "Which of the following gives a positive Tollens' test (silver mirror)?",
-    opts: { A:"Propanone", B:"Propanoic acid", C:"Ethanol", D:"Ethanal" },
-    ans: "D",
-    topic: "Organic Chemistry",
-    exp: "Tollens' reagent ([Ag(NH₃)₂]⁺) oxidises aldehydes to carboxylic acids, depositing a silver mirror: RCHO + 2[Ag(NH₃)₂]⁺ + OH⁻ → RCOO⁻ + 2Ag + ... Ketones (propanone) do not react."
+    id: 5, subject: 'Chemistry',
+    text: 'How many moles of copper are deposited when 3 faradays of electricity is passed through aqueous copper(II) tetraoxosulphate(VI)? (Cu²⁺ + 2e⁻ → Cu)',
+    options: {
+      A: '1.5 mol',
+      B: '3.0 mol',
+      C: '0.75 mol',
+      D: '2.0 mol',
+    },
+    answer: 'A',
+    explanation: 'Cu²⁺ requires 2 electrons per ion. n(Cu) = 3 F / 2 e⁻ per mol = 1.5 mol.',
+    // Level:3, Taxonomy:Mathematical, Tag:faraday-moles, Triage:Return
   },
   {
-    id: 6,
-    text: "What type of reaction occurs when CH₃Br reacts with NaOH(aq)?",
-    opts: { A:"Nucleophilic substitution", B:"Radical substitution", C:"Electrophilic additionxxx", D:"Elimination reaction" },
-    ans: "A",
-    topic: "Organic Chemistry",
-    exp: "OH⁻ is a nucleophile that attacks the electrophilic carbon bearing Br: CH₃Br + OH⁻ → CH₃OH + Br⁻. This is an SN2 nucleophilic substitution reaction (bimolecular)."
+    id: 6, subject: 'Chemistry',
+    text: 'During electrolysis of aqueous copper(II) sulphate using copper electrodes, the mass of the copper anode:',
+    options: {
+      A: 'increases as copper is deposited from the electrolyte onto its surface',
+      B: 'remains constant because it is an inert electrode in the process',
+      C: 'decreases as oxygen is evolved and copper oxide forms at its surface',
+      D: 'decreases as copper atoms are oxidised and dissolve into the electrolyte',
+    },
+    answer: 'D',
+    explanation: 'An active (copper) anode is oxidised: Cu → Cu²⁺ + 2e⁻. The anode loses mass as copper dissolves into solution at the same rate copper is deposited at the cathode.',
+    // Level:3, Taxonomy:Abstract, Tag:active-anode, Triage:Return
   },
   {
-    id: 7,
-    text: "Carboxylic acids react with Na₂CO₃ to produce:",
-    opts: { A:"CO₂, water, and a carboxylate salt", B:"Hydrogen gas and salt", C:"An ester and water formedxxxxxxxxx", D:"CO₂ and an alkene" },
-    ans: "A",
-    topic: "Organic Chemistry",
-    exp: "2RCOOH + Na₂CO₃ → 2RCOONa + H₂O + CO₂. The reaction of a carboxylic acid with a carbonate produces a salt (carboxylate), water, and carbon dioxide gas (effervescence observed)."
+    id: 7, subject: 'Chemistry',
+    text: 'In the electrolysis of concentrated brine, the product preferentially discharged at the cathode is:',
+    options: {
+      A: 'sodium metal, as Na⁺ is the cation present in the highest proportion',
+      B: 'hydrogen gas, because H⁺ from water is discharged in preference to Na⁺',
+      C: 'chlorine gas, because Cl⁻ is present in the greatest concentration',
+      D: 'oxygen gas, produced by the oxidation of hydroxide ions at the electrode',
+    },
+    answer: 'B',
+    explanation: 'At the cathode, H⁺ ions (from water) are preferentially discharged over Na⁺ ions because Na⁺ has a much more negative electrode potential. Hydrogen gas is evolved.',
+    // Level:3, Taxonomy:Abstract, Tag:selective-discharge-cathode, Triage:Return
   },
   {
-    id: 8,
-    text: "Which of the following is a secondary amine?",
-    opts: { A:"CH₃NH₂", B:"NH₃", C:"(CH₃)₃Nx", D:"(CH₃)₂NH" },
-    ans: "D",
-    topic: "Organic Chemistry",
-    exp: "A secondary amine has two alkyl/aryl groups on nitrogen: (CH₃)₂NH (dimethylamine). CH₃NH₂ is primary (one group); (CH₃)₃N is tertiary (three groups); NH₃ is not an amine."
+    id: 8, subject: 'Chemistry',
+    text: 'Faraday\'s second law of electrolysis states that the masses of different substances liberated by the same quantity of electricity are:',
+    options: {
+      A: 'equal to each other, irrespective of the nature of the electrolyte',
+      B: 'directly proportional to the concentration of each electrolyte',
+      C: 'proportional to the chemical equivalent masses of the substances',
+      D: 'inversely proportional to the current density at each electrode',
+    },
+    answer: 'C',
+    explanation: 'Faraday\'s second law: mass deposited is proportional to the electrochemical equivalent, which equals molar mass divided by the number of electrons transferred (M/n).',
+    // Level:3, Taxonomy:Administrative, Tag:faraday-second-law, Triage:Return
   },
   {
-    id: 9,
-    text: "The hydration of ethene to produce ethanol requires:",
-    opts: { A:"Conc. H₂SO₄ catalyst, steam, 300°C", B:"NaOH catalyst and waterxxxxxxxxxxx", C:"Yeast and sugar at 37°C", D:"UV light and water only" },
-    ans: "A",
-    topic: "Organic Chemistry",
-    exp: "Industrial hydration: CH₂=CH₂ + H₂O → CH₃CH₂OH. Uses concentrated H₃PO₄ (or H₂SO₄) as catalyst, steam at ~300°C and 60–70 atm. This gives a continuous, high-purity product."
+    id: 9, subject: 'Chemistry',
+    text: 'The minimum quantity of charge required to deposit 2 moles of aluminium from molten aluminium oxide is: (Al³⁺ + 3e⁻ → Al, F = 96500 C/mol)',
+    options: {
+      A: '193000 C',
+      B: '579000 C',
+      C: '386000 C',
+      D: '289500 C',
+    },
+    answer: 'B',
+    explanation: 'n(e⁻) = 2 mol Al × 3 e⁻/mol = 6 mol. Q = 6 × 96500 = 579000 C.',
+    // Level:3, Taxonomy:Mathematical, Tag:charge-from-moles, Triage:Return
   },
   {
-    id: 10,
-    text: "What is the molar mass of Ca(NO₃)₂? (Ca=40, N=14, O=16)",
-    opts: { A:"102 g/mol", B:"164 g/mol", C:"132 g/mol", D:"148 g/mol" },
-    ans: "B",
-    topic: "Mole Concept",
-    exp: "Ca(NO₃)₂: Ca=40, 2×N=28, 6×O=96. Total = 40+28+96 = 164 g/mol."
+    id: 10, subject: 'Chemistry',
+    text: 'In the electrolysis of dilute sulphuric acid using platinum electrodes, the gas produced at the anode is:',
+    options: {
+      A: 'oxygen, from the oxidation of water molecules at the electrode',
+      B: 'hydrogen, from the reduction of H⁺ ions at the electrode',
+      C: 'sulphur dioxide, formed by the decomposition of sulphate ions',
+      D: 'ozone, formed when oxygen is produced under high current density',
+    },
+    answer: 'A',
+    explanation: 'At the anode (oxidation), water is preferentially oxidised: 2H₂O → O₂ + 4H⁺ + 4e⁻. Sulphate ions are not discharged under standard conditions.',
+    // Level:2, Taxonomy:Abstract, Tag:electrolysis-dilute-H2SO4, Triage:Sprint
+  },
+
+
+/* ─────────────────────────────────────────────────────────
+   GAS LAWS & PVT  Q11 – Q20
+───────────────────────────────────────────────────────── */
+  {
+    id: 11, subject: 'Chemistry',
+    text: 'A gas occupies 600 cm³ at 27°C and 760 mmHg. What volume will it occupy at 127°C and 1520 mmHg?',
+    options: {
+      A: '150 cm³',
+      B: '900 cm³',
+      C: '400 cm³',
+      D: '800 cm³',
+    },
+    answer: 'C',
+    explanation: 'Combined gas law: V₂ = V₁(P₁/P₂)(T₂/T₁). T₁=300K, T₂=400K. V₂ = 600 × (760/1520) × (400/300) = 600 × 0.5 × 1.333 = 400 cm³.',
+    // Level:3, Taxonomy:Mathematical, Tag:combined-gas-law, Triage:Return
   },
   {
-    id: 11,
-    text: "25 cm³ of 0.2 mol/dm³ H₂SO₄ reacts with NaOH. Moles of H₂SO₄ used are:",
-    opts: { A:"0.005 mol", B:"0.050 mol", C:"0.025 mol", D:"0.010 mol" },
-    ans: "A",
-    topic: "Mole Concept",
-    exp: "Moles = concentration × volume (in dm³) = 0.2 × (25/1000) = 0.2 × 0.025 = 0.005 mol H₂SO₄."
+    id: 12, subject: 'Chemistry',
+    text: 'A gas sample of 0.5 mol at 25°C occupies a volume at 2 atm pressure. The volume is: (R = 0.0821 L·atm/mol·K)',
+    options: {
+      A: '24.4 L',
+      B: '6.1 L',
+      C: '12.2 L',
+      D: '3.1 L',
+    },
+    answer: 'B',
+    explanation: 'V = nRT/P = (0.5 × 0.0821 × 298)/2 = 12.23/2 ≈ 6.1 L.',
+    // Level:3, Taxonomy:Mathematical, Tag:ideal-gas-equation, Triage:Return
   },
   {
-    id: 12,
-    text: "What volume of 0.5 mol/dm³ HCl contains 0.1 mol of HCl?",
-    opts: { A:"50 cm³", B:"500 cm³", C:"250 cm³", D:"200 cm³" },
-    ans: "D",
-    topic: "Mole Concept",
-    exp: "Volume = moles/concentration = 0.1/0.5 = 0.2 dm³ = 200 cm³."
+    id: 13, subject: 'Chemistry',
+    text: 'At STP, 3.2 g of a gas occupies 2240 cm³. The molar mass of the gas is: (GMV at STP = 22400 cm³/mol)',
+    options: {
+      A: '64 g/mol',
+      B: '16 g/mol',
+      C: '44 g/mol',
+      D: '32 g/mol',
+    },
+    answer: 'D',
+    explanation: 'n = 2240/22400 = 0.1 mol. M = mass/n = 3.2/0.1 = 32 g/mol. This corresponds to O₂ or S.',
+    // Level:2, Taxonomy:Mathematical, Tag:molar-mass-from-STP, Triage:Sprint
   },
   {
-    id: 13,
-    text: "The percentage yield of a reaction that gives 18 g of product when 30 g is expected is:",
-    opts: { A:"50%", B:"70%", C:"80%", D:"60%" },
-    ans: "D",
-    topic: "Mole Concept",
-    exp: "% yield = (actual yield / theoretical yield) × 100 = (18/30) × 100 = 60%."
+    id: 14, subject: 'Chemistry',
+    text: 'According to Graham\'s law, the rate of diffusion of hydrogen compared to oxygen under identical conditions of temperature and pressure is: (H = 1, O = 16)',
+    options: {
+      A: 'four times faster than oxygen',
+      B: 'twice as fast as oxygen',
+      C: 'eight times faster than oxygen',
+      D: 'sixteen times faster than oxygen',
+    },
+    answer: 'A',
+    explanation: 'r(H₂)/r(O₂) = √(M(O₂)/M(H₂)) = √(32/2) = √16 = 4. Hydrogen diffuses four times faster.',
+    // Level:3, Taxonomy:Mathematical, Tag:graham-law, Triage:Return
   },
   {
-    id: 14,
-    text: "In the reaction Fe₂O₃ + 3CO → 2Fe + 3CO₂, what mass of Fe is produced from 160 g of Fe₂O₃? (Fe=56, O=16)",
-    opts: { A:"56 g iron", B:"168 g iron", C:"112 g iron", D:"224 g iron" },
-    ans: "C",
-    topic: "Mole Concept",
-    exp: "Molar mass Fe₂O₃ = 160 g/mol. Moles Fe₂O₃ = 160/160 = 1 mol. From ratio 1:2, moles Fe = 2 mol. Mass = 2 × 56 = 112 g."
+    id: 15, subject: 'Chemistry',
+    text: '200 cm³ of methane (CH₄) diffuses through a porous plug in 20 seconds. How long will 200 cm³ of sulphur dioxide take under the same conditions? (C=12, H=1, S=32, O=16)',
+    options: {
+      A: '10 s',
+      B: '80 s',
+      C: '40 s',
+      D: '5 s',
+    },
+    answer: 'C',
+    explanation: 'M(CH₄)=16, M(SO₂)=64. t(SO₂)/t(CH₄) = √(M(SO₂)/M(CH₄)) = √(64/16) = 2. t(SO₂) = 2 × 20 = 40 s.',
+    // Level:4, Taxonomy:Mathematical, Tag:graham-law-time, Triage:Return
   },
   {
-    id: 15,
-    text: "Avogadro's number is best defined as:",
-    opts: { A:"6.02 × 10²³ particles per mole", B:"Number of molecules in 22.4 dm³", C:"6.02 × 10²³ particles per gram", D:"Number of atoms in 1 g H₂" },
-    ans: "A",
-    topic: "Mole Concept",
-    exp: "Avogadro's number (Nₐ = 6.02 × 10²³ mol⁻¹) is the number of elementary particles (atoms, molecules, ions) in one mole of substance, regardless of what that substance is."
+    id: 16, subject: 'Chemistry',
+    text: 'Boyle\'s law is valid only when:',
+    options: {
+      A: 'the pressure is greater than one standard atmosphere throughout',
+      B: 'the gas is at or below its normal boiling point temperature',
+      C: 'both temperature and pressure are at standard conditions only',
+      D: 'the temperature and the amount of gas are held constant',
+    },
+    answer: 'D',
+    explanation: 'Boyle\'s law (P₁V₁ = P₂V₂) applies at constant temperature (isothermal) for a fixed mass of gas. Both conditions — constant T and constant n — must hold.',
+    // Level:2, Taxonomy:Abstract, Tag:boyles-law-conditions, Triage:Sprint
   },
   {
-    id: 16,
-    text: "According to Lewis theory, a base is a substance that:",
-    opts: { A:"Donates a proton to an acid", B:"Accepts a proton from acid", C:"Donates an electron pair", D:"Accepts an electron pair" },
-    ans: "C",
-    topic: "Acids Bases Salts",
-    exp: "Lewis theory: a base is an electron-pair donor; an acid is an electron-pair acceptor. This is the broadest acid-base definition, extending beyond proton transfer to include coordination chemistry."
+    id: 17, subject: 'Chemistry',
+    text: 'A gas occupies 4 L at 3 atm. At what pressure will it occupy 6 L at the same temperature?',
+    options: {
+      A: '2 atm',
+      B: '4.5 atm',
+      C: '6 atm',
+      D: '1.5 atm',
+    },
+    answer: 'A',
+    explanation: 'Boyle\'s law: P₁V₁ = P₂V₂. P₂ = (3 × 4)/6 = 2 atm.',
+    // Level:2, Taxonomy:Mathematical, Tag:boyles-law-calculation, Triage:Sprint
   },
   {
-    id: 17,
-    text: "What is the [OH⁻] of a solution with pH = 11 at 25°C?",
-    opts: { A:"1 × 10⁻³ mol/dm³", B:"1 × 10⁻¹¹ mol/dm³", C:"1 × 10⁻¹ mol/dm³", D:"1 × 10⁻² mol/dm³" },
-    ans: "A",
-    topic: "Acids Bases Salts",
-    exp: "pH + pOH = 14, so pOH = 14 − 11 = 3. [OH⁻] = 10⁻³ mol/dm³. Alternatively: Kw = [H⁺][OH⁻] = 10⁻¹⁴, [H⁺] = 10⁻¹¹, [OH⁻] = 10⁻¹⁴/10⁻¹¹ = 10⁻³."
+    id: 18, subject: 'Chemistry',
+    text: 'A gaseous mixture at 800 mmHg total pressure contains 0.4 mol N₂, 0.4 mol O₂ and 0.2 mol CO₂. The partial pressure of oxygen in the mixture is:',
+    options: {
+      A: '160 mmHg',
+      B: '320 mmHg',
+      C: '640 mmHg',
+      D: '80 mmHg',
+    },
+    answer: 'B',
+    explanation: 'Total moles = 1.0. Mole fraction of O₂ = 0.4/1.0 = 0.4. P(O₂) = 0.4 × 800 = 320 mmHg.',
+    // Level:3, Taxonomy:Mathematical, Tag:daltons-partial-pressure, Triage:Return
   },
   {
-    id: 18,
-    text: "A buffer solution of pH 4.74 is prepared using ethanoic acid (pKₐ = 4.74) and sodium ethanoate. The ratio [CH₃COO⁻]/[CH₃COOH] is:",
-    opts: { A:"10:1 ratio", B:"1:10 ratio", C:"1:1 ratio", D:"5:1 ratio" },
-    ans: "C",
-    topic: "Acids Bases Salts",
-    exp: "Henderson-Hasselbalch: pH = pKₐ + log([A⁻]/[HA]). When pH = pKₐ, log([A⁻]/[HA]) = 0, so [A⁻]/[HA] = 1:1. Equal concentrations of acid and conjugate base."
+    id: 19, subject: 'Chemistry',
+    text: 'The van der Waals equation for a real gas corrects the ideal gas equation by accounting for:',
+    options: {
+      A: 'temperature changes caused by intermolecular collisions at high pressure',
+      B: 'variation in molar mass of gas molecules with increasing pressure',
+      C: 'finite volume of gas molecules and intermolecular attractive forces',
+      D: 'change in the gas constant R at temperatures below 0°C',
+    },
+    answer: 'C',
+    explanation: 'The van der Waals equation adds two corrections to PV = nRT: the (nb) term accounts for the finite volume of molecules, and the (a/V²) term accounts for intermolecular attractions.',
+    // Level:4, Taxonomy:Abstract, Tag:van-der-waals, Triage:Return
   },
   {
-    id: 19,
-    text: "Which of the following is an amphoteric substance?",
-    opts: { A:"NaOH solution", B:"HCl solutio", C:"Water (H₂O)", D:"Na₂CO₃ solution" },
-    ans: "C",
-    topic: "Acids Bases Salts",
-    exp: "An amphoteric substance can act as either an acid or a base. Water: as acid: H₂O → H⁺ + OH⁻; as base: H₂O + H⁺ → H₃O⁺. Al(OH)₃ and Al₂O₃ are also amphoteric."
+    id: 20, subject: 'Chemistry',
+    text: 'Two gases X and Y have molar masses of 9 g/mol and 64 g/mol respectively. If X diffuses at 24 cm³/s, the rate of diffusion of Y is:',
+    options: {
+      A: '72 cm³/s',
+      B: '18 cm³/s',
+      C: '4.5 cm³/s',
+      D: '9 cm³/s',
+    },
+    answer: 'D',
+    explanation: 'r(X)/r(Y) = √(M(Y)/M(X)) = √(64/9) = 8/3. r(Y) = 24 × 3/8 = 9 cm³/s.',
+    // Level:4, Taxonomy:Mathematical, Tag:graham-law-rate, Triage:Return
+  },
+
+
+/* ─────────────────────────────────────────────────────────
+   EQUILIBRIUM, K-VALUES & pH  Q21 – Q30
+───────────────────────────────────────────────────────── */
+  {
+    id: 21, subject: 'Chemistry',
+    text: 'For the reaction N₂(g) + 3H₂(g) ⇌ 2NH₃(g), the correct expression for the equilibrium constant Kc is:',
+    options: {
+      A: 'Kc = [NH₃]² / ([N₂][H₂]³)',
+      B: 'Kc = [N₂][H₂]³ / [NH₃]²',
+      C: 'Kc = [NH₃] / ([N₂][H₂])',
+      D: 'Kc = [NH₃]² / ([N₂]²[H₂]³)',
+    },
+    answer: 'A',
+    explanation: 'Kc = [products]^stoich / [reactants]^stoich. Products: [NH₃]². Reactants: [N₂]¹[H₂]³. Correct expression: [NH₃]² / ([N₂][H₂]³).',
+    // Level:2, Taxonomy:Mathematical, Tag:Kc-expression, Triage:Sprint
   },
   {
-    id: 20,
-    text: "The Ka of a weak acid HA at 25°C is 1.8 × 10⁻⁵. Its pKₐ is approximately:",
-    opts: { A:"pKa = 4.74", B:"pKa = 5.74", C:"pKa = 3.74", D:"pKa = 7.00" },
-    ans: "A",
-    topic: "Acids Bases Salts",
-    exp: "pKₐ = −log(Kₐ) = −log(1.8 × 10⁻⁵) = −(log 1.8 + log 10⁻⁵) = −(0.26 − 5) = 4.74. This is ethanoic acid's pKₐ."
+    id: 22, subject: 'Chemistry',
+    text: '20 cm³ of a 2 mol/dm³ ethanoic acid solution is added to excess NaOH. The mass of sodium ethanoate formed is: (Na=23, C=12, H=1, O=16)',
+    options: {
+      A: '1.64 g',
+      B: '3.28 g',
+      C: '6.56 g',
+      D: '0.82 g',
+    },
+    answer: 'B',
+    explanation: 'n(CH₃COOH) = 0.020 × 2 = 0.04 mol. CH₃COOH + NaOH → CH₃COONa + H₂O (1:1 ratio). M(CH₃COONa) = 82 g/mol. Mass = 0.04 × 82 = 3.28 g.',
+    // Level:4, Taxonomy:Mathematical, Tag:neutralisation-mass-salt, Triage:Return
   },
   {
-    id: 21,
-    text: "For N₂O₄(g) ⇌ 2NO₂(g), if Kc = 4.6 × 10⁻³ at 25°C, the equilibrium favours:",
-    opts: { A:"Products (NO₂) stronglyxx", B:"Products only at high pressure", C:"Neither side at all", D:"Reactants (N₂O₄) strongly" },
-    ans: "D",
-    topic: "Equilibrium",
-    exp: "Kc = 4.6 × 10⁻³ << 1. A small Kc means the equilibrium lies far to the left, strongly favouring the reactants (N₂O₄). Very little dissociation occurs at 25°C."
+    id: 23, subject: 'Chemistry',
+    text: 'Adding an inert gas to an equilibrium mixture at constant volume and constant temperature:',
+    options: {
+      A: 'shifts the position toward the side with fewer moles of gas',
+      B: 'shifts the position toward the side with more moles of gas',
+      C: 'increases the value of the equilibrium constant Kc',
+      D: 'has no effect on the equilibrium position or the value of Kc',
+    },
+    answer: 'D',
+    explanation: 'At constant volume, adding an inert gas does not alter the partial pressures or concentrations of the reacting species. Neither the position nor Kc changes.',
+    // Level:4, Taxonomy:Logical, Tag:inert-gas-equilibrium, Triage:Return
   },
   {
-    id: 22,
-    text: "The solubility product (Ksp) of AgCl = 1.8 × 10⁻¹⁰ mol²/dm⁶. Its molar solubility is:",
-    opts: { A:"1.34 × 10⁻⁵ mol/dm³", B:"9.00 × 10⁻¹¹ mol/dm", C:"1.80 × 10⁻¹⁰ mol/dm³", D:"3.24 × 10⁻²⁰ mol/dm³" },
-    ans: "A",
-    topic: "Equilibrium",
-    exp: "AgCl ⇌ Ag⁺ + Cl⁻. If solubility = s, then Ksp = s². s = √(1.8×10⁻¹⁰) = 1.34×10⁻⁵ mol/dm³."
+    id: 24, subject: 'Chemistry',
+    text: 'For the reaction PCl₃(g) + Cl₂(g) ⇌ PCl₅(g), increasing the total pressure at constant temperature:',
+    options: {
+      A: 'decreases the equilibrium concentration of PCl₅ in the mixture',
+      B: 'shifts the equilibrium to the left, increasing PCl₃ and Cl₂',
+      C: 'shifts the equilibrium to the right, increasing the yield of PCl₅',
+      D: 'has no effect because all the species present are in the gas phase',
+    },
+    answer: 'C',
+    explanation: 'Increased pressure favours the side with fewer moles of gas. Left side: 2 mol(g). Right side: 1 mol(g). Equilibrium shifts right to PCl₅.',
+    // Level:3, Taxonomy:Logical, Tag:pressure-effect-equilibrium, Triage:Return
   },
   {
-    id: 23,
-    text: "Le Chatelier's principle predicts that increasing pressure on 2SO₂(g) + O₂(g) ⇌ 2SO₃(g) will:",
-    opts: { A:"Shift equilibrium to left sidex", B:"Have no effect on position", C:"Decrease the rate of reaction", D:"Shift equilibrium to right side" },
-    ans: "D",
-    topic: "Equilibrium",
-    exp: "Left has 3 moles gas (2+1), right has 2. Increasing pressure favours the side with fewer gas moles → shifts right, increasing SO₃ yield. This is exploited in the Contact Process."
+    id: 25, subject: 'Chemistry',
+    text: 'The pH of a 0.001 mol/dm³ solution of NaOH at 25°C is: (Kw = 1×10⁻¹⁴)',
+    options: {
+      A: '3',
+      B: '11',
+      C: '13',
+      D: '7',
+    },
+    answer: 'B',
+    explanation: '[OH⁻] = 0.001 = 10⁻³. pOH = 3. pH = 14 − 3 = 11.',
+    // Level:3, Taxonomy:Mathematical, Tag:pH-strong-base, Triage:Return
   },
   {
-    id: 24,
-    text: "The rate of a reaction typically doubles for every 10°C rise in temperature. This is explained by:",
-    opts: { A:"More molecules exceeding activation energy", B:"Decreased activation energy only", C:"Increased frequency of all collisions only", D:"Increased pressure of the system" },
-    ans: "A",
-    topic: "Equilibrium",
-    exp: "Temperature increases kinetic energy. A 10°C rise roughly doubles the fraction of molecules with energy ≥ activation energy (Eₐ), as described by the Maxwell–Boltzmann distribution and Arrhenius equation."
+    id: 26, subject: 'Chemistry',
+    text: 'A weak acid HA with Ka = 1.0×10⁻⁵ is dissolved in water to give a 0.1 mol/dm³ solution. The approximate pH is:',
+    options: {
+      A: '5',
+      B: '6',
+      C: '1',
+      D: '3',
+    },
+    answer: 'D',
+    explanation: '[H⁺] = √(Ka × C) = √(1×10⁻⁵ × 0.1) = √(10⁻⁶) = 10⁻³. pH = 3.',
+    // Level:4, Taxonomy:Mathematical, Tag:pH-weak-acid, Triage:Return
   },
   {
-    id: 25,
-    text: "In the Contact Process for making H₂SO₄, SO₃ is absorbed in concentrated H₂SO₄ rather than water because:",
-    opts: { A:"Water is too expensive industrially", B:"SO₃ does not react with water", C:"Direct addition gives uncontrollable acid mist", D:"H₂SO₄ is a better absorbing solvent onlyxxxxxx" },
-    ans: "C",
-    topic: "Equilibrium",
-    exp: "SO₃ + H₂O → H₂SO₄ is highly exothermic and produces an unmanageable acid mist if water is used directly. Absorbing SO₃ in concentrated H₂SO₄ forms oleum (H₂S₂O₇), which is then carefully diluted."
+    id: 27, subject: 'Chemistry',
+    text: 'Which of the following salts produces an alkaline solution when dissolved in water?',
+    options: {
+      A: 'sodium carbonate',
+      B: 'ammonium chloride',
+      C: 'aluminium sulphate',
+      D: 'copper(II) nitrate',
+    },
+    answer: 'A',
+    explanation: 'Na₂CO₃ is the salt of a strong base (NaOH) and a weak acid (H₂CO₃). The CO₃²⁻ ion hydrolyses to produce OH⁻, giving an alkaline solution.',
+    // Level:3, Taxonomy:Abstract, Tag:salt-hydrolysis, Triage:Return
   },
   {
-    id: 26,
-    text: "The standard electrode potential of Zn²⁺/Zn is −0.76 V and Cu²⁺/Cu is +0.34 V. EMF of the Daniell cell is:",
-    opts: { A:"+1.10 V", B:"−1.10 V", C:"+0.42 V", D:"+0.76 V" },
-    ans: "A",
-    topic: "Electrochemistry",
-    exp: "E°cell = E°cathode − E°anode = E°(Cu²⁺/Cu) − E°(Zn²⁺/Zn) = 0.34 − (−0.76) = +1.10 V. Positive EMF confirms the cell reaction is spontaneous."
+    id: 28, subject: 'Chemistry',
+    text: 'The Ksp of calcium carbonate at 25°C is 3.36×10⁻⁹. The molar solubility of CaCO₃ in water is approximately:',
+    options: {
+      A: '3.36×10⁻⁹ mol/dm³',
+      B: '1.68×10⁻⁹ mol/dm³',
+      C: '5.8×10⁻⁵ mol/dm³',
+      D: '1.16×10⁻⁴ mol/dm³',
+    },
+    answer: 'C',
+    explanation: 'CaCO₃ ⇌ Ca²⁺ + CO₃²⁻. Ksp = s². s = √(3.36×10⁻⁹) ≈ 5.8×10⁻⁵ mol/dm³.',
+    // Level:5, Taxonomy:Mathematical, Tag:Ksp-solubility, Triage:Pro-Ceiling
   },
   {
-    id: 27,
-    text: "During the electrolysis of concentrated NaCl solution, what is produced at the anode?",
-    opts: { A:"Oxygen gas", B:"Sodium metal", C:"Hydrogen gas", D:"Chlorine gas" },
-    ans: "D",
-    topic: "Electrochemistry",
-    exp: "In concentrated NaCl, Cl⁻ is preferentially discharged at the anode (oxidised): 2Cl⁻ → Cl₂ + 2e⁻. At the cathode, H⁺ from water is reduced: 2H⁺ + 2e⁻ → H₂. NaOH remains in solution."
+    id: 29, subject: 'Chemistry',
+    text: 'For a reversible reaction with Kc = 0.04 at a given temperature, the value of Kc for the reverse reaction at the same temperature is:',
+    options: {
+      A: '0.04',
+      B: '25',
+      C: '0.0016',
+      D: '0.2',
+    },
+    answer: 'B',
+    explanation: 'For the reverse reaction, Kc(reverse) = 1/Kc(forward) = 1/0.04 = 25.',
+    // Level:3, Taxonomy:Mathematical, Tag:Kc-reverse, Triage:Return
   },
   {
-    id: 28,
-    text: "What mass of silver deposits when 9650 C of charge passes through AgNO₃ solution? (Ag=108, F=96500 C)",
-    opts: { A:"5.4 g silverx", B:"54 g silver", C:"108 g silver", D:"10.8 g silver" },
-    ans: "D",
-    topic: "Electrochemistry",
-    exp: "Ag⁺ + e⁻ → Ag (1 electron per Ag). Moles e⁻ = Q/F = 9650/96500 = 0.1 mol. Moles Ag = 0.1 mol. Mass = 0.1 × 108 = 10.8 g."
+    id: 30, subject: 'Chemistry',
+    text: 'A catalyst increases the rate of a chemical reaction by:',
+    options: {
+      A: 'raising the temperature of the reacting system significantly',
+      B: 'shifting the position of equilibrium toward the products',
+      C: 'increasing the activation energy of both forward and reverse reactions',
+      D: 'providing an alternative reaction pathway with lower activation energy',
+    },
+    answer: 'D',
+    explanation: 'A catalyst works by offering a different mechanism with a lower activation energy. It increases the rate of both forward and reverse reactions equally and does not alter equilibrium position or K.',
+    // Level:3, Taxonomy:Abstract, Tag:catalyst-mechanism, Triage:Sprint
+  },
+
+
+/* ─────────────────────────────────────────────────────────
+   ACIDS, BASES & SALTS  Q31 – Q40
+───────────────────────────────────────────────────────── */
+  {
+    id: 31, subject: 'Chemistry',
+    text: 'According to the Brønsted-Lowry theory, an acid is defined as a species that:',
+    options: {
+      A: 'donates a proton to another species in a chemical reaction',
+      B: 'accepts an electron pair from another species in a reaction',
+      C: 'releases H⁺ ions exclusively when dissolved in aqueous solution',
+      D: 'increases the concentration of hydroxide ions in any solvent',
+    },
+    answer: 'A',
+    explanation: 'Brønsted-Lowry acid: proton (H⁺) donor. Brønsted-Lowry base: proton acceptor. This extends the Arrhenius definition to non-aqueous systems.',
+    // Level:2, Taxonomy:Administrative, Tag:bronsted-lowry-acid, Triage:Sprint
   },
   {
-    id: 29,
-    text: "A positive standard electrode potential (E°) indicates the half-cell:",
-    opts: { A:"Is a good reducing agent", B:"Strongly prefers oxidation", C:"Has a tendency to be reduced", D:"Will act as an anode alwaysx" },
-    ans: "C",
-    topic: "Electrochemistry",
-    exp: "A positive E° means the species is easily reduced (gains electrons readily) compared to the standard hydrogen electrode. High positive E° = strong oxidising agent. Negative E° = tendency to be oxidised (reducing agent)."
+    id: 32, subject: 'Chemistry',
+    text: 'According to the Lewis theory, a base is a substance that:',
+    options: {
+      A: 'releases hydroxide ions when dissolved in any polar solvent',
+      B: 'donates a proton to other molecules or ions readily in solution',
+      C: 'donates an electron pair to form a coordinate bond with an acid',
+      D: 'accepts a proton from the conjugate acid of the reaction mixture',
+    },
+    answer: 'C',
+    explanation: 'Lewis base: electron pair donor. Lewis acid: electron pair acceptor. This is the broadest of the three acid-base definitions.',
+    // Level:2, Taxonomy:Administrative, Tag:lewis-base, Triage:Sprint
   },
   {
-    id: 30,
-    text: "In the electrolysis of dilute H₂SO₄, the volume ratio of gas at cathode to anode is:",
-    opts: { A:"1:2 (H₂:O₂)", B:"1:1 (H₂:O₂)", C:"3:1 (H₂:O₂)", D:"2:1 (H₂:O₂)" },
-    ans: "D",
-    topic: "Electrochemistry",
-    exp: "Cathode: 4H⁺ + 4e⁻ → 2H₂. Anode: 2H₂O → O₂ + 4H⁺ + 4e⁻. For every 4 electrons: 2 mol H₂ and 1 mol O₂ produced. Volume ratio H₂:O₂ = 2:1."
+    id: 33, subject: 'Chemistry',
+    text: 'Which of the following is correctly identified as a Lewis acid-base reaction?',
+    options: {
+      A: 'HCl + NaOH → NaCl + H₂O',
+      B: 'BF₃ + NH₃ → F₃B·NH₃',
+      C: 'H₂SO₄ + Ca(OH)₂ → CaSO₄ + 2H₂O',
+      D: 'CO₂ + H₂O → H₂CO₃',
+    },
+    answer: 'B',
+    explanation: 'BF₃ is electron-deficient (Lewis acid). NH₃ donates its lone pair (Lewis base) to form the adduct F₃B·NH₃. No proton transfer is involved.',
+    // Level:3, Taxonomy:Abstract, Tag:lewis-acid-base-example, Triage:Return
   },
   {
-    id: 31,
-    text: "The energy of a photon is given by E = hf. If f = 6 × 10¹⁴ Hz and h = 6.63 × 10⁻³⁴ J·s, E is:",
-    opts: { A:"3.98 × 10⁻¹⁹ J", B:"6.63 × 10⁻³⁴ J", C:"1.10 × 10⁻⁴⁸ J", D:"9.95 × 10⁻¹⁹ J" },
-    ans: "A",
-    topic: "Atomic Structure",
-    exp: "E = hf = 6.63×10⁻³⁴ × 6×10¹⁴ = 39.78×10⁻²⁰ = 3.978×10⁻¹⁹ J ≈ 3.98×10⁻¹⁹ J. This is in the visible light range."
+    id: 34, subject: 'Chemistry',
+    text: 'Anhydrous calcium chloride is suitable as a drying agent because it:',
+    options: {
+      A: 'adsorbs water vapour onto its highly porous crystalline surface',
+      B: 'reacts with CO₂ in the gas stream to generate a dry product',
+      C: 'has a low vapour pressure that prevents atmospheric moisture condensing',
+      D: 'combines chemically with water to form a series of stable hydrates',
+    },
+    answer: 'D',
+    explanation: 'CaCl₂ is a chemical drying agent — it reacts with water to form hydrates (CaCl₂·2H₂O, CaCl₂·6H₂O), removing moisture chemically rather than by adsorption.',
+    // Level:3, Taxonomy:Administrative, Tag:drying-agents, Triage:Return
   },
   {
-    id: 32,
-    text: "Which of the following ions has the electron configuration of a noble gas?",
-    opts: { A:"Cl⁻ ion", B:"Cu²⁺ io", C:"Fe²⁺ ion", D:"Cr³⁺ ion" },
-    ans: "A",
-    topic: "Atomic Structure",
-    exp: "Cl (Z=17) has configuration 2,8,7. Cl⁻ gains one electron: 2,8,8 — the configuration of argon (noble gas). Fe²⁺, Cu²⁺, and Cr³⁺ have partially filled d orbitals and don't match noble gas configurations."
+    id: 35, subject: 'Chemistry',
+    text: 'A substance is described as efflorescent when it:',
+    options: {
+      A: 'loses water of crystallisation on exposure to the atmosphere',
+      B: 'absorbs water vapour from the air and dissolves completely in it',
+      C: 'absorbs moisture from the air without dissolving in the water absorbed',
+      D: 'decomposes on heating to release water and carbon dioxide gas',
+    },
+    answer: 'A',
+    explanation: 'Efflorescent substances (e.g. Na₂CO₃·10H₂O) spontaneously lose water of crystallisation to the atmosphere, turning from crystals to powder on the surface.',
+    // Level:2, Taxonomy:Administrative, Tag:efflorescence, Triage:Sprint
   },
   {
-    id: 33,
-    text: "The bond angle in BF₃ is 120° because BF₃ has:",
-    opts: { A:"3 bonding pairs and 1 lone pair", B:"3 bonding pairs, no lone pairs", C:"2 bonding pairs and 2 lone pairs", D:"4 bonding pairs, no lone pairs" },
-    ans: "B",
-    topic: "Chemical Bonding",
-    exp: "Boron in BF₃ has only 3 bonding pairs and no lone pairs (trigonal planar geometry). With no lone pair repulsion, all three bond pairs are equivalent, giving a 120° bond angle."
+    id: 36, subject: 'Chemistry',
+    text: 'Which of the following is correctly classified as an acidic salt?',
+    options: {
+      A: 'sodium chloride — formed from a strong acid and a strong base',
+      B: 'potassium nitrate — formed from nitric acid and potassium hydroxide',
+      C: 'sodium hydrogen sulphate — which retains an ionisable proton in solution',
+      D: 'calcium carbonate — which releases CO₂ with dilute hydrochloric acid',
+    },
+    answer: 'C',
+    explanation: 'An acidic salt still contains at least one ionisable H atom. NaHSO₄ can donate H⁺ in solution: NaHSO₄ → Na⁺ + H⁺ + SO₄²⁻.',
+    // Level:3, Taxonomy:Administrative, Tag:acidic-salt, Triage:Return
   },
   {
-    id: 34,
-    text: "Which of the following has the strongest intermolecular forces?",
-    opts: { A:"CH₄ molecule", B:"HCl molecule", C:"H₂O molecule", D:"NH₃ molecule" },
-    ans: "C",
-    topic: "Chemical Bonding",
-    exp: "H₂O has the strongest hydrogen bonding because oxygen is the most electronegative atom that forms H-bonds (after F), and has two lone pairs plus two O–H bonds. This gives water an anomalously high boiling point (100°C)."
+    id: 37, subject: 'Chemistry',
+    text: 'The indicator phenolphthalein changes colour over the pH range:',
+    options: {
+      A: 'pH 3.1 to 4.4 — from red to yellow',
+      B: 'pH 8.3 to 10.0 — from colourless to pink',
+      C: 'pH 5.0 to 8.0 — from red to blue',
+      D: 'pH 4.4 to 6.2 — from red to yellow',
+    },
+    answer: 'B',
+    explanation: 'Phenolphthalein is colourless in acidic and neutral solutions, turning pink/magenta above pH 8.3. It is used for titrations involving strong base as the titrant.',
+    // Level:3, Taxonomy:Administrative, Tag:indicators, Triage:Return
   },
   {
-    id: 35,
-    text: "A sigma (σ) bond is formed by:",
-    opts: { A:"Lateral overlap of p orbitals", B:"End-on overlap of orbitals", C:"Overlap of d and f orbital", D:"Ionic transfer of electrons" },
-    ans: "B",
-    topic: "Chemical Bonding",
-    exp: "A σ bond forms by end-on (axial) overlap of orbitals along the internuclear axis (s-s, s-p, or p-p). Electron density is concentrated between the nuclei. All single bonds are σ bonds."
+    id: 38, subject: 'Chemistry',
+    text: 'When calcium carbonate reacts with dilute hydrochloric acid, the products are:',
+    options: {
+      A: 'calcium chloride, water and sulphur dioxide gas',
+      B: 'calcium hydroxide, carbon dioxide and chlorine gas',
+      C: 'calcium hydrogen carbonate and an aqueous chloride salt',
+      D: 'calcium chloride, water and carbon dioxide gas',
+    },
+    answer: 'D',
+    explanation: 'CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂. This is a standard acid-carbonate reaction producing a salt, water and CO₂.',
+    // Level:2, Taxonomy:Administrative, Tag:carbonate-acid-reaction, Triage:Sprint
   },
   {
-    id: 36,
-    text: "2.0 mol of an ideal gas at 27°C occupies what volume at 1 atm? (R = 0.082 L·atm/mol·K)",
-    opts: { A:"49.2 dm³", B:"22.4 dm³", C:"24.6 dm³", D:"44.8 dm³" },
-    ans: "A",
-    topic: "Gas Laws",
-    exp: "PV = nRT → V = nRT/P = 2.0 × 0.082 × 300 / 1 = 49.2 L = 49.2 dm³. (T = 27+273 = 300 K)"
+    id: 39, subject: 'Chemistry',
+    text: 'Which pair of reagents, when mixed in comparable concentrations, will form a buffer solution?',
+    options: {
+      A: 'ethanoic acid and sodium ethanoate',
+      B: 'hydrochloric acid and sodium hydroxide in equal amounts',
+      C: 'sulphuric acid and potassium sulphate in equal concentrations',
+      D: 'nitric acid and calcium nitrate in any proportion',
+    },
+    answer: 'A',
+    explanation: 'A buffer requires a weak acid and its conjugate base (or weak base and conjugate acid). Ethanoic acid (weak acid) and sodium ethanoate (its conjugate base) form the classic acetate buffer.',
+    // Level:3, Taxonomy:Abstract, Tag:buffer-composition, Triage:Return
   },
   {
-    id: 37,
-    text: "Which gas law describes the relationship between volume and amount (moles) at constant T and P?",
-    opts: { A:"Boyle's Law", B:"Graham's Law", C:"Charles's Lawx", D:"Avogadro's Law" },
-    ans: "D",
-    topic: "Gas Laws",
-    exp: "Avogadro's Law: at constant temperature and pressure, equal volumes of all gases contain equal numbers of molecules. V ∝ n — volume is directly proportional to the number of moles."
+    id: 40, subject: 'Chemistry',
+    text: 'The pH of a 0.01 mol/dm³ hydrochloric acid solution at 25°C is:',
+    options: {
+      A: '1',
+      B: '7',
+      C: '2',
+      D: '12',
+    },
+    answer: 'C',
+    explanation: 'HCl is a strong acid — fully dissociated. [H⁺] = 0.01 = 10⁻². pH = −log(10⁻²) = 2.',
+    // Level:2, Taxonomy:Mathematical, Tag:pH-strong-acid, Triage:Sprint
+  },
+
+
+/* ─────────────────────────────────────────────────────────
+   ORGANIC CHEMISTRY  Q41 – Q60
+───────────────────────────────────────────────────────── */
+  {
+    id: 41, subject: 'Chemistry',
+    text: 'Which of the following is a structural isomer of butane, C₄H₁₀?',
+    options: {
+      A: 'cyclobutane',
+      B: '2-methylpropane',
+      C: 'but-1-ene',
+      D: 'pentane',
+    },
+    answer: 'B',
+    explanation: 'Structural isomers must share the same molecular formula. 2-methylpropane is also C₄H₁₀ but has a branched carbon skeleton. Cyclobutane and but-1-ene are C₄H₈; pentane is C₅H₁₂.',
+    // Level:2, Taxonomy:Administrative, Tag:structural-isomers, Triage:Sprint
   },
   {
-    id: 38,
-    text: "The ratio of diffusion rates of H₂ (M=2) and O₂ (M=32) by Graham's Law is:",
-    opts: { A:"H₂ is 2× faster than O₂", B:"H₂ is 8× faster than O₂", C:"H₂ is 16× faster than O₂", D:"H₂ is 4× faster than O₂" },
-    ans: "D",
-    topic: "Gas Laws",
-    exp: "Graham's Law: r₁/r₂ = √(M₂/M₁) = √(32/2) = √16 = 4. H₂ diffuses 4 times faster than O₂."
+    id: 42, subject: 'Chemistry',
+    text: 'The type of structural isomerism exhibited by propan-1-ol and propan-2-ol is:',
+    options: {
+      A: 'chain isomerism — the carbon skeleton differs between the two compounds',
+      B: 'functional group isomerism — the two compounds have different functional groups',
+      C: 'metamerism — different alkyl groups are attached to the same oxygen atom',
+      D: 'position isomerism — the hydroxyl group occupies different carbon positions',
+    },
+    answer: 'D',
+    explanation: 'Both compounds are propanols (same chain length and functional group). The only difference is the position of −OH: C-1 in propan-1-ol and C-2 in propan-2-ol. This is position isomerism.',
+    // Level:3, Taxonomy:Administrative, Tag:position-isomerism, Triage:Return
   },
   {
-    id: 39,
-    text: "Real gases deviate most from ideal behaviour at:",
-    opts: { A:"High temperature and low pressure", B:"Low temperature and high pressure", C:"Low temperature and low pressure", D:"High temperature and high pressure" },
-    ans: "B",
-    topic: "Gas Laws",
-    exp: "Real gases deviate most from ideal behaviour at low temperature (molecules slow down; intermolecular attractions become significant) and high pressure (molecular volume becomes non-negligible compared to container volume)."
+    id: 43, subject: 'Chemistry',
+    text: 'The IUPAC name of the compound CH₃CH(CH₃)CH₂CH₃ is:',
+    options: {
+      A: '2-methylbutane',
+      B: '3-methylbutane',
+      C: '2-methylpentane',
+      D: 'isopentane',
+    },
+    answer: 'A',
+    explanation: 'The longest chain containing the branch is 4 carbons (butane). The methyl group is on C-2 (numbering from the end nearest the branch). IUPAC name: 2-methylbutane.',
+    // Level:3, Taxonomy:Administrative, Tag:IUPAC-branched-alkane, Triage:Return
   },
   {
-    id: 40,
-    text: "The element with the highest first ionisation energy in Period 2 is:",
-    opts: { A:"Oxyg", B:"Neon", C:"Nitrogen", D:"Fluorine" },
-    ans: "B",
-    topic: "Periodic Table",
-    exp: "Neon (noble gas) has the highest first ionisation energy in Period 2 due to its stable, complete electron shell (2,8). Despite the general increase across the period, neon's full shell makes it hardest to ionise."
+    id: 44, subject: 'Chemistry',
+    text: 'Fehling\'s solution gives a brick-red precipitate with an aldehyde but not with a ketone because:',
+    options: {
+      A: 'ketones are not soluble in the alkaline copper(II) complex of the reagent',
+      B: 'aldehydes produce a blue precipitate while ketones give only a colour change',
+      C: 'aldehydes reduce Cu²⁺ ions to Cu⁺, forming copper(I) oxide as precipitate',
+      D: 'ketones oxidise the copper complex, depositing copper metal as a mirror',
+    },
+    answer: 'C',
+    explanation: 'Aldehydes are reducing agents; they donate electrons to reduce Cu²⁺ (blue) to Cu⁺ (brick-red Cu₂O precipitate). Ketones lack the easily oxidisable −CHO group and do not reduce Fehling\'s.',
+    // Level:3, Taxonomy:Abstract, Tag:fehlings-test, Triage:Return
   },
   {
-    id: 41,
-    text: "Which of the following is a property of Group I (alkali) metals?",
-    opts: { A:"High density and melting pointxxxxxx", B:"React violently with water giving H₂", C:"Form coloured compounds always", D:"Have multiple oxidation states" },
-    ans: "B",
-    topic: "Periodic Table",
-    exp: "Alkali metals react vigorously with water: 2M + 2H₂O → 2MOH + H₂. Reactivity increases down the group (Li < Na < K < Rb < Cs). They have low density, low melting points, and only +1 oxidation state."
+    id: 45, subject: 'Chemistry',
+    text: 'Tollens\' reagent (ammoniacal silver nitrate solution) is used to identify:',
+    options: {
+      A: 'carbon-carbon double bonds, which reduce Ag⁺ to give a silver deposit',
+      B: 'aldehydes, which reduce Ag⁺ to produce a silver mirror on the test tube wall',
+      C: 'primary alcohols specifically, since secondary alcohols do not react',
+      D: 'ketones only, since Fehling\'s solution does not react with ketone groups',
+    },
+    answer: 'B',
+    explanation: 'Tollens\' test: the aldehyde reduces silver ions (Ag⁺) in ammoniacal solution to silver metal, which deposits as a mirror. Ketones do not reduce Tollens\' reagent.',
+    // Level:3, Taxonomy:Administrative, Tag:tollens-test, Triage:Return
   },
   {
-    id: 42,
-    text: "The diagonal relationship in the periodic table is best shown between:",
-    opts: { A:"Na and Mg across period", B:"Li and Mg diagonally placed", C:"B and Si diagonally placed", D:"Be and Al diagonally placed" },
-    ans: "D",
-    topic: "Periodic Table",
-    exp: "The diagonal relationship: Be (Period 2, Group II) and Al (Period 3, Group III) have similar charge density and show similar chemistry. Both form amphoteric oxides, are extracted by electrolysis, and form covalent compounds."
+    id: 46, subject: 'Chemistry',
+    text: 'Saponification is the process by which:',
+    options: {
+      A: 'an alkene is hydrated in the presence of a concentrated acid catalyst',
+      B: 'a carboxylic acid and an alcohol react to form an ester and water',
+      C: 'an unsaturated fat is converted to a saturated fat by addition of hydrogen',
+      D: 'a fat or oil reacts with an alkali to produce glycerol and fatty acid salts',
+    },
+    answer: 'D',
+    explanation: 'Saponification is base hydrolysis of a fat (triglyceride) by NaOH or KOH, yielding glycerol and the sodium (or potassium) salts of fatty acids — soap.',
+    // Level:3, Taxonomy:Administrative, Tag:saponification, Triage:Return
   },
   {
-    id: 43,
-    text: "The standard enthalpy of formation of H₂O(l) is the enthalpy change when:",
-    opts: { A:"1 mol H₂O decomposes to H₂ and O₂xxxxxx", B:"H₂O(l) dissolves in excess water", C:"1 mol H₂O(l) forms from H₂(g) and O₂(g)", D:"H₂O(g) condenses to form H₂O(l)" },
-    ans: "C",
-    topic: "Energetics",
-    exp: "Standard enthalpy of formation (ΔH°f) is the enthalpy change when 1 mole of compound forms from its elements in their standard states: H₂(g) + ½O₂(g) → H₂O(l). For elements in standard state, ΔH°f = 0."
+    id: 47, subject: 'Chemistry',
+    text: 'The reaction between ethanol and ethanoic acid in the presence of concentrated H₂SO₄ is an example of:',
+    options: {
+      A: 'esterification, producing ethyl ethanoate and water as products',
+      B: 'saponification, producing a soap and a glycerol derivative',
+      C: 'hydrogenation, adding H₂ across the carbonyl bond of the acid',
+      D: 'hydrolysis, breaking down the reactants by addition of water',
+    },
+    answer: 'A',
+    explanation: 'CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O. This reversible condensation reaction is esterification. Concentrated H₂SO₄ acts as catalyst and dehydrating agent.',
+    // Level:2, Taxonomy:Administrative, Tag:esterification, Triage:Sprint
   },
   {
-    id: 44,
-    text: "A Born-Haber cycle is used to calculate:",
-    opts: { A:"Activation energy of a reaction", B:"Lattice energy of an ionic solid", C:"Gibbs free energy of a solution", D:"Rate constant of ionic reactions" },
-    ans: "B",
-    topic: "Energetics",
-    exp: "The Born-Haber cycle applies Hess's Law to ionic compounds, using measurable enthalpies (atomisation, ionisation, electron affinity) to calculate the otherwise unmeasurable lattice energy of an ionic solid."
+    id: 48, subject: 'Chemistry',
+    text: 'Which of the following is classified as an addition polymer?',
+    options: {
+      A: 'nylon-6,6, formed from a diamine and a dicarboxylic acid',
+      B: 'terylene, formed from a diol and a dicarboxylic acid',
+      C: 'poly(chloroethene) — PVC, formed from chloroethene monomers',
+      D: 'polylactic acid (PLA), formed from lactic acid monomers',
+    },
+    answer: 'C',
+    explanation: 'Addition polymers form when monomers with a C=C double bond join repeatedly without losing any atoms. Chloroethene (CH₂=CHCl) polymerises to give PVC. Nylon, terylene and PLA are condensation polymers.',
+    // Level:3, Taxonomy:Administrative, Tag:addition-polymers, Triage:Return
   },
   {
-    id: 45,
-    text: "Which of the following processes is endothermic?",
-    opts: { A:"Condensation of steam to liquid", B:"Decomposition of CaCO₃ to CaO", C:"Combustion of methane gas", D:"Neutralisation of HCl by NaOH" },
-    ans: "B",
-    topic: "Energetics",
-    exp: "CaCO₃ → CaO + CO₂ is endothermic (ΔH = +178 kJ/mol) — heat must be supplied to break the carbonate. Combustion, condensation, and neutralisation are all exothermic processes."
+    id: 49, subject: 'Chemistry',
+    text: 'The general formula of the homologous series of alkenes is:',
+    options: {
+      A: 'CₙH₂ₙ₊₂',
+      B: 'CₙH₂ₙ',
+      C: 'CₙH₂ₙ₋₂',
+      D: 'CₙHₙ',
+    },
+    answer: 'B',
+    explanation: 'Alkenes have one C=C double bond and general formula CₙH₂ₙ. Alkanes are CₙH₂ₙ₊₂; alkynes are CₙH₂ₙ₋₂.',
+    // Level:1, Taxonomy:Administrative, Tag:homologous-series-formula, Triage:Sprint
   },
   {
-    id: 46,
-    text: "Aluminium is extracted by electrolysis rather than carbon reduction because:",
-    opts: { A:"Aluminium is too reactive for electrolysisxxxxxxxxxxxx", B:"Al₂O₃ has a very high melting point only", C:"Al is more reactive than carbon, so C cannot reduce it", D:"Carbon reduction gives impure aluminium" },
-    ans: "C",
-    topic: "Metals",
-    exp: "Aluminium is more reactive than carbon in the reactivity series. Carbon cannot reduce Al₂O₃ at economically viable temperatures. Electrolysis of molten Al₂O₃ (dissolved in cryolite) is used instead."
+    id: 50, subject: 'Chemistry',
+    text: 'Which reagent confirms the presence of a carbon-carbon double bond (C=C) in an organic compound?',
+    options: {
+      A: 'Fehling\'s solution — changes from blue to brick-red on warming',
+      B: 'iodine solution — produces a blue-black colouration with the compound',
+      C: 'Tollens\' reagent — deposits a silver mirror on the test tube wall',
+      D: 'bromine water — is decolourised by addition across the double bond',
+    },
+    answer: 'D',
+    explanation: 'Bromine water (Br₂/H₂O) is decolourised when added across a C=C bond (electrophilic addition). Fehling\'s and Tollens\' detect aldehydes; iodine/starch detects starch.',
+    // Level:2, Taxonomy:Administrative, Tag:test-for-alkene, Triage:Sprint
   },
   {
-    id: 47,
-    text: "The rusting of iron requires the presence of both:",
-    opts: { A:"CO₂ and nitrogen", B:"Water and oxygen", C:"Chlorine and moisture", D:"Acid and sunlight only" },
-    ans: "B",
-    topic: "Metals",
-    exp: "Rusting (oxidation of iron to Fe₂O₃·xH₂O) requires both water and oxygen. Neither alone is sufficient. Salt water speeds up rusting by acting as an electrolyte but is not essential."
+    id: 51, subject: 'Chemistry',
+    text: 'The iodine value of a fat or oil is a measure of its:',
+    options: {
+      A: 'degree of unsaturation — a higher iodine value indicates more C=C double bonds',
+      B: 'rate of oxidative rancidity under standard atmospheric storage conditions',
+      C: 'saponification value relative to a reference saturated fatty acid standard',
+      D: 'molecular mass as determined by iodometric titration procedure',
+    },
+    answer: 'A',
+    explanation: 'Iodine adds across C=C double bonds. The iodine value (grams of I₂ absorbed per 100 g of fat) directly measures the degree of unsaturation: a higher value means more double bonds.',
+    // Level:3, Taxonomy:Administrative, Tag:iodine-value, Triage:Return
   },
   {
-    id: 48,
-    text: "In the Haber process, nitrogen is obtained from:",
-    opts: { A:"Fractional distillation of air", B:"Decomposition of ammonia gas", C:"Electrolysis of liquid nitroge", D:"Reaction of NOₓ with alkali" },
-    ans: "A",
-    topic: "Non-metals",
-    exp: "Nitrogen (78% of air) is obtained industrially by fractional distillation of liquid air, which also yields oxygen (21%) and argon. The nitrogen is used directly in the Haber process with hydrogen."
+    id: 52, subject: 'Chemistry',
+    text: 'The functional group −CONH₂ is characteristic of:',
+    options: {
+      A: 'carboxylic acids, found at the terminal carbon of the chain',
+      B: 'acid chlorides, formed by reaction of an acid with phosphorus pentachloride',
+      C: 'amides, formed by reaction of a carboxylic acid derivative with ammonia',
+      D: 'esters, formed by the condensation of an acid and an alcohol',
+    },
+    answer: 'C',
+    explanation: '−CONH₂ is the amide functional group. Amides form when −COOH derivatives react with NH₃ or amines. −COCl is an acid chloride; −COOH is a carboxylic acid; −COOR is an ester.',
+    // Level:2, Taxonomy:Administrative, Tag:functional-groups, Triage:Sprint
   },
   {
-    id: 49,
-    text: "A precipitate that dissolves in excess NH₃ solution but not in excess NaOH indicates the presence of:",
-    opts: { A:"Fe³⁺ ion", B:"Cu²⁺ ion", C:"Al³⁺ ion", D:"Pb²⁺ ion" },
-    ans: "B",
-    topic: "Qualitative Analysis",
-    exp: "Cu²⁺ + 2OH⁻ → Cu(OH)₂ (blue precipitate). In excess NH₃: Cu(OH)₂ + 4NH₃ → [Cu(NH₃)₄]²⁺ + 2OH⁻ (deep blue complex). Al(OH)₃ dissolves in excess NaOH (not NH₃); Fe(OH)₃ dissolves in neither."
+    id: 53, subject: 'Chemistry',
+    text: 'Which of the following reactions converts an alkene into a bromoalkane?',
+    options: {
+      A: 'treating the alkene with bromine gas under ultraviolet light irradiation',
+      B: 'adding HBr across the double bond of the alkene molecule',
+      C: 'reacting the alkene with NaOH in an alcoholic solvent at high temperature',
+      D: 'oxidising the alkene with acidified KMnO₄ in the presence of a Ni catalyst',
+    },
+    answer: 'B',
+    explanation: 'Electrophilic addition of HBr across a C=C double bond gives a bromoalkane (haloalkane). Br₂/UV causes free-radical substitution of alkanes, not addition to alkenes.',
+    // Level:3, Taxonomy:Abstract, Tag:HBr-addition, Triage:Return
   },
   {
-    id: 50,
-    text: "The half-life of a radioactive isotope is 20 years. What fraction remains after 60 years?",
-    opts: { A:"1/4 remains", B:"1/16 remains", C:"1/2 remains", D:"1/8 remains" },
-    ans: "D",
-    topic: "Nuclear Chemistry",
-    exp: "Number of half-lives = 60/20 = 3. Fraction remaining = (1/2)³ = 1/8. After each half-life the amount halves: 1 → 1/2 → 1/4 → 1/8."
-  }
+    id: 54, subject: 'Chemistry',
+    text: 'In the free-radical mechanism of halogenation of alkanes, the initiation step involves:',
+    options: {
+      A: 'removal of a hydrogen atom from the alkane by a halogen molecule',
+      B: 'addition of a halogen radical to a carbon-carbon bond in the chain',
+      C: 'combination of two halogen radicals to regenerate a halogen molecule',
+      D: 'homolytic fission of a halogen molecule to produce two halogen radicals',
+    },
+    answer: 'D',
+    explanation: 'Initiation: X−X → 2X• (homolytic bond fission, each atom takes one electron). This is triggered by UV light or heat. Propagation then follows; termination is radical combination.',
+    // Level:4, Taxonomy:Abstract, Tag:free-radical-mechanism, Triage:Return
+  },
+  {
+    id: 55, subject: 'Chemistry',
+    text: 'Which of the following is correctly identified as a secondary alcohol?',
+    options: {
+      A: 'propan-2-ol — the OH group is on a carbon bonded to two other carbons',
+      B: 'methanol — the OH group is on a carbon bonded to no other carbons',
+      C: 'ethanol — the OH group is on a carbon bonded to one other carbon',
+      D: 'butan-1-ol — the OH group is on a terminal carbon of the chain',
+    },
+    answer: 'A',
+    explanation: 'A secondary alcohol has −OH on a carbon bonded to exactly two other carbon atoms. In propan-2-ol, C-2 is bonded to CH₃ on each side. Methanol and ethanol are primary; butan-1-ol is primary.',
+    // Level:3, Taxonomy:Administrative, Tag:primary-secondary-alcohol, Triage:Return
+  },
+  {
+    id: 56, subject: 'Chemistry',
+    text: 'The reduction of an aldehyde with hydrogen over a nickel catalyst produces:',
+    options: {
+      A: 'a secondary alcohol by addition of H₂ across the C=O group',
+      B: 'a carboxylic acid by oxidation of the aldehyde under the conditions',
+      C: 'a primary alcohol by addition of H₂ across the aldehyde carbonyl group',
+      D: 'a ketone by rearrangement of the aldehyde carbon skeleton',
+    },
+    answer: 'C',
+    explanation: 'Catalytic hydrogenation of an aldehyde (RCHO + H₂ → RCH₂OH) gives a primary alcohol. The carbonyl carbon becomes a CH₂ group with −OH.',
+    // Level:3, Taxonomy:Administrative, Tag:reduction-aldehyde, Triage:Return
+  },
+  {
+    id: 57, subject: 'Chemistry',
+    text: 'The IUPAC name of the compound CH₃COCH₂CH₃ is:',
+    options: {
+      A: 'butanal',
+      B: 'butan-2-one',
+      C: 'pentan-2-one',
+      D: 'butan-3-one',
+    },
+    answer: 'B',
+    explanation: 'Four-carbon chain (butane) with a ketone carbonyl at C-2. IUPAC name: butan-2-one. Numbering from the end nearest the carbonyl gives it the lowest locant (2 not 3).',
+    // Level:3, Taxonomy:Administrative, Tag:IUPAC-ketone, Triage:Return
+  },
+  {
+    id: 58, subject: 'Chemistry',
+    text: 'Polyvinyl chloride (PVC) is produced by the addition polymerisation of:',
+    options: {
+      A: 'dichloroethane — a saturated compound with two chlorine substituents',
+      B: 'chloroethane — a saturated compound with one chlorine substituent',
+      C: 'trichloromethane — a trihalogenated single-carbon compound',
+      D: 'chloroethene — which contains a C=C double bond for polymerisation',
+    },
+    answer: 'D',
+    explanation: 'PVC forms by the addition polymerisation of chloroethene (CH₂=CHCl, vinyl chloride). The C=C bond opens and chains link. Saturated haloalkanes cannot undergo addition polymerisation.',
+    // Level:2, Taxonomy:Administrative, Tag:PVC-monomer, Triage:Sprint
+  },
+  {
+    id: 59, subject: 'Chemistry',
+    text: 'Which functional group produces a characteristic blood-red colouration with neutral iron(III) chloride solution?',
+    options: {
+      A: 'phenolic −OH group, as found in phenol and its derivatives',
+      B: 'aliphatic −OH group, as found in simple alcohols like ethanol',
+      C: 'carboxyl −COOH group, as found in ethanoic and propanoic acids',
+      D: 'aldehyde −CHO group, as found in ethanal and propanal',
+    },
+    answer: 'A',
+    explanation: 'Phenol and phenolic compounds give a deep blood-red (or violet) colour with neutral FeCl₃ solution due to complex formation with the phenoxide ion. Simple aliphatic −OH groups do not react.',
+    // Level:3, Taxonomy:Administrative, Tag:phenol-FeCl3-test, Triage:Return
+  },
+  {
+    id: 60, subject: 'Chemistry',
+    text: 'The degree of unsaturation of a compound with molecular formula C₄H₆ is:',
+    options: {
+      A: '1 (one degree of unsaturation)',
+      B: '3 (three degrees of unsaturation)',
+      C: '2 (two degrees of unsaturation)',
+      D: '4 (four degrees of unsaturation)',
+    },
+    answer: 'C',
+    explanation: 'Degree of unsaturation = (2C + 2 − H)/2 = (8 + 2 − 6)/2 = 4/2 = 2. Two degrees could indicate two double bonds, one triple bond, or a ring plus one double bond.',
+    // Level:4, Taxonomy:Mathematical, Tag:degree-of-unsaturation, Triage:Return
+  },
+
+
+/* ─────────────────────────────────────────────────────────
+   ATOMIC STRUCTURE, HYBRIDISATION & PERIODICITY  Q61 – Q72
+───────────────────────────────────────────────────────── */
+  {
+    id: 61, subject: 'Chemistry',
+    text: 'The electronic configuration of chromium (Z = 24) is:',
+    options: {
+      A: '[Ar] 3d⁴ 4s²',
+      B: '[Ar] 3d⁵ 4s¹',
+      C: '[Ar] 3d⁶ 4s⁰',
+      D: '[Ar] 3d³ 4s²',
+    },
+    answer: 'B',
+    explanation: 'Cr is [Ar]3d⁵4s¹, not the expected 3d⁴4s². A half-filled 3d subshell (3d⁵) has extra stability, so one 4s electron is promoted to complete it.',
+    // Level:4, Taxonomy:Abstract, Tag:electron-config-exception-Cr, Triage:Return
+  },
+  {
+    id: 62, subject: 'Chemistry',
+    text: 'Which set of species are all isoelectronic with the argon atom (Z = 18)?',
+    options: {
+      A: 'Na⁺, Mg²⁺, Al³⁺ and Ne (all have 10 electrons)',
+      B: 'F⁻, O²⁻, N³⁻ and Ne (all have 10 electrons)',
+      C: 'Li⁺, Be²⁺, He and H⁻ (all have 2 electrons)',
+      D: 'Cl⁻, K⁺, Ca²⁺ and S²⁻ (all have 18 electrons)',
+    },
+    answer: 'D',
+    explanation: 'Ar has 18 electrons. Cl⁻: 18, K⁺: 18, Ca²⁺: 18, S²⁻: 18. All four are isoelectronic with Ar. Options A, B and C are isoelectronic series with 10 and 2 electrons respectively.',
+    // Level:4, Taxonomy:Logical, Tag:isoelectronic-series, Triage:Return
+  },
+  {
+    id: 63, subject: 'Chemistry',
+    text: 'The carbon atoms in ethyne (C₂H₂) are hybridised as:',
+    options: {
+      A: 'sp hybridised, giving a linear molecule with H−C≡C bond angles of 180°',
+      B: 'sp² hybridised, giving a trigonal arrangement with 120° bond angles',
+      C: 'sp³ hybridised, giving a tetrahedral arrangement with 109.5° angles',
+      D: 'sp³d hybridised, giving a trigonal bipyramidal molecular arrangement',
+    },
+    answer: 'A',
+    explanation: 'Each carbon in ethyne forms two sigma bonds (one to H, one to C) — sp hybridisation. Two unhybridised p orbitals on each carbon form the two π bonds of the triple bond. Bond angle: 180°.',
+    // Level:3, Taxonomy:Abstract, Tag:sp-hybridisation, Triage:Return
+  },
+  {
+    id: 64, subject: 'Chemistry',
+    text: 'In sp² hybridisation at a carbon atom, the number of unhybridised p orbitals remaining is:',
+    options: {
+      A: 'three — all p orbitals are retained for pi bond formation',
+      B: 'none — all four valence orbitals combine in the hybridisation',
+      C: 'one — perpendicular to the plane of the three sp² hybrid orbitals',
+      D: 'two — available for forming two separate pi bonds simultaneously',
+    },
+    answer: 'C',
+    explanation: 'In sp² hybridisation, one s and two p orbitals combine to form three sp² hybrids. One p orbital remains unhybridised, perpendicular to the trigonal plane, and forms the π bond.',
+    // Level:3, Taxonomy:Abstract, Tag:sp2-unhybridised-p, Triage:Return
+  },
+  {
+    id: 65, subject: 'Chemistry',
+    text: 'A molecule with three bonding pairs and no lone pairs on the central atom has the shape and bond angle:',
+    options: {
+      A: 'pyramidal with bond angles of approximately 107°',
+      B: 'trigonal planar with bond angles of exactly 120°',
+      C: 'tetrahedral with bond angles of approximately 109.5°',
+      D: 'linear with bond angles of exactly 180°',
+    },
+    answer: 'B',
+    explanation: 'Three bonding pairs, zero lone pairs → trigonal planar (VSEPR). All three pairs repel equally. Bond angles are exactly 120°. Example: BF₃, AlCl₃.',
+    // Level:2, Taxonomy:Abstract, Tag:VSEPR-trigonal-planar, Triage:Sprint
+  },
+  {
+    id: 66, subject: 'Chemistry',
+    text: 'An atom of ³²S (sulphur-32) contains:',
+    options: {
+      A: '16 protons, 16 electrons and 32 neutrons',
+      B: '16 protons, 32 electrons and 16 neutrons',
+      C: '32 protons, 16 electrons and 16 neutrons',
+      D: '16 protons, 16 electrons and 16 neutrons',
+    },
+    answer: 'D',
+    explanation: 'Atomic number of S = 16 (protons = electrons = 16). Neutrons = mass number − atomic number = 32 − 16 = 16.',
+    // Level:1, Taxonomy:Administrative, Tag:nuclear-composition, Triage:Sprint
+  },
+  {
+    id: 67, subject: 'Chemistry',
+    text: 'An ion X²⁻ has 18 electrons and a mass number of 32. The atomic number and neutron count of X are:',
+    options: {
+      A: 'atomic number 16 and 16 neutrons',
+      B: 'atomic number 18 and 14 neutrons',
+      C: 'atomic number 14 and 18 neutrons',
+      D: 'atomic number 16 and 18 neutrons',
+    },
+    answer: 'A',
+    explanation: 'X²⁻ has 2 extra electrons. Atomic number = 18 − 2 = 16. Neutrons = 32 − 16 = 16. (X is sulphur.)',
+    // Level:3, Taxonomy:Mathematical, Tag:ion-composition, Triage:Return
+  },
+  {
+    id: 68, subject: 'Chemistry',
+    text: 'Across Period 3 from sodium to chlorine, atomic radius generally:',
+    options: {
+      A: 'increases because more electron shells are added across the period',
+      B: 'remains constant because all atoms occupy the same principal energy level',
+      C: 'decreases because increasing nuclear charge pulls electrons closer to the nucleus',
+      D: 'increases at the non-metals and decreases across the metallic elements',
+    },
+    answer: 'C',
+    explanation: 'Across a period, electrons are added to the same shell while nuclear charge increases. The increased nuclear attraction pulls the electron cloud inward — atomic radius decreases.',
+    // Level:2, Taxonomy:Abstract, Tag:atomic-radius-period, Triage:Sprint
+  },
+  {
+    id: 69, subject: 'Chemistry',
+    text: 'The anomalous dip in first ionisation energy between Group II (Be) and Group III (B) in Period 2 is because:',
+    options: {
+      A: 'the 2p¹ electron in boron is harder to remove than the paired 2s² in beryllium',
+      B: 'the 2p¹ electron in boron is easier to remove than the paired 2s² in beryllium',
+      C: 'beryllium\'s 2s subshell has lower energy than boron\'s 2p subshell',
+      D: 'boron has a higher nuclear charge, making its ionisation energy unexpectedly high',
+    },
+    answer: 'B',
+    explanation: 'The 2p orbital is higher in energy and slightly shielded by the 2s electrons, making it easier to remove a 2p¹ (B) than a 2s² (Be). Hence IE₁ of B < IE₁ of Be.',
+    // Level:5, Taxonomy:Abstract, Tag:IE-dip-group2-group3, Triage:Pro-Ceiling
+  },
+  {
+    id: 70, subject: 'Chemistry',
+    text: 'The first ionisation energy dip between nitrogen (Z = 7) and oxygen (Z = 8) arises because:',
+    options: {
+      A: 'nitrogen has a higher nuclear charge, making its outermost electron harder to remove',
+      B: 'nitrogen\'s half-filled 2p subshell is less stable than a full subshell',
+      C: 'the 2p electrons of nitrogen experience greater nuclear shielding than those of oxygen',
+      D: 'electron pairing in oxygen\'s 2p subshell introduces additional repulsion energy',
+    },
+    answer: 'D',
+    explanation: 'N has a half-filled 2p subshell (2p³, extra stability). O has one paired 2p orbital (2p⁴); the paired electrons repel each other, making one easier to remove. IE₁ of O < IE₁ of N.',
+    // Level:5, Taxonomy:Abstract, Tag:IE-dip-N-O, Triage:Pro-Ceiling
+  },
+  {
+    id: 71, subject: 'Chemistry',
+    text: 'The water molecule is described as sp³ hybridised with a bond angle of approximately 104.5° rather than the expected 109.5° because:',
+    options: {
+      A: 'two lone pairs on oxygen occupy more space than bonding pairs and compress the bond angle',
+      B: 'the H−O−H bond is weaker than standard covalent bonds, reducing the bond angle',
+      C: 'oxygen\'s high electronegativity pulls bonding pairs away from the hydrogen atoms',
+      D: 'the small atomic radius of hydrogen forces the two O−H bonds closer together',
+    },
+    answer: 'A',
+    explanation: 'VSEPR: lone pair−lone pair repulsion > lone pair−bonding pair repulsion > bonding pair−bonding pair repulsion. Two lone pairs on O compress the H−O−H angle from 109.5° to 104.5°.',
+    // Level:3, Taxonomy:Abstract, Tag:VSEPR-water, Triage:Return
+  },
+  {
+    id: 72, subject: 'Chemistry',
+    text: 'The shape of the PCl₅ molecule and the hybridisation of the central phosphorus atom are:',
+    options: {
+      A: 'octahedral shape with sp³d² hybridisation at the phosphorus atom',
+      B: 'square pyramidal shape with sp³d hybridisation at the phosphorus atom',
+      C: 'trigonal bipyramidal shape with sp³d hybridisation at the phosphorus atom',
+      D: 'tetrahedral shape with sp³ hybridisation at the phosphorus atom',
+    },
+    answer: 'C',
+    explanation: 'P has 5 bonding pairs and no lone pairs. sp³d hybridisation gives 5 hybrid orbitals arranged in a trigonal bipyramidal geometry (3 equatorial + 2 axial positions).',
+    // Level:4, Taxonomy:Abstract, Tag:hybridisation-PCl5, Triage:Return
+  },
+
+
+/* ─────────────────────────────────────────────────────────
+   OXIDATION & REDUCTION  Q73 – Q80
+───────────────────────────────────────────────────────── */
+  {
+    id: 73, subject: 'Chemistry',
+    text: 'In the reaction MnO₄⁻ + 8H⁺ + 5Fe²⁺ → Mn²⁺ + 5Fe³⁺ + 4H₂O, the oxidising agent is:',
+    options: {
+      A: 'H⁺, which is present in excess and drives the reaction forward',
+      B: 'MnO₄⁻, which gains electrons and is reduced from Mn⁺⁷ to Mn²⁺',
+      C: 'Fe³⁺, which is the product with the highest oxidation state in the reaction',
+      D: 'Fe²⁺, which undergoes a change in oxidation state from +2 to +3',
+    },
+    answer: 'B',
+    explanation: 'The oxidising agent is the species reduced. MnO₄⁻ gains 5e⁻ per Mn: Mn goes from +7 to +2. Fe²⁺ is oxidised (loses electrons) — it is the reducing agent.',
+    // Level:3, Taxonomy:Logical, Tag:oxidising-reducing-agent, Triage:Return
+  },
+  {
+    id: 74, subject: 'Chemistry',
+    text: 'The oxidation state of sulphur in the tetraoxosulphate(VI) ion, SO₄²⁻, is:',
+    options: {
+      A: '+4',
+      B: '+2',
+      C: '+8',
+      D: '+6',
+    },
+    answer: 'D',
+    explanation: 'Assigning oxygen as −2: S + 4(−2) = −2. S − 8 = −2. S = +6.',
+    // Level:2, Taxonomy:Mathematical, Tag:oxidation-state-sulphate, Triage:Sprint
+  },
+  {
+    id: 75, subject: 'Chemistry',
+    text: 'In the reaction Zn(s) + CuSO₄(aq) → ZnSO₄(aq) + Cu(s), the species that undergoes oxidation is:',
+    options: {
+      A: 'Zn, which loses two electrons to form Zn²⁺ ions in solution',
+      B: 'Cu²⁺, which gains two electrons and is deposited as copper metal',
+      C: 'SO₄²⁻, which is transferred from copper to zinc in the reaction',
+      D: 'Cu, which is released as zinc dissolves into the electrolyte',
+    },
+    answer: 'A',
+    explanation: 'Zn → Zn²⁺ + 2e⁻ (oxidation — loss of electrons). Cu²⁺ + 2e⁻ → Cu (reduction — gain of electrons). Zn is the reducing agent; Cu²⁺ is the oxidising agent.',
+    // Level:2, Taxonomy:Logical, Tag:redox-zinc-copper, Triage:Sprint
+  },
+  {
+    id: 76, subject: 'Chemistry',
+    text: 'In the decomposition 2H₂O₂(l) → 2H₂O(l) + O₂(g), the oxygen in hydrogen peroxide undergoes:',
+    options: {
+      A: 'reduction only — oxygen moves from −1 in H₂O₂ to −2 in water',
+      B: 'oxidation only — oxygen moves from −1 in H₂O₂ to 0 in oxygen gas',
+      C: 'both oxidation and reduction — a disproportionation reaction',
+      D: 'no change in oxidation state — oxygen remains as −2 throughout',
+    },
+    answer: 'C',
+    explanation: 'O in H₂O₂ = −1. In H₂O, O = −2 (reduction). In O₂, O = 0 (oxidation). One species is both oxidised and reduced — this is disproportionation.',
+    // Level:5, Taxonomy:Logical, Tag:disproportionation, Triage:Pro-Ceiling
+  },
+  {
+    id: 77, subject: 'Chemistry',
+    text: 'The standard electrode potential of a half-cell is measured with reference to:',
+    options: {
+      A: 'the zinc half-cell, assigned a potential of 0.00 V by international convention',
+      B: 'the standard hydrogen electrode (SHE), assigned a potential of 0.00 V',
+      C: 'the platinum electrode in saturated potassium chloride solution',
+      D: 'the calomel electrode, which has a fixed potential of +0.242 V',
+    },
+    answer: 'B',
+    explanation: 'The SHE (Pt, H₂(g) | H⁺(aq)) is the universal reference, assigned E° = 0.00 V by convention. All standard electrode potentials are measured relative to it.',
+    // Level:3, Taxonomy:Administrative, Tag:standard-hydrogen-electrode, Triage:Return
+  },
+  {
+    id: 78, subject: 'Chemistry',
+    text: 'In the Daniel cell (Zn | ZnSO₄ || CuSO₄ | Cu), the direction of electron flow through the external circuit is:',
+    options: {
+      A: 'from copper to zinc through the external wire',
+      B: 'from the salt bridge outward through both electrodes simultaneously',
+      C: 'from the solution into the zinc electrode through the wire',
+      D: 'from zinc to copper through the external wire',
+    },
+    answer: 'D',
+    explanation: 'Zn is the anode (oxidised): Zn → Zn²⁺ + 2e⁻. Electrons flow through the external wire from anode (Zn) to cathode (Cu), where Cu²⁺ + 2e⁻ → Cu.',
+    // Level:3, Taxonomy:Abstract, Tag:daniel-cell-electron-flow, Triage:Return
+  },
+  {
+    id: 79, subject: 'Chemistry',
+    text: 'When potassium manganate(VII) reacts with iron(II) sulphate in acidic solution, the species that is reduced is:',
+    options: {
+      A: 'Mn in MnO₄⁻, whose oxidation state decreases from +7 to +2',
+      B: 'Fe in FeSO₄, whose oxidation state increases from +2 to +3',
+      C: 'S in SO₄²⁻, which remains at +6 and is unchanged throughout',
+      D: 'K in KMnO₄, whose oxidation state changes during the reaction',
+    },
+    answer: 'A',
+    explanation: 'Reduction = gain of electrons = decrease in oxidation state. Mn in MnO₄⁻ goes from +7 to +2 (gains 5e⁻). Fe²⁺ is oxidised (+2 → +3). K remains +1.',
+    // Level:3, Taxonomy:Logical, Tag:KMnO4-reduction, Triage:Return
+  },
+  {
+    id: 80, subject: 'Chemistry',
+    text: 'The oxidation state of nitrogen in the tetraoxonitrate(V) ion, NO₃⁻, is:',
+    options: {
+      A: '+3',
+      B: '+4',
+      C: '+5',
+      D: '+7',
+    },
+    answer: 'C',
+    explanation: 'N + 3(−2) = −1. N − 6 = −1. N = +5. The name "tetraoxonitrate(V)" also directly states the oxidation state as V (+5).',
+    // Level:2, Taxonomy:Mathematical, Tag:oxidation-state-nitrate, Triage:Sprint
+  },
+
 ];
-
-/* ── STATE ── */
-var ST = { correct: 0, wrong: 0, answered: 0, submitted: false };
-var UA = {};  /* userAnswers: {id: chosen_key} */
-var globalDone = false;
-var GLOBAL_SECS = 1800; /* 30 minutes */
-var PTS_CORRECT = 1;
-var PTS_WRONG   = 0; /* UTME: no negative marking */
-
-/* ── TIMER ── */
-var timerInterval = null;
-function startTimer() {
-  var remaining = GLOBAL_SECS;
-  var dot  = document.getElementById('gdot');
-  var txt  = document.getElementById('gtime');
-  function fmt(s) {
-    var m = Math.floor(s/60), ss = s%60;
-    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
-  }
-  txt.textContent = fmt(remaining);
-  timerInterval = setInterval(function() {
-    remaining--;
-    txt.textContent = fmt(remaining);
-    if (remaining <= 300 && remaining > 60) {
-      txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn';
-    } else if (remaining <= 60) {
-      txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang';
-    }
-    if (remaining <= 0) {
-      clearInterval(timerInterval);
-      timeUp();
-    }
-  }, 1000);
-}
-
-function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
-
-function getTimeDisplay() {
-  var el = document.getElementById('gtime');
-  return el ? el.textContent : '—';
-}
-
-/* ── RENDER ── */
-function render() {
-  var container = document.getElementById('qc');
-  var html = '';
-  for (var i = 0; i < QUESTIONS.length; i++) {
-    var q = QUESTIONS[i];
-    var optsHtml = '';
-    var labels = ['A','B','C','D'];
-    for (var j = 0; j < labels.length; j++) {
-      var lbl = labels[j];
-      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
-        '<span class="opt-key">'+lbl+'.</span>' +
-        '<span class="opt-txt">'+q.opts[lbl]+'</span>' +
-        '</div>';
-    }
-    html += '<div class="qcard" style="animation-delay:' + (i*0.03) + 's">' +
-      '<div class="qcard-top">' +
-        '<span class="qnum">Q' + q.id + ' of 50</span>' +
-        (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') +
-      '</div>' +
-      '<div class="qtxt">' + q.text + '</div>' +
-      '<div class="opts">' + optsHtml + '</div>' +
-      '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>' +
-      '<div class="exp" id="exp' + q.id + '"></div>' +
-      '</div>';
-  }
-  container.innerHTML = html;
-  attachListeners();
-}
-
-/* ── LISTENERS ── */
-function attachListeners() {
-  document.querySelectorAll('.opt').forEach(function(opt) {
-    opt.addEventListener('click', function() {
-      if (globalDone || this.classList.contains('locked')) return;
-      var qid   = parseInt(this.dataset.id);
-      var chose = this.dataset.a;
-      /* deselect siblings */
-      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
-        o.classList.remove('sel');
-      });
-      this.classList.add('sel');
-      UA[qid] = chose;
-      /* enable check button */
-      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
-      if (btn) btn.disabled = false;
-    });
-  });
-
-  document.querySelectorAll('.abtn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      if (globalDone) return;
-      var qid    = parseInt(this.dataset.qid);
-      var q      = QUESTIONS.find(function(x){ return x.id === qid; });
-      var chosen = UA[qid];
-      var ok     = (chosen === q.ans);
-
-      /* lock all opts for this question */
-      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
-        o.classList.add('locked');
-        o.style.pointerEvents = 'none';
-        if (o.dataset.a === q.ans)    o.classList.add('ok');
-        else if (o.dataset.a === chosen) o.classList.add('no');
-      });
-
-      /* explanation */
-      var expEl = document.getElementById('exp' + qid);
-      var markCls = ok ? 'pos' : 'neg';
-      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + q.ans;
-      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' +
-        (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
-      expEl.classList.add('show');
-
-      this.disabled = true;
-
-      /* update stats */
-      if (!ST.answeredIds) ST.answeredIds = new Set();
-      if (!ST.answeredIds.has(qid)) {
-        ST.answered++;
-        ST.answeredIds.add(qid);
-        if (ok) ST.correct++; else ST.wrong++;
-        updateStats();
-      }
-    });
-  });
-}
-
-/* ── STATS ── */
-function updateStats() {
-  var left = QUESTIONS.length - ST.answered;
-  document.getElementById('sc-corr').textContent  = ST.correct;
-  document.getElementById('sc-wrong').textContent  = ST.wrong;
-  document.getElementById('sc-skip').textContent   = left;
-  document.getElementById('answered-count').textContent = ST.answered;
-  document.getElementById('sub-prog').textContent  = ST.answered + ' / 50 answered';
-  document.getElementById('m-ans').textContent     = ST.answered;
-  document.getElementById('m-left').textContent    = left;
-  document.getElementById('m-time').textContent    = getTimeDisplay();
-  /* progress bar */
-  document.getElementById('prog-fill').style.width = (ST.answered / QUESTIONS.length * 100) + '%';
-}
-
-/* ── SUBMIT ── */
-function showSubmitModal() {
-  document.getElementById('m-time').textContent = getTimeDisplay();
-  document.getElementById('submit-modal').classList.add('show');
-}
-function hideSubmitModal() {
-  document.getElementById('submit-modal').classList.remove('show');
-}
-
-function submitQuiz() {
-  hideSubmitModal();
-  globalDone = true;
-  stopTimer();
-
-  /* Auto-check all unanswered questions that have a selection */
-  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){
-    if (!btn.disabled) btn.click();
-  });
-
-  /* Show time-up overlay with results */
-  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
-  var scoreEl = document.getElementById('tu-score');
-  scoreEl.textContent = pct + '%';
-  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
-  document.getElementById('tu-co').textContent = ST.correct;
-  document.getElementById('tu-wr').textContent = ST.wrong;
-  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
-  document.getElementById('tu').classList.add('show');
-}
-
-/* ── TIME UP ── */
-function timeUp() {
-  globalDone = true;
-  /* lock everything */
-  document.querySelectorAll('.opt').forEach(function(o){
-    o.style.pointerEvents = 'none';
-    o.classList.add('locked');
-  });
-  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
-
-  var pct = Math.round((ST.correct / QUESTIONS.length) * 100);
-  var scoreEl = document.getElementById('tu-score');
-  scoreEl.textContent = pct + '%';
-  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
-  document.getElementById('tu-co').textContent = ST.correct;
-  document.getElementById('tu-wr').textContent = ST.wrong;
-  document.getElementById('tu-sk').textContent = QUESTIONS.length - ST.answered;
-  document.getElementById('tu').classList.add('show');
-}
-
-/* ── PDF / PRINT ── */
-function doPrint() {
-  /* Make sure print header is visible for print */
-  document.getElementById('print-header').style.display = 'block';
-  window.print();
-  /* Hide again after */
-  setTimeout(function(){
-    document.getElementById('print-header').style.display = 'none';
-  }, 1000);
-}
-
-/* ── INIT ── */
-render();
-startTimer();
 </script>
+
+<script src="quiz-app.js"></script>
 </body>
 </html>
