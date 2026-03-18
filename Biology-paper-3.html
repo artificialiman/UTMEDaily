@@ -56,10 +56,10 @@
       padding: 1rem;
       transform: rotate(-20deg) scale(1.5);
       transform-origin: center center;
-      opacity: 0.022;
+      opacity: 0.09;
       font-family: var(--mono);
-      font-size: 0.72rem; font-weight: 700;
-      color: #f0eff4; letter-spacing: 0.08em;
+      font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em;
       white-space: nowrap;
       user-select: none; -webkit-user-select: none;
     }
@@ -405,6 +405,8 @@
 .gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
 .gate-btn { width:100%;padding:0.8rem;background:var(--accent,#6e8efb);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:0.5rem; }
 .gate-btn:hover { opacity:0.88; }
+.gate-pw-wrap { position:relative; margin-bottom:0.5rem; }
+.gate-toggle { position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(232,237,245,0.45);cursor:pointer;font-size:0.9rem;padding:0.25rem;line-height:1; }
 </style>
 </head>
 <body>
@@ -423,7 +425,10 @@
     <div class="gate-logo">GrantApp AI</div>
     <h2 class="gate-title">Biology · Paper 1</h2>
     <p class="gate-sub">Enter your access password to continue</p>
-    <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password">
+    <div class="gate-pw-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password" style="margin-bottom:0;padding-right:2.75rem;">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
     <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
     <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
   </div>
@@ -521,8 +526,11 @@
       "763ad3378c8f6f148075fb119e3f9fbe0be5e94de35f15bad16485081d148582": "Temi",
       "9c42e13e303bd8f44e709368ac68109fe0c77c727e8ae9a2dc5697be0e3d8ad3": "Murphy",
       "07d344f500954d778c000e2bf7ecafd810a4a1ca3b8ac632afbf740897d01637": "Improve",
-      "513c3f5bf5d2079f1b8cf727c080b09a79c91874556b6278314833f5c444fb9b": "Benz",
-      "e5d134ef7359e2b397dc1935730988f6525db657ad36cdec62463026a17f7a74": "Silent"
+      "513c3f5bf5d2079f1b8cf727c080b09a79c91874556b6278314833f5c444fb9b": "Zainab",
+      "e5d134ef7359e2b397dc1935730988f6525db657ad36cdec62463026a17f7a74": "Fiyin",
+      "4bfc305c994371adedf1420e5f702b11a654e0c9883bd6fc12af113092883641": "Aliyah",
+      "bb8736f491bd5790e818cb96716c23b1b18dd270995ddd653d2713bb051568f1": "Aremu Ella",
+      "bf828d446e7a4fda91207f567e5bc7d3f3a14a9b54a9825754be394056d01059": "Taiwo"
     };
   async function sha256(str) {
     var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -557,6 +565,12 @@
   document.addEventListener('DOMContentLoaded', function() {
     var inp = document.getElementById('gate-input');
     if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password';
+      inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
   });
 })();
 
