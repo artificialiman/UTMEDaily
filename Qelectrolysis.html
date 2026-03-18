@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Electrolysis — Chemistry · JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Electrolysis</div>
+    <div class="subtitle">80-question mastery drill · Chemistry</div>
+</div>
+
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+const questions = {
+  chemistry: [
+    {q:"4 mol of electrons pass through a Cu²⁺ solution. How many moles of copper are deposited? (Cu²⁺ + 2e⁻ → Cu)", opts:["A. 2 mol","B. 4 mol","C. 1 mol","D. 8 mol"], ans:"A", exp:"n(Cu) = n(e⁻) / valence = 4 / 2 = 2 mol. n here means moles of electrons, not atoms — the first switch students must own."},
+    {q:"0.6 mol of electrons are transferred during electrolysis of silver nitrate solution. How many moles of silver deposit? (Ag⁺ + e⁻ → Ag)", opts:["A. 1.2 mol","B. 0.6 mol","C. 0.3 mol","D. 0.2 mol"], ans:"B", exp:"Ag⁺ needs 1 electron per ion, so n(Ag) = n(e⁻) / 1 = 0.6 mol directly."},
+    {q:"0.9 mol of electrons are transferred in the electrolysis of AlCl₃. How many moles of aluminium deposit at the cathode? (Al³⁺ + 3e⁻ → Al)", opts:["A. 0.9 mol","B. 2.7 mol","C. 0.3 mol","D. 0.45 mol"], ans:"C", exp:"n(Al) = 0.9 / 3 = 0.3 mol. Three electrons are needed per Al³⁺ ion."},
+    {q:"0.5 mol of Cu must be deposited from a Cu²⁺ solution. How many moles of electrons are required?", opts:["A. 1.0 mol","B. 0.5 mol","C. 2.0 mol","D. 0.25 mol"], ans:"A", exp:"n(e⁻) = n(substance) × valence = 0.5 × 2 = 1.0 mol. Going backwards up the spine."},
+    {q:"0.4 mol of iron is deposited from a Fe³⁺ solution. How many moles of electrons were transferred?", opts:["A. 0.4 mol","B. 1.2 mol","C. 0.8 mol","D. 3.0 mol"], ans:"B", exp:"n(e⁻) = 0.4 × 3 = 1.2 mol. Multiply substance moles by valence to climb back to electrons."},
+    {q:"2.5 mol of electrons pass through molten PbBr₂. How many moles of lead deposit at the cathode? (Pb²⁺ + 2e⁻ → Pb)", opts:["A. 2.5 mol","B. 5.0 mol","C. 1.25 mol","D. 0.625 mol"], ans:"C", exp:"n(Pb) = 2.5 / 2 = 1.25 mol."},
+    {q:"1.8 mol of electrons pass through a Cr³⁺ solution. How many moles of chromium deposit?", opts:["A. 0.6 mol","B. 1.8 mol","C. 5.4 mol","D. 0.9 mol"], ans:"A", exp:"n(Cr) = 1.8 / 3 = 0.6 mol."},
+    {q:"3 mol of silver deposit at the cathode of a silver nitrate cell. How many moles of electrons were transferred? (Ag⁺ + e⁻ → Ag)", opts:["A. 6 mol","B. 1.5 mol","C. 9 mol","D. 3 mol"], ans:"D", exp:"One electron per Ag⁺, so n(e⁻) = 3 × 1 = 3 mol."},
+    {q:"0.25 mol of zinc is deposited from a Zn²⁺ solution. How many moles of electrons were transferred?", opts:["A. 0.5 mol","B. 0.25 mol","C. 1.0 mol","D. 0.125 mol"], ans:"A", exp:"n(e⁻) = 0.25 × 2 = 0.5 mol."},
+    {q:"1.5 mol of Au³⁺ ions are reduced at the cathode of a gold plating cell. How many moles of electrons are consumed?", opts:["A. 1.5 mol","B. 3.0 mol","C. 4.5 mol","D. 6.0 mol"], ans:"C", exp:"n(e⁻) = 1.5 × 3 = 4.5 mol. n here is electrons — entirely different quantity from n(Au)."},
+    {q:"A current of 2 A is passed for 965 s through a copper(II) sulphate solution. What mass of copper deposits at the cathode? (Cu = 64, F = 96 500)", opts:["A. 0.64 g","B. 1.28 g","C. 0.32 g","D. 0.02 g"], ans:"A", exp:"Q = 2 × 965 = 1 930 C. n(e⁻) = 1 930/96 500 = 0.02 mol. n(Cu) = 0.02/2 = 0.01 mol. m = 0.01 × 64 = 0.64 g."},
+    {q:"A current of 1 A is passed for 1 930 s through a silver nitrate solution. What mass of silver deposits? (Ag = 108, F = 96 500)", opts:["A. 4.32 g","B. 2.16 g","C. 1.08 g","D. 0.22 g"], ans:"B", exp:"Q = 1 930 C. n(e⁻) = 0.02 mol. n(Ag) = 0.02 mol (Ag⁺, 1e⁻). m = 0.02 × 108 = 2.16 g."},
+    {q:"A current of 5 A is passed for 1 930 s through an aluminium chloride solution. What mass of aluminium deposits? (Al = 27, F = 96 500)", opts:["A. 0.90 g","B. 2.70 g","C. 0.30 g","D. 1.80 g"], ans:"A", exp:"Q = 9 650 C. n(e⁻) = 0.1 mol. n(Al) = 0.1/3 = 0.0333 mol. m = 0.0333 × 27 = 0.90 g."},
+    {q:"A current of 2 A is passed for 2 hours through a copper(II) sulphate solution. What mass of copper deposits? (Cu = 64, F = 96 500)", opts:["A. 4.8 g","B. 9.6 g","C. 2.4 g","D. 1.2 g"], ans:"A", exp:"Q = 2 × 7 200 = 14 400 C. n(e⁻) = 0.1492 mol. n(Cu) = 0.0746 mol. m = 0.0746 × 64 ≈ 4.8 g."},
+    {q:"A current of 3 A is passed for 1 hour through a zinc sulphate solution. What mass of zinc deposits? (Zn = 65, F = 96 500)", opts:["A. 7.3 g","B. 1.8 g","C. 3.6 g","D. 10.8 g"], ans:"C", exp:"Q = 3 × 3 600 = 10 800 C. n(e⁻) = 0.1119 mol. n(Zn) = 0.0560 mol. m = 0.0560 × 65 ≈ 3.6 g."},
+    {q:"A current of 10 A is passed for 965 s through a copper(II) sulphate solution. What mass of copper deposits? (Cu = 64, F = 96 500)", opts:["A. 3.2 g","B. 6.4 g","C. 1.6 g","D. 9.65 g"], ans:"A", exp:"Q = 9 650 C. n(e⁻) = 0.1 mol. n(Cu) = 0.05 mol. m = 0.05 × 64 = 3.2 g."},
+    {q:"A current of 4 A is passed for 2 412.5 s through a silver nitrate solution. What mass of silver deposits? (Ag = 108, F = 96 500)", opts:["A. 10.8 g","B. 5.4 g","C. 21.6 g","D. 1.08 g"], ans:"A", exp:"Q = 4 × 2 412.5 = 9 650 C. n(e⁻) = 0.1 mol. n(Ag) = 0.1 mol. m = 0.1 × 108 = 10.8 g."},
+    {q:"A current of 0.5 A is passed for 3 hours through a nickel sulphate solution. What mass of nickel deposits? (Ni = 58, F = 96 500)", opts:["A. 3.2 g","B. 1.6 g","C. 0.8 g","D. 5.4 g"], ans:"B", exp:"Q = 0.5 × 10 800 = 5 400 C. n(e⁻) = 0.05596 mol. n(Ni) = 0.02798 mol. m = 0.02798 × 58 ≈ 1.6 g."},
+    {q:"A current of 2 A is passed for 30 minutes through an iron(III) sulphate solution. What mass of iron deposits? (Fe = 56, F = 96 500)", opts:["A. 0.70 g","B. 2.09 g","C. 0.23 g","D. 1.40 g"], ans:"A", exp:"Q = 2 × 1 800 = 3 600 C. n(e⁻) = 0.0373 mol. n(Fe) = 0.0373/3 = 0.0124 mol. m = 0.0124 × 56 ≈ 0.70 g."},
+    {q:"A current of 5 A is passed for 3 860 s through copper(II) sulphate solution. What mass of copper deposits? (Cu = 64, F = 96 500)", opts:["A. 12.8 g","B. 3.2 g","C. 6.4 g","D. 19.3 g"], ans:"C", exp:"Q = 5 × 3 860 = 19 300 C. n(e⁻) = 0.2 mol. n(Cu) = 0.1 mol. m = 0.1 × 64 = 6.4 g."},
+    {q:"A current of 1 A is passed for 2 hours through an aluminium chloride solution. What mass of aluminium deposits? (Al = 27, F = 96 500)", opts:["A. 0.67 g","B. 2.01 g","C. 0.22 g","D. 1.34 g"], ans:"A", exp:"Q = 7 200 C. n(e⁻) = 0.07461 mol. n(Al) = 0.02487 mol. m = 0.02487 × 27 ≈ 0.67 g."},
+    {q:"A current of 3 A is passed for 1 hour through a silver nitrate solution. What mass of silver deposits? (Ag = 108, F = 96 500)", opts:["A. 24.2 g","B. 12.1 g","C. 6.0 g","D. 4.0 g"], ans:"B", exp:"Q = 10 800 C. n(e⁻) = 0.1119 mol. n(Ag) = 0.1119 mol. m = 0.1119 × 108 ≈ 12.1 g."},
+    {q:"A current of 2 A is passed for 1 hour through a chromium(III) sulphate solution. What mass of chromium deposits? (Cr = 52, F = 96 500)", opts:["A. 3.9 g","B. 0.43 g","C. 2.6 g","D. 1.3 g"], ans:"D", exp:"Q = 7 200 C. n(e⁻) = 0.07461 mol. n(Cr) = 0.07461/3 = 0.02487 mol. m = 0.02487 × 52 ≈ 1.3 g."},
+    {q:"A current of 4 A is passed for 45 minutes through a zinc sulphate solution. What mass of zinc deposits? (Zn = 65, F = 96 500)", opts:["A. 3.6 g","B. 7.3 g","C. 1.8 g","D. 0.9 g"], ans:"A", exp:"Q = 4 × 2 700 = 10 800 C. n(e⁻) = 0.1119 mol. n(Zn) = 0.05594 mol. m ≈ 3.6 g."},
+    {q:"A current of 1.93 A is passed for 1 000 s through a lead(II) nitrate solution. What mass of lead deposits? (Pb = 207, F = 96 500)", opts:["A. 4.14 g","B. 1.035 g","C. 2.07 g","D. 0.207 g"], ans:"C", exp:"Q = 1 930 C. n(e⁻) = 0.02 mol. n(Pb) = 0.01 mol. m = 0.01 × 207 = 2.07 g."},
+    {q:"A current of 0.965 A is passed for 200 s through dilute sulphuric acid. What volume of hydrogen gas is collected at the cathode at STP? (F = 96 500; molar volume at STP = 22 400 cm³)", opts:["A. 22.4 cm³","B. 44.8 cm³","C. 11.2 cm³","D. 5.6 cm³"], ans:"A", exp:"Q = 193 C. n(e⁻) = 0.002 mol. 2H⁺ + 2e⁻ → H₂, so n(H₂) = 0.001 mol. V = 0.001 × 22 400 = 22.4 cm³."},
+    {q:"A current of 1 A is passed for 965 s through dilute sulphuric acid with platinum electrodes. What volume of oxygen is collected at the anode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 224 cm³","B. 56 cm³","C. 112 cm³","D. 28 cm³"], ans:"B", exp:"Q = 965 C. n(e⁻) = 0.01 mol. 2H₂O → O₂ + 4H⁺ + 4e⁻, so n(O₂) = 0.01/4 = 0.0025 mol. V = 56 cm³."},
+    {q:"A current of 2 A is passed for 1 930 s through concentrated hydrochloric acid. What volume of chlorine gas is produced at the anode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 448 cm³","B. 896 cm³","C. 224 cm³","D. 22.4 cm³"], ans:"A", exp:"Q = 3 860 C. n(e⁻) = 0.04 mol. 2Cl⁻ → Cl₂ + 2e⁻, so n(Cl₂) = 0.02 mol. V = 0.02 × 22 400 = 448 cm³."},
+    {q:"A current of 4 A is passed for 4 825 s through dilute sulphuric acid. What volume of hydrogen is collected at the cathode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 2 240 cm³","B. 4 480 cm³","C. 1 120 cm³","D. 560 cm³"], ans:"A", exp:"Q = 19 300 C. n(e⁻) = 0.2 mol. n(H₂) = 0.2/2 = 0.1 mol. V = 0.1 × 22 400 = 2 240 cm³."},
+    {q:"A current of 5 A is passed for 1 930 s through dilute sulphuric acid. What volume of oxygen is produced at the anode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 560 cm³","B. 2 240 cm³","C. 1 120 cm³","D. 280 cm³"], ans:"A", exp:"Q = 9 650 C. n(e⁻) = 0.1 mol. n(O₂) = 0.1/4 = 0.025 mol. V = 0.025 × 22 400 = 560 cm³."},
+    {q:"A current of 3 A is passed for 965 s through saturated brine. What volume of chlorine gas is produced at the anode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 672 cm³","B. 168 cm³","C. 336 cm³","D. 22.4 cm³"], ans:"C", exp:"Q = 2 895 C. n(e⁻) = 0.03 mol. n(Cl₂) = 0.015 mol. V = 0.015 × 22 400 = 336 cm³."},
+    {q:"A current of 0.5 A is passed for 3 860 s through dilute sulphuric acid. What volume of hydrogen is collected at the cathode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 224 cm³","B. 448 cm³","C. 112 cm³","D. 22.4 cm³"], ans:"A", exp:"Q = 1 930 C. n(e⁻) = 0.02 mol. n(H₂) = 0.01 mol. V = 224 cm³."},
+    {q:"A current of 2 A is passed for 9 650 s through dilute sulphuric acid. What volume of oxygen is produced at the anode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 4 480 cm³","B. 2 240 cm³","C. 560 cm³","D. 1 120 cm³"], ans:"D", exp:"Q = 19 300 C. n(e⁻) = 0.2 mol. n(O₂) = 0.05 mol. V = 0.05 × 22 400 = 1 120 cm³."},
+    {q:"A current of 1.93 A is passed for 500 s through dilute sulphuric acid using platinum electrodes. What volume of hydrogen is collected at the cathode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 112 cm³","B. 224 cm³","C. 56 cm³","D. 448 cm³"], ans:"A", exp:"Q = 965 C. n(e⁻) = 0.01 mol. n(H₂) = 0.005 mol. V = 0.005 × 22 400 = 112 cm³."},
+    {q:"A current of 10 A is passed for 1 930 s through saturated brine using inert electrodes. What volume of chlorine gas is produced at the anode at STP? (F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 4 480 cm³","B. 1 120 cm³","C. 2 240 cm³","D. 448 cm³"], ans:"C", exp:"Q = 19 300 C. n(e⁻) = 0.2 mol. n(Cl₂) = 0.1 mol. V = 0.1 × 22 400 = 2 240 cm³."},
+    {q:"2 Faradays of electricity are passed through a copper(II) sulphate solution. What mass of copper deposits at the cathode? (Cu = 64)", opts:["A. 64 g","B. 32 g","C. 128 g","D. 16 g"], ans:"A", exp:"n(e⁻) = 2 mol. n(Cu) = 2/2 = 1 mol. m = 1 × 64 = 64 g."},
+    {q:"0.5 Faraday of electricity is passed through a silver nitrate solution. What mass of silver deposits? (Ag = 108)", opts:["A. 108 g","B. 27 g","C. 54 g","D. 216 g"], ans:"C", exp:"n(e⁻) = 0.5 mol. n(Ag) = 0.5/1 = 0.5 mol. m = 0.5 × 108 = 54 g."},
+    {q:"3 Faradays of electricity are passed through an aluminium chloride solution. What mass of aluminium deposits? (Al = 27)", opts:["A. 9 g","B. 27 g","C. 81 g","D. 54 g"], ans:"B", exp:"n(e⁻) = 3 mol. n(Al) = 3/3 = 1 mol. m = 1 × 27 = 27 g."},
+    {q:"0.1 Faraday of electricity is passed through a lead(II) nitrate solution. What mass of lead deposits? (Pb = 207)", opts:["A. 10.35 g","B. 20.7 g","C. 5.18 g","D. 41.4 g"], ans:"A", exp:"n(e⁻) = 0.1 mol. n(Pb) = 0.1/2 = 0.05 mol. m = 0.05 × 207 = 10.35 g."},
+    {q:"1 Faraday of electricity is passed through a zinc sulphate solution. How many moles of zinc are deposited? (Zn²⁺ + 2e⁻ → Zn)", opts:["A. 1 mol","B. 0.5 mol","C. 2 mol","D. 0.25 mol"], ans:"B", exp:"n(e⁻) = 1 mol. n(Zn) = 1/2 = 0.5 mol."},
+    {q:"6 Faradays of electricity are passed through a gold(III) chloride solution. What mass of gold deposits? (Au = 197, Au³⁺)", opts:["A. 197 g","B. 394 g","C. 131.3 g","D. 591 g"], ans:"B", exp:"n(e⁻) = 6 mol. n(Au) = 6/3 = 2 mol. m = 2 × 197 = 394 g."},
+    {q:"0.3 Faraday of electricity is passed through an iron(III) sulphate solution. How many moles of iron are deposited? (Fe³⁺ + 3e⁻ → Fe)", opts:["A. 0.3 mol","B. 0.9 mol","C. 0.1 mol","D. 0.033 mol"], ans:"C", exp:"n(e⁻) = 0.3 mol. n(Fe) = 0.3/3 = 0.1 mol."},
+    {q:"4 Faradays of electricity are passed through molten magnesium chloride. What mass of magnesium is deposited? (Mg = 24, Mg²⁺)", opts:["A. 24 g","B. 96 g","C. 12 g","D. 48 g"], ans:"D", exp:"n(e⁻) = 4 mol. n(Mg) = 4/2 = 2 mol. m = 2 × 24 = 48 g."},
+    {q:"0.64 g of a metal X deposits when a charge of 1 930 C is passed. If M(X) = 64, what is the oxidation state of X in the electrolyte? (F = 96 500)", opts:["A. +2","B. +1","C. +3","D. +4"], ans:"A", exp:"n(X) = 0.64/64 = 0.01 mol. n(e⁻) = 1 930/96 500 = 0.02 mol. Valence = 0.02/0.01 = 2. Oxidation state = +2."},
+    {q:"2.16 g of silver deposits when a charge of 1 930 C is passed through a silver salt solution. What is the oxidation state of silver? (Ag = 108, F = 96 500)", opts:["A. +1","B. +2","C. +3","D. +4"], ans:"A", exp:"n(Ag) = 2.16/108 = 0.02 mol. n(e⁻) = 0.02 mol. Valence = 0.02/0.02 = 1. Oxidation state = +1."},
+    {q:"0.18 g of aluminium deposits when a charge of 1 930 C is passed through a molten aluminium salt. What is the oxidation state of aluminium? (Al = 27, F = 96 500)", opts:["A. +1","B. +2","C. +3","D. +6"], ans:"C", exp:"n(Al) = 0.18/27 = 0.00667 mol. n(e⁻) = 0.02 mol. Valence = 0.02/0.00667 = 3. Oxidation state = +3."},
+    {q:"A current of 1 A is passed for 1 930 s through a lead salt solution, depositing 2.07 g of lead. What is the oxidation state of lead in the salt? (Pb = 207, F = 96 500)", opts:["A. +4","B. +2","C. +1","D. +3"], ans:"B", exp:"Q = 1 930 C. n(e⁻) = 0.02 mol. n(Pb) = 2.07/207 = 0.01 mol. Valence = 0.02/0.01 = 2. Oxidation state = +2."},
+    {q:"A current of 1.93 A is passed for 1 500 s through a chromium salt, depositing 0.52 g of chromium. What is the oxidation state of chromium in the salt? (Cr = 52, F = 96 500)", opts:["A. +3","B. +2","C. +6","D. +1"], ans:"A", exp:"Q = 2 895 C. n(e⁻) = 0.03 mol. n(Cr) = 0.52/52 = 0.01 mol. Valence = 3. Oxidation state = +3."},
+    {q:"A current of 1 A is passed for 1 930 s through a nickel salt solution, depositing 0.58 g of nickel. What is the oxidation state of nickel in the salt? (Ni = 58, F = 96 500)", opts:["A. +3","B. +1","C. +2","D. +4"], ans:"C", exp:"n(e⁻) = 0.02 mol. n(Ni) = 0.58/58 = 0.01 mol. Valence = 2. Oxidation state = +2."},
+    {q:"A current of 3 A is passed for 9 650 s through an iron salt, depositing 5.6 g of iron. What is the oxidation state of iron in the salt? (Fe = 56, F = 96 500)", opts:["A. +2","B. +3","C. +1","D. +6"], ans:"B", exp:"Q = 28 950 C. n(e⁻) = 0.3 mol. n(Fe) = 5.6/56 = 0.1 mol. Valence = 0.3/0.1 = 3. Oxidation state = +3."},
+    {q:"A current of 2 A is passed for 1 930 s through a tin salt solution, depositing 1.19 g of tin. What is the oxidation state of tin in the salt? (Sn = 119, F = 96 500)", opts:["A. +4","B. +2","C. +3","D. +1"], ans:"A", exp:"Q = 3 860 C. n(e⁻) = 0.04 mol. n(Sn) = 1.19/119 = 0.01 mol. Valence = 4. Oxidation state = +4. Exception: Tin can also exist as Sn²⁺ (+2). The ratio n(e⁻)/n(Sn) is the definitive test — not assumption."},
+    {q:"A current of 5 A is passed for 1 930 s through an iron salt, depositing 2.8 g of iron. What is the oxidation state of iron in the salt? (Fe = 56, F = 96 500)", opts:["A. +3","B. +2","C. +1","D. +4"], ans:"B", exp:"Q = 9 650 C. n(e⁻) = 0.1 mol. n(Fe) = 2.8/56 = 0.05 mol. Valence = 0.1/0.05 = 2. Oxidation state = +2. Exception: Same current and time as Q51 but different metal and mass — context alone cannot tell you the valence; you must calculate the ratio."},
+    {q:"A current of 1 A is passed for 1 930 s through a copper salt, depositing 1.28 g of copper. What is the oxidation state of copper in the salt? (Cu = 64, F = 96 500)", opts:["A. +4","B. +3","C. +2","D. +1"], ans:"D", exp:"n(e⁻) = 0.02 mol. n(Cu) = 1.28/64 = 0.02 mol. Valence = 1. Copper is Cu⁺ here, not the usual Cu²⁺. Exception: Copper normally forms Cu²⁺, but Cu⁺ exists in compounds like CuCl and Cu₂O. The calculation catches this; assumption would not."},
+    {q:"Theoretical mass of copper expected from electrolysis is 6.4 g, but only 5.12 g is actually collected. What is the current efficiency?", opts:["A. 80%","B. 60%","C. 90%","D. 50%"], ans:"A", exp:"Efficiency = (actual/theoretical) × 100 = (5.12/6.4) × 100 = 80%."},
+    {q:"A current of 2 A is passed for 1 930 s through CuSO₄ solution, but only 0.512 g of copper is deposited. What is the current efficiency? (Cu = 64, F = 96 500)", opts:["A. 40%","B. 80%","C. 60%","D. 20%"], ans:"A", exp:"Theoretical: Q = 3 860 C, n(e⁻) = 0.04, n(Cu) = 0.02, m_th = 1.28 g. Efficiency = 0.512/1.28 × 100 = 40%."},
+    {q:"A current of 5 A is passed for 3 860 s through AgNO₃ solution, depositing 19.44 g of silver. What is the current efficiency? (Ag = 108, F = 96 500)", opts:["A. 90%","B. 75%","C. 80%","D. 60%"], ans:"A", exp:"Q = 19 300 C. n(e⁻) = 0.2, n(Ag) = 0.2, m_th = 21.6 g. Efficiency = 19.44/21.6 × 100 = 90%."},
+    {q:"The theoretical mass of zinc expected from an electrolysis is 3.25 g, but only 2.6 g is deposited. What is the current efficiency?", opts:["A. 60%","B. 70%","C. 80%","D. 50%"], ans:"C", exp:"Efficiency = (2.6/3.25) × 100 = 80%."},
+    {q:"The current efficiency of an aluminium electroplating process is 75%. If the theoretical mass of aluminium is 2.7 g, what mass is actually deposited?", opts:["A. 2.025 g","B. 2.7 g","C. 1.35 g","D. 3.6 g"], ans:"A", exp:"Actual = theoretical × efficiency = 2.7 × 0.75 = 2.025 g."},
+    {q:"An electrolysis process operates at 60% current efficiency. The theoretical mass of copper that should deposit is 6.4 g. What mass actually deposits?", opts:["A. 3.84 g","B. 6.4 g","C. 3.2 g","D. 4.8 g"], ans:"A", exp:"Actual = 6.4 × 0.60 = 3.84 g."},
+    {q:"The theoretical mass of nickel expected from an electrolysis is 2.0 g, but only 1.5 g is deposited. What is the current efficiency?", opts:["A. 80%","B. 75%","C. 50%","D. 60%"], ans:"B", exp:"Efficiency = (1.5/2.0) × 100 = 75%."},
+    {q:"A current of 3 A is passed for 9 650 s through an aluminium salt at 90% current efficiency. What mass of aluminium actually deposits? (Al = 27, F = 96 500)", opts:["A. 2.43 g","B. 2.7 g","C. 3.0 g","D. 1.8 g"], ans:"A", exp:"Q = 28 950 C. n(e⁻) = 0.3 mol. n(Al) = 0.1 mol. m_theoretical = 2.7 g. Actual = 2.7 × 0.90 = 2.43 g."},
+    {q:"During electrolysis of CuSO₄ with inert electrodes, current efficiency for copper deposition is less than 100% mainly because:", opts:["A. Water is oxidised at the anode (O₂ evolves), diverting charge from the main reaction","B. Copper is too dense to deposit quickly","C. The applied voltage is too high","D. Cu²⁺ ions migrate too slowly"], ans:"A", exp:"At the anode, 2H₂O → O₂ + 4H⁺ + 4e⁻ competes with the intended reaction. Charge spent on O₂ evolution does not contribute to Cu deposition."},
+    {q:"In the electrolysis of brine using inert electrodes, current efficiency for Cl₂ production falls when:", opts:["A. OH⁻ ions are discharged at the anode instead of Cl⁻, producing O₂ rather than Cl₂","B. Too much H₂ accumulates at the cathode","C. The solution temperature drops below 20 °C","D. The NaCl concentration is too high"], ans:"A", exp:"At low Cl⁻ concentration or high pH, O₂ evolution (from OH⁻ oxidation) competes with Cl₂ evolution at the anode, reducing Cl₂ yield."},
+    {q:"Why is current efficiency in the Hall–Héroult process (aluminium smelting) typically 85–95% rather than 100%?", opts:["A. Dissolved Al re-oxidises back to Al³⁺, and carbon anodes are consumed producing CO/CO₂, both wasting charge","B. Aluminium evaporates at the high operating temperature","C. The cryolite electrolyte conducts electricity poorly","D. Aluminium plates at both the anode and cathode simultaneously"], ans:"A", exp:"Some freshly deposited Al dissolves back into the melt, and the carbon anodes oxidise (C + O²⁻ → CO₂ + 4e⁻ wasted), both reducing net metal yield per coulomb."},
+    {q:"A student calculates that 3.2 g of copper should deposit from a CuSO₄ electrolysis but collects only 2.56 g. Which explanation is most consistent with Faraday's law?", opts:["A. The ammeter gave an incorrect reading throughout","B. Side reactions and mechanical losses reduce actual yield below the theoretical maximum","C. Faraday's law does not apply to copper electrolysis","D. The electrolyte concentration was too high"], ans:"B", exp:"Faraday's law gives the theoretical ceiling. Real efficiency < 100% because competing electrode reactions and physical losses (e.g. re-dissolution, poor contact) reduce actual yield. Efficiency here = 2.56/3.2 × 100 = 80%."},
+    {q:"Active copper electrodes are used in a CuSO₄ electrolysis cell. After prolonged electrolysis, the concentration of Cu²⁺ in the solution will:", opts:["A. Decrease as copper steadily deposits on the cathode","B. Increase as the anode dissolves faster than copper deposits","C. Stay constant — the active anode replenishes Cu²⁺ at the same rate the cathode removes it","D. Fall to zero once the anode dissolves completely"], ans:"C", exp:"Active anode: Cu → Cu²⁺ + 2e⁻ (dissolution). Cathode: Cu²⁺ + 2e⁻ → Cu (deposition). Rates are equal, so [Cu²⁺] is maintained — the principle behind electrorefining and copper electroplating."},
+    {q:"Inert platinum electrodes replace the copper electrodes in a CuSO₄ electrolysis. What now happens to [Cu²⁺] as electrolysis continues?", opts:["A. [Cu²⁺] stays constant because copper still deposits and dissolves equally","B. [Cu²⁺] progressively decreases as copper deposits but is not replenished","C. [Cu²⁺] increases because platinum releases Cu²⁺ ions","D. [Cu²⁺] is buffered by the sulphate ions and does not change"], ans:"B", exp:"With inert anodes, Cu²⁺ is consumed at the cathode but no copper is released from the anode. Instead, O₂ evolves. [Cu²⁺] falls until the solution is depleted."},
+    {q:"During electrolysis of brine (concentrated NaCl solution) at inert electrodes, the product at the cathode is:", opts:["A. Na metal","B. Cl₂ gas","C. H₂ gas","D. O₂ gas"], ans:"C", exp:"Na⁺ has a very large negative reduction potential; water is preferentially reduced instead: 2H₂O + 2e⁻ → H₂ + 2OH⁻. Sodium metal would require molten NaCl. Exception: In molten NaCl (no water), Na⁺ is the only reducible species, so Na metal deposits."},
+    {q:"Which row correctly compares the cathode product of molten NaCl electrolysis with aqueous NaCl electrolysis?", opts:["A. Both give sodium metal","B. Both give hydrogen gas","C. Molten NaCl → sodium metal; aqueous NaCl → hydrogen gas","D. Molten NaCl → hydrogen gas; aqueous NaCl → sodium metal"], ans:"C", exp:"In the melt, only Na⁺ is available for reduction. In aqueous solution, H₂O is preferentially reduced over Na⁺ because water has a much more favourable discharge potential."},
+    {q:"In electroplating a metallic object with nickel, the object should be connected as the:", opts:["A. Anode — so oxidation deposits nickel onto it","B. Cathode — so reduction deposits Ni²⁺ ions onto it","C. Either electrode, depending on the plating metal","D. External power supply, not part of the circuit"], ans:"B", exp:"Cathode is the site of reduction: Ni²⁺ + 2e⁻ → Ni. Metal ions gain electrons and deposit onto the object. The nickel anode dissolves to replenish Ni²⁺."},
+    {q:"Two electrolytic cells are connected in series: one containing CuSO₄ (Cu²⁺) and one containing AgNO₃ (Ag⁺). When 3.2 g of copper deposits in the first cell, what mass of silver deposits in the second? (Cu = 64, Ag = 108)", opts:["A. 10.8 g","B. 5.4 g","C. 21.6 g","D. 3.2 g"], ans:"A", exp:"n(Cu) = 3.2/64 = 0.05 mol. n(e⁻) = 0.05 × 2 = 0.1 mol (same charge through both cells). n(Ag) = 0.1/1 = 0.1 mol. m(Ag) = 0.1 × 108 = 10.8 g."},
+    {q:"Two cells in series: AlCl₃ and CuSO₄. When 0.9 g of aluminium deposits in the first cell, what mass of copper deposits in the second? (Al = 27, Cu = 64)", opts:["A. 3.2 g","B. 6.4 g","C. 1.6 g","D. 0.9 g"], ans:"A", exp:"n(Al) = 0.9/27 = 0.0333 mol. n(e⁻) = 0.0333 × 3 = 0.1 mol. n(Cu) = 0.1/2 = 0.05 mol. m = 0.05 × 64 = 3.2 g."},
+    {q:"A current of 2 A deposits 6.4 g of copper from a CuSO₄ solution. How long was the current passed? (Cu = 64, F = 96 500)", opts:["A. 19 300 s","B. 4 825 s","C. 9 650 s","D. 3 217 s"], ans:"C", exp:"n(Cu) = 0.1 mol. n(e⁻) = 0.2 mol. Q = 0.2 × 96 500 = 19 300 C. t = Q/I = 19 300/2 = 9 650 s."},
+    {q:"What constant current must be used to deposit 10.8 g of silver from AgNO₃ solution in exactly 1 hour? (Ag = 108, F = 96 500)", opts:["A. 2.68 A","B. 5.36 A","C. 1.34 A","D. 0.268 A"], ans:"A", exp:"n(Ag) = 0.1 mol. n(e⁻) = 0.1 mol. Q = 0.1 × 96 500 = 9 650 C. I = Q/t = 9 650/3 600 ≈ 2.68 A."},
+    {q:"A current of 5 A is passed for 3 860 s through saturated brine with inert electrodes. What volume of Cl₂ is produced at the anode at STP AND what mass of NaOH is formed in the cell? (NaOH = 40, F = 96 500; STP molar volume = 22 400 cm³)", opts:["A. 2 240 cm³ Cl₂ and 8.0 g NaOH","B. 1 120 cm³ Cl₂ and 4.0 g NaOH","C. 4 480 cm³ Cl₂ and 16 g NaOH","D. 2 240 cm³ Cl₂ and 4.0 g NaOH"], ans:"A", exp:"Q = 19 300 C. n(e⁻) = 0.2 mol. n(Cl₂) = 0.1 mol → V = 2 240 cm³. At cathode: 2H₂O + 2e⁻ → H₂ + 2OH⁻, so n(OH⁻) = 0.2 mol → n(NaOH) = 0.2 mol → m = 8.0 g."},
+    {q:"How long must a current of 0.5 A be passed through silver nitrate solution to deposit 2.16 g of silver? (Ag = 108, F = 96 500)", opts:["A. 3 860 s","B. 1 930 s","C. 7 720 s","D. 965 s"], ans:"A", exp:"n(Ag) = 2.16/108 = 0.02 mol. n(e⁻) = 0.02 mol. Q = 0.02 × 96 500 = 1 930 C. t = 1 930/0.5 = 3 860 s."},
+    {q:"A copper plating process operates at 50% current efficiency. What total charge must be passed to achieve a deposit of 6.4 g of copper? (Cu = 64, F = 96 500)", opts:["A. 38 600 C","B. 19 300 C","C. 9 650 C","D. 28 950 C"], ans:"A", exp:"Theoretical: n(Cu) = 0.1 mol, n(e⁻) = 0.2 mol, Q_theoretical = 19 300 C. At 50% efficiency, Q_actual = 19 300/0.50 = 38 600 C."},
+    {q:"The same charge of 9 650 C is passed through a ZnSO₄ cell and a CuSO₄ cell connected in series. What is the ratio of the mass of zinc deposited to the mass of copper deposited? (Zn = 65, Cu = 64)", opts:["A. 1 : 1","B. 65 : 64","C. 64 : 65","D. 2 : 1"], ans:"B", exp:"Same n(e⁻) = 0.1 mol through both. Both are M²⁺, so n(Zn) = n(Cu) = 0.05 mol. m(Zn) = 3.25 g; m(Cu) = 3.2 g. Ratio = 3.25 : 3.20 = 65 : 64. Different molar masses give different masses even with identical charge and valence."},
+    {q:"A current of 2 A is passed for 4 825 s through an Al³⁺ solution. The current efficiency is 90%. What mass of aluminium actually deposits? (Al = 27, F = 96 500)", opts:["A. 0.81 g","B. 0.90 g","C. 0.72 g","D. 1.0 g"], ans:"A", exp:"Q = 9 650 C. n(e⁻) = 0.1 mol. n(Al) = 0.0333 mol. m_theoretical = 0.90 g. m_actual = 0.90 × 0.90 = 0.81 g."},
+    {q:"During electrolysis of dilute sulphuric acid with inert electrodes, what is the ratio of the volume of hydrogen produced at the cathode to the volume of oxygen at the anode (both measured at STP)?", opts:["A. 1 : 2","B. 1 : 1","C. 2 : 1","D. 4 : 1"], ans:"C", exp:"Cathode: 2H⁺ + 2e⁻ → H₂ (2 e⁻ per mol H₂). Anode: 2H₂O → O₂ + 4H⁺ + 4e⁻ (4 e⁻ per mol O₂). Per 4 mol e⁻: 2 mol H₂ and 1 mol O₂ → V(H₂) : V(O₂) = 2 : 1."}
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'chemistry';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>
