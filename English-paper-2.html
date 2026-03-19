@@ -32,9 +32,11 @@
     .gate-input.err{border-color:var(--red);}
     .gate-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
     .gate-btn:hover{opacity:0.88;}
+    .gate-pw-wrap { position: relative; margin-bottom: 10px; }
+    .gate-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(232,237,245,0.45); cursor: pointer; font-size: 0.9rem; padding: 4px; line-height: 1; }
     .gate-err{font-size:12px;color:var(--red);font-family:var(--mono);margin-top:8px;min-height:18px;letter-spacing:0.02em;}
     .gate-attempts{font-size:11px;color:var(--ter);text-align:center;margin-top:16px;}
-    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.8rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.022;font-family:var(--mono);font-size:0.72rem;font-weight:700;color:#f0eff4;letter-spacing:0.08em;white-space:nowrap;user-select:none;-webkit-user-select:none;}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.2rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.09;font-family:var(--mono);font-size:0.95rem;font-weight:700;color:#f0eff4;letter-spacing:0.1em;white-space:nowrap;user-select:none;-webkit-user-select:none;}
     .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
     .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
     .hdr-left{display:flex;flex-direction:column;gap:2px;}
@@ -64,7 +66,7 @@
     .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both;}
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
     .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px;}
-    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.08em;text-transform:uppercase;}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase;}
     .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--blue);letter-spacing:0.3px;}
     .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px;}
     .opts{display:flex;flex-direction:column;gap:8px;}
@@ -147,7 +149,10 @@
     <div class="gate-title">English — Paper 2</div>
     <div class="gate-sub">UTME 2026 · 50 Questions · 30 Minutes</div>
     <div class="gate-label">Access password</div>
-    <input class="gate-input" id="gate-pw" type="password" placeholder="••••••••••••" autocomplete="off">
+    <div class="gate-pw-wrap">
+      <input class="gate-input" id="gate-pw" type="password" placeholder="••••••••••••" autocomplete="off">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
     <div class="gate-err" id="gate-err"></div>
     <button class="gate-btn" onclick="gateSubmit()">Enter →</button>
     <div class="gate-attempts" id="gate-att"></div>
@@ -231,37 +236,49 @@
 <script>
 'use strict';
 
-var VALID = {
-  'con-eng-pp7p3k':'Conve',
-  'kao-eng-ghirbf':'Kaosara',
-  'hab-eng-r1ozjj':'Habibat',
-  'oyi-eng-ee0vtf':'Oyin',
-  'dor-eng-9z7mca':'Dorcas',
-  'fam-eng-qx85sx':'Famous',
-  'oba-eng-4o7dzg':'Obasesam',
-  'pro-eng-zhs8wq':'Prosper',
-  'tem-eng-05rs9h':'Temi',
-  'mur-eng-cf4inh':'Murphy',
-  'abu-eng-m3kx9z':'Abu Ene',
-  'are-eng-k4vz2m':'Aremu',
-  'ttl-eng-q3bx7m':'Taiwo T.'
+var REGISTRY = {
+  "31e2f049ea6226f6d5755f4fb549d95c7f78ceab43a4b1e407f6b28b7ce3beb9": "Conve",
+  "781b7749f5ddd8f9686ee31b4fef571d04b4b8432e61137bc5d78d9ada22c24c": "Kaosara",
+  "3da4c5cd7bb9a4573a160725e390a3214e193094fc4ad86a29db95dc39365ca6": "Habibat",
+  "9403e4ed9497a885390af4a54bbd8acf944cdb0ce1466e65a016ead13c96eab1": "Oyin",
+  "e290b9f1952da521dab7ec693caa609e4ff707d3d9e00c1ecb53f092113a4f3a": "Dorcas",
+  "6ad071baadf38c76a1976e3e07d322d2bb6f534f195bf2253c9d0b2874b121b9": "Famous",
+  "da123098c73e97dc05aa4f080b36fecc0acc46a1d2ea353d65bce0a11d0dfcbf": "Obasesam",
+  "19d3009c2301c89096cb61da53f92e8c854f8fd223c4f368931d312fe6a16e9e": "Prosper",
+  "202ec3362eaf2ac6da6a02fb6354907d0833384c386773ebc599ec2d0d2fb2ca": "Temi",
+  "21d29829c5868128c5b56f13c3f7d446c2bb8fda63b579647e4ab3dfe03f5ed4": "Murphy",
+  "00f1c6e06fbbfb8672c7f96ad536eaf731caa361252cac7caaba7fa781ef049c": "Improve",
+  "5f606895db4060437354146e2f29fd4d2f44452c0a449734b7bbca7bdd0dfbd2": "Zainab",
+  "40a6b5c1ef1603b230f237c119b6a4d22e0ff8263c53a23d1ab766c519770d74": "Fiyin",
+  "a310cf0e3a5016abf43ddf3115d7694bc89e0c05c832b051dd31a5878db633dd": "Aliyah",
+  "ef6a705af5e4ef7b3f4fe9537a9ff64ce8279874d880aed9c6811a3a9a934580": "Taiwo T.",
+  "f0350dab6f3941cbde1aafa8625a20830927f159fa12454dff903a2157b79052": "Aremu Ella",
+  "8351728b036d98831f2b44daf7f25974f1541a4df0aa03afb13b7036ba0175ce": "Abu Ene"
 };
 
 var attempts=0, MAX_ATT=5;
 
-function gateSubmit(){
+async function sha256(s){
+  var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+}
+
+window.gateSubmit=async function(){
   var pw=document.getElementById('gate-pw').value.trim();
   var err=document.getElementById('gate-err');
   var att=document.getElementById('gate-att');
+  document.getElementById('gate-pw').classList.remove('err');
   if(!pw){document.getElementById('gate-pw').classList.add('err');err.textContent='Enter your password.';return;}
   attempts++;
-  var name=VALID[pw];
+  var h=await sha256(pw);
+  var name=REGISTRY[h];
   if(name){
     document.getElementById('gate').classList.add('gone');
     injectWatermark(name);
     var greet=document.getElementById('greeting');
     greet.textContent='Hey, '+name;greet.style.display='block';
     document.getElementById('print-student-name').textContent='Student: '+name;
+    document.getElementById('print-date').textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
     startTimer();
   } else {
     document.getElementById('gate-pw').classList.add('err');
@@ -269,8 +286,17 @@ function gateSubmit(){
     if(left<=0){err.textContent='Too many failed attempts.';document.querySelector('.gate-btn').disabled=true;document.getElementById('gate-pw').disabled=true;}
     else{err.textContent='Incorrect password.';att.textContent=left+' attempt'+(left===1?'':'s')+' remaining.';}
   }
-}
-document.getElementById('gate-pw').addEventListener('keydown',function(e){if(e.key==='Enter')gateSubmit();});
+};
+document.getElementById('gate-pw').addEventListener('keydown',function(e){if(e.key==='Enter')window.gateSubmit();});
+(function(){
+  var inp = document.getElementById('gate-pw');
+  var tog = document.getElementById('gate-toggle');
+  if (tog) tog.addEventListener('click', function() {
+    var hide = inp.type === 'password';
+    inp.type = hide ? 'text' : 'password';
+    tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+  });
+})();
 
 function injectWatermark(name){
   var wm=document.getElementById('watermark');

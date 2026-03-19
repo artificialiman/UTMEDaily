@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>English — Paper 5 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0A0E1A;--card:#111827;--card2:#161E2E;--text:#E8EDF5;--sec:rgba(232,237,245,0.75);--ter:rgba(232,237,245,0.45);--accent:#f59e0b;--accent2:#d97706;--warn:#F59E0B;--red:#EF4444;--green:#10B981;--blue:#3b82f6;--blue2:#2563eb;--sep:rgba(255,255,255,0.08);--r:14px;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+    #gate{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+    #gate.gone{display:none}
+    .gate-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .gate-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+    .gate-title{font-family:var(--mono);font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:4px}
+    .gate-sub{font-size:12px;color:var(--ter);margin-bottom:28px}
+    .gate-label{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--ter);margin-bottom:6px}
+    .gate-input{width:100%;padding:13px 16px;background:var(--card2);border:1px solid var(--sep);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:10px;transition:border-color 0.2s;-webkit-appearance:none}
+    .gate-input:focus{border-color:rgba(59,130,246,0.5)}.gate-input.err{border-color:var(--red)}
+    .gate-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s;margin-top:4px}
+    .gate-btn:hover{opacity:0.88}
+    .gate-pw-wrap { position: relative; margin-bottom: 10px; }
+    .gate-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(232,237,245,0.45); cursor: pointer; font-size: 0.9rem; padding: 4px; line-height: 1; }
+    .gate-err{font-size:12px;color:var(--red);font-family:var(--mono);margin-top:8px;min-height:18px;letter-spacing:0.02em}
+    .gate-attempts{font-size:11px;color:var(--ter);text-align:center;margin-top:16px}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.2rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.09;font-family:var(--mono);font-size:0.95rem;font-weight:700;color:#f0eff4;letter-spacing:0.1em;white-space:nowrap;user-select:none;-webkit-user-select:none}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)}.gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--blue);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)}.gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)}.sc-v.w{color:var(--red)}.sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .cloze-card{background:var(--card);border:1px solid rgba(59,130,246,0.25);border-left:3px solid var(--blue);border-radius:var(--r);padding:20px;margin-bottom:18px;position:relative;z-index:1}
+    .cloze-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+    .cloze-text{font-size:14px;line-height:1.9;color:var(--sec)}
+    .cloze-blank{display:inline-block;border-bottom:2px solid var(--blue);min-width:60px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--blue);padding:0 4px;margin:0 2px}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--blue);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.05)}
+    .opt.sel{border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--blue);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)}.opt.no .opt-key{color:var(--red)}.opt.sel .opt-key{color:var(--blue)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}.abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)}.timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)}.tu-stat-v.w{color:var(--red)}.tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--blue);color:#fff}.modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)}.hdr-title{font-size:13px}}
+    @media print{body{background:#fff !important;color:#000 !important;font-size:12pt}body::before,#watermark,#gate,.hdr,.gtimer,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none !important}.cloze-card{background:#f0f7ff !important;border:1px solid #bfdbfe !important}.cloze-text{color:#000 !important}.exp{display:block !important;background:#f0f7ff !important;border:1px solid #bfdbfe !important;color:#1e3a5f !important}.qcard{break-inside:avoid;border:1px solid #ddd !important;background:#fff !important;margin-bottom:20pt}.opt{border:1px solid #ccc !important;background:#fff !important}.opt.ok{background:#e6f9f0 !important;border-color:#10b981 !important}.opt.no{background:#fef2f2 !important;border-color:#ef4444 !important}.opt-txt,.qtxt{color:#000 !important}.qtopic{background:#eff6ff !important;color:#1d4ed8 !important;border-color:#93c5fd !important}#print-header{display:block !important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000}#print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt}#print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt}#print-header .ph-student{font-size:13pt;font-weight:700}}
+  </style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-brand">GrantApp AI · Premium</div>
+    <div class="gate-title">English — Paper 5</div>
+    <div class="gate-sub">UTME 2026 · 50 Questions · 30 Minutes</div>
+    <div class="gate-label">Access password</div>
+    <div class="gate-pw-wrap">
+      <input class="gate-input" id="gate-pw" type="password" placeholder="••••••••••••" autocomplete="off">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <div class="gate-err" id="gate-err"></div>
+    <button class="gate-btn" onclick="gateSubmit()">Enter →</button>
+    <div class="gate-attempts" id="gate-att"></div>
+  </div>
+</div>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — English Paper 5</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">English · Paper 5</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer"><div class="gtimer-dot" id="gdot"></div><span class="gtimer-txt" id="gtime">30:00</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);">&#8595; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#9203;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#8595; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function(){
+  var REGISTRY={"31e2f049ea6226f6d5755f4fb549d95c7f78ceab43a4b1e407f6b28b7ce3beb9":"Conve","781b7749f5ddd8f9686ee31b4fef571d04b4b8432e61137bc5d78d9ada22c24c":"Kaosara","3da4c5cd7bb9a4573a160725e390a3214e193094fc4ad86a29db95dc39365ca6":"Habibat","9403e4ed9497a885390af4a54bbd8acf944cdb0ce1466e65a016ead13c96eab1":"Oyin","e290b9f1952da521dab7ec693caa609e4ff707d3d9e00c1ecb53f092113a4f3a":"Dorcas","6ad071baadf38c76a1976e3e07d322d2bb6f534f195bf2253c9d0b2874b121b9":"Famous","da123098c73e97dc05aa4f080b36fecc0acc46a1d2ea353d65bce0a11d0dfcbf":"Obasesam","19d3009c2301c89096cb61da53f92e8c854f8fd223c4f368931d312fe6a16e9e":"Prosper","202ec3362eaf2ac6da6a02fb6354907d0833384c386773ebc599ec2d0d2fb2ca":"Temi","21d29829c5868128c5b56f13c3f7d446c2bb8fda63b579647e4ab3dfe03f5ed4":"Murphy","00f1c6e06fbbfb8672c7f96ad536eaf731caa361252cac7caaba7fa781ef049c":"Improve","5f606895db4060437354146e2f29fd4d2f44452c0a449734b7bbca7bdd0dfbd2":"Zainab",
+    "40a6b5c1ef1603b230f237c119b6a4d22e0ff8263c53a23d1ab766c519770d74": "Fiyin",
+    "a310cf0e3a5016abf43ddf3115d7694bc89e0c05c832b051dd31a5878db633dd": "Aliyah","ef6a705af5e4ef7b3f4fe9537a9ff64ce8279874d880aed9c6811a3a9a934580":"Taiwo T.","f0350dab6f3941cbde1aafa8625a20830927f159fa12454dff903a2157b79052":"Aremu Ella","8351728b036d98831f2b44daf7f25974f1541a4df0aa03afb13b7036ba0175ce":"Abu Ene"};
+  var attempts=0,MAX_ATT=5;
+  async function sha256(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+  window.gateSubmit=async function(){
+    var pw=document.getElementById('gate-pw').value.trim();
+    var err=document.getElementById('gate-err');var att=document.getElementById('gate-att');
+    document.getElementById('gate-pw').classList.remove('err');
+    if(!pw){document.getElementById('gate-pw').classList.add('err');err.textContent='Enter your password.';return;}
+    attempts++;var h=await sha256(pw);var name=REGISTRY[h];
+    if(name){
+      document.getElementById('gate').classList.add('gone');
+      var wm=document.getElementById('watermark');
+      if(wm){var t=name+' · GrantApp AI · ';var row='';for(var i=0;i<8;i++)row+=t;var html='';for(var i=0;i<14;i++)html+='<span>'+row+'</span>';wm.innerHTML=html;}
+      var greet=document.getElementById('greeting');
+      if(greet){greet.textContent='Hey, '+name;greet.style.display='block';}
+      document.getElementById('print-student-name').textContent='Student: '+name;
+      document.getElementById('print-date').textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      startTimer();
+    }else{
+      document.getElementById('gate-pw').classList.add('err');
+      var left=MAX_ATT-attempts;
+      if(left<=0){err.textContent='Too many failed attempts.';document.querySelector('.gate-btn').disabled=true;document.getElementById('gate-pw').disabled=true;}
+      else{err.textContent='Incorrect password.';att.textContent=left+' attempt'+(left===1?'':'s')+' remaining.';}
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-pw');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.gateSubmit(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password';
+      inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
+  });
+})();
+
+/* ── CLOZE PASSAGES ── */
+var CLOZES = {
+  X: {
+    label: 'Cloze Test A — Questions 36 to 45',
+    text: 'Education is widely regarded as the most powerful <span class="cloze-blank">[36]</span> for individual and national development. When a society <span class="cloze-blank">[37]</span> in the education of its citizens, it is effectively investing in its own future. Educated individuals are more likely to <span class="cloze-blank">[38]</span> employment, earn higher incomes, and contribute meaningfully to their communities. At the national level, a well-educated workforce drives <span class="cloze-blank">[39]</span>, fosters innovation, and strengthens democratic institutions. Despite these well-documented benefits, millions of young people across the world remain <span class="cloze-blank">[40]</span> from quality education due to poverty, conflict, and inadequate infrastructure. Addressing this <span class="cloze-blank">[41]</span> requires not only financial investment but also a fundamental rethinking of how education systems are designed and <span class="cloze-blank">[42]</span>. Schools must move beyond <span class="cloze-blank">[43]</span> memorisation toward the development of critical thinking and problem-solving skills. Teachers must be properly trained, adequately <span class="cloze-blank">[44]</span>, and given the professional support they need to <span class="cloze-blank">[45]</span> in the classroom.'
+  },
+  Y: {
+    label: 'Cloze Test B — Questions 46 to 50',
+    text: 'The importance of reading cannot be <span class="cloze-blank">[46]</span>. Regular reading expands vocabulary, sharpens analytical skills, and deepens one\'s understanding of the world. Yet in an age of social media and instant <span class="cloze-blank">[47]</span>, many young people find it increasingly difficult to <span class="cloze-blank">[48]</span> the sustained attention that serious reading demands. Educators and parents must work together to <span class="cloze-blank">[49]</span> a culture of reading from an early age, recognising that the habit of reading is one of the most <span class="cloze-blank">[50]</span> gifts that can be given to a child.'
+  }
+};
+
+var QUESTIONS = [
+
+  /* ── WORD FORMATION: Prefixes (Q1–10) ── */
+  {id:1,topic:'Word Formation',text:'Which prefix gives the word "responsible" its negative or opposite meaning?',opts:{A:'ir-',B:'un-',C:'in-',D:'dis-'},ans:'A',exp:'"Irresponsible" — the prefix "ir-" is used before words beginning with "r". Rule: "ir-" before r (irregular, irrelevant); "il-" before l (illegal, illogical); "im-" before m/p (immoral, impossible); "in-" elsewhere. [S]'},
+
+  {id:2,topic:'Word Formation',text:'The prefix "mis-" in the word "misinterpret" means:',opts:{A:'wrongly or incorrectly',B:'not or without',C:'before or in advance',D:'again or anew'},ans:'A',exp:'"Mis-" means wrongly or incorrectly: misinterpret (interpret wrongly), misjudge (judge wrongly), mislead (lead the wrong way). Distinguish from "un-" (not) and "re-" (again). [S]'},
+
+  {id:3,topic:'Word Formation',text:'Choose the correctly prefixed word meaning "to appear again".',opts:{A:'reappear',B:'disappear',C:'misappear',D:'unappear'},ans:'A',exp:'"Re-" means again. "Reappear" = appear again. "Disappear" means to cease being visible — the opposite of appear. "Misappear" and "unappear" are not standard English words. [S]'},
+
+  {id:4,topic:'Word Formation',text:'Which word uses the prefix "pre-" correctly?',opts:{A:'prejudge',B:'misjudge',C:'unjudge',D:'rejudge'},ans:'A',exp:'"Prejudge" = to judge before having sufficient evidence. "Pre-" means before: prejudge, predict, precaution, prehistoric. "Misjudge" exists but uses "mis-" (wrongly), not "pre-". [S]'},
+
+  {id:5,topic:'Word Formation',text:'The word "bilingual" contains the prefix "bi-", which means:',opts:{A:'two',B:'three',C:'half',D:'many'},ans:'A',exp:'"Bi-" means two: bilingual (two languages), bicycle (two wheels), biannual (twice a year). Compare: "tri-" (three), "semi-" (half), "multi-" (many). [S]'},
+
+  {id:6,topic:'Word Formation',text:'Which of the following is NOT correctly formed using a negative prefix?',opts:{A:'unpatient',B:'impatient',C:'impossible',D:'illegal'},ans:'A',exp:'"Unpatient" is incorrect — the correct form is "impatient" (prefix "im-" before p). "Impossible," "illegal," and "impatient" are all correctly formed. The rule: choose the prefix variant that matches the root\'s first letter. [R]'},
+
+  {id:7,topic:'Word Formation',text:'Choose the word formed with the prefix meaning "between" or "among".',opts:{A:'international',B:'intranational',C:'multinational',D:'supranational'},ans:'A',exp:'"Inter-" means between or among: international (between nations), interact, interview. "Intra-" means within (intranet = within a network). "Multi-" = many; "supra-" = above. [S]'},
+
+  {id:8,topic:'Word Formation',text:'The word "semicircle" contains the prefix "semi-", which means:',opts:{A:'half',B:'two',C:'above',D:'beyond'},ans:'A',exp:'"Semi-" means half: semicircle (half a circle), semicolon, semifinal. Compare "bi-" (two), "super-" (above), "ultra-" (beyond). [S]'},
+
+  {id:9,topic:'Word Formation',text:'Which prefix correctly completes the word meaning "to arrange again"? ___arrange',opts:{A:'re-',B:'dis-',C:'mis-',D:'un-'},ans:'A',exp:'"Re-" = again. "Rearrange" = arrange again. "Disarrange" means to disturb order (not re-order); "misarrange" and "unarrange" are non-standard. [S]'},
+
+  {id:10,topic:'Word Formation',text:'The prefix "over-" in "overestimate" means:',opts:{A:'too much or excessively',B:'above in position',C:'before in time',D:'again or anew'},ans:'A',exp:'"Over-" in "overestimate" means excessively — to estimate too highly. "Overwork" (work too much), "overconfident" (too confident). The spatial meaning (over = above) is different: "overhead," "overpass." [R]'},
+
+  /* ── WORD FORMATION: Suffixes (Q11–20) ── */
+  {id:11,topic:'Word Formation',text:'What part of speech is formed when the suffix "-tion" is added to a verb?',opts:{A:'A noun',B:'An adjective',C:'An adverb',D:'Another verb'},ans:'A',exp:'The suffix "-tion" forms nouns from verbs: educate → education, communicate → communication, celebrate → celebration. This is nominalisation — converting a verb into a noun. [S]'},
+
+  {id:12,topic:'Word Formation',text:'Choose the correctly formed adjective from the noun "comfort".',opts:{A:'comfortable',B:'comfortful',C:'comfortious',D:'comfortive'},ans:'A',exp:'"Comfortable" — the suffix "-able" forms adjectives meaning "capable of" or "having the quality of." "Comfortful," "comfortious," and "comfortive" are non-standard. Common -able adjectives: reliable, capable, comfortable. [S]'},
+
+  {id:13,topic:'Word Formation',text:'The suffix "-ment" in "development" indicates that the word is a:',opts:{A:'noun',B:'verb',C:'adjective',D:'adverb'},ans:'A',exp:'"-ment" forms nouns from verbs: develop → development, achieve → achievement, govern → government. The resulting word names a process, result, or state. [S]'},
+
+  {id:14,topic:'Word Formation',text:'Which suffix correctly forms an adverb from the adjective "careful"?',opts:{A:'-ly',B:'-ness',C:'-tion',D:'-ful'},ans:'A',exp:'"-ly" forms adverbs from adjectives: careful → carefully, quick → quickly, serious → seriously. "-ness" forms nouns (carelessness); "-tion" forms nouns from verbs; "-ful" forms adjectives. [S]'},
+
+  {id:15,topic:'Word Formation',text:'What does the suffix "-less" indicate in the word "harmless"?',opts:{A:'Without or lacking',B:'Full of',C:'Capable of',D:'Relating to'},ans:'A',exp:'"-less" means without: harmless (without harm), careless (without care), hopeless (without hope). The opposite suffix is "-ful" (full of): harmful, careful, hopeful. [S]'},
+
+  {id:16,topic:'Word Formation',text:'Choose the correctly formed noun meaning "the state of being free".',opts:{A:'freedom',B:'freeness',C:'freement',D:'freity'},ans:'A',exp:'"Freedom" uses the suffix "-dom" to express a state or condition: freedom, boredom, wisdom, kingdom. "-ness" can also form state nouns (freeness exists informally but "freedom" is standard). [R]'},
+
+  {id:17,topic:'Word Formation',text:'The suffix "-ise" (or "-ize") in "modernise" means:',opts:{A:'to make or cause to become',B:'the study of',C:'one who does',D:'the process of'},ans:'A',exp:'"-ise/-ize" forms verbs meaning "to make": modernise (make modern), organise (make organised), realise (make real). It converts adjectives or nouns into verbs. [S]'},
+
+  {id:18,topic:'Word Formation',text:'Which suffix forms a word meaning "one who teaches"?',opts:{A:'-er',B:'-ness',C:'-tion',D:'-ment'},ans:'A',exp:'"-er" (or "-or") forms agent nouns — words for people who do things: teach → teacher, write → writer, act → actor. "-ness," "-tion," and "-ment" form state or process nouns. [S]'},
+
+  {id:19,topic:'Word Formation',text:'Choose the correctly formed adjective meaning "relating to the nation".',opts:{A:'national',B:'nationism',C:'nationful',D:'nationly'},ans:'A',exp:'"-al" forms adjectives meaning relating to: nation → national, nature → natural, tradition → traditional. "Nationism" would be a noun; "-ful" and "-ly" do not combine naturally with "nation." [S]'},
+
+  {id:20,topic:'Word Formation',text:'Which word is correctly formed from "courage" to mean "having courage"?',opts:{A:'courageous',B:'courageful',C:'couragive',D:'couragious'},ans:'A',exp:'"Courageous" — suffix "-ous" means full of or having: courageous, generous, dangerous, famous. Note spelling: "courageous" retains the "e" before "-ous" to preserve the soft "g" sound. "Couragious" is a common misspelling. [R]'},
+
+  /* ── REGISTER (Q21–35) ── */
+  {id:21,topic:'Register',text:'Which of the following sentences is written in the most FORMAL register?',opts:{A:'We wish to draw your attention to the discrepancy in the aforementioned account.',B:'We want to tell you there\'s a mistake in that account.',C:'Just so you know, something\'s off with that account.',D:'Hey, there\'s a problem with the account we talked about.'},ans:'A',exp:'Formal register uses complex vocabulary, passive constructions, and impersonal tone. "Draw your attention to," "discrepancy," and "aforementioned" are markers of formal written English. Options B, C, and D progressively reduce formality. [S]'},
+
+  {id:22,topic:'Register',text:'A student writes to a university professor: "Hi Prof! Can u send me the notes? Thx." This message is:',opts:{A:'Inappropriate — too informal for the academic context',B:'Appropriate — professors prefer friendly communication',C:'Appropriate — brevity is valued in professional settings',D:'Inappropriate — it contains grammatical errors only'},ans:'A',exp:'Register appropriateness: communication with a professor requires formal register. Abbreviations ("u," "thx"), colloquial address ("Hi Prof!"), and informal tone are inappropriate in academic correspondence. The issue is register mismatch, not merely grammar. [S]'},
+
+  {id:23,topic:'Register',text:'Which of the following is the most appropriate opening for a formal letter?',opts:{A:'Dear Sir/Madam,',B:'Hey there,',C:'Good morning,',D:'To whoever is reading this,'},ans:'A',exp:'"Dear Sir/Madam" is the standard formal salutation when the recipient\'s name is unknown. "Hey there" is informal; "Good morning" is appropriate in spoken contexts but not standard as a letter salutation; "To whoever is reading this" is dismissive and unprofessional. [S]'},
+
+  {id:24,topic:'Register',text:'The word "commence" is to "begin" as "terminate" is to:',opts:{A:'end',B:'start',C:'continue',D:'delay'},ans:'A',exp:'"Commence" is the formal equivalent of "begin." "Terminate" is the formal equivalent of "end." This tests register pairs — formal/Latinate vs informal/Germanic: commence/begin, terminate/end, assist/help, require/need. [R]'},
+
+  {id:25,topic:'Register',text:'Which sentence uses the most appropriate register for a newspaper report?',opts:{A:'The government has announced plans to construct a new highway.',B:'The government is gonna build a new road.',C:'They said they\'d put up a road somewhere.',D:'A road will be built, they reckon.'},ans:'A',exp:'Newspaper reports use formal, precise, impersonal language. Option A uses standard formal diction. Options B–D contain contractions, vague language, and informal vocabulary inappropriate for published journalism. [S]'},
+
+  {id:26,topic:'Register',text:'Which of the following is an example of SLANG?',opts:{A:'"She\'s totally wrecked after that exam."',B:'"She performed poorly in the examination."',C:'"She did not do well in the test."',D:'"Her examination performance was unsatisfactory."'},ans:'A',exp:'"Totally wrecked" is slang — informal, figurative language used within a social group. Options B and C are informal standard English; option D is formal standard English. Slang is characterised by its group-specific, non-standard, often figurative nature. [S]'},
+
+  {id:27,topic:'Register',text:'In which context would you use the expression "I would be most grateful if you could..."?',opts:{A:'A formal letter making a request',B:'A text message to a close friend',C:'A casual conversation on the street',D:'A social media comment'},ans:'A',exp:'"I would be most grateful if you could..." is a highly formal, polite request construction. Its passive-like indirectness and modal verb construction mark it as suitable for formal written requests only. [S]'},
+
+  {id:28,topic:'Register',text:'The formal equivalent of "find out" is:',opts:{A:'ascertain',B:'check',C:'look into',D:'dig up'},ans:'A',exp:'"Ascertain" is the formal equivalent of "find out" — to discover with certainty. "Check" is neutral; "look into" is informal-neutral; "dig up" is informal/colloquial. Formal English often prefers Latinate single words over phrasal verbs. [R]'},
+
+  {id:29,topic:'Register',text:'Which word is a formal synonym for "help"?',opts:{A:'assist',B:'aid',C:'support',D:'all of the above are formal synonyms'},ans:'D',exp:'"Assist," "aid," and "support" are all more formal than "help." In formal contexts, any of the three may be appropriate. JAMB tests awareness that the formal register has multiple acceptable options. [R]'},
+
+  {id:30,topic:'Register',text:'Identify the sentence in the INFORMAL register.',opts:{A:'I\'m totally fed up with all this nonsense.',B:'I find the current situation most unsatisfactory.',C:'The circumstances have become intolerable.',D:'I wish to register my dissatisfaction formally.'},ans:'A',exp:'"Totally fed up" and "all this nonsense" are informal colloquial expressions. Options B, C, and D use formal vocabulary and structure appropriate for written or professional contexts. [S]'},
+
+  {id:31,topic:'Register',text:'Which of the following would be INAPPROPRIATE in a formal essay?',opts:{A:'"In conclusion, it\'s pretty clear that..."',B:'"In conclusion, the evidence strongly suggests that..."',C:'"To summarise, the preceding discussion has demonstrated..."',D:'"The foregoing analysis leads to the conclusion that..."'},ans:'A',exp:'"It\'s pretty clear" uses a contraction and the informal qualifier "pretty" — both inappropriate in formal academic writing. The other options all use formal vocabulary and structure suitable for essay conclusions. [S]'},
+
+  {id:32,topic:'Register',text:'The formal equivalent of the phrasal verb "put off" (meaning to postpone) is:',opts:{A:'defer',B:'delay',C:'postpone',D:'all of the above'},ans:'D',exp:'"Defer," "delay," and "postpone" are all formal equivalents of "put off." In formal writing, phrasal verbs are generally replaced with single-word formal equivalents. All three are acceptable. [R]'},
+
+  {id:33,topic:'Register',text:'Which sentence is written in the passive voice, as preferred in formal academic writing?',opts:{A:'The experiment was conducted under controlled conditions.',B:'We conducted the experiment under controlled conditions.',C:'They ran the experiment carefully.',D:'The scientist did the experiment properly.'},ans:'A',exp:'Formal academic writing frequently uses the passive voice to maintain impersonal objectivity. "The experiment was conducted" removes the personal agent ("we/I"), which is preferred in scientific and academic prose. [S]'},
+
+  {id:34,topic:'Register',text:'Which of the following phrases is characteristic of LEGAL register?',opts:{A:'"hereinafter referred to as"',B:'"as mentioned before"',C:'"like I said earlier"',D:'"going back to what we discussed"'},ans:'A',exp:'"Hereinafter referred to as" is a distinctive marker of legal register — highly formal, archaic in flavour, and specific to legal documents. Legal English uses terms like "whereas," "herein," "aforementioned," and "pursuant to." [S]'},
+
+  {id:35,topic:'Register',text:'A doctor writes in a patient\'s notes: "Patient presents with acute pyrexia and mild tachycardia." The register here is:',opts:{A:'Technical/medical — using specialist terminology for a professional audience',B:'Formal — the vocabulary is complex but widely understood',C:'Informal — the notes are private and not meant for the public',D:'Literary — the language is elevated and poetic'},ans:'A',exp:'"Pyrexia" (fever) and "tachycardia" (elevated heart rate) are medical technical terms — understood by medical professionals but not by the general public. This is technical/specialist register, distinct from formal register (which uses complex but generally accessible language). [R]'},
+
+  /* ── CLOZE TEST (Q36–50) ── */
+  {id:36,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [36]: "Education is widely regarded as the most powerful _____ for individual and national development."',opts:{A:'tool',B:'thing',C:'method',D:'force'},ans:'A',exp:'"Tool" is the most precise and conventional collocation here — "a powerful tool for development" is idiomatic. "Instrument" would also work. "Thing" is too vague; "method" implies procedure rather than means; "force" changes the meaning. [S]'},
+
+  {id:37,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [37]: "When a society _____ in the education of its citizens..."',opts:{A:'invests',B:'puts',C:'places',D:'gives'},ans:'A',exp:'"Invest in" is the correct collocation — to invest in education (spend resources expecting long-term returns). "Puts in" is too informal; "places in" and "gives in" do not collocate naturally with "education" in this context. [S]'},
+
+  {id:38,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [38]: "Educated individuals are more likely to _____ employment..."',opts:{A:'secure',B:'get',C:'find',D:'both B and C are correct'},ans:'D',exp:'Both "find employment" and "get employment" are natural standard collocations. "Secure employment" is more formal and also correct. JAMB may offer all-of-the-above when multiple options are genuinely correct. [R]'},
+
+  {id:39,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [39]: "...a well-educated workforce drives _____, fosters innovation..."',opts:{A:'productivity',B:'production',C:'produce',D:'productive'},ans:'A',exp:'"Productivity" is the noun that collocates with "drives" in this context — drives productivity (increases the rate of output). "Production" is possible but less precise. "Produce" (noun) refers to agricultural goods; "productive" is an adjective. [R]'},
+
+  {id:40,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [40]: "...millions of young people...remain _____ from quality education..."',opts:{A:'excluded',B:'removed',C:'separated',D:'blocked'},ans:'A',exp:'"Excluded from" is the standard collocation — to be denied access to something. "Excluded from education" is the conventional phrase. "Separated from" implies physical distance; "blocked from" is informal; "removed from" changes the meaning. [S]'},
+
+  {id:41,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [41]: "Addressing this _____ requires not only financial investment..."',opts:{A:'challenge',B:'problem',C:'issue',D:'all of the above are correct'},ans:'D',exp:'"Challenge," "problem," and "issue" all fit grammatically and contextually. In the context of education inequality, all three are standard. This tests whether candidates recognise that multiple options can be synonymously correct. [R]'},
+
+  {id:42,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [42]: "...how education systems are designed and _____."',opts:{A:'delivered',B:'taught',C:'given',D:'run'},ans:'A',exp:'"Delivered" collocates with education and systems: "education is delivered." This is the standard formal register term. "Taught" works for individual classes but not systems; "given" and "run" are too informal for this register. [R]'},
+
+  {id:43,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [43]: "Schools must move beyond _____ memorisation..."',opts:{A:'rote',B:'pure',C:'simple',D:'mere'},ans:'A',exp:'"Rote memorisation" is the fixed collocation — rote learning means learning by repetition without understanding. "Pure," "simple," and "mere" do not collocate with "memorisation" as naturally or precisely as "rote." [S]'},
+
+  {id:44,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [44]: "Teachers must be properly trained, adequately _____, and given professional support..."',opts:{A:'remunerated',B:'paid',C:'rewarded',D:'both A and B are correct'},ans:'D',exp:'Both "remunerated" (formal) and "paid" (neutral) are correct. "Remunerated" is more formal and precise; "paid" is simpler but equally valid. "Rewarded" implies bonus/recognition rather than salary. [R]'},
+
+  {id:45,topic:'Cloze Test',cloze:'X',text:'Choose the word that best fills gap [45]: "...the professional support they need to _____ in the classroom."',opts:{A:'excel',B:'succeed',C:'perform',D:'all of the above are correct'},ans:'D',exp:'"Excel," "succeed," and "perform" all collocate naturally with "in the classroom." All three express the idea of doing well professionally. Multiple correct answers are valid here. [R]'},
+
+  {id:46,topic:'Cloze Test',cloze:'Y',text:'Choose the word that best fills gap [46]: "The importance of reading cannot be _____."',opts:{A:'overstated',B:'overstressed',C:'exaggerated',D:'all of the above are correct'},ans:'D',exp:'"Overstated," "overstressed," and "exaggerated" all fit the idiom "cannot be ___" meaning the importance is so great it is impossible to express too strongly. All three are standard. [R]'},
+
+  {id:47,topic:'Cloze Test',cloze:'Y',text:'Choose the word that best fills gap [47]: "...in an age of social media and instant _____..."',opts:{A:'gratification',B:'satisfaction',C:'information',D:'communication'},ans:'A',exp:'"Instant gratification" is the established phrase in the context of social media and attention spans — it refers to the immediate reward provided by digital content. "Instant information" and "instant communication" are possible but less precise to the argument about attention difficulty. [P]'},
+
+  {id:48,topic:'Cloze Test',cloze:'Y',text:'Choose the word that best fills gap [48]: "...many young people find it difficult to _____ the sustained attention that serious reading demands."',opts:{A:'sustain',B:'maintain',C:'give',D:'both A and B are correct'},ans:'D',exp:'"Sustain attention" and "maintain attention" are both standard collocations. "Give attention" is also possible. "Sustain" and "maintain" are the most formal and precise. [R]'},
+
+  {id:49,topic:'Cloze Test',cloze:'Y',text:'Choose the word that best fills gap [49]: "Educators and parents must work together to _____ a culture of reading from an early age..."',opts:{A:'cultivate',B:'build',C:'create',D:'all of the above are correct'},ans:'D',exp:'"Cultivate a culture," "build a culture," and "create a culture" are all natural collocations. "Cultivate" is the most formal and idiomatic in this context, but all three are correct. [R]'},
+
+  {id:50,topic:'Cloze Test',cloze:'Y',text:'Choose the word that best fills gap [50]: "...the habit of reading is one of the most _____ gifts that can be given to a child."',opts:{A:'valuable',B:'precious',C:'enduring',D:'all of the above are correct'},ans:'D',exp:'"Valuable," "precious," and "enduring" all collocate naturally with "gifts" and fit the tone of the passage. All three express the idea that the reading habit is an especially worthwhile gift. [R]'}
+
+];
+
+var ST={correct:0,wrong:0,answered:0};
+var UA={};
+var globalDone=false;
+var timerInterval=null;
+ST.answeredIds=new Set();
+
+function startTimer(){
+  var remaining=1800;var dot=document.getElementById('gdot');var txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}
+    if(remaining<=0){clearInterval(timerInterval);timeUp();}
+  },1000);
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—';}
+
+function render(){
+  var container=document.getElementById('qc');
+  var html='';
+  var labels=['A','B','C','D'];
+  var currentCloze=null;
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i];
+    if(q.cloze&&q.cloze!==currentCloze){
+      currentCloze=q.cloze;
+      var cl=CLOZES[currentCloze];
+      if(cl){html+='<div class="cloze-card"><div class="cloze-label">'+cl.label+'</div><div class="cloze-text">'+cl.text+'</div></div>';}
+    }
+    var pool=labels.map(function(l){return{text:q.opts[l]};});
+    for(var s=pool.length-1;s>0;s--){var r=Math.floor(Math.random()*(s+1));var tmp=pool[s];pool[s]=pool[r];pool[r]=tmp;}
+    var correctText=q.opts[q.ans];var remappedAns='A';var optsHtml='';
+    for(var j=0;j<pool.length;j++){
+      var newLbl=labels[j];
+      if(pool[j].text===correctText)remappedAns=newLbl;
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+newLbl+'"><span class="opt-key">'+newLbl+'.</span><span class="opt-txt">'+pool[j].text+'</span></div>';
+    }
+    q._ans=remappedAns;
+    html+='<div class="qcard" style="animation-delay:'+(i*0.025)+'s"><div class="qcard-top"><span class="qnum">Q'+(i+1)+' of 50</span>'+(q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+'</div><div class="qtxt">'+q.text+'</div><div class="opts">'+optsHtml+'</div><button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button><div class="exp" id="exp'+q.id+'"></div></div>';
+  }
+  container.innerHTML=html;attachListeners();
+}
+
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel');});
+      this.classList.add('sel');UA[qid]=this.dataset.a;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');if(btn)btn.disabled=false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid;});
+      var ans=q._ans||q.ans;var chosen=UA[qid];var ok=(chosen===ans);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===ans)o.classList.add('ok');else if(o.dataset.a===chosen)o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      expEl.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+(ok?'✓ Correct':'✗ Incorrect — correct answer: '+ans)+'</span>'+(q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');this.disabled=true;
+      if(!ST.answeredIds.has(qid)){ST.answered++;ST.answeredIds.add(qid);if(ok)ST.correct++;else ST.wrong++;updateStats();}
+    });
+  });
+}
+
+function updateStats(){
+  var left=QUESTIONS.length-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%';
+}
+
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){if(!btn.disabled)btn.click();});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;document.getElementById('tu-wr').textContent=ST.wrong;document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;document.getElementById('tu-wr').textContent=ST.wrong;document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function doPrint(){document.getElementById('print-header').style.display='block';window.print();setTimeout(function(){document.getElementById('print-header').style.display='none';},1000);}
+
+render();
+</script>
+</body>
+</html>

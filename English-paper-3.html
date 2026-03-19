@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>English — Paper 3 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A; --card:#111827; --card2:#161E2E; --text:#E8EDF5;
+      --sec:rgba(232,237,245,0.75); --ter:rgba(232,237,245,0.45);
+      --accent:#f59e0b; --accent2:#d97706;
+      --warn:#F59E0B; --red:#EF4444; --green:#10B981;
+      --blue:#3b82f6; --blue2:#2563eb;
+      --sep:rgba(255,255,255,0.08); --hov:rgba(255,255,255,0.05);
+      --r:14px; --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+    #gate{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+    #gate.gone{display:none}
+    .gate-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .gate-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+    .gate-title{font-family:var(--mono);font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:4px}
+    .gate-sub{font-size:12px;color:var(--ter);margin-bottom:28px}
+    .gate-label{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--ter);margin-bottom:6px}
+    .gate-input{width:100%;padding:13px 16px;background:var(--card2);border:1px solid var(--sep);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:10px;transition:border-color 0.2s;-webkit-appearance:none}
+    .gate-input:focus{border-color:rgba(59,130,246,0.5)} .gate-input.err{border-color:var(--red)}
+    .gate-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s;margin-top:4px}
+    .gate-btn:hover{opacity:0.88}
+    .gate-pw-wrap { position: relative; margin-bottom: 10px; }
+    .gate-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(232,237,245,0.45); cursor: pointer; font-size: 0.9rem; padding: 4px; line-height: 1; }
+    .gate-err{font-size:12px;color:var(--red);font-family:var(--mono);margin-top:8px;min-height:18px;letter-spacing:0.02em}
+    .gate-attempts{font-size:11px;color:var(--ter);text-align:center;margin-top:16px}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.2rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.09;font-family:var(--mono);font-size:0.95rem;font-weight:700;color:#f0eff4;letter-spacing:0.1em;white-space:nowrap;user-select:none;-webkit-user-select:none}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)} .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--blue);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)} .gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)} .sc-v.w{color:var(--red)} .sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .passage-card{background:var(--card);border:1px solid rgba(59,130,246,0.25);border-left:3px solid var(--blue);border-radius:var(--r);padding:20px;margin-bottom:18px;position:relative;z-index:1}
+    .passage-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+    .passage-text{font-size:14px;line-height:1.85;color:var(--sec)}
+    .passage-text p{margin-bottom:10px} .passage-text p:last-child{margin-bottom:0}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--blue);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.05)}
+    .opt.sel{border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--blue);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)} .opt.no .opt-key{color:var(--red)} .opt.sel .opt-key{color:var(--blue)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)} .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)} .timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)} .tu-stat-v.w{color:var(--red)} .tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--blue);color:#fff} .modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)} .hdr-title{font-size:13px}}
+    @media print{
+      body{background:#fff !important;color:#000 !important;font-size:12pt}
+      body::before,#watermark,#gate,.hdr,.gtimer,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none !important}
+      .passage-card{background:#f0f7ff !important;border:1px solid #bfdbfe !important;border-left:3px solid #3b82f6 !important}
+      .passage-text{color:#000 !important}
+      .exp{display:block !important;background:#f0f7ff !important;border:1px solid #bfdbfe !important;color:#1e3a5f !important}
+      .qcard{break-inside:avoid;border:1px solid #ddd !important;background:#fff !important;margin-bottom:20pt;page-break-inside:avoid}
+      .opt{border:1px solid #ccc !important;background:#fff !important}
+      .opt.ok{background:#e6f9f0 !important;border-color:#10b981 !important}
+      .opt.no{background:#fef2f2 !important;border-color:#ef4444 !important}
+      .opt-txt,.qtxt{color:#000 !important}
+      .qtopic{background:#eff6ff !important;color:#1d4ed8 !important;border-color:#93c5fd !important}
+      #print-header{display:block !important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000}
+      #print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt}
+      #print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt}
+      #print-header .ph-student{font-size:13pt;font-weight:700;color:#000}
+    }
+  </style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-brand">GrantApp AI · Premium</div>
+    <div class="gate-title">English — Paper 3</div>
+    <div class="gate-sub">UTME 2026 · 50 Questions · 30 Minutes</div>
+    <div class="gate-label">Access password</div>
+    <div class="gate-pw-wrap">
+      <input class="gate-input" id="gate-pw" type="password" placeholder="••••••••••••" autocomplete="off">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <div class="gate-err" id="gate-err"></div>
+    <button class="gate-btn" onclick="gateSubmit()">Enter →</button>
+    <div class="gate-attempts" id="gate-att"></div>
+  </div>
+</div>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — English Paper 3</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">English · Paper 3</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);">&#8595; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#9203;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#8595; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function(){
+  var REGISTRY={
+    "31e2f049ea6226f6d5755f4fb549d95c7f78ceab43a4b1e407f6b28b7ce3beb9":"Conve",
+    "781b7749f5ddd8f9686ee31b4fef571d04b4b8432e61137bc5d78d9ada22c24c":"Kaosara",
+    "3da4c5cd7bb9a4573a160725e390a3214e193094fc4ad86a29db95dc39365ca6":"Habibat",
+    "9403e4ed9497a885390af4a54bbd8acf944cdb0ce1466e65a016ead13c96eab1":"Oyin",
+    "e290b9f1952da521dab7ec693caa609e4ff707d3d9e00c1ecb53f092113a4f3a":"Dorcas",
+    "6ad071baadf38c76a1976e3e07d322d2bb6f534f195bf2253c9d0b2874b121b9":"Famous",
+    "da123098c73e97dc05aa4f080b36fecc0acc46a1d2ea353d65bce0a11d0dfcbf":"Obasesam",
+    "19d3009c2301c89096cb61da53f92e8c854f8fd223c4f368931d312fe6a16e9e":"Prosper",
+    "202ec3362eaf2ac6da6a02fb6354907d0833384c386773ebc599ec2d0d2fb2ca":"Temi",
+    "21d29829c5868128c5b56f13c3f7d446c2bb8fda63b579647e4ab3dfe03f5ed4":"Murphy",
+    "00f1c6e06fbbfb8672c7f96ad536eaf731caa361252cac7caaba7fa781ef049c":"Improve",
+    "5f606895db4060437354146e2f29fd4d2f44452c0a449734b7bbca7bdd0dfbd2":"Zainab",
+    "40a6b5c1ef1603b230f237c119b6a4d22e0ff8263c53a23d1ab766c519770d74": "Fiyin",
+    "a310cf0e3a5016abf43ddf3115d7694bc89e0c05c832b051dd31a5878db633dd": "Aliyah",
+    "ef6a705af5e4ef7b3f4fe9537a9ff64ce8279874d880aed9c6811a3a9a934580":"Taiwo T.",
+    "f0350dab6f3941cbde1aafa8625a20830927f159fa12454dff903a2157b79052":"Aremu Ella",
+    "8351728b036d98831f2b44daf7f25974f1541a4df0aa03afb13b7036ba0175ce":"Abu Ene"
+  };
+  var attempts=0,MAX_ATT=5;
+  async function sha256(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+  window.gateSubmit=async function(){
+    var pw=document.getElementById('gate-pw').value.trim();
+    var err=document.getElementById('gate-err');
+    var att=document.getElementById('gate-att');
+    document.getElementById('gate-pw').classList.remove('err');
+    if(!pw){document.getElementById('gate-pw').classList.add('err');err.textContent='Enter your password.';return;}
+    attempts++;
+    var h=await sha256(pw);
+    var name=REGISTRY[h];
+    if(name){
+      document.getElementById('gate').classList.add('gone');
+      var wm=document.getElementById('watermark');
+      if(wm){var t=name+' · GrantApp AI · ';var row='';for(var i=0;i<8;i++)row+=t;var html='';for(var i=0;i<14;i++)html+='<span>'+row+'</span>';wm.innerHTML=html;}
+      var greet=document.getElementById('greeting');
+      if(greet){greet.textContent='Hey, '+name;greet.style.display='block';}
+      document.getElementById('print-student-name').textContent='Student: '+name;
+      document.getElementById('print-date').textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      startTimer();
+    }else{
+      document.getElementById('gate-pw').classList.add('err');
+      var left=MAX_ATT-attempts;
+      if(left<=0){err.textContent='Too many failed attempts.';document.querySelector('.gate-btn').disabled=true;document.getElementById('gate-pw').disabled=true;}
+      else{err.textContent='Incorrect password.';att.textContent=left+' attempt'+(left===1?'':'s')+' remaining.';}
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-pw');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.gateSubmit(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password';
+      inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
+  });
+})();
+
+/* ── PASSAGES ── */
+var PASSAGES = {
+  A: {
+    label: 'Passage A — Questions 1 to 10',
+    text: '<p>The relationship between language and thought has fascinated philosophers and linguists for centuries. Some scholars argue that language merely expresses thought — that we think first and speak afterwards. Others contend that the language we speak actively shapes the way we perceive and categorise reality. This second position, associated most famously with Benjamin Lee Whorf, suggests that speakers of different languages do not simply describe the same world in different ways; they actually inhabit somewhat different cognitive worlds.</p><p>Evidence for this view comes from studies of colour perception, spatial reasoning, and the concept of time. Languages differ significantly in how they carve up the colour spectrum, and research has shown that speakers whose languages distinguish more colours between blue and green are faster at discriminating between those shades. Similarly, some languages describe spatial relationships using absolute directions — north, south, east, west — rather than relative ones such as left and right. Speakers of these languages consistently demonstrate superior spatial memory and orientation skills.</p><p>Critics of the Whorfian hypothesis, however, point out that correlation is not causation. The fact that language and thought patterns co-vary does not prove that language causes the thought pattern. It may be that underlying cognitive tendencies shape both the language community produces and the perceptual skills its members develop. Furthermore, translation — the existence of which presupposes that meanings can cross language barriers — suggests that thought is not entirely imprisoned within the vocabulary of any one language.</p><p>The debate remains unresolved, but most contemporary linguists adopt a moderate position: language does not determine thought, but it can influence it — nudging attention toward certain distinctions and making some conceptual categories more cognitively accessible than others.</p>'
+  },
+  B: {
+    label: 'Passage B — Questions 11 to 20',
+    text: '<p>In recent decades, rapid urbanisation has transformed the social and physical landscape of many African cities. What were once modest towns have swollen into sprawling metropolises, drawing millions from rural areas in search of economic opportunity. This population influx has generated both dynamism and dysfunction: new markets, cultures, and innovations emerge alongside overcrowding, inadequate infrastructure, and environmental degradation.</p><p>The informal economy has been central to this urban experience. Across the continent, a significant proportion of city dwellers earn their livelihoods outside the formal sector — as street traders, artisans, transport operators, and domestic workers. This informality is frequently mischaracterised as backwardness or failure. In reality, it represents a sophisticated adaptive response to contexts in which formal employment is scarce and state services are unreliable. The informal sector provides employment, goods, and services that the formal economy either cannot or does not provide at accessible prices.</p><p>However, the informal economy also has its limitations. Workers in this sector typically lack social protection — no pension, no health insurance, no recourse to labour tribunals in the event of exploitation. Their businesses, operating without legal recognition, face constant harassment from city authorities and are unable to access formal credit markets. The result is a persistent poverty trap: informal workers remain productive yet vulnerable, contributing substantially to urban economies while being systematically excluded from the benefits those economies generate.</p><p>Addressing this paradox requires more than simply bringing informal workers into the formal system. It demands a rethinking of what formality means and who it serves — and a willingness to design institutions that reflect the realities of how the majority of urban Africans actually live and work.</p>'
+  },
+  C: {
+    label: 'Passage C — Questions 21 to 30',
+    text: '<p>The concept of emotional intelligence — broadly defined as the ability to recognise, understand, manage, and use emotions effectively — has attracted considerable attention in educational and workplace settings. Proponents argue that emotional intelligence is at least as important as cognitive intelligence in determining success, and that it can be cultivated through deliberate practice and education. Critics, however, question whether emotional intelligence constitutes a genuine, measurable form of intelligence, or whether it is simply a collection of personality traits and social skills repackaged under a more fashionable label.</p><p>The original framework, developed by psychologists Peter Salovey and John Mayer and later popularised by Daniel Goleman, identified four core components: the perception of emotion in oneself and others, the use of emotion to facilitate thought, the understanding of how emotions evolve and interact, and the management of emotion in oneself and in relationships. Goleman\'s more expansive version added competencies such as self-motivation, empathy, and social skill, transforming a relatively narrow psychological construct into a broad personal development model.</p><p>One persistent criticism is the problem of measurement. Unlike cognitive intelligence, which can be assessed with reasonable reliability through standardised tests, emotional intelligence resists easy quantification. Self-report measures are vulnerable to social desirability bias — people tend to describe themselves as more emotionally intelligent than they actually are. Performance-based measures are more reliable but more complex and costly to administer. The result is a field in which bold claims about the predictive power of emotional intelligence often outrun the quality of the evidence supporting them.</p><p>Despite these concerns, few would dispute that the ability to navigate one\'s own emotional states and those of others is a practically important human capacity. The question is not whether emotions matter, but whether bundling diverse social and personal competencies under a single intelligence label advances or obscures our understanding of human performance.</p>'
+  },
+  D: {
+    label: 'Passage D — Questions 31 to 40',
+    text: '<p>Water scarcity is increasingly recognised as one of the defining challenges of the twenty-first century. Globally, freshwater resources are unevenly distributed, and the gap between demand and sustainable supply is widening due to population growth, agricultural expansion, industrial use, and the accelerating effects of climate change. In many regions, aquifers that took millennia to fill are being depleted within decades, and rivers that once flowed year-round now run dry for months at a time.</p><p>Agriculture is by far the largest consumer of freshwater, accounting for approximately seventy percent of global withdrawals. Much of this water is used inefficiently — lost to evaporation, leakage, and practices that prioritise volume over sustainability. Improving irrigation efficiency through technologies such as drip irrigation and soil moisture monitoring could dramatically reduce agricultural water consumption without reducing crop yields. Yet adoption of these technologies remains slow, partly because of the upfront costs involved and partly because, where water is heavily subsidised, farmers have little financial incentive to conserve it.</p><p>Urban water management presents its own set of challenges. Ageing infrastructure in many cities results in substantial losses through pipe leakage before water reaches consumers. Meanwhile, the rapid growth of informal settlements creates large populations who lack access to safe, piped water and must rely instead on vendors who charge several times the piped rate — a perverse outcome in which the poorest urban residents pay the most for water.</p><p>Solutions exist, but they require coordinated action across governments, the private sector, and civil society. Pricing water to reflect its true scarcity value, investing in infrastructure, and reforming agricultural subsidies are all components of a coherent response. Above all, water governance must shift from treating water as an unlimited resource to recognising it as a finite and precious commons.</p>'
+  },
+  E: {
+    label: 'Passage E — Questions 41 to 50',
+    text: '<p>The rise of social media has fundamentally altered the information environment in which citizens, journalists, and governments operate. News that once took hours or days to travel now spreads across the globe in seconds. Events are recorded, shared, and debated in real time by millions of participants who are simultaneously producers and consumers of content. This democratisation of information has brought genuine benefits: marginalised voices have gained platforms, authoritarian practices have been exposed, and grassroots movements have been able to organise with unprecedented speed and reach.</p><p>Yet the same architecture that enables rapid information sharing also facilitates the rapid spread of misinformation. Algorithms designed to maximise engagement tend to amplify content that provokes strong emotional responses — outrage, fear, tribal solidarity — regardless of its accuracy. The result is an information ecosystem in which false or misleading content frequently outcompetes accurate reporting, particularly in the critical early hours after a breaking event when verified information is scarce and the appetite for news is highest.</p><p>The consequences extend beyond individual instances of belief in false information. Repeated exposure to conflicting claims about basic facts erodes the shared epistemic foundation that democratic deliberation requires. When citizens cannot agree on what is true, meaningful debate about what should be done becomes significantly harder. Some researchers have described this as a shift from a world of shared facts to a world of competing narratives, each curated by algorithms to confirm the existing beliefs of their audiences.</p><p>Responses to this challenge have ranged from platform-level interventions — content moderation, fact-checking labels, algorithm adjustments — to calls for media literacy education and regulatory oversight. None of these approaches is sufficient on its own. Restoring a functional information environment will require sustained effort from technology companies, governments, educators, and citizens alike, as well as a clearer collective understanding of what is at stake if the challenge is left unaddressed.</p>'
+  }
+};
+
+/* ── QUESTIONS ── */
+var QUESTIONS = [
+
+  /* ── PASSAGE A: Language & Thought (Q1–10) ── */
+  {id:1,topic:'Comprehension',passage:'A',text:'According to the passage, what is the central claim of the Whorfian hypothesis?',opts:{A:'Language is merely a tool for expressing pre-existing thoughts.',B:'Speakers of different languages inhabit somewhat different cognitive worlds.',C:'All languages divide reality in the same fundamental way.',D:'Thought is impossible without language.'},ans:'B',exp:'Paragraph 1: "the language we speak actively shapes the way we perceive and categorise reality" and speakers of different languages "actually inhabit somewhat different cognitive worlds." This is the core Whorfian claim.'},
+  {id:2,topic:'Comprehension',passage:'A',text:'The phrase "the colour spectrum" in paragraph 2 refers to:',opts:{A:'A scientific instrument used to measure light wavelengths.',B:'The range of colours that the human eye can perceive.',C:'A linguistic framework for categorising visual experience.',D:'The psychological effect of colour on human emotion.'},ans:'B',exp:'"Colour spectrum" here refers to the continuum of visible colours. The passage uses it to illustrate how languages differ in how they divide this perceptual range — implying it is the full range of colours the human eye perceives.'},
+  {id:3,topic:'Comprehension',passage:'A',text:'Which of the following best describes the evidence cited in paragraph 2?',opts:{A:'Anecdotal accounts from individual language learners.',B:'Theoretical arguments from philosophical literature.',C:'Empirical research on colour perception and spatial reasoning.',D:'Historical records of language change over time.'},ans:'C',exp:'Paragraph 2 cites "studies of colour perception, spatial reasoning, and the concept of time" and refers to research findings — "research has shown" — making this empirical evidence.'},
+  {id:4,topic:'Inference',passage:'A',text:'From the passage, it can be inferred that languages using absolute directions (north, south, east, west) rather than relative directions (left, right) would:',opts:{A:'Be spoken only in communities with advanced technology.',B:'Tend to produce speakers with stronger spatial orientation skills.',C:'Be unable to describe motion or movement accurately.',D:'Have fewer words for colour than relative-direction languages.'},ans:'B',exp:'Paragraph 2 states: "Speakers of these languages consistently demonstrate superior spatial memory and orientation skills." The inference follows directly from this stated relationship.'},
+  {id:5,topic:'Vocabulary',passage:'A',text:'The word "co-vary" as used in paragraph 3 most nearly means:',opts:{A:'Vary in opposite directions — one increases as the other decreases.',B:'Change together — vary in relation to one another.',C:'Remain stable while surrounding variables change.',D:'Be caused by a third underlying variable.'},ans:'B',exp:'"Co-vary" means to vary together — when one changes, the other also changes. The passage uses it to say that language and thought patterns change in tandem without establishing which causes which.'},
+  {id:6,topic:'Comprehension',passage:'A',text:'The critic\'s argument in paragraph 3 is best summarised as:',opts:{A:'Translation proves that language has no effect on thought whatsoever.',B:'The Whorfian hypothesis has been conclusively disproved by modern research.',C:'A correlation between language and thought does not establish that language causes thought.',D:'Language barriers make communication between cultures fundamentally impossible.'},ans:'C',exp:'The critics\' point is that "correlation is not causation" — the fact that language and thought patterns co-vary does not prove language causes those thought patterns. Option A overstates the argument.'},
+  {id:7,topic:'Vocabulary',passage:'A',text:'The phrase "imprisoned within the vocabulary" suggests that language might:',opts:{A:'Provide unlimited freedom to express any idea.',B:'Limit or confine the thoughts a person can have.',C:'Protect certain ideas from being understood by outsiders.',D:'Force speakers to use words they do not understand.'},ans:'B',exp:'The metaphor of imprisonment suggests confinement. "Imprisoned within the vocabulary of any one language" means thought being restricted to only what that language\'s words allow. The passage uses this to argue against such a total restriction.'},
+  {id:8,topic:'Inference',passage:'A',text:'The "moderate position" described in the final paragraph implies that:',opts:{A:'Neither language nor thought has any influence on the other.',B:'Language determines thought completely and inevitably.',C:'Language and thought are entirely independent of each other.',D:'Language can influence thought without fully controlling it.'},ans:'D',exp:'The final paragraph explicitly states: "language does not determine thought, but it can influence it." The moderate position rejects both total determinism and total independence.'},
+  {id:9,topic:'Comprehension',passage:'A',text:'The overall purpose of the passage is to:',opts:{A:'Argue conclusively in favour of the Whorfian hypothesis.',B:'Present and evaluate competing views on the relationship between language and thought.',C:'Describe the history of linguistic research from ancient times to the present.',D:'Persuade the reader that thought is impossible without language.'},ans:'B',exp:'The passage presents the Whorfian position, the evidence for it, the critics\' objections, and then a moderate synthesis. Its purpose is to survey and evaluate competing positions, not to advocate for one.'},
+  {id:10,topic:'Vocabulary',passage:'A',text:'The word "presupposes" in paragraph 3 most nearly means:',opts:{A:'Contradicts and undermines.',B:'Requires or assumes as a prior condition.',C:'Demonstrates through experiment.',D:'Argues strongly in favour of.'},ans:'B',exp:'"Presupposes" means to require something as a prior condition. "Translation...presupposes that meanings can cross language barriers" = translation requires this to be true in order to be possible.'},
+
+  /* ── PASSAGE B: Urbanisation in Africa (Q11–20) ── */
+  {id:11,topic:'Comprehension',passage:'B',text:'According to the passage, which of the following best describes the informal economy?',opts:{A:'A backward and inefficient system that hinders economic development.',B:'A sophisticated adaptive response to scarce formal employment and unreliable state services.',C:'A temporary phase that cities pass through on the way to full formalisation.',D:'A system created deliberately by governments to avoid providing social protection.'},ans:'B',exp:'Paragraph 2 explicitly states: "it represents a sophisticated adaptive response to contexts in which formal employment is scarce and state services are unreliable."'},
+  {id:12,topic:'Vocabulary',passage:'B',text:'The word "mischaracterised" in paragraph 2 most nearly means:',opts:{A:'Correctly identified and labelled.',B:'Deliberately concealed from public view.',C:'Inaccurately described or represented.',D:'Systematically studied and documented.'},ans:'C',exp:'"Mischaracterised" = incorrectly described. The passage says informality is "mischaracterised as backwardness or failure" — meaning it is wrongly described that way.'},
+  {id:13,topic:'Inference',passage:'B',text:'From paragraph 3, it can be inferred that informal workers are vulnerable primarily because:',opts:{A:'They produce low-quality goods that nobody wants to buy.',B:'They lack the skills required to compete in the formal economy.',C:'They operate outside legal frameworks that would otherwise provide them protection.',D:'They are unwilling to join formal employment even when it is available.'},ans:'C',exp:'Paragraph 3 cites lack of social protection, no legal recognition, harassment by authorities, and inability to access formal credit — all consequences of operating outside legal frameworks.'},
+  {id:14,topic:'Comprehension',passage:'B',text:'The phrase "poverty trap" in paragraph 3 suggests that informal workers:',opts:{A:'Are trapped in poverty because they refuse to work hard enough.',B:'Cannot escape poverty despite being productive, because the system excludes them from its benefits.',C:'Choose poverty deliberately to avoid paying taxes.',D:'Create poverty for others by competing with formal businesses.'},ans:'B',exp:'The passage describes workers who are "productive yet vulnerable, contributing substantially to urban economies while being systematically excluded from the benefits." This is the trap — productivity does not translate into escape from poverty.'},
+  {id:15,topic:'Vocabulary',passage:'B',text:'The word "paradox" in paragraph 4 refers to:',opts:{A:'The contradiction between informal workers\' productivity and their exclusion from economic benefits.',B:'The fact that African cities are growing faster than any other cities in the world.',C:'The difficulty of measuring the size of the informal economy accurately.',D:'The tension between rural and urban ways of life.'},ans:'A',exp:'The paradox identified in paragraph 3 — workers who are productive yet systematically excluded from the benefits they help generate — is what paragraph 4 calls a "paradox."'},
+  {id:16,topic:'Comprehension',passage:'B',text:'According to the passage, urbanisation in African cities has produced:',opts:{A:'Only negative consequences for the populations involved.',B:'Only positive consequences in the form of economic growth.',C:'Both positive developments and serious problems simultaneously.',D:'Consequences that are too complex to evaluate positively or negatively.'},ans:'C',exp:'Paragraph 1 states: "This population influx has generated both dynamism and dysfunction: new markets, cultures, and innovations emerge alongside overcrowding, inadequate infrastructure, and environmental degradation."'},
+  {id:17,topic:'Inference',passage:'B',text:'The author\'s attitude towards the informal economy can best be described as:',opts:{A:'Hostile — the author believes it should be eliminated immediately.',B:'Uncritical — the author presents it as entirely positive.',C:'Balanced — the author acknowledges both its value and its limitations.',D:'Dismissive — the author regards it as economically insignificant.'},ans:'C',exp:'Paragraph 2 defends the informal economy against mischaracterisation; paragraph 3 honestly addresses its limitations. The author presents both sides.'},
+  {id:18,topic:'Vocabulary',passage:'B',text:'The phrase "perverse outcome" in paragraph 3 most nearly describes a result that is:',opts:{A:'Sexually immoral and socially unacceptable.',B:'Contrary to what is just or reasonable — an outcome that is the opposite of what is fair.',C:'Too complex to be understood by ordinary people.',D:'Deliberately engineered by corrupt officials.'},ans:'B',exp:'"Perverse" here means contrary to what is right or fair — the poorest people paying the most for water is the opposite of equitable. "Perverse outcome" = outcome that is the reverse of what justice would demand.'},
+  {id:19,topic:'Comprehension',passage:'B',text:'What does the author suggest is needed to address the situation of informal workers?',opts:{A:'Forcing all informal workers into the formal sector as quickly as possible.',B:'Eliminating the informal sector entirely through strict enforcement.',C:'Rethinking what formality means and designing institutions that reflect urban realities.',D:'Providing informal workers with the same wages as formal sector workers.'},ans:'C',exp:'Paragraph 4: "It demands a rethinking of what formality means and who it serves — and a willingness to design institutions that reflect the realities of how the majority of urban Africans actually live and work."'},
+  {id:20,topic:'Inference',passage:'B',text:'The word "systematically" in paragraph 3 implies that the exclusion of informal workers from economic benefits is:',opts:{A:'Accidental and unintended.',B:'Temporary and likely to be corrected soon.',C:'Structural and deliberate, built into the way the system operates.',D:'Caused by the workers\' own choices and behaviour.'},ans:'C',exp:'"Systematically excluded" implies the exclusion is structural — built into the system itself — not accidental or the result of individual behaviour.'},
+
+  /* ── PASSAGE C: Emotional Intelligence (Q21–30) ── */
+  {id:21,topic:'Comprehension',passage:'C',text:'According to the passage, what is the main criticism of Goleman\'s version of emotional intelligence?',opts:{A:'It focuses too narrowly on the perception of emotion.',B:'It expanded the original framework into a broad personal development model that may obscure the original concept.',C:'It was developed without any empirical research to support it.',D:'It ignores the role of cognitive intelligence entirely.'},ans:'B',exp:'Paragraph 2 describes Goleman\'s "more expansive version" which "add[ed] competencies such as self-motivation, empathy, and social skill, transforming a relatively narrow psychological construct into a broad personal development model." The implication is that this expansion is problematic.'},
+  {id:22,topic:'Vocabulary',passage:'C',text:'The phrase "social desirability bias" in paragraph 3 refers to:',opts:{A:'The tendency to prefer socially popular topics for research.',B:'The tendency to give answers that make oneself appear more favourable.',C:'The bias introduced when researchers choose socially prominent subjects.',D:'The preference of test-takers for questions about social situations.'},ans:'B',exp:'Social desirability bias is the well-known research problem where people answer questions in ways that make them look good rather than answering honestly. The passage applies this to emotional intelligence self-reports.'},
+  {id:23,topic:'Comprehension',passage:'C',text:'The four components of emotional intelligence identified by Salovey and Mayer are:',opts:{A:'Self-awareness, self-regulation, motivation, and social skill.',B:'Perception, facilitation, understanding, and management of emotion.',C:'Intelligence, personality, creativity, and social competence.',D:'Empathy, leadership, communication, and emotional stability.'},ans:'B',exp:'Paragraph 2 explicitly lists them: "the perception of emotion in oneself and others, the use of emotion to facilitate thought, the understanding of how emotions evolve and interact, and the management of emotion."'},
+  {id:24,topic:'Inference',passage:'C',text:'From the passage, it can be inferred that performance-based measures of emotional intelligence are:',opts:{A:'Cheaper and easier to administer than self-report measures.',B:'Less reliable than self-report measures.',C:'More reliable than self-report measures but harder to administer.',D:'The dominant method used in emotional intelligence research.'},ans:'C',exp:'Paragraph 3: "Performance-based measures are more reliable but more complex and costly to administer." This directly supports option C.'},
+  {id:25,topic:'Vocabulary',passage:'C',text:'The word "quantification" in paragraph 3 most nearly means:',opts:{A:'The process of improving the quality of something.',B:'The act of measuring or expressing something as a number.',C:'The ability to describe something in precise language.',D:'The comparison of two different things using the same scale.'},ans:'B',exp:'"Quantification" = measuring something numerically. "Resists easy quantification" means it is hard to assign a reliable number to emotional intelligence.'},
+  {id:26,topic:'Comprehension',passage:'C',text:'The main criticism of emotional intelligence research identified in paragraph 3 is that:',opts:{A:'Emotional intelligence has no practical value in real-world settings.',B:'The original framework was too narrow to be useful.',C:'Bold claims about its predictive power exceed the quality of the evidence.',D:'There is no agreement on what emotional intelligence actually is.'},ans:'C',exp:'Paragraph 3 ends: "bold claims about the predictive power of emotional intelligence often outrun the quality of the evidence supporting them." This is the central criticism articulated.'},
+  {id:27,topic:'Vocabulary',passage:'C',text:'The word "bundling" in the final paragraph most nearly means:',opts:{A:'Separating into distinct and clearly defined categories.',B:'Grouping diverse things together under a single label.',C:'Discarding unnecessary or irrelevant components.',D:'Measuring with greater precision and reliability.'},ans:'B',exp:'"Bundling diverse social and personal competencies under a single intelligence label" — bundling means grouping or packaging together under one category.'},
+  {id:28,topic:'Inference',passage:'C',text:'The final paragraph suggests that the author\'s main concern about emotional intelligence as a concept is:',opts:{A:'That emotions are not important for human performance.',B:'That the label "intelligence" is politically motivated.',C:'That grouping diverse competencies under one label may hinder rather than help understanding.',D:'That emotional intelligence cannot be improved through education.'},ans:'C',exp:'The final sentence asks whether "bundling diverse social and personal competencies under a single intelligence label advances or obscures our understanding." The concern is whether the bundling helps or hinders understanding.'},
+  {id:29,topic:'Comprehension',passage:'C',text:'Which of the following best describes the overall structure of the passage?',opts:{A:'A chronological account of how emotional intelligence research developed.',B:'A one-sided argument in favour of emotional intelligence as a concept.',C:'A balanced examination of both the appeal and the limitations of emotional intelligence.',D:'A technical description of how emotional intelligence tests are constructed.'},ans:'C',exp:'The passage introduces the concept, describes its appeal, presents Goleman\'s expansion, raises measurement criticisms, and ends with a nuanced conclusion — a balanced examination.'},
+  {id:30,topic:'Vocabulary',passage:'C',text:'The word "construct" as used in paragraph 2 ("a relatively narrow psychological construct") most nearly means:',opts:{A:'A building or physical structure.',B:'A concept or theoretical framework built by researchers.',C:'A test or examination instrument.',D:'A hypothesis that has not yet been proven.'},ans:'B',exp:'In academic psychology, a "construct" is a theoretical concept — something defined and built by researchers to organise observations. "Psychological construct" = a concept defined within psychological theory.'},
+
+  /* ── PASSAGE D: Water Scarcity (Q31–40) ── */
+  {id:31,topic:'Comprehension',passage:'D',text:'According to the passage, what accounts for approximately seventy percent of global freshwater withdrawals?',opts:{A:'Industrial manufacturing processes.',B:'Domestic household consumption in cities.',C:'Agricultural irrigation and farming.',D:'Hydroelectric power generation.'},ans:'C',exp:'Paragraph 2 explicitly states: "Agriculture is by far the largest consumer of freshwater, accounting for approximately seventy percent of global withdrawals."'},
+  {id:32,topic:'Vocabulary',passage:'D',text:'The phrase "aquifers that took millennia to fill are being depleted within decades" most powerfully conveys:',opts:{A:'The ancient geological history of underground water systems.',B:'The unsustainable rate at which groundwater is being consumed.',C:'The technical difficulty of measuring underground water reserves.',D:'The need for more scientific research into water storage.'},ans:'B',exp:'The contrast between "millennia" (thousands of years) to fill and "decades" (tens of years) to deplete conveys an extreme imbalance — the rate of depletion far exceeds the rate of replenishment. This is the essence of unsustainability.'},
+  {id:33,topic:'Comprehension',passage:'D',text:'According to the passage, why do farmers have little incentive to adopt water-efficient technologies?',opts:{A:'The technologies are not yet proven to work effectively in agricultural settings.',B:'Governments have banned the use of new irrigation technologies.',C:'Where water is heavily subsidised, the financial motivation to conserve it is weak.',D:'Farmers prefer traditional methods and resist technological change.'},ans:'C',exp:'Paragraph 2: "where water is heavily subsidised, farmers have little financial incentive to conserve it." Subsidies remove the price signal that would otherwise reward conservation.'},
+  {id:34,topic:'Inference',passage:'D',text:'From paragraph 3, it can be inferred that informal settlement dwellers pay more for water because:',opts:{A:'They use more water per person than formal residents.',B:'They lack access to subsidised piped water and must buy from vendors at higher prices.',C:'They waste more water through leakage and inefficient use.',D:'City governments deliberately charge them higher rates.'},ans:'B',exp:'Paragraph 3 states they "lack access to safe, piped water and must rely instead on vendors who charge several times the piped rate." The inference is that the absence of piped access forces them to the more expensive vendor market.'},
+  {id:35,topic:'Vocabulary',passage:'D',text:'The word "perverse" in paragraph 3 ("a perverse outcome") suggests an outcome that is:',opts:{A:'Sexually inappropriate and morally wrong.',B:'Extremely complex and difficult to understand.',C:'The opposite of what fairness or logic would suggest.',D:'Deliberately designed to harm a specific group.'},ans:'C',exp:'As in Passage B, "perverse" here means contrary to what is right or reasonable — the poorest paying the most is the reverse of what an equitable system would produce.'},
+  {id:36,topic:'Comprehension',passage:'D',text:'The passage suggests that the main obstacle to improving agricultural water efficiency is:',opts:{A:'A lack of available technology for efficient irrigation.',B:'High upfront costs and reduced financial incentive due to water subsidies.',C:'Resistance from international organisations that oppose farming modernisation.',D:'The inability of farmers to learn how to use new technologies.'},ans:'B',exp:'Paragraph 2 identifies two obstacles: "partly because of the upfront costs involved and partly because, where water is heavily subsidised, farmers have little financial incentive to conserve it."'},
+  {id:37,topic:'Inference',passage:'D',text:'The phrase "finite and precious commons" in the final paragraph implies that water should be treated as:',opts:{A:'A commodity that should be privatised and sold at market rates.',B:'A resource belonging to all, whose limited supply must be managed for collective benefit.',C:'A government monopoly to be controlled exclusively by the state.',D:'An inexhaustible resource that must simply be distributed more fairly.'},ans:'B',exp:'"Commons" refers to a shared resource belonging to a community. "Finite and precious" signals its limited and valuable nature. The phrase implies collective ownership and responsible shared management — not privatisation or state monopoly.'},
+  {id:38,topic:'Comprehension',passage:'D',text:'Which of the following is NOT listed in the passage as a cause of widening water scarcity?',opts:{A:'Population growth.',B:'Agricultural expansion.',C:'Religious and cultural water use practices.',D:'Climate change.'},ans:'C',exp:'Paragraph 1 lists "population growth, agricultural expansion, industrial use, and the accelerating effects of climate change." Religious and cultural practices are not mentioned.'},
+  {id:39,topic:'Vocabulary',passage:'D',text:'The word "coherent" in the final paragraph ("a coherent response") most nearly means:',opts:{A:'Expensive and difficult to implement.',B:'Logical, consistent, and well-integrated.',C:'Popular and widely accepted by all stakeholders.',D:'Rapid and immediately effective.'},ans:'B',exp:'"Coherent response" means a response whose parts fit together logically and consistently — a joined-up, integrated approach rather than fragmented individual measures.'},
+  {id:40,topic:'Inference',passage:'D',text:'The overall tone of the passage towards the water scarcity challenge is best described as:',opts:{A:'Despairing — the author believes the problem is unsolvable.',B:'Complacent — the author suggests existing efforts are sufficient.',C:'Alarmist — the author exaggerates the problem to provoke panic.',D:'Serious but measured — the author acknowledges the severity while indicating that solutions exist.'},ans:'D',exp:'The passage details serious problems throughout but ends with "Solutions exist" and outlines specific responses. The tone is grave but not despairing, and factual rather than alarmist.'},
+
+  /* ── PASSAGE E: Social Media & Misinformation (Q41–50) ── */
+  {id:41,topic:'Comprehension',passage:'E',text:'According to paragraph 1, which of the following is identified as a genuine benefit of social media?',opts:{A:'The elimination of professional journalism.',B:'The ability of marginalised voices to gain platforms and organise movements.',C:'The reduction of government surveillance of citizens.',D:'The standardisation of information across all cultures.'},ans:'B',exp:'Paragraph 1 lists benefits: "marginalised voices have gained platforms, authoritarian practices have been exposed, and grassroots movements have been able to organise with unprecedented speed and reach."'},
+  {id:42,topic:'Vocabulary',passage:'E',text:'The word "amplify" in paragraph 2 most nearly means:',opts:{A:'Reduce and filter out.',B:'Accurately verify and confirm.',C:'Increase the reach and intensity of.',D:'Translate into a different format.'},ans:'C',exp:'"Amplify" means to make louder or stronger — in this context, to increase the spread and impact of content. Algorithms "amplify content that provokes strong emotional responses."'},
+  {id:43,topic:'Comprehension',passage:'E',text:'According to paragraph 2, what type of content do social media algorithms tend to favour?',opts:{A:'Content that has been verified by professional fact-checkers.',B:'Content that is emotionally provocative, regardless of its accuracy.',C:'Content produced by established news organisations.',D:'Content that presents balanced perspectives on complex issues.'},ans:'B',exp:'Paragraph 2: "Algorithms designed to maximise engagement tend to amplify content that provokes strong emotional responses — outrage, fear, tribal solidarity — regardless of its accuracy."'},
+  {id:44,topic:'Inference',passage:'E',text:'The phrase "shared epistemic foundation" in paragraph 3 most nearly refers to:',opts:{A:'A common language that all citizens agree to use.',B:'A set of shared beliefs about what is morally right and wrong.',C:'A common agreement about what counts as factual knowledge.',D:'A platform owned jointly by all citizens of a democracy.'},ans:'C',exp:'"Epistemic" relates to knowledge. "Shared epistemic foundation" = a shared basis of agreed facts — the common ground of factual knowledge that allows people to debate what should be done.'},
+  {id:45,topic:'Vocabulary',passage:'E',text:'The phrase "competing narratives" in paragraph 3 suggests a situation where:',opts:{A:'Different news organisations compete to break stories first.',B:'Different groups hold incompatible versions of reality, each curated to confirm their existing beliefs.',C:'Journalists compete for prizes by writing the most compelling stories.',D:'Governments compete to control the official version of historical events.'},ans:'B',exp:'Paragraph 3 explicitly defines it: "a world of competing narratives, each curated by algorithms to confirm the existing beliefs of their audiences." Different groups have different, algorithm-reinforced versions of reality.'},
+  {id:46,topic:'Comprehension',passage:'E',text:'According to the passage, why is misinformation particularly dangerous in the early hours after a breaking event?',opts:{A:'Journalists are not yet awake to report accurately.',B:'Social media platforms shut down during emergencies.',C:'Verified information is scarce while the appetite for news is highest.',D:'Government censors remove accurate information most quickly at that stage.'},ans:'C',exp:'Paragraph 2: "particularly in the critical early hours after a breaking event when verified information is scarce and the appetite for news is highest."'},
+  {id:47,topic:'Inference',passage:'E',text:'The passage implies that the relationship between social media and misinformation is primarily a result of:',opts:{A:'The deliberate actions of hostile foreign governments.',B:'The incompetence of professional journalists.',C:'The design logic of platforms that prioritise engagement over accuracy.',D:'The inability of ordinary citizens to distinguish true from false information.'},ans:'C',exp:'Paragraph 2 identifies "algorithms designed to maximise engagement" as the structural cause. The problem is built into the platform architecture, not primarily caused by foreign actors, journalist failures, or citizen incompetence.'},
+  {id:48,topic:'Vocabulary',passage:'E',text:'The word "erodes" in paragraph 3 ("repeated exposure...erodes the shared epistemic foundation") most nearly means:',opts:{A:'Builds and reinforces over time.',B:'Gradually wears away and weakens.',C:'Suddenly destroys and collapses.',D:'Transforms into something different.'},ans:'B',exp:'"Erodes" = gradually wears away, as water erodes rock. The shared factual foundation is slowly weakened by repeated exposure to conflicting claims — not suddenly destroyed.'},
+  {id:49,topic:'Comprehension',passage:'E',text:'According to the final paragraph, which of the following best describes the author\'s view of existing responses to misinformation?',opts:{A:'They are completely ineffective and should be abandoned.',B:'They are highly effective and close to solving the problem.',C:'No single approach is sufficient; a combination of sustained efforts is needed.',D:'Government regulation alone is the only viable solution.'},ans:'C',exp:'Final paragraph: "None of these approaches is sufficient on its own. Restoring a functional information environment will require sustained effort from technology companies, governments, educators, and citizens alike."'},
+  {id:50,topic:'Inference',passage:'E',text:'The overall argument of the passage can best be summarised as:',opts:{A:'Social media is harmful and should be banned.',B:'Social media has brought benefits but its architecture creates structural conditions for misinformation to thrive, with serious consequences for democracy.',C:'Misinformation is a new problem that has emerged only with the rise of the internet.',D:'The solution to misinformation lies entirely with individual citizens developing better critical thinking skills.'},ans:'B',exp:'The passage acknowledges genuine benefits (paragraph 1), explains the structural misinformation problem (paragraphs 2–3), and calls for multi-actor solutions (paragraph 4). Option B captures all three dimensions.'}
+
+];
+
+/* ── STATE ── */
+var ST={correct:0,wrong:0,answered:0};
+var UA={};
+var globalDone=false;
+var timerInterval=null;
+ST.answeredIds=new Set();
+
+/* ── TIMER ── */
+function startTimer(){
+  var remaining=1800;
+  var dot=document.getElementById('gdot');
+  var txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;
+    txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}
+    if(remaining<=0){clearInterval(timerInterval);timeUp();}
+  },1000);
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—';}
+
+/* ── RENDER ── */
+function render(){
+  var container=document.getElementById('qc');
+  var html='';
+  var currentPassage=null;
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i];
+    /* Insert passage card when passage changes */
+    if(q.passage&&q.passage!==currentPassage){
+      currentPassage=q.passage;
+      var p=PASSAGES[currentPassage];
+      if(p){
+        html+='<div class="passage-card">'+
+          '<div class="passage-label">'+p.label+'</div>'+
+          '<div class="passage-text">'+p.text+'</div>'+
+          '</div>';
+      }
+    }
+    var labels=['A','B','C','D'];
+    var pool=labels.map(function(l){return{text:q.opts[l]};});
+    for(var s=pool.length-1;s>0;s--){var r=Math.floor(Math.random()*(s+1));var tmp=pool[s];pool[s]=pool[r];pool[r]=tmp;}
+    var correctText=q.opts[q.ans];
+    var remappedAns='A';
+    var optsHtml='';
+    for(var j=0;j<pool.length;j++){
+      var newLbl=labels[j];
+      if(pool[j].text===correctText)remappedAns=newLbl;
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+newLbl+'">'+
+        '<span class="opt-key">'+newLbl+'.</span>'+
+        '<span class="opt-txt">'+pool[j].text+'</span>'+
+        '</div>';
+    }
+    q._ans=remappedAns;
+    html+='<div class="qcard" style="animation-delay:'+(i*0.025)+'s">'+
+      '<div class="qcard-top">'+
+        '<span class="qnum">Q'+(i+1)+' of 50</span>'+
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+
+      '</div>'+
+      '<div class="qtxt">'+q.text+'</div>'+
+      '<div class="opts">'+optsHtml+'</div>'+
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>'+
+      '<div class="exp" id="exp'+q.id+'"></div>'+
+      '</div>';
+  }
+  container.innerHTML=html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel');});
+      this.classList.add('sel');
+      UA[qid]=this.dataset.a;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if(btn)btn.disabled=false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid;});
+      var ans=q._ans||q.ans;
+      var chosen=UA[qid],ok=(chosen===ans);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===ans)o.classList.add('ok');
+        else if(o.dataset.a===chosen)o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      expEl.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+(ok?'✓ Correct':'✗ Incorrect — correct answer: '+ans)+'</span>'+
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled=true;
+      if(!ST.answeredIds.has(qid)){
+        ST.answered++;ST.answeredIds.add(qid);
+        if(ok)ST.correct++;else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats(){
+  var left=QUESTIONS.length-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%';
+}
+
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){if(!btn.disabled)btn.click();});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function doPrint(){
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('print-header').style.display='none';},1000);
+}
+
+render();
+/* Timer starts only after successful auth — see gateSubmit() */
+</script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>English — Paper 4 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0A0E1A;--card:#111827;--card2:#161E2E;--text:#E8EDF5;--sec:rgba(232,237,245,0.75);--ter:rgba(232,237,245,0.45);--accent:#f59e0b;--accent2:#d97706;--warn:#F59E0B;--red:#EF4444;--green:#10B981;--blue:#3b82f6;--blue2:#2563eb;--sep:rgba(255,255,255,0.08);--hov:rgba(255,255,255,0.05);--r:14px;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+    #gate{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+    #gate.gone{display:none}
+    .gate-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .gate-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+    .gate-title{font-family:var(--mono);font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:4px}
+    .gate-sub{font-size:12px;color:var(--ter);margin-bottom:28px}
+    .gate-label{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--ter);margin-bottom:6px}
+    .gate-input{width:100%;padding:13px 16px;background:var(--card2);border:1px solid var(--sep);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:10px;transition:border-color 0.2s;-webkit-appearance:none}
+    .gate-input:focus{border-color:rgba(59,130,246,0.5)}.gate-input.err{border-color:var(--red)}
+    .gate-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s;margin-top:4px}
+    .gate-btn:hover{opacity:0.88}
+    .gate-pw-wrap { position: relative; margin-bottom: 10px; }
+    .gate-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(232,237,245,0.45); cursor: pointer; font-size: 0.9rem; padding: 4px; line-height: 1; }
+    .gate-err{font-size:12px;color:var(--red);font-family:var(--mono);margin-top:8px;min-height:18px;letter-spacing:0.02em}
+    .gate-attempts{font-size:11px;color:var(--ter);text-align:center;margin-top:16px}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.2rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.09;font-family:var(--mono);font-size:0.95rem;font-weight:700;color:#f0eff4;letter-spacing:0.1em;white-space:nowrap;user-select:none;-webkit-user-select:none}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)}.gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--blue);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)}.gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)}.sc-v.w{color:var(--red)}.sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--blue);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.05)}
+    .opt.sel{border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--blue);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)}.opt.no .opt-key{color:var(--red)}.opt.sel .opt-key{color:var(--blue)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}.abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)}.timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)}.tu-stat-v.w{color:var(--red)}.tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--blue);color:#fff}.modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)}.hdr-title{font-size:13px}}
+    @media print{body{background:#fff !important;color:#000 !important;font-size:12pt}body::before,#watermark,#gate,.hdr,.gtimer,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none !important}.exp{display:block !important;background:#f0f7ff !important;border:1px solid #bfdbfe !important;color:#1e3a5f !important}.qcard{break-inside:avoid;border:1px solid #ddd !important;background:#fff !important;margin-bottom:20pt;page-break-inside:avoid}.opt{border:1px solid #ccc !important;background:#fff !important}.opt.ok{background:#e6f9f0 !important;border-color:#10b981 !important}.opt.no{background:#fef2f2 !important;border-color:#ef4444 !important}.opt-txt,.qtxt{color:#000 !important}.qtopic{background:#eff6ff !important;color:#1d4ed8 !important;border-color:#93c5fd !important}#print-header{display:block !important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000}#print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt}#print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt}#print-header .ph-student{font-size:13pt;font-weight:700;color:#000}}
+  </style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-brand">GrantApp AI · Premium</div>
+    <div class="gate-title">English — Paper 4</div>
+    <div class="gate-sub">UTME 2026 · 50 Questions · 30 Minutes</div>
+    <div class="gate-label">Access password</div>
+    <div class="gate-pw-wrap">
+      <input class="gate-input" id="gate-pw" type="password" placeholder="••••••••••••" autocomplete="off">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <div class="gate-err" id="gate-err"></div>
+    <button class="gate-btn" onclick="gateSubmit()">Enter →</button>
+    <div class="gate-attempts" id="gate-att"></div>
+  </div>
+</div>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — English Paper 4</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">English · Paper 4</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer"><div class="gtimer-dot" id="gdot"></div><span class="gtimer-txt" id="gtime">30:00</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);">&#8595; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#9203;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#8595; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function(){
+  var REGISTRY={"31e2f049ea6226f6d5755f4fb549d95c7f78ceab43a4b1e407f6b28b7ce3beb9":"Conve","781b7749f5ddd8f9686ee31b4fef571d04b4b8432e61137bc5d78d9ada22c24c":"Kaosara","3da4c5cd7bb9a4573a160725e390a3214e193094fc4ad86a29db95dc39365ca6":"Habibat","9403e4ed9497a885390af4a54bbd8acf944cdb0ce1466e65a016ead13c96eab1":"Oyin","e290b9f1952da521dab7ec693caa609e4ff707d3d9e00c1ecb53f092113a4f3a":"Dorcas","6ad071baadf38c76a1976e3e07d322d2bb6f534f195bf2253c9d0b2874b121b9":"Famous","da123098c73e97dc05aa4f080b36fecc0acc46a1d2ea353d65bce0a11d0dfcbf":"Obasesam","19d3009c2301c89096cb61da53f92e8c854f8fd223c4f368931d312fe6a16e9e":"Prosper","202ec3362eaf2ac6da6a02fb6354907d0833384c386773ebc599ec2d0d2fb2ca":"Temi","21d29829c5868128c5b56f13c3f7d446c2bb8fda63b579647e4ab3dfe03f5ed4":"Murphy","00f1c6e06fbbfb8672c7f96ad536eaf731caa361252cac7caaba7fa781ef049c":"Improve","5f606895db4060437354146e2f29fd4d2f44452c0a449734b7bbca7bdd0dfbd2":"Zainab",
+    "40a6b5c1ef1603b230f237c119b6a4d22e0ff8263c53a23d1ab766c519770d74": "Fiyin",
+    "a310cf0e3a5016abf43ddf3115d7694bc89e0c05c832b051dd31a5878db633dd": "Aliyah","ef6a705af5e4ef7b3f4fe9537a9ff64ce8279874d880aed9c6811a3a9a934580":"Taiwo T.","f0350dab6f3941cbde1aafa8625a20830927f159fa12454dff903a2157b79052":"Aremu Ella","8351728b036d98831f2b44daf7f25974f1541a4df0aa03afb13b7036ba0175ce":"Abu Ene"};
+  var attempts=0,MAX_ATT=5;
+  async function sha256(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+  window.gateSubmit=async function(){
+    var pw=document.getElementById('gate-pw').value.trim();
+    var err=document.getElementById('gate-err');
+    var att=document.getElementById('gate-att');
+    document.getElementById('gate-pw').classList.remove('err');
+    if(!pw){document.getElementById('gate-pw').classList.add('err');err.textContent='Enter your password.';return;}
+    attempts++;
+    var h=await sha256(pw);
+    var name=REGISTRY[h];
+    if(name){
+      document.getElementById('gate').classList.add('gone');
+      var wm=document.getElementById('watermark');
+      if(wm){var t=name+' · GrantApp AI · ';var row='';for(var i=0;i<8;i++)row+=t;var html='';for(var i=0;i<14;i++)html+='<span>'+row+'</span>';wm.innerHTML=html;}
+      var greet=document.getElementById('greeting');
+      if(greet){greet.textContent='Hey, '+name;greet.style.display='block';}
+      document.getElementById('print-student-name').textContent='Student: '+name;
+      document.getElementById('print-date').textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      startTimer();
+    }else{
+      document.getElementById('gate-pw').classList.add('err');
+      var left=MAX_ATT-attempts;
+      if(left<=0){err.textContent='Too many failed attempts.';document.querySelector('.gate-btn').disabled=true;document.getElementById('gate-pw').disabled=true;}
+      else{err.textContent='Incorrect password.';att.textContent=left+' attempt'+(left===1?'':'s')+' remaining.';}
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-pw');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.gateSubmit(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password';
+      inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
+  });
+})();
+
+var QUESTIONS = [
+
+  /* ── REPORTED SPEECH (Q1–18) ── */
+
+  {id:1,topic:'Reported Speech',text:'Change to reported speech: He said, "I am tired."',opts:{A:'He said that he was tired.',B:'He said that he is tired.',C:'He said that I was tired.',D:'He said that he will be tired.'},ans:'A',exp:'Backshift rule: present simple "am" → past simple "was". The pronoun "I" changes to "he" to reflect the third-person reporter. [S]'},
+
+  {id:2,topic:'Reported Speech',text:'Change to reported speech: She said, "I have finished my work."',opts:{A:'She said that she had finished her work.',B:'She said that she has finished her work.',C:'She said that she finished her work.',D:'She said that she will finish her work.'},ans:'A',exp:'Present perfect "have finished" → past perfect "had finished". This is the standard backshift for perfect tenses in reported speech. [S]'},
+
+  {id:3,topic:'Reported Speech',text:'Change to reported speech: The teacher said, "The exam will be difficult."',opts:{A:'The teacher said that the exam would be difficult.',B:'The teacher said that the exam will be difficult.',C:'The teacher said that the exam was difficult.',D:'The teacher said that the exam is difficult.'},ans:'A',exp:'"Will" backshifts to "would" in reported speech. "Will be" → "would be." [S]'},
+
+  {id:4,topic:'Reported Speech',text:'Which sentence correctly reports: "Don\'t open the window," the manager told the clerk?',opts:{A:'The manager told the clerk not to open the window.',B:'The manager told the clerk to not open the window.',C:'The manager said the clerk should not open the window.',D:'The manager told the clerk that he should open the window.'},ans:'A',exp:'Negative imperatives in reported speech: "Don\'t + verb" → "told + object + not to + infinitive." The infinitive is kept without "to not" splitting it. [S]'},
+
+  {id:5,topic:'Reported Speech',text:'Change to reported speech: "Where do you live?" she asked him.',opts:{A:'She asked him where he lived.',B:'She asked him where did he live.',C:'She asked him where he lives.',D:'She asked him where does he live.'},ans:'A',exp:'Reported questions lose the question word order — no inversion. "Where do you live?" → "where he lived." Pronoun changes: "you" → "he." Tense backshift: "do live" → "lived." [R]'},
+
+  {id:6,topic:'Reported Speech',text:'Change to reported speech: "Have you seen my bag?" Emeka asked Tunde.',opts:{A:'Emeka asked Tunde if he had seen his bag.',B:'Emeka asked Tunde if he has seen his bag.',C:'Emeka asked Tunde whether had he seen his bag.',D:'Emeka asked Tunde did he see his bag.'},ans:'A',exp:'Yes/no questions in reported speech use "if" or "whether." Present perfect "have seen" backshifts to past perfect "had seen." No question word order in reported questions. [R]'},
+
+  {id:7,topic:'Reported Speech',text:'Change to reported speech: "Close the door," he told her.',opts:{A:'He told her to close the door.',B:'He told her that she should close the door.',C:'He said to her close the door.',D:'He told her she closes the door.'},ans:'A',exp:'Affirmative imperatives: "Close the door" → "told + object + to + infinitive." Option A is the most direct and standard form. [S]'},
+
+  {id:8,topic:'Reported Speech',text:'"I will come tomorrow," she promised. In reported speech, "tomorrow" changes to:',opts:{A:'the following day / the next day',B:'yesterday',C:'today',D:'the previous day'},ans:'A',exp:'Time expressions backshift in reported speech: "tomorrow" → "the following day" or "the next day." Other shifts: "yesterday" → "the previous day/the day before"; "today" → "that day"; "now" → "then." [R]'},
+
+  {id:9,topic:'Reported Speech',text:'Choose the correct reported form: "I am going to Lagos next week," Ade told his friend.',opts:{A:'Ade told his friend that he was going to Lagos the following week.',B:'Ade told his friend that he is going to Lagos next week.',C:'Ade told his friend that he will go to Lagos next week.',D:'Ade told his friend that he went to Lagos the following week.'},ans:'A',exp:'"Am going" → "was going." "Next week" → "the following week." Both the tense and the time reference must be adjusted. [R]'},
+
+  {id:10,topic:'Reported Speech',text:'"We have lived here for ten years," the old man said. In reported speech:',opts:{A:'The old man said that they had lived there for ten years.',B:'The old man said that they have lived there for ten years.',C:'The old man said that they lived here for ten years.',D:'The old man said that they had lived here for ten years.'},ans:'A',exp:'"Have lived" → "had lived." "Here" → "there." Both the tense (present perfect → past perfect) and the place reference ("here" → "there") must change. [R]'},
+
+  {id:11,topic:'Reported Speech',text:'The doctor said, "You must rest for a week." In reported speech:',opts:{A:'The doctor said that I had to rest for a week.',B:'The doctor said that I must rest for a week.',C:'The doctor said that I should rest for a week.',D:'The doctor said that I ought to rest for a week.'},ans:'A',exp:'"Must" (obligation) backshifts to "had to" in reported speech. "Should" can sometimes be used informally, but "had to" is the standard formal backshift. [R]'},
+
+  {id:12,topic:'Reported Speech',text:'Identify the correctly reported sentence: "Why did you not attend the meeting?" the chairman asked the secretary.',opts:{A:'The chairman asked the secretary why she had not attended the meeting.',B:'The chairman asked the secretary why did she not attend the meeting.',C:'The chairman asked the secretary why she did not attend the meeting.',D:'The chairman asked the secretary that why she had not attended the meeting.'},ans:'A',exp:'Reported wh-questions: no inversion, past simple backshifts to past perfect. "Why did you not" → "why she had not." "That" is never used before question words in reported speech. [R]'},
+
+  {id:13,topic:'Reported Speech',text:'"This house is mine," she declared. In reported speech, "this" changes to:',opts:{A:'that',B:'this',C:'here',D:'those'},ans:'A',exp:'Demonstrative backshift: "this" (near) → "that" (distant). Similarly: "these" → "those." Place and demonstrative references shift away from the speaker\'s perspective. [S]'},
+
+  {id:14,topic:'Reported Speech',text:'Choose the sentence that is NOT correctly reported.',opts:{A:'He said he will come the next day.',B:'She told him she had been waiting for hours.',C:'They asked whether the results had been released.',D:'The manager said the meeting had been postponed.'},ans:'A',exp:'"Will" must backshift to "would" in reported speech. "He said he will come" is incorrect — it should be "he said he would come." The other options all correctly backshift their modal or tense. [R]'},
+
+  {id:15,topic:'Reported Speech',text:'"Please help me with this," Bisi begged her sister. In reported speech:',opts:{A:'Bisi begged her sister to help her with that.',B:'Bisi begged her sister that she should help her with this.',C:'Bisi begged her sister please to help her.',D:'Bisi begged her sister if she would help her with this.'},ans:'A',exp:'"Please + imperative" in reported speech → "begged + object + to + infinitive." "This" → "that." "Me" → "her." [R]'},
+
+  {id:16,topic:'Reported Speech',text:'Select the correct reported form of: "I can swim very well," the child boasted.',opts:{A:'The child boasted that he could swim very well.',B:'The child boasted that he can swim very well.',C:'The child boasted that he swims very well.',D:'The child boasted that he will swim very well.'},ans:'A',exp:'"Can" backshifts to "could" in reported speech. "I" → "he." The tense change (can → could) is the only required change here. [S]'},
+
+  {id:17,topic:'Reported Speech',text:'Which reported question is correctly formed?',opts:{A:'She wanted to know what time the train arrived.',B:'She wanted to know what time did the train arrive.',C:'She wanted to know when the train will arrive.',D:'She wanted to know if the train arrived what time.'},ans:'A',exp:'Reported questions use statement word order, not question word order. "What time did the train arrive?" → "what time the train arrived." No auxiliary inversion; tense backshifts from past simple. [S]'},
+
+  {id:18,topic:'Reported Speech',text:'"I might be late," he warned them. In reported speech:',opts:{A:'He warned them that he might be late.',B:'He warned them that he may be late.',C:'He warned them that he would be late.',D:'He warned them that he could be late.'},ans:'A',exp:'"Might" is already the past form of "may" and does not backshift further. "Might" remains "might" in reported speech. [P]'},
+
+  /* ── PREPOSITIONS (Q19–34) ── */
+
+  {id:19,topic:'Prepositions',text:'Choose the correct preposition: She has been waiting _____ two hours.',opts:{A:'for',B:'since',C:'during',D:'from'},ans:'A',exp:'"For" is used with a duration of time (two hours, three days, a week). "Since" is used with a point in time (since morning, since 2019). [S]'},
+
+  {id:20,topic:'Prepositions',text:'Choose the correct preposition: I have not seen her _____ last Monday.',opts:{A:'since',B:'for',C:'from',D:'during'},ans:'A',exp:'"Since" is used with a specific point in time — "since last Monday" means from that point up to now. Use "for" with a duration: "for a week." [S]'},
+
+  {id:21,topic:'Prepositions',text:'The ceremony will begin _____ 10 o\'clock _____ the morning.',opts:{A:'at / in',B:'in / at',C:'on / in',D:'at / on'},ans:'A',exp:'"At" is used with specific clock times; "in" is used with parts of the day (morning, afternoon, evening). "At 10 o\'clock in the morning" follows both rules. [S]'},
+
+  {id:22,topic:'Prepositions',text:'He was born _____ the 14th of March.',opts:{A:'on',B:'in',C:'at',D:'by'},ans:'A',exp:'"On" is used with specific dates. "In" is used with months and years. "At" is used with times. Born ON the 14th of March. [S]'},
+
+  {id:23,topic:'Prepositions',text:'The book is different _____ what I expected.',opts:{A:'from',B:'to',C:'than',D:'with'},ans:'A',exp:'"Different from" is the standard formal British English construction. "Different to" is acceptable in informal British English; "different than" is used in American English. JAMB tests "different from." [R]'},
+
+  {id:24,topic:'Prepositions',text:'She is very good _____ mathematics.',opts:{A:'at',B:'in',C:'for',D:'with'},ans:'A',exp:'"Good at" is the correct collocation for describing ability in a subject. "Good in" is a common Nigerian English error — it is not standard. [S]'},
+
+  {id:25,topic:'Prepositions',text:'The students were accused _____ cheating in the examination.',opts:{A:'of',B:'for',C:'with',D:'about'},ans:'A',exp:'"Accuse of" is the fixed collocation. You accuse someone OF a crime or wrongdoing. Never "accuse for." [S]'},
+
+  {id:26,topic:'Prepositions',text:'He apologised _____ his behaviour.',opts:{A:'for',B:'about',C:'of',D:'to'},ans:'A',exp:'"Apologise for" is the correct collocation. You apologise FOR something (a behaviour, an action). Note: "apologise TO someone" but "apologise FOR something." [S]'},
+
+  {id:27,topic:'Prepositions',text:'She is married _____ a doctor.',opts:{A:'to',B:'with',C:'for',D:'by'},ans:'A',exp:'"Married to" is the correct preposition in standard English. "Married with" is a common Nigerian English error. One is married TO a person. [S]'},
+
+  {id:28,topic:'Prepositions',text:'The committee consists _____ five members.',opts:{A:'of',B:'from',C:'with',D:'by'},ans:'A',exp:'"Consist of" — never "consist from" or "consist with." The committee is composed OF five members. [S]'},
+
+  {id:29,topic:'Prepositions',text:'He congratulated her _____ passing her exams.',opts:{A:'on',B:'for',C:'about',D:'with'},ans:'A',exp:'"Congratulate on" is the correct collocation. You congratulate someone ON an achievement. "For" is also heard informally but "on" is the standard form tested by JAMB. [R]'},
+
+  {id:30,topic:'Prepositions',text:'The child was deprived _____ food and shelter.',opts:{A:'of',B:'from',C:'for',D:'with'},ans:'A',exp:'"Deprive of" — to deprive someone OF something means to take it away from them. Fixed collocation, no alternatives. [S]'},
+
+  {id:31,topic:'Prepositions',text:'She is very fond _____ her grandchildren.',opts:{A:'of',B:'with',C:'for',D:'about'},ans:'A',exp:'"Fond of" — fixed collocation. You are fond OF a person or thing. [S]'},
+
+  {id:32,topic:'Prepositions',text:'The result depends _____ how hard you study.',opts:{A:'on',B:'upon',C:'of',D:'from'},ans:'A',exp:'"Depend on" (or "depend upon") — both are correct, but "on" is the more common JAMB answer. Never "depend of." [S]'},
+
+  {id:33,topic:'Prepositions',text:'Choose the sentence with the CORRECT preposition.',opts:{A:'She graduated from the university last year.',B:'She graduated in the university last year.',C:'She graduated at the university last year.',D:'She graduated with the university last year.'},ans:'A',exp:'"Graduate from" — you graduate FROM an institution. This is a very common JAMB test item because Nigerian English frequently produces "graduate in." [S]'},
+
+  {id:34,topic:'Prepositions',text:'The book was written _____ the aim _____ educating young people.',opts:{A:'with / of',B:'for / of',C:'with / for',D:'by / of'},ans:'A',exp:'"Written with the aim of" — fixed phrase. "With the aim of doing something" = intending to do something. [R]'},
+
+  /* ── COLLOCATIONS (Q35–50) ── */
+
+  {id:35,topic:'Collocations',text:'Choose the word that correctly collocates with "decision": She made a _____ decision.',opts:{A:'wise',B:'sensible',C:'clever',D:'all of the above are correct collocations'},ans:'D',exp:'All three — "wise decision," "sensible decision," and "clever decision" — are natural collocations. JAMB occasionally tests awareness that multiple options can be correct; when they are, "all of the above" is the answer. [R]'},
+
+  {id:36,topic:'Collocations',text:'Which of the following is the correct collocation?',opts:{A:'make a mistake',B:'do a mistake',C:'commit a mistake',D:'perform a mistake'},ans:'A',exp:'"Make a mistake" is the standard collocation. "Do a mistake" is one of the most widespread collocation errors in Nigerian English. You DO homework, DO research, DO damage — but you MAKE a mistake. [S]'},
+
+  {id:37,topic:'Collocations',text:'Choose the correct collocation: She _____ a speech at the graduation ceremony.',opts:{A:'delivered',B:'made',C:'gave',D:'both B and C are correct'},ans:'D',exp:'Both "gave a speech" and "made a speech" are natural, standard collocations. "Delivered a speech" is also correct but more formal. JAMB tests "gave/made a speech" most frequently. [R]'},
+
+  {id:38,topic:'Collocations',text:'Which sentence contains a correct collocation?',opts:{A:'He committed a crime.',B:'He did a crime.',C:'He made a crime.',D:'He performed a crime.'},ans:'A',exp:'"Commit a crime" is the only standard collocation. You commit crimes, commit offences, commit murder. "Do/make/perform a crime" are all non-standard. [S]'},
+
+  {id:39,topic:'Collocations',text:'Choose the correct collocation: The doctor _____ the patient a thorough examination.',opts:{A:'gave',B:'made',C:'did',D:'conducted'},ans:'A',exp:'"Give someone an examination" is the standard collocation in this context. "Conducted an examination" is also acceptable (more formal), but "gave" is the core collocation JAMB tests. [R]'},
+
+  {id:40,topic:'Collocations',text:'Which of the following is NOT a natural collocation?',opts:{A:'do your best',B:'make your best',C:'reach a compromise',D:'break a record'},ans:'B',exp:'"Make your best" is not a standard collocation — the correct form is "do your best." "Reach a compromise," "break a record," and "do your best" are all standard. [S]'},
+
+  {id:41,topic:'Collocations',text:'Choose the correct collocation: He _____ a lot of money on the project.',opts:{A:'spent',B:'wasted',C:'used',D:'both A and B are correct collocations'},ans:'D',exp:'Both "spent money" and "wasted money" are correct collocations — "spent" is neutral, "wasted" implies the expenditure was unwise. Both are natural. [R]'},
+
+  {id:42,topic:'Collocations',text:'Which phrase is a correct collocation?',opts:{A:'heavy rain',B:'strong rain',C:'big rain',D:'hard rain'},ans:'A',exp:'"Heavy rain" is the standard collocation. "Strong wind" — not "heavy wind." "Big problem" — not "heavy problem." Weather collocations in English are specific: heavy rain, heavy snow, strong wind, bright sunshine. [S]'},
+
+  {id:43,topic:'Collocations',text:'Choose the correct collocation: She _____ a deep breath before speaking.',opts:{A:'took',B:'made',C:'did',D:'gave'},ans:'A',exp:'"Take a breath" / "take a deep breath" is the standard collocation. You take a nap, take a risk, take a chance, take a break — not "make/do/give" in these phrases. [S]'},
+
+  {id:44,topic:'Collocations',text:'Which of the following is a correct collocation with "responsibility"?',opts:{A:'take responsibility',B:'make responsibility',C:'do responsibility',D:'give responsibility'},ans:'A',exp:'"Take responsibility" — you take responsibility for something. Also: "bear responsibility," "accept responsibility," "shoulder responsibility." Never "make" or "do" responsibility. [S]'},
+
+  {id:45,topic:'Collocations',text:'Choose the correct collocation: The government _____ a new policy on education.',opts:{A:'introduced',B:'made',C:'did',D:'gave'},ans:'A',exp:'"Introduce a policy" is the most precise and formal collocation. "Made a policy" is also acceptable but less idiomatic. In examination contexts, "introduced" is the preferred collocate. [R]'},
+
+  {id:46,topic:'Collocations',text:'"Strong" collocates correctly with which of the following?',opts:{A:'opinion',B:'rain',C:'applause',D:'wind and opinion'},ans:'D',exp:'"Strong wind" and "strong opinion" are both natural collocations. "Strong applause" is non-standard — "thunderous/loud applause" is correct. "Strong rain" is non-standard — "heavy rain" is correct. [P]'},
+
+  {id:47,topic:'Collocations',text:'Which sentence uses the correct verb-noun collocation?',opts:{A:'She raised a question during the meeting.',B:'She lifted a question during the meeting.',C:'She asked a question during the meeting.',D:'Both A and C are correct.'},ans:'D',exp:'Both "raise a question" (formal, often implies bringing an issue to attention) and "ask a question" (neutral, direct) are standard. "Lift a question" is non-standard. [R]'},
+
+  {id:48,topic:'Collocations',text:'Choose the correct collocation: The evidence _____ his innocence.',opts:{A:'proved',B:'showed',C:'demonstrated',D:'all of the above are correct collocations'},ans:'D',exp:'"Prove innocence," "show innocence," and "demonstrate innocence" are all grammatically and idiomatically correct. Evidence can do all three. [R]'},
+
+  {id:49,topic:'Collocations',text:'Which of the following is NOT a correct collocation?',opts:{A:'make progress',B:'do progress',C:'achieve progress',D:'make rapid progress'},ans:'B',exp:'"Do progress" is not a standard collocation. The correct forms are "make progress" and "achieve progress." "Do" collocates with homework, research, business, damage, harm — not with progress. [S]'},
+
+  {id:50,topic:'Collocations',text:'Choose the sentence with the correct collocation.',opts:{A:'The accident caused serious damage to the vehicle.',B:'The accident made serious damage to the vehicle.',C:'The accident did serious damage to the vehicle.',D:'Both A and C are correct.'},ans:'D',exp:'"Cause damage" and "do damage" are both standard collocations. "Make damage" is non-standard. Both A and C are correct English. [P]'}
+
+];
+
+var ST={correct:0,wrong:0,answered:0};
+var UA={};
+var globalDone=false;
+var timerInterval=null;
+ST.answeredIds=new Set();
+
+function startTimer(){
+  var remaining=1800;
+  var dot=document.getElementById('gdot');
+  var txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}
+    if(remaining<=0){clearInterval(timerInterval);timeUp();}
+  },1000);
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—';}
+
+function render(){
+  var container=document.getElementById('qc');
+  var html='';
+  var labels=['A','B','C','D'];
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i];
+    var pool=labels.map(function(l){return{text:q.opts[l]};});
+    for(var s=pool.length-1;s>0;s--){var r=Math.floor(Math.random()*(s+1));var tmp=pool[s];pool[s]=pool[r];pool[r]=tmp;}
+    var correctText=q.opts[q.ans];
+    var remappedAns='A';
+    var optsHtml='';
+    for(var j=0;j<pool.length;j++){
+      var newLbl=labels[j];
+      if(pool[j].text===correctText)remappedAns=newLbl;
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+newLbl+'"><span class="opt-key">'+newLbl+'.</span><span class="opt-txt">'+pool[j].text+'</span></div>';
+    }
+    q._ans=remappedAns;
+    html+='<div class="qcard" style="animation-delay:'+(i*0.025)+'s"><div class="qcard-top"><span class="qnum">Q'+(i+1)+' of 50</span>'+(q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+'</div><div class="qtxt">'+q.text+'</div><div class="opts">'+optsHtml+'</div><button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button><div class="exp" id="exp'+q.id+'"></div></div>';
+  }
+  container.innerHTML=html;
+  attachListeners();
+}
+
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel');});
+      this.classList.add('sel');UA[qid]=this.dataset.a;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if(btn)btn.disabled=false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid;});
+      var ans=q._ans||q.ans;
+      var chosen=UA[qid],ok=(chosen===ans);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===ans)o.classList.add('ok');
+        else if(o.dataset.a===chosen)o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      expEl.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+(ok?'✓ Correct':'✗ Incorrect — correct answer: '+ans)+'</span>'+(q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');this.disabled=true;
+      if(!ST.answeredIds.has(qid)){ST.answered++;ST.answeredIds.add(qid);if(ok)ST.correct++;else ST.wrong++;updateStats();}
+    });
+  });
+}
+
+function updateStats(){
+  var left=QUESTIONS.length-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%';
+}
+
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(btn){if(!btn.disabled)btn.click();});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function doPrint(){document.getElementById('print-header').style.display='block';window.print();setTimeout(function(){document.getElementById('print-header').style.display='none';},1000);}
+
+render();
+</script>
+</body>
+</html>
