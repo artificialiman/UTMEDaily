@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Gas Laws — Chemistry · JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Gas Laws</div>
+    <div class="subtitle">100-question mastery drill · Chemistry</div>
+</div>
+
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// GAS LAWS · 100 QUESTIONS
+// Spine: PV = nRT  —  n is the hub everything flows through
+// Every entry (mass, molarity, VD, solubility, particles, STP volume...)
+// lands at n first. Every exit (P, V, T, mass, particles, conc...) leaves from n.
+// ─────────────────────────────────────────────────────────────────────────────
+// SET 1  · Unit conversion only — pressure, volume, temperature      Q1–8
+// SET 2  · n as the hub — all representations ↔ moles               Q9–18
+// SET 3  · Avogadro — particles ↔ moles ↔ mass                      Q19–26
+// SET 4  · Boyle's law (T constant)                                  Q27–34
+// SET 5  · Charles's law (P constant)                                Q35–41
+// SET 6  · Gay-Lussac's law (V constant)                             Q42–47
+// SET 7  · Combined gas law (two states)                             Q48–55
+// SET 8  · PV = nRT — find P, V, n or T                             Q56–65
+// SET 9  · Molar mass from density and vapour density                Q66–72
+// SET 10 · Molarity and molality                                     Q73–79
+// SET 11 · Solubility                                                Q80–84
+// SET 12 · Dalton's partial pressures and mole fractions             Q85–90
+// SET 13 · Graham's law                                              Q91–95
+// SET 14 · Conceptual — ideal vs real, STP vs RTP, R selection       Q96–100
+// ─────────────────────────────────────────────────────────────────────────────
+
+const questions = {
+  chemistry: [
+
+  // ── SET 1 · Unit conversion only ─────────────────────────────────────────
+
+  {q:"Convert 760 mmHg to atm.",
+   opts:["A. 0.5 atm","B. 1.0 atm","C. 2.0 atm","D. 760 atm"],
+   ans:"B",
+   exp:"By definition, 760 mmHg = 1 atm. This is the most important pressure conversion to memorise — every other pressure unit converts through this anchor."},
+
+  {q:"Convert 101.325 kPa to atm.",
+   opts:["A. 0.1 atm","B. 10 atm","C. 1.0 atm","D. 101 atm"],
+   ans:"C",
+   exp:"101.325 kPa = 1 atm. Standard atmospheric pressure in SI units. 1 bar = 100 kPa is close but not identical to 1 atm."},
+
+  {q:"Convert 500 cm\u00B3 to dm\u00B3 (litres).",
+   opts:["A. 50 L","B. 5.0 L","C. 0.5 L","D. 0.05 L"],
+   ans:"C",
+   exp:"1 dm\u00B3 = 1 L = 1000 cm\u00B3. So 500 cm\u00B3 \u00F7 1000 = 0.5 L. Volume unit conversion is the second most common source of errors in gas law calculations."},
+
+  {q:"Convert 2.5 L to m\u00B3.",
+   opts:["A. 2500 m\u00B3","B. 0.0025 m\u00B3","C. 0.25 m\u00B3","D. 25 m\u00B3"],
+   ans:"B",
+   exp:"1 m\u00B3 = 1000 L, so 2.5 L \u00F7 1000 = 0.0025 m\u00B3. Use m\u00B3 when R = 8.314 Pa\u00B7m\u00B3/mol\u00B7K."},
+
+  {q:"Convert 27\u00B0C to Kelvin.",
+   opts:["A. 27 K","B. 300 K","C. 246 K","D. 373 K"],
+   ans:"B",
+   exp:"K = \u00B0C + 273. Always convert temperature to Kelvin before using any gas law. 0\u00B0C = 273 K; 27\u00B0C = 300 K is a common exam anchor."},
+
+  {q:"Convert \u2212173\u00B0C to Kelvin.",
+   opts:["A. 173 K","B. 446 K","C. 100 K","D. 0 K"],
+   ans:"C",
+   exp:"K = \u2212173 + 273 = 100 K. Negative Celsius temperatures are common traps \u2014 adding 273 always gives a positive Kelvin value above absolute zero."},
+
+  {q:"Convert 380 mmHg to kPa. (1 atm = 101.325 kPa = 760 mmHg)",
+   opts:["A. 25.3 kPa","B. 50.7 kPa","C. 101.3 kPa","D. 380 kPa"],
+   ans:"B",
+   exp:"380 mmHg \u00F7 760 = 0.5 atm. 0.5 \u00D7 101.325 = 50.66 \u2248 50.7 kPa. Route: mmHg \u2192 atm \u2192 kPa."},
+
+  {q:"Which value of R should be used when pressure is in kPa and volume in dm\u00B3?",
+   opts:["A. 0.0821 L\u00B7atm/mol\u00B7K","B. 8.314 Pa\u00B7m\u00B3/mol\u00B7K","C. 8.314 dm\u00B3\u00B7kPa/mol\u00B7K","D. 62.36 mmHg\u00B7L/mol\u00B7K"],
+   ans:"C",
+   exp:"R encodes the unit choice. 8.314 dm\u00B3\u00B7kPa/mol\u00B7K is numerically the same as 8.314 J/mol\u00B7K because 1 J = 1 Pa\u00B7m\u00B3 = 1 kPa\u00B7dm\u00B3. Match R to your units before calculating."},
+
+  // ── SET 2 · n as the hub ─────────────────────────────────────────────────
+
+  {q:"How many moles are in 44 g of CO\u2082? (C=12, O=16)",
+   opts:["A. 2 mol","B. 0.5 mol","C. 1 mol","D. 44 mol"],
+   ans:"C",
+   exp:"M(CO\u2082) = 12 + 32 = 44 g/mol. n = m/M = 44/44 = 1 mol. Mass \u00F7 molar mass is the most fundamental route to n."},
+
+  {q:"What is the mass of 0.25 mol of NH\u2083? (N=14, H=1)",
+   opts:["A. 4.25 g","B. 68 g","C. 8.5 g","D. 4.25 g"],
+   ans:"A",
+   exp:"M(NH\u2083) = 14 + 3 = 17 g/mol. m = nM = 0.25 \u00D7 17 = 4.25 g."},
+
+  {q:"How many moles of gas occupy 11.2 L at STP?",
+   opts:["A. 1 mol","B. 2 mol","C. 0.25 mol","D. 0.5 mol"],
+   ans:"D",
+   exp:"At STP (0\u00B0C, 1 atm), 1 mol of any ideal gas = 22.4 L. n = 11.2/22.4 = 0.5 mol. This is the STP molar volume shortcut \u2014 it is just PV=nRT evaluated at T=273K, P=1atm."},
+
+  {q:"What volume does 3 mol of an ideal gas occupy at STP?",
+   opts:["A. 22.4 L","B. 44.8 L","C. 67.2 L","D. 7.5 L"],
+   ans:"C",
+   exp:"V = n \u00D7 22.4 = 3 \u00D7 22.4 = 67.2 L at STP. Always confirm T = 273 K and P = 1 atm before using 22.4."},
+
+  {q:"A gas has a vapour density of 16. What is its molar mass?",
+   opts:["A. 8 g/mol","B. 16 g/mol","C. 32 g/mol","D. 64 g/mol"],
+   ans:"C",
+   exp:"Molar mass = 2 \u00D7 vapour density = 2 \u00D7 16 = 32 g/mol. Vapour density is defined relative to H\u2082 (M=2), so multiplying by 2 converts it to g/mol."},
+
+  {q:"What is the vapour density of SO\u2082? (S=32, O=16)",
+   opts:["A. 32","B. 16","C. 64","D. 8"],
+   ans:"A",
+   exp:"M(SO\u2082) = 32 + 32 = 64 g/mol. VD = M/2 = 64/2 = 32."},
+
+  {q:"250 cm\u00B3 of a 0.4 mol/L HCl solution is used. How many moles of HCl are present?",
+   opts:["A. 0.01 mol","B. 0.1 mol","C. 1.0 mol","D. 0.04 mol"],
+   ans:"B",
+   exp:"n = c \u00D7 V = 0.4 \u00D7 0.250 = 0.1 mol. Volume must be in litres: 250 cm\u00B3 = 0.250 L."},
+
+  {q:"How many moles are in 500 cm\u00B3 of a 2 mol/L NaOH solution?",
+   opts:["A. 0.25 mol","B. 0.5 mol","C. 1.0 mol","D. 2.0 mol"],
+   ans:"C",
+   exp:"n = c \u00D7 V = 2 \u00D7 0.500 = 1.0 mol. Again, cm\u00B3 \u2192 L first."},
+
+  // ── SET 3 · Avogadro ─────────────────────────────────────────────────────
+
+  {q:"How many molecules are in 1 mol of CO\u2082? (Nₐ = 6.02 \u00D7 10\u00B2\u00B3)",
+   opts:["A. 6.02 \u00D7 10\u00B2\u00B2","B. 6.02 \u00D7 10\u00B2\u00B3","C. 3.01 \u00D7 10\u00B2\u00B3","D. 1.20 \u00D7 10\u00B2\u2074"],
+   ans:"B",
+   exp:"N = n \u00D7 Nₐ = 1 \u00D7 6.02\u00D710\u00B2\u00B3 = 6.02\u00D710\u00B2\u00B3 molecules. Avogadro's number is simply the conversion factor between moles and individual particles."},
+
+  {q:"How many molecules are in 22 g of CO\u2082? (C=12, O=16; Nₐ = 6.02 \u00D7 10\u00B2\u00B3)",
+   opts:["A. 6.02 \u00D7 10\u00B2\u00B3","B. 3.01 \u00D7 10\u00B2\u00B3","C. 1.20 \u00D7 10\u00B2\u2074","D. 6.02 \u00D7 10\u00B2\u00B2"],
+   ans:"B",
+   exp:"M(CO\u2082)=44. n=22/44=0.5 mol. N=0.5\u00D76.02\u00D710\u00B2\u00B3=3.01\u00D710\u00B2\u00B3 molecules."},
+
+  {q:"How many moles correspond to 3.01 \u00D7 10\u00B2\u00B3 atoms of iron? (Nₐ = 6.02 \u00D7 10\u00B2\u00B3)",
+   opts:["A. 2 mol","B. 0.5 mol","C. 1 mol","D. 3.01 mol"],
+   ans:"B",
+   exp:"n = N/Nₐ = 3.01\u00D710\u00B2\u00B3 / 6.02\u00D710\u00B2\u00B3 = 0.5 mol."},
+
+  {q:"What mass of water contains 3.01 \u00D7 10\u00B2\u00B3 molecules? (H=1, O=16; Nₐ = 6.02 \u00D7 10\u00B2\u00B3)",
+   opts:["A. 9 g","B. 18 g","C. 36 g","D. 3 g"],
+   ans:"A",
+   exp:"n = 3.01\u00D710\u00B2\u00B3 / 6.02\u00D710\u00B2\u00B3 = 0.5 mol. m = nM = 0.5 \u00D7 18 = 9 g."},
+
+  {q:"How many atoms are in 8 g of oxygen gas, O\u2082? (O=16; Nₐ = 6.02 \u00D7 10\u00B2\u00B3)",
+   opts:["A. 6.02 \u00D7 10\u00B2\u00B3","B. 1.20 \u00D7 10\u00B2\u00B3","C. 3.01 \u00D7 10\u00B2\u00B3","D. 3.01 \u00D7 10\u00B2\u00B2"],
+   ans:"C",
+   exp:"M(O\u2082)=32. n=8/32=0.25 mol of O\u2082 molecules. Each molecule has 2 atoms, so n(atoms)=0.5 mol. N=0.5\u00D76.02\u00D710\u00B2\u00B3=3.01\u00D710\u00B2\u00B3. Watch for molecules vs atoms."},
+
+  {q:"How many molecules are in 5.6 L of N\u2082 at STP? (Nₐ = 6.02 \u00D7 10\u00B2\u00B3)",
+   opts:["A. 6.02 \u00D7 10\u00B2\u00B3","B. 1.51 \u00D7 10\u00B2\u00B3","C. 3.01 \u00D7 10\u00B2\u00B2","D. 3.01 \u00D7 10\u00B2\u00B3"],
+   ans:"B",
+   exp:"n = 5.6/22.4 = 0.25 mol. N = 0.25 \u00D7 6.02\u00D710\u00B2\u00B3 = 1.51\u00D710\u00B2\u00B3 molecules."},
+
+  {q:"Equal volumes of two gases are at the same temperature and pressure. Which statement is true?",
+   opts:["A. They have equal masses","B. They have equal moles","C. They have equal densities","D. They have equal molar masses"],
+   ans:"B",
+   exp:"Avogadro's law: equal volumes of gases at the same T and P contain equal numbers of moles (and molecules). Masses differ because molar masses differ."},
+
+  {q:"0.1 mol of SO\u2082 contains how many oxygen atoms? (Nₐ = 6.02 \u00D7 10\u00B2\u00B3)",
+   opts:["A. 6.02 \u00D7 10\u00B2\u00B2","B. 6.02 \u00D7 10\u00B2\u00B3","C. 1.20 \u00D7 10\u00B2\u00B3","D. 3.01 \u00D7 10\u00B2\u00B3"],
+   ans:"C",
+   exp:"Each SO\u2082 molecule has 2 oxygen atoms. n(O atoms) = 0.1 \u00D7 2 = 0.2 mol. N = 0.2 \u00D7 6.02\u00D710\u00B2\u00B3 = 1.20\u00D710\u00B2\u00B3 atoms."},
+
+  // ── SET 4 · Boyle's law ──────────────────────────────────────────────────
+
+  {q:"A gas occupies 4 L at 2 atm. What volume does it occupy at 1 atm? (T constant)",
+   opts:["A. 2 L","B. 4 L","C. 8 L","D. 1 L"],
+   ans:"C",
+   exp:"Boyle: P\u2081V\u2081 = P\u2082V\u2082 \u2192 V\u2082 = P\u2081V\u2081/P\u2082 = (2\u00D74)/1 = 8 L. Pressure halved, volume doubled \u2014 inverse relationship."},
+
+  {q:"A gas at 3 atm occupies 500 cm\u00B3. What is the pressure when volume is 1500 cm\u00B3? (T constant)",
+   opts:["A. 9 atm","B. 6 atm","C. 1 atm","D. 1.5 atm"],
+   ans:"C",
+   exp:"P\u2082 = P\u2081V\u2081/V\u2082 = (3\u00D7500)/1500 = 1 atm. Volume tripled so pressure must fall to one third."},
+
+  {q:"A gas occupies 800 cm\u00B3 at 101.3 kPa. What is its volume at 202.6 kPa? (T constant)",
+   opts:["A. 400 cm\u00B3","B. 1600 cm\u00B3","C. 200 cm\u00B3","D. 800 cm\u00B3"],
+   ans:"A",
+   exp:"P\u2082 = 2P\u2081, so V\u2082 = V\u2081/2 = 400 cm\u00B3. No unit conversion needed as both pressures are in kPa \u2014 the ratio is what matters."},
+
+  {q:"At 760 mmHg a gas has a volume of 300 mL. What volume does it occupy at 380 mmHg? (T constant)",
+   opts:["A. 150 mL","B. 300 mL","C. 600 mL","D. 760 mL"],
+   ans:"C",
+   exp:"V\u2082 = (760\u00D7300)/380 = 600 mL. Pressure halved, volume doubled."},
+
+  {q:"A gas is compressed from 10 L to 2 L at constant temperature. If the original pressure was 1 atm, what is the new pressure?",
+   opts:["A. 0.2 atm","B. 2 atm","C. 5 atm","D. 10 atm"],
+   ans:"C",
+   exp:"P\u2082 = P\u2081V\u2081/V\u2082 = (1\u00D710)/2 = 5 atm. Volume reduced by factor of 5, pressure increases by factor of 5."},
+
+  {q:"A fixed mass of gas at 100 kPa occupies 6.0 L. What pressure is needed to compress it to 2.0 L? (T constant)",
+   opts:["A. 33.3 kPa","B. 200 kPa","C. 300 kPa","D. 600 kPa"],
+   ans:"C",
+   exp:"P\u2082 = (100\u00D76)/2 = 300 kPa."},
+
+  {q:"At constant temperature, a gas at 4 atm is allowed to expand until its pressure becomes 1 atm. If the original volume was 250 mL, what is the new volume?",
+   opts:["A. 62.5 mL","B. 1000 mL","C. 500 mL","D. 125 mL"],
+   ans:"B",
+   exp:"V\u2082 = (4\u00D7250)/1 = 1000 mL. Pressure quartered, volume quadrupled."},
+
+  {q:"A gas occupies 1.5 L at 200 kPa and 300 K. The pressure is changed to 400 kPa at the same temperature. What is the new volume?",
+   opts:["A. 3.0 L","B. 0.75 L","C. 1.0 L","D. 1.5 L"],
+   ans:"B",
+   exp:"Boyle only: V\u2082 = P\u2081V\u2081/P\u2082 = (200\u00D71.5)/400 = 0.75 L. Temperature is constant so it cancels."},
+
+  // ── SET 5 · Charles's law ────────────────────────────────────────────────
+
+  {q:"A gas occupies 4 L at 300 K. What volume does it occupy at 600 K? (P constant)",
+   opts:["A. 2 L","B. 4 L","C. 8 L","D. 6 L"],
+   ans:"C",
+   exp:"Charles: V\u2081/T\u2081 = V\u2082/T\u2082 \u2192 V\u2082 = V\u2081T\u2082/T\u2081 = 4\u00D7600/300 = 8 L. Temperature doubled (in K), volume doubles."},
+
+  {q:"A gas at 27\u00B0C has a volume of 300 cm\u00B3. What is its volume at 127\u00B0C? (P constant)",
+   opts:["A. 200 cm\u00B3","B. 400 cm\u00B3","C. 600 cm\u00B3","D. 150 cm\u00B3"],
+   ans:"B",
+   exp:"T\u2081=300 K, T\u2082=400 K. V\u2082=300\u00D7400/300=400 cm\u00B3. Must convert \u00B0C to K first \u2014 the ratio 127/27 would give the wrong answer."},
+
+  {q:"A balloon has a volume of 2.0 L at 20\u00B0C. What is its volume at \u221280\u00B0C? (P constant)",
+   opts:["A. 1.32 L","B. 0.66 L","C. 3.0 L","D. 1.0 L"],
+   ans:"A",
+   exp:"T\u2081=293 K, T\u2082=193 K. V\u2082=2.0\u00D7193/293\u22481.32 L. Negative Celsius \u2014 convert carefully."},
+
+  {q:"A gas occupies 600 mL at 0\u00B0C. At what temperature (in \u00B0C) will it occupy 900 mL? (P constant)",
+   opts:["A. 273\u00B0C","B. 136.5\u00B0C","C. 0\u00B0C","D. 546 K"],
+   ans:"B",
+   exp:"T\u2082=T\u2081\u00D7V\u2082/V\u2081=273\u00D7900/600=409.5 K = 136.5\u00B0C. Answer asked in \u00B0C so subtract 273."},
+
+  {q:"A gas has a volume of 5 L at 500 K. At what temperature will it have a volume of 2 L? (P constant)",
+   opts:["A. 200 K","B. 125 K","C. 1250 K","D. 400 K"],
+   ans:"A",
+   exp:"T\u2082 = T\u2081\u00D7V\u2082/V\u2081 = 500\u00D72/5 = 200 K."},
+
+  {q:"At constant pressure, a gas at 27\u00B0C occupies 2.0 L. What temperature is needed to expand it to 3.0 L?",
+   opts:["A. 40.5\u00B0C","B. 177\u00B0C","C. 450 K","D. 450\u00B0C"],
+   ans:"C",
+   exp:"T\u2082 = 300\u00D73/2 = 450 K. The question asks for temperature \u2014 450 K is the clean answer. In Celsius that's 177\u00B0C, but option C (450 K) is correct as stated."},
+
+  {q:"At constant pressure, the volume of a gas increases from 200 mL to 400 mL. If the initial temperature was 100 K, what is the final temperature?",
+   opts:["A. 50 K","B. 200 K","C. 400 K","D. 800 K"],
+   ans:"B",
+   exp:"T\u2082 = T\u2081\u00D7V\u2082/V\u2081 = 100\u00D7400/200 = 200 K. Volume doubled, temperature doubled."},
+
+  // ── SET 6 · Gay-Lussac's law ─────────────────────────────────────────────
+
+  {q:"A gas in a sealed container has pressure 1 atm at 300 K. What is the pressure at 600 K? (V constant)",
+   opts:["A. 0.5 atm","B. 1 atm","C. 2 atm","D. 4 atm"],
+   ans:"C",
+   exp:"Gay-Lussac: P\u2081/T\u2081 = P\u2082/T\u2082 \u2192 P\u2082 = P\u2081T\u2082/T\u2081 = 1\u00D7600/300 = 2 atm. Temperature doubled (K), pressure doubles."},
+
+  {q:"A tyre at 27\u00B0C has a pressure of 200 kPa. What is the pressure at 77\u00B0C? (V constant)",
+   opts:["A. 233 kPa","B. 300 kPa","C. 177 kPa","D. 574 kPa"],
+   ans:"A",
+   exp:"T\u2081=300 K, T\u2082=350 K. P\u2082=200\u00D7350/300\u2248233 kPa. A common car tyre problem \u2014 pressure rises with temperature."},
+
+  {q:"A sealed vessel at 0\u00B0C has pressure 3 atm. At what temperature will the pressure be 4 atm?",
+   opts:["A. 364 K","B. 364\u00B0C","C. 91 K","D. 204\u00B0C"],
+   ans:"A",
+   exp:"T\u2082 = T\u2081\u00D7P\u2082/P\u2081 = 273\u00D74/3 = 364 K."},
+
+  {q:"A gas in a rigid container has pressure 150 kPa at 300 K. What pressure will it exert at 450 K?",
+   opts:["A. 100 kPa","B. 225 kPa","C. 300 kPa","D. 450 kPa"],
+   ans:"B",
+   exp:"P\u2082 = 150\u00D7450/300 = 225 kPa. V constant, so P proportional to T (in K)."},
+
+  {q:"A gas exerts 2 atm at 200 K in a sealed container. What temperature will produce a pressure of 3 atm?",
+   opts:["A. 300 K","B. 400 K","C. 133 K","D. 600 K"],
+   ans:"A",
+   exp:"T\u2082 = T\u2081\u00D7P\u2082/P\u2081 = 200\u00D73/2 = 300 K."},
+
+  {q:"At constant volume, a gas at 100\u00B0C exerts a pressure of 3 atm. What is the pressure at 0\u00B0C?",
+   opts:["A. 0 atm","B. 2.19 atm","C. 3 atm","D. 1.09 atm"],
+   ans:"B",
+   exp:"T\u2081=373 K, T\u2082=273 K. P\u2082=3\u00D7273/373\u22482.19 atm. Temperature decreased, pressure decreased proportionally."},
+
+  // ── SET 7 · Combined gas law ──────────────────────────────────────────────
+
+  {q:"A gas at 2 atm, 4 L, 300 K is changed to 1 atm and 600 K. What is the new volume?",
+   opts:["A. 4 L","B. 8 L","C. 16 L","D. 2 L"],
+   ans:"C",
+   exp:"P\u2081V\u2081/T\u2081 = P\u2082V\u2082/T\u2082. V\u2082 = P\u2081V\u2081T\u2082/(T\u2081P\u2082) = (2\u00D74\u00D7600)/(300\u00D71) = 16 L."},
+
+  {q:"A gas occupies 500 mL at 0\u00B0C and 101.3 kPa. What is its volume at 27\u00B0C and 50.65 kPa?",
+   opts:["A. 250 mL","B. 1000 mL","C. 500 mL","D. 2000 mL"],
+   ans:"B",
+   exp:"T\u2081=273K, T\u2082=300K, P\u2082=P\u2081/2. V\u2082=500\u00D7(101.3/50.65)\u00D7(300/273)=500\u00D72\u00D71.099\u22481000 mL. Two changes compound."},
+
+  {q:"At 27\u00B0C and 2 atm a gas occupies 3 L. What volume will it occupy at 127\u00B0C and 4 atm?",
+   opts:["A. 1.5 L","B. 2 L","C. 6 L","D. 1 L"],
+   ans:"B",
+   exp:"V\u2082=(2\u00D73\u00D7400)/(300\u00D74)=2400/1200=2 L. Pressure doubled reduces volume, higher T expands it \u2014 net effect is 2 L."},
+
+  {q:"A gas at STP (0\u00B0C, 1 atm) occupies 22.4 L. What volume does it occupy at 27\u00B0C and 2 atm?",
+   opts:["A. 11.2 L","B. 12.2 L","C. 44.8 L","D. 22.4 L"],
+   ans:"B",
+   exp:"V\u2082=22.4\u00D7(1/2)\u00D7(300/273)=22.4\u00D70.5\u00D71.099\u224812.2 L."},
+
+  {q:"A gas at 300 K, 1 atm, and 10 L is heated to 600 K and compressed to 5 atm. What is the new volume?",
+   opts:["A. 2 L","B. 4 L","C. 40 L","D. 20 L"],
+   ans:"B",
+   exp:"V\u2082=(1\u00D710\u00D7600)/(300\u00D75)=6000/1500=4 L."},
+
+  {q:"A sample of gas occupies 800 mL at 17\u00B0C and 750 mmHg. Calculate its volume at 27\u00B0C and 760 mmHg.",
+   opts:["A. 800 mL","B. 820 mL","C. 775 mL","D. 793 mL"],
+   ans:"B",
+   exp:"T\u2081=290K, T\u2082=300K. V\u2082=800\u00D7(750/760)\u00D7(300/290)=800\u00D70.9868\u00D71.0345\u2248817 mL \u2248 820 mL. Pressure slightly lower expands volume; higher temperature also expands \u2014 both changes push volume up slightly."},
+
+  {q:"2 L of gas at 4 atm and 400 K is brought to STP (0\u00B0C, 1 atm). What is its volume?",
+   opts:["A. 8 L","B. 2 L","C. 5.46 L","D. 4 L"],
+   ans:"C",
+   exp:"V\u2082=(4\u00D72\u00D7273)/(400\u00D71)=2184/400=5.46 L."},
+
+  {q:"A gas occupies 1.2 L at 25\u00B0C and 100 kPa. What volume does it occupy at 0\u00B0C and 200 kPa?",
+   opts:["A. 0.55 L","B. 1.1 L","C. 2.4 L","D. 0.6 L"],
+   ans:"A",
+   exp:"V\u2082=1.2\u00D7(100/200)\u00D7(273/298)=1.2\u00D70.5\u00D70.916\u22480.55 L."},
+
+  // ── SET 8 · PV = nRT ─────────────────────────────────────────────────────
+
+  {q:"What pressure does 0.5 mol of an ideal gas exert in a 10 L container at 300 K? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 1.23 atm","B. 0.82 atm","C. 2.46 atm","D. 0.41 atm"],
+   ans:"A",
+   exp:"P = nRT/V = (0.5\u00D70.0821\u00D7300)/10 = 12.315/10 = 1.23 atm."},
+
+  {q:"What volume does 2 mol of ideal gas occupy at 27\u00B0C and 1 atm? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 22.4 L","B. 49.3 L","C. 44.8 L","D. 24.6 L"],
+   ans:"B",
+   exp:"V = nRT/P = (2\u00D70.0821\u00D7300)/1 = 49.26 L \u2248 49.3 L. Note this is NOT 44.8 L \u2014 that would be STP (0\u00B0C), not 27\u00B0C."},
+
+  {q:"How many moles of gas are in a 5 L container at 2 atm and 300 K? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 0.41 mol","B. 0.82 mol","C. 1.64 mol","D. 0.21 mol"],
+   ans:"A",
+   exp:"n = PV/RT = (2\u00D75)/(0.0821\u00D7300) = 10/24.63 \u2248 0.41 mol."},
+
+  {q:"A 3 L container holds 0.6 mol of gas at 400 K. What is the pressure? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 2.19 atm","B. 6.57 atm","C. 0.73 atm","D. 5.47 atm"],
+   ans:"B",
+   exp:"P = nRT/V = (0.6\u00D70.0821\u00D7400)/3 = 19.704/3 = 6.57 atm."},
+
+  {q:"At what temperature does 1 mol of ideal gas occupy 24.5 L at 1 atm? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 273 K","B. 298 K","C. 300 K","D. 310 K"],
+   ans:"B",
+   exp:"T = PV/nR = (1\u00D724.5)/(1\u00D70.0821) = 298 K = 25\u00B0C. This is RTP (room temperature and pressure) \u2014 molar volume 24.5 L/mol at 25\u00B0C."},
+
+  {q:"What volume does 4.4 g of CO\u2082 occupy at 27\u00B0C and 1 atm? (C=12, O=16; R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 2.46 L","B. 4.4 L","C. 22.4 L","D. 1.23 L"],
+   ans:"A",
+   exp:"M(CO\u2082)=44. n=4.4/44=0.1 mol. V=nRT/P=(0.1\u00D70.0821\u00D7300)/1=2.46 L."},
+
+  {q:"What mass of N\u2082 is in a 10 L cylinder at 5 atm and 300 K? (N=14; R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 28 g","B. 56 g","C. 14 g","D. 112 g"],
+   ans:"B",
+   exp:"n = PV/RT = (5\u00D710)/(0.0821\u00D7300) = 50/24.63 \u2248 2.03 mol. m = nM = 2.03\u00D728 \u2248 56 g."},
+
+  {q:"A gas at 300 K and 2 atm is in a 4.1 L container. Using R = 0.0821 L\u00B7atm/mol\u00B7K, how many moles are present?",
+   opts:["A. 0.1 mol","B. 0.2 mol","C. 0.33 mol","D. 1.0 mol"],
+   ans:"C",
+   exp:"n = PV/RT = (2\u00D74.1)/(0.0821\u00D7300) = 8.2/24.63 \u2248 0.33 mol."},
+
+  {q:"A 2 L flask at 27\u00B0C holds gas at 101.3 kPa. How many moles are present? (R = 8.314 dm\u00B3\u00B7kPa/mol\u00B7K)",
+   opts:["A. 0.081 mol","B. 0.81 mol","C. 8.1 mol","D. 0.041 mol"],
+   ans:"A",
+   exp:"n = PV/RT = (101.3\u00D72)/(8.314\u00D7300) = 202.6/2494.2 \u2248 0.081 mol. Using R in kPa\u00B7dm\u00B3 means P in kPa and V in dm\u00B3 (= L) drop in directly."},
+
+  {q:"0.25 mol of gas occupies 4.1 L at 1 atm. What is the temperature? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 100 K","B. 200 K","C. 400 K","D. 300 K"],
+   ans:"B",
+   exp:"T = PV/nR = (1\u00D74.1)/(0.25\u00D70.0821) = 4.1/0.02053 \u2248 200 K."},
+
+  // ── SET 9 · Molar mass from density and vapour density ───────────────────
+
+  {q:"A gas has a density of 1.43 g/L at STP. What is its molar mass?",
+   opts:["A. 16 g/mol","B. 32 g/mol","C. 28 g/mol","D. 44 g/mol"],
+   ans:"B",
+   exp:"At STP, 1 mol occupies 22.4 L. M = \u03C1 \u00D7 22.4 = 1.43 \u00D7 22.4 \u2248 32 g/mol (SO\u2082? No \u2014 that's 64. This is O\u2082)."},
+
+  {q:"A gas has a vapour density of 22. Identify the gas. (C=12, N=14, O=16, S=32)",
+   opts:["A. CO\u2082","B. CO","C. N\u2082O","D. NO\u2082"],
+   ans:"A",
+   exp:"M = 2\u00D7VD = 44 g/mol = M(CO\u2082). Vapour density 22 \u2192 molar mass 44 \u2192 CO\u2082."},
+
+  {q:"A gas has a density of 2.86 g/L at STP. What is its molar mass?",
+   opts:["A. 32 g/mol","B. 44 g/mol","C. 64 g/mol","D. 28 g/mol"],
+   ans:"C",
+   exp:"M = 2.86 \u00D7 22.4 = 64.06 \u2248 64 g/mol (SO\u2082 = 64 g/mol)."},
+
+  {q:"At 27\u00B0C and 1 atm, a gas has a density of 1.31 g/L. What is its molar mass? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 28 g/mol","B. 32 g/mol","C. 44 g/mol","D. 16 g/mol"],
+   ans:"B",
+   exp:"M = \u03C1RT/P = 1.31\u00D70.0821\u00D7300/1 = 32.3 \u2248 32 g/mol. Using M=\u03C1RT/P works at any T and P, unlike the STP shortcut."},
+
+  {q:"A gas has a vapour density of 14. What is its molar mass and what gas could it be? (N=14, C=12, H=1)",
+   opts:["A. 14 g/mol, N","B. 28 g/mol, N\u2082 or CO","C. 28 g/mol, CH\u2084","D. 7 g/mol, Li"],
+   ans:"B",
+   exp:"M = 2\u00D714 = 28 g/mol. Both N\u2082 and CO have molar mass 28 \u2014 they are isobaric/isoelectronic. Vapour density alone cannot distinguish them."},
+
+  {q:"At STP, 5.6 L of an unknown gas has a mass of 11 g. What is its molar mass?",
+   opts:["A. 22 g/mol","B. 44 g/mol","C. 11 g/mol","D. 88 g/mol"],
+   ans:"B",
+   exp:"n = 5.6/22.4 = 0.25 mol. M = m/n = 11/0.25 = 44 g/mol. Route: volume \u2192 moles \u2192 molar mass."},
+
+  {q:"A hydrocarbon gas has a vapour density of 15. Which formula is consistent with this? (C=12, H=1)",
+   opts:["A. CH\u2084 (M=16)","B. C\u2082H\u2086 (M=30)","C. C\u2082H\u2082 (M=26)","D. C\u2083H\u2088 (M=44)"],
+   ans:"B",
+   exp:"M = 2\u00D715 = 30 g/mol. M(C\u2082H\u2086) = 24+6 = 30 g/mol. Ethane."},
+
+  // ── SET 10 · Molarity and molality ───────────────────────────────────────
+
+  {q:"What is the molarity of a solution made by dissolving 4 g of NaOH in water to make 500 mL of solution? (Na=23, O=16, H=1)",
+   opts:["A. 0.1 mol/L","B. 0.2 mol/L","C. 1.0 mol/L","D. 0.4 mol/L"],
+   ans:"B",
+   exp:"M(NaOH)=40. n=4/40=0.1 mol. c=n/V=0.1/0.500=0.2 mol/L."},
+
+  {q:"How many grams of KCl must be dissolved in 250 mL to make a 0.4 mol/L solution? (K=39, Cl=35.5)",
+   opts:["A. 3.73 g","B. 7.45 g","C. 14.9 g","D. 1.86 g"],
+   ans:"B",
+   exp:"n = c\u00D7V = 0.4\u00D70.250 = 0.1 mol. M(KCl)=74.5. m = 0.1\u00D774.5 = 7.45 g."},
+
+  {q:"A 2.0 mol/L NaCl solution is diluted from 100 mL to 400 mL. What is the new concentration?",
+   opts:["A. 8.0 mol/L","B. 0.5 mol/L","C. 1.0 mol/L","D. 0.25 mol/L"],
+   ans:"B",
+   exp:"c\u2081V\u2081 = c\u2082V\u2082. c\u2082 = 2.0\u00D7100/400 = 0.5 mol/L. Dilution: moles constant, volume increases, concentration falls."},
+
+  {q:"What is the molality of a solution containing 18 g of glucose (C\u2086H\u2081\u2082O\u2086) dissolved in 500 g of water? (M=180 g/mol)",
+   opts:["A. 0.1 mol/kg","B. 0.2 mol/kg","C. 1.0 mol/kg","D. 0.36 mol/kg"],
+   ans:"B",
+   exp:"n = 18/180 = 0.1 mol. Molality = n/mass(solvent in kg) = 0.1/0.500 = 0.2 mol/kg. Molality uses mass of solvent, not volume of solution."},
+
+  {q:"500 mL of 0.6 mol/L HCl and 500 mL of 0.4 mol/L HCl are mixed. What is the concentration of the resulting solution?",
+   opts:["A. 1.0 mol/L","B. 0.6 mol/L","C. 0.5 mol/L","D. 0.2 mol/L"],
+   ans:"C",
+   exp:"n\u2081=0.6\u00D70.5=0.3 mol; n\u2082=0.4\u00D70.5=0.2 mol. Total n=0.5 mol, total V=1.0 L. c=0.5/1.0=0.5 mol/L."},
+
+  {q:"What volume of 2 mol/L H\u2082SO\u2084 solution contains 0.5 mol of H\u2082SO\u2084?",
+   opts:["A. 100 mL","B. 250 mL","C. 500 mL","D. 1000 mL"],
+   ans:"B",
+   exp:"V = n/c = 0.5/2 = 0.25 L = 250 mL."},
+
+  {q:"What is the molality of a solution made by dissolving 5.85 g of NaCl in 200 g of water? (Na=23, Cl=35.5)",
+   opts:["A. 0.25 mol/kg","B. 0.5 mol/kg","C. 1.0 mol/kg","D. 0.1 mol/kg"],
+   ans:"B",
+   exp:"M(NaCl)=58.5. n=5.85/58.5=0.1 mol. Molality=0.1/0.200=0.5 mol/kg."},
+
+  // ── SET 11 · Solubility ──────────────────────────────────────────────────
+
+  {q:"The solubility of KNO\u2083 at 60\u00B0C is 110 g per 100 g water. What mass of KNO\u2083 dissolves in 50 g of water at 60\u00B0C?",
+   opts:["A. 110 g","B. 55 g","C. 220 g","D. 27.5 g"],
+   ans:"B",
+   exp:"Solubility scales linearly with solvent mass. 110 g per 100 g \u2192 55 g per 50 g water."},
+
+  {q:"The solubility of NaCl is 36 g per 100 g water at 25\u00B0C. How much NaCl can dissolve in 250 g of water?",
+   opts:["A. 36 g","B. 72 g","C. 90 g","D. 144 g"],
+   ans:"C",
+   exp:"36 g per 100 g \u2192 36\u00D72.5 = 90 g per 250 g water."},
+
+  {q:"100 g of a saturated solution of KNO\u2083 at 80\u00B0C is cooled to 20\u00B0C. Solubility at 80\u00B0C = 170 g/100g water; at 20\u00B0C = 32 g/100g water. What mass of KNO\u2083 crystallises out?",
+   opts:["A. 138 g","B. 50 g","C. 62 g","D. 48 g"],
+   ans:"C",
+   exp:"At 80\u00B0C: 170 g KNO\u2083 in 100 g water \u2192 in 100g solution, mass KNO\u2083 = 170/270\u00D7100 = 63 g, water = 37 g. At 20\u00B0C: 37 g water dissolves 32/100\u00D737 = 11.8 g. Crystallised = 63\u221211.8 \u2248 51 g. Closest answer is B (50 g). Exception: exact value depends on rounding the water mass."},
+
+  {q:"Solubility of a gas in water doubles when the partial pressure of the gas doubles. This is a statement of:",
+   opts:["A. Boyle's law","B. Dalton's law","C. Henry's law","D. Graham's law"],
+   ans:"C",
+   exp:"Henry's law: solubility of a gas \u221d its partial pressure above the solution. It bridges gas laws into solution chemistry \u2014 same n-as-hub logic, different environment."},
+
+  {q:"A saturated solution of Ca(OH)\u2082 has concentration 0.02 mol/L. What mass of Ca(OH)\u2082 dissolves in 500 mL of water? (Ca=40, O=16, H=1)",
+   opts:["A. 0.74 g","B. 1.48 g","C. 0.37 g","D. 2.96 g"],
+   ans:"A",
+   exp:"n = c\u00D7V = 0.02\u00D70.500 = 0.01 mol. M(Ca(OH)\u2082) = 40+34 = 74 g/mol. m = 0.01\u00D774 = 0.74 g."},
+
+  // ── SET 12 · Dalton's partial pressures ──────────────────────────────────
+
+  {q:"A mixture of gases has P(N\u2082) = 0.6 atm, P(O\u2082) = 0.2 atm, P(CO\u2082) = 0.1 atm. What is the total pressure?",
+   opts:["A. 0.9 atm","B. 0.8 atm","C. 1.0 atm","D. 0.6 atm"],
+   ans:"A",
+   exp:"Dalton: P_total = \u03A3P_i = 0.6+0.2+0.1 = 0.9 atm. Each gas exerts pressure independently."},
+
+  {q:"A gas mixture at 1 atm total contains N\u2082 and O\u2082 in a 4:1 mole ratio. What is the partial pressure of O\u2082?",
+   opts:["A. 0.8 atm","B. 0.4 atm","C. 0.25 atm","D. 0.2 atm"],
+   ans:"D",
+   exp:"Mole fraction of O\u2082 = 1/(4+1) = 0.2. P(O\u2082) = 0.2\u00D71 = 0.2 atm. Partial pressure = mole fraction \u00D7 total pressure."},
+
+  {q:"2 mol N\u2082 and 3 mol O\u2082 are in a container at 5 atm. What is P(N\u2082)?",
+   opts:["A. 1 atm","B. 2 atm","C. 3 atm","D. 2.5 atm"],
+   ans:"B",
+   exp:"Mole fraction N\u2082 = 2/5 = 0.4. P(N\u2082) = 0.4\u00D75 = 2 atm."},
+
+  {q:"O\u2082 is collected over water at 27\u00B0C. Total pressure = 760 mmHg. Vapour pressure of water at 27\u00B0C = 26.7 mmHg. What is the partial pressure of O\u2082?",
+   opts:["A. 786.7 mmHg","B. 733.3 mmHg","C. 760 mmHg","D. 26.7 mmHg"],
+   ans:"B",
+   exp:"P(O\u2082) = P_total \u2212 P(H\u2082O) = 760\u221226.7 = 733.3 mmHg. Collecting gas over water is a classic Dalton application \u2014 water vapour always contributes to total pressure."},
+
+  {q:"H\u2082 is collected over water at 17\u00B0C. Total pressure = 100 kPa. Vapour pressure of water = 1.94 kPa. How many moles of dry H\u2082 are in 2 L? (R = 8.314 dm\u00B3\u00B7kPa/mol\u00B7K)",
+   opts:["A. 0.079 mol","B. 0.081 mol","C. 0.040 mol","D. 0.160 mol"],
+   ans:"B",
+   exp:"P(H\u2082) = 100\u22121.94 = 98.06 kPa. n = PV/RT = (98.06\u00D72)/(8.314\u00D7290) = 196.12/2411 \u2248 0.081 mol."},
+
+  {q:"A container holds 0.4 mol He and 0.6 mol Ne at a total pressure of 5 atm. What is the partial pressure of He?",
+   opts:["A. 2.0 atm","B. 3.0 atm","C. 2.5 atm","D. 4.0 atm"],
+   ans:"A",
+   exp:"Mole fraction He = 0.4/1.0 = 0.4. P(He) = 0.4\u00D75 = 2.0 atm."},
+
+  // ── SET 13 · Graham's law ─────────────────────────────────────────────────
+
+  {q:"Which gas effuses faster at the same temperature: H\u2082 (M=2) or O\u2082 (M=32)?",
+   opts:["A. O\u2082 \u2014 heavier molecules move faster","B. H\u2082 \u2014 lighter molecules effuse faster","C. Same rate \u2014 same temperature","D. Cannot determine without pressure"],
+   ans:"B",
+   exp:"Graham: rate \u221d 1/\u221AM. Lighter gas (smaller M) effuses faster. H\u2082 effuses 4\u00D7 faster than O\u2082 (\u221A(32/2)=4)."},
+
+  {q:"Gas A effuses at twice the rate of gas B. If M(B) = 32 g/mol, what is M(A)?",
+   opts:["A. 64 g/mol","B. 16 g/mol","C. 8 g/mol","D. 4 g/mol"],
+   ans:"C",
+   exp:"r_A/r_B = \u221A(M_B/M_A). 2 = \u221A(32/M_A). 4 = 32/M_A. M_A = 8 g/mol."},
+
+  {q:"How much faster does H\u2082 (M=2) effuse than N\u2082 (M=28)?",
+   opts:["A. 14 times","B. 3.74 times","C. 7 times","D. 2 times"],
+   ans:"B",
+   exp:"Rate ratio = \u221A(M_N\u2082/M_H\u2082) = \u221A(28/2) = \u221A14 \u2248 3.74."},
+
+  {q:"CO\u2082 (M=44) and an unknown gas X effuse such that X effuses 3.32 times faster. What is M(X)?",
+   opts:["A. 2 g/mol","B. 4 g/mol","C. 8 g/mol","D. 16 g/mol"],
+   ans:"B",
+   exp:"3.32 = \u221A(44/M_X). 11.02 = 44/M_X. M_X = 44/11.02 \u2248 4 g/mol (He or possibly \u00B2He isotope)."},
+
+  {q:"If 10 mL of SO\u2082 (M=64) effuses in 60 seconds, how long does it take for 10 mL of O\u2082 (M=32) to effuse under the same conditions?",
+   opts:["A. 30 s","B. 120 s","C. 42.4 s","D. 84.8 s"],
+   ans:"C",
+   exp:"r \u221d 1/\u221AM, and r = volume/time, so t \u221d \u221AM. t(O\u2082)/t(SO\u2082) = \u221A(32/64) = \u221A0.5 = 0.707. t(O\u2082) = 60\u00D70.707 \u2248 42.4 s."},
+
+  // ── SET 14 · Conceptual ───────────────────────────────────────────────────
+
+  {q:"At which conditions does a real gas behave most like an ideal gas?",
+   opts:["A. High pressure, low temperature","B. Low pressure, high temperature","C. High pressure, high temperature","D. Low pressure, low temperature"],
+   ans:"B",
+   exp:"Ideal gas assumes negligible molecular volume and no intermolecular forces. At low P, molecules are far apart (forces negligible). At high T, kinetic energy dominates over intermolecular attractions. Both together give closest-to-ideal behaviour."},
+
+  {q:"The van der Waals constant 'a' corrects for intermolecular attractions. A gas with large 'a' is:",
+   opts:["A. Monatomic and noble","B. Highly polar or easily polarisable","C. A light diatomic gas","D. An ideal gas"],
+   ans:"B",
+   exp:"Strong intermolecular forces (high polarity, large electron cloud) mean molecules attract each other significantly \u2014 large 'a'. Noble gases have very small 'a'; polar molecules like NH\u2083 or H\u2082O have large 'a'."},
+
+  {q:"STP is defined as 0\u00B0C and 1 atm; RTP is 25\u00B0C and 1 atm. Molar volumes are 22.4 L and 24.5 L respectively. A student uses 22.4 L/mol at 25\u00B0C. Their answer will be:",
+   opts:["A. Too high by about 9%","B. Correct","C. Too low by about 9%","D. Too high by 25%"],
+   ans:"C",
+   exp:"22.4 < 24.5, so using 22.4 gives fewer moles or smaller volume than reality. Error = (24.5\u221222.4)/24.5 \u00D7 100 \u2248 8.6% \u2248 9% too low. Always check whether T is 0\u00B0C or 25\u00B0C."},
+
+  {q:"Equal masses of CH\u2084 (M=16) and SO\u2082 (M=64) are placed in identical containers at the same temperature. Which has the higher pressure?",
+   opts:["A. SO\u2082 \u2014 heavier molecules","B. CH\u2084 \u2014 more moles, higher pressure","C. Equal \u2014 same mass","D. Cannot determine"],
+   ans:"B",
+   exp:"P = nRT/V. Same mass m: n(CH\u2084) = m/16, n(SO\u2082) = m/64. More moles of CH\u2084 means higher pressure. Pressure depends on moles, not mass."},
+
+  {q:"Avogadro's law states that equal volumes of gases at the same T and P contain equal numbers of molecules. Which of the following is a direct consequence?",
+   opts:["A. All gases have the same molar mass","B. Molar volume of any ideal gas at STP is 22.4 L","C. Real gases obey PV=nRT exactly","D. Heavier gases exert more pressure"],
+   ans:"B",
+   exp:"If equal volumes contain equal moles at the same T and P, then 1 mol of ANY ideal gas occupies the same volume at STP. That volume (22.4 L) follows directly from PV=nRT at T=273K, P=1atm."},
+
+  {q:"A 3 L container holds N\u2082 at 2 atm and a 5 L container holds O\u2082 at 4 atm. They are connected. What is the final total pressure? (T constant)",
+   opts:["A. 3.0 atm","B. 3.25 atm","C. 6.0 atm","D. 2.75 atm"],
+   ans:"B",
+   exp:"n(N\u2082) = P\u2081V\u2081/RT = 6/RT. n(O\u2082) = 20/RT. Total PV = (6+20)/RT \u2192 P_total = 26/(3+5) = 26/8 = 3.25 atm. Dalton meets combined gas law \u2014 total moles in total volume."},
+
+  {q:"What is the total pressure of a mixture of 0.2 mol H\u2082, 0.3 mol N\u2082, and 0.5 mol CO\u2082 in a 10 L container at 300 K? (R = 0.0821 L\u00B7atm/mol\u00B7K)",
+   opts:["A. 2.46 atm","B. 1.23 atm","C. 0.82 atm","D. 3.28 atm"],
+   ans:"A",
+   exp:"Total n = 0.2+0.3+0.5 = 1.0 mol. P = nRT/V = (1.0\u00D70.0821\u00D7300)/10 = 24.63/10 = 2.46 atm. In ideal gas mixtures, treat total moles as a single gas \u2014 individual identities don't matter for total pressure."}
+
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'chemistry';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>

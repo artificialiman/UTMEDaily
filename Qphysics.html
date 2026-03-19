@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Physics — JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Physics</div>
+    <div class="subtitle">100-question mastery drill · Physics</div>
+</div>
+
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// PHYSICS · 100 QUESTIONS
+// The spine architecture mirrors chemistry: every topic has a two-line core,
+// multiple entry/exit variants, and a deliberate conceptual trap layer.
+//
+// Core spines:
+//   Kinematics  : identify 3 of {u,v,a,s,t} → pick the right SUVAT equation
+//   Projectiles : horizontal and vertical are INDEPENDENT — time is the link
+//   Forces      : F_net = ma  (net, not applied)
+//   Energy      : KE + PE = constant (identify forms at start and end)
+//   Momentum    : p = mv, always conserved; KE only in elastic
+//   Circular    : F_centripetal = mv²/r is a REQUIREMENT — different situations
+//                 just supply different forces to meet it (gravity, tension, N)
+//   Waves       : v = f\u03BB  (one equation, all wave types)
+//   Electricity : V = IR  (Ohm's law); P = IV = I²R = V²/R
+//   Heat        : Q = mc\u0394T (temperature change) vs Q = mL (phase change — T constant)
+//   Optics      : 1/f = 1/u + 1/v  (real-is-positive convention)
+// ─────────────────────────────────────────────────────────────────────────────
+// SET 1  · Kinematics — SUVAT variable selection             Q1–10
+// SET 2  · Projectiles — independence of components          Q11–18
+// SET 3  · Forces and Newton's Laws                          Q19–26
+// SET 4  · Work, Energy, Power                               Q27–34
+// SET 5  · Momentum and Impulse                              Q35–42
+// SET 6  · Circular Motion and Gravitation                   Q43–50
+// SET 7  · Waves                                             Q51–58
+// SET 8  · Electricity                                       Q59–68
+// SET 9  · Heat and Thermodynamics                           Q69–76
+// SET 10 · Light and Optics                                  Q77–84
+// SET 11 · Pressure and Fluids                               Q85–90
+// SET 12 · Multi-step mixed                                  Q91–100
+// ─────────────────────────────────────────────────────────────────────────────
+
+const questions = {
+  chemistry: [
+
+  // ── SET 1 · Kinematics ───────────────────────────────────────────────────
+
+  {q:"A body starts from rest and accelerates uniformly at 4 m/s\u00B2 for 5 s. What is its final velocity?",
+   opts:["A. 20 m/s","B. 10 m/s","C. 16 m/s","D. 25 m/s"],
+   ans:"A",
+   exp:"v = u + at = 0 + 4\u00D75 = 20 m/s. Spine of kinematics: identify your 3 known variables (u=0, a=4, t=5), then pick the one equation that connects them to the unknown. Here only v=u+at contains all four."},
+
+  {q:"A car moving at 10 m/s decelerates at 2 m/s\u00B2. What is its velocity after 3 s?",
+   opts:["A. 16 m/s","B. 6 m/s","C. 4 m/s","D. 0 m/s"],
+   ans:"C",
+   exp:"v = u + at = 10 + (\u22122)\u00D73 = 10 \u2212 6 = 4 m/s. Deceleration means a is negative. Never assume the object has stopped \u2014 check whether t exceeds the stopping time (v=0 at t=5 s here, so at t=3 s it is still moving)."},
+
+  {q:"A body starts from rest and accelerates at 5 m/s\u00B2 for 4 s. What distance does it cover?",
+   opts:["A. 20 m","B. 80 m","C. 40 m","D. 10 m"],
+   ans:"C",
+   exp:"s = ut + \u00BDat\u00B2 = 0 + \u00BD\u00D75\u00D716 = 40 m. u=0 makes the first term vanish \u2014 common simplification that students miss when they start from rest."},
+
+  {q:"A car brakes from 20 m/s to rest with deceleration 4 m/s\u00B2. What is the stopping distance?",
+   opts:["A. 25 m","B. 50 m","C. 100 m","D. 5 m"],
+   ans:"B",
+   exp:"v\u00B2 = u\u00B2 + 2as \u2192 0 = 400 + 2(\u22124)s \u2192 s = 400/8 = 50 m. Time is not given and not needed \u2014 the v\u00B2 equation is the correct spine entry when t is absent."},
+
+  {q:"A stone is dropped from a height of 80 m. How long does it take to reach the ground? (g = 10 m/s\u00B2)",
+   opts:["A. 4 s","B. 8 s","C. 16 s","D. 2 s"],
+   ans:"A",
+   exp:"s = \u00BDgt\u00B2 \u2192 80 = \u00BD\u00D710\u00D7t\u00B2 \u2192 t\u00B2 = 16 \u2192 t = 4 s. u=0 for a dropped object. This is the same equation as SET 1 Q3 with a=g. The spine is the same regardless of whether the acceleration is mechanical or gravitational."},
+
+  {q:"A ball is thrown vertically upward at 30 m/s. What maximum height does it reach? (g = 10 m/s\u00B2)",
+   opts:["A. 45 m","B. 90 m","C. 30 m","D. 60 m"],
+   ans:"A",
+   exp:"v\u00B2 = u\u00B2 \u2212 2gh \u2192 0 = 900 \u2212 20h \u2192 h = 45 m. At max height, v = 0. Use v\u00B2 = u\u00B2 + 2as with a = \u2212g and v = 0."},
+
+  {q:"A ball is thrown vertically upward at 20 m/s. How long does it take to reach maximum height? (g = 10 m/s\u00B2)",
+   opts:["A. 4 s","B. 1 s","C. 2 s","D. 10 s"],
+   ans:"C",
+   exp:"v = u \u2212 gt \u2192 0 = 20 \u2212 10t \u2192 t = 2 s. At maximum height, instantaneous velocity = 0. The ball then falls back under the same gravitational acceleration."},
+
+  {q:"A car starting from rest covers 100 m in 5 s with uniform acceleration. What is the acceleration?",
+   opts:["A. 4 m/s\u00B2","B. 20 m/s\u00B2","C. 10 m/s\u00B2","D. 8 m/s\u00B2"],
+   ans:"D",
+   exp:"s = ut + \u00BDat\u00B2 \u2192 100 = 0 + \u00BDa\u00D725 \u2192 a = 200/25 = 8 m/s\u00B2. Cannot use v=u+at without knowing final velocity \u2014 displacement equation is the right choice when t is given but v is not."},
+
+  {q:"An object accelerates from 5 m/s to 25 m/s in 4 s. What distance does it cover?",
+   opts:["A. 60 m","B. 40 m","C. 80 m","D. 100 m"],
+   ans:"A",
+   exp:"s = (u+v)/2 \u00D7 t = (5+25)/2 \u00D7 4 = 15 \u00D7 4 = 60 m. The average-velocity equation s=(u+v)t/2 is often the most direct route when both u and v are known."},
+
+  {q:"A car accelerates from 10 m/s to 30 m/s over a distance of 100 m. What is the acceleration?",
+   opts:["A. 2 m/s\u00B2","B. 4 m/s\u00B2","C. 8 m/s\u00B2","D. 16 m/s\u00B2"],
+   ans:"B",
+   exp:"v\u00B2 = u\u00B2 + 2as \u2192 900 = 100 + 200a \u2192 a = 800/200 = 4 m/s\u00B2. Time is absent from the question \u2014 that is the signal to use v\u00B2 = u\u00B2 + 2as. Variable selection before equation selection is the core skill."},
+
+  // ── SET 2 · Projectiles ──────────────────────────────────────────────────
+
+  {q:"A ball is projected horizontally at 20 m/s from a cliff 45 m high. How long does it take to hit the ground? (g = 10 m/s\u00B2)",
+   opts:["A. 2 s","B. 3 s","C. 4.5 s","D. 9 s"],
+   ans:"B",
+   exp:"Vertical: s = \u00BDgt\u00B2 \u2192 45 = 5t\u00B2 \u2192 t = 3 s. Horizontal velocity is irrelevant to vertical fall \u2014 the two components are completely independent. Always solve vertical first to find t."},
+
+  {q:"Using the scenario in Q11, what is the horizontal range of the ball?",
+   opts:["A. 45 m","B. 90 m","C. 60 m","D. 30 m"],
+   ans:"C",
+   exp:"Horizontal: R = u_x \u00D7 t = 20 \u00D7 3 = 60 m. Time is the link between the two independent components. Having found t from vertical motion, plug it directly into horizontal motion."},
+
+  {q:"A ball is launched at 30\u00B0 above horizontal with speed 20 m/s. What is its maximum height? (g = 10 m/s\u00B2, sin 30\u00B0 = 0.5)",
+   opts:["A. 5 m","B. 10 m","C. 20 m","D. 40 m"],
+   ans:"A",
+   exp:"u_y = 20\u00D7sin30\u00B0 = 10 m/s. At max height v_y = 0: H = u_y\u00B2/(2g) = 100/20 = 5 m. Only the vertical component determines maximum height."},
+
+  {q:"A ball is launched at 45\u00B0 with speed 20 m/s on level ground. What is the horizontal range? (g = 10 m/s\u00B2)",
+   opts:["A. 20 m","B. 40 m","C. 80 m","D. 10 m"],
+   ans:"B",
+   exp:"R = u\u00B2 sin(2\u03B8)/g = 400\u00D7sin90\u00B0/10 = 400/10 = 40 m. 45\u00B0 gives maximum range for a given speed because sin(2\u00D745\u00B0) = sin90\u00B0 = 1 (its maximum value)."},
+
+  {q:"A ball is launched at 30\u00B0 with speed 40 m/s. What is the total time of flight? (g = 10 m/s\u00B2, sin 30\u00B0 = 0.5)",
+   opts:["A. 4 s","B. 2 s","C. 8 s","D. 1 s"],
+   ans:"A",
+   exp:"u_y = 40\u00D70.5 = 20 m/s. Time of flight T = 2u_y/g = 2\u00D720/10 = 4 s. The factor of 2 is because the ball rises and falls symmetrically (same time up as down)."},
+
+  {q:"A projectile is at its maximum height. Which statement about its velocity at that point is correct?",
+   opts:["A. Velocity is zero","B. Only the horizontal component remains","C. Only the vertical component remains","D. Speed equals its initial speed"],
+   ans:"B",
+   exp:"At maximum height the vertical component is zero (v_y = 0) but the horizontal component u cos\u03B8 is unchanged throughout \u2014 there is no horizontal force to change it. Velocity is not zero unless the projectile was thrown straight up."},
+
+  {q:"Two balls are released simultaneously from the same height: one dropped vertically, one thrown horizontally at 15 m/s. Which hits the ground first?",
+   opts:["A. The thrown ball \u2014 horizontal speed gives it extra energy","B. The dropped ball \u2014 it takes a shorter path","C. Both hit the ground at exactly the same time","D. Cannot determine without knowing the height"],
+   ans:"C",
+   exp:"Vertical motion is identical for both balls \u2014 both start with v_y = 0 and both accelerate at g downward. Horizontal velocity has zero effect on vertical acceleration. This is the core independence principle of projectile motion."},
+
+  {q:"A ball is launched at 30\u00B0 and another at 60\u00B0, both with the same initial speed on level ground. How do their horizontal ranges compare?",
+   opts:["A. Range at 30\u00B0 is greater","B. Range at 30\u00B0 equals range at 60\u00B0","C. Range at 60\u00B0 is greater","D. Cannot determine without knowing speed"],
+   ans:"B",
+   exp:"R = u\u00B2 sin(2\u03B8)/g. sin(2\u00D730\u00B0) = sin60\u00B0 = \u221A3/2. sin(2\u00D760\u00B0) = sin120\u00B0 = \u221A3/2. Complementary angles (that add to 90\u00B0) always give equal ranges \u2014 both less than the 45\u00B0 maximum."},
+
+  // ── SET 3 · Forces and Newton's Laws ─────────────────────────────────────
+
+  {q:"A 5 kg block on a surface has a 30 N force applied to it and experiences 10 N friction. What is its acceleration?",
+   opts:["A. 6 m/s\u00B2","B. 4 m/s\u00B2","C. 2 m/s\u00B2","D. 8 m/s\u00B2"],
+   ans:"B",
+   exp:"F_net = 30 \u2212 10 = 20 N. a = F_net/m = 20/5 = 4 m/s\u00B2. The spine of Newton\u2019s second law: ALWAYS find the net force first. Applied force alone is never used in F = ma."},
+
+  {q:"A 3 kg object accelerates at 5 m/s\u00B2. What net force acts on it?",
+   opts:["A. 15 N","B. 8 N","C. 1.67 N","D. 0.6 N"],
+   ans:"A",
+   exp:"F = ma = 3\u00D75 = 15 N. This is the exit direction: given m and a, find F."},
+
+  {q:"A 10 kg block rests on a surface with coefficient of friction \u03BC = 0.3. What is the friction force? (g = 10 m/s\u00B2)",
+   opts:["A. 3 N","B. 30 N","C. 100 N","D. 300 N"],
+   ans:"B",
+   exp:"Normal force N = mg = 10\u00D710 = 100 N. Friction f = \u03BCN = 0.3\u00D7100 = 30 N. Normal force is the perpendicular contact force \u2014 on a flat surface it equals mg."},
+
+  {q:"An 8 kg block lies on a smooth incline of 30\u00B0. What is the component of its weight along the slope? (g = 10 m/s\u00B2, sin 30\u00B0 = 0.5)",
+   opts:["A. 80 N","B. 40 N","C. 69.3 N","D. 4 N"],
+   ans:"B",
+   exp:"F_parallel = mg sin\u03B8 = 8\u00D710\u00D70.5 = 40 N. On an incline, weight splits into mg sin\u03B8 (along slope, driving motion) and mg cos\u03B8 (into surface, producing normal force). These are entry points into F=ma."},
+
+  {q:"A 5 kg block slides down a 37\u00B0 incline (\u03BC = 0.25). What is its acceleration? (g = 10 m/s\u00B2, sin 37\u00B0 = 0.6, cos 37\u00B0 = 0.8)",
+   opts:["A. 6 m/s\u00B2","B. 2 m/s\u00B2","C. 4 m/s\u00B2","D. 8 m/s\u00B2"],
+   ans:"C",
+   exp:"F_down = mg sin37\u00B0 = 5\u00D710\u00D70.6 = 30 N. N = mg cos37\u00B0 = 40 N. Friction f = 0.25\u00D740 = 10 N (opposing motion, i.e. up the slope). F_net = 30\u221210 = 20 N. a = 20/5 = 4 m/s\u00B2."},
+
+  {q:"A horse pulls a cart forward. By Newton\u2019s 3rd law the cart pulls the horse backward with an equal force. Why does the system move?",
+   opts:["A. The horse\u2019s pull is slightly larger than the reaction","B. Action-reaction pairs cancel only when objects are in contact","C. The action-reaction pair acts on different objects \u2014 the horse\u2019s feet push Earth back; Earth pushes the horse forward","D. Newton\u2019s 3rd law does not apply to connected systems"],
+   ans:"C",
+   exp:"Action-reaction forces act on DIFFERENT objects and therefore cannot cancel each other for any single object\u2019s net force. The horse accelerates because the ground pushes it forward (reaction to its foot pushing backward) and this force exceeds the friction and cart tension opposing it."},
+
+  {q:"A 60 kg person stands in a lift accelerating upward at 2 m/s\u00B2. What does the scale read? (g = 10 m/s\u00B2)",
+   opts:["A. 600 N","B. 480 N","C. 720 N","D. 120 N"],
+   ans:"C",
+   exp:"The scale reads the normal force N = m(g + a) = 60\u00D712 = 720 N. Accelerating upward requires a net upward force, so N > mg. The person feels heavier."},
+
+  {q:"The same 60 kg person is in a lift now accelerating downward at 2 m/s\u00B2. What does the scale read? (g = 10 m/s\u00B2)",
+   opts:["A. 600 N","B. 720 N","C. 480 N","D. 0 N"],
+   ans:"C",
+   exp:"N = m(g \u2212 a) = 60\u00D78 = 480 N. Accelerating downward means net force is downward, so N < mg. The person feels lighter. If a = g (free fall), N = 0 \u2014 apparent weightlessness."},
+
+  // ── SET 4 · Work, Energy, Power ──────────────────────────────────────────
+
+  {q:"A 2 kg object moves at 10 m/s. What is its kinetic energy?",
+   opts:["A. 20 J","B. 200 J","C. 100 J","D. 50 J"],
+   ans:"C",
+   exp:"KE = \u00BDmv\u00B2 = \u00BD\u00D72\u00D7100 = 100 J. The v\u00B2 term means doubling speed quadruples KE \u2014 a key reason stopping distance increases so rapidly with speed."},
+
+  {q:"A 3 kg object is raised to a height of 5 m. What is the gain in gravitational PE? (g = 10 m/s\u00B2)",
+   opts:["A. 15 J","B. 150 J","C. 30 J","D. 300 J"],
+   ans:"B",
+   exp:"PE = mgh = 3\u00D710\u00D75 = 150 J."},
+
+  {q:"A ball is dropped from 20 m. What is its speed just before hitting the ground? (g = 10 m/s\u00B2)",
+   opts:["A. 10 m/s","B. 200 m/s","C. 20 m/s","D. 400 m/s"],
+   ans:"C",
+   exp:"Conservation of energy: mgh = \u00BDmv\u00B2 \u2192 v = \u221A(2gh) = \u221A(2\u00D710\u00D720) = \u221A400 = 20 m/s. Mass cancels \u2014 speed at the bottom is independent of the object\u2019s mass."},
+
+  {q:"A force of 50 N moves an object 8 m in the direction of the force. What work is done?",
+   opts:["A. 6.25 J","B. 58 J","C. 400 J","D. 42 J"],
+   ans:"C",
+   exp:"W = Fd = 50\u00D78 = 400 J. Work requires both force and displacement in the same direction. A force perpendicular to motion does zero work."},
+
+  {q:"A 500 W motor lifts a 100 kg mass. How long does it take to raise it by 2 m? (g = 10 m/s\u00B2)",
+   opts:["A. 4 s","B. 1 s","C. 10 s","D. 0.25 s"],
+   ans:"A",
+   exp:"W = mgh = 100\u00D710\u00D72 = 2000 J. t = W/P = 2000/500 = 4 s. Power = energy/time; rearranged to find time."},
+
+  {q:"A 1000 kg car brakes from 20 m/s to rest. What work do the brakes do?",
+   opts:["A. 20 000 J","B. 200 000 J","C. 400 000 J","D. 10 000 J"],
+   ans:"B",
+   exp:"W = \u0394KE = \u00BD\u00D71000\u00D7(20)\u00B2 \u2212 0 = 200 000 J = 200 kJ. The work\u2013energy theorem: net work equals change in KE. The brakes do negative work (opposing motion) of 200 kJ to bring the car to rest."},
+
+  {q:"A machine has 350 J useful output for 500 J input. What is its efficiency?",
+   opts:["A. 30%","B. 70%","C. 143%","D. 150%"],
+   ans:"B",
+   exp:"Efficiency = (useful output/input) \u00D7 100 = (350/500)\u00D7100 = 70%. Efficiency can never exceed 100% \u2014 the remainder (150 J here) is dissipated as heat."},
+
+  {q:"A vehicle engine exerts a force of 200 N at a speed of 5 m/s. What power does it develop?",
+   opts:["A. 40 W","B. 205 W","C. 1000 W","D. 195 W"],
+   ans:"C",
+   exp:"P = Fv = 200\u00D75 = 1000 W = 1 kW. This is the most direct power entry when force and velocity are given \u2014 no need to compute work or time separately."},
+
+  // ── SET 5 · Momentum and Impulse ─────────────────────────────────────────
+
+  {q:"A 2 kg object moves at 6 m/s. What is its momentum?",
+   opts:["A. 3 kg\u00B7m/s","B. 8 kg\u00B7m/s","C. 12 kg\u00B7m/s","D. 4 kg\u00B7m/s"],
+   ans:"C",
+   exp:"p = mv = 2\u00D76 = 12 kg\u00B7m/s. Momentum is a vector \u2014 direction matters in collision problems even though it\u2019s not tested here."},
+
+  {q:"A 3 kg trolley moving at 4 m/s collides with and sticks to a stationary 1 kg trolley. What is the final velocity?",
+   opts:["A. 4 m/s","B. 1 m/s","C. 3 m/s","D. 7 m/s"],
+   ans:"C",
+   exp:"Conservation of momentum: m\u2081u\u2081 = (m\u2081+m\u2082)v \u2192 3\u00D74 = 4\u00D7v \u2192 v = 3 m/s. \u2018Sticks together\u2019 = perfectly inelastic collision. Momentum conserved; KE is not."},
+
+  {q:"A force of 40 N acts on an object for 0.5 s. What is the impulse?",
+   opts:["A. 80 N\u00B7s","B. 20 N\u00B7s","C. 0.0125 N\u00B7s","D. 40.5 N\u00B7s"],
+   ans:"B",
+   exp:"Impulse = F\u00D7t = 40\u00D70.5 = 20 N\u00B7s. Impulse equals change in momentum (impulse\u2013momentum theorem). Large force over short time or moderate force over longer time can give the same impulse."},
+
+  {q:"A 5 kg object receives an impulse of 30 N\u00B7s. By how much does its velocity change?",
+   opts:["A. 150 m/s","B. 25 m/s","C. 6 m/s","D. 0.167 m/s"],
+   ans:"C",
+   exp:"Impulse = m\u0394v \u2192 \u0394v = impulse/m = 30/5 = 6 m/s. Impulse\u2013momentum theorem is just Newton\u2019s 2nd law integrated over time: F\u0394t = m\u0394v."},
+
+  {q:"A 4 kg trolley at 6 m/s collides with and sticks to a stationary 2 kg trolley. What is the final speed?",
+   opts:["A. 6 m/s","B. 3 m/s","C. 4 m/s","D. 2 m/s"],
+   ans:"C",
+   exp:"4\u00D76 = 6\u00D7v \u2192 v = 24/6 = 4 m/s."},
+
+  {q:"A 2 kg rifle fires a 0.01 kg bullet at 400 m/s. What is the rifle\u2019s recoil speed?",
+   opts:["A. 0.5 m/s","B. 4 m/s","C. 2 m/s","D. 8 m/s"],
+   ans:"C",
+   exp:"Conservation of momentum (initial total = 0): 0 = 0.01\u00D7400 + 2\u00D7V \u2192 V = \u22122 m/s. Speed = 2 m/s. The minus sign shows rifle moves opposite to bullet."},
+
+  {q:"In a perfectly inelastic collision, which quantity is definitely conserved?",
+   opts:["A. Kinetic energy only","B. Both kinetic energy and momentum","C. Momentum but not kinetic energy","D. Neither"],
+   ans:"C",
+   exp:"Momentum is always conserved in collisions (no external net force). Kinetic energy is only conserved in elastic collisions. In perfectly inelastic collisions, some KE is converted to heat, sound, and deformation."},
+
+  {q:"Ball A (2 kg, 6 m/s) collides elastically with identical ball B (2 kg, at rest). After the collision:",
+   opts:["A. Both move at 3 m/s","B. A continues at 6 m/s, B stays at rest","C. A stops, B moves at 6 m/s","D. A bounces back at 6 m/s, B stays"],
+   ans:"C",
+   exp:"In an elastic collision between equal masses, the first object stops and the second takes on its velocity exactly. Both momentum (2\u00D76=2\u00D76) and KE (\u00BD\u00D72\u00D736=\u00BD\u00D72\u00D736) are conserved. This is a billiard ball result."},
+
+  // ── SET 6 · Circular Motion and Gravitation ───────────────────────────────
+
+  {q:"A 0.5 kg mass moves in a circle of radius 2 m at 4 m/s. What centripetal force is required?",
+   opts:["A. 1 N","B. 4 N","C. 16 N","D. 2 N"],
+   ans:"B",
+   exp:"F = mv\u00B2/r = 0.5\u00D716/2 = 4 N. This is a REQUIREMENT, not a new type of force. Whatever physical force acts (tension in a string, gravity, normal force, friction) must equal mv\u00B2/r to maintain circular motion."},
+
+  {q:"A car rounds a circular bend of radius 100 m at 20 m/s. What is the centripetal acceleration?",
+   opts:["A. 2 m/s\u00B2","B. 0.2 m/s\u00B2","C. 4 m/s\u00B2","D. 40 m/s\u00B2"],
+   ans:"C",
+   exp:"a = v\u00B2/r = 400/100 = 4 m/s\u00B2. The friction between tyres and road must supply this centripetal acceleration. On ice (low friction), the car cannot maintain the circular path."},
+
+  {q:"A satellite in circular orbit experiences no rocket thrust. What provides its centripetal force?",
+   opts:["A. No force \u2014 it is weightless in space","B. The rocket engines","C. Gravity from Earth","D. The satellite\u2019s own inertia"],
+   ans:"C",
+   exp:"Gravity provides the centripetal force: GMm/r\u00B2 = mv\u00B2/r. The satellite is in continuous free fall toward Earth, but its horizontal speed means it misses Earth and stays in orbit. \u2018Weightlessness\u2019 is free fall, not absence of gravity."},
+
+  {q:"The gravitational field strength at Earth\u2019s surface is 10 N/kg. What is it at a distance of 2R from Earth\u2019s centre? (R = Earth\u2019s radius)",
+   opts:["A. 5 N/kg","B. 2.5 N/kg","C. 20 N/kg","D. 1.25 N/kg"],
+   ans:"B",
+   exp:"g \u221D 1/r\u00B2. At r = 2R: g\u2019 = g/(2)\u00B2 = 10/4 = 2.5 N/kg. This inverse-square law is the gravity version of the Kc transformation \u2014 changing distance transforms the field strength by a predictable factor."},
+
+  {q:"An object moves in a circle of radius 4 m at a constant speed of 2\u03C0 m/s. What is its period?",
+   opts:["A. 2 s","B. 4 s","C. \u03C0 s","D. 8\u03C0 s"],
+   ans:"B",
+   exp:"T = circumference/speed = 2\u03C0r/v = 2\u03C0\u00D74/(2\u03C0) = 4 s. Period is how long one full revolution takes."},
+
+  {q:"A ball on a string moves in a vertical circle of radius 10 m. What is the minimum speed at the top of the circle for the string to remain taut? (g = 10 m/s\u00B2)",
+   opts:["A. 5 m/s","B. 100 m/s","C. 10 m/s","D. \u221A10 m/s"],
+   ans:"C",
+   exp:"At the top, gravity + tension = mv\u00B2/r. Minimum speed when tension = 0: mg = mv\u00B2/r \u2192 v = \u221A(gr) = \u221A(10\u00D710) = 10 m/s. The centripetal force REQUIREMENT must be met by gravity alone at the minimum condition."},
+
+  {q:"A wheel turns at 3 revolutions per second. What is its angular velocity in rad/s? (\u03C0 \u2248 3.14)",
+   opts:["A. 3 rad/s","B. 6\u03C0 rad/s","C. 3\u03C0 rad/s","D. \u03C0/3 rad/s"],
+   ans:"B",
+   exp:"\u03C9 = 2\u03C0f = 2\u03C0\u00D73 = 6\u03C0 rad/s. Each revolution sweeps out 2\u03C0 radians."},
+
+  {q:"A geostationary satellite appears stationary when viewed from Earth. What is its orbital period?",
+   opts:["A. 1 hour","B. 12 hours","C. 24 hours","D. 365 days"],
+   ans:"C",
+   exp:"A geostationary orbit has T = 24 hours (Earth\u2019s rotation period). The satellite orbits at the same angular velocity as Earth\u2019s surface directly above the equator \u2014 always above the same point. This is why satellite dishes point in a fixed direction."},
+
+  // ── SET 7 · Waves ────────────────────────────────────────────────────────
+
+  {q:"A wave has frequency 50 Hz and wavelength 4 m. What is its speed?",
+   opts:["A. 12.5 m/s","B. 200 m/s","C. 54 m/s","D. 46 m/s"],
+   ans:"B",
+   exp:"v = f\u03BB = 50\u00D74 = 200 m/s. This single equation is the spine of all wave calculations. Every wave \u2014 sound, light, water, seismic \u2014 obeys v = f\u03BB."},
+
+  {q:"Sound travels at 340 m/s. A note has frequency 680 Hz. What is its wavelength?",
+   opts:["A. 2 m","B. 0.25 m","C. 0.5 m","D. 1 m"],
+   ans:"C",
+   exp:"\u03BB = v/f = 340/680 = 0.5 m. Exit from the spine: given v and f, find \u03BB."},
+
+  {q:"A wave has a period of 0.05 s. What is its frequency?",
+   opts:["A. 0.05 Hz","B. 2 Hz","C. 20 Hz","D. 200 Hz"],
+   ans:"C",
+   exp:"f = 1/T = 1/0.05 = 20 Hz. Period and frequency are exact reciprocals. Doubling frequency halves period \u2014 they are the same piece of information in different units."},
+
+  {q:"In a standing wave, what is the distance between two adjacent nodes?",
+   opts:["A. One full wavelength \u03BB","B. \u03BB/4","C. \u03BB/2","D. 2\u03BB"],
+   ans:"C",
+   exp:"Nodes (zero displacement) occur at every half-wavelength. The distance between adjacent nodes = \u03BB/2. Between a node and an adjacent antinode = \u03BB/4."},
+
+  {q:"A pipe open at both ends is 0.85 m long. What is its fundamental frequency? (speed of sound = 340 m/s)",
+   opts:["A. 100 Hz","B. 400 Hz","C. 200 Hz","D. 50 Hz"],
+   ans:"C",
+   exp:"For an open pipe: f = v/(2L) = 340/(2\u00D70.85) = 340/1.7 = 200 Hz. An antinode forms at each open end; the fundamental has half a wavelength fitting in the pipe length."},
+
+  {q:"A pipe closed at one end is 0.85 m long. What is its fundamental frequency? (speed of sound = 340 m/s)",
+   opts:["A. 200 Hz","B. 400 Hz","C. 50 Hz","D. 100 Hz"],
+   ans:"D",
+   exp:"For a closed pipe: f = v/(4L) = 340/(4\u00D70.85) = 100 Hz. A node forms at the closed end, antinode at the open end; only a quarter-wavelength fits in the pipe. Closed pipe gives half the fundamental frequency of the same-length open pipe."},
+
+  {q:"A fire engine siren emits a steady tone. As the engine approaches you, then passes and recedes, the pitch you hear:",
+   opts:["A. Rises steadily throughout","B. Falls steadily throughout","C. Is higher than the true pitch as it approaches, lower as it recedes","D. Stays equal to the true pitch throughout"],
+   ans:"C",
+   exp:"Doppler effect: approaching source compresses wavefronts (shorter \u03BB, higher f); receding source stretches them (longer \u03BB, lower f). The siren\u2019s actual frequency does not change \u2014 only the received frequency changes."},
+
+  {q:"Light enters glass (n = 1.5) from air. Compared to its values in air, the light\u2019s frequency, wavelength, and speed in glass are:",
+   opts:["A. All three decrease","B. Frequency unchanged; wavelength and speed decrease","C. Speed unchanged; frequency and wavelength change","D. All three are unchanged"],
+   ans:"B",
+   exp:"Frequency is determined by the source and never changes when light enters a new medium. Speed slows to v = c/n = c/1.5. Wavelength shrinks proportionally (\u03BB\u2019 = \u03BB/n) to maintain v = f\u03BB. Frequency is the conserved quantity across media."},
+
+  // ── SET 8 · Electricity ──────────────────────────────────────────────────
+
+  {q:"A 12 V battery is connected to a 4 \u03A9 resistor. What current flows?",
+   opts:["A. 48 A","B. 3 A","C. 0.33 A","D. 8 A"],
+   ans:"B",
+   exp:"I = V/R = 12/4 = 3 A. Ohm\u2019s law V = IR is the spine of all circuit calculations. Every other circuit formula is built on it."},
+
+  {q:"A 2 A current flows through a 6 \u03A9 resistor. What power is dissipated?",
+   opts:["A. 3 W","B. 12 W","C. 24 W","D. 8 W"],
+   ans:"C",
+   exp:"P = I\u00B2R = 4\u00D76 = 24 W. Three equivalent exits from the power spine: P = IV = I\u00B2R = V\u00B2/R. Choose the one that avoids calculating an intermediate quantity."},
+
+  {q:"Three resistors of 3 \u03A9, 5 \u03A9, and 7 \u03A9 are connected in series. What is the total resistance?",
+   opts:["A. 1.28 \u03A9","B. 5 \u03A9","C. 15 \u03A9","D. 105 \u03A9"],
+   ans:"C",
+   exp:"R_series = R\u2081 + R\u2082 + R\u2083 = 3 + 5 + 7 = 15 \u03A9. In series, same current flows through all; resistances simply add."},
+
+  {q:"A 6 \u03A9 and a 3 \u03A9 resistor are connected in parallel. What is the combined resistance?",
+   opts:["A. 9 \u03A9","B. 4.5 \u03A9","C. 18 \u03A9","D. 2 \u03A9"],
+   ans:"D",
+   exp:"1/R = 1/6 + 1/3 = 1/6 + 2/6 = 3/6 = 1/2. R = 2 \u03A9. In parallel, combined resistance is always LESS than the smallest individual resistor. The product/sum shortcut for two resistors: R = (6\u00D73)/(6+3) = 2 \u03A9."},
+
+  {q:"A 12 V source is connected to a 4 \u03A9 and a 2 \u03A9 resistor in series. What is the voltage across the 4 \u03A9 resistor?",
+   opts:["A. 4 V","B. 6 V","C. 8 V","D. 12 V"],
+   ans:"C",
+   exp:"Total R = 6 \u03A9. I = 12/6 = 2 A (same in series). V_4\u03A9 = IR = 2\u00D74 = 8 V. In series: current is the same; voltage divides in proportion to resistance."},
+
+  {q:"A 12 V source connects to a 3 \u03A9 and 6 \u03A9 resistor in parallel. What is the total current from the source?",
+   opts:["A. 6 A","B. 4 A","C. 2 A","D. 12 A"],
+   ans:"A",
+   exp:"In parallel: same 12 V across each. I\u2081 = 12/3 = 4 A; I\u2082 = 12/6 = 2 A. Total I = 6 A. In parallel: voltage is the same; currents add."},
+
+  {q:"A 3 A current flows through a 6 V component for 10 s. How much electrical energy is converted?",
+   opts:["A. 18 J","B. 180 J","C. 1.8 J","D. 60 J"],
+   ans:"B",
+   exp:"E = Pt = IVt = 3\u00D76\u00D710 = 180 J."},
+
+  {q:"A 2 kW heater runs for 3 hours. How many kilowatt-hours of energy does it use?",
+   opts:["A. 0.67 kWh","B. 5 kWh","C. 6 kWh","D. 600 kWh"],
+   ans:"C",
+   exp:"Energy = Power \u00D7 time = 2 kW \u00D7 3 h = 6 kWh. The kilowatt-hour is a unit of energy (1 kWh = 3.6 MJ), used for billing electricity."},
+
+  {q:"A cell has EMF = 6 V and internal resistance = 1 \u03A9. It is connected to a 5 \u03A9 external resistor. What is the terminal voltage?",
+   opts:["A. 6 V","B. 1 V","C. 5 V","D. 30 V"],
+   ans:"C",
+   exp:"I = EMF/(R+r) = 6/(5+1) = 1 A. Terminal voltage = IR = 1\u00D75 = 5 V. Terminal voltage is less than EMF because 1 V is lost inside the cell (lost voltage = Ir = 1\u00D71 = 1 V)."},
+
+  {q:"A current of 0.5 A flows for 2 minutes. What charge passes a point in the circuit?",
+   opts:["A. 0.0042 C","B. 1 C","C. 60 C","D. 240 C"],
+   ans:"C",
+   exp:"Q = It = 0.5\u00D7120 = 60 C. Convert minutes to seconds first: 2 min = 120 s."},
+
+  // ── SET 9 · Heat and Thermodynamics ──────────────────────────────────────
+
+  {q:"What heat is needed to raise 2 kg of a substance by 25\u00B0C? (specific heat capacity = 400 J/kg\u00B7K)",
+   opts:["A. 200 J","B. 2000 J","C. 20 000 J","D. 200 000 J"],
+   ans:"C",
+   exp:"Q = mc\u0394T = 2\u00D7400\u00D725 = 20 000 J. This is the Q = mc\u0394T spine: mass \u00D7 specific heat capacity \u00D7 temperature change. It applies only when temperature is changing and no phase change is occurring."},
+
+  {q:"What heat is required to raise 0.5 kg of water from 20\u00B0C to 100\u00B0C? (c_water = 4200 J/kg\u00B7K)",
+   opts:["A. 16 800 J","B. 210 000 J","C. 168 000 J","D. 1680 J"],
+   ans:"C",
+   exp:"Q = mc\u0394T = 0.5\u00D74200\u00D780 = 168 000 J. \u0394T = 100 \u2212 20 = 80\u00B0C. Temperature change in Celsius and Kelvin are identical in magnitude."},
+
+  {q:"What heat is needed to completely vaporise 0.2 kg of water at 100\u00B0C? (L_vap = 2.26 \u00D7 10\u2076 J/kg)",
+   opts:["A. 11 300 J","B. 452 000 J","C. 2 260 000 J","D. 22 600 J"],
+   ans:"B",
+   exp:"Q = mL = 0.2\u00D72.26\u00D710\u2076 = 4.52\u00D710\u2075 = 452 000 J. Latent heat (Q=mL) applies during phase change when temperature is CONSTANT. No \u0394T appears in this formula \u2014 that is the core conceptual switch."},
+
+  {q:"What heat is required to melt 0.1 kg of ice at 0\u00B0C? (L_fusion = 3.36 \u00D7 10\u2075 J/kg)",
+   opts:["A. 33 600 J","B. 336 000 J","C. 3 360 J","D. 3 360 000 J"],
+   ans:"A",
+   exp:"Q = mL_fusion = 0.1\u00D73.36\u00D710\u2075 = 33 600 J."},
+
+  {q:"A substance is heated at a constant rate. Its temperature\u2013time graph shows a horizontal segment. This indicates:",
+   opts:["A. The substance has stopped absorbing heat","B. The specific heat capacity has become zero","C. A phase change is occurring at constant temperature","D. The substance is cooling"],
+   ans:"C",
+   exp:"During a phase change, all input energy goes into breaking intermolecular bonds (latent heat) rather than raising temperature. Temperature stays constant until the phase change is complete. This is the signature of Q = mL territory."},
+
+  {q:"Which requires more heat: raising 1 kg of water by 5\u00B0C or raising 1 kg of iron by 5\u00B0C? (c_water = 4200 J/kg\u00B7K, c_iron = 450 J/kg\u00B7K)",
+   opts:["A. Iron requires more \u2014 it is denser","B. Water requires more \u2014 it has higher specific heat capacity","C. Same amount \u2014 same mass and temperature change","D. Cannot determine without volume"],
+   ans:"B",
+   exp:"Q_water = 1\u00D74200\u00D75 = 21 000 J. Q_iron = 1\u00D7450\u00D75 = 2 250 J. Water needs about 9\u00D7 more heat per kg per \u00B0C than iron. High specific heat capacity is why water is used as a coolant."},
+
+  {q:"100 g of water at 80\u00B0C is mixed with 200 g of water at 20\u00B0C. What is the final temperature? (same c throughout)",
+   opts:["A. 50\u00B0C","B. 40\u00B0C","C. 60\u00B0C","D. 45\u00B0C"],
+   ans:"B",
+   exp:"Heat lost = heat gained: 100(80\u2212T) = 200(T\u221220) \u2192 8000\u2212100T = 200T\u22124000 \u2192 12000 = 300T \u2192 T = 40\u00B0C. c cancels when the same substance is mixed."},
+
+  {q:"A steel rod is 2 m long at 20\u00B0C. By how much does it expand when heated to 70\u00B0C? (\u03B1 = 1.2 \u00D7 10\u207B\u2075 /K)",
+   opts:["A. 1.2 \u00D7 10\u207B\u00B3 m","B. 1.2 \u00D7 10\u207B\u2074 m","C. 1.2 \u00D7 10\u207B\u00B2 m","D. 1.2 \u00D7 10\u207B\u2076 m"],
+   ans:"A",
+   exp:"\u0394L = \u03B1L\u0394T = 1.2\u00D710\u207B\u2075\u00D72\u00D750 = 1.2\u00D710\u207B\u00B3 m = 1.2 mm. \u0394T = 70\u221220 = 50 K."},
+
+  // ── SET 10 · Light and Optics ─────────────────────────────────────────────
+
+  {q:"A converging lens has focal length 10 cm. An object is placed 30 cm from the lens. Where is the image formed?",
+   opts:["A. 10 cm","B. 15 cm","C. 30 cm","D. 7.5 cm"],
+   ans:"B",
+   exp:"1/f = 1/u + 1/v \u2192 1/10 = 1/30 + 1/v \u2192 1/v = 1/10 \u2212 1/30 = 3/30 \u2212 1/30 = 2/30 \u2192 v = 15 cm. Real image on the opposite side of the lens."},
+
+  {q:"Using the lens in Q77, what is the magnification of the image?",
+   opts:["A. 2","B. 0.5","C. 3","D. 1"],
+   ans:"B",
+   exp:"m = v/u = 15/30 = 0.5. Magnification less than 1 means the image is smaller (diminished). Magnification greater than 1 means enlarged."},
+
+  {q:"A converging lens (f = 10 cm) has an object placed at 20 cm (at 2f). Describe the image.",
+   opts:["A. Virtual, magnified, same side as object","B. Real, same size, at 20 cm on other side","C. Real, magnified, beyond 2f on other side","D. No image formed"],
+   ans:"B",
+   exp:"1/v = 1/10 \u2212 1/20 = 2/20 \u2212 1/20 = 1/20 \u2192 v = 20 cm. m = 20/20 = 1 (same size). Object at 2f always gives real, inverted, same-size image at 2f on the other side."},
+
+  {q:"A diverging lens has focal length 15 cm. An object is 30 cm from the lens. Where is the image?",
+   opts:["A. 10 cm, virtual","B. 30 cm, real","C. 60 cm, real","D. 15 cm, virtual"],
+   ans:"A",
+   exp:"Diverging lens: f = \u221215 cm. 1/v = 1/(\u221215) \u2212 1/30 = \u22122/30 \u2212 1/30 = \u22123/30 \u2192 v = \u221210 cm. Negative v = virtual image, same side as object, 10 cm from lens. Diverging lenses always form virtual, diminished, upright images."},
+
+  {q:"A concave mirror has focal length 12 cm. An object is 20 cm from the mirror. Where is the image?",
+   opts:["A. 30 cm, real","B. 30 cm, virtual","C. 7.5 cm, real","D. 15 cm, virtual"],
+   ans:"A",
+   exp:"1/f = 1/u + 1/v \u2192 1/12 = 1/20 + 1/v \u2192 1/v = 1/12 \u2212 1/20 = 5/60 \u2212 3/60 = 2/60 \u2192 v = 30 cm. Positive v = real image in front of mirror."},
+
+  {q:"A converging lens has focal length 25 cm. What is its power?",
+   opts:["A. 25 D","B. 0.04 D","C. 4 D","D. 0.25 D"],
+   ans:"C",
+   exp:"P = 1/f = 1/0.25 = 4 D. Focal length must be in metres. Power in dioptres (D) = 1/f(m). Converging lenses have positive power; diverging lenses have negative power."},
+
+  {q:"A glass has refractive index n = \u221A2. What is the critical angle for total internal reflection?",
+   opts:["A. 30\u00B0","B. 60\u00B0","C. 45\u00B0","D. 90\u00B0"],
+   ans:"C",
+   exp:"sin(c) = 1/n = 1/\u221A2. c = 45\u00B0. Above this angle (measured from the normal), light cannot escape the glass \u2014 total internal reflection occurs. This is the principle behind optical fibres."},
+
+  {q:"A ray of light passes from air into glass (n = \u221A2) at an angle of incidence of 45\u00B0. What is the angle of refraction?",
+   opts:["A. 45\u00B0","B. 30\u00B0","C. 60\u00B0","D. 90\u00B0"],
+   ans:"B",
+   exp:"Snell\u2019s law: n\u2081 sin\u03B8\u2081 = n\u2082 sin\u03B8\u2082. 1\u00D7sin45\u00B0 = \u221A2\u00D7sin\u03B8\u2082. sin\u03B8\u2082 = (\u221A2/2)/\u221A2 = 1/2. \u03B8\u2082 = 30\u00B0. Light bends toward the normal when entering a denser medium."},
+
+  // ── SET 11 · Pressure and Fluids ─────────────────────────────────────────
+
+  {q:"A force of 500 N acts on an area of 0.1 m\u00B2. What is the pressure?",
+   opts:["A. 50 Pa","B. 5000 Pa","C. 500 Pa","D. 50 000 Pa"],
+   ans:"B",
+   exp:"P = F/A = 500/0.1 = 5000 Pa. Pressure = force per unit area. The same force on a smaller area creates greater pressure \u2014 why a knife cuts but a hand does not."},
+
+  {q:"What is the pressure at a depth of 5 m in water? (\u03C1_water = 1000 kg/m\u00B3, g = 10 m/s\u00B2)",
+   opts:["A. 5000 Pa","B. 500 Pa","C. 50 000 Pa","D. 500 000 Pa"],
+   ans:"C",
+   exp:"P = \u03C1gh = 1000\u00D710\u00D75 = 50 000 Pa = 50 kPa. Pressure in a fluid increases linearly with depth."},
+
+  {q:"An object displaces 0.002 m\u00B3 of water when submerged. What is the upthrust (buoyancy force)? (\u03C1_water = 1000 kg/m\u00B3, g = 10 m/s\u00B2)",
+   opts:["A. 2 N","B. 20 N","C. 200 N","D. 0.002 N"],
+   ans:"B",
+   exp:"Upthrust = weight of fluid displaced = \u03C1Vg = 1000\u00D70.002\u00D710 = 20 N. This is Archimedes\u2019 principle \u2014 the upthrust equals the weight of the displaced fluid, not the weight of the object."},
+
+  {q:"An object floats with 60% of its volume submerged in water. What is its density? (\u03C1_water = 1000 kg/m\u00B3)",
+   opts:["A. 600 kg/m\u00B3","B. 400 kg/m\u00B3","C. 1000 kg/m\u00B3","D. 1667 kg/m\u00B3"],
+   ans:"A",
+   exp:"For a floating object, weight = upthrust: \u03C1_obj\u00D7V\u00D7g = \u03C1_water\u00D7V_sub\u00D7g. V_sub/V = \u03C1_obj/\u03C1_water = 0.6 \u2192 \u03C1_obj = 600 kg/m\u00B3. An object floats when its density is less than the fluid\u2019s."},
+
+  {q:"A hydraulic press has a small piston of area 0.01 m\u00B2 and a large piston of area 0.1 m\u00B2. A 100 N force is applied to the small piston. What force is exerted by the large piston?",
+   opts:["A. 10 N","B. 100 N","C. 1000 N","D. 0.1 N"],
+   ans:"C",
+   exp:"Pascal\u2019s principle: pressure transmitted equally. F\u2081/A\u2081 = F\u2082/A\u2082 \u2192 F\u2082 = 100\u00D7(0.1/0.01) = 1000 N. The hydraulic press multiplies force by the ratio of areas \u2014 the same principle used in car brakes and lifts."},
+
+  {q:"Standard atmospheric pressure is 101 325 Pa. This is equivalent to:",
+   opts:["A. 760 mmHg and 1 atm","B. 1 bar exactly","C. 1000 mbar exactly","D. 100 kPa exactly"],
+   ans:"A",
+   exp:"101 325 Pa = 760 mmHg = 1 atm exactly. 1 bar = 100 000 Pa (slightly less than 1 atm). These conversions are the pressure unit anchors used in gas law and fluid calculations."},
+
+  // ── SET 12 · Multi-step Mixed ─────────────────────────────────────────────
+
+  {q:"A ball is projected horizontally at 10 m/s from a 45 m high cliff. How far from the base of the cliff does it land? (g = 10 m/s\u00B2)",
+   opts:["A. 45 m","B. 30 m","C. 10 m","D. 450 m"],
+   ans:"B",
+   exp:"Step 1 (vertical \u2014 find t): 45 = \u00BD\u00D710\u00D7t\u00B2 \u2192 t = 3 s. Step 2 (horizontal \u2014 find range): R = 10\u00D73 = 30 m. Time is always the link between the two independent components."},
+
+  {q:"A ball is launched at 30\u00B0 above horizontal with speed 20 m/s. What is the maximum height reached? (g = 10 m/s\u00B2, sin 30\u00B0 = 0.5)",
+   opts:["A. 10 m","B. 20 m","C. 5 m","D. 40 m"],
+   ans:"C",
+   exp:"u_y = 20\u00D70.5 = 10 m/s. H = u_y\u00B2/(2g) = 100/20 = 5 m. Only the vertical component determines height; the horizontal component is irrelevant."},
+
+  {q:"A 0.1 kg ball hits a wall at 20 m/s and bounces back at 15 m/s. Contact time is 0.05 s. What average force does the wall exert?",
+   opts:["A. 35 N","B. 70 N","C. 5 N","D. 10 N"],
+   ans:"B",
+   exp:"Taking toward-wall as positive: \u0394p = m(v\u2212u) = 0.1\u00D7(\u221215\u221220) = 0.1\u00D7(\u221235) = \u22123.5 N\u00B7s. |F| = |\u0394p|/t = 3.5/0.05 = 70 N. Both magnitude AND direction of velocity matter; the wall reverses the ball\u2019s direction, so both speeds add in the change."},
+
+  {q:"A ball on a 5 m string moves in a vertical circle. What minimum speed at the top keeps the string taut AND what speed at the bottom is required for this? (g = 10 m/s\u00B2)",
+   opts:["A. v_top = 5\u221A2 m/s, v_bottom = 5\u221A2 m/s","B. v_top = 5\u221A2 m/s, v_bottom = 5\u221A10 m/s","C. v_top = 10 m/s, v_bottom = 10 m/s","D. v_top = \u221A50 m/s, v_bottom = 5\u221A10 m/s"],
+   ans:"B",
+   exp:"At top (string just taut, T=0): mg = mv_top\u00B2/r \u2192 v_top = \u221A(gr) = \u221A50 = 5\u221A2 m/s. Energy conservation bottom\u2192top: \u00BDv_bot\u00B2 = \u00BDv_top\u00B2 + g(2r) \u2192 v_bot\u00B2 = 50 + 200 = 250 \u2192 v_bot = \u221A250 = 5\u221A10 m/s."},
+
+  {q:"A 2 \u03A9 resistor carries 3 A for 5 minutes. How much heat is generated?",
+   opts:["A. 30 J","B. 540 J","C. 5400 J","D. 1800 J"],
+   ans:"C",
+   exp:"P = I\u00B2R = 9\u00D72 = 18 W. Q = Pt = 18\u00D7300 = 5400 J. Time must be in seconds: 5 min = 300 s. This links electricity to heat \u2014 the same energy quantity connects both topics."},
+
+  {q:"Light travels at 3 \u00D7 10\u2078 m/s in vacuum. What is its speed in glass of refractive index 1.5?",
+   opts:["A. 4.5 \u00D7 10\u2078 m/s","B. 1.5 \u00D7 10\u2078 m/s","C. 2.0 \u00D7 10\u2078 m/s","D. 3.0 \u00D7 10\u2078 m/s"],
+   ans:"C",
+   exp:"v = c/n = 3\u00D710\u2078/1.5 = 2\u00D710\u2078 m/s. Refractive index n = c/v is the ratio of speed in vacuum to speed in medium. It is always \u2265 1."},
+
+  {q:"At Earth\u2019s surface (radius R), g = 10 m/s\u00B2. What is g at altitude R above the surface (i.e., at distance 2R from Earth\u2019s centre)?",
+   opts:["A. 5 m/s\u00B2","B. 2.5 m/s\u00B2","C. 1.25 m/s\u00B2","D. 10 m/s\u00B2"],
+   ans:"B",
+   exp:"g \u221D 1/r\u00B2. At r = 2R: g\u2019 = g/(2R/R)\u00B2 = 10/4 = 2.5 m/s\u00B2. Every doubling of distance from centre reduces g by factor of 4. This is the same inverse-square transformation seen in Coulomb\u2019s law and light intensity."},
+
+  {q:"A simple pendulum of length 2.5 m oscillates on Earth. What is its period? (g = 10 m/s\u00B2, \u03C0 \u2248 3.14)",
+   opts:["A. \u03C0/2 s","B. \u03C0 s","C. 2\u03C0 s","D. 4\u03C0 s"],
+   ans:"B",
+   exp:"T = 2\u03C0\u221A(L/g) = 2\u03C0\u221A(2.5/10) = 2\u03C0\u221A0.25 = 2\u03C0\u00D70.5 = \u03C0 s \u2248 3.14 s. Period depends on length and g only \u2014 not on mass or amplitude (for small oscillations)."},
+
+  {q:"A spring of constant k = 100 N/m has a 0.25 kg mass attached. What is its period of oscillation? (\u03C0 \u2248 3.14)",
+   opts:["A. 0.1\u03C0 s","B. \u03C0 s","C. 0.1 s","D. 10 s"],
+   ans:"A",
+   exp:"T = 2\u03C0\u221A(m/k) = 2\u03C0\u221A(0.25/100) = 2\u03C0\u221A(0.0025) = 2\u03C0\u00D70.05 = 0.1\u03C0 s \u2248 0.314 s. Unlike a pendulum, spring period depends on mass and spring constant, not on g."},
+
+  {q:"A radioactive sample has a half-life of 3 years. If the initial mass is 80 g, what mass remains after 9 years?",
+   opts:["A. 40 g","B. 20 g","C. 10 g","D. 8 g"],
+   ans:"C",
+   exp:"9 years = 3 half-lives. 80 \u2192 40 \u2192 20 \u2192 10 g. After n half-lives: mass = initial \u00D7 (1/2)\u207F. This is the exponential decay spine: each half-life halves the remaining quantity regardless of how much is left."}
+
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'chemistry';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>
