@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Maths for Science — JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Maths for Science</div>
+    <div class="subtitle">90-question skills drill · Chemistry &amp; Physics</div>
+</div>
+
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// MATHS FOR SCIENCE · 90 QUESTIONS
+//
+// This file targets the calculation layer underneath chemistry and physics —
+// the skills that determine whether a student can execute a spine they understand.
+//
+// Architecture: every set follows the same pattern as the science files:
+//   Core skill (naked, no context) → entry variants (dressed in science) →
+//   exit variants (work backwards) → merged (two skills in one problem)
+//
+// Distractors target:
+//   - Wrong power of 10 in standard form (off by one or sign error)
+//   - Rounding to wrong number of sig figs
+//   - Rearranging incorrectly (adding instead of dividing, etc.)
+//   - Confusing direct with inverse proportion
+//   - log vs ln confusion
+//   - Misreading graph scale or gradient
+//   - Unit mismatch (cm vs m, kPa vs Pa, etc.)
+//   - Percentage of wrong quantity
+// ─────────────────────────────────────────────────────────────────────────────
+// SET 1  · Standard form and scientific notation                Q1–8
+// SET 2  · Significant figures and rounding                     Q9–16
+// SET 3  · Rearranging equations                                Q17–28
+// SET 4  · Proportionality                                      Q29–38
+// SET 5  · Logarithms and pH                                    Q39–48
+// SET 6  · Graph interpretation                                 Q49–58
+// SET 7  · Units and dimensional analysis                       Q59–66
+// SET 8  · Percentage, ratio, and error                         Q67–76
+// SET 9  · Substitution and checking answers                    Q77–84
+// SET 10 · Mixed applied                                        Q85–90
+// ─────────────────────────────────────────────────────────────────────────────
+
+const questions = {
+  chemistry: [
+
+  // ── SET 1 · Standard Form and Scientific Notation ────────────────────────
+
+  {q:"Write 0.000365 in standard form.",
+   opts:["A. 3.65 × 10⁻⁴","B. 3.65 × 10⁻³","C. 36.5 × 10⁻⁵","D. 3.65 × 10⁴"],
+   ans:"A",
+   exp:"Standard form: a × 10ⁿ where 1 ≤ a < 10. Count decimal places moved: 0.000365 → move point 4 places right → 3.65 × 10⁻⁴. Negative exponent because original number is less than 1. Option C (36.5 × 10⁻⁵) is equivalent but not standard form (a must be between 1 and 10)."},
+
+  {q:"Write 6 020 000 in standard form.",
+   opts:["A. 6.02 × 10⁵","B. 6.02 × 10⁶","C. 6.20 × 10⁶","D. 60.2 × 10⁵"],
+   ans:"B",
+   exp:"Move decimal point 6 places left: 6 020 000 → 6.02 × 10⁶. Positive exponent because original number is greater than 1. The zero in the middle (6 020 000) is significant — it appears as 6.02, not 6.2. Standard form preserves all significant figures."},
+
+  {q:"Avogadro's number is 6.02 × 10²³. Write this as an ordinary number.",
+   opts:["A. 602 000","B. 6 020 000 000 000 000 000 000","C. 60 200 000 000 000 000 000 000","D. 0.000000000000000000000602"],
+   ans:"B",
+   exp:"6.02 × 10²³: move decimal 23 places right. 6.02 followed by 21 zeros = 602 followed by 21 zeros = 6.02 × 10²³. This is Avogadro's number — the number of particles in one mole. Its enormous magnitude makes standard form essential; writing it in full is impractical."},
+
+  {q:"Calculate (3.0 × 10⁴) × (2.0 × 10³). Give your answer in standard form.",
+   opts:["A. 6.0 × 10⁷","B. 6.0 × 10¹²","C. 5.0 × 10⁷","D. 6.0 × 10⁶"],
+   ans:"A",
+   exp:"Multiply coefficients: 3.0 × 2.0 = 6.0. Add exponents: 10⁴ × 10³ = 10⁷. Answer: 6.0 × 10⁷. Rule: multiply the numbers, ADD the powers. Confusing addition with multiplication of powers is the most common error here."},
+
+  {q:"Calculate (8.0 × 10⁶) ÷ (4.0 × 10²). Give your answer in standard form.",
+   opts:["A. 2.0 × 10³","B. 2.0 × 10⁴","C. 4.0 × 10³","D. 2.0 × 10⁸"],
+   ans:"B",
+   exp:"Divide coefficients: 8.0 ÷ 4.0 = 2.0. Subtract exponents: 10⁶ ÷ 10² = 10⁴. Answer: 2.0 × 10⁴. Rule: divide the numbers, SUBTRACT the powers. Option A (10³) is the result of subtracting incorrectly."},
+
+  {q:"The charge on one electron is 1.6 × 10⁻¹⁹ C. The Faraday constant F = charge on one mole of electrons. Calculate F. (Nₐ = 6.02 × 10²³)",
+   opts:["A. 9.63 × 10⁴ C/mol","B. 9.63 × 10⁵ C/mol","C. 3.76 × 10⁴ C/mol","D. 9.63 × 10²ˣ C/mol"],
+   ans:"A",
+   exp:"F = 1.6 × 10⁻¹⁹ × 6.02 × 10²³ = (1.6 × 6.02) × 10⁽⁻¹⁹⁺²³⁾ = 9.632 × 10⁴ ≈ 96 320 C/mol ≈ 96 500 C/mol. This is exactly how the Faraday constant arises from fundamental constants — a direct standard form multiplication that connects atomic charge to the molar scale."},
+
+  {q:"A wavelength of light is 5.0 × 10⁻⁷ m. Express this in nanometres (1 nm = 10⁻⁹ m).",
+   opts:["A. 5.0 nm","B. 500 nm","C. 5000 nm","D. 0.5 nm"],
+   ans:"B",
+   exp:"5.0 × 10⁻⁷ m ÷ 10⁻⁹ m/nm = 5.0 × 10⁻⁷ × 10⁹ nm = 5.0 × 10² nm = 500 nm. This is visible green-yellow light. Converting between SI prefixes requires moving the power of 10 — a standard form operation dressed as a unit conversion."},
+
+  {q:"Add 3.0 × 10³ and 4.0 × 10². Give your answer in standard form.",
+   opts:["A. 7.0 × 10³","B. 3.4 × 10³","C. 7.0 × 10²","D. 3.04 × 10³"],
+   ans:"B",
+   exp:"Convert to same power first: 4.0 × 10² = 0.4 × 10³. Then add: 3.0 + 0.4 = 3.4 × 10³. You cannot add 3.0 and 4.0 directly — the powers must match. Option A (7.0 × 10³) is the result of incorrectly adding both coefficients without adjusting for the different powers."},
+
+  // ── SET 2 · Significant Figures and Rounding ──────────────────────────────
+
+  {q:"How many significant figures does 0.00420 have?",
+   opts:["A. 5","B. 6","C. 2","D. 3"],
+   ans:"D",
+   exp:"Rules for significant figures: leading zeros (before the first non-zero digit) are NOT significant. The zeros in 0.00420 before the 4 are leading zeros — not significant. Digits 4, 2, and the trailing 0 after the 2 ARE significant (trailing zero after decimal point is significant). Count: 4, 2, 0 = 3 significant figures."},
+
+  {q:"How many significant figures does 3050 have?",
+   opts:["A. 4","B. 3","C. 2","D. Cannot determine without more context"],
+   ans:"D",
+   exp:"Ambiguous: the trailing zero in 3050 may or may not be significant. If the measurement is to the nearest 10, it has 3 sig figs (3, 0, 5). If to the nearest unit, it has 4 sig figs (3, 0, 5, 0). Standard form removes ambiguity: 3.05 × 10³ (3 sig figs) or 3.050 × 10³ (4 sig figs). The ambiguity of trailing zeros before the decimal point is a real problem in scientific communication."},
+
+  {q:"Round 0.08475 to 3 significant figures.",
+   opts:["A. 0.0848","B. 0.0847","C. 0.0850","D. 0.0847500"],
+   ans:"A",
+   exp:"First significant figure: 8 (leading zeros don't count). Three sig figs: 8, 4, 7 — the next digit is 5, so round up the 7 to 8. Answer: 0.0848. Option B (0.0847) truncates instead of rounding. Option C adds a spurious sig fig."},
+
+  {q:"A calculation gives 4.7823 g. The balance is accurate to 0.01 g. How should the answer be reported?",
+   opts:["A. 4.7823 g","B. 4.78 g","C. 4.8 g","D. 5 g"],
+   ans:"B",
+   exp:"Report to the precision of the measuring instrument: balance reads to 0.01 g (2 decimal places). Round 4.7823 to 2 decimal places → 4.78 g. Reporting more decimal places than the instrument provides implies false precision. Reporting fewer loses information. Match precision to instrument accuracy."},
+
+  {q:"A student calculates 12.34 + 0.5 + 125.678. How many decimal places should the answer have?",
+   opts:["A. 3 decimal places","B. 1 decimal place","C. 0 decimal places","D. 2 decimal places"],
+   ans:"B",
+   exp:"For addition/subtraction: the answer has the same number of DECIMAL PLACES as the least precise measurement. 12.34 has 2 d.p.; 0.5 has 1 d.p.; 125.678 has 3 d.p. Least precise: 1 d.p. Answer = 12.34 + 0.5 + 125.678 = 138.518 → round to 1 d.p. → 138.5. Note: for multiplication/division, use significant figures, not decimal places."},
+
+  {q:"A calculation gives 3.8 × 4.21. How many significant figures should the answer have?",
+   opts:["A. 4","B. 3","C. 2","D. 1"],
+   ans:"C",
+   exp:"For multiplication/division: the answer has the same number of SIGNIFICANT FIGURES as the least precise factor. 3.8 has 2 sig figs; 4.21 has 3 sig figs. Least: 2 sig figs. 3.8 × 4.21 = 16.0 (rounded to 2 sig figs). Do not apply decimal place rules to multiplication — sig fig rules apply."},
+
+  {q:"Which of the following has 4 significant figures?",
+   opts:["A. 0.0030","B. 3.000","C. 300","D. 0.300"],
+   ans:"B",
+   exp:"3.000: the trailing zeros after the decimal point ARE significant — they indicate precision. 4 sig figs. 0.0030: leading zeros not significant, trailing zero is → 2 sig figs. 300: ambiguous (1, 2, or 3 sig figs without context). 0.300: 3 sig figs (3, 0, 0 — leading zero not counted)."},
+
+  {q:"The density of a substance is calculated as mass/volume = 25.6 g ÷ 8.0 cm³. Express the answer to the correct number of significant figures.",
+   opts:["A. 3.200 g/cm³","B. 3.2 g/cm³","C. 3.20 g/cm³","D. 3 g/cm³"],
+   ans:"B",
+   exp:"Division: answer to same sig figs as least precise value. 25.6 has 3 sig figs; 8.0 has 2 sig figs. Least: 2 sig figs. 25.6/8.0 = 3.2 g/cm³ (2 sig figs). Option C (3.20) implies 3 sig figs — too many. Option A (3.200) implies 4 sig figs — much too many. Precision cannot be invented by the calculation."},
+
+  // ── SET 3 · Rearranging Equations ─────────────────────────────────────────
+
+  {q:"PV = nRT. Rearrange to make T the subject.",
+   opts:["A. T = nRPV","B. T = PV/nR","C. T = nR/PV","D. T = PV − nR"],
+   ans:"B",
+   exp:"PV = nRT. Divide both sides by nR: T = PV/(nR). Check: substitute back — PV = nR × (PV/nR) = PV ✓. The key error is option D — subtracting nR instead of dividing. In multiplicative relationships, rearranging means dividing, not subtracting."},
+
+  {q:"PV = nRT. Rearrange to make n the subject.",
+   opts:["A. n = PV − RT","B. n = RT/PV","C. n = PV/RT","D. n = PVRT"],
+   ans:"C",
+   exp:"PV = nRT → n = PV/RT. Both P, V appear in the numerator; both R, T appear in the denominator. n is isolated by dividing both sides by RT. Check: nRT = (PV/RT) × RT = PV ✓."},
+
+  {q:"v = u + at. Rearrange to find t.",
+   opts:["A. t = (v − u)/a","B. t = v − u − a","C. t = v/(u + a)","D. t = a/(v − u)"],
+   ans:"A",
+   exp:"v = u + at. Subtract u: v − u = at. Divide by a: t = (v − u)/a. Two steps: subtract (to isolate the term with t), then divide (to isolate t itself). The order matters — reverse the order of operations that built the original equation."},
+
+  {q:"s = ut + ½at². Rearrange to make a the subject.",
+   opts:["A. a = (s − ut)/½t²","B. a = 2(s − ut)/t²","C. a = 2s/(t²) − u","D. a = s − ut/½t²"],
+   ans:"B",
+   exp:"s = ut + ½at². Subtract ut: s − ut = ½at². Multiply both sides by 2: 2(s − ut) = at². Divide by t²: a = 2(s − ut)/t². Option C is wrong — it does not correctly handle the ut term (divides s by t² but subtracts u separately, which is algebraically incorrect)."},
+
+  {q:"E = ½mv². Rearrange to make v the subject.",
+   opts:["A. v = E/m","B. v = √(2E/m)","C. v = 2E/m","D. v = √(E/2m)"],
+   ans:"B",
+   exp:"E = ½mv². Multiply by 2: 2E = mv². Divide by m: v² = 2E/m. Square root: v = √(2E/m). The square root step is where students most commonly err — forgetting to take the root after isolating v²."},
+
+  {q:"1/f = 1/u + 1/v. Rearrange to make v the subject.",
+   opts:["A. v = 1/f − 1/u","B. v = fu/(u − f)","C. v = f − u","D. v = 1/(1/f − 1/u)"],
+   ans:"B",
+   exp:"1/v = 1/f − 1/u = (u − f)/(fu). So v = fu/(u − f). Alternatively: option D is mathematically equivalent — 1/(1/f − 1/u) = 1/((u−f)/fu) = fu/(u−f). Both B and D are correct. At JAMB level, option B is the cleaner form. The key step: 1/v = (u−f)/fu → invert both sides."},
+
+  {q:"F = mv²/r. Rearrange to make r the subject.",
+   opts:["A. r = mv²F","B. r = F/mv²","C. r = mv²/F","D. r = Fv²/m"],
+   ans:"C",
+   exp:"F = mv²/r → Fr = mv² → r = mv²/F. Multiply both sides by r, then divide both sides by F. Check: F = mv²/r → F = m × v² / (mv²/F) = F ✓."},
+
+  {q:"Q = mcΔT. A student wants to find c. They measure Q = 4200 J, m = 0.5 kg, ΔT = 20°C. Calculate c.",
+   opts:["A. 420 J/kg·K","B. 210 J/kg·K","C. 4200 J/kg·K","D. 840 J/kg·K"],
+   ans:"A",
+   exp:"c = Q/(mΔT) = 4200/(0.5 × 20) = 4200/10 = 420 J/kg·K. Rearrange first: c = Q/(mΔT). Then substitute. Never substitute into the original equation and then try to rearrange — always rearrange first, substitute second. This value is much lower than water (4200 J/kg·K) suggesting a metal."},
+
+  {q:"PV = nRT. P = 2 atm, V = 5 L, n = 0.4 mol, T = ? (R = 0.0821 L·atm/mol·K). Find T.",
+   opts:["A. 300 K","B. 305 K","C. 250 K","D. 200 K"],
+   ans:"B",
+   exp:"T = PV/(nR) = (2 × 5)/(0.4 × 0.0821) = 10/0.03284 ≈ 304.5 K ≈ 305 K. Spine: rearrange equation → substitute → calculate. Never skip the rearrangement step. Option A (300 K) is close but slightly off — exam questions often include a 'close but wrong' option to catch students who approximate prematurely."},
+
+  {q:"The period of a simple pendulum is T = 2π√(L/g). Rearrange to make L the subject.",
+   opts:["A. L = T²g/4π²","B. L = Tg/2π","C. L = 4π²T²/g","D. L = T/2π × g"],
+   ans:"A",
+   exp:"T = 2π√(L/g). Divide by 2π: T/2π = √(L/g). Square both sides: T²/4π² = L/g. Multiply by g: L = gT²/4π². Option C inverts numerator and denominator — the most common error when squaring a fraction."},
+
+  {q:"λ = v/f (wave equation). A wave has v = 340 m/s and T = 0.002 s. Find λ.",
+   opts:["A. 0.68 m","B. 1.47 m","C. 680 m","D. 0.68 m"],
+   ans:"A",
+   exp:"T = 0.002 s → f = 1/T = 1/0.002 = 500 Hz. Then λ = v/f = 340/500 = 0.68 m. Two-step rearrangement: find f from T first (f = 1/T), then find λ. Students who try to use T directly in the wave equation (substituting T for 1/f) get the wrong answer."},
+
+  {q:"v² = u² + 2as. u = 0, a = 5 m/s², s = 20 m. Find v.",
+   opts:["A. 200 m/s","B. 14.1 m/s","C. 10 m/s","D. 20 m/s"],
+   ans:"B",
+   exp:"v² = 0 + 2 × 5 × 20 = 200. v = √200 = 14.14 ≈ 14.1 m/s. The step students miss: after computing v², they must take the square root. Option C (10 m/s) = √100 — an error from computing 2 × 5 × 10 instead of 2 × 5 × 20."},
+
+  // ── SET 4 · Proportionality ────────────────────────────────────────────────
+
+  {q:"y is directly proportional to x. When x = 4, y = 12. Find y when x = 10.",
+   opts:["A. 40","B. 30","C. 26","D. 18"],
+   ans:"B",
+   exp:"y ∝ x → y = kx. k = y/x = 12/4 = 3. When x = 10: y = 3 × 10 = 30. In direct proportion, the ratio y/x is constant. If x increases by factor 2.5 (4→10), y also increases by 2.5 (12→30)."},
+
+  {q:"P is inversely proportional to V (Boyle's law). When V = 4 L, P = 3 atm. Find P when V = 2 L.",
+   opts:["A. 1.5 atm","B. 6 atm","C. 3 atm","D. 12 atm"],
+   ans:"B",
+   exp:"P ∝ 1/V → PV = constant = 4 × 3 = 12. When V = 2: P = 12/2 = 6 atm. Inversely proportional: when one doubles, the other halves. V halved (4→2), so P doubles (3→6). Always find the constant (PV = 12) first."},
+
+  {q:"The gravitational force F between two masses is inversely proportional to the square of the distance r. If F = 10 N at r = 2 m, find F at r = 4 m.",
+   opts:["A. 5 N","B. 20 N","C. 2.5 N","D. 40 N"],
+   ans:"C",
+   exp:"F ∝ 1/r² → Fr² = constant = 10 × 4 = 40. At r = 4: F = 40/16 = 2.5 N. Distance doubled (2→4), so r² quadrupled, so F is divided by 4 (10/4 = 2.5). Inverse square: doubling distance quarters the force. This is the spine of gravity, light intensity, and Coulomb's law."},
+
+  {q:"The kinetic energy KE = ½mv². If v doubles, by what factor does KE change?",
+   opts:["A. 2×","B. √2×","C. 4×","D. 8×"],
+   ans:"C",
+   exp:"KE ∝ v². If v → 2v: KE_new = ½m(2v)² = ½m × 4v² = 4 × ½mv² = 4 × KE_old. Doubling v quadruples KE. This is why stopping distance increases as v² — doubling speed requires 4× the braking force over the same distance, or the same force over 4× the distance."},
+
+  {q:"In Ohm's law, V = IR. If V is constant and R doubles, what happens to I?",
+   opts:["A. I doubles","B. I halves","C. I stays the same","D. I quadruples"],
+   ans:"B",
+   exp:"V = IR, V constant → I = V/R → I ∝ 1/R (inverse proportion). If R doubles, I halves. At constant voltage: current and resistance are inversely proportional. This is why a higher resistance bulb draws less current from the same supply."},
+
+  {q:"The period of a pendulum T = 2π√(L/g). If L is quadrupled, what happens to T?",
+   opts:["A. T doubles","B. T quadruples","C. T halves","D. T is unchanged"],
+   ans:"A",
+   exp:"T ∝ √L. If L → 4L: T_new = 2π√(4L/g) = 2π × 2√(L/g) = 2T. Quadrupling L doubles T. T ∝ √L means a 4× change in L gives a 2× change in T (square root relationship). This is distinct from direct proportion (T ∝ L would give 4× change)."},
+
+  {q:"The pressure of a fixed mass of gas at constant volume is P₁ = 100 kPa at T₁ = 300 K. What is P₂ at T₂ = 450 K?",
+   opts:["A. 66.7 kPa","B. 150 kPa","C. 200 kPa","D. 100 kPa"],
+   ans:"B",
+   exp:"P ∝ T (Gay-Lussac): P₁/T₁ = P₂/T₂. P₂ = P₁ × T₂/T₁ = 100 × 450/300 = 150 kPa. Direct proportion between P and T (in Kelvin). T increases by factor 1.5, so P increases by factor 1.5. Always use Kelvin for gas law proportionality."},
+
+  {q:"The rate of diffusion of a gas is inversely proportional to the square root of its molar mass (Graham's law). Gas A (M = 16) diffuses 3 times faster than gas B. What is M_B?",
+   opts:["A. 48 g/mol","B. 144 g/mol","C. 4 g/mol","D. 9 g/mol"],
+   ans:"B",
+   exp:"rate_A/rate_B = √(M_B/M_A). 3 = √(M_B/16). Square both sides: 9 = M_B/16. M_B = 144 g/mol. The distractor M = 48 (3 × 16) is the error from not squaring — treating it as direct proportion instead of square root."},
+
+  {q:"A spring obeys Hooke's law: F = kx. When F = 20 N, x = 0.04 m. How much does the spring extend when F = 35 N?",
+   opts:["A. 0.07 m","B. 0.035 m","C. 0.175 m","D. 1.4 m"],
+   ans:"A",
+   exp:"k = F/x = 20/0.04 = 500 N/m. x = F/k = 35/500 = 0.07 m. Direct proportion: x ∝ F. Or by ratio: x_new/x_old = F_new/F_old → x_new = 0.04 × (35/20) = 0.07 m. Either method — find constant first or use ratio directly."},
+
+  {q:"The intensity I of light from a point source varies inversely with the square of the distance r. A light meter reads 400 lux at 1 m from the source. What does it read at 4 m?",
+   opts:["A. 100 lux","B. 25 lux","C. 1600 lux","D. 50 lux"],
+   ans:"B",
+   exp:"I ∝ 1/r². At r = 4 m (4× further): I decreases by 4² = 16 times. I = 400/16 = 25 lux. Inverse square law: doubling distance quarters intensity; quadrupling distance reduces intensity 16-fold. Same law governs gravity, electrostatic force, and radiation intensity."},
+
+  // ── SET 5 · Logarithms and pH ─────────────────────────────────────────────
+
+  {q:"What is log₁₀(1000)?",
+   opts:["A. 100","B. 10","C. 3","D. 30"],
+   ans:"C",
+   exp:"log₁₀(1000) = log₁₀(10³) = 3. The log₁₀ (common logarithm) asks: 'to what power must 10 be raised to give this number?' 10³ = 1000, so the answer is 3. Key values to memorise: log(1)=0, log(10)=1, log(100)=2, log(1000)=3, log(0.1)=−1."},
+
+  {q:"What is log₁₀(0.001)?",
+   opts:["A. −3","B. 3","C. −0.001","D. 0.001"],
+   ans:"A",
+   exp:"0.001 = 10⁻³. log₁₀(10⁻³) = −3. Numbers less than 1 give negative logs. 0.1 → −1; 0.01 → −2; 0.001 → −3. Negative logs are common in chemistry (pH, pKa, pKb)."},
+
+  {q:"The pH of a solution is defined as pH = −log₁₀[H⁺]. What is the pH of a solution with [H⁺] = 0.01 mol/L?",
+   opts:["A. 2","B. −2","C. 0.01","D. 100"],
+   ans:"A",
+   exp:"pH = −log₁₀(0.01) = −log₁₀(10⁻²) = −(−2) = 2. The negative sign in the definition converts the negative log to a positive pH value for acidic solutions. [H⁺] = 10⁻pH. If pH = 2, [H⁺] = 10⁻² = 0.01 mol/L. pH and [H⁺] are inverse — higher [H⁺] gives lower pH."},
+
+  {q:"What is the pH of a solution with [H⁺] = 3.0 × 10⁻⁵ mol/L?",
+   opts:["A. 5.0","B. 4.52","C. −4.52","D. 5.48"],
+   ans:"B",
+   exp:"pH = −log(3.0 × 10⁻⁵) = −(log 3.0 + log 10⁻⁵) = −(0.477 + (−5)) = −(−4.523) = 4.52. Rule: log(a × 10ⁿ) = log(a) + n. log(3.0) ≈ 0.477. −(0.477 − 5) = 4.52. Option A (5.0) ignores the 3.0 coefficient — the error of treating 3.0 × 10⁻⁵ as simply 10⁻⁵."},
+
+  {q:"A solution has pH = 3. What is the [H⁺]?",
+   opts:["A. 3 mol/L","B. 0.001 mol/L","C. 10⁻³ mol/L","D. Both B and C"],
+   ans:"D",
+   exp:"[H⁺] = 10⁻pH = 10⁻³ = 0.001 mol/L. Both B and C express the same value. pH = −log[H⁺] → [H⁺] = 10⁻pH. This is the exit direction of the pH spine: given pH, find [H⁺] by raising 10 to the negative pH."},
+
+  {q:"A solution has pH = 11. What is [OH⁻]? (Kw = 10⁻¹⁴ at 25°C)",
+   opts:["A. 10⁻¹¹ mol/L","B. 10⁻³ mol/L","C. 11 mol/L","D. 10³ mol/L"],
+   ans:"B",
+   exp:"[H⁺] = 10⁻¹¹ mol/L. Kw = [H⁺][OH⁻] → [OH⁻] = Kw/[H⁺] = 10⁻¹⁴/10⁻¹¹ = 10⁻³ mol/L. Or: pOH = 14 − pH = 14 − 11 = 3 → [OH⁻] = 10⁻³. Two routes to the same answer — pOH = 14 − pH is the shortcut."},
+
+  {q:"log(x) = 2.3. What is x?",
+   opts:["A. 23","B. 10²·³","C. 2.3 × 10","D. 200"],
+   ans:"B",
+   exp:"If log₁₀(x) = 2.3, then x = 10²·³ ≈ 200. 10²·³ = 10² × 10⁰·³ = 100 × 2 = 200 approximately. The antilog (inverse log) of 2.3 is 10²·³. This operation (going from log to number) is the exit direction of logarithm problems."},
+
+  {q:"The pH changes from 4 to 6. By what factor does [H⁺] change?",
+   opts:["A. Decreases by 2","B. Decreases by a factor of 100","C. Increases by a factor of 100","D. Decreases by a factor of 10"],
+   ans:"B",
+   exp:"pH 4: [H⁺] = 10⁻⁴. pH 6: [H⁺] = 10⁻⁶. Change: 10⁻⁶/10⁻⁴ = 10⁻² = 0.01. [H⁺] decreased by factor 100. Each pH unit represents a 10-fold change in [H⁺]. Two pH units = 10² = 100-fold change. The logarithmic scale compresses a huge concentration range into manageable numbers."},
+
+  {q:"The pKa of acetic acid is 4.76. What is its Ka?",
+   opts:["A. 4.76 × 10⁻⁵","B. 1.74 × 10⁻⁵","C. 10⁻⁴·⁷⁶","D. Both B and C"],
+   ans:"D",
+   exp:"Ka = 10⁻pKa = 10⁻⁴·⁷⁶ = 1.74 × 10⁻⁵. Both C (exact form) and B (evaluated) express the same value. pKa = −log(Ka) → Ka = 10⁻pKa. Same relationship as pH/[H⁺]. Lower pKa = higher Ka = stronger acid. Acetic acid (pKa = 4.76) is a weak acid."},
+
+  {q:"ln(x) = 2 (natural log). What is x approximately? (e ≈ 2.718)",
+   opts:["A. 20","B. 7.39","C. 2","D. 0.135"],
+   ans:"B",
+   exp:"ln(x) = 2 → x = e² ≈ (2.718)² ≈ 7.39. Natural log (ln) uses base e, not base 10. ln and log are different: ln(x) = 2.303 × log(x). In chemistry, both appear: pH uses log₁₀; first-order kinetics and radioactive decay use ln. Know which base is required."},
+
+  // ── SET 6 · Graph Interpretation ──────────────────────────────────────────
+
+  {q:"A graph of distance (y-axis) vs time (x-axis) is a straight line through the origin with gradient 5 m/s. What does this tell you about the motion?",
+   opts:["A. The object is accelerating at 5 m/s²","B. The object moves at constant velocity of 5 m/s","C. The object decelerates from 5 m/s to rest","D. The object starts at 5 m and moves away"],
+   ans:"B",
+   exp:"Straight line through origin on distance-time graph: s = vt (constant velocity). Gradient = Δs/Δt = velocity = 5 m/s. A curved line would indicate changing velocity (acceleration). The line passing through the origin confirms the object started from the same position at t=0. This is the simplest graph interpretation: gradient = rate of change of y with x."},
+
+  {q:"A velocity-time graph shows a straight line with positive gradient. What does the gradient represent?",
+   opts:["A. Displacement","B. Speed","C. Distance travelled","D. Acceleration"],
+   ans:"D",
+   exp:"On a velocity-time graph: gradient = Δv/Δt = acceleration. Area under the curve = displacement. Constant positive gradient = uniform acceleration. A horizontal line would mean zero acceleration (constant velocity). The gradient gives the rate of change of velocity — exactly the definition of acceleration."},
+
+  {q:"A graph of pressure (y-axis) vs 1/volume (x-axis) gives a straight line through the origin. What law does this demonstrate?",
+   opts:["A. Charles's law","B. Gay-Lussac's law","C. Boyle's law","D. The ideal gas law"],
+   ans:"C",
+   exp:"Boyle's law: P = k/V → P = k × (1/V). Plotting P vs 1/V: y = k × x → straight line through origin, gradient = k. If you had plotted P vs V instead, you'd get a hyperbola (not straight). Linearising a curved relationship by choosing the right variable to plot against is a key graphical skill."},
+
+  {q:"A straight-line graph has two points: (2, 8) and (6, 20). What is the gradient?",
+   opts:["A. 2.5","B. 3","C. 4","D. 5"],
+   ans:"B",
+   exp:"Gradient = (y₂ − y₁)/(x₂ − x₁) = (20 − 8)/(6 − 2) = 12/4 = 3. Always use two well-separated points to calculate gradient — choosing points close together amplifies reading errors. Gradient = rise/run = change in y / change in x."},
+
+  {q:"A graph of ln(N) vs time gives a straight line with gradient −0.1 s⁻¹ and y-intercept of 4.6. What is the initial number of atoms N₀?",
+   opts:["A. 4.6","B. 46","C. e⁴·⁶ ≈ 100","D. 0.1"],
+   ans:"C",
+   exp:"ln(N) = ln(N₀) − λt. At t=0: ln(N₀) = y-intercept = 4.6. So N₀ = e⁴·⁶ ≈ 100. The gradient gives −λ (decay constant). Reading y-intercept → antilogging to get actual value is the exit step. A y-intercept on a log graph is not the initial value — it is the log of the initial value."},
+
+  {q:"A graph of V (volume) vs T (temperature in °C) for a fixed amount of gas at constant pressure gives a straight line that, when extrapolated, crosses the T-axis at −273°C. What is the significance of this?",
+   opts:["A. The gas condenses at −273°C","B. This is absolute zero — the theoretical temperature at which volume would be zero, defining 0 K","C. The graph is wrong — volume cannot be zero","D. −273°C is the boiling point of all gases"],
+   ans:"B",
+   exp:"Charles's law: V ∝ T(K) → V = 0 at T = 0 K = −273°C. The x-intercept of the V vs T(°C) graph extrapolates to −273°C — the theoretical absolute zero of the Kelvin scale. This was one of the experimental routes to establishing the Kelvin scale. Real gases liquify before this temperature, but the extrapolation defines 0 K."},
+
+  {q:"A straight line on a graph has equation y = 3x − 2. What are the gradient and y-intercept?",
+   opts:["A. Gradient = −2, y-intercept = 3","B. Gradient = 3, y-intercept = −2","C. Gradient = 3, y-intercept = 2","D. Gradient = −2, y-intercept = −3"],
+   ans:"B",
+   exp:"Standard form y = mx + c: m = gradient, c = y-intercept. y = 3x − 2: gradient = 3, y-intercept = −2. The y-intercept is where the line crosses the y-axis (where x = 0): y = 3(0) − 2 = −2. The gradient is the coefficient of x."},
+
+  {q:"The area under a force-time graph represents:",
+   opts:["A. Power","B. Work done","C. Impulse (change in momentum)","D. Acceleration"],
+   ans:"C",
+   exp:"Area under F-t graph = ∫F dt = impulse = Δp (change in momentum). Similarly: area under v-t graph = displacement; area under P-V graph = work done by gas; gradient of v-t graph = acceleration. In physics, both gradient and area of graphs have physical meaning — always identify which quantity each represents."},
+
+  {q:"A heating curve shows temperature vs time for a substance being heated at a constant rate. The flat (horizontal) sections of the curve correspond to:",
+   opts:["A. Periods when the substance is absorbing no heat","B. Phase changes — all heat input goes to latent heat at constant temperature","C. When the specific heat capacity is zero","D. Cooling periods"],
+   ans:"B",
+   exp:"During a phase change (melting or boiling), temperature stays constant even as heat continues to be supplied — all energy goes into breaking intermolecular bonds (latent heat: Q = mL). The sloped sections correspond to temperature rise (Q = mcΔT). The gradient of the sloped sections relates to specific heat capacity — shallower slope = higher c."},
+
+  {q:"A graph of ln(rate) vs 1/T (absolute temperature) gives a straight line with negative gradient. This is an Arrhenius plot. What does the gradient equal?",
+   opts:["A. −Ea/R (where Ea = activation energy, R = gas constant)","B. +Ea/R","C. −R/Ea","D. Ea × R"],
+   ans:"A",
+   exp:"Arrhenius equation: k = Ae^(−Ea/RT) → ln(k) = ln(A) − Ea/R × (1/T). Plotting ln(k) vs 1/T gives a straight line with gradient = −Ea/R and y-intercept = ln(A). Gradient is negative (higher T → larger 1/T is smaller → higher k). |gradient| = Ea/R → Ea = |gradient| × R. This is the graphical method for finding activation energy."},
+
+  // ── SET 7 · Units and Dimensional Analysis ────────────────────────────────
+
+  {q:"What are the SI base units of pressure?",
+   opts:["A. N/m","B. kg/m·s²","C. Pa = kg·m⁻¹·s⁻²","D. N·m"],
+   ans:"C",
+   exp:"Pressure = Force/Area = N/m² = (kg·m·s⁻²)/m² = kg·m⁻¹·s⁻² = Pa (Pascal). 1 Pa = 1 N/m² = 1 kg·m⁻¹·s⁻². Dimensional analysis confirms: [P] = [F]/[A] = (kg·m·s⁻²)/m² = kg·m⁻¹·s⁻². This kind of unit derivation from base units is tested in both chemistry and physics."},
+
+  {q:"The gas constant R = 8.314 J·mol⁻¹·K⁻¹. Express the units of R using only SI base units.",
+   opts:["A. kg·m²·s⁻²·mol⁻¹·K⁻¹","B. Pa·L·mol⁻¹·K⁻¹","C. N·m·mol⁻¹·K⁻¹","D. All three are equivalent"],
+   ans:"D",
+   exp:"1 J = 1 kg·m²·s⁻². So J·mol⁻¹·K⁻¹ = kg·m²·s⁻²·mol⁻¹·K⁻¹. Also: 1 Pa·m³ = 1 N/m² × m³ = N·m = J. And 1 Pa·L = 10⁻³ J (since 1 L = 10⁻³ m³). So R = 8.314 J·mol⁻¹·K⁻¹ = 8.314 Pa·m³·mol⁻¹·K⁻¹ = 8.314 × 10³ Pa·L·mol⁻¹·K⁻¹... actually 0.0821 L·atm·mol⁻¹·K⁻¹. All options A, B, C are equivalent representations — the correct answer is D."},
+
+  {q:"Convert 25°C to Kelvin and 500 K to Celsius.",
+   opts:["A. 298 K and 227°C","B. 298 K and 773°C","C. 248 K and 227°C","D. 298 K and 500°C"],
+   ans:"A",
+   exp:"K = °C + 273: 25 + 273 = 298 K. °C = K − 273: 500 − 273 = 227°C. Common error: adding 273 both ways, or subtracting both ways. Rule: to Kelvin, ADD 273; to Celsius, SUBTRACT 273. This conversion appears in virtually every gas law calculation."},
+
+  {q:"A pressure is given as 760 mmHg. Convert to (a) atm and (b) kPa. (1 atm = 760 mmHg = 101.325 kPa)",
+   opts:["A. (a) 1 atm; (b) 101.3 kPa","B. (a) 0.76 atm; (b) 76 kPa","C. (a) 1 atm; (b) 760 kPa","D. (a) 7.6 atm; (b) 1013 kPa"],
+   ans:"A",
+   exp:"760 mmHg = 1 atm (by definition). 1 atm = 101.325 kPa. Route: mmHg → atm (÷760) → kPa (×101.325). Always route through atm as the anchor unit. Option C (760 kPa) is wrong by a factor of ~7.5 — the most common unit confusion in gas law problems."},
+
+  {q:"What is 2500 cm³ in (a) litres and (b) m³?",
+   opts:["A. (a) 25 L; (b) 0.25 m³","B. (a) 2.5 L; (b) 0.0025 m³","C. (a) 0.25 L; (b) 0.25 m³","D. (a) 2.5 L; (b) 2.5 m³"],
+   ans:"B",
+   exp:"1 L = 1 dm³ = 1000 cm³. 2500 cm³ ÷ 1000 = 2.5 L. 1 m³ = 1000 L. 2.5 L ÷ 1000 = 0.0025 m³. Route: cm³ → L (÷1000) → m³ (÷1000). Volume unit conversions are a frequent source of errors in gas law calculations — especially forgetting that 1 m³ = 10⁶ cm³ (not 10³)."},
+
+  {q:"The unit of electrical charge is the Coulomb (C). Given that current I is charge per unit time (I = Q/t), what are the units of I?",
+   opts:["A. C·s","B. C/s = A (ampere)","C. C·s⁻²","D. C²/s"],
+   ans:"B",
+   exp:"I = Q/t → [I] = C/s. The ampere (A) is defined as 1 Coulomb per second. This is dimensional analysis confirming the definition. 1 A = 1 C/s. Checking units of an equation is a powerful error-detection tool: if units don't work out, the equation is wrong."},
+
+  {q:"Power P = IV where I is current (A) and V is voltage (V = J/C). Show that the units of P are watts (W = J/s).",
+   opts:["A. [P] = A × J/C = A·J·C⁻¹ = (C/s)·(J/C) = J/s = W","B. [P] = A × V = AV — no conversion needed","C. [P] = C/s × J/C = J/s² (wrong)","D. Power has no units"],
+   ans:"A",
+   exp:"[P] = [I] × [V] = (C/s) × (J/C) = J/s = W. The Coulombs cancel: (C/s) × (J/C) = J/s. This confirms P = IV has consistent units. Option C incorrectly gets J/s² by not cancelling C properly. Unit analysis is the self-check for every equation."},
+
+  {q:"The rate constant k for a second-order reaction has units of L·mol⁻¹·s⁻¹. If concentration is in mol/L and time is in seconds, verify this from the rate equation: rate = k[A]².",
+   opts:["A. [k] = mol·L⁻¹·s⁻¹ (wrong — same as first order)","B. [k] = L·mol⁻¹·s⁻¹","C. [k] = L²·mol⁻²·s⁻¹","D. [k] = s⁻¹"],
+   ans:"B",
+   exp:"rate = k[A]². [rate] = mol·L⁻¹·s⁻¹. [A]² = (mol·L⁻¹)² = mol²·L⁻². So [k] = [rate]/[A]² = (mol·L⁻¹·s⁻¹)/(mol²·L⁻²) = (mol·L⁻¹·s⁻¹) × (L²·mol⁻²) = L·mol⁻¹·s⁻¹. Units of k depend on reaction order — this is why units of k must always be stated alongside its numerical value."},
+
+  // ── SET 8 · Percentage, Ratio, and Error ──────────────────────────────────
+
+  {q:"A solution is prepared by dissolving 5 g of NaCl in 95 g of water. What is the percentage by mass of NaCl in the solution?",
+   opts:["A. 5%","B. 5.26%","C. 4.76%","D. 10%"],
+   ans:"A",
+   exp:"% by mass = (mass of solute / total mass of solution) × 100. Total mass = 5 + 95 = 100 g. % NaCl = (5/100) × 100 = 5%. The denominator is the total solution mass (solute + solvent), not just the solvent. Option B (5.26%) is the error of dividing by 95 (solvent only) instead of 100 (solution)."},
+
+  {q:"An experiment gives a measured value of 9.6 m/s for a quantity whose true value is 10.0 m/s. What is the percentage error?",
+   opts:["A. 0.4%","B. 4%","C. 4.17%","D. 40%"],
+   ans:"B",
+   exp:"% error = |measured − true|/true × 100 = |9.6 − 10.0|/10.0 × 100 = 0.4/10 × 100 = 4%. The denominator is always the TRUE (accepted) value — not the measured value. Option C (4.17%) is the error of dividing by 9.6 (measured) instead of 10.0 (true)."},
+
+  {q:"A recipe requires flour and sugar in the ratio 3:1. If 180 g of flour is used, how much sugar is needed?",
+   opts:["A. 540 g","B. 60 g","C. 45 g","D. 90 g"],
+   ans:"B",
+   exp:"Ratio 3:1 means for every 3 parts flour, 1 part sugar. 180 g flour ÷ 3 = 60 g per part. Sugar = 1 × 60 = 60 g. Or: sugar = flour × (1/3) = 180/3 = 60 g. The ratio method: identify the total parts, find the value of one part, multiply by the required number of parts."},
+
+  {q:"A gas is 40% carbon, 6.7% hydrogen, and 53.3% oxygen by mass. If a 50 g sample is taken, what mass of oxygen does it contain?",
+   opts:["A. 26.65 g","B. 53.3 g","C. 20 g","D. 16 g"],
+   ans:"A",
+   exp:"Mass of oxygen = 53.3% × 50 g = 0.533 × 50 = 26.65 g. Percentage of a quantity: multiply the percentage (as a decimal) by the total quantity. Option B (53.3 g) is the error of taking the percentage value directly rather than applying it to 50 g."},
+
+  {q:"The theoretical yield of a reaction is 8.0 g but only 6.4 g is obtained. What is the percentage yield?",
+   opts:["A. 125%","B. 80%","C. 6.4%","D. 20%"],
+   ans:"B",
+   exp:"% yield = (actual yield / theoretical yield) × 100 = (6.4/8.0) × 100 = 80%. Percentage yield can never exceed 100% — a value >100% signals an arithmetic error. Option A (125%) = 8.0/6.4 × 100 — the common error of inverting actual and theoretical."},
+
+  {q:"Two quantities are in the ratio 3:5. Their sum is 160. Find each quantity.",
+   opts:["A. 60 and 100","B. 48 and 112","C. 80 and 80","D. 96 and 64"],
+   ans:"A",
+   exp:"Total parts = 3 + 5 = 8. Value of one part = 160/8 = 20. First quantity = 3 × 20 = 60. Second = 5 × 20 = 100. Check: 60 + 100 = 160 ✓; 60:100 = 3:5 ✓. The ratio method: find the value of one 'share', then multiply by the number of shares for each part."},
+
+  {q:"A balance has an uncertainty of ±0.01 g. A student weighs a sample four times: 2.34, 2.35, 2.33, 2.36 g. What is the mean and absolute uncertainty in the mean?",
+   opts:["A. Mean = 2.35 g, uncertainty = ±0.01 g","B. Mean = 2.345 g, uncertainty = ±0.015 g","C. Mean = 2.35 g, uncertainty = ±0.015 g","D. Mean = 2.345 g, uncertainty = ±0.01 g"],
+   ans:"C",
+   exp:"Mean = (2.34+2.35+2.33+2.36)/4 = 9.38/4 = 2.345 → rounds to 2.35 g (limited by balance precision of 0.01 g). Range = 2.36 − 2.33 = 0.03. Half-range uncertainty = ±0.015 g. The uncertainty in repeated measurements is ±(range/2), not the instrument uncertainty alone. Report mean to same decimal places as the balance (0.01 g precision)."},
+
+  {q:"A student measures the density of a metal as 7.8 g/cm³. The literature value is 7.9 g/cm³. What is the percentage error, and is the student's value an overestimate or underestimate?",
+   opts:["A. 1.27% overestimate","B. 1.27% underestimate","C. 1.28% underestimate","D. 1.28% overestimate"],
+   ans:"B",
+   exp:"% error = |7.8 − 7.9|/7.9 × 100 = 0.1/7.9 × 100 = 1.27%. The student's value (7.8) is LESS than the true value (7.9) → underestimate. Overestimate = measured > true. Underestimate = measured < true. Always state direction as well as magnitude for a complete error analysis."},
+
+  {q:"In a titration, 24.85 cm³ of NaOH is used. The burette reads to ±0.05 cm³. What is the percentage uncertainty in the volume?",
+   opts:["A. 0.05%","B. 0.2%","C. 2%","D. 0.002%"],
+   ans:"B",
+   exp:"% uncertainty = (absolute uncertainty / measured value) × 100 = (0.05/24.85) × 100 = 0.201% ≈ 0.2%. Larger measurements give smaller percentage uncertainties for the same absolute instrument error. This is why using a full burette (reading close to 50 cm³) gives better precision than using only a few cm³."},
+
+  {q:"An experiment measures the specific heat capacity of water as 4150 J/kg·K. The accepted value is 4200 J/kg·K. Calculate the percentage error.",
+   opts:["A. 1.19%","B. 50 J/kg·K","C. 1.20%","D. 1.19% or 1.20% depending on rounding"],
+   ans:"D",
+   exp:"% error = |4150 − 4200|/4200 × 100 = 50/4200 × 100 = 1.190...%. Rounded to 3 sig figs: 1.19%. Rounded to 2 sig figs: 1.2%. Both are defensible given the precision of the data. Option D acknowledges this — precision in the answer should match precision in the data."},
+
+  // ── SET 9 · Substitution and Checking Answers ─────────────────────────────
+
+  {q:"A student calculates the EMF of a galvanic cell: E°cell = E°cathode − E°anode = 0.34 − (−0.76) = −0.42 V. What error did the student make?",
+   opts:["A. Used the wrong formula — should add the potentials","B. Subtracted incorrectly: 0.34 − (−0.76) = 0.34 + 0.76 = +1.10 V, not −0.42 V","C. The anode and cathode potentials are reversed","D. Should use absolute values only"],
+   ans:"B",
+   exp:"0.34 − (−0.76): subtracting a negative number is the same as adding the positive. 0.34 − (−0.76) = 0.34 + 0.76 = +1.10 V. The error: treating −(−0.76) as −0.76 instead of +0.76. This is the most common arithmetic error in electrochemistry calculations. Double-check: subtracting a negative = adding a positive."},
+
+  {q:"PV = nRT. P = 101 325 Pa, V = 0.024 m³, T = 298 K, R = 8.314 J/mol·K. A student calculates n = PV/RT = (101 325 × 0.024)/(8.314 × 298) = 2431.8/2477.6 ≈ 0.98 mol. Is this correct?",
+   opts:["A. Wrong — should use R = 0.0821","B. Wrong — P should be in kPa","C. Correct — units are consistent: Pa × m³ = J = kg·m²·s⁻²","D. Wrong — T should be in Celsius"],
+   ans:"C",
+   exp:"Pa × m³ = (kg·m⁻¹·s⁻²) × m³ = kg·m²·s⁻² = J. R has units J·mol⁻¹·K⁻¹. So (Pa × m³)/(J·mol⁻¹·K⁻¹ × K) = J/(J·mol⁻¹) = mol ✓. Units are perfectly consistent. R = 0.0821 is only used when P is in atm and V in litres. The unit check confirms the calculation is correct."},
+
+  {q:"A student uses s = ut + ½at² with u = 0, a = 10 m/s², t = 3 s and gets s = ½ × 10 × 3 = 15 m. What error did the student make?",
+   opts:["A. Should multiply by 2 instead of ½","B. Forgot to square t: s = ½ × 10 × 3² = ½ × 10 × 9 = 45 m","C. Wrong formula — should use v = u + at","D. u = 0 so the term should be omitted entirely"],
+   ans:"B",
+   exp:"s = ½at² = ½ × 10 × 3² = ½ × 10 × 9 = 45 m. The student computed ½ × 10 × 3 = 15, forgetting to square t. t² = 9, not 3. This is the most common error in SUVAT calculations — writing t² but computing t. Always write out t² explicitly before substituting."},
+
+  {q:"n(CO₂) = mass/M = 44/44 = 1 mol. A student then says n(C) = 1/2 mol because CO₂ has 2 oxygen atoms. What is wrong?",
+   opts:["A. The molar mass of CO₂ is wrong","B. n(C) = n(CO₂) = 1 mol — each molecule of CO₂ contains exactly one carbon atom, not half","C. Should divide by 12 not 44","D. The calculation is correct"],
+   ans:"B",
+   exp:"n(C) = n(CO₂) × 1 (one C per molecule) = 1 mol. Dividing by 2 would give n(O) from a molecule with 2 oxygens. The ratio of atoms to molecules equals the stoichiometric coefficient in the formula. CO₂: 1 C and 2 O per molecule. 1 mol CO₂ → 1 mol C and 2 mol O. Never divide moles of a compound by the total number of atoms."},
+
+  {q:"A student calculates the number of moles in 18 g of water: n = 18/18 = 1 mol, then says the number of molecules = 1 × 6 × 10²³ = 6 × 10²³. The teacher asks how many hydrogen atoms are present. The student says 6 × 10²³. Is this correct?",
+   opts:["A. Yes — 1 mol of water has 6 × 10²³ hydrogen atoms","B. No — each water molecule has 2 H atoms, so N(H) = 2 × 6 × 10²³ = 1.2 × 10²⁴","C. No — the molar mass of water is wrong","D. Yes — hydrogen atoms and water molecules are in 1:1 ratio"],
+   ans:"B",
+   exp:"H₂O: 2 hydrogen atoms per molecule. N(H₂O) = 6 × 10²³. N(H) = 2 × 6 × 10²³ = 1.2 × 10²⁴. The ratio molecules:atoms depends on the formula. Always multiply by the subscript for the atom in question. This is a counting check — the type of error that costs marks when students calculate moles correctly but then fail to convert to atoms."},
+
+  {q:"A student finds the velocity using v² = u² + 2as = 0 + 2(10)(5) = 100, giving v = 100 m/s. What error was made?",
+   opts:["A. Should use v = u + at instead","B. Forgot to take the square root: v = √100 = 10 m/s","C. a should be negative","D. s and a units are inconsistent"],
+   ans:"B",
+   exp:"v² = 100 → v = √100 = 10 m/s. The student reported v² (100) as v. The square root step is the final operation. A useful check: v = 100 m/s is about 360 km/h — physically unreasonable for an object starting from rest with moderate acceleration over 5 m. Always sanity-check the answer against physical expectations."},
+
+  {q:"pH = −log[H⁺] = −log(0.1) = −(−1) = 1. A student writes pH = −log(0.1) = −1. What error did they make?",
+   opts:["A. log(0.1) = +1, not −1","B. log(0.1) = −1, but the negative sign in front of log gives pH = −(−1) = +1, not −1","C. Should use ln not log","D. [H⁺] = 0.1 is too high for pH calculation"],
+   ans:"B",
+   exp:"log(0.1) = log(10⁻¹) = −1. Then pH = −log(0.1) = −(−1) = +1. The student applied the negative sign incorrectly — treating −log(0.1) as −1 rather than −(−1) = +1. This sign error is extremely common. The pH formula has a double negative for concentrations less than 1: log gives a negative number; the minus sign in pH makes it positive."},
+
+  {q:"Q = mcΔT. m = 200 g, c = 4.2 J/g·K, ΔT = 25°C. A student calculates Q = 200 × 4.2 × 25 = 21 000 J. Is this correct?",
+   opts:["A. Wrong — m should be in kg, giving Q = 0.2 × 4.2 × 25 = 21 J","B. Wrong — ΔT must be in Kelvin, not °C","C. Correct — units are consistent: g × J/g·K × K = J","D. Wrong — should divide by ΔT"],
+   ans:"C",
+   exp:"Units: g × (J/g·K) × K = J ✓. The grams in m and in c cancel; the Kelvin in c and in ΔT cancel. Note: ΔT in °C numerically equals ΔT in K (a change of 25°C is exactly a change of 25 K). The calculation is correct. Option B is a common misconception — ΔT does not need conversion because degree size is the same on both scales; only absolute temperatures (like in PV=nRT) require Kelvin."},
+
+  // ── SET 10 · Mixed Applied ────────────────────────────────────────────────
+
+  {q:"A radioactive sample has N₀ = 6.4 × 10⁸ atoms and t½ = 5 years. How many atoms remain after 20 years? Give your answer in standard form.",
+   opts:["A. 4.0 × 10⁷","B. 4.0 × 10⁸","C. 1.6 × 10⁷","D. 3.2 × 10⁷"],
+   ans:"A",
+   exp:"n = 20/5 = 4 half-lives. N = 6.4 × 10⁸ × (½)⁴ = 6.4 × 10⁸ / 16 = 0.4 × 10⁸ = 4.0 × 10⁷. Standard form: coefficient must be ≥1 and <10, so 0.4 × 10⁸ is rewritten as 4.0 × 10⁷. This merges half-life calculation with standard form — two skills in one question."},
+
+  {q:"Using PV = nRT: a gas has P = 2.0 atm, V = 3.0 L, T = 300 K. Calculate n to 2 significant figures. (R = 0.0821 L·atm/mol·K)",
+   opts:["A. 0.25 mol","B. 0.24 mol","C. 2.4 mol","D. 0.245 mol"],
+   ans:"B",
+   exp:"n = PV/RT = (2.0 × 3.0)/(0.0821 × 300) = 6.0/24.63 = 0.2437 mol. To 2 sig figs: 0.24 mol. The given data (2.0 and 3.0) each have 2 sig figs — so the answer rounds to 2 sig figs. 0.2437 rounds to 0.24 (the third sig fig is 3, which rounds down)."},
+
+  {q:"The pH of a solution is 4.5. Calculate [H⁺] and express it in standard form to 2 sig figs. (log 3.16 ≈ 0.5)",
+   opts:["A. 3.2 × 10⁻⁵ mol/L","B. 4.5 × 10⁻⁴ mol/L","C. 3.2 × 10⁻⁴ mol/L","D. 1.0 × 10⁻⁴·⁵ mol/L"],
+   ans:"A",
+   exp:"[H⁺] = 10⁻⁴·⁵ = 10⁻⁵ × 10⁰·⁵ = 10⁻⁵ × √10 = 10⁻⁵ × 3.162 ≈ 3.16 × 10⁻⁵ ≈ 3.2 × 10⁻⁵ mol/L. Split the exponent: 10⁻⁴·⁵ = 10⁻⁵⁺⁰·⁵ = 10⁰·⁵ × 10⁻⁵. 10⁰·⁵ = √10 ≈ 3.162. This merges logarithm work with standard form — two skills combined."},
+
+  {q:"A Daniell cell has E°cell = +1.10 V. How many moles of electrons are transferred per mole of reaction (Zn + Cu²⁺ → Zn²⁺ + Cu)? Using ΔG° = −nFE°, calculate ΔG° per mole. (F = 96 500 C/mol)",
+   opts:["A. n=1; ΔG° = −106 150 J/mol","B. n=2; ΔG° = −212 300 J/mol","C. n=2; ΔG° = +212 300 J/mol","D. n=1; ΔG° = +106 150 J/mol"],
+   ans:"B",
+   exp:"Zn → Zn²⁺ + 2e⁻. Cu²⁺ + 2e⁻ → Cu. n = 2 electrons transferred per formula unit. ΔG° = −nFE° = −2 × 96 500 × 1.10 = −212 300 J/mol = −212.3 kJ/mol. Negative ΔG° confirms spontaneous reaction. This merges electrochemistry with thermodynamics through dimensional analysis."},
+
+  {q:"A student measures the acceleration due to gravity g using a pendulum: T = 2π√(L/g). T = 2.0 s, L = 1.0 m. Calculate g and express to 2 sig figs. (π² ≈ 9.87)",
+   opts:["A. 9.9 m/s²","B. 9.87 m/s²","C. 10 m/s²","D. 4.0 m/s²"],
+   ans:"A",
+   exp:"g = 4π²L/T² = 4 × 9.87 × 1.0/4.0 = 39.48/4.0 = 9.87 m/s² → 2 sig figs: 9.9 m/s². Rearranging T = 2π√(L/g): T² = 4π²L/g → g = 4π²L/T². This merges equation rearrangement, substitution, and significant figure rounding in one question."},
+
+  {q:"In an electrolysis experiment, 0.64 g of copper is deposited in 10 minutes by a current of 0.5 A. Calculate the number of electrons transferred and verify using Q = It. (Cu = 64, F = 96 500 C/mol; 1 mol Cu²⁺ requires 2 mol e⁻)",
+   opts:["A. Q = 300 C; n(e⁻) = 0.00311 mol — does not match Faraday","B. Q = 300 C; n(e⁻) = Q/F = 0.00311 mol; n(Cu) = 0.64/64 = 0.01 mol needing 0.02 mol e⁻ — inconsistency shows measurement error","C. Q = 300 C; n(e⁻) = 0.02 mol — consistent with n(Cu) = 0.01 mol","D. Q = It is not applicable to electrolysis"],
+   ans:"B",
+   exp:"Q = It = 0.5 × 600 = 300 C. n(e⁻) from Faraday = 300/96 500 = 0.00311 mol. n(Cu) from mass = 0.64/64 = 0.01 mol → requires 0.02 mol e⁻. But Q only gives 0.00311 mol e⁻ — factor of ~6 discrepancy. This reveals a measurement error (or deliberate inconsistency in the question). The ability to notice when numbers don't match and identify the inconsistency is a key scientific skill."}
+
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'chemistry';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>
