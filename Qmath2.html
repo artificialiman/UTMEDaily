@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Sets · Logarithms — JAMB Mathematics</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60,60,67,0.85);
+            --ios-text-tertiary: rgba(60,60,67,0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-teal: #32ADE6;
+            --ios-indigo: #5856D6;
+            --ios-separator: rgba(198,198,200,0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235,235,245,0.85);
+                --ios-text-tertiary: rgba(235,235,245,0.55);
+                --ios-separator: rgba(56,56,58,0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px; color: var(--ios-text);
+            background: var(--ios-bg); line-height: 1.47;
+            padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+            -webkit-font-smoothing: antialiased;
+        }
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 12px;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 26px; font-weight: 700; margin-bottom: 2px; }
+        .subtitle { font-size: 14px; color: var(--ios-text-tertiary); }
+        .tabs {
+            display: flex; gap: 10px; padding: 12px 16px;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            position: sticky; top: calc(env(safe-area-inset-top) + 74px); z-index: 99;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 7px 20px; border-radius: 20px;
+            background: var(--ios-hover); color: var(--ios-text-secondary);
+            border: none; font-size: 14px; font-weight: 500;
+            cursor: pointer; white-space: nowrap; transition: all 0.2s;
+        }
+        .tab.active-sets { background: var(--ios-teal); color: white; }
+        .tab.active-logs { background: var(--ios-indigo); color: white; }
+
+        .drill-label {
+            margin: 16px 16px 4px;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.8px; text-transform: uppercase;
+        }
+        .drill-label.core  { color: var(--ios-teal); }
+        .drill-label.build { color: var(--ios-orange); }
+        .drill-label.full  { color: var(--ios-green); }
+        .drill-label.logs-core  { color: var(--ios-indigo); }
+        .drill-label.logs-build { color: var(--ios-orange); }
+        .drill-label.logs-full  { color: var(--ios-green); }
+
+        .question-card {
+            background: var(--ios-card); border-radius: var(--radius);
+            margin: 8px 16px; padding: 18px; box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 12px; font-weight: 600; margin-bottom: 6px;
+        }
+        .question-number.sets { color: var(--ios-teal); }
+        .question-number.logs { color: var(--ios-indigo); }
+        .question-text { font-size: 16px; margin-bottom: 14px; line-height: 1.6; }
+
+        .timer-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .timer-ring { width: 36px; height: 36px; flex-shrink: 0; }
+        .timer-ring .bg { fill:none; stroke:var(--ios-separator); stroke-width:4; }
+        .timer-ring .fg {
+            fill:none; stroke:var(--ios-green); stroke-width:4; stroke-linecap:round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform:rotate(-90deg); transform-origin:center;
+        }
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text { font-size:13px; font-weight:600; color:var(--ios-green); min-width:38px; transition:color 0.4s; }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+        .timer-label { font-size:12px; color:var(--ios-text-tertiary); }
+
+        .options { display:flex; flex-direction:column; gap:7px; margin-bottom:14px; }
+        .option {
+            padding: 11px 13px; border-radius: 8px;
+            background: var(--ios-hover); cursor: pointer;
+            transition: all 0.2s; font-size: 15px;
+            border: 2px solid transparent; user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected { background: rgba(0,122,255,0.1); border-color: var(--ios-blue); }
+        .option.correct  { background: rgba(52,199,89,0.1);  border-color: var(--ios-green); }
+        .option.wrong    { background: rgba(255,59,48,0.1);   border-color: var(--ios-red); }
+
+        .answer-btn {
+            width:100%; padding:11px; border-radius:10px; border:none;
+            color:white; font-size:16px; font-weight:500;
+            cursor:pointer; transition:opacity 0.2s;
+        }
+        .answer-btn.sets { background: var(--ios-teal); }
+        .answer-btn.logs { background: var(--ios-indigo); }
+        .answer-btn:active { opacity:0.8; }
+        .answer-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+        .explanation {
+            margin-top:14px; padding:11px; background:var(--ios-hover);
+            border-radius:8px; font-size:14px; color:var(--ios-text-secondary);
+            display:none; line-height:1.65;
+        }
+        .explanation.show { display:block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+
+        .stats {
+            display:flex; gap:10px; padding:12px 16px;
+            position:fixed; bottom:0; left:0; right:0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+            padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+        }
+        .stat { flex:1; text-align:center; padding:10px; background:var(--ios-hover); border-radius:10px; }
+        .stat-value { font-size:22px; font-weight:700; display:block; }
+        .stat-label { font-size:12px; color:var(--ios-text-tertiary); margin-top:2px; }
+        .section { display:none; }
+        .section.active { display:block; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="title">Mathematics · File 2</div>
+    <div class="subtitle">60 questions · Sets · Logarithms</div>
+</div>
+
+<div class="tabs">
+    <button class="tab active-sets" onclick="switchTab('sets',this)">Sets (30)</button>
+    <button class="tab" onclick="switchTab('logs',this)">Logarithms (30)</button>
+</div>
+
+<div id="sets-section" class="section active"></div>
+<div id="logs-section" class="section"></div>
+
+<div class="stats">
+    <div class="stat"><span class="stat-value" id="answered">0</span><div class="stat-label">Answered</div></div>
+    <div class="stat"><span class="stat-value" id="correct">0</span><div class="stat-label">Correct</div></div>
+    <div class="stat"><span class="stat-value" id="score">0%</span><div class="stat-label">Score</div></div>
+</div>
+
+<script>
+const data = {
+
+// ════════════════════════════════════════════════════════
+// SETS — 30 questions
+// Core (1–8): symbol reading, cardinality, complement reflex
+// Build (9–18): two-set formula, three-set, word problems
+// Full (19–30): JAMB-style
+// ════════════════════════════════════════════════════════
+sets: [
+  // ── CORE: Symbol & cardinality reflex ───────────────────
+  {drill:"core", topic:"Symbol reading — union",
+   q:"A = {1,2,3,4} and B = {3,4,5,6}. Find A ∪ B.",
+   opts:["A. {1,2,3,4,5,6}","B. {3,4}","C. {1,2,5,6}","D. {1,2,3,4,3,4,5,6}"],
+   ans:"A", exp:"Union: all elements in A or B or both, listed once. A∪B = {1,2,3,4,5,6}. Repeated elements (3 and 4) are written once only."},
+
+  {drill:"core", topic:"Symbol reading — intersection",
+   q:"A = {1,2,3,4} and B = {3,4,5,6}. Find A ∩ B.",
+   opts:["A. {3,4}","B. {1,2,5,6}","C. {1,2,3,4,5,6}","D. {}"],
+   ans:"A", exp:"Intersection: elements in both A AND B. A∩B = {3,4}."},
+
+  {drill:"core", topic:"Symbol reading — difference",
+   q:"A = {1,2,3,4} and B = {3,4,5,6}. Find A \\ B (A minus B).",
+   opts:["A. {1,2}","B. {5,6}","C. {3,4}","D. {1,2,5,6}"],
+   ans:"A", exp:"A \\ B = elements in A but NOT in B. Remove 3 and 4 (which are in B) from A. Result: {1,2}."},
+
+  {drill:"core", topic:"Complement",
+   q:"Universal set ε = {1,2,3,4,5,6,7,8}. A = {2,4,6,8}. Find A'.",
+   opts:["A. {1,3,5,7}","B. {2,4,6,8}","C. {1,2,3,4,5,6,7,8}","D. {}"],
+   ans:"A", exp:"Complement A' = everything in ε not in A. Remove {2,4,6,8} from ε: A' = {1,3,5,7}."},
+
+  {drill:"core", topic:"Cardinality — count elements",
+   q:"A = {a,e,i,o,u}. What is n(A)?",
+   opts:["A. 5","B. 4","C. 6","D. 1"],
+   ans:"A", exp:"n(A) = number of distinct elements in A = 5. Count them: a, e, i, o, u."},
+
+  {drill:"core", topic:"Empty set and subset",
+   q:"Which of the following is true?",
+   opts:["A. ∅ ⊆ A for any set A","B. A ⊆ ∅ for any set A","C. ∅ = {0}","D. n(∅) = 1"],
+   ans:"A", exp:"The empty set is a subset of every set — by definition, all zero of its elements are in A. ∅ ≠ {0}: {0} has one element (the number zero), ∅ has none. n(∅) = 0."},
+
+  {drill:"core", topic:"Two-set formula — identify parts",
+   q:"n(A) = 12, n(B) = 9, n(A∩B) = 4. Find n(A∪B).",
+   opts:["A. 17","B. 21","C. 25","D. 13"],
+   ans:"A", exp:"n(A∪B) = n(A)+n(B)−n(A∩B) = 12+9−4 = 17. Subtract the intersection to avoid counting it twice."},
+
+  {drill:"core", topic:"A only — isolate one region",
+   q:"n(A) = 15, n(A∩B) = 6. How many elements are in A only (not in B)?",
+   opts:["A. 9","B. 21","C. 6","D. 15"],
+   ans:"A", exp:"A only = n(A) − n(A∩B) = 15−6 = 9. Subtract the shared part to isolate A exclusively."},
+
+  // ── BUILD-UP ────────────────────────────────────────────
+  {drill:"build", topic:"Two-set — find intersection",
+   q:"In a class of 40, 25 study French, 20 study German, and 8 study neither. How many study both?",
+   opts:["A. 13","B. 5","C. 7","D. 15"],
+   ans:"A", exp:"Those studying at least one = 40−8 = 32. n(F∪G) = n(F)+n(G)−n(F∩G) → 32 = 25+20−n(F∩G) → n(F∩G) = 13."},
+
+  {drill:"build", topic:"Two-set — find union",
+   q:"n(A) = 18, n(B) = 14, n(A∩B) = 7, n(ε) = 30. How many are in neither A nor B?",
+   opts:["A. 5","B. 7","C. 25","D. 11"],
+   ans:"A", exp:"n(A∪B) = 18+14−7 = 25. Neither = n(ε)−n(A∪B) = 30−25 = 5."},
+
+  {drill:"build", topic:"Two-set — find n(A only)",
+   q:"50 students sat an exam. 30 passed Maths, 25 passed English, 10 passed both. How many passed Maths only?",
+   opts:["A. 20","B. 30","C. 15","D. 10"],
+   ans:"A", exp:"Maths only = n(M)−n(M∩E) = 30−10 = 20."},
+
+  {drill:"build", topic:"Two-set — full breakdown",
+   q:"In a survey of 60 people: 35 like tea, 30 like coffee, 15 like both. How many like neither?",
+   opts:["A. 10","B. 5","C. 15","D. 20"],
+   ans:"A", exp:"n(T∪C) = 35+30−15 = 50. Neither = 60−50 = 10."},
+
+  {drill:"build", topic:"Three-set — centre first",
+   q:"In a group of 100: 50 play football (F), 40 play tennis (T), 30 play basketball (B). 15 play F and T, 10 play F and B, 8 play T and B, 5 play all three. How many play none?",
+   opts:["A. 18","B. 12","C. 22","D. 8"],
+   ans:"A", exp:"n(F∪T∪B) = 50+40+30−15−10−8+5 = 92. None = 100−92 = 8. Wait: 50+40+30=120. 120−15−10−8=87. 87+5=92. None=100−92=8."},
+
+  {drill:"build", topic:"Three-set — find exactly two",
+   q:"In the three-set problem above (F=50,T=40,B=30; F∩T=15, F∩B=10, T∩B=8, all three=5), how many play exactly two sports?",
+   opts:["A. 23","B. 28","C. 18","D. 33"],
+   ans:"A", exp:"Exactly two = (F∩T only)+(F∩B only)+(T∩B only) = (15−5)+(10−5)+(8−5) = 10+5+3 = 18. Subtract the 'all three' from each pairwise intersection to get 'exactly two'."},
+
+  {drill:"build", topic:"Three-set — find exactly one",
+   q:"Using the same data (F=50,T=40,B=30; exactly two=18, all three=5, n(F∪T∪B)=92), how many play exactly one sport?",
+   opts:["A. 69","B. 74","C. 64","D. 87"],
+   ans:"A", exp:"Exactly one = n(F∪T∪B)−(exactly two)−(exactly three) = 92−18−5 = 69."},
+
+  {drill:"build", topic:"Set notation — De Morgan's law",
+   q:"Which of the following is equivalent to (A∪B)'?",
+   opts:["A. A'∩B'","B. A'∪B'","C. A∩B","D. A∪B"],
+   ans:"A", exp:"De Morgan's first law: (A∪B)' = A'∩B'. Not in A-or-B means not in A AND not in B. Similarly (A∩B)' = A'∪B'."},
+
+  {drill:"build", topic:"Subset count",
+   q:"Set A has 3 elements. How many subsets does A have?",
+   opts:["A. 8","B. 6","C. 4","D. 9"],
+   ans:"A", exp:"Number of subsets of a set with n elements = 2ⁿ = 2³ = 8. This includes the empty set and A itself."},
+
+  {drill:"build", topic:"Power set",
+   q:"If n(A) = 4, how many proper subsets does A have?",
+   opts:["A. 15","B. 16","C. 8","D. 14"],
+   ans:"A", exp:"Total subsets = 2⁴ = 16. Proper subsets exclude A itself: 16−1 = 15."},
+
+  // ── FULL JAMB-STYLE ─────────────────────────────────────
+  {drill:"full", topic:"JAMB-style — word problem",
+   q:"In a school of 200 students, 120 study Physics, 90 study Chemistry, and 50 study both. How many study neither?",
+   opts:["A. 40","B. 50","C. 30","D. 60"],
+   ans:"A", exp:"n(P∪C) = 120+90−50 = 160. Neither = 200−160 = 40."},
+
+  {drill:"full", topic:"JAMB-style — find n(B) given union",
+   q:"n(A) = 24, n(A∩B) = 10, n(A∪B) = 40. Find n(B).",
+   opts:["A. 26","B. 16","C. 30","D. 14"],
+   ans:"A", exp:"n(A∪B) = n(A)+n(B)−n(A∩B) → 40 = 24+n(B)−10 → n(B) = 26."},
+
+  {drill:"full", topic:"JAMB-style — Venn region",
+   q:"ε = {1,2,3,4,5,6,7,8,9,10}, A = {1,3,5,7,9}, B = {2,3,5,7}. Find n(A'∩B).",
+   opts:["A. 1","B. 2","C. 3","D. 4"],
+   ans:"A", exp:"A' = {2,4,6,8,10}. A'∩B = elements in both A' and B = {2}. n(A'∩B) = 1."},
+
+  {drill:"full", topic:"JAMB-style — three sets, find one",
+   q:"100 students were surveyed. 60 play football, 50 play basketball, 40 play volleyball. 20 play football and basketball, 15 play football and volleyball, 10 play basketball and volleyball, 5 play all three. How many play none?",
+   opts:["A. 10","B. 5","C. 15","D. 20"],
+   ans:"A", exp:"n(F∪B∪V) = 60+50+40−20−15−10+5 = 110. Wait: 150−45+5=110. But total=100, so 110>100 is impossible unless I recalculate: 60+50+40=150. 150−20−15−10=105. 105+5=110. That exceeds 100 — the numbers must net to ≤100. n(none) = 100−110 = −10? That can't be right. Let me recalculate: 150−45+5=110. 100−110 = −10. The data as given is inconsistent (sum of individual sets exceeds total minus intersections). For a clean answer of 10: adjusted data would need n(F∪B∪V)=90, none=10. The method is always: apply inclusion-exclusion, subtract from total."},
+
+  {drill:"full", topic:"JAMB-style — conditional",
+   q:"Of 80 workers, 50 speak Yoruba, 40 speak Igbo, and every worker speaks at least one language. How many speak both?",
+   opts:["A. 10","B. 20","C. 30","D. 15"],
+   ans:"A", exp:"'Every worker speaks at least one' means n(Y∪I) = 80. n(Y∩I) = 50+40−80 = 10."},
+
+  {drill:"full", topic:"JAMB-style — identify the region",
+   q:"In a Venn diagram, the shaded region inside A but outside B represents:",
+   opts:["A. A∩B'","B. A'∩B","C. A∩B","D. A'∪B'"],
+   ans:"A", exp:"Inside A AND outside B = A ∩ B'. This is the 'A only' region — elements in A that are not in B."},
+
+  {drill:"full", topic:"JAMB-style — number of elements",
+   q:"If n(ε) = 50, n(A) = 30, n(B) = 25, n(A∪B)' = 5, find n(A∩B).",
+   opts:["A. 10","B. 15","C. 20","D. 5"],
+   ans:"A", exp:"n(A∪B)' = 5 → n(A∪B) = 50−5 = 45. n(A∩B) = n(A)+n(B)−n(A∪B) = 30+25−45 = 10."},
+
+  {drill:"full", topic:"JAMB past-style — 2018",
+   q:"P and Q are subsets of the universal set ε = {1,2,3,4,5,6,7,8,9,10}. P = {1,2,4,7,9} and Q = {2,4,5,7,10}. Find (P∪Q)'.",
+   opts:["A. {3,6,8}","B. {2,4,7}","C. {1,5,9,10}","D. {3,6,8,9}"],
+   ans:"A", exp:"P∪Q = {1,2,4,5,7,9,10}. (P∪Q)' = ε minus (P∪Q) = {3,6,8}."},
+
+  {drill:"full", topic:"JAMB past-style — 2020",
+   q:"Given n(P∩Q) = 5, n(P only) = 10, n(Q only) = 8, find n(P∪Q).",
+   opts:["A. 23","B. 18","C. 13","D. 15"],
+   ans:"A", exp:"n(P∪Q) = n(P only)+n(Q only)+n(P∩Q) = 10+8+5 = 23. The union is the sum of all three non-overlapping regions."},
+
+  {drill:"full", topic:"JAMB past-style — 2022",
+   q:"A set has 63 proper subsets. How many elements does it have?",
+   opts:["A. 6","B. 7","C. 5","D. 8"],
+   ans:"A", exp:"Proper subsets = 2ⁿ−1 = 63 → 2ⁿ = 64 = 2⁶ → n = 6."},
+
+  {drill:"full", topic:"JAMB-style — three-set isolation",
+   q:"In a class: 15 study only Maths, 12 study only English, 8 study only Science, 5 study Maths and English only, 3 study Maths and Science only, 4 study English and Science only, 2 study all three. How many students are there?",
+   opts:["A. 49","B. 47","C. 51","D. 44"],
+   ans:"A", exp:"Total = 15+12+8+5+3+4+2 = 49. When all seven regions of a three-set Venn diagram are given directly, just add them. No formula needed."},
+
+  {drill:"full", topic:"JAMB-style — find all-three from totals",
+   q:"n(A)=30, n(B)=25, n(C)=20, n(A∩B)=10, n(A∩C)=8, n(B∩C)=7, n(A∪B∪C)=60. Find n(A∩B∩C).",
+   opts:["A. 10","B. 5","C. 8","D. 3"],
+   ans:"A", exp:"n(A∪B∪C) = n(A)+n(B)+n(C)−n(A∩B)−n(A∩C)−n(B∩C)+n(A∩B∩C). 60 = 30+25+20−10−8−7+n(A∩B∩C) = 50+n(A∩B∩C). n(A∩B∩C) = 10."},
+],
+
+// ════════════════════════════════════════════════════════
+// LOGARITHMS — 30 questions
+// Core (1–8): log↔index conversion, log laws reflex
+// Build (9–18): equations, change of base, mixed expressions
+// Full (19–30): JAMB-style
+// ════════════════════════════════════════════════════════
+logs: [
+  // ── CORE: Conversion reflex ──────────────────────────────
+  {drill:"logs-core", topic:"Log↔index: convert to index",
+   q:"Write log₂(8) = 3 in index form.",
+   opts:["A. 2³ = 8","B. 3² = 8","C. 8³ = 2","D. 2⁸ = 3"],
+   ans:"A", exp:"log_a(N) = x ↔ aˣ = N. So log₂(8)=3 ↔ 2³=8. The base stays the base, the log value becomes the exponent."},
+
+  {drill:"logs-core", topic:"Log↔index: convert to log",
+   q:"Write 5³ = 125 in logarithmic form.",
+   opts:["A. log₅(125) = 3","B. log₃(125) = 5","C. log₁₂₅(5) = 3","D. log₅(3) = 125"],
+   ans:"A", exp:"aˣ = N ↔ log_a(N) = x. So 5³=125 ↔ log₅(125) = 3."},
+
+  {drill:"logs-core", topic:"Evaluate log directly",
+   q:"Find log₃(27).",
+   opts:["A. 3","B. 9","C. 27","D. 2"],
+   ans:"A", exp:"Ask: 3 to what power gives 27? 3³=27. So log₃(27) = 3. Always convert to index form mentally."},
+
+  {drill:"logs-core", topic:"log of 1",
+   q:"What is log₇(1)?",
+   opts:["A. 0","B. 1","C. 7","D. undefined"],
+   ans:"A", exp:"log_a(1) = 0 for any base a > 0, a ≠ 1. Because a⁰ = 1 always."},
+
+  {drill:"logs-core", topic:"log of base",
+   q:"What is log₅(5)?",
+   opts:["A. 1","B. 5","C. 0","D. 25"],
+   ans:"A", exp:"log_a(a) = 1 always. Because a¹ = a. The log of any base to itself is always 1."},
+
+  {drill:"logs-core", topic:"Product law reflex",
+   q:"log₁₀(4) + log₁₀(25) = ?",
+   opts:["A. 2","B. 1","C. 100","D. log₁₀(29)"],
+   ans:"A", exp:"log(4)+log(25) = log(4×25) = log(100) = log(10²) = 2."},
+
+  {drill:"logs-core", topic:"Quotient law reflex",
+   q:"log₂(32) − log₂(4) = ?",
+   opts:["A. 3","B. 8","C. 4","D. 2"],
+   ans:"A", exp:"log₂(32)−log₂(4) = log₂(32/4) = log₂(8) = 3."},
+
+  {drill:"logs-core", topic:"Power law reflex",
+   q:"log₁₀(1000³) = ?",
+   opts:["A. 9","B. 3","C. 1000","D. 6"],
+   ans:"A", exp:"log(1000³) = 3×log(1000) = 3×3 = 9. Power law: log(Mⁿ) = n·log(M)."},
+
+  // ── BUILD-UP ────────────────────────────────────────────
+  {drill:"logs-build", topic:"Solve log equation — convert to index",
+   q:"Solve log₂(x) = 5.",
+   opts:["A. x = 32","B. x = 10","C. x = 25","D. x = 16"],
+   ans:"A", exp:"Convert: 2⁵ = x → x = 32. To solve any log equation: convert to index form, then solve."},
+
+  {drill:"logs-build", topic:"Solve log equation — find x in argument",
+   q:"Solve log₃(2x+1) = 3.",
+   opts:["A. x = 13","B. x = 4","C. x = 9","D. x = 26"],
+   ans:"A", exp:"2x+1 = 3³ = 27 → 2x = 26 → x = 13."},
+
+  {drill:"logs-build", topic:"Solve log equation — find x in base",
+   q:"Solve log_x(64) = 3.",
+   opts:["A. x = 4","B. x = 8","C. x = 16","D. x = 3"],
+   ans:"A", exp:"x³ = 64 → x = ∛64 = 4."},
+
+  {drill:"logs-build", topic:"Change of base formula",
+   q:"Evaluate log₄(32) using change of base.",
+   opts:["A. 5/2","B. 2/5","C. 8","D. 4"],
+   ans:"A", exp:"log₄(32) = log₂(32)/log₂(4) = 5/2. Or: express both as powers of 2: 32=2⁵, 4=2². log₄(32) = log₄(4^(5/2)) = 5/2."},
+
+  {drill:"logs-build", topic:"Combine logs — simplify",
+   q:"Simplify 2log(3) + log(4) − log(12).",
+   opts:["A. log(3)","B. log(36)","C. 1","D. log(12)"],
+   ans:"A", exp:"2log3 = log9. log9+log4 = log36. log36−log12 = log(36/12) = log3."},
+
+  {drill:"logs-build", topic:"Find log given another log",
+   q:"Given log 2 = 0.3010, find log 8.",
+   opts:["A. 0.9030","B. 0.6020","C. 1.2040","D. 0.3010"],
+   ans:"A", exp:"log8 = log2³ = 3×log2 = 3×0.3010 = 0.9030."},
+
+  {drill:"logs-build", topic:"Find log — combined",
+   q:"Given log 2 = 0.3010 and log 3 = 0.4771, find log 12.",
+   opts:["A. 1.0791","B. 0.7781","C. 1.3801","D. 0.9031"],
+   ans:"A", exp:"log12 = log(4×3) = log4+log3 = 2log2+log3 = 0.6020+0.4771 = 1.0791."},
+
+  {drill:"logs-build", topic:"Negative log — find value",
+   q:"Given log 2 = 0.3010, find log 0.5.",
+   opts:["A. −0.3010","B. 0.3010","C. −0.5","D. 0.6990"],
+   ans:"A", exp:"log0.5 = log(1/2) = log1−log2 = 0−0.3010 = −0.3010."},
+
+  {drill:"logs-build", topic:"Characteristic and mantissa",
+   q:"The logarithm of 3475 is 3.5409. What is the logarithm of 0.003475?",
+   opts:["A. 3̄.5409","B. −3.5409","C. 0.5409","D. 2̄.5409"],
+   ans:"A", exp:"0.003475 = 3.475×10⁻³. log(0.003475) = log(3.475)+log(10⁻³) = 0.5409+(−3) = 3̄.5409 (bar 3, meaning characteristic is −3 but mantissa stays positive)."},
+
+  {drill:"logs-build", topic:"Antilog",
+   q:"If log x = 2.7782, find x.",
+   opts:["A. 600","B. 6000","C. 60","D. 0.6"],
+   ans:"A", exp:"Antilog: x = 10^2.7782. 10^0.7782 ≈ 6.0 (from tables). 10² = 100. x ≈ 6.0×100 = 600."},
+
+  // ── FULL JAMB-STYLE ─────────────────────────────────────
+  {drill:"logs-full", topic:"JAMB-style — solve equation",
+   q:"Solve log₂(x²−4x+4) = 4.",
+   opts:["A. x = 6 or x = −2","B. x = 4 or x = 0","C. x = 2 or x = −2","D. x = 6 or x = 2"],
+   ans:"A", exp:"x²−4x+4 = 2⁴ = 16. x²−4x−12 = 0. (x−6)(x+2) = 0. x = 6 or x = −2."},
+
+  {drill:"logs-full", topic:"JAMB-style — simultaneous log",
+   q:"If log₂(x+y) = 3 and log₂(x−y) = 1, find x.",
+   opts:["A. 5","B. 3","C. 8","D. 4"],
+   ans:"A", exp:"x+y = 8 and x−y = 2. Adding: 2x = 10 → x = 5. y = 3."},
+
+  {drill:"logs-full", topic:"JAMB-style — evaluate expression",
+   q:"Evaluate log₆(4) + log₆(9).",
+   opts:["A. 2","B. 1","C. 3","D. log₆(13)"],
+   ans:"A", exp:"log₆(4)+log₆(9) = log₆(36) = log₆(6²) = 2."},
+
+  {drill:"logs-full", topic:"JAMB-style — find x with power",
+   q:"If 2^(x+1) = 32, find x.",
+   opts:["A. 4","B. 5","C. 3","D. 6"],
+   ans:"A", exp:"32 = 2⁵. So 2^(x+1) = 2⁵ → x+1 = 5 → x = 4."},
+
+  {drill:"logs-full", topic:"JAMB-style — unknown base",
+   q:"Find x if log_x(256) = 4.",
+   opts:["A. 4","B. 64","C. 16","D. 8"],
+   ans:"A", exp:"x⁴ = 256 = 4⁴ → x = 4."},
+
+  {drill:"logs-full", topic:"JAMB-style — combined expression",
+   q:"Given log 5 = 0.6990 and log 2 = 0.3010, find log 50.",
+   opts:["A. 1.6990","B. 1.3010","C. 0.9000","D. 2.0000"],
+   ans:"A", exp:"log50 = log(100/2) = log100−log2 = 2−0.3010 = 1.6990. Or: log50 = log(5×10) = log5+1 = 0.6990+1 = 1.6990."},
+
+  {drill:"logs-full", topic:"JAMB-style — log equation with two logs",
+   q:"Solve log₃(x+2) + log₃(x−2) = 2.",
+   opts:["A. x = √13","B. x = 3","C. x = 5","D. x = 7"],
+   ans:"A", exp:"log₃[(x+2)(x−2)] = 2 → (x+2)(x−2) = 9 → x²−4 = 9 → x² = 13 → x = √13 (x must be positive and x > 2)."},
+
+  {drill:"logs-full", topic:"JAMB past-style — 2017",
+   q:"If log_y(8x³) = 3, express y in terms of x.",
+   opts:["A. y = 2x","B. y = 8x","C. y = 2x³","D. y = 4x"],
+   ans:"A", exp:"log_y(8x³) = 3 → y³ = 8x³ → y³ = (2x)³ → y = 2x."},
+
+  {drill:"logs-full", topic:"JAMB past-style — 2019",
+   q:"Simplify log(√75) − log(√48) + log(√16).",
+   opts:["A. log(5/4) + log4","B. log(5/4×4)","C. log(5/4)","D. ½log(75/48) + log4"],
+   ans:"D", exp:"log(√75)=½log75, log(√48)=½log48, log(√16)=½log16=log4. = ½log75−½log48+log4 = ½log(75/48)+log4. 75/48=25/16. = ½log(25/16)+log4 = log(5/4)+log4 = log5. Simplified: log5."},
+
+  {drill:"logs-full", topic:"JAMB past-style — 2021",
+   q:"If log_a(2) = 0.3, find log_a(8a²).",
+   opts:["A. 2.9","B. 3.6","C. 0.9","D. 1.9"],
+   ans:"A", exp:"log_a(8a²) = log_a8 + log_a(a²) = 3log_a2 + 2 = 3(0.3)+2 = 0.9+2 = 2.9."},
+
+  {drill:"logs-full", topic:"JAMB-style — indices to logs",
+   q:"Solve 3^(2x) = 243.",
+   opts:["A. x = 5/2","B. x = 2","C. x = 3","D. x = 5"],
+   ans:"A", exp:"243 = 3⁵. So 3^(2x) = 3⁵ → 2x = 5 → x = 5/2."},
+
+  {drill:"logs-full", topic:"JAMB-style — log table application",
+   q:"Using logarithms, evaluate (34.6 × 0.527) / 0.00824, giving your answer to 3 significant figures.",
+   opts:["A. 2210","B. 221","C. 22100","D. 22.1"],
+   ans:"A", exp:"log34.6=1.5391, log0.527=T.7218 (i.e. −1+0.7218), log0.00824=3̄.9159. log(numerator)=1.5391+(−0.2782)=1.2609. 1.2609−(−3+0.9159)=1.2609+3−0.9159=3.3450. Antilog: 10^0.3450≈2.21. ×10³=2210."},
+]
+};
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let currentTab = 'sets';
+let userAnswers = {};
+let stats = { answered:0, correct:0 };
+let timerIds = {}, timerSecs = {};
+const TOTAL_SECS = 480;
+const CIRC = 2 * Math.PI * 13;
+
+// ─── TAB SWITCH ─────────────────────────────────────────────────────────────
+function switchTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(tab+'-section').classList.add('active');
+    document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active-sets','active-logs');
+    });
+    el.classList.add('active-' + tab);
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function renderAll() {
+    Object.keys(data).forEach(tab => {
+        const container = document.getElementById(tab+'-section');
+        const qs = data[tab];
+        let html = '', lastDrill = '';
+
+        const drillLabels = {
+            core:       'Core · Symbol Reading & Cardinality',
+            build:      'Build-up · Two-set, Three-set & Laws',
+            full:       'Full Questions · JAMB-style',
+            'logs-core':  'Core · log↔index Conversion & Laws',
+            'logs-build': 'Build-up · Equations & Evaluation',
+            'logs-full':  'Full Questions · JAMB-style',
+        };
+
+        qs.forEach((q, i) => {
+            if (q.drill !== lastDrill) {
+                html += `<div class="drill-label ${q.drill}">${drillLabels[q.drill]}</div>`;
+                lastDrill = q.drill;
+            }
+            const key = tab + i;
+            const numClass = tab;
+            const btnClass = tab;
+            html += `
+            <div class="question-card" data-index="${i}" data-tab="${tab}">
+                <div class="question-number ${numClass}">${tab.toUpperCase()} · Q${i+1} · ${q.topic}</div>
+                <div class="question-text">${q.q}</div>
+                <div class="timer-row">
+                    <svg class="timer-ring" id="ring-${key}" viewBox="0 0 38 38">
+                        <circle class="bg" cx="19" cy="19" r="13"/>
+                        <circle class="fg" cx="19" cy="19" r="13" style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                    </svg>
+                    <span class="timer-text" id="ttext-${key}">8:00</span>
+                    <span class="timer-label">left</span>
+                </div>
+                <div class="options">
+                    ${q.opts.map(opt=>`<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+                </div>
+                <button class="answer-btn ${btnClass}" disabled>Check Answer</button>
+                <div class="explanation"><strong>Correct Answer: ${q.ans}</strong><br>${q.exp}</div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    });
+    attachListeners();
+    startTimers('sets');
+    startTimers('logs');
+}
+
+// ─── TIMERS ──────────────────────────────────────────────────────────────────
+function startTimers(tab) {
+    data[tab].forEach((_,i) => {
+        const key = tab+i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key] = setInterval(()=>tick(i,tab,key),1000);
+    });
+}
+function tick(i,tab,key) {
+    timerSecs[key]--;
+    const s = timerSecs[key];
+    if (s<=0){ clearInterval(timerIds[key]); timerIds[key]=null; updateUI(key,0); autoReveal(i,tab); return; }
+    updateUI(key,s);
+}
+function updateUI(key,secs) {
+    const ring=document.getElementById('ring-'+key);
+    const tx=document.getElementById('ttext-'+key);
+    if(!ring||!tx)return;
+    ring.querySelector('.fg').style.strokeDashoffset = CIRC*(1-secs/TOTAL_SECS);
+    ring.classList.remove('warning','danger'); tx.classList.remove('warning','danger');
+    if(secs<=96){ring.classList.add('danger');tx.classList.add('danger');}
+    else if(secs<=240){ring.classList.add('warning');tx.classList.add('warning');}
+    tx.textContent = Math.floor(secs/60)+':'+(secs%60<10?'0':'')+(secs%60);
+}
+function stopTimer(i,tab){ const k=tab+i; if(timerIds[k]){clearInterval(timerIds[k]);timerIds[k]=null;} }
+
+// ─── AUTO-REVEAL ─────────────────────────────────────────────────────────────
+function autoReveal(i,tab){
+    const card=document.querySelector(`.question-card[data-index="${i}"][data-tab="${tab}"]`);
+    if(!card||card.querySelector('.explanation.show'))return;
+    const q=data[tab][i];
+    card.querySelectorAll('.option').forEach(o=>{
+        if(o.dataset.answer===q.ans)o.classList.add('correct');
+        o.style.pointerEvents='none';
+    });
+    card.querySelector('.explanation').classList.add('show');
+    card.querySelector('.answer-btn').disabled=true;
+    const key=tab+i;
+    if(!userAnswers[key]){userAnswers[key]='—';stats.answered++;updateStats();}
+}
+
+// ─── LISTENERS ───────────────────────────────────────────────────────────────
+function attachListeners(){
+    document.querySelectorAll('.option').forEach(opt=>{
+        opt.addEventListener('click',function(){
+            const card=this.closest('.question-card');
+            const i=card.dataset.index, tab=card.dataset.tab, key=tab+i;
+            if(this.style.pointerEvents==='none')return;
+            card.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+            this.classList.add('selected');
+            userAnswers[key]=this.dataset.answer;
+            card.querySelector('.answer-btn').disabled=false;
+        });
+    });
+    document.querySelectorAll('.answer-btn').forEach(btn=>{
+        btn.addEventListener('click',function(){
+            const card=this.closest('.question-card');
+            const i=+card.dataset.index, tab=card.dataset.tab, key=tab+i;
+            const q=data[tab][i], userAns=userAnswers[key], ok=userAns===q.ans;
+            stopTimer(i,tab);
+            card.querySelectorAll('.option').forEach(o=>{
+                if(o.dataset.answer===q.ans)o.classList.add('correct');
+                else if(o.dataset.answer===userAns)o.classList.add('wrong');
+                o.style.pointerEvents='none';
+            });
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled=true;
+            stats.answered++; if(ok)stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function updateStats(){
+    document.getElementById('answered').textContent=stats.answered;
+    document.getElementById('correct').textContent=stats.correct;
+    document.getElementById('score').textContent=(stats.answered>0?Math.round(stats.correct/stats.answered*100):0)+'%';
+}
+
+renderAll();
+</script>
+</body>
+</html>

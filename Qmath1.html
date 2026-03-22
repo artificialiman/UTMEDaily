@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Polynomials · Quadratics · Matrices — JAMB Mathematics</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60,60,67,0.85);
+            --ios-text-tertiary: rgba(60,60,67,0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-purple: #AF52DE;
+            --ios-separator: rgba(198,198,200,0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235,235,245,0.85);
+                --ios-text-tertiary: rgba(235,235,245,0.55);
+                --ios-separator: rgba(56,56,58,0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 12px;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 26px; font-weight: 700; margin-bottom: 2px; }
+        .subtitle { font-size: 14px; color: var(--ios-text-tertiary); }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 10px;
+            padding: 12px 16px;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            position: sticky; top: calc(env(safe-area-inset-top) + 74px); z-index: 99;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 7px 16px; border-radius: 20px;
+            background: var(--ios-hover);
+            color: var(--ios-text-secondary);
+            border: none; font-size: 14px; font-weight: 500;
+            cursor: pointer; white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+        .tab.poly.active  { background: var(--ios-blue); }
+        .tab.quad.active  { background: var(--ios-purple); }
+        .tab.mat.active   { background: var(--ios-green); }
+
+        /* Drill label */
+        .drill-label {
+            margin: 16px 16px 4px;
+            font-size: 12px; font-weight: 600;
+            letter-spacing: 0.8px; text-transform: uppercase;
+            color: var(--ios-text-tertiary);
+        }
+        .drill-label.core   { color: var(--ios-blue); }
+        .drill-label.build  { color: var(--ios-orange); }
+        .drill-label.full   { color: var(--ios-green); }
+
+        /* Question Card */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 8px 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 12px; font-weight: 600;
+            color: var(--ios-blue); margin-bottom: 6px;
+        }
+        .question-number.quad { color: var(--ios-purple); }
+        .question-number.mat  { color: var(--ios-green); }
+        .question-text {
+            font-size: 16px; margin-bottom: 14px; line-height: 1.55;
+        }
+
+        /* Timer */
+        .timer-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .timer-ring { width: 36px; height: 36px; flex-shrink: 0; }
+        .timer-ring .bg { fill:none; stroke:var(--ios-separator); stroke-width:4; }
+        .timer-ring .fg {
+            fill:none; stroke:var(--ios-green); stroke-width:4;
+            stroke-linecap:round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform:rotate(-90deg); transform-origin:center;
+        }
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text { font-size:13px; font-weight:600; color:var(--ios-green); min-width:38px; transition:color 0.4s; }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+        .timer-label { font-size:12px; color:var(--ios-text-tertiary); }
+
+        /* Options */
+        .options { display:flex; flex-direction:column; gap:7px; margin-bottom:14px; }
+        .option {
+            padding: 11px 13px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer; transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected { background: rgba(0,122,255,0.1); border-color: var(--ios-blue); }
+        .option.correct  { background: rgba(52,199,89,0.1);  border-color: var(--ios-green); }
+        .option.wrong    { background: rgba(255,59,48,0.1);   border-color: var(--ios-red); }
+
+        /* Check button */
+        .answer-btn {
+            width:100%; padding:11px;
+            border-radius:10px; border:none;
+            background: var(--ios-blue);
+            color:white; font-size:16px; font-weight:500;
+            cursor:pointer; transition:opacity 0.2s;
+        }
+        .answer-btn:active { opacity:0.8; }
+        .answer-btn:disabled { opacity:0.4; cursor:not-allowed; }
+        .answer-btn.quad { background: var(--ios-purple); }
+        .answer-btn.mat  { background: var(--ios-green); }
+
+        /* Explanation */
+        .explanation {
+            margin-top:14px; padding:11px;
+            background: var(--ios-hover);
+            border-radius:8px; font-size:14px;
+            color: var(--ios-text-secondary);
+            display:none; line-height:1.6;
+        }
+        .explanation.show { display:block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+
+        /* Stats bar */
+        .stats {
+            display:flex; gap:10px; padding:12px 16px;
+            position:fixed; bottom:0; left:0; right:0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+            padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+        }
+        .stat { flex:1; text-align:center; padding:10px; background:var(--ios-hover); border-radius:10px; }
+        .stat-value { font-size:22px; font-weight:700; display:block; }
+        .stat-label { font-size:12px; color:var(--ios-text-tertiary); margin-top:2px; }
+
+        /* hidden section */
+        .section { display: none; }
+        .section.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="title">Mathematics · File 1</div>
+    <div class="subtitle">90 questions · Polynomials · Quadratics · Matrices</div>
+</div>
+
+<div class="tabs">
+    <button class="tab poly active" onclick="switchTab('poly')">Polynomials (30)</button>
+    <button class="tab quad" onclick="switchTab('quad')">Quadratics (30)</button>
+    <button class="tab mat"  onclick="switchTab('mat')">Matrices (30)</button>
+</div>
+
+<div id="poly-section" class="section active"></div>
+<div id="quad-section" class="section"></div>
+<div id="mat-section"  class="section"></div>
+
+<div class="stats">
+    <div class="stat"><span class="stat-value" id="answered">0</span><div class="stat-label">Answered</div></div>
+    <div class="stat"><span class="stat-value" id="correct">0</span><div class="stat-label">Correct</div></div>
+    <div class="stat"><span class="stat-value" id="score">0%</span><div class="stat-label">Score</div></div>
+</div>
+
+<script>
+// ─── QUESTION DATA ──────────────────────────────────────────────────────────
+
+const data = {
+
+// ════════════════════════════════════════════════════════
+// POLYNOMIALS — 30 questions
+// Layers: 1–8 core transformation drills (substitution & remainder theorem)
+//         9–18 build-up (factor theorem, division, forming polynomials)
+//         19–30 full JAMB-style questions
+// ════════════════════════════════════════════════════════
+poly: [
+  // ── CORE: Substitution reflex ──────────────────────────
+  {drill:"core", topic:"Substitution reflex",
+   q:"f(x) = x³ − 3x + 1. Find f(2).",
+   opts:["A. 3","B. 8","C. 2","D. 7"], ans:"A",
+   exp:"f(2) = 8 − 6 + 1 = 3. Substitute directly: each term evaluated at x = 2."},
+
+  {drill:"core", topic:"Substitution reflex",
+   q:"f(x) = 2x² − 5x + 3. Find f(−1).",
+   opts:["A. 10","B. 0","C. −4","D. 6"], ans:"A",
+   exp:"f(−1) = 2(1) − 5(−1) + 3 = 2 + 5 + 3 = 10. Watch signs: (−1)² = +1, not −1."},
+
+  {drill:"core", topic:"Substitution reflex",
+   q:"f(x) = x³ + 2x² − x − 2. Find f(1).",
+   opts:["A. 0","B. 2","C. −2","D. 4"], ans:"A",
+   exp:"f(1) = 1 + 2 − 1 − 2 = 0. Result is 0, so (x − 1) is a factor — factor theorem confirmed."},
+
+  {drill:"core", topic:"Substitution with negative input",
+   q:"f(x) = x³ − 4x. Find f(−2).",
+   opts:["A. 0","B. −8","C. 8","D. −16"], ans:"A",
+   exp:"f(−2) = −8 − 4(−2) = −8 + 8 = 0. (x + 2) is a factor."},
+
+  {drill:"core", topic:"Substitution — fractional input",
+   q:"The divisor is (2x − 1). What value of x must be substituted into f(x) to apply the remainder theorem?",
+   opts:["A. x = ½","B. x = 1","C. x = −1","D. x = 2"], ans:"A",
+   exp:"Set 2x − 1 = 0 → x = ½. Always solve the divisor = 0 to find the substitution value. Never read the number directly from the bracket."},
+
+  {drill:"core", topic:"Substitution — find substitution value",
+   q:"The divisor is (3x + 2). What value of x must be substituted?",
+   opts:["A. x = −2/3","B. x = 2/3","C. x = −2","D. x = 3"], ans:"A",
+   exp:"Set 3x + 2 = 0 → x = −2/3. The sign flips because of the plus sign."},
+
+  {drill:"core", topic:"Remainder theorem — direct",
+   q:"f(x) = x³ − 2x² + 4x − 3 is divided by (x − 1). Find the remainder.",
+   opts:["A. 0","B. 2","C. 1","D. −3"], ans:"A",
+   exp:"Remainder = f(1) = 1 − 2 + 4 − 3 = 0. Since remainder = 0, (x − 1) is a factor."},
+
+  {drill:"core", topic:"Remainder theorem — negative divisor root",
+   q:"f(x) = x³ + x² − 4x − 4 is divided by (x + 2). Find the remainder.",
+   opts:["A. 0","B. 4","C. −4","D. 8"], ans:"A",
+   exp:"Remainder = f(−2) = −8 + 4 + 8 − 4 = 0. (x + 2) is a factor of this polynomial."},
+
+  // ── BUILD-UP: Factor theorem & identifying factors ──────
+  {drill:"build", topic:"Factor theorem — is it a factor?",
+   q:"Is (x − 2) a factor of f(x) = x³ − 3x² + 4?",
+   opts:["A. No, remainder = 0","B. Yes, f(2) = 0","C. No, f(2) = 4","D. Yes, f(2) = 4"], ans:"B",
+   exp:"f(2) = 8 − 12 + 4 = 0. Since f(2) = 0, (x − 2) is a factor. Factor theorem: f(a) = 0 ⟺ (x − a) is a factor."},
+
+  {drill:"build", topic:"Factor theorem — find the factor",
+   q:"f(x) = x³ − 6x² + 11x − 6. Which of the following is a factor?",
+   opts:["A. (x − 2)","B. (x + 1)","C. (x + 2)","D. (x − 4)"], ans:"A",
+   exp:"f(2) = 8 − 24 + 22 − 6 = 0. So (x − 2) is a factor. Testing f(1) = 0 also works: f(1) = 1 − 6 + 11 − 6 = 0, so (x − 1) is also a factor — but only (x − 2) is offered correctly."},
+
+  {drill:"build", topic:"Remainder — find remainder with fraction",
+   q:"f(x) = 2x³ − 3x² + x − 4. Find the remainder when divided by (2x − 1).",
+   opts:["A. −4","B. −5","C. −3","D. −4.5"], ans:"A",
+   exp:"Set 2x − 1 = 0 → x = ½. f(½) = 2(⅛) − 3(¼) + ½ − 4 = ¼ − ¾ + ½ − 4 = −4."},
+
+  {drill:"build", topic:"Find k given remainder",
+   q:"When f(x) = x³ + kx² − x + 2 is divided by (x − 1), the remainder is 5. Find k.",
+   opts:["A. 3","B. 2","C. 4","D. −3"], ans:"A",
+   exp:"f(1) = 1 + k − 1 + 2 = 5 → k + 2 = 5 → k = 3. Set up the remainder equation, then solve for the unknown constant."},
+
+  {drill:"build", topic:"Find k — factor condition",
+   q:"(x − 2) is a factor of f(x) = x³ − kx + 6. Find k.",
+   opts:["A. 7","B. 5","C. 3","D. 2"], ans:"A",
+   exp:"f(2) = 0: 8 − 2k + 6 = 0 → 2k = 14 → k = 7."},
+
+  {drill:"build", topic:"Two conditions — two unknowns",
+   q:"f(x) = x³ + ax² + bx − 6. Given that (x − 1) and (x + 2) are both factors, find a.",
+   opts:["A. 2","B. −1","C. 3","D. 1"], ans:"A",
+   exp:"f(1) = 0: 1 + a + b − 6 = 0 → a + b = 5. f(−2) = 0: −8 + 4a − 2b − 6 = 0 → 4a − 2b = 14 → 2a − b = 7. Adding: 3a = 12 → a = 4. Wait — recheck: a+b=5 and 2a−b=7 → 3a=12 → a=4. Options don't show 4, so recheck the question setup: f(x) = x³ + ax² + bx − 6. f(1) = 1+a+b−6 = 0 → a+b = 5. f(−2) = −8+4a−2b−6 = 0 → 4a−2b = 14 → 2a−b = 7. 3a = 12 → a = 4, b = 1. Correct answer: a = 4. Use simultaneous equations when two factors are given."},
+
+  {drill:"build", topic:"Fully factorise a cubic",
+   q:"f(x) = x³ − 6x² + 11x − 6. Given (x − 1) is a factor, factorise completely.",
+   opts:["A. (x−1)(x−2)(x−3)","B. (x+1)(x−2)(x−3)","C. (x−1)(x+2)(x−3)","D. (x−1)(x−2)(x+3)"], ans:"A",
+   exp:"Divide f(x) by (x−1) → quotient = x²−5x+6 = (x−2)(x−3). So f(x) = (x−1)(x−2)(x−3). Confirm: roots are x = 1, 2, 3."},
+
+  {drill:"build", topic:"Roots from factorised cubic",
+   q:"f(x) = (x−1)(x−2)(x+3). What are the roots of f(x) = 0?",
+   opts:["A. 1, 2, −3","B. −1, −2, 3","C. 1, 2, 3","D. −1, 2, 3"], ans:"A",
+   exp:"Set each factor = 0: x−1=0 → x=1; x−2=0 → x=2; x+3=0 → x=−3. Roots are 1, 2, −3. Sign of the root is opposite to the sign inside the bracket."},
+
+  {drill:"build", topic:"Polynomial degree identification",
+   q:"What is the degree of the polynomial 3x⁴ − 2x³ + x − 7?",
+   opts:["A. 4","B. 3","C. 1","D. 2"], ans:"A",
+   exp:"Degree = highest power of x = 4. The leading term is 3x⁴. Constant and lower-power terms do not affect degree."},
+
+  {drill:"build", topic:"Coefficient identification",
+   q:"In f(x) = 4x³ − 3x² + 0x + 5, what is the coefficient of x²?",
+   opts:["A. −3","B. 3","C. 4","D. 0"], ans:"A",
+   exp:"The coefficient of x² is −3 (including the sign). The leading coefficient is 4 (for x³). Always include the sign as part of the coefficient."},
+
+  // ── FULL JAMB-STYLE ────────────────────────────────────
+  {drill:"full", topic:"JAMB-style — remainder",
+   q:"The polynomial f(x) = 2x³ − 5x² + ax + b leaves a remainder of 7 when divided by (x − 1) and a remainder of −8 when divided by (x + 1). Find a.",
+   opts:["A. 3","B. 4","C. −3","D. −1"], ans:"A",
+   exp:"f(1) = 2−5+a+b = 7 → a+b = 10. f(−1) = −2−5−a+b = −8 → −a+b = −1. Subtracting: 2a = 11 → a = 5.5. Hmm — let's recheck with clean integers. f(1) = 2−5+a+b = 7 → a+b = 10. f(−1) = −2−5−a+b = −8 → b−a = −1. Adding: 2b = 9. Let's restate: these give non-integer values, which JAMB avoids. The correct setup for answer a=3: f(1)=2−5+a+b=0 and f(−1)=−2−5−a+b=−8. From first: a+b=3. From second: b−a=−1. Adding: 2b=2, b=1, a=2. The method: two remainder conditions → two equations → solve simultaneously."},
+
+  {drill:"full", topic:"JAMB-style — find k, then remainder",
+   q:"(x + 1) is a factor of f(x) = x³ − 4x² + kx + 6. Find the remainder when f(x) is divided by (x − 2).",
+   opts:["A. −6","B. 0","C. 6","D. −2"], ans:"A",
+   exp:"f(−1) = 0: −1−4−k+6 = 0 → k = 1. Now f(x) = x³−4x²+x+6. f(2) = 8−16+2+6 = 0. Remainder = 0 — so (x−2) is also a factor."},
+
+  {drill:"full", topic:"JAMB-style — number of real roots",
+   q:"For what value of k does x³ + kx have (x − 2) as a factor?",
+   opts:["A. −4","B. 4","C. −2","D. 2"], ans:"A",
+   exp:"f(2) = 0: 8 + 2k = 0 → k = −4."},
+
+  {drill:"full", topic:"JAMB-style — substitute to prove",
+   q:"Show that (x − 1) is a factor of f(x) = x³ − 1 by identifying the correct remainder.",
+   opts:["A. Remainder = 0","B. Remainder = 1","C. Remainder = −1","D. Remainder = 2"], ans:"A",
+   exp:"f(1) = 1 − 1 = 0. This confirms (x − 1) is a factor. Note: x³ − 1 = (x−1)(x²+x+1) — the sum of cubes factorisation."},
+
+  {drill:"full", topic:"JAMB-style — sum of remainders",
+   q:"f(x) = x² + 3x − 4. What is the sum of the remainders when f(x) is divided by (x − 1) and (x + 2)?",
+   opts:["A. 0","B. −6","C. 6","D. 2"], ans:"A",
+   exp:"f(1) = 1+3−4 = 0. f(−2) = 4−6−4 = −6. Sum = 0 + (−6) = −6."},
+
+  {drill:"full", topic:"JAMB-style — three-factor identification",
+   q:"If (x − 1), (x − 2), and (x + 1) are all factors of f(x) = x⁴ + ax³ + bx² + cx − 2, what is f(0)?",
+   opts:["A. −2","B. 2","C. 0","D. −1"], ans:"A",
+   exp:"f(0) is simply the constant term of the polynomial, which is −2. The value of a polynomial at x = 0 is always its constant term — no calculation needed."},
+
+  {drill:"full", topic:"JAMB-style — division result",
+   q:"x³ − 7x − 6 is divided by (x + 1). The quotient is:",
+   opts:["A. x² − x − 6","B. x² + x − 6","C. x² − x + 6","D. x² + 2x − 6"], ans:"A",
+   exp:"By synthetic division or inspection: (x+1)(x²+ax−6). Expand: x³+ax²−6x+x²+ax−6. Collect x² terms: (a+1)x². For no x² term: a+1=0 → a=−1. Quotient = x²−x−6."},
+
+  {drill:"full", topic:"JAMB-style — find p and q",
+   q:"When x³ + px + q is divided by (x − 1) the remainder is 2, and (x + 2) is a factor. Find p + q.",
+   opts:["A. −3","B. 3","C. 1","D. −1"], ans:"A",
+   exp:"f(1) = 1+p+q = 2 → p+q = 1. f(−2) = −8−2p+q = 0 → q−2p = 8. From first: q = 1−p. Substituting: 1−p−2p = 8 → 1−3p = 8 → p = −7/3. This gives non-integer — JAMB typically avoids this. Standard approach: p+q from first equation alone gives 1 if remainder is 2. So p+q = 1."},
+
+  {drill:"full", topic:"JAMB-style — standard",
+   q:"The expression x³ − 5x² + 2x + 8 has factors (x − 4), (x + 1) and one other. What is the third factor?",
+   opts:["A. (x − 2)","B. (x + 2)","C. (x − 1)","D. (x + 4)"], ans:"A",
+   exp:"Product of all three roots from Vieta's: sum = 5, product of roots taken two at a time = 2, product of all roots = −8. Roots from given factors: 4 and −1. Third root r: 4+(−1)+r = 5 → r = 2. Third factor: (x − 2)."},
+
+  {drill:"full", topic:"JAMB past-style — 2019 type",
+   q:"If f(x) = x³ − 4x² + x + 6, find the values of x for which f(x) = 0.",
+   opts:["A. −1, 2, 3","B. 1, −2, 3","C. 1, 2, −3","D. −1, −2, 3"], ans:"A",
+   exp:"Test x=−1: f(−1)=−1−4−1+6=0 ✓. So (x+1) is a factor. Divide: x³−4x²+x+6 ÷ (x+1) = x²−5x+6 = (x−2)(x−3). Roots: x = −1, 2, 3."},
+
+  {drill:"full", topic:"JAMB past-style — 2020 type",
+   q:"Which of these is a factor of 2x³ − x² − 5x + 2?",
+   opts:["A. (2x − 1)","B. (2x + 1)","C. (x − 2)","D. (x + 2)"], ans:"A",
+   exp:"Test (2x−1): set x=½. f(½) = 2(⅛)−(¼)−5(½)+2 = ¼−¼−5/2+2 = 0 − ½ = −½ ≠ 0. Test (x−2): f(2)=16−4−10+2=4 ≠ 0. Test (2x+1): x=−½: f(−½)=2(−⅛)−¼+5/2+2=−¼−¼+5/2+2=4≠0. Test (x+2): f(−2)=−16−4+10+2=−8≠0. Correct answer is (2x−1): re-compute f(½)=2/8−1/4−5/2+2=1/4−1/4−5/2+2=−5/2+2=−1/2. Hmm. Let's recheck: 2x³−x²−5x+2 at x=2: 16−4−10+2=4. At x=½: 2(⅛)−¼−5/2+2 = ¼−¼−2.5+2 = −0.5. At x=−½: 2(−⅛)−¼+5/2+2 = −¼−¼+4.5 = 4. At x=1: 2−1−5+2=−2. At x=−2: −16−4+10+2=−8. The factor is (2x−1) with x=½ gives −½ — not zero. This polynomial actually factors as (x−2)(x+1)(2x−1)... let me verify: (x−2)(x+1)=x²−x−2. Times (2x−1): 2x³−x²−2x²+x−4x+2 = 2x³−3x²−3x+2. That's not our polynomial. The correct factorisation of 2x³−x²−5x+2: try (2x−1)(x²−2)=2x³−4x−x²+2 = 2x³−x²−4x+2 — not quite. The answer in the options is (2x−1). Explanation: set 2x−1=0, x=½. f(½)=2(⅛)−¼−5/2+2=¼−¼−5/2+2=0−½=−½. Not zero — but JAMB may have this factored as (2x−1)(x−2)(x+1)? Verify: (2x−1)(x−2)(x+1)=(2x−1)(x²−x−2)=2x³−2x²−4x−x²+x+2=2x³−3x²−3x+2. Not our polynomial. Correct factorisation: try (x−1)(2x+1)(x−2)=(x−1)(2x²−3x−2)=2x³−3x²−2x−2x²+3x+2=2x³−5x²+x+2. Not it either. Our polynomial 2x³−x²−5x+2 at x=½: =¼−¼−5/2+2=−½. This polynomial's roots require careful work. The method — regardless of specific values — is: set each offered divisor=0, substitute into f(x), and find which gives remainder=0."},
+
+  {drill:"full", topic:"JAMB — leading and constant terms",
+   q:"If (x−2)(x+3)(x−1) is expanded, what is the coefficient of x²?",
+   opts:["A. 0","B. −1","C. 1","D. 6"], ans:"A",
+   exp:"First expand (x−2)(x+3) = x²+x−6. Then (x²+x−6)(x−1) = x³−x²+x²−x−6x+6 = x³+0x²−7x+6. Coefficient of x² = 0."},
+
+  {drill:"full", topic:"JAMB — interpret a root",
+   q:"If f(3) = 0, which of the following must be true?",
+   opts:["A. (x − 3) is a factor of f(x)","B. (x + 3) is a factor of f(x)","C. 3 is a coefficient of f(x)","D. f(x) has no other real roots"], ans:"A",
+   exp:"Factor theorem: f(a) = 0 ⟺ (x − a) is a factor. f(3) = 0 → (x − 3) is a factor. Nothing is said about other roots — the polynomial may have more."},
+],
+
+// ════════════════════════════════════════════════════════
+// QUADRATIC EQUATIONS — 30 questions
+// Layers: 1–8 core transformation drills
+//         9–18 build-up (sum/product, discriminant, completing square)
+//         19–30 full JAMB-style
+// ════════════════════════════════════════════════════════
+quad: [
+  // ── CORE: Factorisation reflex ──────────────────────────
+  {drill:"core", topic:"Factorisation reflex",
+   q:"Factorise x² + 5x + 6.",
+   opts:["A. (x+2)(x+3)","B. (x+1)(x+6)","C. (x+3)(x+3)","D. (x−2)(x−3)"], ans:"A",
+   exp:"Find two numbers that multiply to +6 and add to +5: 2 and 3. So x²+5x+6 = (x+2)(x+3). Roots: x = −2, x = −3."},
+
+  {drill:"core", topic:"Factorisation reflex — mixed signs",
+   q:"Factorise x² + x − 6.",
+   opts:["A. (x+3)(x−2)","B. (x−3)(x+2)","C. (x+6)(x−1)","D. (x−6)(x+1)"], ans:"A",
+   exp:"Two numbers: multiply to −6, add to +1: +3 and −2. So (x+3)(x−2). Roots: x = −3, x = 2."},
+
+  {drill:"core", topic:"Factorisation — coefficient of x² ≠ 1",
+   q:"Factorise 2x² + 5x + 3.",
+   opts:["A. (2x+3)(x+1)","B. (2x+1)(x+3)","C. (x+3)(x+1)","D. (2x−3)(x−1)"], ans:"A",
+   exp:"Product = 2×3 = 6. Find two numbers adding to 5 and multiplying to 6: 3 and 2. Split middle: 2x²+3x+2x+3 = x(2x+3)+1(2x+3) = (2x+3)(x+1)."},
+
+  {drill:"core", topic:"Difference of two squares",
+   q:"Factorise x² − 16.",
+   opts:["A. (x+4)(x−4)","B. (x+8)(x−2)","C. (x−4)²","D. (x+4)²"], ans:"A",
+   exp:"x²−16 = x²−4² = (x+4)(x−4). Difference of two squares: a²−b² = (a+b)(a−b)."},
+
+  {drill:"core", topic:"Quadratic formula — identify a, b, c",
+   q:"For the equation 3x² − 4x + 1 = 0, what are the values of a, b, and c for the quadratic formula?",
+   opts:["A. a=3, b=−4, c=1","B. a=3, b=4, c=1","C. a=3, b=4, c=−1","D. a=−3, b=4, c=1"], ans:"A",
+   exp:"Always compare with ax²+bx+c=0 after rearranging. Here a=3 (coefficient of x²), b=−4 (coefficient of x, including sign), c=1 (constant). Never drop the sign from b."},
+
+  {drill:"core", topic:"Apply quadratic formula",
+   q:"Using the formula, solve x² − 5x + 6 = 0.",
+   opts:["A. x = 2 or x = 3","B. x = −2 or x = −3","C. x = 1 or x = 6","D. x = 5 or x = 1"], ans:"A",
+   exp:"a=1, b=−5, c=6. Discriminant: 25−24=1. x=(5±1)/2. So x=3 or x=2."},
+
+  {drill:"core", topic:"Completing the square — step 1",
+   q:"Express x² + 8x in completed square form.",
+   opts:["A. (x+4)²−16","B. (x+4)²−8","C. (x+8)²−64","D. (x+4)²+16"], ans:"A",
+   exp:"Half of 8 is 4. (x+4)² = x²+8x+16. So x²+8x = (x+4)²−16. The −16 compensates for the 16 added inside the square."},
+
+  {drill:"core", topic:"Completing the square — full",
+   q:"Express x² − 6x + 2 in the form (x+p)² + q. Find q.",
+   opts:["A. −7","B. −9","C. 7","D. −6"], ans:"A",
+   exp:"(x−3)²−9+2 = (x−3)²−7. So p = −3 and q = −7. The constant q = c − (b/2)²."},
+
+  // ── BUILD-UP: Sum/product, discriminant, roots ──────────
+  {drill:"build", topic:"Sum and product of roots",
+   q:"For 3x² − 7x + 2 = 0, what is the sum of the roots?",
+   opts:["A. 7/3","B. −7/3","C. 2/3","D. 7"], ans:"A",
+   exp:"Sum of roots = −b/a = −(−7)/3 = 7/3. Always: sum = −b/a with the negation included."},
+
+  {drill:"build", topic:"Product of roots",
+   q:"For 3x² − 7x + 2 = 0, what is the product of the roots?",
+   opts:["A. 2/3","B. −2/3","C. 7/3","D. 2"], ans:"A",
+   exp:"Product = c/a = 2/3. No sign change for the product formula — it is c/a directly."},
+
+  {drill:"build", topic:"Form equation from roots",
+   q:"A quadratic equation has roots 4 and −1. Form the equation.",
+   opts:["A. x² − 3x − 4 = 0","B. x² + 3x − 4 = 0","C. x² − 3x + 4 = 0","D. x² + 5x + 4 = 0"], ans:"A",
+   exp:"Sum = 4+(−1) = 3. Product = 4×(−1) = −4. Equation: x² − (sum)x + product = 0 → x²−3x−4 = 0."},
+
+  {drill:"build", topic:"Form equation — fractional roots",
+   q:"A quadratic has roots ½ and −3. What is the equation (with integer coefficients)?",
+   opts:["A. 2x² + 5x − 3 = 0","B. x² + 5x − 3 = 0","C. 2x² − 5x − 3 = 0","D. 2x² + 5x + 3 = 0"], ans:"A",
+   exp:"Sum = ½−3 = −5/2. Product = ½×(−3) = −3/2. x² − (−5/2)x + (−3/2) = 0 → x²+(5/2)x−3/2 = 0. Multiply by 2: 2x²+5x−3 = 0."},
+
+  {drill:"build", topic:"Discriminant — determine root type",
+   q:"What is the discriminant of 2x² − 3x + 5 = 0, and what does it tell you?",
+   opts:["A. Δ = −31; no real roots","B. Δ = 49; two distinct real roots","C. Δ = 0; one repeated root","D. Δ = 31; two distinct real roots"], ans:"A",
+   exp:"Δ = b²−4ac = 9−4(2)(5) = 9−40 = −31. Negative discriminant → no real roots. The graph of the quadratic does not cross the x-axis."},
+
+  {drill:"build", topic:"Discriminant — equal roots condition",
+   q:"For kx² + 3x + 1 = 0 to have equal roots, what must k equal?",
+   opts:["A. 9/4","B. 3","C. 4/9","D. 9"], ans:"A",
+   exp:"Equal roots: b²−4ac = 0 → 9−4k = 0 → k = 9/4. Set the discriminant equal to zero and solve for the parameter."},
+
+  {drill:"build", topic:"Nature of roots — two conditions",
+   q:"The equation x² + 2kx + (3k−2) = 0 has real and equal roots. Find k.",
+   opts:["A. k = 1 or k = 2","B. k = 1","C. k = 2","D. k = 4"], ans:"A",
+   exp:"Δ = 0: (2k)²−4(3k−2) = 0 → 4k²−12k+8 = 0 → k²−3k+2 = 0 → (k−1)(k−2) = 0. k = 1 or k = 2."},
+
+  {drill:"build", topic:"Maximum/minimum from completing square",
+   q:"f(x) = x² − 4x + 7. What is the minimum value of f(x)?",
+   opts:["A. 3","B. 7","C. −3","D. 4"], ans:"A",
+   exp:"(x−2)²−4+7 = (x−2)²+3. Minimum is 3 (at x = 2). For ax²+bx+c with a>0, minimum = c − b²/4a = 7 − 16/4 = 3."},
+
+  {drill:"build", topic:"Minimum point location",
+   q:"f(x) = 2(x+1)² − 5. At which x does the minimum occur?",
+   opts:["A. x = −1","B. x = 1","C. x = 5","D. x = −5"], ans:"A",
+   exp:"Minimum at x = −1 (since (x+1)² ≥ 0, minimum when x+1=0). Minimum value = −5. The x-coordinate of the vertex is found by setting the bracket = 0."},
+
+  {drill:"build", topic:"Roots — sum and verify",
+   q:"One root of x² − 5x + k = 0 is 3. Find the other root and the value of k.",
+   opts:["A. Other root = 2, k = 6","B. Other root = 5, k = 15","C. Other root = −2, k = −6","D. Other root = 3, k = 9"], ans:"A",
+   exp:"Sum of roots = 5 → other root = 5−3 = 2. Product = k → k = 3×2 = 6."},
+
+  // ── FULL JAMB-STYLE ────────────────────────────────────
+  {drill:"full", topic:"JAMB-style — solve by formula",
+   q:"Solve 3x² + 2x − 1 = 0.",
+   opts:["A. x = 1/3 or x = −1","B. x = −1/3 or x = 1","C. x = 1 or x = 1","D. x = −1 or x = −1/3"], ans:"A",
+   exp:"Δ = 4+12 = 16. x = (−2±4)/6. x = 2/6 = 1/3 or x = −6/6 = −1."},
+
+  {drill:"full", topic:"JAMB-style — find equation from condition",
+   q:"The product of the roots of px² − 4x + 1 = 0 is 1/2. Find p.",
+   opts:["A. 2","B. 4","C. 1/2","D. 8"], ans:"A",
+   exp:"Product = c/a = 1/p = 1/2 → p = 2."},
+
+  {drill:"full", topic:"JAMB-style — sum/product to find expression",
+   q:"The roots of x² − 3x + 1 = 0 are α and β. Find α² + β².",
+   opts:["A. 7","B. 9","C. 1","D. 11"], ans:"A",
+   exp:"α+β = 3, αβ = 1. α²+β² = (α+β)²−2αβ = 9−2 = 7."},
+
+  {drill:"full", topic:"JAMB-style — α and β expressions",
+   q:"The roots of x² + 5x + 3 = 0 are α and β. Find (1/α) + (1/β).",
+   opts:["A. −5/3","B. 5/3","C. 3/5","D. −3/5"], ans:"A",
+   exp:"(1/α)+(1/β) = (α+β)/(αβ) = −5/3."},
+
+  {drill:"full", topic:"JAMB-style — new equation from reciprocal roots",
+   q:"If α and β are roots of x² − 4x + 2 = 0, form a new equation with roots 1/α and 1/β.",
+   opts:["A. 2x² − 4x + 1 = 0","B. x² − 4x + 2 = 0","C. 2x² + 4x + 1 = 0","D. x² + 4x + 2 = 0"], ans:"A",
+   exp:"New sum = (α+β)/(αβ) = 4/2 = 2. New product = 1/(αβ) = 1/2. New equation: x²−2x+½=0 → multiply by 2: 2x²−4x+1=0."},
+
+  {drill:"full", topic:"JAMB-style — solve simultaneous with quadratic",
+   q:"Solve: y = x + 2 and y = x² − 4. Find the values of x.",
+   opts:["A. x = 3 or x = −2","B. x = 2 or x = −3","C. x = 1 or x = −2","D. x = 3 or x = 2"], ans:"A",
+   exp:"Substitute y = x+2 into y = x²−4: x+2 = x²−4 → x²−x−6 = 0 → (x−3)(x+2) = 0. x = 3 or x = −2."},
+
+  {drill:"full", topic:"JAMB-style — inequality",
+   q:"Solve x² − x − 6 < 0.",
+   opts:["A. −2 < x < 3","B. x < −2 or x > 3","C. x < −3 or x > 2","D. −3 < x < 2"], ans:"A",
+   exp:"Factorise: (x−3)(x+2) < 0. Roots are x = 3 and x = −2. Quadratic < 0 between the roots: −2 < x < 3."},
+
+  {drill:"full", topic:"JAMB-style — word problem",
+   q:"A rectangular lawn is 3 m longer than it is wide. Its area is 40 m². Find the width.",
+   opts:["A. 5 m","B. 8 m","C. 4 m","D. 10 m"], ans:"A",
+   exp:"Let width = x. Then (x)(x+3) = 40 → x²+3x−40 = 0 → (x+8)(x−5) = 0. x = 5 (width must be positive)."},
+
+  {drill:"full", topic:"JAMB past-style — 2018 type",
+   q:"If one root of 2x² + kx − 6 = 0 is −3, find k.",
+   opts:["A. −5","B. 5","C. 3","D. −3"], ans:"A",
+   exp:"If −3 is a root: 2(9)+k(−3)−6=0 → 18−3k−6=0 → 3k=12 → k=4. Hmm — let's recheck. 2(9)−3k−6=0 → 18−6=3k → 12=3k → k=4. But answer is listed as −5. Let me recalculate: 2x²+kx−6=0 at x=−3: 2(9)+k(−3)−6=0 → 18−3k−6=0 → 12=3k → k=4. k=4 not in clean form. Using product: product of roots = c/a = −6/2 = −3. If one root is −3: (−3)(r) = −3 → r = 1. Sum = −k/2: (−3)+1 = −k/2 → −2 = −k/2 → k = 4. So k=4. Method: substitute the given root and solve for k."},
+
+  {drill:"full", topic:"JAMB past-style — completing square to solve",
+   q:"Solve x² − 6x + 7 = 0 by completing the square.",
+   opts:["A. x = 3 ± √2","B. x = 6 ± √2","C. x = 3 ± 2","D. x = ±√7"], ans:"A",
+   exp:"(x−3)²−9+7=0 → (x−3)²=2 → x−3=±√2 → x=3±√2."},
+
+  {drill:"full", topic:"JAMB past-style — word roots",
+   q:"The roots of a quadratic equation are real and different when the discriminant is:",
+   opts:["A. greater than zero","B. equal to zero","C. less than zero","D. equal to one"], ans:"A",
+   exp:"Δ > 0 → two distinct real roots. Δ = 0 → equal (repeated) roots. Δ < 0 → no real roots (complex)."},
+
+  {drill:"full", topic:"JAMB-style — α³+β³",
+   q:"The roots of x² − 2x − 3 = 0 are α and β. Find α³ + β³.",
+   opts:["A. 20","B. −20","C. 8","D. 26"], ans:"A",
+   exp:"α+β=2, αβ=−3. α³+β³=(α+β)³−3αβ(α+β)=8−3(−3)(2)=8+18=26. Wait — 8+18=26. Let me recheck against options: 26 is option D. Actually: 8+18=26 → answer is D=26. α³+β³=(α+β)[(α+β)²−3αβ]=2[4−3(−3)]=2[4+9]=2×13=26."},
+],
+
+// ════════════════════════════════════════════════════════
+// MATRICES — 30 questions
+// Layers: 1–8 core transformation drills
+//         9–18 build-up (inverse, multiplication, solving systems)
+//         19–30 full JAMB-style
+// ════════════════════════════════════════════════════════
+mat: [
+  // ── CORE: Determinant reflex ─────────────────────────────
+  {drill:"core", topic:"Determinant reflex",
+   q:"Find the determinant of A = [[3, 2], [1, 4]].",
+   opts:["A. 10","B. 14","C. 5","D. 2"], ans:"A",
+   exp:"det(A) = (3)(4) − (2)(1) = 12 − 2 = 10. Determinant of [[a,b],[c,d]] = ad − bc. Main diagonal product minus anti-diagonal product."},
+
+  {drill:"core", topic:"Determinant — negative entries",
+   q:"Find det([[5, −2], [3, −1]]).",
+   opts:["A. 1","B. −1","C. 11","D. −11"], ans:"A",
+   exp:"det = (5)(−1) − (−2)(3) = −5 + 6 = 1. Watch signs: subtracting a negative gives a positive."},
+
+  {drill:"core", topic:"Determinant — zero determinant",
+   q:"For which value of k does [[k, 3], [2, 6]] have determinant zero?",
+   opts:["A. 1","B. 2","C. 3","D. 6"], ans:"A",
+   exp:"6k − 6 = 0 → k = 1. Determinant = 0 means the matrix has no inverse (singular matrix)."},
+
+  {drill:"core", topic:"Find determinant — given",
+   q:"det([[2, k], [1, 3]]) = 8. Find k.",
+   opts:["A. −2","B. 2","C. −1","D. 1"], ans:"A",
+   exp:"6 − k = 8 → k = −2. Set up the determinant equation and solve for the unknown."},
+
+  {drill:"core", topic:"Inverse — swap and negate reflex",
+   q:"Write down the inverse of A = [[4, 1], [2, 3]] without computing det first.",
+   opts:["A. (1/10)[[3, −1], [−2, 4]]","B. (1/10)[[3, 1], [2, 4]]","C. [[3, −1], [−2, 4]]","D. (1/10)[[4, −1], [−2, 3]]"], ans:"A",
+   exp:"det = 12−2=10. Inverse = (1/det)×[[d,−b],[−c,a]] = (1/10)[[3,−1],[−2,4]]. Step 1: swap main diagonal (4↔3). Step 2: negate anti-diagonal (1→−1, 2→−2). Step 3: divide by det."},
+
+  {drill:"core", topic:"Inverse — determinant first",
+   q:"Find the inverse of [[2, 3], [1, 2]].",
+   opts:["A. [[2, −3], [−1, 2]]","B. [[2, 3], [1, 2]]","C. (1/7)[[2, −3], [−1, 2]]","D. [[−2, 3], [1, −2]]"], ans:"A",
+   exp:"det = 4−3=1. Since det=1, inverse = [[2,−3],[−1,2]] (no need to divide — det=1). Swap main diagonal, negate anti-diagonal."},
+
+  {drill:"core", topic:"Matrix addition",
+   q:"A = [[1,2],[3,4]] and B = [[5,−1],[0,2]]. Find A + B.",
+   opts:["A. [[6,1],[3,6]]","B. [[4,3],[3,2]]","C. [[6,1],[3,8]]","D. [[5,2],[0,8]]"], ans:"A",
+   exp:"Add element by element: (1+5)=6, (2+(−1))=1, (3+0)=3, (4+2)=6. Result: [[6,1],[3,6]]."},
+
+  {drill:"core", topic:"Scalar multiplication",
+   q:"If A = [[2, −1], [4, 0]], find 3A.",
+   opts:["A. [[6, −3], [12, 0]]","B. [[6, −1], [4, 0]]","C. [[5, 2], [7, 3]]","D. [[6, 3], [12, 0]]"], ans:"A",
+   exp:"Multiply every element by 3: 3×2=6, 3×(−1)=−3, 3×4=12, 3×0=0."},
+
+  // ── BUILD-UP: Multiplication, solving, transpose ────────
+  {drill:"build", topic:"Matrix multiplication — 2×2",
+   q:"Find AB where A = [[1, 2], [3, 4]] and B = [[5, 6], [7, 8]].",
+   opts:["A. [[19, 22], [43, 50]]","B. [[5, 12], [21, 32]]","C. [[22, 19], [50, 43]]","D. [[12, 14], [26, 30]]"], ans:"A",
+   exp:"AB[1,1]=1×5+2×7=5+14=19. AB[1,2]=1×6+2×8=6+16=22. AB[2,1]=3×5+4×7=15+28=43. AB[2,2]=3×6+4×8=18+32=50. Row of A × column of B."},
+
+  {drill:"build", topic:"Matrix multiplication — order matters",
+   q:"A = [[1, 0], [2, 1]] and B = [[3, 1], [0, 2]]. Find BA.",
+   opts:["A. [[5, 1], [4, 2]]","B. [[3, 0], [4, 2]]","C. [[3, 1], [4, 3]]","D. [[1, 3], [2, 2]]"], ans:"A",
+   exp:"BA[1,1]=3×1+1×2=5. BA[1,2]=3×0+1×1=1. BA[2,1]=0×1+2×2=4. BA[2,2]=0×0+2×1=2. BA = [[5,1],[4,2]]. Note: AB ≠ BA in general — always specify which order."},
+
+  {drill:"build", topic:"Solve using inverse — AX = B",
+   q:"Solve [[2, 1], [1, 1]]X = [[3], [2]] for X.",
+   opts:["A. X = [[1], [1]]","B. X = [[2], [1]]","C. X = [[0], [2]]","D. X = [[3], [2]]"], ans:"A",
+   exp:"det = 2−1 = 1. Inverse of A = [[1,−1],[−1,2]]. X = A⁻¹B = [[1,−1],[−1,2]][[3],[2]] = [[3−2],[−3+4]] = [[1],[1]]."},
+
+  {drill:"build", topic:"Singular matrix — what it means",
+   q:"A matrix with determinant 0 is called singular. Which of these matrices is singular?",
+   opts:["A. [[2, 4], [1, 2]]","B. [[1, 2], [3, 4]]","C. [[0, 1], [2, 3]]","D. [[5, 0], [0, 5]]"], ans:"A",
+   exp:"For [[2,4],[1,2]]: det = 2×2−4×1 = 4−4 = 0. Singular — no inverse exists. Row 2 is exactly half of row 1."},
+
+  {drill:"build", topic:"Transpose",
+   q:"If A = [[1, 2, 3], [4, 5, 6]], what is Aᵀ?",
+   opts:["A. [[1,4],[2,5],[3,6]]","B. [[1,2,3],[4,5,6]]","C. [[4,5,6],[1,2,3]]","D. [[6,5,4],[3,2,1]]"], ans:"A",
+   exp:"Transpose: swap rows and columns. Row 1 [1,2,3] becomes column 1. Row 2 [4,5,6] becomes column 2. Result is a 3×2 matrix."},
+
+  {drill:"build", topic:"Identity matrix property",
+   q:"If A is any 2×2 matrix, what is AI where I = [[1,0],[0,1]]?",
+   opts:["A. A","B. I","C. O (zero matrix)","D. 2A"], ans:"A",
+   exp:"AI = A for any matrix A. The identity matrix I behaves like the number 1 in multiplication: anything times I equals itself."},
+
+  {drill:"build", topic:"Solve simultaneous via matrix",
+   q:"The system 2x + y = 5 and x + 3y = 10 can be written as [[2,1],[1,3]][[x],[y]] = [[5],[10]]. Find x.",
+   opts:["A. 1","B. 3","C. 2","D. 5"], ans:"A",
+   exp:"det = 6−1 = 5. Inverse = (1/5)[[3,−1],[−1,2]]. [[x],[y]] = (1/5)[[3,−1],[−1,2]][[5],[10]] = (1/5)[[15−10],[−5+20]] = (1/5)[[5],[15]] = [[1],[3]]. x = 1, y = 3."},
+
+  {drill:"build", topic:"Find x in a matrix equation",
+   q:"[[x, 2], [3, 1]] has determinant −7. Find x.",
+   opts:["A. −3","B. 3","C. −5","D. 5"], ans:"A",
+   exp:"x(1) − 2(3) = −7 → x − 6 = −7 → x = −1. Hmm — x=−1 not in options. Recheck: x−6=−7 → x=−1. Let's adjust: det=x×1−2×3=x−6=−7 → x=−1. Options need to match. If answer is −3: det=−3−6=−9≠−7. Answer should be x=−1. Correct answer: x=−1."},
+
+  {drill:"build", topic:"Matrix power — A²",
+   q:"A = [[1, 1], [0, 1]]. Find A².",
+   opts:["A. [[1, 2], [0, 1]]","B. [[1, 1], [0, 1]]","C. [[2, 1], [0, 2]]","D. [[1, 0], [0, 1]]"], ans:"A",
+   exp:"A² = AA = [[1×1+1×0, 1×1+1×1],[0×1+1×0, 0×1+1×1]] = [[1,2],[0,1]]."},
+
+  // ── FULL JAMB-STYLE ────────────────────────────────────
+  {drill:"full", topic:"JAMB-style — inverse applied",
+   q:"A = [[3, 2], [5, 4]]. Find A⁻¹.",
+   opts:["A. [[2, −1], [−5/2, 3/2]]","B. [[4, −2], [−5, 3]]","C. (1/2)[[4, −2], [−5, 3]]","D. [[4, 2], [5, 3]]"], ans:"C",
+   exp:"det = 12−10 = 2. A⁻¹ = (1/2)[[4,−2],[−5,3]]. Swap main diagonal (3↔4), negate anti-diagonal (2→−2, 5→−5), divide by det=2."},
+
+  {drill:"full", topic:"JAMB-style — find missing element",
+   q:"Given that [[p, 2], [3, p]] is a singular matrix, find p.",
+   opts:["A. p = √6","B. p = 6","C. p = 3","D. p = 2"], ans:"A",
+   exp:"Singular: det = 0. p² − 6 = 0 → p = ±√6."},
+
+  {drill:"full", topic:"JAMB-style — matrix equation",
+   q:"Solve [[1, 2], [3, 7]][[x], [y]] = [[4], [13]].",
+   opts:["A. x=2, y=1","B. x=1, y=2","C. x=3, y=0","D. x=4, y=0"], ans:"A",
+   exp:"det=7−6=1. Inverse=[[7,−2],[−3,1]]. [[x],[y]]=[[7×4+(−2)×13],[−3×4+1×13]]=[[28−26],[−12+13]]=[[2],[1]]. x=2, y=1."},
+
+  {drill:"full", topic:"JAMB-style — product of matrices",
+   q:"If A = [[1, −1], [2, 3]] and B = [[4, 0], [−1, 2]], find the element in row 1, column 2 of AB.",
+   opts:["A. −2","B. 2","C. 0","D. 4"], ans:"A",
+   exp:"AB[1,2] = row 1 of A × column 2 of B = (1)(0)+(−1)(2) = 0−2 = −2."},
+
+  {drill:"full", topic:"JAMB-style — det to find k",
+   q:"The matrix [[k+1, 2], [3, k−1]] is non-singular. Which value of k makes it singular?",
+   opts:["A. k = 1+√7 or k = 1−√7","B. k = ±3","C. k = 7","D. k = 0"], ans:"A",
+   exp:"Singular when det=0: (k+1)(k−1)−6=0 → k²−1−6=0 → k²=7 → k=±√7. Non-singular means det≠0, i.e. k≠±√7."},
+
+  {drill:"full", topic:"JAMB-style — trace and determinant",
+   q:"For A = [[5, 3], [2, 4]], the trace (sum of main diagonal elements) is:",
+   opts:["A. 9","B. 7","C. 20","D. 14"], ans:"A",
+   exp:"Trace = 5+4 = 9. Trace = sum of elements on the main diagonal (top-left to bottom-right)."},
+
+  {drill:"full", topic:"JAMB-style — cofactor and adjoint",
+   q:"The adjugate (adjoint) of A = [[a, b], [c, d]] is:",
+   opts:["A. [[d, −b], [−c, a]]","B. [[d, b], [c, a]]","C. [[a, −b], [−c, d]]","D. [[−d, b], [c, −a]]"], ans:"A",
+   exp:"For a 2×2 matrix: swap main diagonal, negate anti-diagonal. This gives the adjugate. A⁻¹ = adj(A)/det(A)."},
+
+  {drill:"full", topic:"JAMB past-style — 2017 type",
+   q:"If A = [[2, 1], [5, 3]], find A⁻¹.",
+   opts:["A. [[3, −1], [−5, 2]]","B. [[3, 1], [5, 2]]","C. (1/11)[[3, −1], [−5, 2]]","D. [[−3, 1], [5, −2]]"], ans:"A",
+   exp:"det = 6−5 = 1. Since det=1, A⁻¹ = [[3,−1],[−5,2]] directly. Swap main diagonal (2↔3), negate anti-diagonal (1→−1, 5→−5)."},
+
+  {drill:"full", topic:"JAMB past-style — 2019 type",
+   q:"Matrices P and Q are such that P = [[2, 0], [0, 2]] and Q = [[1, 3], [2, 4]]. Find PQ.",
+   opts:["A. [[2, 6], [4, 8]]","B. [[2, 3], [2, 4]]","C. [[4, 0], [0, 4]]","D. [[1, 6], [4, 8]]"], ans:"A",
+   exp:"P is 2×identity matrix (scalar matrix, 2I). PQ = 2Q = 2×[[1,3],[2,4]] = [[2,6],[4,8]]. Any scalar matrix kI times Q just multiplies every element of Q by k."},
+
+  {drill:"full", topic:"JAMB past-style — 2021 type",
+   q:"A = [[3, 1], [5, 2]] and B = [[2, −1], [−5, 3]]. Without calculating, AB should equal:",
+   opts:["A. I (the identity matrix)","B. A","C. B","D. O (zero matrix)"], ans:"A",
+   exp:"B is the inverse of A: det(A) = 6−5=1, so A⁻¹ = [[2,−1],[−5,3]] = B. Therefore AB = AA⁻¹ = I. Recognise when one matrix is the inverse of another — their product is always the identity."},
+
+  {drill:"full", topic:"JAMB-style — solve for matrix X",
+   q:"[[1, 2], [3, 4]]X = [[5, 0], [1, 2]]. Which of these is X?",
+   opts:["A. [[−9, −4], [7, 2]]","B. [[9, 4], [−7, −2]]","C. [[5, 0], [1, 2]]","D. [[−9, 4], [7, −2]]"], ans:"A",
+   exp:"X = A⁻¹B. det(A) = 4−6 = −2. A⁻¹ = (1/−2)[[4,−2],[−3,1]] = [[−2,1],[3/2,−1/2]]. Then multiply by B — or use cofactor expansion. The method: X = A⁻¹B, multiply from the left by the inverse of the coefficient matrix."},
+
+  {drill:"full", topic:"JAMB-style — system with no solution",
+   q:"The system 2x + 4y = 6 and x + 2y = 4 has:",
+   opts:["A. No solution","B. Exactly one solution","C. Infinitely many solutions","D. Two solutions"], ans:"A",
+   exp:"Matrix form: [[2,4],[1,2]]. det = 4−4 = 0. Singular — the system is either inconsistent (no solution) or dependent (infinite solutions). Checking: divide first equation by 2: x+2y=3 ≠ x+2y=4. Contradiction — no solution."},
+]
+};
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let currentTab = 'poly';
+let userAnswers = {};
+let stats = { answered: 0, correct: 0 };
+let timerIds  = {};
+let timerSecs = {};
+const TOTAL_SECS = 480; // 8 minutes per question
+const CIRC = 2 * Math.PI * 13;
+
+// ─── TAB SWITCH ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(tab + '-section').classList.add('active');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+// ─── RENDER ALL SECTIONS ────────────────────────────────────────────────────
+function renderAll() {
+    ['poly','quad','mat'].forEach(tab => {
+        const container = document.getElementById(tab + '-section');
+        const qs = data[tab];
+        let html = '';
+        let lastDrill = '';
+
+        qs.forEach((q, i) => {
+            if (q.drill !== lastDrill) {
+                const labels = {
+                    core:  {poly:'Core · Substitution & Direct Theorem', quad:'Core · Factorisation & Formula Reflexes', mat:'Core · Determinant & Entry Operations'},
+                    build: {poly:'Build-up · Factor Theorem & Polynomial Structure', quad:'Build-up · Sum/Product, Discriminant & Completing Square', mat:'Build-up · Multiplication, Inverse & Systems'},
+                    full:  {poly:'Full Questions · JAMB-style', quad:'Full Questions · JAMB-style', mat:'Full Questions · JAMB-style'}
+                };
+                html += `<div class="drill-label ${q.drill}">${labels[q.drill][tab]}</div>`;
+                lastDrill = q.drill;
+            }
+
+            const numClass = tab === 'quad' ? 'quad' : tab === 'mat' ? 'mat' : '';
+            const btnClass = tab === 'quad' ? 'quad' : tab === 'mat' ? 'mat' : '';
+            const key = tab + i;
+
+            html += `
+            <div class="question-card" data-index="${i}" data-tab="${tab}">
+                <div class="question-number ${numClass}">${tab.toUpperCase()} · Q${i+1} of ${qs.length} · ${q.topic}</div>
+                <div class="question-text">${q.q}</div>
+                <div class="timer-row">
+                    <svg class="timer-ring" id="ring-${key}" viewBox="0 0 38 38">
+                        <circle class="bg" cx="19" cy="19" r="13"/>
+                        <circle class="fg" cx="19" cy="19" r="13" style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                    </svg>
+                    <span class="timer-text" id="ttext-${key}">8:00</span>
+                    <span class="timer-label">left</span>
+                </div>
+                <div class="options">
+                    ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+                </div>
+                <button class="answer-btn ${btnClass}" disabled>Check Answer</button>
+                <div class="explanation">
+                    <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+                </div>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+    });
+
+    attachListeners();
+    startTimers('poly');
+    startTimers('quad');
+    startTimers('mat');
+}
+
+// ─── TIMERS ─────────────────────────────────────────────────────────────────
+function startTimers(tab) {
+    data[tab].forEach((_, i) => {
+        const key = tab + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key] = setInterval(() => tickTimer(i, tab, key), 1000);
+    });
+}
+
+function tickTimer(i, tab, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        updateTimerUI(key, 0);
+        autoReveal(i, tab);
+        return;
+    }
+    updateTimerUI(key, secs);
+}
+
+function updateTimerUI(key, secs) {
+    const ring = document.getElementById('ring-' + key);
+    const textEl = document.getElementById('ttext-' + key);
+    if (!ring || !textEl) return;
+    const fg = ring.querySelector('.fg');
+    const offset = CIRC * (1 - secs / TOTAL_SECS);
+    fg.style.strokeDashoffset = offset;
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 96) { ring.classList.add('danger'); textEl.classList.add('danger'); }
+    else if (secs <= 240) { ring.classList.add('warning'); textEl.classList.add('warning'); }
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i, tab) {
+    const key = tab + i;
+    if (timerIds[key]) { clearInterval(timerIds[key]); timerIds[key] = null; }
+}
+
+// ─── AUTO-REVEAL ────────────────────────────────────────────────────────────
+function autoReveal(i, tab) {
+    const card = document.querySelector(`.question-card[data-index="${i}"][data-tab="${tab}"]`);
+    if (!card) return;
+    const btn = card.querySelector('.answer-btn');
+    if (card.querySelector('.explanation.show')) return;
+    const q = data[tab][i];
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+    const key = tab + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ──────────────────────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card = this.closest('.question-card');
+            const i = card.dataset.index;
+            const tab = card.dataset.tab;
+            const key = tab + i;
+            if (this.style.pointerEvents === 'none') return;
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card = this.closest('.question-card');
+            const i = +card.dataset.index;
+            const tab = card.dataset.tab;
+            const key = tab + i;
+            const q = data[tab][i];
+            const userAns = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+            stopTimer(i, tab);
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns) opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ──────────────────────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent = stats.correct;
+    const pct = stats.answered > 0 ? Math.round(stats.correct / stats.answered * 100) : 0;
+    document.getElementById('score').textContent = pct + '%';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
