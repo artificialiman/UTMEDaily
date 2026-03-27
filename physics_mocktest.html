@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Physics Mock Test — JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000; --ios-card: #1C1C1E; --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235,235,245,0.85);
+                --ios-text-tertiary: rgba(235,235,245,0.55);
+                --ios-separator: rgba(56,56,58,0.5); --ios-hover: #2C2C2E;
+            }
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size:17px; color:var(--ios-text); background:var(--ios-bg);
+            line-height:1.47; padding-bottom:env(safe-area-inset-bottom);
+            -webkit-font-smoothing:antialiased;
+        }
+        .header {
+            background:var(--ios-card); border-bottom:0.5px solid var(--ios-separator);
+            padding:calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position:sticky; top:0; z-index:100;
+            backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+        }
+        .title { font-size:28px; font-weight:700; margin-bottom:4px; }
+        .subtitle { font-size:15px; color:var(--ios-text-tertiary); }
+        .tabs { display:flex; gap:12px; padding:16px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .tabs::-webkit-scrollbar { display:none; }
+        .tab {
+            padding:8px 16px; border-radius:20px; background:var(--ios-card);
+            color:var(--ios-text-secondary); border:none; font-size:15px;
+            font-weight:500; cursor:pointer; white-space:nowrap; transition:all 0.2s;
+        }
+        .tab.active { background:var(--ios-blue); color:white; }
+        .question-card {
+            background:var(--ios-card); border-radius:var(--radius);
+            margin:12px 16px; padding:20px; box-shadow:var(--shadow);
+        }
+        .question-number { font-size:13px; font-weight:600; color:var(--ios-blue); margin-bottom:8px; }
+        .question-text { font-size:17px; margin-bottom:16px; line-height:1.5; }
+        .question-diagram { margin-bottom:16px; display:flex; justify-content:center; }
+        .question-diagram svg { max-width:100%; height:auto; }
+        .timer-row { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+        .timer-ring { width:38px; height:38px; flex-shrink:0; }
+        .timer-ring .bg { fill:none; stroke:var(--ios-separator); stroke-width:4; }
+        .timer-ring .fg {
+            fill:none; stroke:var(--ios-green); stroke-width:4; stroke-linecap:round;
+            transition:stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform:rotate(-90deg); transform-origin:center;
+        }
+        .timer-text { font-size:14px; font-weight:600; color:var(--ios-green); transition:color 0.4s; min-width:42px; }
+        .timer-label { font-size:13px; color:var(--ios-text-tertiary); }
+        .timer-ring.warning .fg { stroke:var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke:var(--ios-red); }
+        .timer-text.warning { color:var(--ios-orange); }
+        .timer-text.danger  { color:var(--ios-red); }
+        .options { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+        .option {
+            padding:12px; border-radius:8px; background:var(--ios-hover);
+            cursor:pointer; transition:all 0.2s; font-size:15px;
+            border:2px solid transparent; user-select:none;
+        }
+        .option:active { transform:scale(0.98); }
+        .option.selected  { background:rgba(0,122,255,0.1); border-color:var(--ios-blue); }
+        .option.correct   { background:rgba(52,199,89,0.1);  border-color:var(--ios-green); }
+        .option.wrong     { background:rgba(255,59,48,0.1);  border-color:var(--ios-red); }
+        .answer-btn {
+            width:100%; padding:12px; border-radius:10px; border:none;
+            background:var(--ios-blue); color:white; font-size:17px;
+            font-weight:500; cursor:pointer; transition:opacity 0.2s;
+        }
+        .answer-btn:active   { opacity:0.8; }
+        .answer-btn:disabled { opacity:0.5; cursor:not-allowed; }
+        .explanation {
+            margin-top:16px; padding:12px; background:var(--ios-hover);
+            border-radius:8px; font-size:15px; color:var(--ios-text-secondary); display:none;
+        }
+        .explanation.show { display:block; animation:slideIn 0.3s ease; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .stats {
+            display:flex; gap:12px; padding:16px; position:sticky; bottom:0;
+            background:var(--ios-card); border-top:0.5px solid var(--ios-separator);
+        }
+        .stat { flex:1; text-align:center; padding:12px; background:var(--ios-hover); border-radius:10px; }
+        .stat-value { font-size:24px; font-weight:700; display:block; }
+        .stat-label { font-size:13px; color:var(--ios-text-tertiary); margin-top:4px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="title">Physics Mock Test</div>
+    <div class="subtitle">54-question mock · All blocks</div>
+</div>
+
+<div class="tabs">
+    <button class="tab active" onclick="switchTab('mechanics',this)">Mechanics</button>
+    <button class="tab" onclick="switchTab('waves',this)">Waves & Optics</button>
+    <button class="tab" onclick="switchTab('thermal',this)">Thermal</button>
+    <button class="tab" onclick="switchTab('electricity',this)">Electricity</button>
+    <button class="tab" onclick="switchTab('modern',this)">Modern Physics</button>
+</div>
+
+<div id="questions-container"></div>
+
+<div class="stats">
+    <div class="stat"><span class="stat-value" id="answered">0</span><div class="stat-label">Answered</div></div>
+    <div class="stat"><span class="stat-value" id="correct">0</span><div class="stat-label">Correct</div></div>
+    <div class="stat"><span class="stat-value" id="score">0%</span><div class="stat-label">Score</div></div>
+</div>
+
+<script>
+const questions = {
+
+  mechanics: [
+    // Block 1 — Dimensions
+    { q:"The dimension of pressure is",
+      opts:["A. MLT⁻²", "B. ML²T⁻²", "C. ML⁻¹T⁻²", "D. ML⁻²T⁻¹"],
+      ans:"C",
+      exp:"Pressure = Force/Area = (kg·m/s²)/m² = kg·m⁻¹·s⁻² → ML⁻¹T⁻². A is force (MLT⁻²). B is energy (ML²T⁻²). Always derive — never memorise dimensions." },
+
+    // Block 2 — Vectors
+    { q:"Two forces of 3 N and 4 N act at right angles. Their resultant is",
+      opts:["A. 7 N", "B. 1 N", "C. 5 N", "D. 12 N"],
+      ans:"C",
+      exp:"Resultant = √(3² + 4²) = √25 = 5 N (3-4-5 Pythagorean triple). At right angles, use Pythagoras. At other angles, use R² = A² + B² + 2ABcosθ. Adding magnitudes directly (7 N) is the most common error." },
+
+    // Block 3 — Linear motion
+    { q:"A car starts from rest and covers 80 m in 4 s with uniform acceleration. Its acceleration is",
+      opts:["A. 20 m/s²", "B. 5 m/s²", "C. 40 m/s²", "D. 10 m/s²"],
+      ans:"D",
+      exp:"s = ut + ½at². u = 0, so 80 = ½ × a × 16 → a = 10 m/s². Trap: using a = s/t = 20 m/s² (confusing displacement/time with acceleration)." },
+
+    // Block 4 — Projectile (diagram)
+    { q:"A ball is launched horizontally at 20 m/s from a cliff 45 m high. How far from the base does it land? (g = 10 m/s²)",
+      svg:`<svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <!-- cliff -->
+        <rect x="10" y="10" width="40" height="130" fill="none" stroke="currentColor" stroke-width="2"/>
+        <line x1="50" y1="140" x2="270" y2="140" stroke="currentColor" stroke-width="2"/>
+        <!-- height label -->
+        <line x1="5" y1="10" x2="5" y2="140" stroke="currentColor" stroke-width="1" marker-end="url(#pa)" marker-start="url(#pb)"/>
+        <text x="8" y="80" fill="currentColor">45 m</text>
+        <!-- ball path (parabola approximation) -->
+        <path d="M50,10 Q170,10 260,140" fill="none" stroke="var(--ios-blue)" stroke-width="2" stroke-dasharray="6,3"/>
+        <!-- velocity arrow -->
+        <line x1="50" y1="10" x2="100" y2="10" stroke="var(--ios-orange)" stroke-width="2" marker-end="url(#pc)"/>
+        <text x="55" y="8" fill="var(--ios-orange)" font-size="11">20 m/s</text>
+        <!-- range label -->
+        <line x1="50" y1="150" x2="260" y2="150" stroke="currentColor" stroke-width="1" marker-end="url(#pa)" marker-start="url(#pb)"/>
+        <text x="140" y="163" fill="currentColor">R = ?</text>
+        <defs>
+          <marker id="pa" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="currentColor"/></marker>
+          <marker id="pb" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="270"><path d="M0,0 L0,6 L6,3z" fill="currentColor"/></marker>
+          <marker id="pc" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="var(--ios-orange)"/></marker>
+        </defs>
+      </svg>`,
+      opts:["A. 45 m", "B. 90 m", "C. 20 m", "D. 60 m"],
+      ans:"D",
+      exp:"Time to fall: 45 = ½ × 10 × t² → t = 3 s. Horizontal distance = 20 × 3 = 60 m. Horizontal and vertical motions are independent — vertical is free fall, horizontal is constant velocity." },
+
+    // Block 5 — Newton's laws
+    { q:"A 5 kg mass is pushed by a 20 N force. A 5 N friction force opposes motion. The acceleration is",
+      opts:["A. 4 m/s²", "B. 1 m/s²", "C. 3 m/s²", "D. 5 m/s²"],
+      ans:"C",
+      exp:"Net force = 20 − 5 = 15 N. a = F/m = 15/5 = 3 m/s². Without friction: a = 20/5 = 4 m/s². The trap is using the applied force (20 N) without subtracting friction." },
+
+    // Block 6 — Momentum
+    { q:"A 2 kg ball moving at 6 m/s collides with a stationary 4 kg ball and they stick together. Their common velocity is",
+      opts:["A. 3 m/s", "B. 6 m/s", "C. 4 m/s", "D. 2 m/s"],
+      ans:"D",
+      exp:"Conservation of momentum: 2 × 6 + 0 = (2 + 4)v → 12 = 6v → v = 2 m/s. Perfectly inelastic collision — maximum KE loss. Trap: dividing total momentum by just one mass." },
+
+    // Block 7 — Friction
+    { q:"A 10 kg block rests on a surface with coefficient of static friction μ = 0.4. The minimum force to start it moving is (g = 10 m/s²)",
+      opts:["A. 4 N", "B. 100 N", "C. 400 N", "D. 40 N"],
+      ans:"D",
+      exp:"Normal reaction N = mg = 100 N. Limiting friction = μN = 0.4 × 100 = 40 N. Applied force must exceed 40 N to start motion. Static friction (to start) > kinetic friction (to maintain)." },
+
+    // Block 8 — Circular motion
+    { q:"A 1000 kg car moves in a circle of radius 50 m at 10 m/s. The centripetal force is",
+      opts:["A. 200 N", "B. 5000 N", "C. 500 N", "D. 2000 N"],
+      ans:"D",
+      exp:"F = mv²/r = 1000 × 100/50 = 2000 N. This force points toward the centre — it is centripetal, not centrifugal. Trap: using v instead of v² in the formula." },
+
+    // Block 9 — Moments (diagram)
+    { q:"A uniform beam of weight 100 N and length 4 m is pivoted at its centre. A 200 N load is placed 1 m from the left end. Where must a 100 N force be placed on the right side to balance?",
+      svg:`<svg viewBox="0 0 320 100" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <!-- beam -->
+        <line x1="20" y1="45" x2="300" y2="45" stroke="currentColor" stroke-width="4"/>
+        <!-- pivot -->
+        <polygon points="160,45 150,70 170,70" fill="currentColor"/>
+        <line x1="150" y1="70" x2="170" y2="70" stroke="currentColor" stroke-width="2"/>
+        <!-- 200N load at 60px from left (1m from left end = 1m from left, beam spans 4m so left end=20, right=300, 1m= 70px) -->
+        <line x1="90" y1="45" x2="90" y2="75" stroke="var(--ios-red)" stroke-width="2" marker-end="url(#ma)"/>
+        <text x="60" y="90" fill="var(--ios-red)">200 N</text>
+        <!-- 100N beam weight at centre -->
+        <line x1="160" y1="45" x2="160" y2="75" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#ma)"/>
+        <text x="163" y="90" fill="currentColor">100 N</text>
+        <!-- unknown 100N on right side -->
+        <line x1="240" y1="45" x2="240" y2="75" stroke="var(--ios-blue)" stroke-width="2" marker-end="url(#ma)"/>
+        <text x="245" y="62" fill="var(--ios-blue)">100 N</text>
+        <text x="245" y="78" fill="var(--ios-blue)">?</text>
+        <!-- dimension marks -->
+        <text x="22" y="38" fill="currentColor" font-size="10">1m</text>
+        <text x="78" y="38" fill="currentColor" font-size="10">←1m→</text>
+        <defs><marker id="ma" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="currentColor"/></marker></defs>
+      </svg>`,
+      opts:["A. 1 m from centre", "B. At the right end (2 m from centre)", "C. 1.5 m from centre", "D. The beam cannot be balanced"],
+      ans:"B",
+      exp:"Moments about centre: anticlockwise = 200 × 1 = 200 N·m. Beam weight acts at centre → zero moment. Clockwise: 100 × d = 200 → d = 2 m from centre, which is the right end. Beam is 2 m to each side of its centre." },
+
+    // Block 10 — Equilibrium
+    { q:"Three concurrent forces are in equilibrium. Two of them are 5 N and 12 N at right angles. The third force is",
+      opts:["A. 7 N", "B. 17 N", "C. 13 N", "D. 60 N"],
+      ans:"C",
+      exp:"For equilibrium, the third force = resultant of the other two, reversed. Resultant of 5 N and 12 N at 90° = √(25 + 144) = √169 = 13 N. Third force = 13 N acting opposite to that resultant." },
+
+    // Block 11 — Centre of gravity
+    { q:"A tall bus is more likely to topple than a low sports car when cornering because the bus has",
+      opts:["A. More mass", "B. A narrower wheelbase", "C. A higher centre of gravity", "D. Worse tyres"],
+      ans:"C",
+      exp:"Stability depends on height of centre of gravity and width of base. High CoG means the vertical line through it falls outside the base at a smaller tilt angle — toppling occurs sooner. Mass alone does not determine stability." },
+
+    // Block 12 — Machines
+    { q:"A pulley system has velocity ratio 4 and efficiency 75%. The effort to lift a 300 N load is",
+      opts:["A. 75 N", "B. 400 N", "C. 225 N", "D. 100 N"],
+      ans:"D",
+      exp:"Efficiency = MA/VR × 100 → 75 = MA/4 × 100 → MA = 3. Effort = Load/MA = 300/3 = 100 N. Trap: confusing VR (fixed by geometry) with MA (reduced by friction). MA = VR × η." },
+
+    // Block 13 — Work done
+    { q:"A 50 N force acts at 60° to the direction of motion. Work done over 10 m is",
+      svg:`<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <line x1="20" y1="70" x2="220" y2="70" stroke="currentColor" stroke-width="2"/>
+        <!-- force vector -->
+        <line x1="40" y1="70" x2="110" y2="20" stroke="var(--ios-blue)" stroke-width="2.5" marker-end="url(#wa)"/>
+        <text x="112" y="18" fill="var(--ios-blue)">50 N</text>
+        <!-- horizontal component -->
+        <line x1="40" y1="70" x2="110" y2="70" stroke="var(--ios-orange)" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="62" y="85" fill="var(--ios-orange)">F·cos60°</text>
+        <!-- angle arc -->
+        <path d="M60,70 A20,20 0 0,0 51,54" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="63" y="62" fill="currentColor">60°</text>
+        <!-- displacement -->
+        <line x1="130" y1="75" x2="210" y2="75" stroke="currentColor" stroke-width="1.5" marker-end="url(#wa)" marker-start="url(#wb)"/>
+        <text x="155" y="90" fill="currentColor">10 m</text>
+        <defs>
+          <marker id="wa" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="currentColor"/></marker>
+          <marker id="wb" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L6,6 L0,3z" fill="currentColor"/></marker>
+        </defs>
+      </svg>`,
+      opts:["A. 500 J", "B. 433 J", "C. 50 J", "D. 250 J"],
+      ans:"D",
+      exp:"W = Fd·cosθ = 50 × 10 × cos60° = 50 × 10 × 0.5 = 250 J. Only the component parallel to motion does work. If the force were parallel (0°): W = 500 J. Perpendicular (90°): W = 0 J." },
+
+    // Block 14 — Energy
+    { q:"A 2 kg object is dropped from 20 m. Its kinetic energy just before hitting the ground is (g = 10 m/s²)",
+      opts:["A. 200 J", "B. 800 J", "C. 40 J", "D. 400 J"],
+      ans:"D",
+      exp:"KE = mgh = 2 × 10 × 20 = 400 J (all PE converts to KE, no air resistance). Check: v² = 2gh = 400, v = 20 m/s; KE = ½ × 2 × 400 = 400 J ✓. Trap: computing ½mgh = 200 J." },
+
+    // Block 15 — Conservation of energy
+    { q:"A pendulum bob of 0.5 kg is raised 0.2 m. Its maximum speed at the lowest point is (g = 10 m/s²)",
+      opts:["A. 4 m/s", "B. 0.5 m/s", "C. 1 m/s", "D. 2 m/s"],
+      ans:"D",
+      exp:"mgh = ½mv² → v² = 2gh = 2 × 10 × 0.2 = 4 → v = 2 m/s. Mass cancels — speed is independent of mass. Trap: forgetting to take the square root, giving 4 m/s." },
+
+    // Block 16 — Power & efficiency
+    { q:"A motor (efficiency 80%) lifts a 500 N load through 10 m in 5 s. Its input power is",
+      opts:["A. 1000 W", "B. 800 W", "C. 625 W", "D. 1250 W"],
+      ans:"D",
+      exp:"Useful output power = (500 × 10)/5 = 1000 W. Input = output/efficiency = 1000/0.8 = 1250 W. Trap: giving 1000 W — that is output power, not input." },
+
+    // Block 17 — Hooke's Law
+    { q:"A spring of natural length 20 cm extends to 25 cm under 10 N. What load extends it to 32 cm?",
+      opts:["A. 12 N", "B. 32 N", "C. 16 N", "D. 24 N"],
+      ans:"D",
+      exp:"Extension under 10 N = 5 cm → k = 10/5 = 2 N/cm. Extension to 32 cm = 12 cm. F = kx = 2 × 12 = 24 N. Trap: using total length (32 cm) instead of extension from natural length (12 cm)." },
+
+    // Block 18 — Gravitation
+    { q:"The gravitational force between two masses is 80 N. Both masses are doubled and the distance is also doubled. The new force is",
+      opts:["A. 160 N", "B. 40 N", "C. 320 N", "D. 80 N"],
+      ans:"D",
+      exp:"F = Gm₁m₂/r². Doubling both masses: ×4. Doubling distance: ÷4. Net effect: unchanged → 80 N. JAMB frequently uses this 'cancellation' pattern to catch students who only apply one change." },
+
+    // Block 21 — Density & Archimedes
+    { q:"A solid weighs 50 N in air and 30 N when fully submerged in water. Its relative density is",
+      opts:["A. 1.5", "B. 0.6", "C. 5.0", "D. 2.5"],
+      ans:"D",
+      exp:"Upthrust = 50 − 30 = 20 N = weight of water displaced. Relative density = weight in air ÷ upthrust = 50/20 = 2.5. RD > 1 confirms the object is denser than water and sinks." },
+
+    // Block 22 — Fluid pressure (diagram)
+    { q:"A hydraulic press has pistons of area 2 cm² and 100 cm². A 10 N force on the small piston produces a force on the large piston of",
+      svg:`<svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <!-- fluid body -->
+        <path d="M30,90 L30,50 L90,50 L90,20 L190,20 L190,50 L250,50 L250,90 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+        <!-- small piston -->
+        <rect x="25" y="40" width="70" height="12" rx="2" fill="var(--ios-blue)" opacity="0.7"/>
+        <text x="40" y="38" fill="currentColor">2 cm²</text>
+        <line x1="60" y1="28" x2="60" y2="40" stroke="var(--ios-orange)" stroke-width="2" marker-end="url(#ha)"/>
+        <text x="63" y="28" fill="var(--ios-orange)">10 N</text>
+        <!-- large piston -->
+        <rect x="185" y="10" width="70" height="12" rx="2" fill="var(--ios-green)" opacity="0.7"/>
+        <text x="193" y="8" fill="currentColor">100 cm²</text>
+        <line x1="220" y1="22" x2="220" y2="34" stroke="var(--ios-red)" stroke-width="2.5" marker-end="url(#ha)"/>
+        <text x="224" y="35" fill="var(--ios-red)">F = ?</text>
+        <defs><marker id="ha" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto"><path d="M0,0 L6,0 L3,6z" fill="currentColor"/></marker></defs>
+      </svg>`,
+      opts:["A. 0.2 N", "B. 200 N", "C. 1000 N", "D. 500 N"],
+      ans:"D",
+      exp:"Pascal's principle: P = F₁/A₁ = F₂/A₂. F₂ = F₁ × A₂/A₁ = 10 × 100/2 = 500 N. MA = 50. Principle behind hydraulic brakes, jacks and lifts." },
+
+    // Block 23 — Surface tension
+    { q:"A steel needle floats on water despite being denser than water. This demonstrates",
+      opts:["A. Archimedes' principle", "B. Capillary action", "C. Surface tension", "D. Viscosity"],
+      ans:"C",
+      exp:"Surface tension creates a thin elastic layer that supports the needle if it doesn't pierce the surface. Archimedes' principle applies to submerged objects, not objects resting on the surface. Viscosity and capillary action are different phenomena." },
+
+    // Block 26 — SHM
+    { q:"A mass on a spring has period T. If the mass is quadrupled, the new period is",
+      opts:["A. 4T", "B. T/2", "C. T/4", "D. 2T"],
+      ans:"D",
+      exp:"T = 2π√(m/k) → T ∝ √m. Quadrupling m: T_new = 2π√(4m/k) = 2T. For a simple pendulum, T = 2π√(L/g) — independent of mass. JAMB exploits this distinction between spring-mass and pendulum." },
+  ],
+
+  waves: [
+    // Block 27 — Wave properties
+    { q:"A wave has frequency 500 Hz and wavelength 0.68 m. Its speed is",
+      opts:["A. 735 m/s", "B. 170 m/s", "C. 340 m/s", "D. 0.00136 m/s"],
+      ans:"C",
+      exp:"v = fλ = 500 × 0.68 = 340 m/s. This is the speed of sound in air at room temperature. Trap: inverting the formula to v = f/λ (wrong units too)." },
+
+    // Block 29 — Stationary waves (diagram)
+    { q:"A string of length 0.6 m vibrates in its fundamental mode. The wavelength of the standing wave is",
+      svg:`<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <!-- string -->
+        <line x1="20" y1="40" x2="280" y2="40" stroke="var(--ios-separator)" stroke-width="1" stroke-dasharray="4,2"/>
+        <!-- fundamental mode: one half-wave -->
+        <path d="M20,40 Q150,5 280,40" fill="none" stroke="var(--ios-blue)" stroke-width="2.5"/>
+        <!-- nodes at ends -->
+        <circle cx="20"  cy="40" r="4" fill="currentColor"/>
+        <circle cx="280" cy="40" r="4" fill="currentColor"/>
+        <text x="10" y="60" fill="currentColor">N</text>
+        <text x="270" y="60" fill="currentColor">N</text>
+        <text x="130" y="18" fill="var(--ios-blue)">A</text>
+        <!-- length label -->
+        <line x1="20" y1="70" x2="280" y2="70" stroke="currentColor" stroke-width="1" marker-end="url(#sa)" marker-start="url(#sb)"/>
+        <text x="120" y="80" fill="currentColor">L = 0.6 m</text>
+        <defs>
+          <marker id="sa" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="currentColor"/></marker>
+          <marker id="sb" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L6,6 L0,3z" fill="currentColor"/></marker>
+        </defs>
+      </svg>`,
+      opts:["A. 0.6 m", "B. 2.4 m", "C. 0.3 m", "D. 1.2 m"],
+      ans:"D",
+      exp:"Fundamental mode: string length = λ/2. λ = 2L = 2 × 0.6 = 1.2 m. 2nd harmonic: L = λ (λ = 0.6 m). 3rd harmonic: L = 3λ/2 (λ = 0.4 m). The node-antinode pattern determines the relationship." },
+
+    // Block 30 — Sound / echo
+    { q:"The speed of sound is 340 m/s. A person hears an echo 2 s after shouting toward a wall. The distance to the wall is",
+      opts:["A. 680 m", "B. 170 m", "C. 1360 m", "D. 340 m"],
+      ans:"D",
+      exp:"Total distance = 340 × 2 = 680 m (there and back). Distance to wall = 680/2 = 340 m. Most common error: forgetting the return journey and not dividing by 2." },
+
+    // Block 32 — Reflection (diagram)
+    { q:"An object is placed 30 cm in front of a concave mirror of focal length 10 cm. The image distance is",
+      svg:`<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="11">
+        <!-- mirror arc -->
+        <path d="M150,10 Q100,60 150,110" fill="none" stroke="currentColor" stroke-width="3"/>
+        <!-- principal axis -->
+        <line x1="10" y1="60" x2="290" y2="60" stroke="currentColor" stroke-width="1" stroke-dasharray="4,2"/>
+        <!-- centre / focal marks -->
+        <line x1="90" y1="55" x2="90" y2="65" stroke="currentColor" stroke-width="1.5"/>
+        <text x="82" y="52" fill="currentColor" font-size="10">C</text>
+        <line x1="120" y1="55" x2="120" y2="65" stroke="currentColor" stroke-width="1.5"/>
+        <text x="113" y="52" fill="currentColor" font-size="10">F</text>
+        <!-- object -->
+        <line x1="30" y1="60" x2="30" y2="30" stroke="var(--ios-blue)" stroke-width="2.5" marker-end="url(#ra)"/>
+        <text x="10" y="28" fill="var(--ios-blue)">Object</text>
+        <!-- distances -->
+        <text x="25" y="80" fill="currentColor" font-size="10">u=30cm</text>
+        <text x="100" y="80" fill="currentColor" font-size="10">f=10cm</text>
+        <defs><marker id="ra" markerWidth="6" markerHeight="6" refX="3" refY="0" orient="auto"><path d="M0,6 L6,6 L3,0z" fill="var(--ios-blue)"/></marker></defs>
+      </svg>`,
+      opts:["A. 30 cm", "B. 15 cm (real)", "C. 10 cm", "D. −15 cm (virtual)"],
+      ans:"B",
+      exp:"Mirror formula: 1/f = 1/v + 1/u. Using real-is-positive: u = 30 cm (object in front), f = 10 cm (concave). 1/v = 1/10 − 1/30 = 2/30 → v = 15 cm. Positive v = real image, 15 cm in front. Sign convention is the primary trap." },
+
+    // Block 34 — Total internal reflection
+    { q:"The critical angle for glass of refractive index 1.5 is approximately",
+      opts:["A. 60°", "B. 48.6°", "C. 30°", "D. 41.8°"],
+      ans:"D",
+      exp:"sinC = 1/n = 1/1.5 = 0.667. C = sin⁻¹(0.667) ≈ 41.8°. TIR occurs only when light travels from dense to less dense medium AND angle of incidence exceeds the critical angle. Applications: optical fibres, periscopes, diamonds." },
+
+    // Block 35 — Lenses
+    { q:"An object is placed 20 cm from a converging lens of focal length 15 cm. The image distance is",
+      opts:["A. 8.6 cm", "B. At infinity", "C. 60 cm", "D. −60 cm"],
+      ans:"C",
+      exp:"1/f = 1/v − 1/u. u = −20, f = +15. 1/v = 1/15 + 1/(−20)... using 1/v = 1/f + 1/u with real-is-positive convention: 1/v = 1/15 − 1/20 = 1/60 → v = 60 cm. Real, inverted, magnified image on the other side." },
+
+    // Block 37 — Dispersion
+    { q:"White light disperses into a spectrum through a prism because",
+      opts:["A. The prism absorbs some colours",
+            "B. All colours travel at the same speed in glass",
+            "C. Different wavelengths have different refractive indices in glass",
+            "D. White light contains sound waves"],
+      ans:"C",
+      exp:"Refractive index is slightly larger for shorter wavelengths — violet bends most, red least. In vacuum all visible light travels at c regardless of wavelength. The difference in n within glass causes dispersion." },
+
+    // Block 38 — EM spectrum
+    { q:"Arrange in order of increasing frequency: radio waves, visible light, X-rays, gamma rays",
+      svg:`<svg viewBox="0 0 320 50" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="11">
+        <text x="5"  y="20" fill="currentColor">Radio</text>
+        <text x="58" y="20" fill="currentColor">Microwave</text>
+        <text x="126" y="20" fill="currentColor">IR</text>
+        <text x="152" y="20" fill="var(--ios-blue)">Visible</text>
+        <text x="205" y="20" fill="currentColor">UV</text>
+        <text x="232" y="20" fill="currentColor">X-ray</text>
+        <text x="278" y="20" fill="currentColor">γ</text>
+        <line x1="5" y1="30" x2="305" y2="30" stroke="currentColor" stroke-width="1.5" marker-end="url(#em)"/>
+        <text x="110" y="44" fill="currentColor">increasing frequency →</text>
+        <defs><marker id="em" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="currentColor"/></marker></defs>
+      </svg>`,
+      opts:["A. Gamma &lt; X-rays &lt; visible &lt; radio",
+            "B. Radio &lt; X-rays &lt; visible &lt; gamma",
+            "C. Visible &lt; radio &lt; X-rays &lt; gamma",
+            "D. Radio &lt; visible &lt; X-rays &lt; gamma"],
+      ans:"D",
+      exp:"EM spectrum low to high frequency: radio → microwave → IR → visible → UV → X-ray → gamma. All travel at c = 3 × 10⁸ m/s in vacuum. JAMB tests ordering and properties of each region." },
+  ],
+
+  thermal: [
+    // Block 39 — Temperature scales
+    { q:"Normal body temperature is 37°C. In Kelvin and Fahrenheit this is",
+      opts:["A. 300 K and 98.6 °F", "B. 373 K and 98.6 °F", "C. 310 K and 100 °F", "D. 310 K and 98.6 °F"],
+      ans:"D",
+      exp:"K = °C + 273 = 310 K. °F = (9/5 × 37) + 32 = 66.6 + 32 = 98.6 °F. JAMB tests both conversions. Trap: using 273.15 or forgetting the +32 in the Fahrenheit formula." },
+
+    // Block 40 — Specific heat
+    { q:"Heat needed to raise 2 kg of water from 20 °C to 70 °C is (c = 4200 J/kg·K)",
+      opts:["A. 42 000 J", "B. 840 000 J", "C. 8400 J", "D. 420 000 J"],
+      ans:"D",
+      exp:"Q = mcΔT = 2 × 4200 × 50 = 420 000 J. ΔT = 70 − 20 = 50 K. Trap: using the final temperature (70) instead of the temperature change (50)." },
+
+    // Block 41 — Latent heat
+    { q:"Heat required to convert 500 g of ice at 0 °C to steam at 100 °C is (L_f = 336 000 J/kg, c = 4200 J/kg·K, L_v = 2 260 000 J/kg)",
+      opts:["A. 210 000 J", "B. 1 130 000 J", "C. 336 000 J", "D. 1 508 000 J"],
+      ans:"D",
+      exp:"Three stages: (1) Melt ice: 0.5 × 336 000 = 168 000 J. (2) Heat water 0→100 °C: 0.5 × 4200 × 100 = 210 000 J. (3) Vaporise: 0.5 × 2 260 000 = 1 130 000 J. Total = 1 508 000 J. The three-step process is the key skill." },
+
+    // Block 42 — Gas laws
+    { q:"A gas at 27 °C and 2 atm occupies 3 dm³. At 127 °C and 4 atm, its volume is",
+      opts:["A. 1.5 dm³", "B. 3 dm³", "C. 6 dm³", "D. 2 dm³"],
+      ans:"D",
+      exp:"P₁V₁/T₁ = P₂V₂/T₂. T₁ = 300 K, T₂ = 400 K. V₂ = (2 × 3 × 400)/(300 × 4) = 2400/1200 = 2 dm³. Must convert °C to Kelvin — the most common error in gas law questions." },
+
+    // Block 44 — Thermal expansion (diagram)
+    { q:"A bimetallic strip bends when heated because",
+      svg:`<svg viewBox="0 0 280 90" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="11">
+        <!-- cold strip: straight -->
+        <rect x="20" y="20" width="100" height="10" rx="2" fill="var(--ios-blue)" opacity="0.7"/>
+        <rect x="20" y="30" width="100" height="10" rx="2" fill="var(--ios-orange)" opacity="0.7"/>
+        <text x="25" y="18" fill="var(--ios-blue)">Metal A (low α)</text>
+        <text x="25" y="52" fill="var(--ios-orange)">Metal B (high α)</text>
+        <text x="40" y="68" fill="currentColor">Cold (straight)</text>
+        <!-- hot strip: bent -->
+        <path d="M160,25 Q210,22 250,35" fill="none" stroke="var(--ios-blue)" stroke-width="10" opacity="0.7"/>
+        <path d="M160,35 Q215,35 250,50" fill="none" stroke="var(--ios-orange)" stroke-width="10" opacity="0.7"/>
+        <text x="165" y="68" fill="currentColor">Hot (bends down)</text>
+      </svg>`,
+      opts:["A. One metal melts before the other",
+            "B. Heat conducts faster through one metal",
+            "C. The two metals have different coefficients of linear expansion",
+            "D. The metals repel each other when hot"],
+      ans:"C",
+      exp:"The metal with larger α expands more when heated equally. Being bonded, the strip bends with the more-expanding metal on the outside (longer arc). Principle behind thermostats, fire alarms and circuit breakers." },
+
+    // Block 45 — Heat transfer
+    { q:"A vacuum flask reduces heat transfer by using",
+      opts:["A. Thick glass walls for insulation",
+            "B. Cold trapped air between double walls",
+            "C. Silvered walls, a vacuum gap, and a stopper — addressing radiation, conduction/convection, and neck convection",
+            "D. A chemical reaction that absorbs heat"],
+      ans:"C",
+      exp:"(1) Silvering reflects radiated heat back. (2) Vacuum eliminates conduction (no medium) and convection (no fluid). (3) Stopper prevents convection at the neck. All three heat transfer mechanisms are addressed by design." },
+  ],
+
+  electricity: [
+    // Block 46 — Electrostatics
+    { q:"Two point charges +4 μC and +9 μC are 0.3 m apart. The force between them is (k = 9 × 10⁹ N·m²/C²)",
+      opts:["A. 0.4 N", "B. 40 N", "C. 0.04 N", "D. 4 N"],
+      ans:"D",
+      exp:"F = kq₁q₂/r² = (9×10⁹ × 4×10⁻⁶ × 9×10⁻⁶)/0.09 = 324×10⁻³/0.09 ≈ 4 N. Both positive → repulsive. Coulomb's Law is structurally identical to Newton's gravitational law." },
+
+    // Block 47 — Capacitance
+    { q:"6 μF and 3 μF capacitors in series across 12 V. The charge on each capacitor is",
+      opts:["A. 48 μC", "B. 24 μC", "C. 72 μC", "D. 12 μC"],
+      ans:"B",
+      exp:"Series: 1/C = 1/6 + 1/3 = 1/2 → C = 2 μF. Q = CV = 2 × 12 = 24 μC. In series, charge on each capacitor is the same. Voltages differ: V₁ = 24/6 = 4 V; V₂ = 24/3 = 8 V. V₁ + V₂ = 12 V ✓" },
+
+    // Block 48 — Ohm's Law (diagram)
+    { q:"A 6 Ω and 3 Ω resistor are in parallel across a 12 V battery. The total current from the battery is",
+      svg:`<svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <!-- battery -->
+        <line x1="20" y1="30" x2="20" y2="90" stroke="currentColor" stroke-width="2"/>
+        <text x="4" y="64" fill="currentColor">12V</text>
+        <!-- top wire -->
+        <line x1="20" y1="30" x2="260" y2="30" stroke="currentColor" stroke-width="1.5"/>
+        <!-- bottom wire -->
+        <line x1="20" y1="90" x2="260" y2="90" stroke="currentColor" stroke-width="1.5"/>
+        <!-- 6Ω branch -->
+        <line x1="100" y1="30" x2="100" y2="48" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="85" y="48" width="30" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="90" y="64" fill="currentColor">6 Ω</text>
+        <line x1="100" y1="72" x2="100" y2="90" stroke="currentColor" stroke-width="1.5"/>
+        <!-- 3Ω branch -->
+        <line x1="180" y1="30" x2="180" y2="48" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="165" y="48" width="30" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="170" y="64" fill="currentColor">3 Ω</text>
+        <line x1="180" y1="72" x2="180" y2="90" stroke="currentColor" stroke-width="1.5"/>
+        <!-- current arrow -->
+        <line x1="30" y1="30" x2="70" y2="30" stroke="var(--ios-orange)" stroke-width="1.5" marker-end="url(#oa)"/>
+        <text x="32" y="24" fill="var(--ios-orange)">I = ?</text>
+        <defs><marker id="oa" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="var(--ios-orange)"/></marker></defs>
+      </svg>`,
+      opts:["A. 2 A", "B. 3 A", "C. 4 A", "D. 6 A"],
+      ans:"D",
+      exp:"Parallel: 1/R = 1/6 + 1/3 = 1/2 → R = 2 Ω. I = V/R = 12/2 = 6 A. Check: I₁ = 12/6 = 2 A; I₂ = 12/3 = 4 A; 2 + 4 = 6 A ✓. In parallel, voltage is the same across each branch." },
+
+    // Block 49 — Resistivity
+    { q:"A wire of length 2 m, cross-sectional area 0.5 × 10⁻⁶ m², has resistance 8 Ω. Its resistivity is",
+      opts:["A. 8 × 10⁻⁶ Ω·m", "B. 4 × 10⁻⁶ Ω·m", "C. 1 × 10⁻⁶ Ω·m", "D. 2 × 10⁻⁶ Ω·m"],
+      ans:"D",
+      exp:"ρ = RA/L = 8 × 0.5×10⁻⁶ / 2 = 4×10⁻⁶/2 = 2×10⁻⁶ Ω·m. Resistivity is a material property, not dependent on the wire's dimensions. This value is in the range of metal alloys." },
+
+    // Block 50 — Series & parallel
+    { q:"Three resistors 2 Ω, 3 Ω and 6 Ω are connected in parallel. Equivalent resistance is",
+      opts:["A. 11 Ω", "B. 2 Ω", "C. 3 Ω", "D. 1 Ω"],
+      ans:"D",
+      exp:"1/R = 1/2 + 1/3 + 1/6 = 3/6 + 2/6 + 1/6 = 6/6 = 1 → R = 1 Ω. Parallel combination is always less than the smallest individual resistor. JAMB uses 2, 3, 6 because they share denominator 6." },
+
+    // Block 51 — Electrical energy
+    { q:"A 1000 W iron is used for 2 hours. Energy consumed and cost at ₦50/kWh is",
+      opts:["A. 2000 kWh and ₦100 000", "B. 1 kWh and ₦50", "C. 0.5 kWh and ₦25", "D. 2 kWh and ₦100"],
+      ans:"D",
+      exp:"Energy = Power × time = 1 kW × 2 h = 2 kWh. Cost = 2 × ₦50 = ₦100. 1 kWh = 3.6 × 10⁶ J. JAMB tests both the kWh unit and cost calculation." },
+
+    // Block 52 — EMF & internal resistance
+    { q:"A battery of EMF 12 V and internal resistance 2 Ω drives current through an external 4 Ω resistor. Terminal voltage is",
+      opts:["A. 12 V", "B. 4 V", "C. 6 V", "D. 8 V"],
+      ans:"D",
+      exp:"I = EMF/(R + r) = 12/6 = 2 A. Terminal voltage = EMF − Ir = 12 − (2 × 2) = 8 V. Also: V = IR_ext = 2 × 4 = 8 V ✓. Terminal voltage < EMF due to internal resistance voltage drop." },
+
+    // Block 53 — Wheatstone bridge (diagram)
+    { q:"In the balanced Wheatstone bridge shown, the unknown resistance S is",
+      svg:`<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <!-- diamond shape -->
+        <line x1="120" y1="15"  x2="30"  y2="80"  stroke="currentColor" stroke-width="1.5"/>
+        <line x1="120" y1="15"  x2="210" y2="80"  stroke="currentColor" stroke-width="1.5"/>
+        <line x1="30"  y1="80"  x2="120" y2="145" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="210" y1="80"  x2="120" y2="145" stroke="currentColor" stroke-width="1.5"/>
+        <!-- galvanometer bridge -->
+        <line x1="30" y1="80" x2="210" y2="80" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <rect x="105" y="72" width="30" height="16" rx="3" fill="var(--ios-card)" stroke="currentColor" stroke-width="1.2"/>
+        <text x="110" y="84" fill="currentColor">G</text>
+        <!-- labels -->
+        <text x="52"  y="52"  fill="currentColor">P = 2Ω</text>
+        <text x="165" y="52"  fill="currentColor">Q = 4Ω</text>
+        <text x="52"  y="118" fill="currentColor">R = 6Ω</text>
+        <text x="165" y="118" fill="var(--ios-blue)">S = ?</text>
+        <!-- battery at top -->
+        <text x="108" y="12"  fill="var(--ios-orange)">+</text>
+        <text x="108" y="155" fill="currentColor">−</text>
+      </svg>`,
+      opts:["A. 3 Ω", "B. 48 Ω", "C. 8 Ω", "D. 12 Ω"],
+      ans:"D",
+      exp:"Balance condition: P/Q = R/S → S = QR/P = (4 × 6)/2 = 12 Ω. At balance, no current flows through the galvanometer. Cross-multiply: P × S = Q × R." },
+
+    // Block 54 — Magnetic force
+    { q:"A conductor carrying 5 A in a 0.4 T magnetic field (perpendicular) experiences a force of 2 N. The length of conductor in the field is",
+      opts:["A. 0.4 m", "B. 5 m", "C. 2 m", "D. 1 m"],
+      ans:"D",
+      exp:"F = BIL → L = F/(BI) = 2/(0.4 × 5) = 1 m. Maximum force when B ⊥ I. When parallel, F = 0. General case: F = BILsinθ." },
+
+    // Block 55 — Electromagnetic induction
+    { q:"A coil of 100 turns has flux changing at 0.02 Wb/s. The induced EMF is",
+      opts:["A. 0.02 V", "B. 0.0002 V", "C. 200 V", "D. 2 V"],
+      ans:"D",
+      exp:"Faraday's Law: |EMF| = N × dΦ/dt = 100 × 0.02 = 2 V. More turns = larger EMF (transformer principle). Lenz's Law: induced current opposes the change causing it." },
+
+    // Block 56 — Transformers
+    { q:"A transformer has 200 primary turns and 1000 secondary turns. Primary voltage is 240 V. The secondary voltage and transformer type are",
+      opts:["A. 48 V; step-up", "B. 1200 V; step-down", "C. 48 V; step-down", "D. 1200 V; step-up"],
+      ans:"D",
+      exp:"V_s = V_p × N_s/N_p = 240 × 1000/200 = 1200 V. More secondary turns → higher voltage → step-up. Step-down transformer has fewer secondary turns. P_in = P_out for ideal transformer (V_p·I_p = V_s·I_s)." },
+
+    // Block 57 — AC circuits
+    { q:"The peak voltage of an AC supply is 311 V. The rms voltage is approximately",
+      opts:["A. 311 V", "B. 440 V", "C. 156 V", "D. 220 V"],
+      ans:"D",
+      exp:"V_rms = V_peak/√2 = 311/1.414 ≈ 220 V. Nigeria's mains supply is 220 V rms, 50 Hz. The rms value is what meters read and what does equivalent DC heating work. V_peak = V_rms × √2." },
+  ],
+
+  modern: [
+    // Block 58 — Photoelectric effect
+    { q:"Light of frequency 8 × 10¹⁴ Hz falls on a metal with work function 2.0 eV. Maximum KE of emitted electrons is (h = 6.63 × 10⁻³⁴ J·s, 1 eV = 1.6 × 10⁻¹⁹ J)",
+      opts:["A. 2.0 eV", "B. No electrons emitted", "C. 1.31 eV", "D. 3.31 eV"],
+      ans:"C",
+      exp:"E_photon = hf = 6.63×10⁻³⁴ × 8×10¹⁴ = 5.3×10⁻¹⁹ J = 3.31 eV. KE_max = E_photon − φ = 3.31 − 2.0 = 1.31 eV. Since E > φ, emission occurs. Einstein's equation: hf = φ + KE_max." },
+
+    // Block 61 — Radioactivity
+    { q:"Which correctly describes β⁻ decay?",
+      opts:["A. A proton → neutron; Z decreases by 1",
+            "B. The nucleus emits a helium-4 nucleus; A decreases by 4",
+            "C. A neutron → proton + electron; Z increases by 1, A unchanged",
+            "D. The nucleus emits a photon; Z and A unchanged"],
+      ans:"C",
+      exp:"β⁻: n → p + e⁻ + antineutrino. Z increases by 1 (more protons), A unchanged (same nucleons total). α: Z−2, A−4. β⁺: Z−1, A unchanged. γ: Z and A both unchanged." },
+
+    // Block 62 — Half-life
+    { q:"A radioactive source has activity 800 Bq. After 6 hours its activity is 100 Bq. The half-life is",
+      opts:["A. 3 hours", "B. 1 hour", "C. 6 hours", "D. 2 hours"],
+      ans:"D",
+      exp:"800 → 400 → 200 → 100: three halvings. Total time = 6 hours → half-life = 6/3 = 2 hours. Counting halvings is faster than the exponential formula for JAMB timing." },
+
+    // Block 65 — Semiconductors
+    { q:"In a p-n junction diode under forward bias, current flows because",
+      opts:["A. The depletion layer widens, blocking all current",
+            "B. Only electrons carry current through the junction",
+            "C. The p-side is connected to the negative terminal",
+            "D. The depletion layer narrows, allowing majority carriers to cross"],
+      ans:"D",
+      exp:"Forward bias (p to +, n to −) opposes the built-in barrier, narrowing the depletion layer. Majority carriers (holes in p, electrons in n) can now cross the junction → conventional current flows. Reverse bias widens the depletion layer → negligible current." },
+
+    // Block 66 — Logic gates
+    { q:"A NAND gate has inputs A = 1, B = 1. Its output is fed as both inputs to a second NAND gate. The final output is",
+      svg:`<svg viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12">
+        <!-- First NAND -->
+        <line x1="10" y1="25" x2="50" y2="25" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="10" y1="45" x2="50" y2="45" stroke="currentColor" stroke-width="1.5"/>
+        <text x="2"  y="28" fill="currentColor">1</text>
+        <text x="2"  y="48" fill="currentColor">1</text>
+        <path d="M50,15 L50,55 Q85,55 85,35 Q85,15 50,15Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="88" cy="35" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="53" y="38" fill="currentColor">NAND</text>
+        <!-- first output -->
+        <line x1="92" y1="35" x2="140" y2="35" stroke="currentColor" stroke-width="1.5"/>
+        <text x="96" y="28" fill="var(--ios-orange)">out=?</text>
+        <!-- Second NAND -->
+        <line x1="140" y1="28" x2="160" y2="28" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="140" y1="42" x2="160" y2="42" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M160,18 L160,52 Q195,52 195,35 Q195,18 160,18Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="198" cy="35" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="163" y="38" fill="currentColor">NAND</text>
+        <line x1="202" y1="35" x2="240" y2="35" stroke="currentColor" stroke-width="1.5"/>
+        <text x="205" y="28" fill="var(--ios-blue)">final?</text>
+      </svg>`,
+      opts:["A. 0", "B. Undefined", "C. Depends on clock speed", "D. 1"],
+      ans:"D",
+      exp:"First NAND: 1,1 → NOT(1 AND 1) = 0. Second NAND: 0,0 → NOT(0 AND 0) = NOT(0) = 1. A NAND with both inputs the same acts as a NOT gate. NAND is a universal gate — any logic can be built from it." },
+
+    // Block 67 — Renewable energy
+    { q:"Which energy source is both renewable AND environmentally clean during use?",
+      opts:["A. Coal", "B. Nuclear fission", "C. Natural gas", "D. Solar energy"],
+      ans:"D",
+      exp:"Solar is renewable (inexhaustible on human timescales) and produces no emissions during use. Coal and natural gas are non-renewable and release CO₂. Nuclear fission uses finite uranium and produces radioactive waste." },
+
+    // Block 68 — Solar efficiency
+    { q:"A solar panel of efficiency 20% receives solar intensity 1000 W/m². Electrical output per m² is",
+      opts:["A. 1000 W", "B. 800 W", "C. 20 W", "D. 200 W"],
+      ans:"D",
+      exp:"Output = efficiency × input = 0.20 × 1000 = 200 W/m². The remaining 800 W is lost as heat. Same formula as any energy conversion efficiency problem." },
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentTab  = 'mechanics';
+let userAnswers = {};
+let stats       = { answered: 0, correct: 0 };
+let timerIds    = {};
+let timerSecs   = {};
+
+const TOTAL_SECS = 2700;
+const CIRC       = 2 * Math.PI * 14;
+
+function switchTab(tab, el) {
+    clearAllTimers();
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderQuestions();
+}
+
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentTab];
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+            ${q.svg ? `<div class="question-diagram">${q.svg}</div>` : ''}
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">45:00</span>
+                <span class="timer-label">left</span>
+            </div>
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+    attachListeners();
+    startAllTimers();
+}
+
+function startAllTimers() {
+    questions[currentTab].forEach((_, i) => {
+        const key      = currentTab + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        updateTimerUI(i, 0);
+        autoReveal(i);
+        return;
+    }
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring   = document.getElementById('ring-' + i);
+    const textEl = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+    ring.querySelector('.fg').style.strokeDashoffset = CIRC * (1 - secs / TOTAL_SECS);
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if      (secs <= 450) { ring.classList.add('danger');  textEl.classList.add('danger'); }
+    else if (secs <= 900) { ring.classList.add('warning'); textEl.classList.add('warning'); }
+    const m = Math.floor(secs / 60), s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentTab + i;
+    if (timerIds[key]) { clearInterval(timerIds[key]); timerIds[key] = null; }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => { if (timerIds[k]) clearInterval(timerIds[k]); });
+    timerIds = {}; timerSecs = {};
+}
+
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+    const btn = card.querySelector('.answer-btn');
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+    const q = questions[currentTab][i];
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+    const key = currentTab + i;
+    if (!userAnswers[key]) { userAnswers[key] = '—'; stats.answered++; updateStats(); }
+}
+
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentTab + index;
+            if (this.style.pointerEvents === 'none') return;
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentTab + index;
+            const q         = questions[currentTab][index];
+            const userAns   = userAnswers[key];
+            stopTimer(index);
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)        opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns) opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+            stats.answered++;
+            if (userAns === q.ans) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
