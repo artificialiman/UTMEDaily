@@ -1,488 +1,1560 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Physics — JAMB Practice · GrantApp AI</title>
-    <link rel="stylesheet" href="quiz-styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="quiz-body">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Physics — UTME 2026 Practice · 100 Questions</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ── RESET & TOKENS ── */
+:root {
+  --bg:#0f0f1a; --surface:#16162a; --surface2:#1c1c35; --border:#252540;
+  --text:#e8e8f0; --muted:#7070a0; --accent:#00c2ff; --accent-glow:rgba(0,194,255,.15);
+  --green:#22c55e; --red:#ef4444; --yellow:#f59e0b; --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
 
-<!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
+/* ── HEADER ── */
+.quiz-header{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);height:60px}
+.quiz-header-container{display:flex;align-items:center;justify-content:space-between;height:100%;padding:0 1rem;gap:.5rem}
+.quiz-header-left{display:flex;align-items:center;gap:.75rem;min-width:0;flex:1}
+.subject-name{font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--accent)}
+.subject-meta{font-size:.72rem;color:var(--muted)}
+.quiz-header-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+
+/* ── TIMER ── */
+.quiz-timer-container{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
+.timer-progress-ring{width:44px;height:44px;position:relative}
+.timer-progress-ring svg{width:100%;height:100%}
+.timer-display{font-size:.9rem;font-weight:700;font-variant-numeric:tabular-nums;min-width:44px;color:var(--text)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .9rem;border-radius:var(--radius);border:none;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;text-decoration:none}
+.btn-primary{background:var(--accent);color:#000}.btn-primary:hover{filter:brightness(1.1)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent)}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{filter:brightness(1.1)}
+.btn-sm{padding:.35rem .7rem;font-size:.8rem}
+.btn-icon{background:transparent;border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .15s}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── LAYOUT ── */
+.quiz-container{display:flex;padding-top:60px;min-height:100vh}
+.quiz-main{flex:1;padding:1.5rem;max-width:800px;margin:0 auto;width:100%}
+
+/* ── SIDEBAR ── */
+.quiz-sidebar{position:fixed;top:60px;left:0;width:280px;height:calc(100vh - 60px);background:var(--surface);border-right:1px solid var(--border);z-index:90;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .25s;overflow-y:auto}
+.quiz-sidebar.open{transform:translateX(0)}
+.sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid var(--border)}
+.sidebar-header h3{font-size:.95rem}
+.sidebar-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;padding:1rem;border-bottom:1px solid var(--border)}
+.stat-item{text-align:center}
+.stat-value{font-size:1.3rem;font-weight:700}
+.stat-label{font-size:.7rem;color:var(--muted)}
+.question-palette{display:grid;grid-template-columns:repeat(6,1fr);gap:.35rem;padding:1rem}
+.palette-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.palette-btn.current{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.palette-btn.answered{background:var(--accent);border-color:var(--accent);color:#000}
+.palette-btn.flagged{background:var(--yellow);border-color:var(--yellow);color:#000}
+.sidebar-legend{display:flex;flex-wrap:wrap;gap:.5rem;padding:0 1rem 1rem}
+.legend-item{display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)}
+.legend-dot{width:10px;height:10px;border-radius:3px;background:var(--surface2);border:1px solid var(--border)}
+.legend-dot.current{background:var(--accent-glow);border-color:var(--accent)}
+.legend-dot.answered{background:var(--accent);border-color:var(--accent)}
+.legend-dot.flagged{background:var(--yellow);border-color:var(--yellow)}
+
+/* ── QUESTION CARD ── */
+.question-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.question-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.question-number{font-size:.8rem;color:var(--muted);font-weight:600}
+.btn-flag{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.3rem .7rem;border-radius:8px;cursor:pointer;font-size:.8rem;display:flex;align-items:center;gap:.3rem;transition:all .15s}
+.btn-flag.flagged{border-color:var(--yellow);color:var(--yellow);background:rgba(245,158,11,.1)}
+.btn-flag:hover{border-color:var(--yellow);color:var(--yellow)}
+.topic-tag{display:inline-block;padding:.2rem .65rem;border-radius:20px;font-size:.7rem;font-weight:700;margin-bottom:.8rem;background:var(--accent-glow);color:var(--accent);border:1px solid rgba(0,194,255,.2)}
+.question-text{font-size:1rem;line-height:1.7;color:var(--text);margin-bottom:1.25rem}
+.options-container{display:flex;flex-direction:column;gap:.6rem}
+.option-btn{display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;text-align:left;transition:all .15s;width:100%}
+.option-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-glow)}
+.option-btn.selected{border-color:var(--accent);background:var(--accent-glow)}
+.option-btn.correct{border-color:var(--green)!important;background:rgba(34,197,94,.12)!important}
+.option-btn.wrong{border-color:var(--red)!important;background:rgba(239,68,68,.12)!important}
+.option-btn:disabled{cursor:default}
+.option-letter{font-weight:700;font-size:.85rem;color:var(--muted);min-width:20px;padding-top:1px;flex-shrink:0}
+.option-btn.selected .option-letter{color:var(--accent)}
+.option-btn.correct .option-letter{color:var(--green)}
+.option-btn.wrong .option-letter{color:var(--red)}
+.option-text{font-size:.9rem;line-height:1.55}
+
+/* ── EXPLANATION ── */
+.question-explanation{margin-top:1rem;padding:.85rem 1rem;background:rgba(0,194,255,.05);border:1px solid rgba(0,194,255,.15);border-radius:10px}
+.explanation-header{display:flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:700;color:var(--accent);margin-bottom:.4rem}
+.explanation-content{font-size:.85rem;line-height:1.6;color:var(--text)}
+.exception-content{font-size:.8rem;line-height:1.55;color:var(--yellow);margin-top:.4rem;padding-top:.4rem;border-top:1px solid rgba(245,158,11,.2)}
+.hidden{display:none!important}
+
+/* ── NAVIGATION ── */
+.quiz-navigation{display:flex;gap:.75rem}
+.quiz-navigation .btn{flex:1;justify-content:center}
+
+/* ── MOBILE TRIGGER ── */
+.mobile-palette-trigger{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--accent);color:#000;border:none;border-radius:50px;padding:.6rem 1.1rem;display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:700;cursor:pointer;z-index:80;box-shadow:0 4px 20px rgba(0,194,255,.35)}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:440px;overflow:hidden}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.3rem;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:1rem}
+.modal-body{padding:1.3rem}
+.modal-footer{display:flex;gap:.75rem;padding:1rem 1.3rem;border-top:1px solid var(--border)}
+.modal-footer .btn{flex:1;justify-content:center}
+.submit-summary{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
+.summary-item{background:var(--surface2);border-radius:10px;padding:.75rem;display:flex;flex-direction:column;gap:.25rem}
+.summary-label{font-size:.72rem;color:var(--muted)}
+.summary-value{font-size:1.2rem;font-weight:700}
+.answered-text{color:var(--green)}
+.warning-text{color:var(--yellow)}
+.warning-message{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);padding:.6rem;background:rgba(245,158,11,.07);border-radius:8px;border:1px solid rgba(245,158,11,.2)}
+
+/* ── RESULTS ── */
+#resultsView{padding:75px 1rem 2rem;max-width:800px;margin:0 auto}
+.results-header{text-align:center;margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
+.score-circle{width:110px;height:110px;border-radius:50%;border:4px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1rem;background:var(--accent-glow)}
+.score-pct{font-size:2rem;font-weight:800;color:var(--accent)}
+.score-raw{font-size:.8rem;color:var(--muted)}
+.results-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.results-actions .btn{flex:1;min-width:140px;justify-content:center}
+.review-list{display:flex;flex-direction:column;gap:.75rem}
+.review-item{background:var(--surface);border-radius:10px;padding:1rem;border-left:3px solid}
+.review-item.correct-item{border-color:var(--green)}
+.review-item.wrong-item{border-color:var(--red)}
+.review-item.skip-item{border-color:var(--muted)}
+.review-q-meta{font-size:.72rem;color:var(--muted);margin-bottom:.3rem}
+.review-q-text{font-size:.88rem;line-height:1.55;margin-bottom:.5rem}
+.review-answers{display:flex;flex-wrap:wrap;gap:.4rem;font-size:.78rem;margin-bottom:.4rem}
+.ans-tag{padding:.2rem .55rem;border-radius:6px;font-weight:600}
+.your-wrong{background:rgba(239,68,68,.15);color:var(--red)}
+.correct-ans{background:rgba(34,197,94,.15);color:var(--green)}
+.skip-ans{background:rgba(112,112,160,.15);color:var(--muted)}
+.review-explanation{font-size:.78rem;line-height:1.55;color:var(--muted)}
+.review-exception{font-size:.76rem;line-height:1.5;color:var(--yellow);margin-top:.3rem}
+
+/* ── CALCULATOR ── */
+.calculator{display:flex;flex-direction:column;gap:.5rem}
+.calculator-display{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;font-size:1.4rem;font-weight:700;text-align:right;color:var(--text);width:100%}
+.calculator-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.calc-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:.7rem;font-size:.9rem;cursor:pointer;font-weight:600;transition:all .15s}
+.calc-btn:hover{border-color:var(--accent);color:var(--accent)}
+.calc-equals{background:var(--accent);border-color:var(--accent);color:#000}
+.calc-equals:hover{filter:brightness(1.1)}
+.calculator-modal{max-width:320px}
+
+@media(max-width:600px){
+  .quiz-main{padding:1rem}
+  .question-card{padding:1.1rem}
+  .results-actions .btn{min-width:120px}
+}
+</style>
+</head>
+<body>
+
 <script>
-const DURATION = 1800;
+const DURATION = 3600; /* 60 min for 100 Qs */
+const TOTAL = 100;
 
 const QUESTIONS = [
+  /* ══ MECHANICS (1–25) ══ */
   {
-    id: 1, subject: 'Physics',
-    text: 'A body moving with constant velocity has:',
-    options: { A: 'Zero acceleration', B: 'Constant acceleration', C: 'Increasing acceleration', D: 'Decreasing acceleration' },
-    answer: 'A',
-    explanation: 'Constant velocity means no change in speed or direction, so a = Δv/Δt = 0.',
-    exception: 'Constant speed with changing direction (circular motion) HAS acceleration — don\'t confuse velocity with speed.',
+    id:1, topic:'Mechanics',
+    text:'A body is said to be in equilibrium when the net force acting on it is:',
+    options:{A:'Equal to its weight',B:'Equal to its momentum',C:'Zero',D:'Equal to the applied force'},
+    answer:'C',
+    explanation:'Equilibrium requires ΣF = 0 in all directions. The body may be stationary (static) or moving at constant velocity (dynamic).',
+    exception:'A body moving at constant velocity is in dynamic equilibrium — net force is still zero even though it is moving.'
   },
   {
-    id: 2, subject: 'Physics',
-    text: 'An object is thrown vertically upward. At its highest point:',
-    options: { A: 'Velocity = 0, acceleration = 0', B: 'Velocity = 0, acceleration = g downward', C: 'Velocity = g, acceleration = 0', D: 'Both velocity and acceleration are maximum' },
-    answer: 'B',
-    explanation: 'At the peak, v = 0 instantaneously, but gravity still acts (a = 9.8 m/s² downward).',
-    exception: 'Acceleration is NOT zero at the highest point — gravity never stops acting.',
+    id:2, topic:'Mechanics',
+    text:'A car of mass 800 kg accelerates from 10 m/s to 30 m/s in 5 s. The net force acting on it is:',
+    options:{A:'3 200 N',B:'4 800 N',C:'6 400 N',D:'1 600 N'},
+    answer:'A',
+    explanation:'a = (30 − 10)/5 = 4 m/s². F = ma = 800 × 4 = 3 200 N.',
+    exception:'This is the NET force; the engine force would be larger after accounting for friction.'
   },
   {
-    id: 3, subject: 'Physics',
-    text: 'A 5 kg block is pushed with 20 N force against a 5 N friction force. Find the acceleration:',
-    options: { A: '3 m/s²', B: '4 m/s²', C: '5 m/s²', D: '1 m/s²' },
-    answer: 'A',
-    explanation: 'Net force = 20 − 5 = 15 N. a = F/m = 15/5 = 3 m/s².',
-    exception: 'Always subtract friction from the applied force before using F = ma.',
+    id:3, topic:'Mechanics',
+    text:'A stone is thrown horizontally from a cliff with speed 15 m/s. It hits the ground after 3 s. How far horizontally from the base of the cliff does it land? (g = 10 m/s²)',
+    options:{A:'30 m',B:'45 m',C:'90 m',D:'150 m'},
+    answer:'B',
+    explanation:'Horizontal distance = u × t = 15 × 3 = 45 m. Horizontal velocity is unchanged throughout.',
+    exception:'Vertical and horizontal motions are independent — gravity only affects the vertical component.'
   },
   {
-    id: 4, subject: 'Physics',
-    text: 'Two forces of 6 N and 8 N act perpendicular to each other. The resultant force is:',
-    options: { A: '2 N', B: '10 N', C: '14 N', D: '48 N' },
-    answer: 'B',
-    explanation: 'R = √(6² + 8²) = √(36 + 64) = √100 = 10 N.',
-    exception: 'Perpendicular forces must be added as vectors (Pythagoras), not simply added linearly.',
+    id:4, topic:'Mechanics',
+    text:'The moment of a force about a pivot depends on:',
+    options:{A:'The mass of the object only',B:'The magnitude of the force and perpendicular distance from the pivot',C:'Speed of the object',D:'Temperature of the surroundings'},
+    answer:'B',
+    explanation:'Moment (torque) = F × d⊥. Only the perpendicular distance from the line of action to the pivot counts.',
+    exception:'If the force passes through the pivot, the perpendicular distance is zero, so moment = 0 regardless of force magnitude.'
   },
   {
-    id: 5, subject: 'Physics',
-    text: 'A car accelerates from rest and travels 100 m in 5 s. Find the acceleration:',
-    options: { A: '4 m/s²', B: '8 m/s²', C: '10 m/s²', D: '20 m/s²' },
-    answer: 'B',
-    explanation: 's = ut + ½at². With u = 0: 100 = ½a(25), so a = 8 m/s².',
-    exception: 'Cannot use v = u + at without knowing the final velocity; use the displacement equation.',
+    id:5, topic:'Mechanics',
+    text:'An object moves in a circle of radius 2 m at a constant speed of 4 m/s. Its centripetal acceleration is:',
+    options:{A:'2 m/s²',B:'4 m/s²',C:'8 m/s²',D:'16 m/s²'},
+    answer:'C',
+    explanation:'a_c = v²/r = 16/2 = 8 m/s². The direction is always towards the centre.',
+    exception:'Centripetal acceleration changes direction continuously but has constant magnitude for uniform circular motion.'
   },
   {
-    id: 6, subject: 'Physics',
-    text: 'Newton\'s third law action-reaction pairs:',
-    options: { A: 'Act on the same object', B: 'Act on different objects', C: 'Cancel each other out', D: 'Only apply to collisions' },
-    answer: 'B',
-    explanation: 'Action and reaction forces act on DIFFERENT objects (e.g., book on table / table on book).',
-    exception: 'They cannot cancel because they act on different bodies — a common misconception.',
+    id:6, topic:'Mechanics',
+    text:'A 3 kg object moving at 6 m/s collides with a stationary 9 kg object and they move together. Their common velocity is:',
+    options:{A:'1.5 m/s',B:'2 m/s',C:'3 m/s',D:'4.5 m/s'},
+    answer:'A',
+    explanation:'Conservation of momentum: 3(6) = (3+9)v → 18 = 12v → v = 1.5 m/s.',
+    exception:'Kinetic energy is NOT conserved here — this is a perfectly inelastic collision.'
   },
   {
-    id: 7, subject: 'Physics',
-    text: 'An object weighs 60 N on Earth (g = 10 m/s²). On the Moon (g = 1.6 m/s²), it weighs:',
-    options: { A: '9.6 N', B: '36 N', C: '60 N', D: '360 N' },
-    answer: 'A',
-    explanation: 'Mass = W/g = 60/10 = 6 kg (constant). Moon weight = 6 × 1.6 = 9.6 N.',
-    exception: 'Mass is invariant; weight changes with gravity — the most common confusion in mechanics.',
+    id:7, topic:'Mechanics',
+    text:'Work done by a force on an object is zero when:',
+    options:{A:'The object accelerates',B:'The force is perpendicular to the displacement',C:'The object moves very slowly',D:'The force is large'},
+    answer:'B',
+    explanation:'W = Fd cos θ. When θ = 90°, cos 90° = 0, so W = 0. A magnetic force on a moving charge is a classic example.',
+    exception:'Tension in circular motion does no work — it is always perpendicular to velocity (displacement).'
   },
   {
-    id: 8, subject: 'Physics',
-    text: 'A projectile is launched at 45° for maximum range. At 30°, the range is:',
-    options: { A: 'Greater than at 45°', B: 'Less than at 45°', C: 'Equal to at 45°', D: 'Zero' },
-    answer: 'B',
-    explanation: 'Maximum range occurs at 45°. Any other angle gives a smaller range for the same launch speed.',
-    exception: 'Complementary angles (30° and 60°) give equal ranges to each other, but both less than at 45°.',
+    id:8, topic:'Mechanics',
+    text:'A 4 kg object is lifted 5 m vertically in 2 s. The power expended is: (g = 10 m/s²)',
+    options:{A:'40 W',B:'50 W',C:'100 W',D:'200 W'},
+    answer:'C',
+    explanation:'Work = mgh = 4 × 10 × 5 = 200 J. Power = W/t = 200/2 = 100 W.',
+    exception:'This assumes constant velocity — if accelerating, extra work is done increasing kinetic energy.'
   },
   {
-    id: 9, subject: 'Physics',
-    text: 'A ball dropped from height h takes time t to hit the ground. From height 4h, time taken is:',
-    options: { A: 't', B: '2t', C: '4t', D: '16t' },
-    answer: 'B',
-    explanation: 'h ∝ t² (from h = ½gt²). If h increases 4×, t increases √4 = 2×.',
-    exception: 'Linear thinking (4h → 4t) is wrong; the relationship between height and time is quadratic.',
+    id:9, topic:'Mechanics',
+    text:'A spring of spring constant 200 N/m is compressed by 0.05 m. The elastic potential energy stored is:',
+    options:{A:'0.25 J',B:'0.50 J',C:'5 J',D:'10 J'},
+    answer:'A',
+    explanation:'E_p = ½kx² = ½ × 200 × (0.05)² = ½ × 200 × 0.0025 = 0.25 J.',
+    exception:'The ½ factor is essential — omitting it gives twice the correct answer, a very common error.'
   },
   {
-    id: 10, subject: 'Physics',
-    text: 'Momentum is conserved in:',
-    options: { A: 'Elastic collisions only', B: 'Inelastic collisions only', C: 'All collisions in an isolated system', D: 'No collisions' },
-    answer: 'C',
-    explanation: 'Momentum is conserved in ALL collisions as long as no net external force acts.',
-    exception: 'Kinetic energy is conserved ONLY in elastic collisions — don\'t confuse the two conservation laws.',
+    id:10, topic:'Mechanics',
+    text:'The velocity ratio (VR) of a pulley system with 4 pulleys in a block-and-tackle arrangement is:',
+    options:{A:'2',B:'4',C:'6',D:'8'},
+    answer:'B',
+    explanation:'In a block-and-tackle system with n ropes supporting the load, VR = n = 4.',
+    exception:'VR does not depend on efficiency; MA = VR × efficiency gives actual mechanical advantage.'
   },
   {
-    id: 11, subject: 'Physics',
-    text: 'A 2 kg object at 5 m/s collides and sticks to a stationary 3 kg object. Final velocity:',
-    options: { A: '1 m/s', B: '2 m/s', C: '3 m/s', D: '5 m/s' },
-    answer: 'B',
-    explanation: 'Momentum conservation: 2(5) + 3(0) = 5v, so v = 2 m/s.',
-    exception: 'This is a perfectly inelastic collision — kinetic energy is NOT conserved, only momentum.',
+    id:11, topic:'Mechanics',
+    text:'A body at rest on an inclined plane of angle θ is held by friction. The minimum coefficient of static friction required is:',
+    options:{A:'cos θ',B:'sin θ',C:'tan θ',D:'1/tan θ'},
+    answer:'C',
+    explanation:'At the point of slipping: f = mg sin θ and N = mg cos θ. μ = f/N = tan θ.',
+    exception:'This gives the MINIMUM μ — higher μ means the body can remain on steeper inclines.'
   },
   {
-    id: 12, subject: 'Physics',
-    text: 'Power is defined as:',
-    options: { A: 'Work done per unit time', B: 'Force times distance', C: 'Energy stored', D: 'Mass times acceleration' },
-    answer: 'A',
-    explanation: 'P = W/t (primary definition). Also equivalent to P = Fv for constant force.',
-    exception: 'P = Fv is the instantaneous power form; both expressions are valid definitions.',
+    id:12, topic:'Mechanics',
+    text:'A satellite orbits Earth at constant speed. The work done by gravity on the satellite each orbit is:',
+    options:{A:'Maximum',B:'Negative',C:'Zero',D:'Dependent on orbital radius'},
+    answer:'C',
+    explanation:'In a circular orbit, gravity acts perpendicular to velocity at every point, so W = Fd cos 90° = 0.',
+    exception:'For elliptical orbits, gravity does work during portions of the orbit, but net work over a complete orbit is still zero.'
   },
   {
-    id: 13, subject: 'Physics',
-    text: 'A machine lifts a 500 N load 2 m using 200 N effort over 6 m. Efficiency is:',
-    options: { A: '40%', B: '60%', C: '83.3%', D: '120%' },
-    answer: 'C',
-    explanation: 'Efficiency = (Work output / Work input) × 100 = (500×2)/(200×6) × 100 = 83.3%.',
-    exception: 'Efficiency can NEVER exceed 100% — this would violate conservation of energy.',
+    id:13, topic:'Mechanics',
+    text:'Two objects A (2 kg, 6 m/s) and B (3 kg, −4 m/s) collide. Total momentum of the system is:',
+    options:{A:'−24 kg·m/s',B:'0 kg·m/s',C:'0 kg·m/s',D:'10 kg·m/s'},
+    answer:'B',
+    explanation:'p_total = (2×6) + (3×−4) = 12 − 12 = 0 kg·m/s.',
+    exception:'Zero total momentum means the centre of mass is stationary — important in explosion and collision analysis.'
   },
   {
-    id: 14, subject: 'Physics',
-    text: 'The unit of impulse is:',
-    options: { A: 'N', B: 'N·s', C: 'J', D: 'W' },
-    answer: 'B',
-    explanation: 'Impulse = FΔt (units: N·s) = change in momentum (kg·m/s). Both units are equivalent.',
-    exception: 'N·s and kg·m/s look different but are dimensionally identical; impulse = Δ(mv).',
+    id:14, topic:'Mechanics',
+    text:'The range of a projectile launched at angle θ with speed u is R = u²sin2θ/g. For θ = 60°, the range equals that for θ =:',
+    options:{A:'30°',B:'45°',C:'120°',D:'90°'},
+    answer:'A',
+    explanation:'sin 2(60°) = sin 120° = sin 60°. Complementary angles (30° and 60°) give equal ranges.',
+    exception:'This symmetry only holds on flat ground with the same launch and landing height.'
   },
   {
-    id: 15, subject: 'Physics',
-    text: 'A spring (k = 100 N/m) is compressed 0.2 m. Elastic PE stored:',
-    options: { A: '2 J', B: '4 J', C: '10 J', D: '20 J' },
-    answer: 'A',
-    explanation: 'PE = ½kx² = ½ × 100 × 0.04 = 2 J.',
-    exception: 'Common error: forgetting the ½ factor or not squaring the displacement.',
+    id:15, topic:'Mechanics',
+    text:'Archimedes\' principle states that the buoyant force on an object equals:',
+    options:{A:'The weight of the object',B:'The weight of fluid displaced',C:'The mass of fluid displaced',D:'The volume of the object multiplied by g'},
+    answer:'B',
+    explanation:'F_b = ρ_fluid × V_submerged × g = weight of displaced fluid.',
+    exception:'An object floats when buoyant force equals its weight; it sinks when weight exceeds buoyant force.'
   },
   {
-    id: 16, subject: 'Physics',
-    text: 'Two resistors (4 Ω and 6 Ω) in parallel have equivalent resistance:',
-    options: { A: '2.4 Ω', B: '5 Ω', C: '10 Ω', D: '24 Ω' },
-    answer: 'A',
-    explanation: '1/R = 1/4 + 1/6 = 3/12 + 2/12 = 5/12, so R = 12/5 = 2.4 Ω.',
-    exception: 'Parallel resistance is always LESS than the smallest individual resistor — never their sum.',
+    id:16, topic:'Mechanics',
+    text:'A body undergoes simple harmonic motion with amplitude A. At displacement x = A/2, the fraction of total energy that is kinetic is:',
+    options:{A:'1/4',B:'1/2',C:'3/4',D:'1'},
+    answer:'C',
+    explanation:'KE = ½mω²(A²−x²). At x=A/2: KE/E_total = (A²−A²/4)/A² = (3/4).',
+    exception:'At x = 0 (equilibrium), KE = total energy; at x = A (amplitude), KE = 0.'
   },
   {
-    id: 17, subject: 'Physics',
-    text: 'A wire of resistance R is stretched to double its length (volume constant). New resistance:',
-    options: { A: 'R/2', B: 'R', C: '2R', D: '4R' },
-    answer: 'D',
-    explanation: 'R = ρL/A. If L doubles, volume conservation means A halves. R_new = ρ(2L)/(A/2) = 4R.',
-    exception: 'Resistance scales with the square of the length ratio when volume is constant.',
+    id:17, topic:'Mechanics',
+    text:'The period of a simple pendulum is doubled when its length is:',
+    options:{A:'Doubled',B:'Halved',C:'Quadrupled',D:'Tripled'},
+    answer:'C',
+    explanation:'T = 2π√(L/g). T ∝ √L. To double T, need L to increase by factor 4.',
+    exception:'Period is independent of mass and amplitude (for small angles) — only length and g matter.'
   },
   {
-    id: 18, subject: 'Physics',
-    text: 'In a circuit, an ammeter should be connected in:',
-    options: { A: 'Series', B: 'Parallel', C: 'Either', D: 'Depends on value' },
-    answer: 'A',
-    explanation: 'Ammeter measures current and must be in series (very low resistance). Voltmeter goes in parallel.',
-    exception: 'Ideal ammeter has zero resistance; real ammeters have a small but non-zero resistance.',
+    id:18, topic:'Mechanics',
+    text:'The SI unit of angular momentum is:',
+    options:{A:'kg·m/s',B:'kg·m²/s',C:'N·m',D:'J·s²'},
+    answer:'B',
+    explanation:'L = Iω = (kg·m²)(rad/s) = kg·m²/s. Also equivalent to J·s.',
+    exception:'Angular momentum is conserved when no net external torque acts — the principle behind a spinning skater pulling arms in.'
   },
   {
-    id: 19, subject: 'Physics',
-    text: 'Kirchhoff\'s current law (KCL) states:',
-    options: { A: 'Sum of currents entering a junction equals sum leaving', B: 'Voltage drop around a loop equals zero', C: 'Resistance is constant', D: 'Power is conserved' },
-    answer: 'A',
-    explanation: 'KCL: ΣI_in = ΣI_out at any junction (charge conservation).',
-    exception: 'KVL (voltage law) covers energy around loops; KCL covers charge at junctions — don\'t confuse them.',
+    id:19, topic:'Mechanics',
+    text:'Bernoulli\'s principle relates to the conservation of:',
+    options:{A:'Mass in fluid flow',B:'Momentum in fluid flow',C:'Energy in fluid flow',D:'Volume in fluid flow'},
+    answer:'C',
+    explanation:'Bernoulli\'s equation is a statement of conservation of energy per unit volume for steady, incompressible flow.',
+    exception:'It applies only to ideal fluids (non-viscous, incompressible) along a streamline.'
   },
   {
-    id: 20, subject: 'Physics',
-    text: 'A transformer has 100 primary turns and 500 secondary turns. It is a:',
-    options: { A: 'Step-down transformer (voltage decreases)', B: 'Step-up transformer (voltage increases 5×)', C: '1:1 ratio transformer', D: 'Current amplifier (current increases 5×)' },
-    answer: 'B',
-    explanation: 'V_s/V_p = N_s/N_p = 500/100 = 5. Voltage increases by a factor of 5.',
-    exception: 'Current does the opposite: it decreases by factor 5. Power is conserved (ideal transformer).',
+    id:20, topic:'Mechanics',
+    text:'A wheel of radius 0.5 m completes 2 revolutions per second. The linear speed of a point on the rim is:',
+    options:{A:'π m/s',B:'2π m/s',C:'4π m/s',D:'8π m/s'},
+    answer:'B',
+    explanation:'ω = 2π × 2 = 4π rad/s. v = ωr = 4π × 0.5 = 2π m/s ≈ 6.28 m/s.',
+    exception:'Linear speed increases with radius; the axle (r=0) has zero linear speed but same angular speed.'
   },
   {
-    id: 21, subject: 'Physics',
-    text: 'An AC supply has an RMS current of 10 A. The peak current is:',
-    options: { A: '7.07 A', B: '10 A', C: '14.14 A', D: '20 A' },
-    answer: 'C',
-    explanation: 'I_peak = I_rms × √2 = 10 × 1.414 ≈ 14.14 A.',
-    exception: 'Peak is √2 times RMS, not 2 times. RMS is the effective (heating-equivalent) value.',
+    id:21, topic:'Mechanics',
+    text:'The escape velocity from Earth (radius R, mass M) is given by:',
+    options:{A:'√(GM/R)',B:'√(2GM/R)',C:'2GM/R',D:'√(GM/2R)'},
+    answer:'B',
+    explanation:'Setting kinetic energy equal to gravitational PE: ½mv² = GMm/R → v_esc = √(2GM/R).',
+    exception:'Escape velocity does not depend on the mass of the escaping object — only on the planet\'s mass and radius.'
   },
   {
-    id: 22, subject: 'Physics',
-    text: 'The speed of light in glass (refractive index n = 1.5) is:',
-    options: { A: '3 × 10⁸ m/s', B: '2 × 10⁸ m/s', C: '1.5 × 10⁸ m/s', D: '4.5 × 10⁸ m/s' },
-    answer: 'B',
-    explanation: 'n = c/v, so v = c/n = (3 × 10⁸)/1.5 = 2 × 10⁸ m/s.',
-    exception: 'Light always slows when entering a denser medium and can never exceed c (speed in vacuum).',
+    id:22, topic:'Mechanics',
+    text:'Surface tension in liquids is caused by:',
+    options:{A:'Adhesive forces between unlike molecules',B:'Cohesive forces between like molecules at the surface',C:'Atmospheric pressure on the liquid surface',D:'Viscosity of the liquid'},
+    answer:'B',
+    explanation:'Molecules at the surface experience a net inward force due to cohesion with neighbours below and sideways, creating surface tension.',
+    exception:'Adhesion (liquid-solid) causes capillary rise; cohesion (liquid-liquid) causes surface tension — distinct phenomena.'
   },
   {
-    id: 23, subject: 'Physics',
-    text: 'Total internal reflection occurs when light travels:',
-    options: { A: 'From a denser to a rarer medium at an angle greater than the critical angle', B: 'From a rarer to a denser medium', C: 'At any angle', D: 'Only inside optical fibers' },
-    answer: 'A',
-    explanation: 'TIR requires two conditions: denser → rarer medium AND angle of incidence > critical angle.',
-    exception: 'TIR cannot occur going rarer → denser; light always refracts into a denser medium.',
+    id:23, topic:'Mechanics',
+    text:'A force of 12 N acts at 60° to the horizontal. Its horizontal component is:',
+    options:{A:'6 N',B:'6√3 N',C:'10.4 N',D:'12 N'},
+    answer:'A',
+    explanation:'F_x = F cos θ = 12 cos 60° = 12 × 0.5 = 6 N.',
+    exception:'cos 60° = 0.5 exactly; sin 60° = √3/2 ≈ 0.866. Do not confuse the components.'
   },
   {
-    id: 24, subject: 'Physics',
-    text: 'A concave mirror has focal length 20 cm. An object placed 30 cm away forms an image at:',
-    options: { A: '60 cm (real, inverted)', B: '12 cm (virtual, upright)', C: '60 cm (virtual, upright)', D: 'Infinity' },
-    answer: 'A',
-    explanation: '1/f = 1/u + 1/v → 1/20 = 1/30 + 1/v → v = 60 cm. Positive v means real and inverted.',
-    exception: 'Between F and C the image is magnified, real, and inverted — beyond C on the same side.',
+    id:24, topic:'Mechanics',
+    text:'Hooke\'s Law is valid only:',
+    options:{A:'For metals only',B:'Below the elastic limit',C:'Above the yield point',D:'When temperature is constant'},
+    answer:'B',
+    explanation:'Hooke\'s Law (F = kx) holds while a material deforms elastically and returns to its original shape — up to the elastic limit.',
+    exception:'Beyond the elastic limit, deformation is permanent (plastic) and the material no longer obeys Hooke\'s Law.'
   },
   {
-    id: 25, subject: 'Physics',
-    text: 'Two waves of the same frequency interfere with a path difference of λ/2. The result is:',
-    options: { A: 'Constructive interference (bright fringe)', B: 'Destructive interference (dark fringe)', C: 'No interference', D: 'Partial interference' },
-    answer: 'B',
-    explanation: 'Path difference = (n + ½)λ gives destructive interference (180° phase shift).',
-    exception: 'Path difference = nλ gives constructive interference; half-wavelength shift inverts the wave.',
+    id:25, topic:'Mechanics',
+    text:'Two identical balls collide elastically head-on (same mass, equal and opposite speeds v). After collision:',
+    options:{A:'Both stop',B:'They pass through each other unchanged',C:'Each rebounds with the other\'s original velocity',D:'They move together at 2v'},
+    answer:'C',
+    explanation:'In a 1D elastic collision between equal masses, the velocities are exchanged. Each ball takes on the other\'s velocity.',
+    exception:'This exchange-of-velocities result is unique to equal-mass elastic collisions — different masses behave differently.'
+  },
+
+  /* ══ HEAT & THERMODYNAMICS (26–40) ══ */
+  {
+    id:26, topic:'Heat & Thermodynamics',
+    text:'The absolute zero of temperature is:',
+    options:{A:'0°C',B:'−100°C',C:'−273°C',D:'−373°C'},
+    answer:'C',
+    explanation:'Absolute zero is 0 K = −273.15°C ≈ −273°C, the theoretical temperature at which thermal energy is at a minimum.',
+    exception:'T(K) = T(°C) + 273. Always convert to Kelvin for gas law calculations.'
   },
   {
-    id: 26, subject: 'Physics',
-    text: 'A wave has wavelength 2 m and travels at 10 m/s. Its frequency is:',
-    options: { A: '0.2 Hz', B: '5 Hz', C: '20 Hz', D: '50 Hz' },
-    answer: 'B',
-    explanation: 'v = fλ, so f = v/λ = 10/2 = 5 Hz.',
-    exception: 'Frequency (oscillations/second) and wave speed (distance/second) are different quantities.',
+    id:27, topic:'Heat & Thermodynamics',
+    text:'A gas at 27°C is heated to 327°C at constant pressure. The ratio of final to initial volume is:',
+    options:{A:'2',B:'3',C:'4',D:'12'},
+    answer:'A',
+    explanation:'T₁ = 300 K, T₂ = 600 K. By Charles\'s Law: V₂/V₁ = T₂/T₁ = 600/300 = 2.',
+    exception:'Always use Kelvin — using Celsius gives 327/27 = 12.1, a completely wrong answer.'
   },
   {
-    id: 27, subject: 'Physics',
-    text: 'When a sound source approaches an observer, the Doppler effect causes the observed frequency to:',
-    options: { A: 'Increase', B: 'Decrease', C: 'Remain constant', D: 'Double' },
-    answer: 'A',
-    explanation: 'Approaching source compresses wavefronts → shorter wavelength → higher observed frequency.',
-    exception: 'The effect applies to light too: approaching sources appear blue-shifted, receding ones red-shifted.',
+    id:28, topic:'Heat & Thermodynamics',
+    text:'Which mode of heat transfer requires no medium?',
+    options:{A:'Convection',B:'Conduction',C:'Radiation',D:'Advection'},
+    answer:'C',
+    explanation:'Radiation transfers energy via electromagnetic waves and travels through a vacuum (e.g., solar energy reaching Earth).',
+    exception:'Conduction requires physical contact; convection requires fluid movement — both need a medium.'
   },
   {
-    id: 28, subject: 'Physics',
-    text: 'In a standing wave, the distance between two consecutive nodes is:',
-    options: { A: 'λ/4', B: 'λ/2', C: 'λ', D: '2λ' },
-    answer: 'B',
-    explanation: 'Node-to-node distance = λ/2. Antinode-to-antinode is also λ/2. Node-to-antinode is λ/4.',
-    exception: 'Don\'t confuse node spacing (λ/2) with antinode-to-next-node spacing (also λ/4).',
+    id:29, topic:'Heat & Thermodynamics',
+    text:'The specific latent heat of vaporisation of water is about 2 260 kJ/kg. Energy needed to vaporise 0.5 kg of water at 100°C is:',
+    options:{A:'565 kJ',B:'1 130 kJ',C:'2 260 kJ',D:'4 520 kJ'},
+    answer:'B',
+    explanation:'Q = mL = 0.5 × 2 260 = 1 130 kJ. No temperature change occurs during a phase change.',
+    exception:'Do not confuse specific heat capacity (used for temperature change) with latent heat (used for phase change).'
   },
   {
-    id: 29, subject: 'Physics',
-    text: 'At absolute zero (0 K), according to quantum mechanics:',
-    options: { A: 'All molecular motion stops completely', B: 'Some motion remains due to zero-point energy', C: 'Molecular motion increases', D: 'Motion becomes completely chaotic' },
-    answer: 'B',
-    explanation: 'Classically motion stops, but the Heisenberg uncertainty principle forbids truly zero motion (zero-point energy).',
-    exception: 'This is the key difference between classical and quantum predictions at 0 K.',
+    id:30, topic:'Heat & Thermodynamics',
+    text:'Which thermometric property is used in a resistance thermometer?',
+    options:{A:'Volume of mercury',B:'Electrical resistance of platinum',C:'EMF of a thermocouple',D:'Pressure of a gas'},
+    answer:'B',
+    explanation:'Resistance thermometers exploit the variation of electrical resistance of platinum with temperature.',
+    exception:'Each thermometer type exploits a different physical property — mercury uses volume expansion, gas thermometers use pressure.'
   },
   {
-    id: 30, subject: 'Physics',
-    text: 'The internal energy of an ideal gas depends on:',
-    options: { A: 'Temperature only', B: 'Pressure and volume', C: 'Volume only', D: 'All of the above equally' },
-    answer: 'A',
-    explanation: 'For an ideal gas, U depends only on temperature (it equals the total kinetic energy of molecules).',
-    exception: 'Real gases also have intermolecular potential energy, so U depends on volume too.',
+    id:31, topic:'Heat & Thermodynamics',
+    text:'In a refrigerator, heat flows from a cold region to a hot region. This is possible because:',
+    options:{A:'It violates the second law of thermodynamics',B:'External work is done on the system',C:'The refrigerant spontaneously absorbs heat',D:'Entropy decreases naturally in closed systems'},
+    answer:'B',
+    explanation:'The second law is not violated — a refrigerator requires external work (electrical energy) to pump heat from cold to hot.',
+    exception:'Heat never spontaneously flows from cold to hot; an external energy input is always required.'
   },
   {
-    id: 31, subject: 'Physics',
-    text: 'The first law of thermodynamics states:',
-    options: { A: 'ΔU = Q − W', B: 'Entropy always increases', C: 'Heat flows from hot to cold spontaneously', D: 'Total energy of the universe is constant' },
-    answer: 'A',
-    explanation: 'ΔU = Q − W: change in internal energy equals heat added minus work done BY the system.',
-    exception: 'Some textbooks use ΔU = Q + W where W is work done ON the system; check the sign convention.',
+    id:32, topic:'Heat & Thermodynamics',
+    text:'The efficiency of a Carnot engine operating between 500 K and 300 K is:',
+    options:{A:'20%',B:'40%',C:'60%',D:'80%'},
+    answer:'B',
+    explanation:'η = 1 − T_cold/T_hot = 1 − 300/500 = 1 − 0.6 = 0.4 = 40%.',
+    exception:'Carnot efficiency is the MAXIMUM possible for any heat engine between those temperatures; real engines do worse.'
   },
   {
-    id: 32, subject: 'Physics',
-    text: 'In an adiabatic process:',
-    options: { A: 'Q = 0 (no heat transfer)', B: 'ΔU = 0', C: 'W = 0', D: 'Pressure is constant' },
-    answer: 'A',
-    explanation: 'Adiabatic means thermally isolated, so Q = 0. From the first law: ΔU = −W.',
-    exception: 'Temperature DOES change in an adiabatic process — unlike an isothermal process where T is constant.',
+    id:33, topic:'Heat & Thermodynamics',
+    text:'The gas law PV = nRT is obeyed most closely by a gas at:',
+    options:{A:'High pressure and low temperature',B:'Low pressure and high temperature',C:'High pressure and high temperature',D:'Low pressure and low temperature'},
+    answer:'B',
+    explanation:'At low pressure, molecules are far apart (negligible intermolecular forces); at high temperature, kinetic energy dominates potential energy — ideal gas assumptions are best satisfied.',
+    exception:'Real gases deviate most from ideal behaviour near their condensation (liquefaction) conditions.'
   },
   {
-    id: 33, subject: 'Physics',
-    text: 'Water has specific heat capacity 4200 J/(kg·K). Energy needed to raise 2 kg by 5°C:',
-    options: { A: '2100 J', B: '8400 J', C: '21 000 J', D: '42 000 J' },
-    answer: 'D',
-    explanation: 'Q = mcΔT = 2 × 4200 × 5 = 42 000 J.',
-    exception: 'Specific heat capacity is per kg per degree; don\'t forget to multiply by BOTH mass and ΔT.',
+    id:34, topic:'Heat & Thermodynamics',
+    text:'A bimetallic strip bends when heated because the two metals have:',
+    options:{A:'Different densities',B:'Different specific heat capacities',C:'Different coefficients of linear expansion',D:'Different melting points'},
+    answer:'C',
+    explanation:'The metal with the higher coefficient of expansion expands more, causing the strip to curve towards the less expansive metal.',
+    exception:'This differential expansion is exploited in thermostats, fire alarms, and circuit breakers.'
   },
   {
-    id: 34, subject: 'Physics',
-    text: 'The photoelectric effect — electrons emitted only above a threshold frequency — supports:',
-    options: { A: 'Classical wave theory of light', B: 'Quantum (particle) theory of light', C: 'Both theories equally', D: 'Neither theory' },
-    answer: 'B',
-    explanation: 'Below the threshold, no electrons are emitted regardless of intensity — proving photons carry discrete energy packets.',
-    exception: 'Classical wave theory predicted intensity (not frequency) should govern emission; experiment disproved this.',
+    id:35, topic:'Heat & Thermodynamics',
+    text:'Newton\'s law of cooling states that the rate of heat loss of an object is proportional to:',
+    options:{A:'Its absolute temperature',B:'The square of its temperature',C:'The excess temperature above the surroundings',D:'Its mass'},
+    answer:'C',
+    explanation:'dQ/dt ∝ (T_object − T_surroundings). The greater the temperature difference, the faster the cooling.',
+    exception:'This law only applies for small temperature differences; Stefan-Boltzmann law is used for large differences.'
   },
   {
-    id: 35, subject: 'Physics',
-    text: 'The de Broglie wavelength of a particle with momentum p is:',
-    options: { A: 'λ = h/p', B: 'λ = p/h', C: 'λ = hp', D: 'λ = h/p²' },
-    answer: 'A',
-    explanation: 'λ = h/p, where h is Planck\'s constant. This links wave and particle descriptions of matter.',
-    exception: 'All matter has a de Broglie wavelength, but it is only significant for very small masses like electrons.',
+    id:36, topic:'Heat & Thermodynamics',
+    text:'Which of the following is NOT a greenhouse gas?',
+    options:{A:'Water vapour',B:'Methane',C:'Oxygen',D:'Carbon dioxide'},
+    answer:'C',
+    explanation:'O₂ does not absorb infrared radiation and therefore does not contribute to the greenhouse effect.',
+    exception:'N₂ (nitrogen) is also not a greenhouse gas — together N₂ and O₂ make up ~99% of the atmosphere but are not greenhouse gases.'
+  },
+  {
+    id:37, topic:'Heat & Thermodynamics',
+    text:'The triple point of water is the unique temperature and pressure at which:',
+    options:{A:'Water boils under pressure',B:'Ice melts fastest',C:'All three phases (solid, liquid, gas) coexist in equilibrium',D:'Water has maximum density'},
+    answer:'C',
+    explanation:'At 273.16 K and 611.7 Pa, water exists simultaneously as ice, liquid, and vapour in thermodynamic equilibrium.',
+    exception:'The triple point is used as a fundamental reference point for the Kelvin temperature scale.'
+  },
+  {
+    id:38, topic:'Heat & Thermodynamics',
+    text:'An ideal gas undergoes isothermal compression. Which statement is correct?',
+    options:{A:'Internal energy increases',B:'Temperature falls',C:'Pressure increases as volume decreases',D:'Heat is absorbed from surroundings'},
+    answer:'C',
+    explanation:'Isothermal means T = constant. By Boyle\'s Law, PV = const, so P increases as V decreases.',
+    exception:'Since T is constant, internal energy is unchanged (ΔU = 0). Work done ON the gas equals heat released to surroundings.'
+  },
+  {
+    id:39, topic:'Heat & Thermodynamics',
+    text:'The coefficient of cubical expansion of a liquid is approximately:',
+    options:{A:'One-third of linear expansion',B:'Three times the linear expansion',C:'Equal to linear expansion',D:'Six times the linear expansion'},
+    answer:'B',
+    explanation:'γ ≈ 3α where γ is cubical (volume) expansion and α is linear expansion.',
+    exception:'For liquids, only cubical (volume) expansion is meaningful; linear expansion applies to solids.'
+  },
+  {
+    id:40, topic:'Heat & Thermodynamics',
+    text:'A heat engine absorbs 1 000 J per cycle and does 400 J of work. Heat rejected to the cold reservoir is:',
+    options:{A:'400 J',B:'600 J',C:'1 000 J',D:'1 400 J'},
+    answer:'B',
+    explanation:'Energy conservation: Q_hot = W + Q_cold → 1 000 = 400 + Q_cold → Q_cold = 600 J.',
+    exception:'Efficiency here is 40% — the rejected heat is NOT wasted; it is required by the second law.'
+  },
+
+  /* ══ WAVES & OPTICS (41–58) ══ */
+  {
+    id:41, topic:'Waves & Optics',
+    text:'Light of frequency 6 × 10¹⁴ Hz travels in a vacuum. Its wavelength is: (c = 3 × 10⁸ m/s)',
+    options:{A:'2 × 10⁻⁶ m',B:'5 × 10⁻⁷ m',C:'1.8 × 10²³ m',D:'2 × 10⁶ m'},
+    answer:'B',
+    explanation:'λ = c/f = (3 × 10⁸)/(6 × 10¹⁴) = 5 × 10⁻⁷ m = 500 nm (green visible light).',
+    exception:'This is in the visible spectrum. UV has shorter wavelengths; IR has longer wavelengths.'
+  },
+  {
+    id:42, topic:'Waves & Optics',
+    text:'Which electromagnetic wave has the longest wavelength?',
+    options:{A:'X-rays',B:'Ultraviolet',C:'Infrared',D:'Radio waves'},
+    answer:'D',
+    explanation:'The EM spectrum from shortest to longest wavelength: γ-rays, X-rays, UV, visible, IR, microwaves, radio waves.',
+    exception:'Radio waves can be kilometres long; gamma rays are smaller than an atomic nucleus.'
+  },
+  {
+    id:43, topic:'Waves & Optics',
+    text:'A convex lens has focal length 25 cm. An object is placed 100 cm away. The image distance is:',
+    options:{A:'25 cm',B:'33.3 cm',C:'50 cm',D:'75 cm'},
+    answer:'B',
+    explanation:'1/v − 1/u = 1/f (real-is-positive): 1/v = 1/25 + 1/−(−100). Using 1/f = 1/v − 1/u with u = −100 (object left): 1/25 = 1/v + 1/100 → 1/v = 4/100 − 1/100 = 3/100 → v = 33.3 cm.',
+    exception:'Sign conventions differ by textbook; always state which convention you use. Here, object distance is negative (real object, left of lens).'
+  },
+  {
+    id:44, topic:'Waves & Optics',
+    text:'Polarisation of light proves that light waves are:',
+    options:{A:'Longitudinal',B:'Transverse',C:'Mechanical',D:'Standing waves'},
+    answer:'B',
+    explanation:'Only transverse waves can be polarised (restricted to oscillation in one plane). Sound (longitudinal) cannot be polarised.',
+    exception:'Polarisation is impossible for longitudinal waves — this is the experimental proof that light is transverse.'
+  },
+  {
+    id:45, topic:'Waves & Optics',
+    text:'In Young\'s double-slit experiment, if the slit separation is halved, fringe spacing:',
+    options:{A:'Halves',B:'Doubles',C:'Stays the same',D:'Quadruples'},
+    answer:'B',
+    explanation:'Fringe width y = λD/d. If d is halved, y doubles.',
+    exception:'Increasing wavelength or increasing screen distance D also widens fringes — three ways to change fringe width.'
+  },
+  {
+    id:46, topic:'Waves & Optics',
+    text:'The critical angle for glass-air interface (n_glass = 1.5) is approximately:',
+    options:{A:'30°',B:'42°',C:'48°',D:'60°'},
+    answer:'B',
+    explanation:'sin C = 1/n = 1/1.5 = 0.667 → C = sin⁻¹(0.667) ≈ 41.8° ≈ 42°.',
+    exception:'Beyond the critical angle, all light is internally reflected — the basis of fibre optics and diamond brilliance.'
+  },
+  {
+    id:47, topic:'Waves & Optics',
+    text:'The image formed by a plane mirror is:',
+    options:{A:'Real, inverted, same size',B:'Virtual, upright, same size',C:'Real, upright, magnified',D:'Virtual, inverted, diminished'},
+    answer:'B',
+    explanation:'A plane mirror always produces a virtual (behind mirror), upright, laterally inverted image the same size as the object.',
+    exception:'The image appears to be as far behind the mirror as the object is in front — it is not laterally inverted top-to-bottom, only left-to-right.'
+  },
+  {
+    id:48, topic:'Waves & Optics',
+    text:'Which phenomenon explains why the sky is blue?',
+    options:{A:'Reflection of sunlight off the ocean',B:'Diffraction of light by clouds',C:'Rayleigh scattering of sunlight by air molecules',D:'Refraction of light at the horizon'},
+    answer:'C',
+    explanation:'Rayleigh scattering scatters shorter (blue) wavelengths much more strongly than longer (red) wavelengths. Blue light is scattered in all directions, making the sky appear blue.',
+    exception:'At sunset/sunrise, light travels through more atmosphere, scattering away most blue — leaving red and orange hues.'
+  },
+  {
+    id:49, topic:'Waves & Optics',
+    text:'Resonance in a vibrating string occurs when the string length equals:',
+    options:{A:'Any integer multiple of the wavelength',B:'An odd multiple of quarter-wavelength only',C:'A whole number multiple of half-wavelength',D:'Twice the wavelength'},
+    answer:'C',
+    explanation:'For a string fixed at both ends, L = nλ/2 (n = 1, 2, 3, …). The fundamental (n=1) has λ = 2L.',
+    exception:'An open pipe also has L = nλ/2; a closed pipe has L = (2n−1)λ/4. Boundary conditions differ.'
+  },
+  {
+    id:50, topic:'Waves & Optics',
+    text:'A longitudinal wave travels through air. Which quantity oscillates parallel to the direction of wave travel?',
+    options:{A:'Pressure variation only',B:'The air molecules (particle displacement)',C:'Electric field',D:'Transverse displacement'},
+    answer:'B',
+    explanation:'In a longitudinal wave, particles oscillate back and forth along the direction of wave propagation, creating compressions and rarefactions.',
+    exception:'The pressure variation is also parallel to propagation, but "particle displacement" is the primary descriptor of wave type.'
+  },
+  {
+    id:51, topic:'Waves & Optics',
+    text:'A sound wave has intensity I. The intensity level in decibels relative to I₀ is:',
+    options:{A:'10 log(I/I₀)',B:'log(I/I₀)',C:'10 ln(I/I₀)',D:'20 log(I/I₀)'},
+    answer:'A',
+    explanation:'β (dB) = 10 log₁₀(I/I₀), where I₀ = 10⁻¹² W/m² is the threshold of hearing.',
+    exception:'The factor 20 (not 10) is used for amplitude or pressure ratios: β = 20 log(P/P₀).'
+  },
+  {
+    id:52, topic:'Waves & Optics',
+    text:'An object is placed at the focal point of a concave mirror. The image is formed:',
+    options:{A:'At the centre of curvature',B:'Between F and the mirror',C:'At infinity',D:'Behind the mirror'},
+    answer:'C',
+    explanation:'When u = f in the mirror formula (1/v + 1/u = 1/f), v = ∞. Reflected rays are parallel.',
+    exception:'This principle is exploited in searchlights and car headlights — a bulb at F produces a parallel beam.'
+  },
+  {
+    id:53, topic:'Waves & Optics',
+    text:'Diffraction is most pronounced when the wavelength of the wave is:',
+    options:{A:'Much smaller than the aperture',B:'Much larger than the aperture',C:'Comparable to the size of the aperture',D:'Independent of aperture size'},
+    answer:'C',
+    explanation:'Maximum diffraction occurs when λ ≈ aperture size. Very small λ gives little spreading; very large λ gives broad but weak diffraction.',
+    exception:'Radio waves (long λ) diffract around buildings; light (short λ) barely diffracts through doorways.'
+  },
+  {
+    id:54, topic:'Waves & Optics',
+    text:'A person\'s near point is 100 cm. To read clearly at 25 cm, a lens of power _____ is needed.',
+    options:{A:'+3 D',B:'+4 D',C:'+5 D',D:'+6 D'},
+    answer:'A',
+    explanation:'Using lens formula: 1/f = 1/v − 1/u = 1/(−100) − 1/(−25) = −0.01 + 0.04 = 0.03 m⁻¹... Wait — recompute: object at 25 cm, image at −100 cm (virtual). 1/f = 1/(−100) + 1/25 (in cm) = (−1+4)/100 = 3/100 cm⁻¹ → f = 33.3 cm → P = 1/0.333 = 3 D.',
+    exception:'Hypermetropia (far-sightedness) is corrected with converging (positive) lenses; myopia with diverging (negative) lenses.'
+  },
+  {
+    id:55, topic:'Waves & Optics',
+    text:'Electromagnetic waves are produced by:',
+    options:{A:'Stationary electric charges',B:'Moving electric charges at constant velocity',C:'Accelerating electric charges',D:'Magnetic monopoles'},
+    answer:'C',
+    explanation:'Only accelerating charges emit electromagnetic radiation (Maxwell\'s theory). Constant velocity charges produce static fields only.',
+    exception:'This is why oscillating electrons in an antenna emit radio waves, and why decelerating electrons produce X-rays (Bremsstrahlung).'
+  },
+  {
+    id:56, topic:'Waves & Optics',
+    text:'The refractive index of a medium is 1.6. The angle of refraction for a ray entering from air at 30° incidence is approximately:',
+    options:{A:'18.2°',B:'24.6°',C:'30°',D:'53°'},
+    answer:'A',
+    explanation:'Snell\'s law: n₁ sin θ₁ = n₂ sin θ₂ → sin θ₂ = sin 30°/1.6 = 0.5/1.6 = 0.3125 → θ₂ ≈ 18.2°.',
+    exception:'Light bends towards the normal when entering a denser medium (n₂ > n₁), so θ₂ < θ₁.'
+  },
+  {
+    id:57, topic:'Waves & Optics',
+    text:'Infrared radiation is detected using:',
+    options:{A:'Geiger-Müller tube',B:'Photographic film sensitive to UV',C:'Thermopile or blackened thermometer',D:'Fluorescent screen'},
+    answer:'C',
+    explanation:'Infrared (heat radiation) is detected by thermal sensors such as thermopiles, bolometers, or blackened thermometers.',
+    exception:'Geiger-Müller tubes detect ionising radiation (α, β, γ); fluorescent screens detect UV and X-rays.'
+  },
+  {
+    id:58, topic:'Waves & Optics',
+    text:'Two coherent sources for observable interference must have:',
+    options:{A:'The same amplitude and zero phase difference',B:'A constant phase difference and the same frequency',C:'Equal intensities and opposite phases',D:'Identical wavelengths and zero path difference'},
+    answer:'B',
+    explanation:'Coherent sources maintain a constant (not necessarily zero) phase difference and have the same frequency.',
+    exception:'Same amplitude is preferred for maximum contrast but not strictly required for interference to occur.'
+  },
+
+  /* ══ ELECTRICITY & MAGNETISM (59–78) ══ */
+  {
+    id:59, topic:'Electricity & Magnetism',
+    text:'Coulomb\'s law states that the electrostatic force between two charges is:',
+    options:{A:'Proportional to the sum of charges and inversely proportional to distance',B:'Proportional to the product of charges and inversely proportional to the square of distance',C:'Independent of the medium between the charges',D:'Proportional to the square of each charge'},
+    answer:'B',
+    explanation:'F = kQ₁Q₂/r². Force is proportional to the product of charges and inversely proportional to r².',
+    exception:'The medium affects the force: in a medium of permittivity ε, k is replaced by 1/(4πε), reducing the force.'
+  },
+  {
+    id:60, topic:'Electricity & Magnetism',
+    text:'The electric field inside a hollow charged conductor is:',
+    options:{A:'Maximum at the centre',B:'Equal to the external field',C:'Zero',D:'Proportional to the charge on the surface'},
+    answer:'C',
+    explanation:'By Gauss\'s law, the electric field inside a conductor in electrostatic equilibrium is zero — charge resides only on the surface.',
+    exception:'This is the Faraday cage effect — a hollow conductor shields its interior from external electric fields.'
+  },
+  {
+    id:61, topic:'Electricity & Magnetism',
+    text:'A capacitor of capacitance 200 µF is charged to 50 V. The energy stored is:',
+    options:{A:'0.1 J',B:'0.25 J',C:'0.5 J',D:'5 J'},
+    answer:'B',
+    explanation:'E = ½CV² = ½ × 200 × 10⁻⁶ × 2500 = ½ × 0.5 = 0.25 J.',
+    exception:'Energy = ½CV² = ½QV = Q²/(2C). All three forms are equivalent.'
+  },
+  {
+    id:62, topic:'Electricity & Magnetism',
+    text:'Three capacitors of 3 µF, 6 µF, and 9 µF are connected in series. Total capacitance is:',
+    options:{A:'18 µF',B:'6 µF',C:'1.64 µF',D:'3 µF'},
+    answer:'C',
+    explanation:'1/C = 1/3 + 1/6 + 1/9 = 6/18 + 3/18 + 2/18 = 11/18 → C = 18/11 ≈ 1.64 µF.',
+    exception:'Series capacitors give a lower total — opposite to resistors. Parallel capacitors add directly.'
+  },
+  {
+    id:63, topic:'Electricity & Magnetism',
+    text:'The terminal voltage of a battery with EMF 12 V and internal resistance 1 Ω, supplying 2 A is:',
+    options:{A:'10 V',B:'11 V',C:'12 V',D:'14 V'},
+    answer:'A',
+    explanation:'V_terminal = EMF − Ir = 12 − (2 × 1) = 10 V.',
+    exception:'The terminal voltage equals EMF only when current is zero (open circuit). Increasing load decreases terminal voltage.'
+  },
+  {
+    id:64, topic:'Electricity & Magnetism',
+    text:'The heating effect of current in a resistor is given by:',
+    options:{A:'P = I/R',B:'P = IR',C:'P = I²R',D:'P = IR²'},
+    answer:'C',
+    explanation:'P = I²R (from P = IV and V = IR). Also written P = V²/R.',
+    exception:'The heating effect increases with the SQUARE of current — doubling current quadruples heat produced.'
+  },
+  {
+    id:65, topic:'Electricity & Magnetism',
+    text:'A current-carrying conductor placed in a magnetic field experiences a force. This is the principle behind:',
+    options:{A:'Transformer',B:'Electric generator',C:'Electric motor',D:'Capacitor'},
+    answer:'C',
+    explanation:'An electric motor uses the force on a current-carrying conductor in a magnetic field (F = BIL) to produce rotation.',
+    exception:'A generator uses the reverse: mechanical rotation in a magnetic field generates current (electromagnetic induction).'
+  },
+  {
+    id:66, topic:'Electricity & Magnetism',
+    text:'Lenz\'s law is a consequence of the conservation of:',
+    options:{A:'Charge',B:'Momentum',C:'Energy',D:'Mass'},
+    answer:'C',
+    explanation:'The induced EMF always opposes the change causing it — if it aided the change, energy would be created from nothing.',
+    exception:'Lenz\'s law determines the DIRECTION of induced current; Faraday\'s law gives its MAGNITUDE.'
+  },
+  {
+    id:67, topic:'Electricity & Magnetism',
+    text:'In an RL circuit, when a DC source is switched on, the current:',
+    options:{A:'Instantly reaches its maximum value',B:'Grows exponentially towards a maximum value',C:'Oscillates sinusoidally',D:'Decreases exponentially to zero'},
+    answer:'B',
+    explanation:'The inductor opposes sudden current changes; current builds up exponentially with time constant τ = L/R.',
+    exception:'The larger the inductance L, the slower the current rises. Once steady state is reached, the inductor acts as a plain wire.'
+  },
+  {
+    id:68, topic:'Electricity & Magnetism',
+    text:'The force on a charge q moving with velocity v perpendicular to a magnetic field B is:',
+    options:{A:'F = qvB sin θ',B:'F = qvB only when θ = 0°',C:'F = qB/v',D:'F = qv/B'},
+    answer:'A',
+    explanation:'F = qvB sin θ. Maximum force (qvB) occurs when v ⊥ B (θ = 90°); zero force when v ∥ B (θ = 0°).',
+    exception:'This magnetic force does no work on the charge — it only changes the direction, not the speed.'
+  },
+  {
+    id:69, topic:'Electricity & Magnetism',
+    text:'Ohm\'s law is a material property, not a universal law. It fails for:',
+    options:{A:'Copper at room temperature',B:'Semiconductor diodes',C:'Carbon resistors',D:'Nichrome wire'},
+    answer:'B',
+    explanation:'Semiconductor diodes have non-linear I-V characteristics — resistance depends on voltage and direction. They are "non-ohmic" devices.',
+    exception:'Filament bulbs also deviate from Ohm\'s law because resistance increases with temperature.'
+  },
+  {
+    id:70, topic:'Electricity & Magnetism',
+    text:'A step-down transformer reduces voltage from 240 V to 12 V. If the primary has 800 turns, the secondary has:',
+    options:{A:'16 turns',B:'40 turns',C:'160 turns',D:'400 turns'},
+    answer:'B',
+    explanation:'N_s/N_p = V_s/V_p → N_s = 800 × (12/240) = 800 × 0.05 = 40 turns.',
+    exception:'In an ideal transformer, P_primary = P_secondary; current increases as voltage decreases.'
+  },
+  {
+    id:71, topic:'Electricity & Magnetism',
+    text:'The unit of magnetic flux is the:',
+    options:{A:'Tesla',B:'Weber',C:'Henry',D:'Gauss'},
+    answer:'B',
+    explanation:'Magnetic flux Φ = B·A has SI unit Weber (Wb). Tesla (T) is the unit of magnetic flux density (B = Φ/A).',
+    exception:'1 Weber = 1 Tesla × 1 m². Henry (H) is the unit of inductance, not flux.'
+  },
+  {
+    id:72, topic:'Electricity & Magnetism',
+    text:'The capacitive reactance X_C of a capacitor in an AC circuit:',
+    options:{A:'Increases with increasing frequency',B:'Decreases with increasing frequency',C:'Is independent of frequency',D:'Is equal to the resistance'},
+    answer:'B',
+    explanation:'X_C = 1/(2πfC). As frequency f increases, X_C decreases — capacitors "pass" high-frequency signals easily.',
+    exception:'Inductive reactance X_L = 2πfL does the opposite: increases with frequency. Together they form resonant circuits.'
+  },
+  {
+    id:73, topic:'Electricity & Magnetism',
+    text:'Kirchhoff\'s voltage law (KVL) states that around any closed loop:',
+    options:{A:'The sum of currents is zero',B:'The sum of all EMFs equals the sum of voltage drops',C:'Resistance equals voltage divided by current',D:'Power dissipated equals power supplied'},
+    answer:'B',
+    explanation:'KVL: ΣV = 0 around a closed loop, equivalently ΣEMF = ΣIR. This expresses conservation of energy.',
+    exception:'KCL (currents at a node) expresses conservation of charge; KVL (voltages around loop) expresses conservation of energy.'
+  },
+  {
+    id:74, topic:'Electricity & Magnetism',
+    text:'The potential difference across a 40 Ω resistor carrying 0.5 A is:',
+    options:{A:'0.0125 V',B:'20 V',C:'80 V',D:'40.5 V'},
+    answer:'B',
+    explanation:'V = IR = 0.5 × 40 = 20 V. Ohm\'s law applied directly.',
+    exception:'Ensure units are consistent: amperes × ohms = volts.'
+  },
+  {
+    id:75, topic:'Electricity & Magnetism',
+    text:'Electromagnetic induction occurs when there is a change in:',
+    options:{A:'Resistance through the conductor',B:'Magnetic flux through a circuit',C:'Current in an external circuit',D:'Voltage across the terminals'},
+    answer:'B',
+    explanation:'Faraday\'s law: EMF = −dΦ/dt. Any change in magnetic flux (whether by changing B, area, or angle) induces an EMF.',
+    exception:'A stationary conductor in a constant magnetic field experiences no induction — change in flux is essential.'
+  },
+  {
+    id:76, topic:'Electricity & Magnetism',
+    text:'In a series RLC circuit at resonance:',
+    options:{A:'Impedance is maximum',B:'Current is minimum',C:'Inductive and capacitive reactances are equal and cancel',D:'The circuit behaves as a pure capacitor'},
+    answer:'C',
+    explanation:'At resonance, X_L = X_C, so they cancel. Impedance Z = R (minimum), and current is maximum.',
+    exception:'At resonance, voltage across L and C can individually exceed the supply voltage — but they are equal and opposite.'
+  },
+  {
+    id:77, topic:'Electricity & Magnetism',
+    text:'The electric potential at a point is the work done per unit charge in bringing a positive test charge from:',
+    options:{A:'One point to another',B:'Infinity to that point',C:'The charge to infinity',D:'The surface to the centre of a conductor'},
+    answer:'B',
+    explanation:'Electric potential V = W/q, where W is work done bringing +q from infinity (zero reference) to the point.',
+    exception:'Potential is a scalar; electric field is a vector. E = −dV/dr (field is the negative gradient of potential).'
+  },
+  {
+    id:78, topic:'Electricity & Magnetism',
+    text:'A 100 W bulb and a 60 W bulb are connected in series to a 240 V supply. Which glows brighter?',
+    options:{A:'The 100 W bulb',B:'They glow equally',C:'The 60 W bulb',D:'Neither glows'},
+    answer:'C',
+    explanation:'In series, same current flows. R = V²/P, so 60 W has higher resistance (R∝1/P). Power P=I²R → higher R → more power → brighter.',
+    exception:'This counter-intuitive result (lower-rated bulb brighter in series) is a classic JAMB/UTME exam question.'
+  },
+
+  /* ══ MODERN PHYSICS & ATOMIC STRUCTURE (79–100) ══ */
+  {
+    id:79, topic:'Modern Physics',
+    text:'The photoelectric effect showed that the energy of a photon is:',
+    options:{A:'E = hλ',B:'E = hf',C:'E = mc',D:'E = h/f'},
+    answer:'B',
+    explanation:'E = hf, where h = 6.63 × 10⁻³⁴ J·s (Planck\'s constant) and f is frequency.',
+    exception:'E = hc/λ is equivalent (since c = fλ), but E = hf is the primary form from Planck\'s quantum hypothesis.'
+  },
+  {
+    id:80, topic:'Modern Physics',
+    text:'The work function of a metal is the minimum energy required to:',
+    options:{A:'Ionise an atom in the metal',B:'Eject an electron from the metal surface',C:'Break a chemical bond in the metal',D:'Accelerate an electron through 1 V'},
+    answer:'B',
+    explanation:'The work function φ is the minimum energy needed to free a surface electron. If hf < φ, no photoelectric emission occurs.',
+    exception:'Excess photon energy beyond the work function becomes the kinetic energy of the emitted electron: KE_max = hf − φ.'
+  },
+  {
+    id:81, topic:'Modern Physics',
+    text:'In Bohr\'s model, an electron emits a photon when it:',
+    options:{A:'Moves from a lower to a higher energy level',B:'Moves from a higher to a lower energy level',C:'Orbits the nucleus at constant speed',D:'Absorbs energy from the nucleus'},
+    answer:'B',
+    explanation:'When an electron drops to a lower energy level, energy is released as a photon of frequency f = (E_high − E_low)/h.',
+    exception:'Absorption (photon in) moves electron to higher level; emission (photon out) moves it lower — opposite processes.'
+  },
+  {
+    id:82, topic:'Modern Physics',
+    text:'The half-life of a radioactive isotope is 8 days. After 24 days, the fraction of original sample remaining is:',
+    options:{A:'1/4',B:'1/6',C:'1/8',D:'1/16'},
+    answer:'C',
+    explanation:'24 days = 3 half-lives. Remaining fraction = (1/2)³ = 1/8.',
+    exception:'Number of half-lives = total time / half-life. Each half-life reduces the remaining amount by half.'
+  },
+  {
+    id:83, topic:'Modern Physics',
+    text:'Alpha particles are identical to:',
+    options:{A:'Helium-4 nuclei',B:'High-energy electrons',C:'Hydrogen nuclei',D:'Helium-3 nuclei'},
+    answer:'A',
+    explanation:'An alpha particle consists of 2 protons and 2 neutrons — identical to a helium-4 (⁴He) nucleus.',
+    exception:'Beta particles are electrons (β⁻) or positrons (β⁺); gamma rays are high-energy photons — not particles.'
+  },
+  {
+    id:84, topic:'Modern Physics',
+    text:'Nuclear fission releases energy because:',
+    options:{A:'Products have greater mass than reactants',B:'Mass of products is less than mass of reactants (mass defect)',C:'Neutrons are absorbed during the reaction',D:'Protons are converted to neutrons'},
+    answer:'B',
+    explanation:'The mass defect Δm is converted to energy via E = Δmc² (Einstein\'s mass-energy equivalence).',
+    exception:'Even tiny mass differences release enormous energy because c² ≈ 9 × 10¹⁶ m²/s².'
+  },
+  {
+    id:85, topic:'Modern Physics',
+    text:'The Geiger-Müller (GM) tube detects ionising radiation by:',
+    options:{A:'Producing light flashes when struck by particles',B:'Producing a pulse of current from gas ionisation',C:'Measuring the temperature rise due to radiation',D:'Absorbing gamma rays in a dense metal'},
+    answer:'B',
+    explanation:'Ionising radiation creates ion pairs in the gas-filled GM tube; the resulting pulse of current is counted electronically.',
+    exception:'Scintillation counters detect radiation via light flashes; thermoluminescent dosimeters (TLDs) measure dose — different techniques.'
+  },
+  {
+    id:86, topic:'Modern Physics',
+    text:'Pair production occurs when a high-energy photon:',
+    options:{A:'Ejects an electron from a metal surface',B:'Is absorbed by a nucleus causing fission',C:'Creates an electron-positron pair near a nucleus',D:'Scatters off an electron losing energy'},
+    answer:'C',
+    explanation:'Pair production converts photon energy into mass: γ → e⁻ + e⁺. Minimum photon energy = 2m_e c² ≈ 1.02 MeV.',
+    exception:'The reverse — pair annihilation — converts e⁻ + e⁺ → 2 photons, releasing 1.02 MeV total.'
+  },
+  {
+    id:87, topic:'Modern Physics',
+    text:'An electron is accelerated through a potential difference of 100 V. Its kinetic energy is:',
+    options:{A:'1.6 × 10⁻¹⁹ J',B:'1.6 × 10⁻¹⁷ J',C:'1.6 × 10⁻²¹ J',D:'100 eV only in SI'},
+    answer:'B',
+    explanation:'KE = eV = 1.6 × 10⁻¹⁹ × 100 = 1.6 × 10⁻¹⁷ J. (Also expressed as 100 eV.)',
+    exception:'1 eV = 1.6 × 10⁻¹⁹ J. The electron-volt is a convenient unit for atomic-scale energies.'
+  },
+  {
+    id:88, topic:'Modern Physics',
+    text:'Radioactive decay is a:',
+    options:{A:'Chemical reaction that depends on temperature',B:'Random and spontaneous nuclear process',C:'Process that can be slowed by cooling',D:'Process triggered by chemical bonding'},
+    answer:'B',
+    explanation:'Radioactive decay is a spontaneous, random nuclear process — unaffected by temperature, pressure, or chemical state.',
+    exception:'Half-life is statistical: we cannot predict WHICH atom decays next, only the fraction that will decay per unit time.'
+  },
+  {
+    id:89, topic:'Modern Physics',
+    text:'The atomic number of an element equals:',
+    options:{A:'The number of neutrons in the nucleus',B:'The total number of nucleons',C:'The number of protons in the nucleus',D:'The mass of the atom in atomic mass units'},
+    answer:'C',
+    explanation:'Atomic number Z = number of protons. It uniquely identifies the element. Mass number A = Z + N (protons + neutrons).',
+    exception:'Isotopes have the same Z but different N (and different A). They are the same element but differ in mass.'
+  },
+  {
+    id:90, topic:'Modern Physics',
+    text:'In a nuclear equation ₉₂²³⁸U → ₉₀²³⁴Th + ?, the emitted particle is:',
+    options:{A:'Beta particle (₋₁⁰e)',B:'Alpha particle (₂⁴He)',C:'Gamma ray (₀⁰γ)',D:'Neutron (₀¹n)'},
+    answer:'B',
+    explanation:'Mass number: 238 = 234 + 4 ✓. Atomic number: 92 = 90 + 2 ✓. This matches an alpha particle ₂⁴He.',
+    exception:'Alpha decay reduces Z by 2 and A by 4; beta-minus decay increases Z by 1 (no change in A).'
+  },
+  {
+    id:91, topic:'Modern Physics',
+    text:'The de Broglie wavelength of a particle of mass m moving with velocity v is:',
+    options:{A:'λ = mv/h',B:'λ = h/mv',C:'λ = hmv',D:'λ = h/m²v'},
+    answer:'B',
+    explanation:'λ = h/p = h/(mv). This wave-particle duality applies to all matter; it is only measurable for very small particles.',
+    exception:'For an electron accelerated through V volts: p = √(2meV) and λ = h/√(2meV).'
+  },
+  {
+    id:92, topic:'Modern Physics',
+    text:'X-rays are produced when:',
+    options:{A:'Gamma rays interact with matter',B:'Fast-moving electrons are suddenly decelerated by a metal target',C:'Protons collide with neutrons',D:'Visible light is reflected from a crystal'},
+    answer:'B',
+    explanation:'X-rays (Bremsstrahlung) are produced when high-speed electrons decelerate rapidly — kinetic energy converts to X-ray photons.',
+    exception:'Characteristic X-rays are also produced when inner-shell electrons are displaced and outer electrons fill the gaps.'
+  },
+  {
+    id:93, topic:'Modern Physics',
+    text:'The binding energy per nucleon is greatest for:',
+    options:{A:'Hydrogen-1',B:'Uranium-238',C:'Iron-56',D:'Helium-4'},
+    answer:'C',
+    explanation:'Iron-56 has the highest binding energy per nucleon (~8.8 MeV) — it is the most stable nucleus. Fission and fusion both release energy by moving nuclei towards iron.',
+    exception:'Elements lighter than Fe release energy by fusion; heavier elements release energy by fission — all moving towards Fe stability.'
+  },
+  {
+    id:94, topic:'Modern Physics',
+    text:'Compton scattering demonstrated that:',
+    options:{A:'Light has a fixed speed in all media',B:'Electrons orbit in discrete shells',C:'Photons have momentum and behave as particles',D:'Gamma rays can produce electron-positron pairs'},
+    answer:'C',
+    explanation:'When X-rays scatter off electrons with a wavelength shift, it proved photons carry momentum p = h/λ — a particle property.',
+    exception:'The photoelectric effect showed photons carry energy; Compton scattering showed they carry momentum — together establishing the photon particle model.'
+  },
+  {
+    id:95, topic:'Modern Physics',
+    text:'In a semiconductor, the energy gap between valence and conduction bands is:',
+    options:{A:'Zero (bands overlap)',B:'Very large (> 5 eV)',C:'Small (0.1–2 eV)',D:'Exactly 1.0 eV for all semiconductors'},
+    answer:'C',
+    explanation:'Semiconductors have a small band gap (~0.1–2 eV) that can be overcome by thermal energy or doping. Conductors have no gap; insulators have large gaps (> 5 eV).',
+    exception:'Silicon has E_gap = 1.1 eV; germanium = 0.67 eV. Temperature affects conductivity by enabling more electrons to bridge the gap.'
+  },
+  {
+    id:96, topic:'Modern Physics',
+    text:'A radioactive sample initially contains N₀ atoms. After two half-lives the number of undecayed atoms is:',
+    options:{A:'N₀/2',B:'N₀/3',C:'N₀/4',D:'N₀/8'},
+    answer:'C',
+    explanation:'After 1 half-life: N₀/2. After 2 half-lives: N₀/4.',
+    exception:'The number decayed is N₀ − N₀/4 = 3N₀/4. Remaining and decayed fractions always sum to 1.'
+  },
+  {
+    id:97, topic:'Modern Physics',
+    text:'Which of the following radiations has the greatest penetrating power?',
+    options:{A:'Alpha (α)',B:'Beta (β)',C:'Gamma (γ)',D:'They all penetrate equally'},
+    answer:'C',
+    explanation:'γ-rays (electromagnetic) penetrate most — requiring centimetres of lead or metres of concrete. β needs millimetres of aluminium; α is stopped by paper or skin.',
+    exception:'Conversely, α particles are the most ionising because their large charge and mass cause dense ionisation over a short path.'
+  },
+  {
+    id:98, topic:'Modern Physics',
+    text:'Einstein\'s special theory of relativity postulates that:',
+    options:{A:'Mass increases with altitude',B:'The speed of light in a vacuum is the same for all inertial observers',C:'Energy equals mass times velocity',D:'Time always flows at the same rate for all observers'},
+    answer:'B',
+    explanation:'The constancy of the speed of light (c) for all inertial observers is Einstein\'s second postulate, leading to time dilation and length contraction.',
+    exception:'Time dilation and length contraction are consequences, not postulates. Moving clocks run slow; moving lengths contract.'
+  },
+  {
+    id:99, topic:'Modern Physics',
+    text:'Nuclear fusion requires extremely high temperatures because:',
+    options:{A:'Neutrons need to overcome gravitational attraction',B:'Protons must overcome electrostatic repulsion to come close enough for the strong force',C:'Electrons must be stripped from atoms',D:'The binding energy must be reduced first'},
+    answer:'B',
+    explanation:'Protons are positively charged and repel each other (Coulomb barrier). Only at temperatures ~10⁷–10⁸ K do nuclei have enough kinetic energy to overcome this repulsion.',
+    exception:'Once nuclei are close enough (~10⁻¹⁵ m), the strong nuclear force dominates and fusion occurs.'
+  },
+  {
+    id:100, topic:'Modern Physics',
+    text:'The Heisenberg Uncertainty Principle states that:',
+    options:{A:'We cannot measure the speed of light precisely',B:'The position and momentum of a particle cannot both be known with arbitrary precision simultaneously',C:'Energy is always uncertain at absolute zero',D:'The frequency of a photon is uncertain'},
+    answer:'B',
+    explanation:'ΔxΔp ≥ h/(4π). The more precisely position is known, the less precisely momentum can be known — and vice versa.',
+    exception:'This is a fundamental limit of nature, not a limitation of measuring instruments. It reflects the wave nature of matter.'
   },
 ];
 </script>
 
-<!-- Fixed Header -->
+<!-- ═══ HEADER ═══ -->
 <header class="quiz-header">
-    <div class="quiz-header-container">
-
-        <div class="quiz-header-left">
-            <button class="btn-icon" id="menuBtn" aria-label="Menu">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="subject-info">
-                <div class="subject-name" id="subjectName">Physics</div>
-                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">35</span></div>
-            </div>
-        </div>
-
-        <div class="quiz-timer-container" id="quizTimerContainer">
-            <div class="timer-progress-ring">
-                <svg viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
-                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
-                            stroke="var(--accent)" stroke-width="4"
-                            stroke-dasharray="163.36" stroke-dashoffset="0"
-                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="timer-icon"><i class="fas fa-clock"></i></div>
-            <div class="timer-display" id="timerDisplay">15:00</div>
-        </div>
-
-        <div class="quiz-header-right">
-            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
-                <i class="fas fa-calculator"></i>
-            </button>
-            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
-        </div>
+  <div class="quiz-header-container">
+    <div class="quiz-header-left">
+      <button class="btn-icon" id="menuBtn" aria-label="Menu"><i class="fas fa-bars"></i></button>
+      <div class="subject-info">
+        <div class="subject-name" id="subjectName">Physics — UTME 2026</div>
+        <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of 100</div>
+      </div>
     </div>
+    <div class="quiz-timer-container">
+      <div class="timer-progress-ring">
+        <svg viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+          <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
+                  stroke="var(--accent)" stroke-width="4"
+                  stroke-dasharray="163.36" stroke-dashoffset="0"
+                  transform="rotate(-90 30 30)" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="timer-display" id="timerDisplay">60:00</div>
+    </div>
+    <div class="quiz-header-right">
+      <button class="btn-icon" id="calculatorBtn" aria-label="Calculator"><i class="fas fa-calculator"></i></button>
+      <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
+    </div>
+  </div>
 </header>
 
+<!-- ═══ LAYOUT ═══ -->
 <div class="quiz-container">
+  <aside class="quiz-sidebar" id="quizSidebar">
+    <div class="sidebar-header">
+      <h3>Navigator</h3>
+      <button class="btn-icon" id="closeSidebar"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="sidebar-stats">
+      <div class="stat-item"><div class="stat-value" id="answeredCount">0</div><div class="stat-label">Done</div></div>
+      <div class="stat-item"><div class="stat-value" id="unansweredCount">100</div><div class="stat-label">Left</div></div>
+      <div class="stat-item"><div class="stat-value" id="flaggedCount">0</div><div class="stat-label">Flagged</div></div>
+    </div>
+    <div class="question-palette" id="questionPalette"></div>
+    <div class="sidebar-legend">
+      <div class="legend-item"><span class="legend-dot current"></span>Current</div>
+      <div class="legend-item"><span class="legend-dot answered"></span>Answered</div>
+      <div class="legend-item"><span class="legend-dot flagged"></span>Flagged</div>
+      <div class="legend-item"><span class="legend-dot"></span>Unanswered</div>
+    </div>
+    <div style="padding:1rem;border-top:1px solid var(--border);margin-top:auto;">
+      <a href="science_clusters.html" class="btn btn-secondary"
+         style="width:100%;text-align:center;display:block;"
+         onclick="return confirm('Leave quiz? Progress will be lost.')">&#8592; Back</a>
+    </div>
+  </aside>
 
-    <aside class="quiz-sidebar" id="quizSidebar">
-        <div class="sidebar-header">
-            <h3>Navigator</h3>
-            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="sidebar-stats">
-            <div class="stat-item">
-                <div class="stat-value" id="answeredCount">0</div>
-                <div class="stat-label">Done</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="unansweredCount">35</div>
-                <div class="stat-label">Left</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="flaggedCount">0</div>
-                <div class="stat-label">Flagged</div>
-            </div>
-        </div>
-        <div class="question-palette" id="questionPalette"></div>
-        <div class="sidebar-legend">
-            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
-            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
-            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
-            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
-        </div>
-        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
-            <a href="science_clusters.html"
-               class="btn btn-secondary"
-               style="width:100%;text-align:center;text-decoration:none;display:block;"
-               onclick="return confirm('Leave quiz? Progress will be lost.')">
-                &#8592; Back
-            </a>
-        </div>
-    </aside>
-
-    <main class="quiz-main">
-        <div class="question-card" id="questionCard">
-            <div class="question-header">
-                <div class="question-number">Question <span id="questionNumber">1</span></div>
-                <button class="btn-flag" id="flagBtn" aria-label="Flag">
-                    <i class="far fa-flag"></i> Flag
-                </button>
-            </div>
-            <div class="question-text" id="questionText">Loading...</div>
-            <div class="options-container" id="optionsContainer"></div>
-            <div class="question-explanation hidden" id="questionExplanation">
-                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
-                <div class="explanation-content" id="explanationContent"></div>
-            </div>
-        </div>
-
-        <div class="quiz-navigation">
-            <button class="btn btn-secondary" id="prevBtn" disabled>
-                <i class="fas fa-arrow-left"></i> Previous
-            </button>
-            <button class="btn btn-secondary" id="clearBtn">
-                <i class="fas fa-eraser"></i> Clear
-            </button>
-            <button class="btn btn-primary" id="nextBtn">
-                Next <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
-    </main>
+  <main class="quiz-main" id="quizMain">
+    <div class="question-card" id="questionCard">
+      <div class="question-header">
+        <div class="question-number">Question <span id="questionNumber">1</span></div>
+        <button class="btn-flag" id="flagBtn"><i class="far fa-flag"></i> Flag</button>
+      </div>
+      <div id="topicTag"></div>
+      <div class="question-text" id="questionText">Loading…</div>
+      <div class="options-container" id="optionsContainer"></div>
+      <div class="question-explanation hidden" id="questionExplanation">
+        <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
+        <div class="explanation-content" id="explanationContent"></div>
+        <div class="exception-content hidden" id="exceptionContent"></div>
+      </div>
+    </div>
+    <div class="quiz-navigation">
+      <button class="btn btn-secondary" id="prevBtn" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+      <button class="btn btn-secondary" id="clearBtn"><i class="fas fa-eraser"></i> Clear</button>
+      <button class="btn btn-primary" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </main>
 </div>
 
-<div class="mobile-palette-trigger" id="mobilePaletteBtn">
-    <i class="fas fa-th"></i> <span>Questions</span>
-</div>
+<button class="mobile-palette-trigger" id="mobilePaletteBtn">
+  <i class="fas fa-th"></i> <span>Questions</span>
+</button>
 
 <!-- Submit Modal -->
 <div class="modal-overlay hidden" id="submitModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3>Submit Test?</h3>
-            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="submit-summary">
-                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">35</span></div>
-                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
-                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">35</span></div>
-                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">15:00</span></div>
-            </div>
-            <div class="warning-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>You cannot change answers after submission.</span>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
-            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
-        </div>
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Submit Test?</h3>
+      <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
     </div>
+    <div class="modal-body">
+      <div class="submit-summary">
+        <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value">100</span></div>
+        <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnswered">0</span></div>
+        <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnanswered">100</span></div>
+        <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTime">60:00</span></div>
+      </div>
+      <div class="warning-message"><i class="fas fa-exclamation-triangle"></i> You cannot change answers after submission.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelSubmit">Cancel</button>
+      <button class="btn btn-danger" id="confirmSubmit"><i class="fas fa-check"></i> Submit</button>
+    </div>
+  </div>
 </div>
 
 <!-- Time Up Modal -->
 <div class="modal-overlay hidden" id="timeUpModal">
-    <div class="modal">
-        <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
-        <div class="modal-body">
-            <p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" id="viewResultsBtn">View Results</button>
-        </div>
-    </div>
+  <div class="modal">
+    <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
+    <div class="modal-body"><p style="color:var(--muted);font-size:.9rem">Your time has run out. Answers recorded.</p></div>
+    <div class="modal-footer"><button class="btn btn-primary" id="timeUpResultBtn">View Results</button></div>
+  </div>
 </div>
 
 <!-- Calculator Modal -->
 <div class="modal-overlay hidden" id="calculatorModal">
-    <div class="modal calculator-modal">
-        <div class="modal-header">
-            <h3>Calculator</h3>
-            <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="calculator">
-                <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
-                <div class="calculator-buttons">
-                    <button class="calc-btn" data-action="clear">C</button>
-                    <button class="calc-btn" data-action="delete">&#8592;</button>
-                    <button class="calc-btn" data-action="divide">&#247;</button>
-                    <button class="calc-btn" data-action="multiply">&#215;</button>
-                    <button class="calc-btn" data-value="7">7</button>
-                    <button class="calc-btn" data-value="8">8</button>
-                    <button class="calc-btn" data-value="9">9</button>
-                    <button class="calc-btn" data-action="subtract">&#8722;</button>
-                    <button class="calc-btn" data-value="4">4</button>
-                    <button class="calc-btn" data-value="5">5</button>
-                    <button class="calc-btn" data-value="6">6</button>
-                    <button class="calc-btn" data-action="add">+</button>
-                    <button class="calc-btn" data-value="1">1</button>
-                    <button class="calc-btn" data-value="2">2</button>
-                    <button class="calc-btn" data-value="3">3</button>
-                    <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
-                    <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
-                    <button class="calc-btn" data-value=".">.</button>
-                </div>
-            </div>
-        </div>
+  <div class="modal calculator-modal">
+    <div class="modal-header">
+      <h3>Calculator</h3>
+      <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
     </div>
+    <div class="modal-body">
+      <div class="calculator">
+        <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
+        <div class="calculator-buttons">
+          <button class="calc-btn" data-action="clear">C</button>
+          <button class="calc-btn" data-action="delete">&#8592;</button>
+          <button class="calc-btn" data-action="divide">&#247;</button>
+          <button class="calc-btn" data-action="multiply">&#215;</button>
+          <button class="calc-btn" data-value="7">7</button>
+          <button class="calc-btn" data-value="8">8</button>
+          <button class="calc-btn" data-value="9">9</button>
+          <button class="calc-btn" data-action="subtract">&#8722;</button>
+          <button class="calc-btn" data-value="4">4</button>
+          <button class="calc-btn" data-value="5">5</button>
+          <button class="calc-btn" data-value="6">6</button>
+          <button class="calc-btn" data-action="add">+</button>
+          <button class="calc-btn" data-value="1">1</button>
+          <button class="calc-btn" data-value="2">2</button>
+          <button class="calc-btn" data-value="3">3</button>
+          <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
+          <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
+          <button class="calc-btn" data-value=".">.</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<script src="quiz-app.js"></script>
+<!-- Results (injected) -->
+<div id="resultsView" class="hidden"></div>
+
+<!-- ═══ APP SCRIPT ═══ -->
+<script>
+/* ── STATE ── */
+let cur = 0;
+let answers = {};
+let flagged = new Set();
+let submitted = false;
+let timeLeft = DURATION;
+let timerInterval = null;
+let calcPrev = null, calcOp = null, calcReset = false;
+
+/* ── UTILS ── */
+const $ = id => document.getElementById(id);
+const fmtTime = s => {
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
+    : `${m}:${String(sec).padStart(2,'0')}`;
+};
+
+/* ── TIMER ── */
+function startTimer() {
+  $('timerDisplay').textContent = fmtTime(timeLeft);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    $('timerDisplay').textContent = fmtTime(timeLeft);
+    const pct = timeLeft / DURATION;
+    $('timerProgressCircle').setAttribute('stroke-dashoffset', 163.36 * (1 - pct));
+    if (timeLeft <= 0) { clearInterval(timerInterval); $('timeUpModal').classList.remove('hidden'); }
+  }, 1000);
+}
+
+/* ── RENDER ── */
+function render() {
+  const q = QUESTIONS[cur];
+  $('currentQuestionNum').textContent = q.id;
+  $('questionNumber').textContent = q.id;
+  $('topicTag').innerHTML = `<span class="topic-tag">${q.topic}</span>`;
+  $('questionText').textContent = q.text;
+
+  const oc = $('optionsContainer');
+  oc.innerHTML = '';
+  ['A','B','C','D'].forEach(L => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.dataset.letter = L;
+    btn.innerHTML = `<span class="option-letter">${L}.</span><span class="option-text">${q.options[L]}</span>`;
+    if (submitted) {
+      btn.disabled = true;
+      if (L === q.answer) btn.classList.add('correct');
+      else if (answers[q.id] === L) btn.classList.add('wrong');
+    } else {
+      if (answers[q.id] === L) btn.classList.add('selected');
+      btn.addEventListener('click', () => selectAnswer(L));
+    }
+    oc.appendChild(btn);
+  });
+
+  const expEl = $('questionExplanation');
+  const excEl = $('exceptionContent');
+  if (submitted) {
+    $('explanationContent').textContent = q.explanation || '';
+    if (q.exception) {
+      excEl.textContent = '⚠ Common trap: ' + q.exception;
+      excEl.classList.remove('hidden');
+    } else {
+      excEl.classList.add('hidden');
+    }
+    expEl.classList.remove('hidden');
+  } else {
+    expEl.classList.add('hidden');
+  }
+
+  const fb = $('flagBtn');
+  fb.className = 'btn-flag' + (flagged.has(q.id) ? ' flagged' : '');
+  $('prevBtn').disabled = cur === 0;
+  $('nextBtn').textContent = cur === QUESTIONS.length - 1 ? 'Finish' : 'Next ›';
+
+  updatePalette();
+  updateStats();
+}
+
+function selectAnswer(letter) {
+  if (submitted) return;
+  answers[QUESTIONS[cur].id] = letter;
+  document.querySelectorAll('.option-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.letter === letter));
+  updateStats();
+  updatePalette();
+}
+
+/* ── PALETTE ── */
+function buildPalette() {
+  const pal = $('questionPalette');
+  pal.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'palette-btn';
+    btn.textContent = q.id;
+    btn.addEventListener('click', () => { cur = i; render(); closeSidebar(); });
+    pal.appendChild(btn);
+  });
+}
+
+function updatePalette() {
+  document.querySelectorAll('.palette-btn').forEach((btn, i) => {
+    const q = QUESTIONS[i];
+    btn.className = 'palette-btn';
+    if (i === cur) btn.classList.add('current');
+    else if (flagged.has(q.id)) btn.classList.add('flagged');
+    else if (answers[q.id]) btn.classList.add('answered');
+  });
+}
+
+function updateStats() {
+  const done = Object.keys(answers).length;
+  $('answeredCount').textContent = done;
+  $('unansweredCount').textContent = TOTAL - done;
+  $('flaggedCount').textContent = flagged.size;
+}
+
+/* ── SIDEBAR ── */
+function openSidebar() { $('quizSidebar').classList.add('open'); }
+function closeSidebar() { $('quizSidebar').classList.remove('open'); }
+$('menuBtn').addEventListener('click', openSidebar);
+$('mobilePaletteBtn').addEventListener('click', openSidebar);
+$('closeSidebar').addEventListener('click', closeSidebar);
+
+/* ── NAVIGATION ── */
+$('prevBtn').addEventListener('click', () => { if (cur > 0) { cur--; render(); } });
+$('nextBtn').addEventListener('click', () => {
+  if (cur < QUESTIONS.length - 1) { cur++; render(); }
+  else openSubmitModal();
+});
+$('clearBtn').addEventListener('click', () => {
+  delete answers[QUESTIONS[cur].id];
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  updateStats(); updatePalette();
+});
+$('flagBtn').addEventListener('click', () => {
+  const id = QUESTIONS[cur].id;
+  flagged.has(id) ? flagged.delete(id) : flagged.add(id);
+  render();
+});
+
+/* ── SUBMIT ── */
+function openSubmitModal() {
+  const done = Object.keys(answers).length;
+  $('modalAnswered').textContent = done;
+  $('modalUnanswered').textContent = TOTAL - done;
+  $('modalTime').textContent = fmtTime(timeLeft);
+  $('submitModal').classList.remove('hidden');
+}
+$('submitBtn').addEventListener('click', openSubmitModal);
+$('closeSubmitModal').addEventListener('click', () => $('submitModal').classList.add('hidden'));
+$('cancelSubmit').addEventListener('click', () => $('submitModal').classList.add('hidden'));
+$('confirmSubmit').addEventListener('click', () => { $('submitModal').classList.add('hidden'); doSubmit(); });
+$('timeUpResultBtn').addEventListener('click', () => { $('timeUpModal').classList.add('hidden'); doSubmit(); });
+
+function doSubmit() {
+  clearInterval(timerInterval);
+  submitted = true;
+  $('submitBtn').disabled = true;
+  showResults();
+}
+
+/* ── RESULTS ── */
+function showResults() {
+  $('quizMain').classList.add('hidden');
+  $('mobilePaletteBtn').classList.add('hidden');
+
+  // Score by topic
+  const topicMap = {};
+  QUESTIONS.forEach(q => {
+    if (!topicMap[q.topic]) topicMap[q.topic] = { correct: 0, total: 0 };
+    topicMap[q.topic].total++;
+    if (answers[q.id] === q.answer) topicMap[q.topic].correct++;
+  });
+  const totalCorrect = Object.values(topicMap).reduce((s, t) => s + t.correct, 0);
+  const pct = Math.round(totalCorrect / TOTAL * 100);
+
+  const topicHTML = Object.entries(topicMap).map(([topic, d]) => {
+    const p = Math.round(d.correct / d.total * 100);
+    const col = p >= 70 ? 'var(--green)' : p >= 50 ? 'var(--yellow)' : 'var(--red)';
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.8rem;margin-bottom:.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+        <span style="font-size:.82rem;font-weight:600">${topic}</span>
+        <span style="font-size:.82rem;color:${col};font-weight:700">${d.correct}/${d.total} (${p}%)</span>
+      </div>
+      <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="width:${p}%;height:100%;background:${col};border-radius:3px;transition:width 1s"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const reviewHTML = QUESTIONS.map(q => {
+    const ua = answers[q.id];
+    const correct = ua === q.answer;
+    const borderCol = !ua ? 'var(--muted)' : correct ? 'var(--green)' : 'var(--red)';
+    const statusText = !ua ? '— Skipped' : correct ? '✓ Correct' : '✗ Wrong';
+    const statusCol = !ua ? 'var(--muted)' : correct ? 'var(--green)' : 'var(--red)';
+    return `<div style="background:var(--surface);border-radius:10px;padding:1rem;border-left:3px solid ${borderCol};margin-bottom:.6rem">
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <span style="font-size:.72rem;color:var(--muted)">Q${q.id} · ${q.topic}</span>
+        <span style="font-size:.72rem;font-weight:700;color:${statusCol}">${statusText}</span>
+      </div>
+      <div style="font-size:.88rem;line-height:1.55;margin-bottom:.5rem">${q.text}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.4rem">
+        ${ua ? `<span style="padding:.2rem .5rem;border-radius:6px;font-size:.75rem;font-weight:600;background:${correct?'rgba(34,197,94,.15)':'rgba(239,68,68,.15)'};color:${correct?'var(--green)':'var(--red)'}">Your: ${ua}. ${q.options[ua]}</span>` : '<span style="padding:.2rem .5rem;border-radius:6px;font-size:.75rem;background:rgba(112,112,160,.15);color:var(--muted)">Not answered</span>'}
+        ${!correct ? `<span style="padding:.2rem .5rem;border-radius:6px;font-size:.75rem;font-weight:600;background:rgba(34,197,94,.15);color:var(--green)">Correct: ${q.answer}. ${q.options[q.answer]}</span>` : ''}
+      </div>
+      ${q.explanation ? `<div style="font-size:.78rem;line-height:1.55;color:var(--muted)">${q.explanation}</div>` : ''}
+      ${q.exception ? `<div style="font-size:.75rem;line-height:1.5;color:var(--yellow);margin-top:.3rem;padding-top:.3rem;border-top:1px solid rgba(245,158,11,.2)">⚠ ${q.exception}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const rv = $('resultsView');
+  rv.classList.remove('hidden');
+  rv.innerHTML = `
+  <div class="results-header">
+    <div class="score-circle">
+      <div class="score-pct">${pct}%</div>
+      <div class="score-raw">${totalCorrect}/${TOTAL}</div>
+    </div>
+    <h2 style="margin-bottom:.25rem">Test Complete</h2>
+    <p style="color:var(--muted);font-size:.85rem">UTME 2026 Physics — 100 Questions</p>
+  </div>
+  <div style="margin-bottom:1.5rem">${topicHTML}</div>
+  <div class="results-actions">
+    <button class="btn btn-primary" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+    <button class="btn btn-secondary" onclick="location.reload()"><i class="fas fa-redo"></i> Retake</button>
+  </div>
+  <h3 style="margin-bottom:1rem;font-size:.95rem">Question Review</h3>
+  <div>${reviewHTML}</div>`;
+}
+
+/* ── PDF DOWNLOAD ── */
+async function downloadPDF() {
+  if (!window.jspdf) { alert('PDF library not loaded. Please check your internet connection.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const PW = doc.internal.pageSize.getWidth();
+  const PH = doc.internal.pageSize.getHeight();
+  const ML = 14, MR = 14, MT = 14, MB = 14;
+  const CW = PW - ML - MR;
+  let y = MT;
+
+  const addPage = () => { doc.addPage(); y = MT; };
+  const checkY = (need = 12) => { if (y + need > PH - MB) addPage(); };
+
+  // ── Cover header ──
+  doc.setFillColor(15, 15, 26);
+  doc.rect(0, 0, PW, PH, 'F');
+  doc.setFillColor(0, 194, 255);
+  doc.rect(0, 0, PW, 22, 'F');
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+  doc.text('UTME 2026 · Physics · Results Report', PW / 2, 13, { align: 'center' });
+
+  y = 28;
+
+  // Score summary block
+  const totalCorrect = QUESTIONS.filter(q => answers[q.id] === q.answer).length;
+  const pct = Math.round(totalCorrect / TOTAL * 100);
+  const grade = pct >= 70 ? 'PASS' : 'NEEDS WORK';
+  const gradeRGB = pct >= 70 ? [34, 197, 94] : [239, 68, 68];
+
+  doc.setFillColor(22, 22, 42);
+  doc.roundedRect(ML, y, CW, 28, 3, 3, 'F');
+  doc.setTextColor(0, 194, 255); doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+  doc.text(`${pct}%`, ML + 10, y + 14);
+  doc.setTextColor(232, 232, 240); doc.setFontSize(10);
+  doc.text(`Score: ${totalCorrect} / ${TOTAL}`, ML + 30, y + 10);
+  doc.text(`Time Used: ${fmtTime(DURATION - timeLeft)}`, ML + 30, y + 17);
+  doc.setTextColor(...gradeRGB); doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+  doc.text(grade, PW - MR - 5, y + 14, { align: 'right' });
+  y += 34;
+
+  // Topic breakdown
+  const topicMap = {};
+  QUESTIONS.forEach(q => {
+    if (!topicMap[q.topic]) topicMap[q.topic] = { correct: 0, total: 0 };
+    topicMap[q.topic].total++;
+    if (answers[q.id] === q.answer) topicMap[q.topic].correct++;
+  });
+
+  doc.setTextColor(0, 194, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+  doc.text('TOPIC BREAKDOWN', ML, y); y += 5;
+
+  Object.entries(topicMap).forEach(([topic, d]) => {
+    checkY(8);
+    const p = Math.round(d.correct / d.total * 100);
+    const col = p >= 70 ? [34, 197, 94] : p >= 50 ? [245, 158, 11] : [239, 68, 68];
+    doc.setFillColor(28, 28, 53);
+    doc.roundedRect(ML, y, CW, 7, 2, 2, 'F');
+    doc.setFillColor(...col);
+    doc.roundedRect(ML, y, CW * p / 100, 7, 2, 2, 'F');
+    doc.setTextColor(232, 232, 240); doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+    doc.text(`${topic}  ${d.correct}/${d.total} (${p}%)`, ML + 2, y + 4.5);
+    y += 9;
+  });
+  y += 6;
+
+  // ── Questions ──
+  doc.setTextColor(0, 194, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+  checkY(10);
+  doc.text('QUESTION REVIEW', ML, y); y += 6;
+
+  QUESTIONS.forEach((q) => {
+    const ua = answers[q.id];
+    const correct = ua === q.answer;
+    const borderCol = !ua ? [100, 100, 130] : correct ? [34, 197, 94] : [239, 68, 68];
+    const statusLabel = !ua ? 'SKIPPED' : correct ? 'CORRECT' : 'WRONG';
+
+    // Estimate block height
+    const qLines = doc.splitTextToSize(`${q.id}. ${q.text}`, CW - 6);
+    const expLines = q.explanation ? doc.splitTextToSize(q.explanation, CW - 6) : [];
+    const excLines = q.exception ? doc.splitTextToSize('⚠ ' + q.exception, CW - 6) : [];
+    const blockH = 6 + qLines.length * 4.5 + 4 * 4 + expLines.length * 4 + excLines.length * 4 + 8;
+    checkY(blockH);
+
+    // Border accent
+    doc.setFillColor(...borderCol);
+    doc.rect(ML, y, 2, blockH, 'F');
+
+    // Background
+    doc.setFillColor(22, 22, 42);
+    doc.rect(ML + 2, y, CW - 2, blockH, 'F');
+
+    let iy = y + 4;
+
+    // Q number + status
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
+    doc.setTextColor(180, 180, 200);
+    doc.text(`Q${q.id}  ·  ${q.topic}`, ML + 5, iy);
+    doc.setTextColor(...borderCol);
+    doc.text(statusLabel, PW - MR - 3, iy, { align: 'right' });
+    iy += 5;
+
+    // Question text
+    doc.setTextColor(232, 232, 240); doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+    doc.text(qLines, ML + 5, iy);
+    iy += qLines.length * 4.5 + 1;
+
+    // Options
+    ['A', 'B', 'C', 'D'].forEach(L => {
+      const isCorrect = L === q.answer;
+      const isWrong = L === ua && !isCorrect;
+      if (isCorrect) doc.setTextColor(34, 197, 94);
+      else if (isWrong) doc.setTextColor(239, 68, 68);
+      else doc.setTextColor(120, 120, 150);
+      doc.setFont('helvetica', isCorrect || isWrong ? 'bold' : 'normal');
+      doc.setFontSize(7.5);
+      const optLines = doc.splitTextToSize(`${L}.  ${q.options[L]}`, CW - 12);
+      doc.text(optLines, ML + 7, iy);
+      iy += optLines.length * 4;
+    });
+
+    // Explanation
+    if (q.explanation) {
+      iy += 2;
+      doc.setTextColor(0, 194, 255); doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+      doc.text('Explanation:', ML + 5, iy); iy += 3.5;
+      doc.setTextColor(180, 180, 200); doc.setFont('helvetica', 'normal');
+      const el = doc.splitTextToSize(q.explanation, CW - 10);
+      doc.text(el, ML + 5, iy); iy += el.length * 4;
+    }
+
+    // Exception/trap
+    if (q.exception) {
+      iy += 1;
+      doc.setTextColor(245, 158, 11); doc.setFontSize(7); doc.setFont('helvetica', 'italic');
+      const xl = doc.splitTextToSize('⚠ ' + q.exception, CW - 10);
+      doc.text(xl, ML + 5, iy); iy += xl.length * 4;
+    }
+
+    y += blockH + 3;
+  });
+
+  // Footer on each page
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    doc.setFontSize(7); doc.setTextColor(80, 80, 110);
+    doc.text(`UTME 2026 Physics Practice  |  Page ${p} of ${pageCount}`, PW / 2, PH - 6, { align: 'center' });
+  }
+
+  doc.save('UTME-2026-Physics-Results.pdf');
+}
+
+/* ── CALCULATOR ── */
+$('calculatorBtn').addEventListener('click', () => $('calculatorModal').classList.remove('hidden'));
+$('closeCalculatorModal').addEventListener('click', () => $('calculatorModal').classList.add('hidden'));
+
+document.querySelectorAll('.calc-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const v = btn.dataset.value, a = btn.dataset.action;
+    const d = $('calcDisplay');
+    if (v !== undefined) {
+      if (calcReset) { d.value = ''; calcReset = false; }
+      if (v === '.' && d.value.includes('.')) return;
+      d.value = (d.value === '0' && v !== '.') ? v : d.value + v;
+    } else if (a === 'clear') {
+      d.value = '0'; calcPrev = null; calcOp = null; calcReset = false;
+    } else if (a === 'delete') {
+      d.value = d.value.length > 1 ? d.value.slice(0, -1) : '0';
+    } else if (['add','subtract','multiply','divide'].includes(a)) {
+      calcPrev = parseFloat(d.value); calcOp = a; calcReset = true;
+    } else if (a === 'equals') {
+      if (calcOp !== null && calcPrev !== null) {
+        const cur = parseFloat(d.value);
+        const res = calcOp === 'add' ? calcPrev + cur
+                  : calcOp === 'subtract' ? calcPrev - cur
+                  : calcOp === 'multiply' ? calcPrev * cur
+                  : cur !== 0 ? calcPrev / cur : NaN;
+        d.value = isNaN(res) ? 'Error' : parseFloat(res.toFixed(8)).toString();
+        calcOp = null; calcPrev = null; calcReset = true;
+      }
+    }
+  });
+});
+
+/* ── INIT ── */
+buildPalette();
+render();
+startTimer();
+</script>
 </body>
 </html>
