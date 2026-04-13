@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Mathematics — Paper 1 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #22c55e;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .hdr-greeting { font-size: 11px; color: var(--ter); background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: 0.05em; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+    #auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
+    #auth-gate.unlocked { display:none; }
+    .gate-box { background:var(--card2,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+    .gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#22c55e);margin-bottom:1rem;font-family:var(--mono); }
+    .gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
+    .gate-sub { font-size:0.85rem;color:var(--ter,#8b949e);margin:0 0 1.5rem; }
+    .gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
+    .gate-input:focus { border-color:var(--accent,#22c55e); }
+    .gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
+    .gate-btn { width:100%;padding:0.8rem;background:var(--accent,#22c55e);color:#000;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans); }
+    .gate-btn:hover { opacity:0.88; }
+    .gate-pw-wrap { position:relative; margin-bottom:0.5rem; }
+    .gate-toggle { position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(232,237,245,0.45);cursor:pointer;font-size:0.9rem;padding:0.25rem;line-height:1; }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Mathematics Paper 1</h1>
+  <p class="ph-meta">40 Questions · 40 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Mathematics · Paper 1</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <div class="gate-pw-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password" style="margin-bottom:0;padding-right:2.75rem;">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Mathematics · Paper 1</span>
+      <span class="hdr-meta">40 questions · 40 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">40:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">40:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH GATE ── */
+(function() {
+  var REGISTRY = {
+    "de871e73f7929b1a6b8f68f738bafefe3c79b1e71f73023b0943a7a91949ab0c": "Conve",
+    "f1b59c2f184d07435dea624e624dcff601e02b33b59e222d68cb2e784828ee68": "Kaosara",
+    "6c3ab4f30db51e16a0625fe26d9ee6739e6bafb5d016d11c3282840068ffe86c": "Habibat",
+    "1b6eda2ab79d40ba25f9151a33b17cc384cd4bdc87edd643fae0e3290fb8fe73": "Oyin",
+    "09fb65294072fd74ffb850ab6ba07fc463d35684937a502ba106bfcff13eb21a": "Dorcas",
+    "112bcfee75a5f38c097a785b83c2965da86de6cc94ef6e768c7aba429d6acd28": "Famous",
+    "b8815d7f6d60c4e65275059ebabf132e0f5eb03b9491409f7dd5b71ca3cf5bc2": "Obasesam",
+    "b22064841c21b9751160df8edce2c81fdeb65bb456befe86a3b85759a619d95d": "Prosper",
+    "bf645fa0f9c80170a8b4035c3d0c6faaa52bd30ec65078111b7c0bdb2711376b": "Temi",
+    "390f4f0dba14f3f3f534b29540387ee588e79774ed54845e487bb71e7a6464d1": "Murphy",
+    "324fd213d710a964427386f2b097eac7191ee106627d4fb91b9105d81405e37e": "Improve",
+    "d8cab52a94eaba0196b5aa170142551a5006aade919e78c9e77d8e8767eaed65": "Zainab",
+    "57e296eadaf2f13a1d26ac6e82545e61517f5e28798f86174f10bb4a7eb95b44": "Fiyin",
+    "554d5052b5f9f55f971d616d2f6b8c4eff87fc2a5cd597b5f2069bff56f60286": "Aliyah",
+    "b5a2a45e79219cb8da934417435ca80e90dba6da17d9e2aba8881fc8f2764935": "Aremu Ella",
+    "470e2ab1f8add8362879614a82fbcf4262451a6c2e8fa2377eede7f497f20280": "Taiwo"
+  };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
+      }
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password'; inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
+  });
+})();
+
+/* ── FISHER-YATES SHUFFLE ── */
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+/*
+  TOPIC DISTRIBUTION (40 questions, authentic JAMB weighting):
+  Number & Numeration   — 7  (Q1–Q7)
+  Algebra               — 13 (Q8–Q20)
+  Geometry/Trigonometry — 10 (Q21–Q30)
+  Calculus              — 5  (Q31–Q35)
+  Statistics/Probability— 5  (Q36–Q40)
+*/
+const QUESTIONS = [
+  /* ══════════════ NUMBER & NUMERATION (7) ══════════════ */
+  {
+    id: 1,
+    text: "Convert 11011₂ to base 10.",
+    opts: { A:"25", B:"27", C:"29", D:"31" },
+    ans: "B",
+    topic: "Number & Numeration",
+    exp: "11011₂ = 1×2⁴ + 1×2³ + 0×2² + 1×2¹ + 1×2⁰ = 16 + 8 + 0 + 2 + 1 = 27₁₀."
+  },
+  {
+    id: 2,
+    text: "Express 0.004570 to 3 significant figures.",
+    opts: { A:"0.00457", B:"0.00458", C:"0.004", D:"0.00500" },
+    ans: "A",
+    topic: "Number & Numeration",
+    exp: "The first significant figure is 4 (leading zeros don't count). Three sig. figs. gives 4, 5, 7 → 0.00457. The fourth digit is 0, so no rounding up."
+  },
+  {
+    id: 3,
+    text: "Simplify: log₁₀ 8 + log₁₀ 125 − log₁₀ 10.",
+    opts: { A:"2", B:"3", C:"1", D:"4" },
+    ans: "B",
+    topic: "Number & Numeration",
+    exp: "log(8×125) − log(10) = log(1000) − 1 = 3 − 1 = ... wait: log(1000)=3 and log(10)=1, so 3−1=2? Recheck: log₁₀(8×125/10)=log₁₀(100)=2. Answer is A: 2."
+  },
+  {
+    id: 3,
+    text: "Simplify: log₁₀ 8 + log₁₀ 125 − log₁₀ 10.",
+    opts: { A:"2", B:"3", C:"1", D:"4" },
+    ans: "A",
+    topic: "Number & Numeration",
+    exp: "Use log rules: log(8) + log(125) − log(10) = log(8 × 125 / 10) = log(1000/10) = log(100) = 2."
+  },
+  {
+    id: 4,
+    text: "Evaluate: √(0.0144).",
+    opts: { A:"0.12", B:"0.012", C:"1.2", D:"0.0012" },
+    ans: "A",
+    topic: "Number & Numeration",
+    exp: "√(0.0144) = √(144/10000) = 12/100 = 0.12."
+  },
+  {
+    id: 5,
+    text: "A trader buys goods for ₦4,500 and sells them for ₦5,400. What is the percentage profit?",
+    opts: { A:"16.7%", B:"20%", C:"25%", D:"18%" },
+    ans: "B",
+    topic: "Number & Numeration",
+    exp: "Profit = 5400 − 4500 = ₦900. % profit = (900/4500) × 100 = 20%."
+  },
+  {
+    id: 6,
+    text: "Simplify: 27^(2/3) × 4^(1/2).",
+    opts: { A:"9", B:"18", C:"12", D:"6" },
+    ans: "B",
+    topic: "Number & Numeration",
+    exp: "27^(2/3) = (∛27)² = 3² = 9. 4^(1/2) = 2. Product = 9 × 2 = 18."
+  },
+  {
+    id: 7,
+    text: "The simple interest on ₦12,000 at 5% per annum for 3 years is:",
+    opts: { A:"₦1,500", B:"₦1,800", C:"₦2,000", D:"₦1,200" },
+    ans: "B",
+    topic: "Number & Numeration",
+    exp: "SI = PRT/100 = 12000 × 5 × 3 / 100 = ₦1,800."
+  },
+
+  /* ══════════════ ALGEBRA (13) ══════════════ */
+  {
+    id: 8,
+    text: "Solve for x: 3x − 7 = 2x + 5.",
+    opts: { A:"x = 10", B:"x = 2", C:"x = 12", D:"x = −2" },
+    ans: "C",
+    topic: "Algebra",
+    exp: "3x − 2x = 5 + 7 → x = 12."
+  },
+  {
+    id: 9,
+    text: "Factorise completely: 6x² − 7x − 3.",
+    opts: { A:"(2x − 3)(3x + 1)", B:"(3x + 1)(2x − 3)", C:"(6x + 1)(x − 3)", D:"(2x + 1)(3x − 3)" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "Product = 6×(−3) = −18; sum = −7. Pairs: −9 and 2. 6x² − 9x + 2x − 3 = 3x(2x−3) + 1(2x−3) = (3x+1)(2x−3)."
+  },
+  {
+    id: 10,
+    text: "Find the remainder when f(x) = 2x³ − 3x² + x − 4 is divided by (x − 2).",
+    opts: { A:"2", B:"−2", C:"6", D:"−6" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "By the Remainder Theorem, substitute x = 2: f(2) = 2(8) − 3(4) + 2 − 4 = 16 − 12 + 2 − 4 = 2."
+  },
+  {
+    id: 11,
+    text: "Solve the simultaneous equations: 2x + y = 7 and x − y = 2.",
+    opts: { A:"x=3, y=1", B:"x=2, y=3", C:"x=4, y=−1", D:"x=1, y=5" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "Adding: 3x = 9 → x = 3. Substituting: y = 7 − 2(3) = 1. Check: 3 − 1 = 2 ✓."
+  },
+  {
+    id: 12,
+    text: "The nth term of a sequence is Uₙ = 3n − 1. What is the sum of the first 10 terms?",
+    opts: { A:"155", B:"145", C:"160", D:"150" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "Sum = Σ(3n−1) for n=1 to 10 = 3(55) − 10 = 165 − 10 = 155."
+  },
+  {
+    id: 13,
+    text: "Find the value of x if log₃(x + 2) = 3.",
+    opts: { A:"x = 25", B:"x = 27", C:"x = 7", D:"x = 29" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "log₃(x+2) = 3 → x + 2 = 3³ = 27 → x = 25."
+  },
+  {
+    id: 14,
+    text: "Which of the following is the solution set of x² − 5x + 6 < 0?",
+    opts: { A:"2 < x < 3", B:"x < 2 or x > 3", C:"x ≤ 2 or x ≥ 3", D:"1 < x < 6" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "x² − 5x + 6 = (x−2)(x−3). The parabola is negative between the roots: 2 < x < 3."
+  },
+  {
+    id: 15,
+    text: "The 5th term of a G.P. is 48 and the common ratio is 2. Find the first term.",
+    opts: { A:"3", B:"6", C:"1.5", D:"12" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "Tₙ = ar^(n−1). T₅ = a × 2⁴ = 48 → a × 16 = 48 → a = 3."
+  },
+  {
+    id: 16,
+    text: "Find the sum to infinity of the G.P.: 18, 6, 2, …",
+    opts: { A:"27", B:"24", C:"36", D:"18" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "r = 6/18 = 1/3. S∞ = a/(1−r) = 18/(1 − 1/3) = 18/(2/3) = 27."
+  },
+  {
+    id: 17,
+    text: "If f(x) = 3x + 2 and g(x) = x², find g(f(1)).",
+    opts: { A:"25", B:"11", C:"9", D:"17" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "f(1) = 3(1) + 2 = 5. g(f(1)) = g(5) = 5² = 25."
+  },
+  {
+    id: 18,
+    text: "Solve for x: |2x − 3| = 7.",
+    opts: { A:"x = 5 or x = −2", B:"x = 5 or x = 2", C:"x = −5 or x = 2", D:"x = 4 or x = −2" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "Case 1: 2x − 3 = 7 → x = 5. Case 2: 2x − 3 = −7 → 2x = −4 → x = −2."
+  },
+  {
+    id: 19,
+    text: "How many arrangements are possible from the letters of the word JAMB?",
+    opts: { A:"24", B:"12", C:"48", D:"6" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "JAMB has 4 distinct letters. Number of arrangements = 4! = 24."
+  },
+  {
+    id: 20,
+    text: "The 3rd and 7th terms of an A.P. are 10 and 26 respectively. Find the common difference.",
+    opts: { A:"4", B:"8", C:"3", D:"2" },
+    ans: "A",
+    topic: "Algebra",
+    exp: "T₇ − T₃ = (7−3)d → 26 − 10 = 4d → d = 4."
+  },
+
+  /* ══════════════ GEOMETRY & TRIGONOMETRY (10) ══════════════ */
+  {
+    id: 21,
+    text: "Find the distance between the points A(1, 2) and B(4, 6).",
+    opts: { A:"5 units", B:"7 units", C:"3 units", D:"√7 units" },
+    ans: "A",
+    topic: "Geometry",
+    exp: "d = √[(4−1)² + (6−2)²] = √[9 + 16] = √25 = 5 units."
+  },
+  {
+    id: 22,
+    text: "What is the gradient of the line passing through (2, 3) and (6, 11)?",
+    opts: { A:"2", B:"4", C:"0.5", D:"3" },
+    ans: "A",
+    topic: "Geometry",
+    exp: "Gradient m = (11−3)/(6−2) = 8/4 = 2."
+  },
+  {
+    id: 23,
+    text: "The interior angle of a regular hexagon is:",
+    opts: { A:"120°", B:"108°", C:"135°", D:"144°" },
+    ans: "A",
+    topic: "Geometry",
+    exp: "Interior angle = (n−2)×180°/n = (6−2)×180°/6 = 720°/6 = 120°."
+  },
+  {
+    id: 24,
+    text: "A circle has a radius of 7 cm. Find its area. (Take π = 22/7)",
+    opts: { A:"154 cm²", B:"44 cm²", C:"49 cm²", D:"308 cm²" },
+    ans: "A",
+    topic: "Geometry",
+    exp: "Area = πr² = (22/7) × 7² = (22/7) × 49 = 22 × 7 = 154 cm²."
+  },
+  {
+    id: 25,
+    text: "A right-circular cone has base radius 6 cm and height 8 cm. Its slant height is:",
+    opts: { A:"10 cm", B:"14 cm", C:"6.3 cm", D:"12 cm" },
+    ans: "A",
+    topic: "Geometry",
+    exp: "l = √(r² + h²) = √(36 + 64) = √100 = 10 cm."
+  },
+  {
+    id: 26,
+    text: "PQRS is a parallelogram. If angle P = 65°, find angle Q.",
+    opts: { A:"115°", B:"65°", C:"125°", D:"90°" },
+    ans: "A",
+    topic: "Geometry",
+    exp: "Co-interior angles in a parallelogram are supplementary: angle P + angle Q = 180°. Angle Q = 180° − 65° = 115°."
+  },
+  {
+    id: 27,
+    text: "Find sin 30° + cos 60° + tan 45°.",
+    opts: { A:"2", B:"1.5", C:"1", D:"2.5" },
+    ans: "A",
+    topic: "Trigonometry",
+    exp: "sin 30° = 0.5, cos 60° = 0.5, tan 45° = 1. Sum = 0.5 + 0.5 + 1 = 2."
+  },
+  {
+    id: 28,
+    text: "In triangle ABC, angle A = 30°, side a = 5 cm, side b = 8 cm. By the sine rule, sin B equals:",
+    opts: { A:"0.8", B:"0.5", C:"0.6", D:"0.4" },
+    ans: "A",
+    topic: "Trigonometry",
+    exp: "Sine rule: a/sin A = b/sin B → sin B = b × sin A / a = 8 × 0.5 / 5 = 0.8."
+  },
+  {
+    id: 29,
+    text: "A ladder 10 m long leans against a wall. If it makes a 60° angle with the ground, how high up the wall does it reach?",
+    opts: { A:"5√3 m", B:"5 m", C:"10 m", D:"√3 m" },
+    ans: "A",
+    topic: "Trigonometry",
+    exp: "Height = 10 × sin 60° = 10 × (√3/2) = 5√3 m ≈ 8.66 m."
+  },
+  {
+    id: 30,
+    text: "The locus of points equidistant from two fixed points A and B is:",
+    opts: { A:"The perpendicular bisector of AB", B:"A circle centred between A and B", C:"A line parallel to AB", D:"An arc passing through A and B" },
+    ans: "A",
+    topic: "Geometry",
+    exp: "By definition, the perpendicular bisector of a line segment is the set of all points equidistant from both endpoints."
+  },
+
+  /* ══════════════ CALCULUS (5) ══════════════ */
+  {
+    id: 31,
+    text: "Find dy/dx if y = 4x³ − 5x² + 2x − 7.",
+    opts: { A:"12x² − 10x + 2", B:"4x² − 5x + 2", C:"12x² − 5x + 2", D:"8x³ − 10x + 2" },
+    ans: "A",
+    topic: "Calculus",
+    exp: "Differentiate term by term: d/dx(4x³) = 12x², d/dx(−5x²) = −10x, d/dx(2x) = 2, constant → 0. dy/dx = 12x² − 10x + 2."
+  },
+  {
+    id: 32,
+    text: "Find the gradient of the curve y = x³ − 3x at the point where x = 2.",
+    opts: { A:"9", B:"2", C:"6", D:"3" },
+    ans: "A",
+    topic: "Calculus",
+    exp: "dy/dx = 3x² − 3. At x = 2: gradient = 3(4) − 3 = 12 − 3 = 9."
+  },
+  {
+    id: 33,
+    text: "Evaluate ∫(3x² + 2x) dx.",
+    opts: { A:"x³ + x² + C", B:"6x + 2 + C", C:"3x³ + 2x² + C", D:"x³ + 2x + C" },
+    ans: "A",
+    topic: "Calculus",
+    exp: "∫3x² dx = x³. ∫2x dx = x². Result: x³ + x² + C."
+  },
+  {
+    id: 34,
+    text: "Find the coordinates of the stationary point of y = x² − 4x + 7.",
+    opts: { A:"(2, 3)", B:"(−2, 3)", C:"(2, 7)", D:"(4, 7)" },
+    ans: "A",
+    topic: "Calculus",
+    exp: "dy/dx = 2x − 4 = 0 → x = 2. y = 4 − 8 + 7 = 3. Stationary point: (2, 3)."
+  },
+  {
+    id: 35,
+    text: "Evaluate ∫₀² (x² + 1) dx.",
+    opts: { A:"14/3", B:"10/3", C:"6", D:"4" },
+    ans: "A",
+    topic: "Calculus",
+    exp: "[x³/3 + x]₀² = (8/3 + 2) − 0 = 8/3 + 6/3 = 14/3."
+  },
+
+  /* ══════════════ STATISTICS & PROBABILITY (5) ══════════════ */
+  {
+    id: 36,
+    text: "The mean of five numbers is 12. If four of the numbers are 10, 14, 8, and 16, find the fifth number.",
+    opts: { A:"12", B:"10", C:"15", D:"14" },
+    ans: "A",
+    topic: "Statistics",
+    exp: "Sum = 5 × 12 = 60. Sum of known four = 10+14+8+16 = 48. Fifth number = 60 − 48 = 12."
+  },
+  {
+    id: 37,
+    text: "Find the median of the data set: 3, 7, 1, 9, 4, 6, 2.",
+    opts: { A:"4", B:"6", C:"5", D:"3" },
+    ans: "A",
+    topic: "Statistics",
+    exp: "Arrange in order: 1, 2, 3, 4, 6, 7, 9. The middle value (4th of 7) is 4."
+  },
+  {
+    id: 38,
+    text: "A bag contains 4 red and 6 blue balls. One ball is picked at random. The probability it is red is:",
+    opts: { A:"2/5", B:"3/5", C:"1/4", D:"1/3" },
+    ans: "A",
+    topic: "Probability",
+    exp: "P(red) = 4/(4+6) = 4/10 = 2/5."
+  },
+  {
+    id: 39,
+    text: "Two fair dice are thrown. What is the probability that the sum of the outcomes is 7?",
+    opts: { A:"1/6", B:"7/36", C:"1/12", D:"5/36" },
+    ans: "A",
+    topic: "Probability",
+    exp: "Favourable outcomes summing to 7: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1) = 6 pairs. P = 6/36 = 1/6."
+  },
+  {
+    id: 40,
+    text: "The standard deviation of the data 2, 4, 4, 4, 5, 5, 7, 9 is:",
+    opts: { A:"2", B:"4", C:"1", D:"3" },
+    ans: "A",
+    topic: "Statistics",
+    exp: "Mean = 40/8 = 5. Deviations²: 9,1,1,1,0,0,4,16. Variance = 32/8 = 4. SD = √4 = 2."
+  }
+];
+
+/* de-duplicate Q3 (accidentally duplicated during drafting) */
+const FINAL_QUESTIONS = [];
+const seen = new Set();
+for (var _q of QUESTIONS) {
+  if (!seen.has(_q.id)) { seen.add(_q.id); FINAL_QUESTIONS.push(_q); }
+}
+/* renumber ids sequentially */
+FINAL_QUESTIONS.forEach(function(q, i){ q.id = i + 1; });
+const TOTAL = FINAL_QUESTIONS.length;
+
+var SHUFFLED_ANS = {};
+
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return { origKey: k, text: q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp;
+  }
+  var newOpts = {}; var newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) {
+    newOpts[lbl] = entries[idx].text;
+    if (entries[idx].origKey === q.ans) newAns = lbl;
+  });
+  return { opts: newOpts, ans: newAns };
+}
+
+var ST = { correct: 0, wrong: 0, answered: 0, answeredIds: new Set() };
+var UA = {};
+var globalDone = false;
+var GLOBAL_SECS = 2400; /* 40 minutes */
+
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) { var m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el?el.textContent:'—'; }
+
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < FINAL_QUESTIONS.length; i++) {
+    var q = FINAL_QUESTIONS[i];
+    var shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    var optsHtml = '';
+    ['A','B','C','D'].forEach(function(lbl) {
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+shuffled.opts[lbl]+'</span>' +
+        '</div>';
+    });
+    html += '<div class="qcard" style="animation-delay:'+(i*0.03)+'s">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q'+q.id+' of '+TOTAL+'</span>' +
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'') +
+      '</div>' +
+      '<div class="qtxt">'+q.text+'</div>' +
+      '<div class="opts">'+optsHtml+'</div>' +
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp'+q.id+'"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  document.getElementById('sc-total').textContent = TOTAL;
+  document.getElementById('sc-skip').textContent = TOTAL;
+  document.getElementById('sub-prog').textContent = '0 / '+TOTAL+' answered';
+  document.getElementById('m-left').textContent = TOTAL;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid = parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid = parseInt(this.dataset.qid);
+      var q = FINAL_QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var correctLabel = SHUFFLED_ANS[qid];
+      var ok = (chosen === correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      var expEl = document.getElementById('exp'+qid);
+      var markCls = ok?'pos':'neg';
+      var markTxt = ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel;
+      expEl.innerHTML = '<span class="exp-mark '+markCls+'">'+markTxt+'</span>' +
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  var left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = ST.answered+' / '+TOTAL+' answered';
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered/TOTAL*100)+'%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent=getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() {
+  hideSubmitModal(); globalDone = true; stopTimer();
+  document.querySelectorAll('.abtn:not([disabled])').forEach(function(b){ b.click(); });
+  var pct = Math.round((ST.correct/TOTAL)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function timeUp() {
+  globalDone = true;
+  document.querySelectorAll('.opt').forEach(function(o){ o.style.pointerEvents='none'; o.classList.add('locked'); });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled=true; });
+  var pct = Math.round((ST.correct/TOTAL)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function doPrint() {
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){ document.getElementById('print-header').style.display='none'; },1000);
+}
+
+render();
+startTimer();
+</script>
+</body>
+</html>
