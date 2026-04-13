@@ -1,34 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Chemistry — Paper 6 · JAMB 2026 Practice · GrantApp AI</title>
-    <link rel="stylesheet" href="quiz-styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Chemistry &mdash; Paper 6 &middot; JAMB 2026 Practice</title>
+<style>
+/* ── RESET & BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0f0f1a;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
+
+/* ── CSS VARIABLES ── */
+:root{
+  --bg:#0f0f1a;--surface:#1a1a2e;--surface2:#16213e;--border:#2d2d44;
+  --text:#e2e8f0;--muted:#94a3b8;--accent:#7c3aed;--accent2:#6d28d9;
+  --correct:#059669;--incorrect:#dc2626;--flag:#f59e0b;
+  --header-h:56px;--nav-h:64px;--sidebar-w:260px;
+}
+
+/* ── HEADER ── */
+.quiz-header{
+  position:fixed;top:0;left:0;right:0;height:var(--header-h);
+  background:var(--surface);border-bottom:1px solid var(--border);
+  z-index:100;display:flex;align-items:center;
+}
+.quiz-header-container{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:0 12px;gap:8px;
+}
+.quiz-header-left{display:flex;align-items:center;gap:10px;min-width:0}
+.subject-name{font-weight:700;font-size:.95rem;color:var(--text);white-space:nowrap}
+.subject-meta{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.quiz-header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* ── TIMER ── */
+.quiz-timer-container{
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+  background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);
+  border-radius:20px;padding:3px 10px 3px 4px;
+}
+.timer-progress-ring{width:34px;height:34px;flex-shrink:0}
+.timer-progress-ring svg{width:34px;height:34px}
+.timer-icon{display:none}
+.timer-display{font-size:.85rem;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;min-width:52px}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 14px;
+  border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;
+  transition:opacity .15s,transform .1s;text-decoration:none;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:5px 10px;font-size:.78rem}
+.btn-icon{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;
+}
+.btn-icon:hover{color:var(--text);background:var(--border)}
+.btn-flag{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  cursor:pointer;padding:5px 10px;border-radius:6px;font-size:.78rem;
+  display:flex;align-items:center;gap:5px;transition:all .15s;
+}
+.btn-flag.active,.btn-flag:hover{color:var(--flag);border-color:var(--flag)}
+
+/* ── LAYOUT ── */
+.quiz-container{
+  display:flex;margin-top:var(--header-h);min-height:calc(100vh - var(--header-h));
+}
+.quiz-main{
+  flex:1;min-width:0;padding:16px 16px calc(var(--nav-h) + 20px);
+  max-width:760px;margin:0 auto;width:100%;
+}
+
+/* ── SIDEBAR ── */
+.quiz-sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  position:fixed;left:0;top:var(--header-h);bottom:0;
+  transform:translateX(-100%);transition:transform .25s ease;
+  z-index:90;display:flex;flex-direction:column;overflow:hidden;
+}
+.quiz-sidebar.open{transform:translateX(0)}
+.sidebar-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.sidebar-header h3{font-size:.9rem;font-weight:700;color:var(--text)}
+.sidebar-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);flex-shrink:0;
+}
+.stat-item{
+  background:var(--surface2);padding:10px 6px;text-align:center;
+}
+.stat-value{font-size:1.3rem;font-weight:800;color:var(--accent)}
+.stat-label{font-size:.68rem;color:var(--muted);margin-top:2px}
+.question-palette{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
+  padding:12px;overflow-y:auto;flex:1;
+}
+.palette-btn{
+  aspect-ratio:1;border:1px solid var(--border);background:var(--surface2);
+  color:var(--muted);border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600;
+  transition:all .15s;display:flex;align-items:center;justify-content:center;
+}
+.palette-btn.current{border-color:var(--accent);color:var(--accent);background:rgba(124,58,237,.15)}
+.palette-btn.answered{background:var(--accent);border-color:var(--accent);color:#fff}
+.palette-btn.flagged{background:var(--flag);border-color:var(--flag);color:#fff}
+.sidebar-legend{
+  display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--muted)}
+.legend-dot{
+  width:10px;height:10px;border-radius:3px;border:1px solid var(--border);
+  background:var(--surface2);display:inline-block;flex-shrink:0;
+}
+.legend-dot.current{background:rgba(124,58,237,.15);border-color:var(--accent)}
+.legend-dot.answered{background:var(--accent);border-color:var(--accent)}
+.legend-dot.flagged{background:var(--flag);border-color:var(--flag)}
+
+/* ── QUESTION CARD ── */
+.question-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:20px;margin-bottom:16px;
+}
+.question-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+}
+.question-number{font-size:.78rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.question-text{
+  font-size:.95rem;line-height:1.65;color:var(--text);margin-bottom:18px;
+}
+.question-diagram{
+  margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  background:rgba(0,0,0,.25);border-radius:8px;padding:10px;
+  border:1px solid var(--border);
+}
+.question-diagram svg{display:block;max-width:100%;height:auto}
+
+/* ── OPTIONS ── */
+.options-container{display:flex;flex-direction:column;gap:9px}
+.option-btn{
+  width:100%;text-align:left;display:flex;align-items:flex-start;gap:11px;
+  background:var(--surface2);border:1.5px solid var(--border);
+  color:var(--text);border-radius:9px;padding:12px 14px;
+  cursor:pointer;font-size:.88rem;line-height:1.5;transition:all .15s;
+}
+.option-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(124,58,237,.08)}
+.option-btn.selected{border-color:var(--accent);background:rgba(124,58,237,.15);color:#fff}
+.option-btn.correct{border-color:var(--correct) !important;background:rgba(5,150,105,.18) !important;color:#6ee7b7 !important}
+.option-btn.incorrect{border-color:var(--incorrect) !important;background:rgba(220,38,38,.18) !important;color:#fca5a5 !important}
+.option-btn:disabled{cursor:default}
+.option-letter{
+  flex-shrink:0;width:24px;height:24px;border-radius:6px;
+  background:rgba(255,255,255,.07);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:800;color:var(--muted);margin-top:1px;
+}
+.option-btn.selected .option-letter{background:var(--accent);border-color:var(--accent);color:#fff}
+.option-btn.correct .option-letter{background:var(--correct);border-color:var(--correct);color:#fff}
+.option-btn.incorrect .option-letter{background:var(--incorrect);border-color:var(--incorrect);color:#fff}
+.option-text{flex:1;min-width:0}
+
+/* ── EXPLANATION ── */
+.question-explanation{
+  margin-top:16px;border-top:1px solid var(--border);padding-top:14px;
+}
+.question-explanation.hidden{display:none}
+.explanation-header{
+  font-size:.78rem;font-weight:700;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.explanation-content{font-size:.87rem;line-height:1.65;color:var(--muted)}
+
+/* ── NAV BAR ── */
+.quiz-navigation{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--surface);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;height:var(--nav-h);z-index:80;gap:8px;
+}
+
+/* ── MOBILE PALETTE TRIGGER ── */
+.mobile-palette-trigger{
+  position:fixed;bottom:calc(var(--nav-h) + 12px);right:14px;
+  background:var(--accent);color:#fff;border-radius:24px;
+  padding:8px 16px;font-size:.78rem;font-weight:700;
+  display:flex;align-items:center;gap:7px;cursor:pointer;
+  box-shadow:0 4px 20px rgba(124,58,237,.5);z-index:79;
+  border:none;transition:transform .15s;
+}
+.mobile-palette-trigger:active{transform:scale(.95)}
+
+/* ── MODALS ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;z-index:200;
+  padding:16px;
+}
+.modal-overlay.hidden{display:none}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;width:100%;max-width:400px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;
+}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+}
+.modal-header h3{font-size:.95rem;font-weight:700;color:var(--text)}
+.modal-body{padding:20px}
+.modal-footer{
+  display:flex;justify-content:flex-end;gap:10px;
+  padding:14px 20px;border-top:1px solid var(--border);
+}
+.submit-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.summary-item{
+  background:var(--surface2);border-radius:8px;padding:10px 12px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.summary-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.summary-value{font-size:1.1rem;font-weight:800;color:var(--text)}
+.answered-text{color:var(--correct)}
+.warning-text{color:var(--incorrect)}
+.warning-message{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);
+  border-radius:8px;padding:10px 12px;color:#fca5a5;font-size:.82rem;
+}
+
+/* ── CALCULATOR ── */
+.calculator-modal{max-width:320px}
+.calculator{display:flex;flex-direction:column;gap:10px}
+.calculator-display{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;color:var(--text);
+  font-size:1.2rem;text-align:right;font-variant-numeric:tabular-nums;
+}
+.calculator-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.calc-btn{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);border-radius:7px;padding:10px 6px;
+  font-size:.88rem;font-weight:600;cursor:pointer;transition:background .1s;
+}
+.calc-btn:hover{background:var(--border)}
+.calc-equals{background:var(--accent);border-color:var(--accent);color:#fff}
+.calc-equals:hover{background:var(--accent2)}
+
+/* ── SCORE SCREEN ── */
+#scoreScreen{
+  display:none;flex-direction:column;align-items:center;
+  justify-content:center;min-height:calc(100vh - var(--header-h));
+  padding:24px 16px calc(var(--nav-h)+24px);text-align:center;
+}
+#scoreScreen.visible{display:flex}
+.score-circle{
+  width:140px;height:140px;border-radius:50%;
+  border:6px solid var(--accent);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;margin:0 auto 20px;
+  background:rgba(124,58,237,.1);
+}
+.score-number{font-size:2.4rem;font-weight:900;color:var(--accent)}
+.score-denom{font-size:.9rem;color:var(--muted)}
+.score-label{font-size:1rem;color:var(--muted);margin-bottom:6px}
+.score-pct{font-size:2rem;font-weight:800;color:var(--text);margin-bottom:20px}
+.score-breakdown{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  width:100%;max-width:360px;margin-bottom:24px;
+}
+.score-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 8px}
+.score-item-val{font-size:1.3rem;font-weight:800;color:var(--text)}
+.score-item-lbl{font-size:.7rem;color:var(--muted);margin-top:2px}
+.score-correct .score-item-val{color:var(--correct)}
+.score-wrong .score-item-val{color:var(--incorrect)}
+
+/* ── RESPONSIVE ── */
+@media(min-width:640px){
+  .quiz-sidebar{transform:translateX(0);position:sticky;top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto}
+  .quiz-main{padding:20px 24px calc(var(--nav-h)+24px)}
+  .mobile-palette-trigger{display:none}
+}
+@media(max-width:380px){
+  .option-btn{padding:10px 11px;font-size:.84rem}
+  .question-text{font-size:.88rem}
+  .quiz-navigation{padding:8px 10px;gap:5px}
+  .btn{padding:7px 10px;font-size:.78rem}
+}
+</style>
 </head>
-<body class="quiz-body">
-
+<body>
 <script>
-<!-- QUESTIONS_START -->
 const DURATION = 6000;
-
-/*
-  Chemistry Paper 6 — 40 questions.
-  Theme: Visual / diagrammatic reasoning + statistical high-weight subtopics.
-  8 questions carry embedded SVG diagrams (IDs 3, 8, 13, 18, 22, 28, 33, 38).
-  Diagrams cover: solubility curves, fractional distillation column, structural
-  formulas (organic), lab apparatus (titration), electrochemical cell, pH/
-  indicator chart, activity-series displacement, and orbital/electron-dot.
-  Remaining 32 questions sweep JAMB's most-tested subtopics with fresh wording,
-  changed numbers, and pragmatic-ambiguity framing.
-  Hidden taxonomies maintained across the 40: ~30% Mathematical, ~20% Logical,
-  ~20% Pragmatic, ~20% Abstract, ~10% Administrative.
-*/
-
-/* ─── SVG HELPER: each diagram question stores its visual in diagramSVG ─── */
-
 const QUESTIONS = [
 
   /* ══════════════════════════════════════════
@@ -182,7 +455,7 @@ const QUESTIONS = [
       D: 'P having higher nuclear charge'
     },
     answer: 'B',
-    explanation: 'P has configuration [Ne] 3s² 3p³ — a half-filled p subshell, one electron per orbital. Exchange-energy stabilisation makes this configuration extra stable, so removing an electron from P requires more energy than expected. S ([Ne] 3s² 3p⁴) has a paired electron in one 3p orbital; electron-electron repulsion in the pair makes it easier to remove → IE₁(S) < IE₁(P). P does have lower Z than S (option D is wrong direction) — yet P's IE₁ is higher. This is the same anomaly as N–O in Period 2.',
+    explanation: 'P has configuration [Ne] 3s² 3p³ — a half-filled p subshell, one electron per orbital. Exchange-energy stabilisation makes this configuration extra stable, so removing an electron from P requires more energy than expected. S ([Ne] 3s² 3p⁴) has a paired electron in one 3p orbital; electron-electron repulsion in the pair makes it easier to remove → IE₁(S) < IE₁(P). P does have lower Z than S (option D is wrong direction) — yet P\'s IE₁ is higher. This is the same anomaly as N–O in Period 2.',
     /* Level 3, Taxonomy: Abstract */
   },
 
@@ -1039,396 +1312,372 @@ const QUESTIONS = [
   },
 
 ];
-<!-- QUESTIONS_END -->
 </script>
 
-<!-- ══════════════════════════════════════════════════════════════
-     PAGE SHELL — identical structure to Papers 1-5
-     Relies on quiz-styles.css and quiz-app.js
-════════════════════════════════════════════════════════════════ -->
-
-<!-- Fixed Header -->
-<header class="quiz-header">
-    <div class="quiz-header-container">
-
-        <div class="quiz-header-left">
-            <button class="btn-icon" id="menuBtn" aria-label="Menu">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="subject-info">
-                <div class="subject-name" id="subjectName">Chemistry</div>
-                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">40</span></div>
-            </div>
-        </div>
-
-        <div class="quiz-timer-container" id="quizTimerContainer">
-            <div class="timer-progress-ring">
-                <svg viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
-                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
-                            stroke="var(--accent)" stroke-width="4"
-                            stroke-dasharray="163.36" stroke-dashoffset="0"
-                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="timer-icon"><i class="fas fa-clock"></i></div>
-            <div class="timer-display" id="timerDisplay">1:40:00</div>
-        </div>
-
-        <div class="quiz-header-right">
-            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
-                <i class="fas fa-calculator"></i>
-            </button>
-            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
-        </div>
+<!-- ═══ SCORE SCREEN ═══ -->
+<div id="scoreScreen">
+  <p class="score-label">Your Score</p>
+  <div class="score-circle">
+    <span class="score-number" id="sFinal">0/40</span>
+  </div>
+  <div class="score-pct" id="sPct">0%</div>
+  <div class="score-breakdown">
+    <div class="score-item score-correct">
+      <div class="score-item-val" id="sCorrect">0</div>
+      <div class="score-item-lbl">Correct</div>
     </div>
+    <div class="score-item score-wrong">
+      <div class="score-item-val" id="sWrong">0</div>
+      <div class="score-item-lbl">Wrong</div>
+    </div>
+    <div class="score-item">
+      <div class="score-item-val" id="sUnanswered">0</div>
+      <div class="score-item-lbl">Skipped</div>
+    </div>
+  </div>
+  <button class="btn btn-primary" id="reviewBtn">Review Answers</button>
+</div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div id="mainContent">
+
+<!-- Header -->
+<header class="quiz-header">
+  <div class="quiz-header-container">
+    <div class="quiz-header-left">
+      <button class="btn-icon" id="menuBtn" aria-label="Menu"><i class="fas fa-bars"></i></button>
+      <div class="subject-info">
+        <div class="subject-name">Chemistry</div>
+        <div class="subject-meta">Q <span id="qNumH">1</span> of <span id="totalQ">40</span></div>
+      </div>
+    </div>
+    <div class="quiz-timer-container">
+      <div class="timer-progress-ring">
+        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/><circle id="timerCircle" cx="30" cy="30" r="26" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="163.36" stroke-dashoffset="0" transform="rotate(-90 30 30)" stroke-linecap="round"/></svg>
+      </div>
+      <div class="timer-display" id="timerDisplay">1:40:00</div>
+    </div>
+    <div class="quiz-header-right">
+      <button class="btn-icon" id="calcBtn" aria-label="Calculator"><i class="fas fa-calculator"></i></button>
+      <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
+    </div>
+  </div>
 </header>
 
+<!-- Layout -->
 <div class="quiz-container">
+  <!-- Sidebar -->
+  <aside class="quiz-sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Navigator</h3>
+      <button class="btn-icon btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="sidebar-stats">
+      <div class="stat-item"><div class="stat-value" id="answeredCount">0</div><div class="stat-label">Done</div></div>
+      <div class="stat-item"><div class="stat-value" id="unansweredCount">40</div><div class="stat-label">Left</div></div>
+      <div class="stat-item"><div class="stat-value" id="flaggedCount">0</div><div class="stat-label">Flagged</div></div>
+    </div>
+    <div class="question-palette" id="palette"></div>
+    <div class="sidebar-legend">
+      <div class="legend-item"><span class="legend-dot current"></span>Current</div>
+      <div class="legend-item"><span class="legend-dot answered"></span>Answered</div>
+      <div class="legend-item"><span class="legend-dot flagged"></span>Flagged</div>
+      <div class="legend-item"><span class="legend-dot"></span>Unanswered</div>
+    </div>
+    <div style="padding:12px;border-top:1px solid var(--border);margin-top:auto">
+      <a href="science_clusters.html" class="btn btn-secondary" style="width:100%;text-align:center;display:block;text-decoration:none" onclick="return confirm('Leave? Progress lost.')">&#8592; Back</a>
+    </div>
+  </aside>
 
-    <aside class="quiz-sidebar" id="quizSidebar">
-        <div class="sidebar-header">
-            <h3>Navigator</h3>
-            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="sidebar-stats">
-            <div class="stat-item">
-                <div class="stat-value" id="answeredCount">0</div>
-                <div class="stat-label">Done</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="unansweredCount">40</div>
-                <div class="stat-label">Left</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="flaggedCount">0</div>
-                <div class="stat-label">Flagged</div>
-            </div>
-        </div>
-        <div class="question-palette" id="questionPalette"></div>
-        <div class="sidebar-legend">
-            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
-            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
-            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
-            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
-        </div>
-        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
-            <a href="science_clusters.html"
-               class="btn btn-secondary"
-               style="width:100%;text-align:center;text-decoration:none;display:block;"
-               onclick="return confirm('Leave quiz? Progress will be lost.')">
-                &#8592; Back
-            </a>
-        </div>
-    </aside>
-
-    <main class="quiz-main">
-        <div class="question-card" id="questionCard">
-            <div class="question-header">
-                <div class="question-number">Question <span id="questionNumber">1</span></div>
-                <button class="btn-flag" id="flagBtn" aria-label="Flag">
-                    <i class="far fa-flag"></i> Flag
-                </button>
-            </div>
-            <div class="question-text" id="questionText">Loading...</div>
-            <div class="options-container" id="optionsContainer"></div>
-            <div class="question-explanation hidden" id="questionExplanation">
-                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
-                <div class="explanation-content" id="explanationContent"></div>
-            </div>
-        </div>
-
-        <div class="quiz-navigation">
-            <button class="btn btn-secondary" id="prevBtn" disabled>
-                <i class="fas fa-arrow-left"></i> Previous
-            </button>
-            <button class="btn btn-secondary" id="clearBtn">
-                <i class="fas fa-eraser"></i> Clear
-            </button>
-            <button class="btn btn-primary" id="nextBtn">
-                Next <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
-    </main>
+  <!-- Main -->
+  <main class="quiz-main">
+    <div class="question-card" id="questionCard">
+      <div class="question-header">
+        <div class="question-number">Question <span id="qNum">1</span></div>
+        <button class="btn-flag" id="flagBtn"><i class="far fa-flag"></i> Flag</button>
+      </div>
+      <div class="question-text" id="qText">Loading...</div>
+      <div class="options-container" id="optCont"></div>
+      <div class="question-explanation hidden" id="explSection">
+        <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
+        <div class="explanation-content" id="explContent"></div>
+      </div>
+    </div>
+    <div class="quiz-navigation">
+      <button class="btn btn-secondary" id="prevBtn" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+      <button class="btn btn-secondary" id="clearBtn"><i class="fas fa-eraser"></i> Clear</button>
+      <button class="btn btn-primary" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </main>
 </div>
 
-<div class="mobile-palette-trigger" id="mobilePaletteBtn">
-    <i class="fas fa-th"></i> <span>Questions</span>
-</div>
+<!-- Mobile trigger -->
+<button class="mobile-palette-trigger" id="mobileTrigger"><i class="fas fa-th"></i> Questions</button>
 
+<!-- Submit modal -->
 <div class="modal-overlay hidden" id="submitModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3>Submit Test?</h3>
-            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="submit-summary">
-                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">40</span></div>
-                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
-                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">40</span></div>
-                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">1:40:00</span></div>
-            </div>
-            <div class="warning-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>You cannot change answers after submission.</span>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
-            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
-        </div>
+  <div class="modal">
+    <div class="modal-header"><h3>Submit Test?</h3><button class="btn-icon" id="closeSubmit"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="submit-summary">
+        <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="mTot">40</span></div>
+        <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="mAns">0</span></div>
+        <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="mUnans">40</span></div>
+        <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="mTime">1:40:00</span></div>
+      </div>
+      <div class="warning-message"><i class="fas fa-exclamation-triangle"></i> You cannot change answers after submission.</div>
     </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelSubmit">Cancel</button>
+      <button class="btn btn-danger" id="confirmSubmit"><i class="fas fa-check"></i> Submit</button>
+    </div>
+  </div>
 </div>
 
+<!-- Time up modal -->
 <div class="modal-overlay hidden" id="timeUpModal">
-    <div class="modal">
-        <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
-        <div class="modal-body">
-            <p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" id="viewResultsBtn">View Results</button>
-        </div>
-    </div>
+  <div class="modal">
+    <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
+    <div class="modal-body"><p style="color:var(--muted);font-size:.88rem">Your time has run out. Tap below to see your results.</p></div>
+    <div class="modal-footer"><button class="btn btn-primary" id="viewResults">View Results</button></div>
+  </div>
 </div>
 
-<div class="modal-overlay hidden" id="calculatorModal">
-    <div class="modal calculator-modal">
-        <div class="modal-header">
-            <h3>Calculator</h3>
-            <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
+<!-- Calculator modal -->
+<div class="modal-overlay hidden" id="calcModal">
+  <div class="modal calculator-modal">
+    <div class="modal-header"><h3>Calculator</h3><button class="btn-icon" id="closeCalc"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <div class="calculator">
+        <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
+        <div class="calculator-buttons">
+          <button class="calc-btn" data-action="clear">C</button>
+          <button class="calc-btn" data-action="delete">&#8592;</button>
+          <button class="calc-btn" data-action="divide">&#247;</button>
+          <button class="calc-btn" data-action="multiply">&#215;</button>
+          <button class="calc-btn" data-value="7">7</button>
+          <button class="calc-btn" data-value="8">8</button>
+          <button class="calc-btn" data-value="9">9</button>
+          <button class="calc-btn" data-action="subtract">&#8722;</button>
+          <button class="calc-btn" data-value="4">4</button>
+          <button class="calc-btn" data-value="5">5</button>
+          <button class="calc-btn" data-value="6">6</button>
+          <button class="calc-btn" data-action="add">+</button>
+          <button class="calc-btn" data-value="1">1</button>
+          <button class="calc-btn" data-value="2">2</button>
+          <button class="calc-btn" data-value="3">3</button>
+          <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
+          <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
+          <button class="calc-btn" data-value=".">.</button>
         </div>
-        <div class="modal-body">
-            <div class="calculator">
-                <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
-                <div class="calculator-buttons">
-                    <button class="calc-btn" data-action="clear">C</button>
-                    <button class="calc-btn" data-action="delete">&#8592;</button>
-                    <button class="calc-btn" data-action="divide">&#247;</button>
-                    <button class="calc-btn" data-action="multiply">&#215;</button>
-                    <button class="calc-btn" data-value="7">7</button>
-                    <button class="calc-btn" data-value="8">8</button>
-                    <button class="calc-btn" data-value="9">9</button>
-                    <button class="calc-btn" data-action="subtract">&#8722;</button>
-                    <button class="calc-btn" data-value="4">4</button>
-                    <button class="calc-btn" data-value="5">5</button>
-                    <button class="calc-btn" data-value="6">6</button>
-                    <button class="calc-btn" data-action="add">+</button>
-                    <button class="calc-btn" data-value="1">1</button>
-                    <button class="calc-btn" data-value="2">2</button>
-                    <button class="calc-btn" data-value="3">3</button>
-                    <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
-                    <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
-                    <button class="calc-btn" data-value=".">.</button>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     INLINE QUIZ ENGINE
-     Handles diagramSVG property: renders SVG above question text
-     Fully self-contained — no dependency changes to quiz-app.js
-     (replace <script src="quiz-app.js"></script> with this block
-      OR keep quiz-app.js and add diagramSVG support patch below)
-════════════════════════════════════════════════════════════ -->
+</div><!-- end #mainContent -->
+
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- ═══ INLINE QUIZ ENGINE ═══ -->
 <script>
-(function () {
-  /* ── State ── */
-  const TOTAL = QUESTIONS.length;
-  let current = 0;
-  const state = QUESTIONS.map(() => ({ selected: null, flagged: false }));
-  let timerInterval = null;
-  let remaining = DURATION;
-  let submitted = false;
+(function(){
+  var TOTAL = QUESTIONS.length;
+  var current = 0;
+  var state = QUESTIONS.map(function(){ return {selected:null,flagged:false}; });
+  var remaining = DURATION;
+  var submitted = false;
+  var timerInterval = null;
 
-  /* ── DOM refs ── */
-  const $ = id => document.getElementById(id);
-  const qText        = $('questionText');
-  const qNumber      = $('questionNumber');
-  const qNum2        = $('currentQuestionNum');
-  const optCont      = $('optionsContainer');
-  const explSection  = $('questionExplanation');
-  const explContent  = $('explanationContent');
-  const prevBtn      = $('prevBtn');
-  const nextBtn      = $('nextBtn');
-  const clearBtn     = $('clearBtn');
-  const flagBtn      = $('flagBtn');
-  const timerDisplay = $('timerDisplay');
-  const timerCircle  = $('timerProgressCircle');
-  const answeredEl   = $('answeredCount');
-  const unansweredEl = $('unansweredCount');
-  const flaggedEl    = $('flaggedCount');
-  const palette      = $('questionPalette');
-  const sidebar      = $('quizSidebar');
-  const totalEl      = $('totalQuestions');
-  totalEl.textContent = TOTAL;
+  function $(id){ return document.getElementById(id); }
 
   /* ── Timer ── */
-  function fmtTime(s) {
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  function fmtTime(s){
+    var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+    return h+':'+pad(m)+':'+pad(sec);
   }
-  function tickTimer() {
-    if (remaining <= 0) { clearInterval(timerInterval); if (!submitted) autoSubmit(); return; }
+  function pad(n){ return n<10?'0'+n:String(n); }
+
+  function tick(){
+    if(remaining<=0){ clearInterval(timerInterval); if(!submitted) showTimeUp(); return; }
     remaining--;
-    timerDisplay.textContent = fmtTime(remaining);
-    const pct = remaining / DURATION;
-    const circumference = 163.36;
-    timerCircle.setAttribute('stroke-dashoffset', circumference * (1 - pct));
-    if (pct < 0.25) timerCircle.style.stroke = '#ef4444';
-    else if (pct < 0.5) timerCircle.style.stroke = '#f59e0b';
+    $('timerDisplay').textContent = fmtTime(remaining);
+    var pct = remaining/DURATION;
+    var circ = 163.36;
+    $('timerCircle').setAttribute('stroke-dashoffset', circ*(1-pct));
+    $('timerCircle').style.stroke = pct<0.25?'#ef4444':pct<0.5?'#f59e0b':'var(--accent)';
   }
-  timerInterval = setInterval(tickTimer, 1000);
+  timerInterval = setInterval(tick, 1000);
 
-  /* ── Render question ── */
-  function render() {
-    const q = QUESTIONS[current];
-    const s = state[current];
+  /* ── Render ── */
+  function render(){
+    var q = QUESTIONS[current];
+    var s = state[current];
 
-    qNumber.textContent = current + 1;
-    qNum2.textContent   = current + 1;
+    $('qNum').textContent   = current+1;
+    $('qNumH').textContent  = current+1;
+    $('qTotal').textContent = TOTAL;
 
-    /* Diagram: insert SVG above question text if present */
-    let diagramHTML = '';
-    if (q.diagramSVG) {
-      diagramHTML = `<div class="question-diagram" style="margin-bottom:1rem;overflow-x:auto;">${q.diagramSVG}</div>`;
+    /* Diagram */
+    var diag = '';
+    if(q.diagramSVG){
+      diag = '<div class="question-diagram">'+q.diagramSVG+'</div>';
     }
-    qText.innerHTML = diagramHTML + q.text.replace(/\n/g, '<br>');
+    /* Question text — newlines to <br> */
+    var txt = (q.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    $('qText').innerHTML = diag + txt;
 
     /* Options */
-    optCont.innerHTML = '';
-    ['A','B','C','D'].forEach(letter => {
-      const btn = document.createElement('button');
-      btn.className = 'option-btn' + (s.selected === letter ? ' selected' : '');
-      btn.innerHTML = `<span class="option-letter">${letter}</span><span class="option-text">${q.options[letter]}</span>`;
-      if (submitted) {
-        if (letter === q.answer) btn.classList.add('correct');
-        else if (s.selected === letter) btn.classList.add('incorrect');
-        btn.disabled = true;
+    var oc = $('optCont');
+    oc.innerHTML='';
+    ['A','B','C','D'].forEach(function(letter){
+      var btn = document.createElement('button');
+      btn.className = 'option-btn' + (s.selected===letter?' selected':'');
+      /* safe text for option */
+      var optTxt = (q.options[letter]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      btn.innerHTML = '<span class="option-letter">'+letter+'</span><span class="option-text">'+optTxt+'</span>';
+      if(submitted){
+        if(letter===q.answer) btn.classList.add('correct');
+        else if(s.selected===letter) btn.classList.add('incorrect');
+        btn.disabled=true;
       } else {
-        btn.addEventListener('click', () => select(letter));
+        (function(l){ btn.addEventListener('click',function(){ if(!submitted){state[current].selected=l;render();} }); })(letter);
       }
-      optCont.appendChild(btn);
+      oc.appendChild(btn);
     });
 
-    /* Explanation (shown after submit) */
-    if (submitted) {
-      explSection.classList.remove('hidden');
-      explContent.textContent = q.explanation;
+    /* Explanation */
+    var ex = $('explSection');
+    if(submitted){
+      ex.classList.remove('hidden');
+      $('explContent').textContent = q.explanation||'';
     } else {
-      explSection.classList.add('hidden');
+      ex.classList.add('hidden');
     }
 
-    /* Flag button */
-    flagBtn.innerHTML = s.flagged
+    /* Flag */
+    $('flagBtn').innerHTML = s.flagged
       ? '<i class="fas fa-flag"></i> Flagged'
       : '<i class="far fa-flag"></i> Flag';
-    flagBtn.classList.toggle('active', s.flagged);
+    $('flagBtn').classList.toggle('active', !!s.flagged);
 
-    /* Nav buttons */
-    prevBtn.disabled = current === 0;
-    nextBtn.textContent = current === TOTAL - 1 ? 'Submit' : 'Next';
-    nextBtn.innerHTML = current === TOTAL - 1
-      ? 'Submit <i class="fas fa-check"></i>'
-      : 'Next <i class="fas fa-arrow-right"></i>';
+    /* Nav */
+    $('prevBtn').disabled = (current===0);
+    if(current===TOTAL-1){
+      $('nextBtn').innerHTML='Submit <i class="fas fa-check"></i>';
+    } else {
+      $('nextBtn').innerHTML='Next <i class="fas fa-arrow-right"></i>';
+    }
 
+    /* Stats */
     updateStats();
     updatePalette();
   }
 
-  function select(letter) {
-    if (submitted) return;
-    state[current].selected = letter;
-    render();
+  function updateStats(){
+    var ans = state.filter(function(s){return s.selected!==null;}).length;
+    var flg = state.filter(function(s){return s.flagged;}).length;
+    $('answeredCount').textContent  = ans;
+    $('unansweredCount').textContent= TOTAL-ans;
+    $('flaggedCount').textContent   = flg;
+    $('mTot').textContent  = TOTAL;
+    $('mAns').textContent  = ans;
+    $('mUnans').textContent= TOTAL-ans;
+    $('mTime').textContent = fmtTime(remaining);
   }
 
-  /* ── Stats ── */
-  function updateStats() {
-    const answered = state.filter(s => s.selected !== null).length;
-    const flagged  = state.filter(s => s.flagged).length;
-    answeredEl.textContent   = answered;
-    unansweredEl.textContent = TOTAL - answered;
-    flaggedEl.textContent    = flagged;
-    $('modalTotalQuestions').textContent   = TOTAL;
-    $('modalAnsweredCount').textContent    = answered;
-    $('modalUnansweredCount').textContent  = TOTAL - answered;
-    $('modalTimeRemaining').textContent    = fmtTime(remaining);
-  }
-
-  /* ── Palette ── */
-  function updatePalette() {
-    palette.innerHTML = '';
-    QUESTIONS.forEach((_, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'palette-btn';
-      btn.textContent = i + 1;
-      if (i === current)          btn.classList.add('current');
-      if (state[i].selected)      btn.classList.add('answered');
-      if (state[i].flagged)       btn.classList.add('flagged');
-      btn.addEventListener('click', () => { current = i; render(); });
-      palette.appendChild(btn);
+  function updatePalette(){
+    var pal = $('palette');
+    pal.innerHTML='';
+    QUESTIONS.forEach(function(q,i){
+      var btn=document.createElement('button');
+      btn.className='palette-btn';
+      btn.textContent=i+1;
+      if(i===current) btn.classList.add('current');
+      if(state[i].selected) btn.classList.add('answered');
+      if(state[i].flagged)  btn.classList.add('flagged');
+      (function(idx){ btn.addEventListener('click',function(){current=idx;render();}); })(i);
+      pal.appendChild(btn);
     });
   }
 
-  /* ── Navigation ── */
-  prevBtn.addEventListener('click', () => { if (current > 0) { current--; render(); } });
-  nextBtn.addEventListener('click', () => {
-    if (current < TOTAL - 1) { current++; render(); }
-    else { $('submitModal').classList.remove('hidden'); }
+  /* ── Buttons ── */
+  $('prevBtn').addEventListener('click',function(){if(current>0){current--;render();}});
+  $('nextBtn').addEventListener('click',function(){
+    if(current<TOTAL-1){current++;render();}
+    else{ $('submitModal').classList.remove('hidden'); }
   });
-  clearBtn.addEventListener('click', () => { if (!submitted) { state[current].selected = null; render(); } });
-  flagBtn.addEventListener('click', () => { state[current].flagged = !state[current].flagged; render(); });
+  $('clearBtn').addEventListener('click',function(){if(!submitted){state[current].selected=null;render();}});
+  $('flagBtn').addEventListener('click',function(){state[current].flagged=!state[current].flagged;render();});
 
   /* ── Sidebar ── */
-  $('menuBtn').addEventListener('click', () => sidebar.classList.toggle('open'));
-  $('closeSidebar').addEventListener('click', () => sidebar.classList.remove('open'));
-  $('mobilePaletteBtn').addEventListener('click', () => sidebar.classList.toggle('open'));
+  $('menuBtn').addEventListener('click',function(){$('sidebar').classList.toggle('open');});
+  $('closeSidebar').addEventListener('click',function(){$('sidebar').classList.remove('open');});
+  $('mobileTrigger').addEventListener('click',function(){$('sidebar').classList.toggle('open');});
 
   /* ── Submit modal ── */
-  $('submitBtn').addEventListener('click', () => $('submitModal').classList.remove('hidden'));
-  $('closeSubmitModal').addEventListener('click', () => $('submitModal').classList.add('hidden'));
-  $('cancelSubmitBtn').addEventListener('click', () => $('submitModal').classList.add('hidden'));
-  $('confirmSubmitBtn').addEventListener('click', () => { $('submitModal').classList.add('hidden'); doSubmit(); });
-  $('viewResultsBtn').addEventListener('click', () => { $('timeUpModal').classList.add('hidden'); doSubmit(); });
+  $('submitBtn').addEventListener('click',function(){$('submitModal').classList.remove('hidden');});
+  $('closeSubmit').addEventListener('click',function(){$('submitModal').classList.add('hidden');});
+  $('cancelSubmit').addEventListener('click',function(){$('submitModal').classList.add('hidden');});
+  $('confirmSubmit').addEventListener('click',function(){$('submitModal').classList.add('hidden');doSubmit();});
+  $('viewResults').addEventListener('click',function(){$('timeUpModal').classList.add('hidden');doSubmit();});
 
-  function autoSubmit() { $('timeUpModal').classList.remove('hidden'); }
+  function showTimeUp(){ $('timeUpModal').classList.remove('hidden'); }
 
-  function doSubmit() {
-    submitted = true;
+  function doSubmit(){
+    submitted=true;
     clearInterval(timerInterval);
-    render();
-    /* Scroll to top */
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    /* show score screen */
+    var correct=0;
+    QUESTIONS.forEach(function(q,i){ if(state[i].selected===q.answer) correct++; });
+    var wrong = QUESTIONS.filter(function(q,i){return state[i].selected!==null && state[i].selected!==q.answer;}).length;
+    var unanswered = state.filter(function(s){return s.selected===null;}).length;
+    var pct = Math.round(correct/TOTAL*100);
+    $('sFinal').textContent  = correct+'/'+TOTAL;
+    $('sPct').textContent    = pct+'%';
+    $('sCorrect').textContent= correct;
+    $('sWrong').textContent  = wrong;
+    $('sUnanswered').textContent = unanswered;
+    $('scoreScreen').classList.add('visible');
+    $('mainContent').style.display='none';
+    window.scrollTo({top:0,behavior:'smooth'});
   }
 
+  $('reviewBtn').addEventListener('click',function(){
+    $('scoreScreen').classList.remove('visible');
+    $('mainContent').style.display='';
+    current=0;
+    render();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
   /* ── Calculator ── */
-  const calcModal   = $('calculatorModal');
-  const calcDisplay = $('calcDisplay');
-  let calcExpr = '';
-  $('calculatorBtn').addEventListener('click', () => calcModal.classList.remove('hidden'));
-  $('closeCalculatorModal').addEventListener('click', () => calcModal.classList.add('hidden'));
-  document.querySelectorAll('.calc-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const v = btn.dataset.value, a = btn.dataset.action;
-      if (v !== undefined) { calcExpr += v; calcDisplay.value = calcExpr; }
-      else if (a === 'clear')    { calcExpr = ''; calcDisplay.value = '0'; }
-      else if (a === 'delete')   { calcExpr = calcExpr.slice(0,-1); calcDisplay.value = calcExpr || '0'; }
-      else if (a === 'equals')   { try { calcDisplay.value = Function('"use strict";return (' + calcExpr.replace(/×/g,'*').replace(/÷/g,'/') + ')')(); calcExpr = String(calcDisplay.value); } catch { calcDisplay.value = 'Error'; calcExpr = ''; } }
-      else { calcExpr += ({add:'+',subtract:'-',multiply:'*',divide:'/'}[a]||''); calcDisplay.value = calcExpr; }
+  var calcExpr='';
+  $('calcBtn').addEventListener('click',function(){$('calcModal').classList.remove('hidden');});
+  $('closeCalc').addEventListener('click',function(){$('calcModal').classList.add('hidden');});
+  document.querySelectorAll('.calc-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var v=btn.dataset.value, a=btn.dataset.action;
+      if(v!==undefined){ calcExpr+=v; $('calcDisplay').value=calcExpr; }
+      else if(a==='clear'){ calcExpr=''; $('calcDisplay').value='0'; }
+      else if(a==='delete'){ calcExpr=calcExpr.slice(0,-1); $('calcDisplay').value=calcExpr||'0'; }
+      else if(a==='equals'){
+        try{
+          var expr=calcExpr.replace(/\u00d7/g,'*').replace(/\u00f7/g,'/').replace(/\u2212/g,'-');
+          $('calcDisplay').value=Function('"use strict";return('+expr+')')();
+          calcExpr=String($('calcDisplay').value);
+        }catch(e){ $('calcDisplay').value='Err'; calcExpr=''; }
+      } else {
+        var ops={add:'+',subtract:'-',multiply:'*',divide:'/'};
+        calcExpr+=ops[a]||'';
+        $('calcDisplay').value=calcExpr;
+      }
     });
   });
 
   /* ── Init ── */
+  $('totalQ').textContent = TOTAL;
   render();
 })();
 </script>
-
-</body>
-</html>
+</body></html>
