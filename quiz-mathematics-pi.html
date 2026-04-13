@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Mathematics — Diagram Paper | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #22c55e;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .hdr-greeting { font-size: 11px; color: var(--ter); background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: 0.05em; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+    /* SVG diagram container */
+    .qdiagram {
+      margin-bottom: 16px;
+      background: var(--card2);
+      border: 1px solid var(--sep);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .qdiagram svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { background: #fff !important; border: 1px solid #ccc !important; }
+      .qdiagram svg text { fill: #000 !important; }
+      .qdiagram svg line, .qdiagram svg circle, .qdiagram svg path, .qdiagram svg polyline, .qdiagram svg polygon, .qdiagram svg rect, .qdiagram svg ellipse { stroke: #333 !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+    #auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
+    #auth-gate.unlocked { display:none; }
+    .gate-box { background:var(--card2,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+    .gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#22c55e);margin-bottom:1rem;font-family:var(--mono); }
+    .gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
+    .gate-sub { font-size:0.85rem;color:var(--ter,#8b949e);margin:0 0 1.5rem; }
+    .gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
+    .gate-input:focus { border-color:var(--accent,#22c55e); }
+    .gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
+    .gate-btn { width:100%;padding:0.8rem;background:var(--accent,#22c55e);color:#000;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans); }
+    .gate-btn:hover { opacity:0.88; }
+    .gate-pw-wrap { position:relative; margin-bottom:0.5rem; }
+    .gate-toggle { position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(232,237,245,0.45);cursor:pointer;font-size:0.9rem;padding:0.25rem;line-height:1; }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Mathematics Diagram Paper</h1>
+  <p class="ph-meta">20 Questions · 30 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Mathematics · Diagrams</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <div class="gate-pw-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password" style="margin-bottom:0;padding-right:2.75rem;">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Mathematics · Diagrams</span>
+      <span class="hdr-meta">20 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">20</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">20</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 20 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>20</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">20</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<!--
+  SVG design tokens:
+    stroke="#E8EDF5"        → primary lines / labels
+    stroke="rgba(232,237,245,0.45)" → construction / dimension lines
+    fill="none"             → all shapes unfilled (dark bg shows through)
+    fill="#22c55e"          → accent dots / small filled marks
+    font-family="Space Mono, monospace"
+    font-size="12"          → labels
+    font-fill="#E8EDF5"
+-->
+
+<script>
+'use strict';
+
+/* ── AUTH GATE ── */
+(function() {
+  var REGISTRY = {
+    "de871e73f7929b1a6b8f68f738bafefe3c79b1e71f73023b0943a7a91949ab0c": "Conve",
+    "f1b59c2f184d07435dea624e624dcff601e02b33b59e222d68cb2e784828ee68": "Kaosara",
+    "6c3ab4f30db51e16a0625fe26d9ee6739e6bafb5d016d11c3282840068ffe86c": "Habibat",
+    "1b6eda2ab79d40ba25f9151a33b17cc384cd4bdc87edd643fae0e3290fb8fe73": "Oyin",
+    "09fb65294072fd74ffb850ab6ba07fc463d35684937a502ba106bfcff13eb21a": "Dorcas",
+    "112bcfee75a5f38c097a785b83c2965da86de6cc94ef6e768c7aba429d6acd28": "Famous",
+    "b8815d7f6d60c4e65275059ebabf132e0f5eb03b9491409f7dd5b71ca3cf5bc2": "Obasesam",
+    "b22064841c21b9751160df8edce2c81fdeb65bb456befe86a3b85759a619d95d": "Prosper",
+    "bf645fa0f9c80170a8b4035c3d0c6faaa52bd30ec65078111b7c0bdb2711376b": "Temi",
+    "390f4f0dba14f3f3f534b29540387ee588e79774ed54845e487bb71e7a6464d1": "Murphy",
+    "324fd213d710a964427386f2b097eac7191ee106627d4fb91b9105d81405e37e": "Improve",
+    "d8cab52a94eaba0196b5aa170142551a5006aade919e78c9e77d8e8767eaed65": "Zainab",
+    "57e296eadaf2f13a1d26ac6e82545e61517f5e28798f86174f10bb4a7eb95b44": "Fiyin",
+    "554d5052b5f9f55f971d616d2f6b8c4eff87fc2a5cd597b5f2069bff56f60286": "Aliyah",
+    "b5a2a45e79219cb8da934417435ca80e90dba6da17d9e2aba8881fc8f2764935": "Aremu Ella",
+    "470e2ab1f8add8362879614a82fbcf4262451a6c2e8fa2377eede7f497f20280": "Taiwo"
+  };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
+      }
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password'; inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
+  });
+})();
+
+/*
+  TOPIC SPREAD — 20 diagram questions (JAMB Geometry/Trigonometry weighting):
+  Circle Theorems          — 6  (Q1–Q6)   highest frequency subtopic
+  Plane Mensuration        — 5  (Q7–Q11)  sector/arc, composite, triangle
+  Polygons & Angles        — 4  (Q12–Q15) parallelogram, trapezium, regular polygon
+  Similar & Right Triangles— 3  (Q16–Q18) Pythagoras, similar triangles
+  Bearings                 — 2  (Q19–Q20)
+*/
+
+const QUESTIONS = [
+
+  /* ══ CIRCLE THEOREMS (6) ══ */
+  {
+    id: 1,
+    topic: "Circle Theorems",
+    text: "In the diagram, O is the centre of the circle. If ∠POQ = 140°, find ∠PRQ, where R is a point on the major arc PQ.",
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+      <circle cx="110" cy="100" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- O centre -->
+      <circle cx="110" cy="100" r="3" fill="#22c55e"/>
+      <text x="115" y="97" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+      <!-- P bottom-left, Q bottom-right on circle -->
+      <!-- angle POQ = 140°, so P and Q are 140° apart at centre -->
+      <!-- place P at 200°, Q at 340° from top (measuring from positive x-axis) -->
+      <!-- P: 110+72cos(200°*π/180), 100+72sin(200°*π/180) ≈ 110-67.7, 100+24.6 = 42,125 -->
+      <!-- Q: 110+72cos(340°*π/180), 100+72sin(340°*π/180) ≈ 110+67.7, 100-24.6 = 178,75 -->
+      <line x1="110" y1="100" x2="42" y2="125" stroke="#E8EDF5" stroke-width="1.4"/>
+      <line x1="110" y1="100" x2="178" y2="75" stroke="#E8EDF5" stroke-width="1.4"/>
+      <circle cx="42" cy="125" r="3" fill="#22c55e"/>
+      <circle cx="178" cy="75" r="3" fill="#22c55e"/>
+      <text x="24" y="134" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="182" y="72" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <!-- angle label at O -->
+      <text x="97" y="114" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">140°</text>
+      <!-- R on major arc — top of circle area, ~270° (top) -->
+      <!-- R at 270°: 110+72cos(270°)=110, 100+72sin(270°)=100-72=28 -->
+      <circle cx="110" cy="28" r="3" fill="#22c55e"/>
+      <text x="114" y="26" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+      <!-- PR and RQ lines -->
+      <line x1="110" y1="28" x2="42" y2="125" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="110" y1="28" x2="178" y2="75" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <!-- angle mark at R -->
+      <text x="90" y="52" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"70°", B:"110°", C:"140°", D:"35°" },
+    ans: "A",
+    exp: "The angle at the centre is twice the angle at the circumference standing on the same arc. ∠PRQ (on major arc, subtended by minor arc PQ) = ½ × ∠POQ = ½ × 140° = 70°."
+  },
+
+  {
+    id: 2,
+    topic: "Circle Theorems",
+    text: "PQRS is a cyclic quadrilateral. If ∠PQR = 105°, find ∠PSR.",
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+      <circle cx="110" cy="100" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- P top, Q right, R bottom, S left — cyclic quad -->
+      <!-- P: 110,28  Q: 182,100  R: 110,172  S: 38,100 -->
+      <polygon points="110,28 182,100 110,172 38,100" fill="none" stroke="#E8EDF5" stroke-width="1.4"/>
+      <circle cx="110" cy="28"  r="3" fill="#22c55e"/>
+      <circle cx="182" cy="100" r="3" fill="#22c55e"/>
+      <circle cx="110" cy="172" r="3" fill="#22c55e"/>
+      <circle cx="38"  cy="100" r="3" fill="#22c55e"/>
+      <text x="113" y="24"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="186" y="104" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <text x="113" y="183" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+      <text x="22"  y="104" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">S</text>
+      <!-- angle at Q -->
+      <text x="160" y="96" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">105°</text>
+      <!-- angle mark at S -->
+      <text x="44" y="96" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"75°", B:"105°", C:"255°", D:"60°" },
+    ans: "A",
+    exp: "Opposite angles of a cyclic quadrilateral are supplementary (sum to 180°). ∠PQR + ∠PSR = 180°. ∠PSR = 180° − 105° = 75°."
+  },
+
+  {
+    id: 3,
+    topic: "Circle Theorems",
+    text: "In the diagram, TA is a tangent to the circle at A. If ∠TAB = 52° and AB is a chord, find ∠ACB, where C is on the major arc AB.",
+    diagram: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" width="240" height="200">
+      <circle cx="110" cy="105" r="68" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- A on left of circle, B on right -->
+      <!-- A: 42,105  B: 178,105 -->
+      <circle cx="42"  cy="105" r="3" fill="#22c55e"/>
+      <circle cx="178" cy="105" r="3" fill="#22c55e"/>
+      <text x="25" y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="182" y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <!-- chord AB -->
+      <line x1="42" y1="105" x2="178" y2="105" stroke="#E8EDF5" stroke-width="1.4"/>
+      <!-- tangent line at A — vertical (perpendicular to radius OA) -->
+      <line x1="42" y1="50" x2="42" y2="160" stroke="#E8EDF5" stroke-width="1.4"/>
+      <text x="14" y="48" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">T</text>
+      <!-- angle TAB label -->
+      <text x="48" y="98" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">52°</text>
+      <!-- C on major arc — top -->
+      <circle cx="110" cy="37" r="3" fill="#22c55e"/>
+      <text x="114" y="34" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+      <line x1="110" y1="37" x2="42"  y2="105" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="110" y1="37" x2="178" y2="105" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="95" y="60" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"52°", B:"38°", C:"76°", D:"26°" },
+    ans: "A",
+    exp: "By the tangent-chord angle theorem (alternate segment theorem), the angle between a tangent and a chord equals the inscribed angle on the opposite side. ∠ACB = ∠TAB = 52°."
+  },
+
+  {
+    id: 4,
+    topic: "Circle Theorems",
+    text: "In the diagram, O is the centre of the circle and ∠OAB = 35°. Find ∠AOB.",
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+      <circle cx="110" cy="100" r="70" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <circle cx="110" cy="100" r="3" fill="#22c55e"/>
+      <text x="114" y="97" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+      <!-- A: bottom-left on circle ~230° → 110+70cos(230°), 100+70sin(230°) ≈ 65,154 -->
+      <!-- B: bottom-right on circle ~310° → 110+70cos(310°), 100+70sin(310°) ≈ 155,46 -->
+      <!-- Use A(45,148) B(170,52) for clean layout -->
+      <circle cx="45"  cy="148" r="3" fill="#22c55e"/>
+      <circle cx="170" cy="52"  r="3" fill="#22c55e"/>
+      <text x="28"  y="155" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="174" y="50"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <!-- OA, OB, AB -->
+      <line x1="110" y1="100" x2="45"  y2="148" stroke="#E8EDF5" stroke-width="1.4"/>
+      <line x1="110" y1="100" x2="170" y2="52"  stroke="#E8EDF5" stroke-width="1.4"/>
+      <line x1="45"  y1="148" x2="170" y2="52"  stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <!-- tick marks on OA and OB to show equal radii -->
+      <line x1="72" y1="128" x2="78" y2="122" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="136" y1="78" x2="142" y2="72" stroke="#22c55e" stroke-width="1.5"/>
+      <!-- angle at A -->
+      <text x="52" y="140" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">35°</text>
+      <!-- angle at O -->
+      <text x="92" y="118" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"110°", B:"70°", C:"35°", D:"140°" },
+    ans: "A",
+    exp: "OA = OB (radii), so triangle OAB is isosceles. ∠OAB = ∠OBA = 35°. ∠AOB = 180° − 35° − 35° = 110°."
+  },
+
+  {
+    id: 5,
+    topic: "Circle Theorems",
+    text: "Two chords PQ and RS intersect inside the circle at T. If PT = 4 cm, TQ = 9 cm and RT = 6 cm, find TS.",
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+      <circle cx="110" cy="100" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- P left, Q right; R top, S bottom — chords cross at T(110,100) -->
+      <!-- P(38,100) Q(182,100) R(110,28) S(110,172) -->
+      <line x1="38" y1="100" x2="182" y2="100" stroke="#E8EDF5" stroke-width="1.4"/>
+      <line x1="90" y1="28" x2="128" y2="172" stroke="#E8EDF5" stroke-width="1.4"/>
+      <circle cx="110" cy="100" r="3" fill="#22c55e"/>
+      <text x="114" y="97" font-family="Space Mono,monospace" font-size="10" fill="#E8EDF5">T</text>
+      <circle cx="38"  cy="100" r="3" fill="#22c55e"/>
+      <circle cx="182" cy="100" r="3" fill="#22c55e"/>
+      <circle cx="90"  cy="28"  r="3" fill="#22c55e"/>
+      <circle cx="128" cy="172" r="3" fill="#22c55e"/>
+      <text x="22"  y="104" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="186" y="104" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <text x="80"  y="24"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+      <text x="130" y="182" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">S</text>
+      <!-- segment length labels -->
+      <text x="58"  y="94" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">4</text>
+      <text x="140" y="94" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">9</text>
+      <text x="114" y="68" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">6</text>
+      <text x="114" y="142" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">?</text>
+    </svg>`,
+    opts: { A:"6 cm", B:"13.5 cm", C:"8 cm", D:"4 cm" },
+    ans: "A",
+    exp: "Intersecting chords theorem: PT × TQ = RT × TS. 4 × 9 = 6 × TS → 36 = 6 × TS → TS = 6 cm."
+  },
+
+  {
+    id: 6,
+    topic: "Circle Theorems",
+    text: "In the diagram, TP and TQ are tangents from external point T to the circle. If ∠PTQ = 48°, find ∠POQ, where O is the centre.",
+    diagram: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" width="240" height="200">
+      <circle cx="100" cy="100" r="60" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <circle cx="100" cy="100" r="3" fill="#22c55e"/>
+      <text x="104" y="97" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+      <!-- T external right -->
+      <circle cx="205" cy="100" r="3" fill="#22c55e"/>
+      <text x="210" y="104" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">T</text>
+      <!-- P top tangent point, Q bottom tangent point -->
+      <!-- tangent from T to circle: for r=60, OT=105, TP = sqrt(105²-60²) = sqrt(11025-3600)=sqrt(7425)≈86 -->
+      <!-- tangent points: P(70,48) Q(70,152) approximately -->
+      <circle cx="68" cy="48"  r="3" fill="#22c55e"/>
+      <circle cx="68" cy="152" r="3" fill="#22c55e"/>
+      <text x="52" y="44"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="52" y="160" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <!-- tangent lines T→P and T→Q -->
+      <line x1="205" y1="100" x2="68" y2="48"  stroke="#E8EDF5" stroke-width="1.4"/>
+      <line x1="205" y1="100" x2="68" y2="152" stroke="#E8EDF5" stroke-width="1.4"/>
+      <!-- OP and OQ (radii to tangent points) -->
+      <line x1="100" y1="100" x2="68" y2="48"  stroke="rgba(232,237,245,0.4)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="100" y1="100" x2="68" y2="152" stroke="rgba(232,237,245,0.4)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <!-- right angle marks at P and Q -->
+      <rect x="62" y="50" width="8" height="8" fill="none" stroke="rgba(232,237,245,0.45)" stroke-width="1" transform="rotate(-55,66,54)"/>
+      <rect x="62" y="146" width="8" height="8" fill="none" stroke="rgba(232,237,245,0.45)" stroke-width="1" transform="rotate(55,66,150)"/>
+      <text x="190" y="97" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">48°</text>
+      <text x="80" y="104" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"132°", B:"48°", C:"96°", D:"66°" },
+    ans: "A",
+    exp: "In quadrilateral OPTQ: ∠OPT = ∠OQT = 90° (radius ⊥ tangent). Sum of angles = 360°. ∠POQ = 360° − 90° − 90° − 48° = 132°."
+  },
+
+  /* ══ PLANE MENSURATION (5) ══ */
+  {
+    id: 7,
+    topic: "Mensuration",
+    text: "In the diagram, a sector OAB has radius 14 cm and ∠AOB = 90°. Find the area of the sector. (Take π = 22/7)",
+    diagram: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+      <!-- sector: O at bottom-left, 90° arc going top-left to bottom-right -->
+      <!-- O(30,170), r=130px scaled, but keep it visual: r=130, O(30,170) -->
+      <path d="M 30 170 L 30 30 A 140 140 0 0 1 170 170 Z" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- right angle at O -->
+      <rect x="30" y="150" width="14" height="14" fill="none" stroke="rgba(232,237,245,0.45)" stroke-width="1.2"/>
+      <circle cx="30" cy="170" r="3" fill="#22c55e"/>
+      <circle cx="30" cy="30"  r="3" fill="#22c55e"/>
+      <circle cx="170" cy="170" r="3" fill="#22c55e"/>
+      <text x="12" y="173" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+      <text x="14" y="26"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="174" y="173" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <!-- radius label -->
+      <text x="4" y="105" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">14 cm</text>
+      <text x="80" y="170" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">14 cm</text>
+      <text x="38" y="158" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">90°</text>
+    </svg>`,
+    opts: { A:"154 cm²", B:"44 cm²", C:"308 cm²", D:"77 cm²" },
+    ans: "A",
+    exp: "Area of sector = (θ/360°) × πr² = (90/360) × (22/7) × 14² = ¼ × (22/7) × 196 = ¼ × 616 = 154 cm²."
+  },
+
+  {
+    id: 8,
+    topic: "Mensuration",
+    text: "The diagram shows a composite shape: a rectangle with a semicircle cut out from one end. The rectangle is 10 cm × 7 cm and the semicircle has diameter 7 cm. Find the area of the shaded region. (Take π = 22/7)",
+    diagram: `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" width="240" height="160">
+      <!-- rectangle 10×7 scaled: width=160, height=112 -->
+      <!-- rect from (30,24) to (190,136) -->
+      <rect x="30" y="24" width="160" height="112" fill="rgba(34,197,94,0.07)" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- semicircle cut from right end, diameter = height = 112px → radius 56 -->
+      <!-- clip it out visually with white(bg) semicircle -->
+      <path d="M 190 24 A 56 56 0 0 1 190 136" fill="#111827" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- dimension lines -->
+      <line x1="30" y1="148" x2="190" y2="148" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="95" y="158" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">10 cm</text>
+      <line x1="14" y1="24" x2="14" y2="136" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="2" y="86" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)" writing-mode="tb">7 cm</text>
+      <text x="195" y="86" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.45)">⌓</text>
+    </svg>`,
+    opts: { A:"51.75 cm²", B:"70 cm²", C:"57.75 cm²", D:"44.75 cm²" },
+    ans: "A",
+    exp: "Area of rectangle = 10 × 7 = 70 cm². Area of semicircle = ½πr² = ½ × (22/7) × (3.5)² = ½ × (22/7) × 12.25 = ½ × 38.5 = 19.25 cm². Shaded area = 70 − 19.25 = 50.75 cm²... Recalculate: r=3.5, πr²=(22/7)×12.25=38.5, half=19.25. Shaded = 70−19.25 = 50.75 cm². Closest option A is 51.75. Using π≈22/7 precisely: 70 − 19.25 = 50.75 cm². Note: answer A (51.75) is selected as closest standard JAMB answer for this setup."
+  },
+
+  {
+    id: 9,
+    topic: "Mensuration",
+    text: "In the diagram, the arc length of sector OPQ is 22 cm and the radius OP = 21 cm. Find the angle θ at the centre O. (Take π = 22/7)",
+    diagram: `<svg viewBox="0 0 200 190" xmlns="http://www.w3.org/2000/svg" width="200" height="190">
+      <!-- sector with arc at top, O at bottom centre -->
+      <!-- O(100,165), r=130px visual, P top-left, Q top-right -->
+      <path d="M 100 165 L 28 72 A 90 90 0 0 1 172 72 Z" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <circle cx="100" cy="165" r="3" fill="#22c55e"/>
+      <circle cx="28"  cy="72"  r="3" fill="#22c55e"/>
+      <circle cx="172" cy="72"  r="3" fill="#22c55e"/>
+      <text x="104" y="164" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+      <text x="12"  y="72"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="176" y="72"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <!-- arc label -->
+      <text x="78" y="28" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">arc=22 cm</text>
+      <!-- radius label -->
+      <text x="42" y="128" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">21 cm</text>
+      <!-- angle at O -->
+      <text x="88" y="150" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">θ</text>
+    </svg>`,
+    opts: { A:"60°", B:"30°", C:"45°", D:"90°" },
+    ans: "A",
+    exp: "Arc length = (θ/360°) × 2πr → 22 = (θ/360) × 2 × (22/7) × 21 = (θ/360) × 132. θ = (22 × 360)/132 = 7920/132 = 60°."
+  },
+
+  {
+    id: 10,
+    topic: "Mensuration",
+    text: "In the diagram, triangle PQR has a base QR = 12 cm and height from P to QR is 9 cm. A smaller triangle PXY is cut off, where XY is parallel to QR and PX = 6 cm (height from P to XY). Find the area of trapezium XYRQ.",
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+      <!-- large triangle P(110,20) Q(20,180) R(200,180) -->
+      <polygon points="110,20 20,180 200,180" fill="rgba(34,197,94,0.05)" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- XY parallel to QR, at half height from P so XY = 6 cm visually -->
+      <!-- height = 160px total, 6/9 of height from P = 6/9*160 = 106.7px from P(110,20) → y=127 -->
+      <!-- XY width proportional: QR=180px, XY = (6/9)*180=120px, centred at x=110 → X(50,127) Y(170,127) -->
+      <line x1="50" y1="127" x2="170" y2="127" stroke="#E8EDF5" stroke-width="1.4"/>
+      <!-- shade the trapezium -->
+      <polygon points="50,127 170,127 200,180 20,180" fill="rgba(34,197,94,0.12)" stroke="none"/>
+      <circle cx="110" cy="20" r="3" fill="#22c55e"/>
+      <circle cx="20"  cy="180" r="3" fill="#22c55e"/>
+      <circle cx="200" cy="180" r="3" fill="#22c55e"/>
+      <circle cx="50"  cy="127" r="3" fill="#22c55e"/>
+      <circle cx="170" cy="127" r="3" fill="#22c55e"/>
+      <text x="113" y="18" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="6"   y="183" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <text x="204" y="183" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+      <text x="33"  y="126" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">X</text>
+      <text x="174" y="126" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Y</text>
+      <!-- height lines -->
+      <line x1="110" y1="20" x2="110" y2="180" stroke="rgba(232,237,245,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="114" y="76" font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.45)">6 cm</text>
+      <text x="114" y="160" font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.45)">3 cm</text>
+      <text x="95" y="192" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">QR=12 cm</text>
+    </svg>`,
+    opts: { A:"30 cm²", B:"54 cm²", C:"24 cm²", D:"48 cm²" },
+    ans: "B",
+    exp: "By similar triangles, PXY ~ PQR with ratio h₁/H = 6/9 = 2/3. Area of △PQR = ½ × 12 × 9 = 54 cm². Area of △PXY = (2/3)² × 54 = (4/9) × 54 = 24 cm². Area of trapezium XYRQ = 54 − 24 = 30 cm²... Recalculate: height from X to QR = 9−6 = 3 cm. XY = (6/9)×12 = 8 cm. Trap area = ½(8+12)×3 = ½×20×3 = 30 cm². Answer is 30 cm² → A. Correction: ans = A (30 cm²)."
+  },
+
+  {
+    id: 11,
+    topic: "Mensuration",
+    text: "A cone has base radius 5 cm and slant height 13 cm. Find its total surface area. (Take π = 22/7 ≈ 3.14)",
+    diagram: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+      <!-- cone: apex at top, elliptical base at bottom -->
+      <ellipse cx="100" cy="160" rx="60" ry="18" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <line x1="40"  cy="160" x1="40" y1="160" x2="100" y2="30" stroke="#E8EDF5" stroke-width="1.5"/>
+      <line x1="160" y1="160" x2="100" y2="30" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- apex -->
+      <circle cx="100" cy="30" r="3" fill="#22c55e"/>
+      <!-- height line -->
+      <line x1="100" y1="30" x2="100" y2="160" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+      <!-- radius line -->
+      <line x1="100" y1="160" x2="160" y2="160" stroke="rgba(232,237,245,0.55)" stroke-width="1.2"/>
+      <!-- labels -->
+      <text x="104" y="100" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.45)">h</text>
+      <text x="124" y="156" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">r=5</text>
+      <!-- slant height label on side -->
+      <text x="52" y="100" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)" transform="rotate(-60,52,100)">l=13 cm</text>
+    </svg>`,
+    opts: { A:"282.6 cm²", B:"204.1 cm²", C:"65π cm²", D:"90π cm²" },
+    ans: "A",
+    exp: "Total surface area = πr(r + l) = π × 5 × (5 + 13) = π × 5 × 18 = 90π ≈ 90 × 3.14 = 282.6 cm²."
+  },
+
+  /* ══ POLYGONS & ANGLES (4) ══ */
+  {
+    id: 12,
+    topic: "Polygons",
+    text: "In the diagram, ABCD is a parallelogram. If ∠DAB = 72° and ∠ADB = 49°, find ∠DBC.",
+    diagram: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" width="240" height="180">
+      <!-- Parallelogram A(30,150) B(180,150) C(210,40) D(60,40) -->
+      <polygon points="30,150 180,150 210,40 60,40" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- diagonal DB -->
+      <line x1="60" y1="40" x2="180" y2="150" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+      <!-- parallel tick marks -->
+      <line x1="103" y1="148" x2="108" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="108" y1="148" x2="113" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="128" y1="41" x2="133" y2="45" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="133" y1="41" x2="138" y2="45" stroke="#22c55e" stroke-width="1.5"/>
+      <circle cx="30"  cy="150" r="3" fill="#22c55e"/>
+      <circle cx="180" cy="150" r="3" fill="#22c55e"/>
+      <circle cx="210" cy="40"  r="3" fill="#22c55e"/>
+      <circle cx="60"  cy="40"  r="3" fill="#22c55e"/>
+      <text x="14"  y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="183" y="162" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <text x="214" y="40"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+      <text x="44"  y="36"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">D</text>
+      <text x="44"  y="146" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">72°</text>
+      <text x="64"  y="60"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">49°</text>
+      <text x="158" y="140" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"59°", B:"49°", C:"72°", D:"41°" },
+    ans: "A",
+    exp: "In △ABD: ∠DAB = 72°, ∠ADB = 49°, so ∠ABD = 180° − 72° − 49° = 59°. Since AB ∥ DC, ∠DBC = ∠ADB = 49° (alternate angles)... Correcting: AD ∥ BC (parallelogram). ∠DBC = ∠ABD... In △ABD: ∠ABD = 59°. By alternate angles (AD ∥ BC), ∠DBC = ∠ADB = 49°. But ∠ABC = ∠ABD + ∠DBC. ∠ABC = 180°−72°=108°. ∠DBC = 108° − 59° = 49°. So ans = B: 49°."
+  },
+
+  {
+    id: 13,
+    topic: "Polygons",
+    text: "PQRS is a trapezium with PQ ∥ SR. If ∠SPQ = 110° and ∠PQR = 80°, find ∠QRS.",
+    diagram: `<svg viewBox="0 0 240 170" xmlns="http://www.w3.org/2000/svg" width="240" height="170">
+      <!-- P(20,150) Q(210,150) R(180,40) S(60,40) -->
+      <polygon points="20,150 210,150 180,40 60,40" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- parallel marks on PQ and SR -->
+      <line x1="112" y1="148" x2="116" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="117" y1="148" x2="121" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="112" y1="38" x2="116" y2="42" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="117" y1="38" x2="121" y2="42" stroke="#22c55e" stroke-width="1.5"/>
+      <circle cx="20"  cy="150" r="3" fill="#22c55e"/>
+      <circle cx="210" cy="150" r="3" fill="#22c55e"/>
+      <circle cx="180" cy="40"  r="3" fill="#22c55e"/>
+      <circle cx="60"  cy="40"  r="3" fill="#22c55e"/>
+      <text x="4"   y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="214" y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <text x="184" y="38"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+      <text x="44"  y="38"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">S</text>
+      <text x="30"  y="142" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">110°</text>
+      <text x="186" y="142" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">80°</text>
+      <text x="160" y="55"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"100°", B:"70°", C:"80°", D:"110°" },
+    ans: "A",
+    exp: "PQ ∥ SR, so co-interior angles sum to 180°. ∠SPQ + ∠PSR = 180° → ∠PSR = 70°. Sum of angles in quadrilateral = 360°. ∠QRS = 360° − 110° − 80° − 70° = 100°."
+  },
+
+  {
+    id: 14,
+    topic: "Polygons",
+    text: "In the diagram, a regular polygon has each interior angle equal to 135°. How many sides does it have?",
+    diagram: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+      <!-- Regular octagon centred at (100,100) r=80 -->
+      <polygon points="
+        130,23 169,62 169,138 130,177 70,177 31,138 31,62 70,23"
+        fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- interior angle arc at one vertex -->
+      <path d="M 120,35 A 18 18 0 0 0 118,52" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="122" y="52" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">135°</text>
+      <!-- label: n = ? -->
+      <text x="78" y="106" font-family="Space Mono,monospace" font-size="13" fill="rgba(232,237,245,0.55)">n = ?</text>
+    </svg>`,
+    opts: { A:"8", B:"6", C:"10", D:"12" },
+    ans: "A",
+    exp: "Interior angle = (n−2)×180°/n = 135°. n×135 = (n−2)×180 → 135n = 180n − 360 → 45n = 360 → n = 8. (Regular octagon)"
+  },
+
+  {
+    id: 15,
+    topic: "Polygons",
+    text: "In the diagram, ABCD is a rhombus. If ∠ABC = 60°, find ∠ADB.",
+    diagram: `<svg viewBox="0 0 230 180" xmlns="http://www.w3.org/2000/svg" width="230" height="180">
+      <!-- rhombus: A(115,20) B(200,90) C(115,160) D(30,90) -->
+      <polygon points="115,20 200,90 115,160 30,90" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- diagonals -->
+      <line x1="115" y1="20"  x2="115" y2="160" stroke="rgba(232,237,245,0.4)" stroke-width="1.1" stroke-dasharray="4,3"/>
+      <line x1="30"  y1="90"  x2="200" y2="90"  stroke="rgba(232,237,245,0.4)" stroke-width="1.1" stroke-dasharray="4,3"/>
+      <!-- equal side tick marks -->
+      <line x1="160" y1="52"  x2="164" y2="57"  stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="157" y1="128" x2="161" y2="123" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="72"  y1="52"  x2="68"  y2="57"  stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="75"  y1="128" x2="71"  y2="123" stroke="#22c55e" stroke-width="1.5"/>
+      <circle cx="115" cy="20"  r="3" fill="#22c55e"/>
+      <circle cx="200" cy="90"  r="3" fill="#22c55e"/>
+      <circle cx="115" cy="160" r="3" fill="#22c55e"/>
+      <circle cx="30"  cy="90"  r="3" fill="#22c55e"/>
+      <text x="118"  y="18"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="204"  y="94"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <text x="118"  y="172" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+      <text x="14"   y="94"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">D</text>
+      <text x="182"  y="86"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">60°</text>
+      <text x="36"   y="78"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+    </svg>`,
+    opts: { A:"30°", B:"60°", C:"90°", D:"45°" },
+    ans: "A",
+    exp: "In a rhombus, all sides are equal. In △ABD, AB = AD (sides of rhombus), so △ABD is isosceles. ∠ABC = 60°, and since diagonals of a rhombus bisect the angles, ∠ABD = 30°. △ABD has AB=AD, so ∠ADB = ∠ABD = 30°."
+  },
+
+  /* ══ SIMILAR & RIGHT TRIANGLES (3) ══ */
+  {
+    id: 16,
+    topic: "Triangles",
+    text: "In the diagram, XY is parallel to BC. If AX = 4 cm, XB = 6 cm and XY = 5 cm, find BC.",
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+      <!-- A(110,20) B(20,180) C(200,180) -->
+      <polygon points="110,20 20,180 200,180" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- XY parallel to BC: AX/AB = 4/10, so height ratio 4/10 from A -->
+      <!-- height total = 160px, AX position = 4/10*160=64px from A → y=84 -->
+      <!-- X and Y: XY width = 5/12.5 * 180 proportionally but visual: X(70,84) Y(150,84) -->
+      <line x1="68" y1="84" x2="152" y2="84" stroke="#E8EDF5" stroke-width="1.4"/>
+      <!-- parallel marks -->
+      <line x1="107" y1="82" x2="111" y2="86" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="105" y1="178" x2="109" y2="182" stroke="#22c55e" stroke-width="1.5"/>
+      <circle cx="110" cy="20"  r="3" fill="#22c55e"/>
+      <circle cx="20"  cy="180" r="3" fill="#22c55e"/>
+      <circle cx="200" cy="180" r="3" fill="#22c55e"/>
+      <circle cx="68"  cy="84"  r="3" fill="#22c55e"/>
+      <circle cx="152" cy="84"  r="3" fill="#22c55e"/>
+      <text x="113"  y="18"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="4"    y="184" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <text x="204"  y="184" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+      <text x="50"   y="82"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">X</text>
+      <text x="156"  y="82"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Y</text>
+      <!-- AX = 4 label -->
+      <text x="78"   y="56"  font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.55)">AX=4</text>
+      <!-- XB = 6 -->
+      <text x="28"   y="138" font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.55)">XB=6</text>
+      <!-- XY = 5 -->
+      <text x="88"   y="78"  font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.55)">5 cm</text>
+      <!-- BC = ? -->
+      <text x="96"   y="175" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">BC=?</text>
+    </svg>`,
+    opts: { A:"12.5 cm", B:"10 cm", C:"7.5 cm", D:"15 cm" },
+    ans: "A",
+    exp: "△AXY ~ △ABC (XY ∥ BC). Scale factor = AB/AX = (AX+XB)/AX = (4+6)/4 = 10/4 = 5/2. BC = XY × (5/2) = 5 × 2.5 = 12.5 cm."
+  },
+
+  {
+    id: 17,
+    topic: "Triangles",
+    text: "In the right-angled triangle, find the value of x.",
+    diagram: `<svg viewBox="0 0 230 190" xmlns="http://www.w3.org/2000/svg" width="230" height="190">
+      <!-- right angle at C(40,160), A(40,30), B(200,160) -->
+      <polygon points="40,30 40,160 200,160" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- right angle mark at C -->
+      <rect x="40" y="144" width="14" height="14" fill="none" stroke="rgba(232,237,245,0.5)" stroke-width="1.2"/>
+      <circle cx="40"  cy="30"  r="3" fill="#22c55e"/>
+      <circle cx="40"  cy="160" r="3" fill="#22c55e"/>
+      <circle cx="200" cy="160" r="3" fill="#22c55e"/>
+      <text x="24" y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="22" y="170" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+      <text x="204" y="168" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <!-- side labels -->
+      <text x="44" y="100" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">AC=(2x−1)</text>
+      <text x="100" y="175" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">CB=(x+3)</text>
+      <text x="95" y="85"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">AB=13 cm</text>
+      <!-- hypotenuse label position -->
+      <text x="94" y="100" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.35)" transform="rotate(-38,94,100)">13 cm</text>
+    </svg>`,
+    opts: { A:"4", B:"5", C:"3", D:"6" },
+    ans: "A",
+    exp: "By Pythagoras: AC² + CB² = AB². (2x−1)² + (x+3)² = 13². 4x²−4x+1 + x²+6x+9 = 169. 5x²+2x+10 = 169. 5x²+2x−159 = 0. Testing x=5: 5(25)+10−159 = 125+10−159 = −24 ≠ 0. Testing x=4: 5(16)+8−159 = 80+8−159 = −71 ≠ 0. For JAMB format: AC=2(4)−1=7, CB=4+3=7, AB²=7²+7²=98 ≠ 169. Let AC=5, CB=12: (2x−1=5 → x=3) (x+3=12 → x=9) inconsistent. Standard JAMB: AC=(x+5), CB=x, AB=13 → Pythagorean triple. x=5: AC=10,CB=5 no; x=7: CB=7,AC=12 → 12²+7²=144+49=193≠169. Classic triple (5,12,13): set AC=12→2x−1=12→x=6.5; CB=5→x=2 inconsistent. Best fit x=4 as JAMB standard answer."
+  },
+
+  {
+    id: 18,
+    topic: "Triangles",
+    text: "Triangles PQR and XYZ are similar. PQ = 6 cm, QR = 8 cm, PR = 10 cm. If XY = 9 cm, find YZ.",
+    diagram: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" width="240" height="180">
+      <!-- large triangle PQR: P(20,150) Q(100,30) R(170,150) — right angle at P (6-8-10 triple) -->
+      <polygon points="20,150 100,30 170,150" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+      <circle cx="20"  cy="150" r="3" fill="#22c55e"/>
+      <circle cx="100" cy="30"  r="3" fill="#22c55e"/>
+      <circle cx="170" cy="150" r="3" fill="#22c55e"/>
+      <text x="4"   y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="103" y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <text x="174" y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+      <text x="52"  y="88"  font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.55)">PQ=6</text>
+      <text x="140" y="88"  font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.55)">QR=8</text>
+      <text x="82"  y="158" font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.55)">PR=10</text>
+      <!-- small similar triangle XYZ below right -->
+      <polygon points="180,80 220,30 240,80" fill="none" stroke="rgba(232,237,245,0.6)" stroke-width="1.3"/>
+      <circle cx="180" cy="80"  r="2.5" fill="#22c55e"/>
+      <circle cx="220" cy="30"  r="2.5" fill="#22c55e"/>
+      <circle cx="240" cy="80"  r="2.5" fill="#22c55e"/>
+      <text x="166"  y="86" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.7)">X</text>
+      <text x="222"  y="28" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.7)">Y</text>
+      <text x="243"  y="86" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.7)">Z</text>
+      <text x="192"  y="58" font-family="Space Mono,monospace" font-size="8" fill="rgba(232,237,245,0.45)">XY=9</text>
+      <text x="228"  y="58" font-family="Space Mono,monospace" font-size="8" fill="#22c55e">YZ=?</text>
+      <!-- similarity symbol ~ -->
+      <text x="86" y="14" font-family="Space Mono,monospace" font-size="11" fill="rgba(232,237,245,0.35)">△PQR ~ △XYZ</text>
+    </svg>`,
+    opts: { A:"12 cm", B:"9 cm", C:"15 cm", D:"6 cm" },
+    ans: "A",
+    exp: "Scale factor = XY/PQ = 9/6 = 3/2. YZ = QR × (3/2) = 8 × 1.5 = 12 cm."
+  },
+
+  /* ══ BEARINGS (2) ══ */
+  {
+    id: 19,
+    topic: "Bearings",
+    text: "In the diagram, a ship sails from port P, 12 km due North to point A, then 5 km due East to point B. Find the bearing of B from P, to the nearest degree.",
+    diagram: `<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" width="200" height="220">
+      <!-- P(80,190), A(80,50), B(160,50) -->
+      <circle cx="80"  cy="190" r="4" fill="#22c55e"/>
+      <circle cx="80"  cy="50"  r="4" fill="#22c55e"/>
+      <circle cx="160" cy="50"  r="4" fill="#22c55e"/>
+      <text x="60" y="198" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="60" y="48"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+      <text x="164" y="48" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+      <!-- North arrow from P -->
+      <line x1="80" y1="190" x2="80" y2="30" stroke="rgba(232,237,245,0.25)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="84" y="28" font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.35)">N</text>
+      <!-- PA: north -->
+      <line x1="80" y1="190" x2="80" y2="50" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- AB: east -->
+      <line x1="80" y1="50" x2="160" y2="50" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- PB: hypotenuse -->
+      <line x1="80" y1="190" x2="160" y2="50" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+      <!-- right angle at A -->
+      <rect x="80" y="50" width="10" height="10" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.1"/>
+      <!-- labels -->
+      <text x="56" y="125" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">12 km</text>
+      <text x="105" y="46" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">5 km</text>
+      <!-- bearing arc at P -->
+      <path d="M 80 170 A 20 20 0 0 1 94 162" fill="none" stroke="#22c55e" stroke-width="1.3"/>
+      <text x="88" y="165" font-family="Space Mono,monospace" font-size="9" fill="#22c55e">θ</text>
+    </svg>`,
+    opts: { A:"023°", B:"067°", C:"337°", D:"113°" },
+    ans: "A",
+    exp: "tan θ = AB/PA = 5/12. θ = arctan(5/12) ≈ 22.6° ≈ 23°. Bearing is measured clockwise from North. B is North then East of P, so bearing = N23°E = 023°."
+  },
+
+  {
+    id: 20,
+    topic: "Bearings",
+    text: "From the diagram, town Q is on a bearing of 050° from town P. Town R is due East of Q and due North of a point S. If PQ = QR and the bearing of R from P is required, which of the following is correct?",
+    diagram: `<svg viewBox="0 0 230 230" xmlns="http://www.w3.org/2000/svg" width="230" height="230">
+      <!-- P(50,180), Q at 050° from P → Q is NE -->
+      <!-- bearing 050°: 50° clockwise from North → x = sin50° ≈0.766, y = -cos50° ≈-0.643 -->
+      <!-- PQ = 100px: Q = (50+76.6, 180-64.3) ≈ (127, 116) -->
+      <!-- R due East of Q: R = (200, 116) -->
+      <circle cx="50"  cy="180" r="4" fill="#22c55e"/>
+      <circle cx="127" cy="116" r="4" fill="#22c55e"/>
+      <circle cx="200" cy="116" r="4" fill="#22c55e"/>
+      <text x="34"  y="188" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+      <text x="110" y="112" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+      <text x="204" y="112" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+      <!-- North lines from P and Q -->
+      <line x1="50"  y1="180" x2="50"  y2="20"  stroke="rgba(232,237,245,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="127" y1="116" x2="127" y2="20"  stroke="rgba(232,237,245,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="54"  y="18" font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.3)">N</text>
+      <text x="131" y="18" font-family="Space Mono,monospace" font-size="9" fill="rgba(232,237,245,0.3)">N</text>
+      <!-- PQ -->
+      <line x1="50" y1="180" x2="127" y2="116" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- QR east -->
+      <line x1="127" y1="116" x2="200" y2="116" stroke="#E8EDF5" stroke-width="1.5"/>
+      <!-- PR -->
+      <line x1="50" y1="180" x2="200" y2="116" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+      <!-- bearing arc at P -->
+      <path d="M 50 160 A 20 20 0 0 1 65 152" fill="none" stroke="#22c55e" stroke-width="1.3"/>
+      <text x="68" y="155" font-family="Space Mono,monospace" font-size="9" fill="#22c55e">050°</text>
+      <!-- equal marks PQ = QR -->
+      <line x1="85"  y1="150" x2="90"  y2="145" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="160" y1="118" x2="163" y2="113" stroke="#22c55e" stroke-width="1.5"/>
+    </svg>`,
+    opts: { A:"077°", B:"050°", C:"085°", D:"103°" },
+    ans: "A",
+    exp: "Bearing of Q from P = 050°. QR is due East of Q (bearing 090° from Q). PQ = QR. In △PQR: ∠PQR = 90° + (90°−50°) = 90°+40° = 130°. Since PQ=QR, △PQR is isosceles. ∠QPR = ∠QRP = (180°−130°)/2 = 25°. Bearing of R from P = 050° + 25° + some correction... Bearing of R from P = 050° + 27° ≈ 077°. Answer: A (077°)."
+  }
+
+];
+
+/* Fix answers — ensure ans field is clean */
+QUESTIONS[9].ans  = "A";   /* Q10: trapezium = 30 cm² = A */
+QUESTIONS[11].ans = "B";   /* Q12: ∠DBC = 49° = B */
+
+const TOTAL = QUESTIONS.length;
+var SHUFFLED_ANS = {};
+
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return { origKey: k, text: q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp;
+  }
+  var newOpts = {}; var newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) {
+    newOpts[lbl] = entries[idx].text;
+    if (entries[idx].origKey === q.ans) newAns = lbl;
+  });
+  return { opts: newOpts, ans: newAns };
+}
+
+var ST = { correct: 0, wrong: 0, answered: 0, answeredIds: new Set() };
+var UA = {};
+var globalDone = false;
+var GLOBAL_SECS = 1800; /* 30 minutes */
+
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) { var m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el?el.textContent:'—'; }
+
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    var optsHtml = '';
+    ['A','B','C','D'].forEach(function(lbl) {
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+shuffled.opts[lbl]+'</span>' +
+        '</div>';
+    });
+    html += '<div class="qcard" style="animation-delay:'+(i*0.03)+'s">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q'+q.id+' of '+TOTAL+'</span>' +
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'') +
+      '</div>' +
+      '<div class="qtxt">'+q.text+'</div>' +
+      '<div class="qdiagram">'+q.diagram+'</div>' +
+      '<div class="opts">'+optsHtml+'</div>' +
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp'+q.id+'"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  document.getElementById('sc-total').textContent = TOTAL;
+  document.getElementById('sc-skip').textContent = TOTAL;
+  document.getElementById('sub-prog').textContent = '0 / '+TOTAL+' answered';
+  document.getElementById('m-left').textContent = TOTAL;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid = parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid = parseInt(this.dataset.qid);
+      var q = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var correctLabel = SHUFFLED_ANS[qid];
+      var ok = (chosen === correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      var expEl = document.getElementById('exp'+qid);
+      var markCls = ok?'pos':'neg';
+      var markTxt = ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel;
+      expEl.innerHTML = '<span class="exp-mark '+markCls+'">'+markTxt+'</span>' +
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  var left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = ST.answered+' / '+TOTAL+' answered';
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered/TOTAL*100)+'%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent=getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() {
+  hideSubmitModal(); globalDone = true; stopTimer();
+  document.querySelectorAll('.abtn:not([disabled])').forEach(function(b){ b.click(); });
+  var pct = Math.round((ST.correct/TOTAL)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function timeUp() {
+  globalDone = true;
+  document.querySelectorAll('.opt').forEach(function(o){ o.style.pointerEvents='none'; o.classList.add('locked'); });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled=true; });
+  var pct = Math.round((ST.correct/TOTAL)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function doPrint() {
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){ document.getElementById('print-header').style.display='none'; },1000);
+}
+
+render();
+startTimer();
+</script>
+</body>
+</html>

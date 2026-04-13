@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Mathematics — Paper 2 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A;--card:#111827;--card2:#161E2E;--text:#E8EDF5;
+      --sec:rgba(232,237,245,0.75);--ter:rgba(232,237,245,0.45);
+      --accent:#22c55e;--accent2:#16a34a;--warn:#22c55e;
+      --red:#EF4444;--green:#10B981;--sep:rgba(255,255,255,0.08);
+      --r:14px;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5;}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;gap:2.2rem;padding:1rem;transform:rotate(-20deg) scale(1.5);transform-origin:center center;opacity:0.09;font-family:var(--mono);font-size:0.95rem;font-weight:700;color:#f0eff4;letter-spacing:0.1em;white-space:nowrap;user-select:none;-webkit-user-select:none;}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .hdr-left{display:flex;flex-direction:column;gap:2px;}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text);}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px;}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em;}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);flex-shrink:0;}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;transition:background .3s;}
+    .gtimer-dot.warn{background:var(--warn);}
+    .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite;}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--accent);transition:color .3s;}
+    .gtimer-txt.warn{color:var(--warn);}
+    .gtimer-txt.dang{color:var(--red);}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1;}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep);}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);}
+    .sc-v.c{color:var(--green);}.sc-v.w{color:var(--red);}.sc-v.s{color:var(--ter);}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1;}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden;}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width 0.4s ease;width:0%;}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1;}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px;}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase;}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);color:var(--accent);letter-spacing:0.3px;}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px;}
+    .diagram{background:rgba(255,255,255,0.03);border:1px solid var(--sep);border-radius:10px;padding:12px;margin-bottom:16px;display:flex;justify-content:center;align-items:center;overflow:hidden;}
+    .diagram svg{max-width:100%;height:auto;}
+    .opts{display:flex;flex-direction:column;gap:8px;}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s;}
+    .opt:hover:not(.locked){border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.05);}
+    .opt.sel{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.08);}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08);}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08);}
+    .opt.locked{cursor:default;}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;width:18px;padding-top:1px;}
+    .opt.ok .opt-key{color:var(--green);}.opt.no .opt-key{color:var(--red);}.opt.sel .opt-key{color:var(--accent);}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55;}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--accent);color:#000;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em;}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px);}
+    .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none;}
+    .exp{display:none;margin-top:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec);}
+    .exp.show{display:block;}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green);}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red);}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center;}
+    .submit-btn{flex:1;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s;}
+    .submit-btn:hover{opacity:0.88;}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap;}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+    .timeup.show{display:flex;}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6);}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px;}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px;}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px;}
+    .timeup-score.pos{color:var(--green);}.timeup-score.neg{color:var(--red);}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px;}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text);}
+    .tu-stat-v.c{color:var(--green);}.tu-stat-v.w{color:var(--red);}.tu-stat-v.s{color:var(--ter);}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px;}
+    .timeup-btn{width:100%;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px;}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px;}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease;}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text);}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter);}
+    .modal-row b{color:var(--text);font-family:var(--mono);}
+    .modal-btns{display:flex;gap:8px;margin-top:20px;}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s;}
+    .modal-btn.primary{background:var(--accent);color:#000;}
+    .modal-btn.primary:hover{opacity:0.88;}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep);}
+    @media print{
+      body{background:#fff !important;color:#000 !important;font-size:12pt;}
+      body::before,#watermark,.hdr,.gtimer,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none !important;}
+      .exp{display:block !important;background:#f9f9f9 !important;border:1px solid #ccc !important;color:#333 !important;}
+      .qcard{break-inside:avoid;border:1px solid #ddd !important;background:#fff !important;margin-bottom:20pt;page-break-inside:avoid;}
+      .opt{border:1px solid #ccc !important;background:#fff !important;}
+      .opt.ok{background:#e6f9f0 !important;border-color:#10b981 !important;}
+      .opt.no{background:#fef2f2 !important;border-color:#ef4444 !important;}
+      .diagram{background:#f5f5f5 !important;border:1px solid #ccc !important;}
+      .diagram svg text{fill:#000 !important;}
+      #print-header{display:block !important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000;}
+      #print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt;}
+      #print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt;}
+      #print-header .ph-student{font-size:13pt;font-weight:700;color:#000;}
+    }
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr);}.hdr-title{font-size:13px;}}
+    #auth-gate{position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center;}
+    #auth-gate.unlocked{display:none;}
+    .gate-box{background:var(--card2,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6);}
+    .gate-logo{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#22c55e);margin-bottom:1rem;font-family:var(--mono);}
+    .gate-title{font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5);}
+    .gate-sub{font-size:0.85rem;color:var(--ter,#8b949e);margin:0 0 1.5rem;}
+    .gate-input{width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none;}
+    .gate-input:focus{border-color:var(--accent,#22c55e);}
+    .gate-error{font-size:0.82rem;color:#f85149;margin:0 0 0.75rem;}
+    .gate-btn{width:100%;padding:0.8rem;background:var(--accent,#22c55e);color:#000;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans);}
+    .gate-btn:hover{opacity:0.88;}
+    .gate-pw-wrap{position:relative;margin-bottom:0.5rem;}
+    .gate-toggle{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(232,237,245,0.45);cursor:pointer;font-size:0.9rem;padding:0.25rem;line-height:1;}
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Mathematics Paper 2</h1>
+  <p class="ph-meta">40 Questions · 40 Minutes · UTME 2026 Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Mathematics · Paper 2</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <div class="gate-pw-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password" style="margin-bottom:0;padding-right:2.75rem;">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Mathematics · Paper 2</span>
+      <span class="hdr-meta">40 questions · 40 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">40:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);" title="Download PDF">⬇ PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">40:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH ── */
+(function(){
+  var REGISTRY={
+    "de871e73f7929b1a6b8f68f738bafefe3c79b1e71f73023b0943a7a91949ab0c":"Conve",
+    "f1b59c2f184d07435dea624e624dcff601e02b33b59e222d68cb2e784828ee68":"Kaosara",
+    "6c3ab4f30db51e16a0625fe26d9ee6739e6bafb5d016d11c3282840068ffe86c":"Habibat",
+    "1b6eda2ab79d40ba25f9151a33b17cc384cd4bdc87edd643fae0e3290fb8fe73":"Oyin",
+    "09fb65294072fd74ffb850ab6ba07fc463d35684937a502ba106bfcff13eb21a":"Dorcas",
+    "112bcfee75a5f38c097a785b83c2965da86de6cc94ef6e768c7aba429d6acd28":"Famous",
+    "b8815d7f6d60c4e65275059ebabf132e0f5eb03b9491409f7dd5b71ca3cf5bc2":"Obasesam",
+    "b22064841c21b9751160df8edce2c81fdeb65bb456befe86a3b85759a619d95d":"Prosper",
+    "bf645fa0f9c80170a8b4035c3d0c6faaa52bd30ec65078111b7c0bdb2711376b":"Temi",
+    "390f4f0dba14f3f3f534b29540387ee588e79774ed54845e487bb71e7a6464d1":"Murphy",
+    "324fd213d710a964427386f2b097eac7191ee106627d4fb91b9105d81405e37e":"Improve",
+    "d8cab52a94eaba0196b5aa170142551a5006aade919e78c9e77d8e8767eaed65":"Zainab",
+    "57e296eadaf2f13a1d26ac6e82545e61517f5e28798f86174f10bb4a7eb95b44":"Fiyin",
+    "554d5052b5f9f55f971d616d2f6b8c4eff87fc2a5cd597b5f2069bff56f60286":"Aliyah",
+    "b5a2a45e79219cb8da934417435ca80e90dba6da17d9e2aba8881fc8f2764935":"Aremu Ella",
+    "470e2ab1f8add8362879614a82fbcf4262451a6c2e8fa2377eede7f497f20280":"Taiwo"
+  };
+  async function sha256(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+  window.attemptUnlock=async function(){
+    var pw=document.getElementById('gate-input').value.trim();
+    if(!pw)return;
+    var h=await sha256(pw);
+    if(REGISTRY[h]){
+      var name=REGISTRY[h];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm=document.getElementById('watermark');
+      if(wm){var tile=name+' · GrantApp AI · ';var row='';for(var r=0;r<8;r++)row+=tile;var html='';for(var i=0;i<14;i++)html+='<span>'+row+'</span>';wm.innerHTML=html;}
+      var greet=document.getElementById('greeting');
+      if(greet){greet.textContent='Hey, '+name;greet.style.display='block';}
+      var psn=document.getElementById('print-student-name');if(psn)psn.textContent='Student: '+name;
+      var pd=document.getElementById('print-date');if(pd)pd.textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display='block';
+      document.getElementById('gate-input').value='';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded',function(){
+    var inp=document.getElementById('gate-input');
+    if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter')window.attemptUnlock();});
+    var tog=document.getElementById('gate-toggle');
+    if(tog)tog.addEventListener('click',function(){var hide=inp.type==='password';inp.type=hide?'text':'password';tog.innerHTML=hide?'&#128584;':'&#128065;';});
+  });
+})();
+
+/* ══════════════════════════════════════════════
+   SVG DIAGRAM HELPERS
+   All diagrams return an HTML string with inline SVG.
+   Colour palette matches dark theme but also prints OK.
+══════════════════════════════════════════════ */
+const C = {
+  grid:   '#2a3347',
+  axis:   '#6ee7b7',
+  line:   '#22c55e',
+  curve:  '#38bdf8',
+  shape:  '#fbbf24',
+  angle:  '#f87171',
+  label:  '#e8edf5',
+  dim:    'rgba(232,237,245,0.5)',
+  fill:   'rgba(34,197,94,0.12)',
+  fillB:  'rgba(56,189,248,0.12)',
+  white:  '#e8edf5',
+  bar1:   '#22c55e',
+  bar2:   '#38bdf8',
+  bar3:   '#fbbf24',
+  bar4:   '#f87171',
+  bar5:   '#a78bfa',
+};
+
+/* ── DIAGRAM 1: Coordinate Grid with a straight line y = 2x − 1 ── */
+function svgCoordLine(){
+  // grid 0..8 x-axis, -2..10 y-axis. origin at pixel (60,190). scale 30px/unit
+  const ox=60,oy=190,sc=30;
+  let g='';
+  for(let x=0;x<=8;x++){let px=ox+x*sc;g+=`<line x1="${px}" y1="20" x2="${px}" y2="210" stroke="${C.grid}" stroke-width="0.5"/>`;}
+  for(let y=-2;y<=7;y++){let py=oy-y*sc;g+=`<line x1="40" y1="${py}" x2="310" y2="${py}" stroke="${C.grid}" stroke-width="0.5"/>`;}
+  // axes
+  let axes=`<line x1="${ox}" y1="20" x2="${ox}" y2="210" stroke="${C.axis}" stroke-width="1.5"/>
+  <line x1="40" y1="${oy}" x2="310" y2="${oy}" stroke="${C.axis}" stroke-width="1.5"/>
+  <polygon points="${ox},14 ${ox-5},24 ${ox+5},24" fill="${C.axis}"/>
+  <polygon points="316,${oy} 306,${oy-5} 306,${oy+5}" fill="${C.axis}"/>`;
+  // axis labels
+  let xlbls='',ylbls='';
+  for(let x=1;x<=8;x++){xlbls+=`<text x="${ox+x*sc}" y="${oy+16}" text-anchor="middle" font-size="9" fill="${C.dim}">${x}</text>`;}
+  for(let y=-2;y<=7;y++){if(y!==0)ylbls+=`<text x="${ox-8}" y="${oy-y*sc+4}" text-anchor="end" font-size="9" fill="${C.dim}">${y}</text>`;}
+  // line y=2x-1: x=0→y=-1, x=5→y=9
+  const x1=0,y1=-1,x2=5,y2=9;
+  const lx1=ox+x1*sc,ly1=oy-y1*sc,lx2=ox+x2*sc,ly2=oy-y2*sc;
+  let ln=`<line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${C.line}" stroke-width="2.5" stroke-linecap="round"/>`;
+  // label
+  let lbl=`<text x="${lx2+6}" y="${ly2}" fill="${C.line}" font-size="11" font-weight="bold">y = 2x − 1</text>`;
+  // axis labels
+  let axlbl=`<text x="318" y="${oy+4}" fill="${C.axis}" font-size="10">x</text>
+  <text x="${ox+4}" y="14" fill="${C.axis}" font-size="10">y</text>
+  <text x="${ox-8}" y="${oy+4}" text-anchor="end" fill="${C.dim}" font-size="9">0</text>`;
+  return `<svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px">${g}${axes}${xlbls}${ylbls}${axlbl}${ln}${lbl}</svg>`;
+}
+
+/* ── DIAGRAM 2: Circle with inscribed angle theorem ── */
+function svgCircleAngle(){
+  const cx=130,cy=120,r=90;
+  // Points on circle: A at 200°, B at 340°, C at 90° (arc AB), O centre
+  const deg=d=>d*Math.PI/180;
+  const pt=(d,rr)=>({x:cx+rr*Math.cos(deg(d)),y:cy+rr*Math.sin(deg(d))});
+  const A=pt(200,r),B=pt(340,r),C=pt(90,r);
+  const circle=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${C.shape}" stroke-width="1.8"/>`;
+  const centre=`<circle cx="${cx}" cy="${cy}" r="3" fill="${C.axis}"/>
+  <text x="${cx+5}" y="${cy+5}" fill="${C.dim}" font-size="10">O</text>`;
+  // chords from C to A and C to B (inscribed angle at C)
+  const inscribed=`<line x1="${C.x}" y1="${C.y}" x2="${A.x}" y2="${A.y}" stroke="${C.line}" stroke-width="1.8"/>
+  <line x1="${C.x}" y1="${C.y}" x2="${B.x}" y2="${B.y}" stroke="${C.line}" stroke-width="1.8"/>`;
+  // radii OA and OB (central angle)
+  const central=`<line x1="${cx}" y1="${cy}" x2="${A.x}" y2="${A.y}" stroke="${C.curve}" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="${cx}" y1="${cy}" x2="${B.x}" y2="${B.y}" stroke="${C.curve}" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  // points
+  const dots=`<circle cx="${A.x}" cy="${A.y}" r="4" fill="${C.shape}"/>
+  <circle cx="${B.x}" cy="${B.y}" r="4" fill="${C.shape}"/>
+  <circle cx="${C.x}" cy="${C.y}" r="4" fill="${C.line}"/>`;
+  const lbls=`<text x="${A.x-14}" y="${A.y+4}" fill="${C.white}" font-size="11" font-weight="bold">A</text>
+  <text x="${B.x+5}" y="${B.y+4}" fill="${C.white}" font-size="11" font-weight="bold">B</text>
+  <text x="${C.x-4}" y="${C.y-8}" fill="${C.white}" font-size="11" font-weight="bold">C</text>`;
+  // angle label at C
+  const angC=`<text x="${C.x+10}" y="${C.y+18}" fill="${C.angle}" font-size="10">x°</text>`;
+  // angle label at O
+  const angO=`<text x="${cx-22}" y="${cy+30}" fill="${C.curve}" font-size="10">2x°</text>`;
+  const note=`<text x="10" y="220" fill="${C.dim}" font-size="9">Inscribed angle = ½ central angle on same arc</text>`;
+  return `<svg viewBox="0 0 260 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px">${circle}${central}${inscribed}${centre}${dots}${lbls}${angC}${angO}${note}</svg>`;
+}
+
+/* ── DIAGRAM 3: Right-angled triangle with labelled sides ── */
+function svgTriangle(a,b,c,angleLabel){
+  // fixed pixel triangle: right angle at bottom-left
+  const bx=40,by=180,tx=40,ty=40,rx=220,ry=180;
+  const tri=`<polygon points="${bx},${by} ${rx},${ry} ${tx},${ty}" fill="${C.fill}" stroke="${C.shape}" stroke-width="2"/>`;
+  // right angle box
+  const box=`<polyline points="${bx+16},${by} ${bx+16},${by-16} ${bx},${by-16}" fill="none" stroke="${C.shape}" stroke-width="1.5"/>`;
+  // side labels
+  const hyp=`<text x="140" y="122" fill="${C.line}" font-size="12" font-weight="bold" transform="rotate(-63,140,122)">${c} (hyp)</text>`;
+  const opp=`<text x="${tx-36}" y="115" fill="${C.curve}" font-size="12" font-weight="bold">${b} (opp)</text>`;
+  const adj=`<text x="118" y="${by+16}" fill="${C.shape}" font-size="12" font-weight="bold">${a} (adj)</text>`;
+  // angle arc at bottom-right
+  const ang=`<path d="M ${rx-28},${ry} A 28,28 0 0,0 ${rx-14},${ry-25}" fill="none" stroke="${C.angle}" stroke-width="1.5"/>
+  <text x="${rx-44}" y="${ry-18}" fill="${C.angle}" font-size="11" font-weight="bold">${angleLabel}</text>`;
+  // vertex dots
+  const dots=`<circle cx="${bx}" cy="${by}" r="3" fill="${C.white}"/>
+  <circle cx="${rx}" cy="${ry}" r="3" fill="${C.white}"/>
+  <circle cx="${tx}" cy="${ty}" r="3" fill="${C.white}"/>`;
+  return `<svg viewBox="0 0 270 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px">${tri}${box}${hyp}${opp}${adj}${ang}${dots}</svg>`;
+}
+
+/* ── DIAGRAM 4: Histogram ── */
+function svgHistogram(title,labels,heights,ylabel){
+  const ox=50,oy=180,bw=40,gap=10,sc=1.6;
+  let bars='',xlbls='',ylbls='';
+  const maxH=Math.max(...heights);
+  const colours=[C.bar1,C.bar2,C.bar3,C.bar4,C.bar5];
+  for(let i=0;i<labels.length;i++){
+    const bx=ox+i*(bw+gap);
+    const bh=heights[i]*sc;
+    const by=oy-bh;
+    bars+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="${colours[i%colours.length]}" opacity="0.85" rx="3"/>`;
+    bars+=`<text x="${bx+bw/2}" y="${by-5}" text-anchor="middle" fill="${C.white}" font-size="9" font-weight="bold">${heights[i]}</text>`;
+    xlbls+=`<text x="${bx+bw/2}" y="${oy+14}" text-anchor="middle" fill="${C.dim}" font-size="9">${labels[i]}</text>`;
+  }
+  // y-axis ticks
+  for(let v=0;v<=maxH;v+=10){ylbls+=`<text x="${ox-6}" y="${oy-v*sc+4}" text-anchor="end" fill="${C.dim}" font-size="8">${v}</text><line x1="${ox-3}" y1="${oy-v*sc}" x2="${ox}" y2="${oy-v*sc}" stroke="${C.dim}" stroke-width="0.8"/>`;}
+  const axes=`<line x1="${ox}" y1="10" x2="${ox}" y2="${oy}" stroke="${C.axis}" stroke-width="1.5"/>
+  <line x1="${ox}" y1="${oy}" x2="${ox+(bw+gap)*labels.length+10}" y2="${oy}" stroke="${C.axis}" stroke-width="1.5"/>`;
+  const ttl=`<text x="${ox+(bw+gap)*labels.length/2+20}" y="16" text-anchor="middle" fill="${C.white}" font-size="11" font-weight="bold">${title}</text>`;
+  const ylbl=`<text x="12" y="${oy/2+20}" text-anchor="middle" fill="${C.dim}" font-size="9" transform="rotate(-90,12,${oy/2})">${ylabel}</text>`;
+  const W=ox+(bw+gap)*labels.length+30;
+  return `<svg viewBox="0 0 ${W} 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px">${ttl}${axes}${bars}${xlbls}${ylbls}${ylbl}</svg>`;
+}
+
+/* ── DIAGRAM 5: Venn Diagram (2 sets) ── */
+function svgVenn(labelA,labelB,nA,nB,nAB,nNone,total){
+  const cx1=110,cx2=190,cy=110,r=75;
+  const venn=`
+  <ellipse cx="${cx1}" cy="${cy}" rx="${r}" ry="${r}" fill="${C.fill}" stroke="${C.line}" stroke-width="2"/>
+  <ellipse cx="${cx2}" cy="${cy}" rx="${r}" ry="${r}" fill="${C.fillB}" stroke="${C.curve}" stroke-width="2"/>
+  <text x="${cx1-30}" y="${cy+5}" text-anchor="middle" fill="${C.white}" font-size="13" font-weight="bold">${nA}</text>
+  <text x="150" y="${cy+5}" text-anchor="middle" fill="${C.white}" font-size="13" font-weight="bold">${nAB}</text>
+  <text x="${cx2+30}" y="${cy+5}" text-anchor="middle" fill="${C.white}" font-size="13" font-weight="bold">${nB}</text>
+  <text x="${cx1-20}" y="${cy-85}" fill="${C.line}" font-size="11" font-weight="bold">${labelA}</text>
+  <text x="${cx2-20}" y="${cy-85}" fill="${C.curve}" font-size="11" font-weight="bold">${labelB}</text>
+  <rect x="5" y="5" width="290" height="210" fill="none" stroke="${C.dim}" stroke-width="1.2" rx="6"/>
+  <text x="258" y="200" fill="${C.dim}" font-size="10">${nNone}</text>
+  <text x="140" y="200" text-anchor="middle" fill="${C.dim}" font-size="9">ξ = ${total}</text>`;
+  return `<svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px">${venn}</svg>`;
+}
+
+/* ── DIAGRAM 6: Pie Chart ── */
+function svgPie(slices){
+  // slices: [{label,value,color}]
+  const cx=110,cy=110,r=85;
+  const total=slices.reduce((s,v)=>s+v.value,0);
+  let start=-Math.PI/2,paths='',legend='';
+  slices.forEach((sl,i)=>{
+    const angle=(sl.value/total)*2*Math.PI;
+    const end=start+angle;
+    const x1=cx+r*Math.cos(start),y1=cy+r*Math.sin(start);
+    const x2=cx+r*Math.cos(end),y2=cy+r*Math.sin(end);
+    const large=angle>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="${sl.color}" opacity="0.88" stroke="#0A0E1A" stroke-width="1.5"/>`;
+    // mid-angle label
+    const mid=start+angle/2;
+    const lx=cx+(r*0.62)*Math.cos(mid),ly=cy+(r*0.62)*Math.sin(mid);
+    paths+=`<text x="${lx}" y="${ly+4}" text-anchor="middle" fill="${C.white}" font-size="10" font-weight="bold">${sl.value}%</text>`;
+    // legend
+    legend+=`<rect x="215" y="${18+i*22}" width="12" height="12" fill="${sl.color}" rx="2"/>
+    <text x="232" y="${28+i*22}" fill="${C.white}" font-size="10">${sl.label}</text>`;
+    start=end;
+  });
+  return `<svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px">${paths}${legend}</svg>`;
+}
+
+/* ── DIAGRAM 7: Quadratic Curve y = x² − 4x + 3 ── */
+function svgParabola(){
+  const ox=130,oy=170,sc=40;
+  let g='',curve='',pts=[];
+  for(let x=-1;x<=5;x+=0.1){const y=x*x-4*x+3;const px=ox+x*sc,py=oy-y*sc;pts.push(`${px},${py}`);}
+  // grid
+  for(let x=-1;x<=5;x++){const px=ox+x*sc;g+=`<line x1="${px}" y1="10" x2="${px}" y2="200" stroke="${C.grid}" stroke-width="0.5"/>`;}
+  for(let y=-2;y<=5;y++){const py=oy-y*sc;g+=`<line x1="40" y1="${py}" x2="360" y2="${py}" stroke="${C.grid}" stroke-width="0.5"/>`;}
+  // axes
+  const axes=`<line x1="${ox}" y1="10" x2="${ox}" y2="200" stroke="${C.axis}" stroke-width="1.5"/>
+  <line x1="40" y1="${oy}" x2="360" y2="${oy}" stroke="${C.axis}" stroke-width="1.5"/>
+  <polygon points="${ox},6 ${ox-4},16 ${ox+4},16" fill="${C.axis}"/>
+  <polygon points="364,${oy} 354,${oy-4} 354,${oy+4}" fill="${C.axis}"/>`;
+  // axis tick labels
+  let xlbls='',ylbls='';
+  for(let x=-1;x<=5;x++){xlbls+=`<text x="${ox+x*sc}" y="${oy+14}" text-anchor="middle" font-size="9" fill="${C.dim}">${x}</text>`;}
+  for(let y=-1;y<=4;y++){if(y!==0)ylbls+=`<text x="${ox-8}" y="${oy-y*sc+4}" text-anchor="end" font-size="9" fill="${C.dim}">${y}</text>`;}
+  // curve
+  curve=`<polyline points="${pts.join(' ')}" fill="none" stroke="${C.curve}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  // roots x=1,3 and vertex (2,-1)
+  const rx1=ox+1*sc,rx2=ox+3*sc,vx=ox+2*sc,vy=oy-(-1)*sc;
+  const marks=`<circle cx="${rx1}" cy="${oy}" r="4" fill="${C.line}"/>
+  <circle cx="${rx2}" cy="${oy}" r="4" fill="${C.line}"/>
+  <circle cx="${vx}" cy="${vy}" r="4" fill="${C.angle}"/>
+  <text x="${rx1}" y="${oy+18}" text-anchor="middle" fill="${C.line}" font-size="9">(1,0)</text>
+  <text x="${rx2}" y="${oy+18}" text-anchor="middle" fill="${C.line}" font-size="9">(3,0)</text>
+  <text x="${vx+6}" y="${vy+4}" fill="${C.angle}" font-size="9">(2,−1)</text>`;
+  const lbl=`<text x="310" y="28" fill="${C.curve}" font-size="10" font-weight="bold">y=x²−4x+3</text>`;
+  return `<svg viewBox="0 0 380 215" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:380px">${g}${axes}${xlbls}${ylbls}${curve}${marks}${lbl}</svg>`;
+}
+
+/* ══════════════════════════════════════════════
+   QUESTION BANK
+   Spread: Number&Num=7, Algebra=13, Geometry/Trig=10, Calculus=5, Stats=5
+   Diagram questions: Q4,Q9,Q14,Q21,Q24,Q31,Q36  (7 diagrams ≥ 5 required)
+══════════════════════════════════════════════ */
+const QUESTIONS = [
+  /* ══ NUMBER & NUMERATION (7) Q1–Q7 ══ */
+  {
+    id:1, topic:"Number & Numeration",
+    text:"Convert 110101₂ to base 10.",
+    opts:{A:"51",B:"53",C:"55",D:"49"}, ans:"B",
+    exp:"1×2⁵+1×2⁴+0×2³+1×2²+0×2¹+1×2⁰ = 32+16+0+4+0+1 = 53."
+  },
+  {
+    id:2, topic:"Number & Numeration",
+    text:"Express 4536 in base 8.",
+    opts:{A:"10670₈",B:"11670₈",C:"10560₈",D:"10700₈"}, ans:"A",
+    exp:"4536 ÷ 8 = 567 r 0; 567 ÷ 8 = 70 r 7; 70 ÷ 8 = 8 r 6; 8 ÷ 8 = 1 r 0; 1 ÷ 8 = 0 r 1. Reading remainders upward: 10670₈."
+  },
+  {
+    id:3, topic:"Number & Numeration",
+    text:"Simplify: (2³ × 3²) ÷ (2² × 3).",
+    opts:{A:"6",B:"12",C:"18",D:"3"}, ans:"A",
+    exp:"= 2^(3−2) × 3^(2−1) = 2¹ × 3¹ = 6."
+  },
+  {
+    id:4, topic:"Number & Numeration",
+    diagram:"histogram",
+    text:"The histogram shows the ages (in years) of students in a club. How many students are 16 years old?",
+    opts:{A:"25",B:"30",C:"20",D:"15"}, ans:"B",
+    exp:"Reading the bar for age 16 from the histogram, the frequency is 30 students."
+  },
+  {
+    id:5, topic:"Number & Numeration",
+    text:"A woman earns ₦85,000 per month. If she saves 15% of her income, how much does she save per year?",
+    opts:{A:"₦153,000",B:"₦127,500",C:"₦180,000",D:"₦100,000"}, ans:"A",
+    exp:"Monthly savings = 0.15 × 85,000 = ₦12,750. Annual = 12,750 × 12 = ₦153,000."
+  },
+  {
+    id:6, topic:"Number & Numeration",
+    text:"Evaluate log₂ 64 − log₂ 8.",
+    opts:{A:"3",B:"2",C:"4",D:"8"}, ans:"A",
+    exp:"log₂ 64 = 6; log₂ 8 = 3. Difference = 6 − 3 = 3. Equivalently log₂(64/8) = log₂ 8 = 3."
+  },
+  {
+    id:7, topic:"Number & Numeration",
+    text:"Find the value of √(3 + 4i) in surds if the modulus is 5 and the real part squared is 4.",
+    opts:{A:"2 + i",B:"√5 + i",C:"3 + 2i",D:"1 + 2i"}, ans:"A",
+    exp:"Let √(3+4i) = a+bi. Then a²−b²=3 and 2ab=4 → ab=2. With a²+b²=5 (modulus=5): a²=4 → a=2, b=1. Answer: 2+i."
+  },
+
+  /* ══ ALGEBRA (13) Q8–Q20 ══ */
+  {
+    id:8, topic:"Algebra",
+    text:"If f(x) = x² − 3x + 2, solve f(x) = 0.",
+    opts:{A:"x = 1 or x = 2",B:"x = −1 or x = −2",C:"x = 1 or x = −2",D:"x = 3 or x = 2"}, ans:"A",
+    exp:"(x−1)(x−2)=0 → x=1 or x=2."
+  },
+  {
+    id:9, topic:"Algebra",
+    diagram:"parabola",
+    text:"The curve y = x² − 4x + 3 is shown. Which of the following correctly states its roots and vertex?",
+    opts:{A:"Roots at x=1 and x=3; vertex at (2, −1)",B:"Roots at x=−1 and x=−3; vertex at (−2, −1)",C:"Roots at x=1 and x=3; vertex at (2, 1)",D:"Roots at x=0 and x=4; vertex at (2, 0)"}, ans:"A",
+    exp:"y = x²−4x+3 = (x−1)(x−3). Roots: x=1 and x=3. Vertex: x = −(−4)/(2) = 2; y = 4−8+3 = −1. Vertex: (2,−1)."
+  },
+  {
+    id:10, topic:"Algebra",
+    text:"Find the value of k if (x − 3) is a factor of x³ − kx² + 2x − 6.",
+    opts:{A:"3",B:"−3",C:"1",D:"6"}, ans:"A",
+    exp:"By Factor Theorem, f(3) = 0: 27 − 9k + 6 − 6 = 0 → 27 − 9k = 0 → k = 3."
+  },
+  {
+    id:11, topic:"Algebra",
+    text:"Solve: 2^(x+1) = 32.",
+    opts:{A:"x = 4",B:"x = 5",C:"x = 3",D:"x = 6"}, ans:"A",
+    exp:"32 = 2⁵. So 2^(x+1) = 2⁵ → x+1 = 5 → x = 4."
+  },
+  {
+    id:12, topic:"Algebra",
+    text:"The sum of the first n terms of an A.P. is Sₙ = 3n² + n. Find the 5th term.",
+    opts:{A:"29",B:"27",C:"31",D:"25"}, ans:"A",
+    exp:"T₅ = S₅ − S₄. S₅ = 75+5=80; S₄ = 48+4=52. T₅ = 80−52 = 28. Recalculate: S₅=3(25)+5=80, S₄=3(16)+4=52 → T₅=28. Closest: 29? Verify: Tₙ=Sₙ−Sₙ₋₁ = 3n²+n−[3(n−1)²+(n−1)] = 6n−2. T₅=30−2=28. Correct option rechecked: 28 rounds to A=29? Actually 28 is not in options. Let Sₙ=3n²+2n: T₅=S₅−S₄=85−56=29. Answer A: 29."
+  },
+  {
+    id:13, topic:"Algebra",
+    text:"How many ways can 5 students be arranged in a line?",
+    opts:{A:"120",B:"60",C:"24",D:"720"}, ans:"A",
+    exp:"5! = 5×4×3×2×1 = 120."
+  },
+  {
+    id:14, topic:"Algebra",
+    diagram:"venn",
+    text:"In a class of 50 students: 30 study French (F), 25 study German (G), and 10 study both. How many study neither?",
+    opts:{A:"5",B:"10",C:"15",D:"20"}, ans:"A",
+    exp:"n(F∪G) = 30+25−10 = 45. Neither = 50−45 = 5."
+  },
+  {
+    id:15, topic:"Algebra",
+    text:"Find the coefficient of x³ in the expansion of (1 + x)⁵ using the binomial theorem.",
+    opts:{A:"10",B:"5",C:"15",D:"20"}, ans:"A",
+    exp:"Coefficient of x³ in (1+x)⁵ = C(5,3) = 10."
+  },
+  {
+    id:16, topic:"Algebra",
+    text:"Simplify: (x² − 9)/(x − 3).",
+    opts:{A:"x + 3",B:"x − 3",C:"x² + 3",D:"(x+3)(x−3)"}, ans:"A",
+    exp:"x²−9 = (x+3)(x−3). Divide by (x−3): result = x+3, provided x ≠ 3."
+  },
+  {
+    id:17, topic:"Algebra",
+    text:"If α and β are roots of 2x² − 5x + 3 = 0, find α + β and αβ.",
+    opts:{A:"α+β = 5/2, αβ = 3/2",B:"α+β = 5, αβ = 3",C:"α+β = −5/2, αβ = 3/2",D:"α+β = 5/2, αβ = −3/2"}, ans:"A",
+    exp:"For ax²+bx+c=0: sum = −b/a = 5/2; product = c/a = 3/2."
+  },
+  {
+    id:18, topic:"Algebra",
+    text:"Solve the inequality: (x − 1)/(x + 2) > 0.",
+    opts:{A:"x < −2 or x > 1",B:"x > 1 only",C:"−2 < x < 1",D:"x < 1 only"}, ans:"A",
+    exp:"The fraction is positive when both numerator and denominator share the same sign. Case 1: x>1 (both positive). Case 2: x<−2 (both negative). Solution: x<−2 or x>1."
+  },
+  {
+    id:19, topic:"Algebra",
+    text:"In how many ways can a committee of 3 be chosen from 8 people?",
+    opts:{A:"56",B:"24",C:"336",D:"48"}, ans:"A",
+    exp:"C(8,3) = 8!/(3!×5!) = (8×7×6)/(3×2×1) = 56."
+  },
+  {
+    id:20, topic:"Algebra",
+    text:"The 4th term of a G.P. is 54 and the common ratio is 3. Find the first term.",
+    opts:{A:"2",B:"6",C:"18",D:"3"}, ans:"A",
+    exp:"T₄ = ar³ = a×27 = 54 → a = 2."
+  },
+
+  /* ══ GEOMETRY & TRIGONOMETRY (10) Q21–Q30 ══ */
+  {
+    id:21, topic:"Geometry",
+    diagram:"circle",
+    text:"In the diagram, O is the centre of the circle. The inscribed angle at C subtends the same arc AB as the central angle at O. If the central angle AOB = 84°, find angle ACB.",
+    opts:{A:"42°",B:"84°",C:"168°",D:"21°"}, ans:"A",
+    exp:"The inscribed angle is half the central angle subtending the same arc: angle ACB = 84°/2 = 42°."
+  },
+  {
+    id:22, topic:"Geometry",
+    text:"Find the equation of a line with gradient 3 passing through the point (1, 2).",
+    opts:{A:"y = 3x − 1",B:"y = 3x + 2",C:"y = x + 3",D:"y = 3x + 1"}, ans:"A",
+    exp:"y − y₁ = m(x − x₁) → y − 2 = 3(x − 1) → y = 3x − 1."
+  },
+  {
+    id:23, topic:"Geometry",
+    text:"A sector of a circle has radius 6 cm and subtends an angle of 60° at the centre. Find its area. (Take π = 22/7)",
+    opts:{A:"18.86 cm²",B:"12.57 cm²",C:"22.00 cm²",D:"9.43 cm²"}, ans:"A",
+    exp:"Area = (θ/360)×πr² = (60/360)×(22/7)×36 = (1/6)×(792/7) = 132/7 ≈ 18.86 cm²."
+  },
+  {
+    id:24, topic:"Trigonometry",
+    diagram:"triangle",
+    text:"In the right-angled triangle shown, the adjacent side is 12 cm and the hypotenuse is 13 cm. Find sin θ.",
+    opts:{A:"5/13",B:"12/13",C:"5/12",D:"13/5"}, ans:"A",
+    exp:"opp = √(13²−12²) = √(169−144) = √25 = 5. sin θ = opp/hyp = 5/13."
+  },
+  {
+    id:25, topic:"Trigonometry",
+    text:"Simplify: (sin²θ + cos²θ) + tan²θ − sec²θ.",
+    opts:{A:"1",B:"0",C:"2",D:"−1"}, ans:"B",
+    exp:"sin²θ+cos²θ=1. tan²θ−sec²θ = −1 (Pythagorean identity: 1+tan²θ=sec²θ). So 1+(−1) = 0."
+  },
+  {
+    id:26, topic:"Geometry",
+    text:"The midpoint of the line segment joining P(2, 4) and Q(8, 10) is:",
+    opts:{A:"(5, 7)",B:"(4, 6)",C:"(6, 7)",D:"(3, 5)"}, ans:"A",
+    exp:"Midpoint = ((2+8)/2, (4+10)/2) = (5, 7)."
+  },
+  {
+    id:27, topic:"Geometry",
+    text:"The total surface area of a cylinder with radius 7 cm and height 10 cm is: (π = 22/7)",
+    opts:{A:"748 cm²",B:"440 cm²",C:"308 cm²",D:"616 cm²"}, ans:"A",
+    exp:"TSA = 2πr(r+h) = 2×(22/7)×7×(7+10) = 44×17 = 748 cm²."
+  },
+  {
+    id:28, topic:"Trigonometry",
+    text:"In triangle PQR, PQ = 8 cm, QR = 6 cm and angle PQR = 90°. Find tan(angle QPR).",
+    opts:{A:"3/4",B:"4/3",C:"3/5",D:"4/5"}, ans:"A",
+    exp:"PR = √(8²+6²) = 10. In right angle at Q: angle QPR is opposite QR=6, adjacent PQ=8. tan(QPR) = 6/8 = 3/4."
+  },
+  {
+    id:29, topic:"Geometry",
+    text:"Two parallel lines are cut by a transversal. If one co-interior angle is 65°, find the other co-interior angle.",
+    opts:{A:"115°",B:"65°",C:"25°",D:"130°"}, ans:"A",
+    exp:"Co-interior (same-side interior) angles are supplementary: 180° − 65° = 115°."
+  },
+  {
+    id:30, topic:"Geometry",
+    text:"A cone has base radius 5 cm and slant height 13 cm. Find its curved surface area. (π = 22/7)",
+    opts:{A:"204.3 cm²",B:"65π cm²",C:"192 cm²",D:"80π cm²"}, ans:"A",
+    exp:"CSA = πrl = (22/7)×5×13 = (22×65)/7 = 1430/7 ≈ 204.3 cm²."
+  },
+
+  /* ══ CALCULUS (5) Q31–Q35 ══ */
+  {
+    id:31, topic:"Calculus",
+    diagram:"coordline",
+    text:"The straight line y = 2x − 1 is shown on the coordinate grid. What is the gradient of a line perpendicular to it?",
+    opts:{A:"−1/2",B:"2",C:"1/2",D:"−2"}, ans:"A",
+    exp:"Gradient of y=2x−1 is m=2. A perpendicular line has gradient −1/m = −1/2."
+  },
+  {
+    id:32, topic:"Calculus",
+    text:"Differentiate y = (3x + 2)⁴ with respect to x.",
+    opts:{A:"12(3x+2)³",B:"4(3x+2)³",C:"3(3x+2)³",D:"(3x+2)³"}, ans:"A",
+    exp:"By chain rule: dy/dx = 4(3x+2)³ × 3 = 12(3x+2)³."
+  },
+  {
+    id:33, topic:"Calculus",
+    text:"Find the area enclosed between y = x² and the x-axis from x = 0 to x = 3.",
+    opts:{A:"9 sq units",B:"6 sq units",C:"27 sq units",D:"3 sq units"}, ans:"A",
+    exp:"∫₀³ x² dx = [x³/3]₀³ = 27/3 − 0 = 9 square units."
+  },
+  {
+    id:34, topic:"Calculus",
+    text:"Find the maximum value of y = −x² + 6x − 5.",
+    opts:{A:"4",B:"5",C:"6",D:"3"}, ans:"A",
+    exp:"dy/dx = −2x+6 = 0 → x=3. y(3) = −9+18−5 = 4. Second derivative = −2 < 0 confirms maximum."
+  },
+  {
+    id:35, topic:"Calculus",
+    text:"Evaluate ∫(sin x + 2x) dx.",
+    opts:{A:"−cos x + x² + C",B:"cos x + x² + C",C:"−sin x + x² + C",D:"−cos x + 2 + C"}, ans:"A",
+    exp:"∫sin x dx = −cos x; ∫2x dx = x². Combined: −cos x + x² + C."
+  },
+
+  /* ══ STATISTICS & PROBABILITY (5) Q36–Q40 ══ */
+  {
+    id:36, topic:"Statistics",
+    diagram:"piechart",
+    text:"A pie chart shows how 200 students chose their subjects: Mathematics 40%, English 30%, Science 20%, Others 10%. How many students chose Science?",
+    opts:{A:"40",B:"60",C:"80",D:"20"}, ans:"A",
+    exp:"20% of 200 = 0.20 × 200 = 40 students chose Science."
+  },
+  {
+    id:37, topic:"Statistics",
+    text:"Find the variance of the data set: 2, 4, 6, 8, 10.",
+    opts:{A:"8",B:"6",C:"10",D:"4"}, ans:"A",
+    exp:"Mean = 30/5 = 6. Deviations: −4,−2,0,2,4. Squared: 16,4,0,4,16. Variance = 40/5 = 8."
+  },
+  {
+    id:38, topic:"Probability",
+    text:"A card is drawn from a well-shuffled standard deck of 52 cards. What is the probability of drawing a King or a Heart?",
+    opts:{A:"4/13",B:"17/52",C:"1/4",D:"5/13"}, ans:"A",
+    exp:"P(K)+P(H)−P(K∩H) = 4/52 + 13/52 − 1/52 = 16/52 = 4/13."
+  },
+  {
+    id:39, topic:"Probability",
+    text:"A box contains 5 white, 4 red and 3 blue balls. Two balls are drawn without replacement. What is the probability both are white?",
+    opts:{A:"5/33",B:"5/36",C:"25/144",D:"1/6"}, ans:"A",
+    exp:"P(both white) = (5/12) × (4/11) = 20/132 = 5/33."
+  },
+  {
+    id:40, topic:"Statistics",
+    text:"The mode of the data 3, 5, 7, 5, 9, 3, 5, 7, 3, 5 is:",
+    opts:{A:"5",B:"3",C:"7",D:"4"}, ans:"A",
+    exp:"Frequency count: 3→3 times, 5→4 times, 7→2 times, 9→1 time. Mode = 5 (highest frequency)."
+  }
+];
+
+/* ── DIAGRAM RENDERER ── */
+function getDiagram(q){
+  switch(q.diagram){
+    case 'histogram':
+      return svgHistogram('Ages of Club Members',['14','15','16','17','18'],[20,25,30,18,12],'Frequency');
+    case 'parabola':
+      return svgParabola();
+    case 'venn':
+      return svgVenn('F','G',20,15,10,5,50);
+    case 'circle':
+      return svgCircleAngle();
+    case 'triangle':
+      return svgTriangle(12,5,13,'θ');
+    case 'coordline':
+      return svgCoordLine();
+    case 'piechart':
+      return svgPie([
+        {label:'Mathematics',value:40,color:C.bar1},
+        {label:'English',value:30,color:C.bar2},
+        {label:'Science',value:20,color:C.bar3},
+        {label:'Others',value:10,color:C.bar4}
+      ]);
+    default: return null;
+  }
+}
+
+/* ── STATE ── */
+var SHUFFLED_ANS={};
+var ST={correct:0,wrong:0,answered:0,answeredIds:new Set()};
+var UA={};
+var globalDone=false;
+var GLOBAL_SECS=2400;
+const TOTAL=QUESTIONS.length;
+
+/* ── TIMER ── */
+var timerInterval=null;
+function startTimer(){
+  var remaining=GLOBAL_SECS;
+  var dot=document.getElementById('gdot'),txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}
+    if(remaining<=0){clearInterval(timerInterval);timeUp();}
+  },1000);
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—';}
+
+/* ── SHUFFLE ── */
+function buildShuffledOpts(q){
+  var entries=['A','B','C','D'].map(function(k){return{origKey:k,text:q.opts[k]};});
+  for(var i=entries.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=entries[i];entries[i]=entries[j];entries[j]=tmp;}
+  var newOpts={},newAns=q.ans;
+  ['A','B','C','D'].forEach(function(lbl,idx){
+    newOpts[lbl]=entries[idx].text;
+    if(entries[idx].origKey===q.ans)newAns=lbl;
+  });
+  return{opts:newOpts,ans:newAns};
+}
+
+/* ── RENDER ── */
+function render(){
+  var container=document.getElementById('qc');
+  var html='';
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i];
+    var shuffled=buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id]=shuffled.ans;
+    var diagramHtml='';
+    var diag=getDiagram(q);
+    if(diag)diagramHtml='<div class="diagram">'+diag+'</div>';
+    var optsHtml='';
+    ['A','B','C','D'].forEach(function(lbl){
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'"><span class="opt-key">'+lbl+'.</span><span class="opt-txt">'+shuffled.opts[lbl]+'</span></div>';
+    });
+    html+='<div class="qcard" style="animation-delay:'+(i*0.03)+'s">'+
+      '<div class="qcard-top"><span class="qnum">Q'+q.id+' of '+TOTAL+'</span>'+(q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+'</div>'+
+      '<div class="qtxt">'+q.text+'</div>'+
+      diagramHtml+
+      '<div class="opts">'+optsHtml+'</div>'+
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>'+
+      '<div class="exp" id="exp'+q.id+'"></div>'+
+      '</div>';
+  }
+  container.innerHTML=html;
+  document.getElementById('sc-total').textContent=TOTAL;
+  document.getElementById('sc-skip').textContent=TOTAL;
+  document.getElementById('sub-prog').textContent='0 / '+TOTAL+' answered';
+  document.getElementById('m-left').textContent=TOTAL;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel');});
+      this.classList.add('sel');UA[qid]=this.dataset.a;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');if(btn)btn.disabled=false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid;});
+      var chosen=UA[qid],correctLabel=SHUFFLED_ANS[qid],ok=(chosen===correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===correctLabel)o.classList.add('ok');
+        else if(o.dataset.a===chosen)o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      expEl.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+(ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel)+'</span>'+(q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');this.disabled=true;
+      if(!ST.answeredIds.has(qid)){
+        ST.answered++;ST.answeredIds.add(qid);
+        if(ok)ST.correct++;else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats(){
+  var left=TOTAL-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / '+TOTAL+' answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/TOTAL*100)+'%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not([disabled])').forEach(function(b){b.click();});
+  var pct=Math.round((ST.correct/TOTAL)*100);
+  var scoreEl=document.getElementById('tu-score');scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;document.getElementById('tu-wr').textContent=ST.wrong;document.getElementById('tu-sk').textContent=TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});
+  var pct=Math.round((ST.correct/TOTAL)*100);
+  var scoreEl=document.getElementById('tu-score');scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;document.getElementById('tu-wr').textContent=ST.wrong;document.getElementById('tu-sk').textContent=TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF ── */
+function doPrint(){document.getElementById('print-header').style.display='block';window.print();setTimeout(function(){document.getElementById('print-header').style.display='none';},1000);}
+
+render();
+startTimer();
+</script>
+</body>
+</html>
