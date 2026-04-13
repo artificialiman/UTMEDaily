@@ -2,341 +2,245 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<title>Chemistry &mdash; Paper 6 &middot; JAMB 2026 Practice</title>
+<title>Chemistry Paper 6 — JAMB 2026 Practice</title>
 <style>
-/* ── RESET & BASE ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px;-webkit-text-size-adjust:100%}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0f0f1a;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
-
-/* ── CSS VARIABLES ── */
-:root{
-  --bg:#0f0f1a;--surface:#1a1a2e;--surface2:#16213e;--border:#2d2d44;
-  --text:#e2e8f0;--muted:#94a3b8;--accent:#7c3aed;--accent2:#6d28d9;
-  --correct:#059669;--incorrect:#dc2626;--flag:#f59e0b;
-  --header-h:56px;--nav-h:64px;--sidebar-w:260px;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #0f0f1a; color: #e2e8f0; min-height: 100vh;
+  padding: 0 0 40px 0;
+}
+:root {
+  --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #16213e;
+  --border: #2d2d44; --text: #e2e8f0; --muted: #94a3b8;
+  --accent: #7c3aed; --correct: #059669; --incorrect: #dc2626;
 }
 
 /* ── HEADER ── */
-.quiz-header{
-  position:fixed;top:0;left:0;right:0;height:var(--header-h);
-  background:var(--surface);border-bottom:1px solid var(--border);
-  z-index:100;display:flex;align-items:center;
+.quiz-header {
+  background: var(--surface); border-bottom: 2px solid var(--accent);
+  padding: 14px 20px; display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 10;
 }
-.quiz-header-container{
-  width:100%;display:flex;align-items:center;justify-content:space-between;
-  padding:0 12px;gap:8px;
-}
-.quiz-header-left{display:flex;align-items:center;gap:10px;min-width:0}
-.subject-name{font-weight:700;font-size:.95rem;color:var(--text);white-space:nowrap}
-.subject-meta{font-size:.72rem;color:var(--muted);white-space:nowrap}
-.quiz-header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-
-/* ── TIMER ── */
-.quiz-timer-container{
-  display:flex;align-items:center;gap:6px;flex-shrink:0;
-  background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);
-  border-radius:20px;padding:3px 10px 3px 4px;
-}
-.timer-progress-ring{width:34px;height:34px;flex-shrink:0}
-.timer-progress-ring svg{width:34px;height:34px}
-.timer-icon{display:none}
-.timer-display{font-size:.85rem;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;min-width:52px}
-
-/* ── BUTTONS ── */
-.btn{
-  display:inline-flex;align-items:center;gap:6px;padding:7px 14px;
-  border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;
-  transition:opacity .15s,transform .1s;text-decoration:none;
-}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent2)}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{background:var(--border)}
-.btn-danger{background:#dc2626;color:#fff}
-.btn-danger:hover{background:#b91c1c}
-.btn-sm{padding:5px 10px;font-size:.78rem}
-.btn-icon{
-  background:none;border:none;color:var(--muted);cursor:pointer;
-  padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;
-}
-.btn-icon:hover{color:var(--text);background:var(--border)}
-.btn-flag{
-  background:none;border:1px solid var(--border);color:var(--muted);
-  cursor:pointer;padding:5px 10px;border-radius:6px;font-size:.78rem;
-  display:flex;align-items:center;gap:5px;transition:all .15s;
-}
-.btn-flag.active,.btn-flag:hover{color:var(--flag);border-color:var(--flag)}
-
-/* ── LAYOUT ── */
-.quiz-container{
-  display:flex;margin-top:var(--header-h);min-height:calc(100vh - var(--header-h));
-}
-.quiz-main{
-  flex:1;min-width:0;padding:16px 16px calc(var(--nav-h) + 20px);
-  max-width:760px;margin:0 auto;width:100%;
+.header-title { font-size: 1rem; font-weight: 800; color: var(--text); }
+.header-sub { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+.header-badge {
+  background: var(--accent); color: #fff; border-radius: 20px;
+  padding: 4px 14px; font-size: .78rem; font-weight: 700;
 }
 
-/* ── SIDEBAR ── */
-.quiz-sidebar{
-  width:var(--sidebar-w);flex-shrink:0;
-  background:var(--surface);border-right:1px solid var(--border);
-  position:fixed;left:0;top:var(--header-h);bottom:0;
-  transform:translateX(-100%);transition:transform .25s ease;
-  z-index:90;display:flex;flex-direction:column;overflow:hidden;
+/* ── PROGRESS BAR ── */
+.progress-bar-wrap {
+  background: var(--surface2); height: 4px; width: 100%;
 }
-.quiz-sidebar.open{transform:translateX(0)}
-.sidebar-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;
+.progress-bar {
+  background: var(--accent); height: 4px; width: 0%;
+  transition: width .3s;
 }
-.sidebar-header h3{font-size:.9rem;font-weight:700;color:var(--text)}
-.sidebar-stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
-  background:var(--border);flex-shrink:0;
-}
-.stat-item{
-  background:var(--surface2);padding:10px 6px;text-align:center;
-}
-.stat-value{font-size:1.3rem;font-weight:800;color:var(--accent)}
-.stat-label{font-size:.68rem;color:var(--muted);margin-top:2px}
-.question-palette{
-  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
-  padding:12px;overflow-y:auto;flex:1;
-}
-.palette-btn{
-  aspect-ratio:1;border:1px solid var(--border);background:var(--surface2);
-  color:var(--muted);border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600;
-  transition:all .15s;display:flex;align-items:center;justify-content:center;
-}
-.palette-btn.current{border-color:var(--accent);color:var(--accent);background:rgba(124,58,237,.15)}
-.palette-btn.answered{background:var(--accent);border-color:var(--accent);color:#fff}
-.palette-btn.flagged{background:var(--flag);border-color:var(--flag);color:#fff}
-.sidebar-legend{
-  display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;
-  border-top:1px solid var(--border);flex-shrink:0;
-}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--muted)}
-.legend-dot{
-  width:10px;height:10px;border-radius:3px;border:1px solid var(--border);
-  background:var(--surface2);display:inline-block;flex-shrink:0;
-}
-.legend-dot.current{background:rgba(124,58,237,.15);border-color:var(--accent)}
-.legend-dot.answered{background:var(--accent);border-color:var(--accent)}
-.legend-dot.flagged{background:var(--flag);border-color:var(--flag)}
 
-/* ── QUESTION CARD ── */
-.question-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:20px;margin-bottom:16px;
+/* ── INSTRUCTIONS ── */
+.instructions {
+  max-width: 720px; margin: 24px auto 0; padding: 0 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; font-size: .85rem;
+  color: var(--muted); line-height: 1.6;
 }
-.question-header{
-  display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+.instructions strong { color: var(--text); }
+
+/* ── QUESTION BLOCK ── */
+.q-wrapper {
+  max-width: 720px; margin: 24px auto 0; padding: 0 16px;
 }
-.question-number{font-size:.78rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
-.question-text{
-  font-size:.95rem;line-height:1.65;color:var(--text);margin-bottom:18px;
+.q-block {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px; margin-bottom: 20px;
 }
-.question-diagram{
-  margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  background:rgba(0,0,0,.25);border-radius:8px;padding:10px;
-  border:1px solid var(--border);
+.q-num {
+  font-size: .72rem; font-weight: 800; color: var(--accent);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
 }
-.question-diagram svg{display:block;max-width:100%;height:auto}
+.q-diagram {
+  margin-bottom: 14px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  background: rgba(0,0,0,.3); border-radius: 8px; padding: 12px;
+  border: 1px solid var(--border);
+}
+.q-diagram svg { display: block; max-width: 100%; height: auto; }
+.q-text {
+  font-size: .93rem; line-height: 1.7; color: var(--text);
+  margin-bottom: 18px; white-space: pre-wrap;
+}
 
 /* ── OPTIONS ── */
-.options-container{display:flex;flex-direction:column;gap:9px}
-.option-btn{
-  width:100%;text-align:left;display:flex;align-items:flex-start;gap:11px;
-  background:var(--surface2);border:1.5px solid var(--border);
-  color:var(--text);border-radius:9px;padding:12px 14px;
-  cursor:pointer;font-size:.88rem;line-height:1.5;transition:all .15s;
+.options { display: flex; flex-direction: column; gap: 9px; }
+.opt-label {
+  display: flex; align-items: flex-start; gap: 11px; cursor: pointer;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 9px; padding: 11px 14px; transition: border-color .15s;
 }
-.option-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(124,58,237,.08)}
-.option-btn.selected{border-color:var(--accent);background:rgba(124,58,237,.15);color:#fff}
-.option-btn.correct{border-color:var(--correct) !important;background:rgba(5,150,105,.18) !important;color:#6ee7b7 !important}
-.option-btn.incorrect{border-color:var(--incorrect) !important;background:rgba(220,38,38,.18) !important;color:#fca5a5 !important}
-.option-btn:disabled{cursor:default}
-.option-letter{
-  flex-shrink:0;width:24px;height:24px;border-radius:6px;
-  background:rgba(255,255,255,.07);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.75rem;font-weight:800;color:var(--muted);margin-top:1px;
+.opt-label:hover { border-color: var(--accent); }
+.opt-label input[type=radio] { display: none; }
+.opt-label input[type=radio]:checked ~ .opt-letter {
+  background: var(--accent); border-color: var(--accent); color: #fff;
 }
-.option-btn.selected .option-letter{background:var(--accent);border-color:var(--accent);color:#fff}
-.option-btn.correct .option-letter{background:var(--correct);border-color:var(--correct);color:#fff}
-.option-btn.incorrect .option-letter{background:var(--incorrect);border-color:var(--incorrect);color:#fff}
-.option-text{flex:1;min-width:0}
+.opt-label:has(input:checked) {
+  border-color: var(--accent); background: rgba(124,58,237,.12);
+}
+.opt-letter {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 6px;
+  background: rgba(255,255,255,.07); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .74rem; font-weight: 800; color: var(--muted);
+  margin-top: 1px; transition: all .15s;
+}
+.opt-text { flex: 1; font-size: .88rem; line-height: 1.5; color: var(--text); }
 
-/* ── EXPLANATION ── */
-.question-explanation{
-  margin-top:16px;border-top:1px solid var(--border);padding-top:14px;
+/* ── ANSWER REVEAL (details/summary) ── */
+.answer-reveal {
+  margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;
 }
-.question-explanation.hidden{display:none}
-.explanation-header{
-  font-size:.78rem;font-weight:700;color:var(--accent);
-  text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;
-  display:flex;align-items:center;gap:6px;
+details summary {
+  cursor: pointer; font-size: .78rem; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; letter-spacing: .05em;
+  list-style: none; display: flex; align-items: center; gap: 6px;
+  padding: 4px 0;
 }
-.explanation-content{font-size:.87rem;line-height:1.65;color:var(--muted)}
+details summary::before { content: '▶ '; font-size: .7rem; }
+details[open] summary::before { content: '▼ '; }
+details summary::-webkit-details-marker { display: none; }
+.answer-box {
+  margin-top: 10px; background: var(--surface2); border-radius: 8px;
+  padding: 12px 14px; font-size: .86rem; line-height: 1.65;
+}
+.correct-ans {
+  font-weight: 800; color: #6ee7b7; font-size: .85rem; margin-bottom: 6px;
+}
+.explanation { color: var(--muted); }
 
-/* ── NAV BAR ── */
-.quiz-navigation{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--surface);border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 16px;height:var(--nav-h);z-index:80;gap:8px;
+/* ── SUBMIT SECTION ── */
+.submit-section {
+  max-width: 720px; margin: 10px auto 40px; padding: 0 16px; text-align: center;
 }
+.submit-btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 10px;
+  padding: 14px 40px; font-size: 1rem; font-weight: 800; cursor: pointer;
+  transition: background .15s; margin-top: 10px;
+}
+.submit-btn:hover { background: #6d28d9; }
 
-/* ── MOBILE PALETTE TRIGGER ── */
-.mobile-palette-trigger{
-  position:fixed;bottom:calc(var(--nav-h) + 12px);right:14px;
-  background:var(--accent);color:#fff;border-radius:24px;
-  padding:8px 16px;font-size:.78rem;font-weight:700;
-  display:flex;align-items:center;gap:7px;cursor:pointer;
-  box-shadow:0 4px 20px rgba(124,58,237,.5);z-index:79;
-  border:none;transition:transform .15s;
-}
-.mobile-palette-trigger:active{transform:scale(.95)}
-
-/* ── MODALS ── */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);
-  display:flex;align-items:center;justify-content:center;z-index:200;
-  padding:16px;
-}
-.modal-overlay.hidden{display:none}
-.modal{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:14px;width:100%;max-width:400px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;
-}
-.modal-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px;border-bottom:1px solid var(--border);
-}
-.modal-header h3{font-size:.95rem;font-weight:700;color:var(--text)}
-.modal-body{padding:20px}
-.modal-footer{
-  display:flex;justify-content:flex-end;gap:10px;
-  padding:14px 20px;border-top:1px solid var(--border);
-}
-.submit-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-.summary-item{
-  background:var(--surface2);border-radius:8px;padding:10px 12px;
-  display:flex;flex-direction:column;gap:3px;
-}
-.summary-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.summary-value{font-size:1.1rem;font-weight:800;color:var(--text)}
-.answered-text{color:var(--correct)}
-.warning-text{color:var(--incorrect)}
-.warning-message{
-  display:flex;align-items:center;gap:8px;
-  background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);
-  border-radius:8px;padding:10px 12px;color:#fca5a5;font-size:.82rem;
+/* ── SCORE (pure CSS — uses :checked state) ── */
+/* Score relies on server-side or print — for offline we use the details trick */
+.score-info {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; font-size: .85rem; color: var(--muted); line-height: 1.7;
+  margin-bottom: 20px;
 }
 
-/* ── CALCULATOR ── */
-.calculator-modal{max-width:320px}
-.calculator{display:flex;flex-direction:column;gap:10px}
-.calculator-display{
-  width:100%;background:var(--surface2);border:1px solid var(--border);
-  border-radius:8px;padding:10px 14px;color:var(--text);
-  font-size:1.2rem;text-align:right;font-variant-numeric:tabular-nums;
+/* ── PRINT ── */
+@media print {
+  .quiz-header, .instructions, .submit-section { display: none; }
+  .q-block { break-inside: avoid; border: 1px solid #ccc; }
+  body { background: white; color: black; }
 }
-.calculator-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.calc-btn{
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text);border-radius:7px;padding:10px 6px;
-  font-size:.88rem;font-weight:600;cursor:pointer;transition:background .1s;
-}
-.calc-btn:hover{background:var(--border)}
-.calc-equals{background:var(--accent);border-color:var(--accent);color:#fff}
-.calc-equals:hover{background:var(--accent2)}
-
-/* ── SCORE SCREEN ── */
-#scoreScreen{
-  display:none;flex-direction:column;align-items:center;
-  justify-content:center;min-height:calc(100vh - var(--header-h));
-  padding:24px 16px calc(var(--nav-h)+24px);text-align:center;
-}
-#scoreScreen.visible{display:flex}
-.score-circle{
-  width:140px;height:140px;border-radius:50%;
-  border:6px solid var(--accent);display:flex;flex-direction:column;
-  align-items:center;justify-content:center;margin:0 auto 20px;
-  background:rgba(124,58,237,.1);
-}
-.score-number{font-size:2.4rem;font-weight:900;color:var(--accent)}
-.score-denom{font-size:.9rem;color:var(--muted)}
-.score-label{font-size:1rem;color:var(--muted);margin-bottom:6px}
-.score-pct{font-size:2rem;font-weight:800;color:var(--text);margin-bottom:20px}
-.score-breakdown{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-  width:100%;max-width:360px;margin-bottom:24px;
-}
-.score-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 8px}
-.score-item-val{font-size:1.3rem;font-weight:800;color:var(--text)}
-.score-item-lbl{font-size:.7rem;color:var(--muted);margin-top:2px}
-.score-correct .score-item-val{color:var(--correct)}
-.score-wrong .score-item-val{color:var(--incorrect)}
 
 /* ── RESPONSIVE ── */
-@media(min-width:640px){
-  .quiz-sidebar{transform:translateX(0);position:sticky;top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto}
-  .quiz-main{padding:20px 24px calc(var(--nav-h)+24px)}
-  .mobile-palette-trigger{display:none}
-}
-@media(max-width:380px){
-  .option-btn{padding:10px 11px;font-size:.84rem}
-  .question-text{font-size:.88rem}
-  .quiz-navigation{padding:8px 10px;gap:5px}
-  .btn{padding:7px 10px;font-size:.78rem}
+@media (max-width: 420px) {
+  .q-text { font-size: .87rem; }
+  .opt-text { font-size: .84rem; }
+  .q-block { padding: 16px 14px; }
 }
 </style>
 </head>
 <body>
-<script>
-const DURATION = 6000;
-const QUESTIONS = [
-
-  /* ══════════════════════════════════════════
-     CLUSTER 1: ATOMIC STRUCTURE & PERIODICITY
-     Q1–Q7
-  ══════════════════════════════════════════ */
-
-  {
-    id: 1, subject: 'Chemistry',
-    text: 'An element has the electron configuration 1s² 2s² 2p⁶ 3s² 3p⁶ 3d⁵ 4s². The element belongs to which block and period of the Periodic Table?',
-    options: { A: 'd-block, Period 4', B: 'd-block, Period 3', C: 'p-block, Period 4', D: 's-block, Period 4' },
-    answer: 'A',
-    explanation: 'The highest principal quantum number is 4 (4s²) → Period 4. The last electrons fill a d subshell (3d⁵) → d-block (transition metals). The element is Mn (manganese). p-block elements end in a p subshell; s-block in s. Period is determined by the highest n, not the subshell being filled.',
-    /* Level 2, Taxonomy: Abstract */
-  },
-
-  {
-    id: 2, subject: 'Chemistry',
-    text: 'Down Group II (Be → Ba), which of the following trends is INCORRECT?',
-    options: {
-      A: 'Atomic radius increases',
-      B: 'First ionisation energy decreases',
-      C: 'Melting point increases',
-      D: 'Electronegativity decreases'
-    },
-    answer: 'C',
-    explanation: 'Down Group II, atomic radius ↑ (more shells), IE₁ ↓ (outer electrons further from nucleus, better shielded), electronegativity ↓ (Pauling scale). Melting point does NOT increase uniformly — it actually shows an irregular trend and DECREASES overall from Be (1287°C) to Ba (727°C). Mg has an unusually high m.p. relative to its neighbours. Option C is the false statement. Students typically assume metals get harder/higher-melting down groups — that\'s Groups I.',
-    /* Level 3, Taxonomy: Logical */
-  },
-
-  {
-    id: 3, subject: 'Chemistry',
-    /* DIAGRAM: Electron dot (Lewis) structure of ozone O₃ showing the resonance
-       and the formal charges, plus one distractor structure with wrong lone pairs */
-    diagramSVG: `<svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;font-family:inherit;">
+<header class="quiz-header">
+<div><div class="header-title">Chemistry — Paper 6</div>
+<div class="header-sub">JAMB 2026 Practice · 40 Questions · 100 mins</div></div>
+<div class="header-badge">Paper 6 of 7</div>
+</header>
+<div class="progress-bar-wrap"><div class="progress-bar"></div></div>
+<div class="instructions">
+<strong>Instructions:</strong> Choose the best answer for each question. 
+Tap <strong>Show Answer</strong> after each question to check. 
+All 40 questions must be attempted. Time allowed: <strong>100 minutes</strong>.
+</div>
+<form method="post" action="#" id="quizForm">
+<div class="q-wrapper">
+<div class="q-block" id="q1">
+<div class="q-num">Question 1 of 40</div>
+<div class="q-text">An element has the electron configuration 1s² 2s² 2p⁶ 3s² 3p⁶ 3d⁵ 4s². The element belongs to which block and period of the Periodic Table?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q1" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">s-block, Period 4</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q1" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">d-block, Period 3</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q1" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">p-block, Period 4</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q1" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">d-block, Period 4</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — d-block, Period 4</div>
+<div class="explanation">The highest principal quantum number is 4 (4s²) → Period 4. The last electrons fill a d subshell (3d⁵) → d-block (transition metals). The element is Mn (manganese). p-block elements end in a p subshell; s-block in s. Period is determined by the highest n, not the subshell being filled.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q2">
+<div class="q-num">Question 2 of 40</div>
+<div class="q-text">Down Group II (Be → Ba), which of the following trends is INCORRECT?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q2" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Melting point increases</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q2" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Electronegativity decreases</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q2" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Atomic radius increases</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q2" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">First ionisation energy decreases</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — Melting point increases</div>
+<div class="explanation">Down Group II, atomic radius ↑ (more shells), IE₁ ↓ (outer electrons further from nucleus, better shielded), electronegativity ↓ (Pauling scale). Melting point does NOT increase uniformly — it actually shows an irregular trend and DECREASES overall from Be (1287°C) to Ba (727°C). Mg has an unusually high m.p. relative to its neighbours. Option C is the false statement. Students typically assume metals get harder/higher-melting down groups — that&#x27;s Groups I.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q3">
+<div class="q-num">Question 3 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;font-family:inherit;">
   <defs>
     <style>
       .lbl{font-size:14px;fill:var(--text,#e0e0e0);text-anchor:middle;}
@@ -390,84 +294,187 @@ const QUESTIONS = [
   <text x="384" y="145" class="sub" style="text-anchor:middle;">All single bonds, no formal charges</text>
 
   <text x="260" y="185" class="sub" style="text-anchor:middle;font-size:12px;">Structures (A) and (B) — which is correct for JAMB?</text>
-</svg>`,
-    text: 'The two Lewis structures of ozone (O₃) shown above are compared. Which statement about the CORRECT structure is TRUE?',
-    options: {
-      A: 'Structure B is correct because oxygen forms only single bonds',
-      B: 'Structure A is correct; it shows one double bond, one single bond, and formal charges −1 and +1 on terminal and central O respectively',
-      C: 'Structure A is correct but ozone has three equal bonds and no formal charges',
-      D: 'Structure B is correct because ozone has 18 electrons arranged symmetrically'
-    },
-    answer: 'B',
-    explanation: 'Ozone has 18 valence electrons. The Lewis structure requires one O=O double bond and one O–O single bond, generating formal charges: central O = +1, terminal single-bonded O = −1. The actual molecule is a resonance hybrid of both forms, with bond order 1.5. Option A describes this correctly. All-single-bond structure (B) would violate the electron count — each O would have only 6 electrons satisfied, not 8.',
-    /* Level 4/Abstract, Taxonomy: Abstract */
-  },
-
-  {
-    id: 4, subject: 'Chemistry',
-    text: 'The successive ionisation energies (kJ/mol) of element R are:\nIE₁ = 738  IE₂ = 1 451  IE₃ = 7 733  IE₄ = 10 540\nThe most stable ion formed by R and the group it belongs to are',
-    options: {
-      A: 'R³⁺, Group III',
-      B: 'R²⁺, Group II',
-      C: 'R⁺, Group I',
-      D: 'R⁴⁺, Group IV'
-    },
-    answer: 'B',
-    explanation: 'Large jump between IE₂ (1 451) and IE₃ (7 733) — over 5× increase. Removing the 3rd electron breaks into a stable inner shell. Therefore R loses 2 electrons easily → R²⁺ is the stable ion → Group II. The element is Mg (magnesium). The trap: IE₁ alone might suggest Group I, but IE₂ is also manageable, confirming two outer electrons.',
-    /* Level 2, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 5, subject: 'Chemistry',
-    text: 'Which of the following pairs of elements would form a compound with the GREATEST ionic character?',
-    options: {
-      A: 'C and O',
-      B: 'Na and Cl',
-      C: 'Cs and F',
-      D: 'Be and Cl'
-    },
-    answer: 'C',
-    explanation: 'Ionic character increases with electronegativity DIFFERENCE between the two atoms. Cs (electronegativity 0.79) and F (3.98) have the largest difference (~3.19) of any real compound. NaCl difference ≈ 2.1; BeCl₂ ≈ 1.5 (significantly covalent); C–O ≈ 1.0 (polar covalent). CsF is the most ionic compound known — Cs is the least electronegative metal, F the most electronegative element.',
-    /* Level 3, Taxonomy: Logical */
-  },
-
-  {
-    id: 6, subject: 'Chemistry',
-    text: 'An atom of ⁵⁶₂₆Fe²⁺ contains how many protons, neutrons, and electrons respectively?',
-    options: {
-      A: '26 protons, 30 neutrons, 26 electrons',
-      B: '26 protons, 30 neutrons, 24 electrons',
-      C: '26 protons, 56 neutrons, 24 electrons',
-      D: '30 protons, 26 neutrons, 28 electrons'
-    },
-    answer: 'B',
-    explanation: 'Atomic number (Z) = 26 = protons. Mass number (A) = 56; neutrons = 56 − 26 = 30. Fe²⁺ means the atom has LOST 2 electrons: electrons = 26 − 2 = 24. The most common trap: students use the mass number as neutron count, or forget to subtract the charge from the electron count.',
-    /* Level 1, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 7, subject: 'Chemistry',
-    text: 'Across Period 3 (Na to Cl), the first ionisation energy of sulphur (S) is LOWER than that of phosphorus (P). This is best explained by',
-    options: {
-      A: 'S having a larger atomic radius than P',
-      B: 'P having a half-filled 3p³ subshell with extra exchange-energy stability',
-      C: 'S forming more ionic bonds than P',
-      D: 'P having higher nuclear charge'
-    },
-    answer: 'B',
-    explanation: 'P has configuration [Ne] 3s² 3p³ — a half-filled p subshell, one electron per orbital. Exchange-energy stabilisation makes this configuration extra stable, so removing an electron from P requires more energy than expected. S ([Ne] 3s² 3p⁴) has a paired electron in one 3p orbital; electron-electron repulsion in the pair makes it easier to remove → IE₁(S) < IE₁(P). P does have lower Z than S (option D is wrong direction) — yet P\'s IE₁ is higher. This is the same anomaly as N–O in Period 2.',
-    /* Level 3, Taxonomy: Abstract */
-  },
-
-  /* ══════════════════════════════════════════
-     CLUSTER 2: STOICHIOMETRY & MOLES
-     Q8–Q13
-  ══════════════════════════════════════════ */
-
-  {
-    id: 8, subject: 'Chemistry',
-    /* DIAGRAM: Solubility curve for KNO₃, NaCl, KCl and CaSO₄ vs temperature */
-    diagramSVG: `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;font-family:inherit;">
+</svg>
+</div>
+<div class="q-text">The two Lewis structures of ozone (O₃) shown above are compared. Which statement about the CORRECT structure is TRUE?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q3" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Structure B is correct because oxygen forms only single bonds</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q3" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Structure B is correct because ozone has 18 electrons arranged symmetrically</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q3" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Structure A is correct; it shows one double bond, one single bond, and formal charges −1 and +1 on terminal and central O respectively</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q3" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Structure A is correct but ozone has three equal bonds and no formal charges</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: C — Structure A is correct; it shows one double bond, one single bond, and formal charges −1 and +1 on terminal and central O respectively</div>
+<div class="explanation">Ozone has 18 valence electrons. The Lewis structure requires one O=O double bond and one O–O single bond, generating formal charges: central O = +1, terminal single-bonded O = −1. The actual molecule is a resonance hybrid of both forms, with bond order 1.5. Option A describes this correctly. All-single-bond structure (B) would violate the electron count — each O would have only 6 electrons satisfied, not 8.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q4">
+<div class="q-num">Question 4 of 40</div>
+<div class="q-text">The successive ionisation energies (kJ/mol) of element R are:
+IE₁ = 738  IE₂ = 1 451  IE₃ = 7 733  IE₄ = 10 540
+The most stable ion formed by R and the group it belongs to are</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q4" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">R²⁺, Group II</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q4" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">R⁴⁺, Group IV</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q4" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">R³⁺, Group III</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q4" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">R⁺, Group I</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — R²⁺, Group II</div>
+<div class="explanation">Large jump between IE₂ (1 451) and IE₃ (7 733) — over 5× increase. Removing the 3rd electron breaks into a stable inner shell. Therefore R loses 2 electrons easily → R²⁺ is the stable ion → Group II. The element is Mg (magnesium). The trap: IE₁ alone might suggest Group I, but IE₂ is also manageable, confirming two outer electrons.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q5">
+<div class="q-num">Question 5 of 40</div>
+<div class="q-text">Which of the following pairs of elements would form a compound with the GREATEST ionic character?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q5" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">C and O</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q5" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Na and Cl</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q5" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Be and Cl</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q5" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Cs and F</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — Cs and F</div>
+<div class="explanation">Ionic character increases with electronegativity DIFFERENCE between the two atoms. Cs (electronegativity 0.79) and F (3.98) have the largest difference (~3.19) of any real compound. NaCl difference ≈ 2.1; BeCl₂ ≈ 1.5 (significantly covalent); C–O ≈ 1.0 (polar covalent). CsF is the most ionic compound known — Cs is the least electronegative metal, F the most electronegative element.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q6">
+<div class="q-num">Question 6 of 40</div>
+<div class="q-text">An atom of ⁵⁶₂₆Fe²⁺ contains how many protons, neutrons, and electrons respectively?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q6" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">30 protons, 26 neutrons, 28 electrons</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q6" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">26 protons, 30 neutrons, 24 electrons</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q6" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">26 protons, 56 neutrons, 24 electrons</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q6" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">26 protons, 30 neutrons, 26 electrons</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — 26 protons, 30 neutrons, 24 electrons</div>
+<div class="explanation">Atomic number (Z) = 26 = protons. Mass number (A) = 56; neutrons = 56 − 26 = 30. Fe²⁺ means the atom has LOST 2 electrons: electrons = 26 − 2 = 24. The most common trap: students use the mass number as neutron count, or forget to subtract the charge from the electron count.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q7">
+<div class="q-num">Question 7 of 40</div>
+<div class="q-text">Across Period 3 (Na to Cl), the first ionisation energy of sulphur (S) is LOWER than that of phosphorus (P). This is best explained by</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q7" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">S forming more ionic bonds than P</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q7" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">P having higher nuclear charge</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q7" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">P having a half-filled 3p³ subshell with extra exchange-energy stability</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q7" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">S having a larger atomic radius than P</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: C — P having a half-filled 3p³ subshell with extra exchange-energy stability</div>
+<div class="explanation">P has configuration [Ne] 3s² 3p³ — a half-filled p subshell, one electron per orbital. Exchange-energy stabilisation makes this configuration extra stable, so removing an electron from P requires more energy than expected. S ([Ne] 3s² 3p⁴) has a paired electron in one 3p orbital; electron-electron repulsion in the pair makes it easier to remove → IE₁(S) &lt; IE₁(P). P does have lower Z than S (option D is wrong direction) — yet P&#x27;s IE₁ is higher. This is the same anomaly as N–O in Period 2.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q8">
+<div class="q-num">Question 8 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;font-family:inherit;">
   <defs>
     <style>
       .ax{stroke:var(--text,#ccc);stroke-width:1.5;fill:none;}
@@ -521,59 +528,187 @@ const QUESTIONS = [
   <text x="475" y="246" class="lbl" style="fill:#fbbf24;font-size:11px;">CaSO₄</text>
 
   <text x="260" y="14" class="title">Solubility Curves — UTME Reference</text>
-</svg>`,
-    text: 'Use the solubility curve diagram above. At 60 °C, 80 g of KNO₃ is dissolved in 100 g of water. The solution is then cooled to 20 °C. The mass of KNO₃ that crystallises out is approximately',
-    options: {
-      A: '80 g',
-      B: '48 g',
-      C: '32 g',
-      D: '16 g'
-    },
-    answer: 'B',
-    explanation: 'From the graph: at 60°C, KNO₃ solubility ≈ 107 g/100 g H₂O, so 80 g is fully dissolved (unsaturated at 60°C). At 20°C, KNO₃ solubility ≈ 32 g/100 g H₂O. Amount that remains dissolved = 32 g. Amount that crystallises = 80 − 32 = 48 g. The key step students miss: check that the original solution is actually dissolved (80 g < 107 g at 60°C ✓), then subtract solubility at the lower temperature.',
-    /* Level 4/5, Taxonomy: Mathematical */
-  },
+</svg>
+</div>
+<div class="q-text">Use the solubility curve diagram above. At 60 °C, 80 g of KNO₃ is dissolved in 100 g of water. The solution is then cooled to 20 °C. The mass of KNO₃ that crystallises out is approximately</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q8" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">48 g</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q8" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">80 g</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q8" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">16 g</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q8" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">32 g</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — 48 g</div>
+<div class="explanation">From the graph: at 60°C, KNO₃ solubility ≈ 107 g/100 g H₂O, so 80 g is fully dissolved (unsaturated at 60°C). At 20°C, KNO₃ solubility ≈ 32 g/100 g H₂O. Amount that remains dissolved = 32 g. Amount that crystallises = 80 − 32 = 48 g. The key step students miss: check that the original solution is actually dissolved (80 g &lt; 107 g at 60°C ✓), then subtract solubility at the lower temperature.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q9">
+<div class="q-num">Question 9 of 40</div>
+<div class="q-text">What volume of 0.25 mol/dm³ NaOH solution is required to neutralise 40 cm³ of 0.15 mol/dm³ H₂SO₄?
 
-  {
-    id: 9, subject: 'Chemistry',
-    text: 'What volume of 0.25 mol/dm³ NaOH solution is required to neutralise 40 cm³ of 0.15 mol/dm³ H₂SO₄?\n\n[H₂SO₄ + 2NaOH → Na₂SO₄ + 2H₂O]',
-    options: { A: '24 cm³', B: '48 cm³', C: '12 cm³', D: '60 cm³' },
-    answer: 'B',
-    explanation: 'Moles H₂SO₄ = 0.040 × 0.15 = 0.006 mol. From equation, moles NaOH = 2 × 0.006 = 0.012 mol. Volume NaOH = 0.012 / 0.25 = 0.048 dm³ = 48 cm³. The trap: the 2:1 NaOH:H₂SO₄ ratio. Students who treat H₂SO₄ as monoprotic calculate 24 cm³ (option A), which is the #1 wrong answer here.',
-    /* Level 2, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 10, subject: 'Chemistry',
-    text: '3.2 g of sulphur (S) reacts with excess oxygen. What volume of SO₂ gas is produced at STP? [S = 32; molar volume at STP = 22.4 dm³/mol]',
-    options: { A: '22.4 dm³', B: '11.2 dm³', C: '2.24 dm³', D: '44.8 dm³' },
-    answer: 'C',
-    explanation: 'S + O₂ → SO₂. Moles S = 3.2/32 = 0.1 mol. Moles SO₂ = 0.1 mol (1:1 ratio). Volume = 0.1 × 22.4 = 2.24 dm³. Common trap: using the full 22.4 dm³ (for 1 mole), forgetting to scale by 0.1 mol.',
-    /* Level 2, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 11, subject: 'Chemistry',
-    text: 'The empirical formula of a compound is CH₂O. Its relative molecular mass is 180. The molecular formula is',
-    options: { A: 'C₃H₆O₃', B: 'C₆H₁₂O₆', C: 'C₂H₄O₂', D: 'CH₂O' },
-    answer: 'B',
-    explanation: 'Empirical formula mass of CH₂O = 12 + 2 + 16 = 30. n = RMM / EFM = 180 / 30 = 6. Molecular formula = (CH₂O)₆ = C₆H₁₂O₆ — glucose. The trap: option C (C₂H₄O₂ = acetic acid) has RMM 60, which also divides 180, leading students to pick n=3 → C₃H₆O₃ without checking: (CH₂O)₃ = 90 ≠ 180.',
-    /* Level 2, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 12, subject: 'Chemistry',
-    text: 'A gas occupies 560 cm³ at 27 °C and 1.5 atm. What volume will it occupy at STP (0 °C, 1 atm)?',
-    options: { A: '770 cm³', B: '560 cm³', C: '840 cm³', D: '420 cm³' },
-    answer: 'A',
-    explanation: 'Combined gas law: P₁V₁/T₁ = P₂V₂/T₂. P₁=1.5, V₁=560, T₁=300 K; P₂=1.0, T₂=273 K. V₂ = (1.5 × 560 × 273) / (1.0 × 300) = 229,320 / 300 = 764.4 ≈ 770 cm³. The trap: forgetting to convert °C to Kelvin (27°C = 300 K, NOT 27 K). Students who leave T in °C get wildly wrong answers.',
-    /* Level 2, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 13, subject: 'Chemistry',
-    /* DIAGRAM: Titration apparatus — burette, conical flask, white tile, labels */
-    diagramSVG: `<svg viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;font-family:inherit;">
+[H₂SO₄ + 2NaOH → Na₂SO₄ + 2H₂O]</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q9" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">24 cm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q9" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">12 cm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q9" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">60 cm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q9" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">48 cm³</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — 48 cm³</div>
+<div class="explanation">Moles H₂SO₄ = 0.040 × 0.15 = 0.006 mol. From equation, moles NaOH = 2 × 0.006 = 0.012 mol. Volume NaOH = 0.012 / 0.25 = 0.048 dm³ = 48 cm³. The trap: the 2:1 NaOH:H₂SO₄ ratio. Students who treat H₂SO₄ as monoprotic calculate 24 cm³ (option A), which is the #1 wrong answer here.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q10">
+<div class="q-num">Question 10 of 40</div>
+<div class="q-text">3.2 g of sulphur (S) reacts with excess oxygen. What volume of SO₂ gas is produced at STP? [S = 32; molar volume at STP = 22.4 dm³/mol]</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q10" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">11.2 dm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q10" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">44.8 dm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q10" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">2.24 dm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q10" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">22.4 dm³</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: C — 2.24 dm³</div>
+<div class="explanation">S + O₂ → SO₂. Moles S = 3.2/32 = 0.1 mol. Moles SO₂ = 0.1 mol (1:1 ratio). Volume = 0.1 × 22.4 = 2.24 dm³. Common trap: using the full 22.4 dm³ (for 1 mole), forgetting to scale by 0.1 mol.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q11">
+<div class="q-num">Question 11 of 40</div>
+<div class="q-text">The empirical formula of a compound is CH₂O. Its relative molecular mass is 180. The molecular formula is</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q11" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">C₆H₁₂O₆</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q11" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">CH₂O</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q11" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">C₃H₆O₃</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q11" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">C₂H₄O₂</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — C₆H₁₂O₆</div>
+<div class="explanation">Empirical formula mass of CH₂O = 12 + 2 + 16 = 30. n = RMM / EFM = 180 / 30 = 6. Molecular formula = (CH₂O)₆ = C₆H₁₂O₆ — glucose. The trap: option C (C₂H₄O₂ = acetic acid) has RMM 60, which also divides 180, leading students to pick n=3 → C₃H₆O₃ without checking: (CH₂O)₃ = 90 ≠ 180.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q12">
+<div class="q-num">Question 12 of 40</div>
+<div class="q-text">A gas occupies 560 cm³ at 27 °C and 1.5 atm. What volume will it occupy at STP (0 °C, 1 atm)?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q12" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">560 cm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q12" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">840 cm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q12" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">770 cm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q12" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">420 cm³</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: C — 770 cm³</div>
+<div class="explanation">Combined gas law: P₁V₁/T₁ = P₂V₂/T₂. P₁=1.5, V₁=560, T₁=300 K; P₂=1.0, T₂=273 K. V₂ = (1.5 × 560 × 273) / (1.0 × 300) = 229,320 / 300 = 764.4 ≈ 770 cm³. The trap: forgetting to convert °C to Kelvin (27°C = 300 K, NOT 27 K). Students who leave T in °C get wildly wrong answers.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q13">
+<div class="q-num">Question 13 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;font-family:inherit;">
   <defs>
     <style>
       .hw{stroke:var(--text,#ccc);stroke-width:1.8;fill:none;}
@@ -632,79 +767,185 @@ const QUESTIONS = [
   <text x="100" y="310" class="lbl">White tile</text>
 
   <text x="160" y="330" class="lbl" style="text-anchor:middle;font-size:11px;fill:var(--muted,#888);">Standard acid-base titration setup</text>
-</svg>`,
-    text: 'In the titration setup shown, a student fills the burette with NaOH solution and places HCl in the conical flask with a few drops of phenolphthalein indicator. The end-point is reached when',
-    options: {
-      A: 'The solution in the flask turns colourless from pink',
-      B: 'The solution in the flask turns permanently pink from colourless',
-      C: 'The burette reading reaches exactly 25.00 cm³',
-      D: 'Gas bubbles are visible in the conical flask'
-    },
-    answer: 'B',
-    explanation: 'Phenolphthalein is colourless in acid, pink in alkali. The flask starts with HCl (acid) → indicator is colourless. NaOH is added from the burette. At the equivalence point (neutral/just alkaline), one drop excess NaOH turns the solution permanently pink → end-point. Option A describes the reverse scenario (if alkali were in the flask). Gas bubbles (D) indicate a carbonate reaction — not an HCl/NaOH titration.',
-    /* Level 5/6, Taxonomy: Pragmatic */
-  },
-
-  /* ══════════════════════════════════════════
-     CLUSTER 3: ACIDS, BASES, SALTS & pH
-     Q14–Q19
-  ══════════════════════════════════════════ */
-
-  {
-    id: 14, subject: 'Chemistry',
-    text: 'A buffer solution resists changes in pH when small amounts of acid or base are added. Which mixture produces a buffer solution?',
-    options: {
-      A: '100 cm³ of 0.1 mol/dm³ NaOH + 100 cm³ of 0.1 mol/dm³ HCl',
-      B: '50 cm³ of 0.1 mol/dm³ NaOH + 100 cm³ of 0.1 mol/dm³ CH₃COOH',
-      C: '100 cm³ of 0.1 mol/dm³ NaOH + 50 cm³ of 0.1 mol/dm³ HNO₃',
-      D: '50 cm³ of 0.1 mol/dm³ NH₃ + 50 cm³ of 0.1 mol/dm³ NaOH'
-    },
-    answer: 'B',
-    explanation: 'A buffer requires a weak acid + its conjugate base (or weak base + conjugate acid). Option B: 50 cm³ 0.1M NaOH = 0.005 mol NaOH reacts with 100 cm³ 0.1M CH₃COOH = 0.010 mol acid. NaOH neutralises half the acid → mixture of CH₃COOH (0.005 mol) + CH₃COONa (0.005 mol) = a buffer. A (strong acid + strong base, equimolar) gives NaCl neutral salt. C (excess strong base). D (two bases, no acid).',
-    /* Level 5, Taxonomy: Logical */
-  },
-
-  {
-    id: 15, subject: 'Chemistry',
-    text: 'Concentrated H₂SO₄ acts as an oxidising agent in its reaction with copper. The correct half-equation for sulphuric acid being reduced is',
-    options: {
-      A: 'SO₄²⁻ + 4H⁺ + 2e⁻ → SO₂ + 2H₂O',
-      B: 'H₂SO₄ + 2e⁻ → S + 2OH⁻',
-      C: 'Cu → Cu²⁺ + 2e⁻',
-      D: 'SO₄²⁻ → SO₂ + O²⁻ + 2e⁻'
-    },
-    answer: 'A',
-    explanation: 'When conc. H₂SO₄ oxidises Cu: Cu → Cu²⁺ + 2e⁻ (oxidation at Cu). S in H₂SO₄ is reduced from +6 to +4 (in SO₂): SO₄²⁻ + 4H⁺ + 2e⁻ → SO₂ + 2H₂O. This correctly balances charge and atoms. Option C is the half-equation for Cu (oxidation, not reduction). Option D has the electrons on the wrong side (products) — it would represent oxidation of SO₄²⁻, which is nonsensical.',
-    /* Level 5, Taxonomy: Logical */
-  },
-
-  {
-    id: 16, subject: 'Chemistry',
-    text: 'The pH of a 0.001 mol/dm³ solution of NaOH at 25°C is',
-    options: { A: '3', B: '11', C: '7', D: '1' },
-    answer: 'B',
-    explanation: 'NaOH is a strong base, fully dissociating: [OH⁻] = 0.001 = 10⁻³ mol/dm³. pOH = 3. pH = 14 − pOH = 14 − 3 = 11. Common errors: (a) treating [OH⁻] as [H⁺] → pH = 3 (option A); (b) forgetting that Kw = [H⁺][OH⁻] = 10⁻¹⁴ at 25°C is the link between acid and base pH.',
-    /* Level 2, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 17, subject: 'Chemistry',
-    text: 'Which of the following correctly lists three properties that ALWAYS apply to a Brønsted-Lowry acid?',
-    options: {
-      A: 'Produces H⁺ in water; has pH < 7; contains oxygen',
-      B: 'Donates a proton; has a conjugate base; can be neutral, cationic, or anionic',
-      C: 'Accepts an electron pair; increases [OH⁻]; turns litmus red',
-      D: 'Is a proton donor only in aqueous solution; always contains H'
-    },
-    answer: 'B',
-    explanation: 'Brønsted-Lowry acid: proton (H⁺) DONOR. Every B-L acid has a conjugate base (formed after donating H⁺). B-L acids can be molecules (HCl), cations (NH₄⁺), or anions (HSO₄⁻). Option A: not all acids contain oxygen (HCl, HBr, HF do not). Option C describes a Lewis acid or base (accepting pairs, raising [OH⁻]). Option D: B-L acids act in non-aqueous solvents too — the definition is not restricted to water.',
-    /* Level 3, Taxonomy: Abstract */
-  },
-
-  {
-    id: 18, subject: 'Chemistry',
-    /* DIAGRAM: pH/indicator colour chart for methyl orange, litmus, phenolphthalein */
-    diagramSVG: `<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;font-family:inherit;">
+</svg>
+</div>
+<div class="q-text">In the titration setup shown, a student fills the burette with NaOH solution and places HCl in the conical flask with a few drops of phenolphthalein indicator. The end-point is reached when</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q13" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">The solution in the flask turns permanently pink from colourless</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q13" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Gas bubbles are visible in the conical flask</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q13" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">The burette reading reaches exactly 25.00 cm³</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q13" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">The solution in the flask turns colourless from pink</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — The solution in the flask turns permanently pink from colourless</div>
+<div class="explanation">Phenolphthalein is colourless in acid, pink in alkali. The flask starts with HCl (acid) → indicator is colourless. NaOH is added from the burette. At the equivalence point (neutral/just alkaline), one drop excess NaOH turns the solution permanently pink → end-point. Option A describes the reverse scenario (if alkali were in the flask). Gas bubbles (D) indicate a carbonate reaction — not an HCl/NaOH titration.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q14">
+<div class="q-num">Question 14 of 40</div>
+<div class="q-text">A buffer solution resists changes in pH when small amounts of acid or base are added. Which mixture produces a buffer solution?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q14" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">50 cm³ of 0.1 mol/dm³ NH₃ + 50 cm³ of 0.1 mol/dm³ NaOH</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q14" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">50 cm³ of 0.1 mol/dm³ NaOH + 100 cm³ of 0.1 mol/dm³ CH₃COOH</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q14" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">100 cm³ of 0.1 mol/dm³ NaOH + 50 cm³ of 0.1 mol/dm³ HNO₃</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q14" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">100 cm³ of 0.1 mol/dm³ NaOH + 100 cm³ of 0.1 mol/dm³ HCl</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — 50 cm³ of 0.1 mol/dm³ NaOH + 100 cm³ of 0.1 mol/dm³ CH₃COOH</div>
+<div class="explanation">A buffer requires a weak acid + its conjugate base (or weak base + conjugate acid). Option B: 50 cm³ 0.1M NaOH = 0.005 mol NaOH reacts with 100 cm³ 0.1M CH₃COOH = 0.010 mol acid. NaOH neutralises half the acid → mixture of CH₃COOH (0.005 mol) + CH₃COONa (0.005 mol) = a buffer. A (strong acid + strong base, equimolar) gives NaCl neutral salt. C (excess strong base). D (two bases, no acid).</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q15">
+<div class="q-num">Question 15 of 40</div>
+<div class="q-text">Concentrated H₂SO₄ acts as an oxidising agent in its reaction with copper. The correct half-equation for sulphuric acid being reduced is</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q15" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Cu → Cu²⁺ + 2e⁻</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q15" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">SO₄²⁻ + 4H⁺ + 2e⁻ → SO₂ + 2H₂O</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q15" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">H₂SO₄ + 2e⁻ → S + 2OH⁻</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q15" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">SO₄²⁻ → SO₂ + O²⁻ + 2e⁻</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — SO₄²⁻ + 4H⁺ + 2e⁻ → SO₂ + 2H₂O</div>
+<div class="explanation">When conc. H₂SO₄ oxidises Cu: Cu → Cu²⁺ + 2e⁻ (oxidation at Cu). S in H₂SO₄ is reduced from +6 to +4 (in SO₂): SO₄²⁻ + 4H⁺ + 2e⁻ → SO₂ + 2H₂O. This correctly balances charge and atoms. Option C is the half-equation for Cu (oxidation, not reduction). Option D has the electrons on the wrong side (products) — it would represent oxidation of SO₄²⁻, which is nonsensical.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q16">
+<div class="q-num">Question 16 of 40</div>
+<div class="q-text">The pH of a 0.001 mol/dm³ solution of NaOH at 25°C is</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q16" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">1</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q16" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">7</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q16" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">3</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q16" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">11</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — 11</div>
+<div class="explanation">NaOH is a strong base, fully dissociating: [OH⁻] = 0.001 = 10⁻³ mol/dm³. pOH = 3. pH = 14 − pOH = 14 − 3 = 11. Common errors: (a) treating [OH⁻] as [H⁺] → pH = 3 (option A); (b) forgetting that Kw = [H⁺][OH⁻] = 10⁻¹⁴ at 25°C is the link between acid and base pH.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q17">
+<div class="q-num">Question 17 of 40</div>
+<div class="q-text">Which of the following correctly lists three properties that ALWAYS apply to a Brønsted-Lowry acid?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q17" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Accepts an electron pair; increases [OH⁻]; turns litmus red</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q17" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Donates a proton; has a conjugate base; can be neutral, cationic, or anionic</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q17" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Is a proton donor only in aqueous solution; always contains H</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q17" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Produces H⁺ in water; has pH &lt; 7; contains oxygen</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — Donates a proton; has a conjugate base; can be neutral, cationic, or anionic</div>
+<div class="explanation">Brønsted-Lowry acid: proton (H⁺) DONOR. Every B-L acid has a conjugate base (formed after donating H⁺). B-L acids can be molecules (HCl), cations (NH₄⁺), or anions (HSO₄⁻). Option A: not all acids contain oxygen (HCl, HBr, HF do not). Option C describes a Lewis acid or base (accepting pairs, raising [OH⁻]). Option D: B-L acids act in non-aqueous solvents too — the definition is not restricted to water.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q18">
+<div class="q-num">Question 18 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;font-family:inherit;">
   <defs>
     <style>
       .ph{font-size:11px;fill:var(--text,#ccc);text-anchor:middle;}
@@ -760,70 +1001,152 @@ const QUESTIONS = [
   <text x="372" y="162" class="ph" style="fill:white;">pink/red</text>
 
   <text x="240" y="205" class="title">Transition zones are approximate; JAMB uses standard values above</text>
-</svg>`,
-    text: 'The indicator chart is used for three separate titrations. In which titration is METHYL ORANGE a suitable indicator but PHENOLPHTHALEIN is NOT?',
-    options: {
-      A: 'Strong acid + strong base',
-      B: 'Weak acid + strong base',
-      C: 'Strong acid + weak base',
-      D: 'Weak acid + weak base'
-    },
-    answer: 'C',
-    explanation: 'The indicator must change colour within the steep vertical portion of the titration curve (near the equivalence point). Strong acid + weak base (e.g. HCl + NH₃) has equivalence point at pH ~5 — within methyl orange\'s range (3.1–4.4 transition) but outside phenolphthalein (8.2–10). Phenolphthalein suits weak acid + strong base (equivalence ~9). Both suit strong acid + strong base. No reliable indicator for weak acid + weak base (equivalence at ~7 with a very gradual curve).',
-    /* Level 5, Taxonomy: Logical */
-  },
+</svg>
+</div>
+<div class="q-text">The indicator chart is used for three separate titrations. In which titration is METHYL ORANGE a suitable indicator but PHENOLPHTHALEIN is NOT?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q18" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Weak acid + weak base</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q18" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Weak acid + strong base</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q18" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Strong acid + strong base</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q18" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Strong acid + weak base</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — Strong acid + weak base</div>
+<div class="explanation">The indicator must change colour within the steep vertical portion of the titration curve (near the equivalence point). Strong acid + weak base (e.g. HCl + NH₃) has equivalence point at pH ~5 — within methyl orange&#x27;s range (3.1–4.4 transition) but outside phenolphthalein (8.2–10). Phenolphthalein suits weak acid + strong base (equivalence ~9). Both suit strong acid + strong base. No reliable indicator for weak acid + weak base (equivalence at ~7 with a very gradual curve).</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q19">
+<div class="q-num">Question 19 of 40</div>
+<div class="q-text">Aluminium hydroxide Al(OH)₃ is described as amphoteric. Which pair of equations CORRECTLY shows both its acidic and basic behaviour?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q19" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Al(OH)₃ → Al³⁺ + 3OH⁻  AND  Al(OH)₃ + 3H⁺ → Al³⁺ + 3H₂O</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q19" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Al(OH)₃ + 3HCl → AlCl₃ + 3H₂O  AND  Al(OH)₃ + NaOH → NaAlO₂ + 2H₂O</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q19" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Al(OH)₃ + O₂ → Al₂O₃ + H₂O  AND  Al(OH)₃ + NaOH → Al³⁺ + OH⁻</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q19" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Al(OH)₃ + 3NaOH → Na₃AlO₃ + 3H₂O  AND  Al(OH)₃ + HCl → Al(OH)₂Cl + H₂O</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — Al(OH)₃ + 3HCl → AlCl₃ + 3H₂O  AND  Al(OH)₃ + NaOH → NaAlO₂ + 2H₂O</div>
+<div class="explanation">Amphoteric means reacts with both acids AND bases. Al(OH)₃ + 3HCl → AlCl₃ + 3H₂O (acting as a BASE, neutralising acid). Al(OH)₃ + NaOH → NaAlO₂ (sodium aluminate) + 2H₂O (acting as an ACID, donating protons to the strong base). Option B has incorrect stoichiometry in the second equation. Option C shows only dissociation and acid reaction — no base reaction. This is a classic JAMB &quot;both equations must be balanced&quot; trap.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q20">
+<div class="q-num">Question 20 of 40</div>
+<div class="q-text">In electroplating an iron spoon with silver, the spoon is connected to</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q20" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">The negative terminal (cathode); iron(II) sulphate solution used</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q20" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">The negative terminal (cathode); silver nitrate solution used</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q20" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">The positive terminal (anode); dilute HCl used</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q20" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">The positive terminal (anode); silver nitrate solution used</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — The negative terminal (cathode); silver nitrate solution used</div>
+<div class="explanation">In electroplating, the object to be plated is always the CATHODE (negative electrode) — metal ions are reduced and deposited on it. The electrolyte must contain ions of the plating metal: AgNO₃ for silver plating. The anode is typically made of the plating metal (Ag) to replenish ions. The trap: students confuse which electrode the object goes on, and which electrolyte to use.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q21">
+<div class="q-num">Question 21 of 40</div>
+<div class="q-text">In the reaction: Cl₂ + 2KBr → 2KCl + Br₂
 
-  {
-    id: 19, subject: 'Chemistry',
-    text: 'Aluminium hydroxide Al(OH)₃ is described as amphoteric. Which pair of equations CORRECTLY shows both its acidic and basic behaviour?',
-    options: {
-      A: 'Al(OH)₃ + 3HCl → AlCl₃ + 3H₂O  AND  Al(OH)₃ + NaOH → NaAlO₂ + 2H₂O',
-      B: 'Al(OH)₃ + 3NaOH → Na₃AlO₃ + 3H₂O  AND  Al(OH)₃ + HCl → Al(OH)₂Cl + H₂O',
-      C: 'Al(OH)₃ → Al³⁺ + 3OH⁻  AND  Al(OH)₃ + 3H⁺ → Al³⁺ + 3H₂O',
-      D: 'Al(OH)₃ + O₂ → Al₂O₃ + H₂O  AND  Al(OH)₃ + NaOH → Al³⁺ + OH⁻'
-    },
-    answer: 'A',
-    explanation: 'Amphoteric means reacts with both acids AND bases. Al(OH)₃ + 3HCl → AlCl₃ + 3H₂O (acting as a BASE, neutralising acid). Al(OH)₃ + NaOH → NaAlO₂ (sodium aluminate) + 2H₂O (acting as an ACID, donating protons to the strong base). Option B has incorrect stoichiometry in the second equation. Option C shows only dissociation and acid reaction — no base reaction. This is a classic JAMB "both equations must be balanced" trap.',
-    /* Level 5, Taxonomy: Logical */
-  },
-
-  /* ══════════════════════════════════════════
-     CLUSTER 4: ELECTROCHEMISTRY & REDOX
-     Q20–Q25
-  ══════════════════════════════════════════ */
-
-  {
-    id: 20, subject: 'Chemistry',
-    text: 'In electroplating an iron spoon with silver, the spoon is connected to',
-    options: {
-      A: 'The positive terminal (anode); silver nitrate solution used',
-      B: 'The negative terminal (cathode); silver nitrate solution used',
-      C: 'The negative terminal (cathode); iron(II) sulphate solution used',
-      D: 'The positive terminal (anode); dilute HCl used'
-    },
-    answer: 'B',
-    explanation: 'In electroplating, the object to be plated is always the CATHODE (negative electrode) — metal ions are reduced and deposited on it. The electrolyte must contain ions of the plating metal: AgNO₃ for silver plating. The anode is typically made of the plating metal (Ag) to replenish ions. The trap: students confuse which electrode the object goes on, and which electrolyte to use.',
-    /* Level 2/6, Taxonomy: Administrative */
-  },
-
-  {
-    id: 21, subject: 'Chemistry',
-    text: 'In the reaction: Cl₂ + 2KBr → 2KCl + Br₂\n\nWhich species is OXIDISED and which is REDUCED?',
-    options: {
-      A: 'Cl₂ is oxidised; Br⁻ is reduced',
-      B: 'Br⁻ is oxidised; Cl₂ is reduced',
-      C: 'K⁺ is oxidised; Cl₂ is reduced',
-      D: 'Both Cl₂ and Br⁻ are oxidised'
-    },
-    answer: 'B',
-    explanation: 'Cl₂ (0) → Cl⁻ (−1): gains electrons → REDUCED. Br⁻ (−1) → Br₂ (0): loses electrons → OXIDISED. Cl₂ is the oxidising agent (it causes Br⁻ to be oxidised). This works because Cl is above Br in the activity/halogen reactivity series — a more reactive halogen displaces a less reactive one from its salt. The trap: naming Cl₂ as oxidised because it reacts, or confusing "oxidising agent" with "substance oxidised".',
-    /* Level 3, Taxonomy: Logical */
-  },
-
-  {
-    id: 22, subject: 'Chemistry',
-    /* DIAGRAM: Electrochemical cell — Zn-Cu Daniell cell with labels, salt bridge, voltmeter */
-    diagramSVG: `<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;font-family:inherit;">
+Which species is OXIDISED and which is REDUCED?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q21" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Br⁻ is oxidised; Cl₂ is reduced</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q21" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">K⁺ is oxidised; Cl₂ is reduced</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q21" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Both Cl₂ and Br⁻ are oxidised</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q21" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Cl₂ is oxidised; Br⁻ is reduced</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — Br⁻ is oxidised; Cl₂ is reduced</div>
+<div class="explanation">Cl₂ (0) → Cl⁻ (−1): gains electrons → REDUCED. Br⁻ (−1) → Br₂ (0): loses electrons → OXIDISED. Cl₂ is the oxidising agent (it causes Br⁻ to be oxidised). This works because Cl is above Br in the activity/halogen reactivity series — a more reactive halogen displaces a less reactive one from its salt. The trap: naming Cl₂ as oxidised because it reacts, or confusing &quot;oxidising agent&quot; with &quot;substance oxidised&quot;.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q22">
+<div class="q-num">Question 22 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;font-family:inherit;">
   <defs>
     <style>
       .hw{stroke:var(--text,#ccc);stroke-width:2;fill:none;}
@@ -868,93 +1191,220 @@ const QUESTIONS = [
   <line x1="270" y1="112" x2="270" y2="135" stroke="#6b7280" stroke-width="2"/>
 
   <text x="240" y="255" class="lbl" style="font-size:11px;fill:var(--muted,#888);">Daniell Cell — EMF ≈ 1.10 V</text>
-</svg>`,
-    text: 'In the Daniell cell shown, which of the following correctly identifies the anode and the direction of conventional current flow in the external circuit?',
-    options: {
-      A: 'Zinc is the anode; conventional current flows from Zn to Cu externally',
-      B: 'Copper is the anode; conventional current flows from Cu to Zn externally',
-      C: 'Zinc is the anode; conventional current flows from Cu to Zn externally',
-      D: 'Copper is the cathode; conventional current flows from Zn to Cu externally'
-    },
-    answer: 'C',
-    explanation: 'Zinc is oxidised (loses electrons) → Zn is the ANODE (negative terminal in a galvanic cell). Electrons flow from Zn → Cu through the external wire (electron flow). Conventional current is OPPOSITE to electron flow → conventional current flows from Cu (positive/cathode) to Zn (negative/anode) externally. Options A and D confuse conventional current direction with electron flow. The distinction is classic JAMB.',
-    /* Level 5, Taxonomy: Logical */
-  },
-
-  {
-    id: 23, subject: 'Chemistry',
-    text: 'What mass of copper is deposited when a current of 2 A is passed through CuSO₄ solution for 32 minutes and 10 seconds? [Cu = 63.5; F = 96 500 C/mol]',
-    options: { A: '1.27 g', B: '2.54 g', C: '0.635 g', D: '3.175 g' },
-    answer: 'A',
-    explanation: 'Time = 32×60 + 10 = 1930 s. Charge = I × t = 2 × 1930 = 3860 C. Cu²⁺ + 2e⁻ → Cu (n=2). Moles e⁻ = 3860/96500 = 0.04 mol. Moles Cu = 0.04/2 = 0.02 mol. Mass = 0.02 × 63.5 = 1.27 g. Trap: forgetting the 2-electron transfer for Cu²⁺ (using n=1 gives 2.54 g, option B).',
-    /* Level 5, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 24, subject: 'Chemistry',
-    text: 'Which of the following is the CORRECT standard electrode potential for the Zn²⁺/Zn half-cell, and what does a NEGATIVE value signify?',
-    options: {
-      A: 'E° = +0.76 V; Zn tends to gain electrons (be reduced) under standard conditions',
-      B: 'E° = −0.76 V; Zn tends to lose electrons (be oxidised) relative to the standard hydrogen electrode',
-      C: 'E° = −0.76 V; Zn is a non-metal and does not conduct electricity',
-      D: 'E° = +0.34 V; Zn²⁺ has greater affinity for electrons than Cu²⁺'
-    },
-    answer: 'B',
-    explanation: 'E°(Zn²⁺/Zn) = −0.76 V by convention (relative to SHE = 0.00 V). A NEGATIVE E° means the metal tends to be OXIDISED (lose electrons) — it is a better reducing agent than H₂. Zn sits below H₂ in reducing power. +0.34 V is E° for Cu²⁺/Cu (option D). The Daniell cell EMF = E°(cathode) − E°(anode) = +0.34 − (−0.76) = +1.10 V.',
-    /* Level 5, Taxonomy: Abstract */
-  },
-
-  {
-    id: 25, subject: 'Chemistry',
-    text: 'Iron rusts in the presence of both water and oxygen, but NOT in water alone or oxygen alone. This suggests that rusting is',
-    options: {
-      A: 'A thermal decomposition reaction',
-      B: 'An electrochemical process requiring both an oxidising agent and an electrolyte',
-      C: 'A physical process caused by temperature changes',
-      D: 'A simple acid-base reaction'
-    },
-    answer: 'B',
-    explanation: 'Rusting is an electrochemical corrosion process. Water acts as the electrolyte (ion conductor), and O₂ is the oxidising agent at the cathodic regions. Without both, the electrochemical circuit cannot be completed. The overall reaction: 4Fe + 3O₂ + 2xH₂O → 2Fe₂O₃·xH₂O (rust). The requirement for BOTH confirms the electrochemical nature — neither substance alone suffices.',
-    /* Level 7, Taxonomy: Pragmatic */
-  },
-
-  /* ══════════════════════════════════════════
-     CLUSTER 5: ORGANIC CHEMISTRY
-     Q26–Q33
-  ══════════════════════════════════════════ */
-
-  {
-    id: 26, subject: 'Chemistry',
-    text: 'Which of the following is the structural formula for 2-methylbut-1-ene?',
-    options: {
-      A: 'CH₂=CH–CH₂–CH₂–CH₃',
-      B: 'CH₂=C(CH₃)–CH₂–CH₃',
-      C: 'CH₃–CH=CH–CH₂–CH₃',
-      D: '(CH₃)₂C=CH–CH₃'
-    },
-    answer: 'B',
-    explanation: '2-methylbut-1-ene: parent chain = but-1-ene (4 carbons, double bond at C1); methyl branch at C2. Structure: CH₂=C(CH₃)–CH₂–CH₃. Option A is pent-1-ene (no methyl branch). Option C is pent-2-ene. Option D is 2-methylbut-2-ene (double bond at C2, not C1). IUPAC naming is tested heavily; the position of both the double bond AND the branch must be correct.',
-    /* Level 3, Taxonomy: Administrative */
-  },
-
-  {
-    id: 27, subject: 'Chemistry',
-    text: 'Ethanol reacts with ethanoic acid in the presence of a small amount of concentrated H₂SO₄ to produce ethyl ethanoate. This reaction is an example of',
-    options: {
-      A: 'Addition reaction',
-      B: 'Esterification (condensation reaction)',
-      C: 'Saponification',
-      D: 'Substitution reaction'
-    },
-    answer: 'B',
-    explanation: 'Esterification: alcohol + carboxylic acid ⇌ ester + water. It is a condensation reaction because a small molecule (H₂O) is eliminated. H₂SO₄ is the dehydrating catalyst, shifts equilibrium and speeds the reaction. The reaction is reversible — hydrolysis of the ester (with water) is the reverse. Saponification is base hydrolysis of an ester; addition and substitution describe different reaction types.',
-    /* Level 2/3, Taxonomy: Administrative */
-  },
-
-  {
-    id: 28, subject: 'Chemistry',
-    /* DIAGRAM: Structural formulas of 4 organic molecules for identification */
-    diagramSVG: `<svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;font-family:inherit;">
+</svg>
+</div>
+<div class="q-text">In the Daniell cell shown, which of the following correctly identifies the anode and the direction of conventional current flow in the external circuit?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q22" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Copper is the anode; conventional current flows from Cu to Zn externally</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q22" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Zinc is the anode; conventional current flows from Zn to Cu externally</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q22" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Zinc is the anode; conventional current flows from Cu to Zn externally</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q22" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Copper is the cathode; conventional current flows from Zn to Cu externally</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: C — Zinc is the anode; conventional current flows from Cu to Zn externally</div>
+<div class="explanation">Zinc is oxidised (loses electrons) → Zn is the ANODE (negative terminal in a galvanic cell). Electrons flow from Zn → Cu through the external wire (electron flow). Conventional current is OPPOSITE to electron flow → conventional current flows from Cu (positive/cathode) to Zn (negative/anode) externally. Options A and D confuse conventional current direction with electron flow. The distinction is classic JAMB.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q23">
+<div class="q-num">Question 23 of 40</div>
+<div class="q-text">What mass of copper is deposited when a current of 2 A is passed through CuSO₄ solution for 32 minutes and 10 seconds? [Cu = 63.5; F = 96 500 C/mol]</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q23" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">2.54 g</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q23" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">3.175 g</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q23" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">1.27 g</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q23" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">0.635 g</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: C — 1.27 g</div>
+<div class="explanation">Time = 32×60 + 10 = 1930 s. Charge = I × t = 2 × 1930 = 3860 C. Cu²⁺ + 2e⁻ → Cu (n=2). Moles e⁻ = 3860/96500 = 0.04 mol. Moles Cu = 0.04/2 = 0.02 mol. Mass = 0.02 × 63.5 = 1.27 g. Trap: forgetting the 2-electron transfer for Cu²⁺ (using n=1 gives 2.54 g, option B).</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q24">
+<div class="q-num">Question 24 of 40</div>
+<div class="q-text">Which of the following is the CORRECT standard electrode potential for the Zn²⁺/Zn half-cell, and what does a NEGATIVE value signify?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q24" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">E° = +0.76 V; Zn tends to gain electrons (be reduced) under standard conditions</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q24" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">E° = −0.76 V; Zn tends to lose electrons (be oxidised) relative to the standard hydrogen electrode</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q24" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">E° = +0.34 V; Zn²⁺ has greater affinity for electrons than Cu²⁺</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q24" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">E° = −0.76 V; Zn is a non-metal and does not conduct electricity</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — E° = −0.76 V; Zn tends to lose electrons (be oxidised) relative to the standard hydrogen electrode</div>
+<div class="explanation">E°(Zn²⁺/Zn) = −0.76 V by convention (relative to SHE = 0.00 V). A NEGATIVE E° means the metal tends to be OXIDISED (lose electrons) — it is a better reducing agent than H₂. Zn sits below H₂ in reducing power. +0.34 V is E° for Cu²⁺/Cu (option D). The Daniell cell EMF = E°(cathode) − E°(anode) = +0.34 − (−0.76) = +1.10 V.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q25">
+<div class="q-num">Question 25 of 40</div>
+<div class="q-text">Iron rusts in the presence of both water and oxygen, but NOT in water alone or oxygen alone. This suggests that rusting is</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q25" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">A physical process caused by temperature changes</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q25" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">A thermal decomposition reaction</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q25" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">A simple acid-base reaction</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q25" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">An electrochemical process requiring both an oxidising agent and an electrolyte</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — An electrochemical process requiring both an oxidising agent and an electrolyte</div>
+<div class="explanation">Rusting is an electrochemical corrosion process. Water acts as the electrolyte (ion conductor), and O₂ is the oxidising agent at the cathodic regions. Without both, the electrochemical circuit cannot be completed. The overall reaction: 4Fe + 3O₂ + 2xH₂O → 2Fe₂O₃·xH₂O (rust). The requirement for BOTH confirms the electrochemical nature — neither substance alone suffices.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q26">
+<div class="q-num">Question 26 of 40</div>
+<div class="q-text">Which of the following is the structural formula for 2-methylbut-1-ene?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q26" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">CH₃–CH=CH–CH₂–CH₃</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q26" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">CH₂=CH–CH₂–CH₂–CH₃</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q26" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">(CH₃)₂C=CH–CH₃</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q26" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">CH₂=C(CH₃)–CH₂–CH₃</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — CH₂=C(CH₃)–CH₂–CH₃</div>
+<div class="explanation">2-methylbut-1-ene: parent chain = but-1-ene (4 carbons, double bond at C1); methyl branch at C2. Structure: CH₂=C(CH₃)–CH₂–CH₃. Option A is pent-1-ene (no methyl branch). Option C is pent-2-ene. Option D is 2-methylbut-2-ene (double bond at C2, not C1). IUPAC naming is tested heavily; the position of both the double bond AND the branch must be correct.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q27">
+<div class="q-num">Question 27 of 40</div>
+<div class="q-text">Ethanol reacts with ethanoic acid in the presence of a small amount of concentrated H₂SO₄ to produce ethyl ethanoate. This reaction is an example of</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q27" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Substitution reaction</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q27" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Addition reaction</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q27" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Esterification (condensation reaction)</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q27" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Saponification</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: C — Esterification (condensation reaction)</div>
+<div class="explanation">Esterification: alcohol + carboxylic acid ⇌ ester + water. It is a condensation reaction because a small molecule (H₂O) is eliminated. H₂SO₄ is the dehydrating catalyst, shifts equilibrium and speeds the reaction. The reaction is reversible — hydrolysis of the ester (with water) is the reverse. Saponification is base hydrolysis of an ester; addition and substitution describe different reaction types.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q28">
+<div class="q-num">Question 28 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;font-family:inherit;">
   <defs>
     <style>
       .bond{stroke:var(--text,#ccc);stroke-width:2;fill:none;}
@@ -1018,79 +1468,185 @@ const QUESTIONS = [
   <text x="360" y="200" class="sub">Propanone</text>
 
   <text x="250" y="248" class="lbl" style="font-size:11px;fill:var(--muted,#555);">Identify the molecule that undergoes iodoform reaction</text>
-</svg>`,
-    text: 'From the four structural formulas shown, which compound gives a POSITIVE iodoform test (yellow precipitate of CHI₃ with I₂/NaOH)?',
-    options: {
-      A: 'Compound A (propan-1-ol)',
-      B: 'Compound B (propanal)',
-      C: 'Compound C (propanoic acid)',
-      D: 'Compound D (propanone)'
-    },
-    answer: 'D',
-    explanation: 'The iodoform test is positive for: methyl ketones (CH₃CO–), acetaldehyde (CH₃CHO), and secondary alcohols that can be oxidised to methyl ketones (e.g. propan-2-ol → propanone). Propanone (D) is a methyl ketone → CHI₃ (yellow precipitate). Propanal (B) lacks the methyl carbonyl group. Propanoic acid (C) does not react. Propan-1-ol (A) oxidises to propanal, not a methyl ketone. Only methyl ketones and CH₃CHO test positive.',
-    /* Level 5, Taxonomy: Logical */
-  },
-
-  {
-    id: 29, subject: 'Chemistry',
-    text: 'Butan-2-ol is treated with excess acidified K₂Cr₂O₇. The product and the type of oxidation are',
-    options: {
-      A: 'Butanal; primary alcohol oxidation',
-      B: 'Butanone; secondary alcohol oxidation',
-      C: 'Butanoic acid; tertiary alcohol oxidation',
-      D: 'But-2-ene; dehydration'
-    },
-    answer: 'B',
-    explanation: 'Butan-2-ol is a SECONDARY alcohol (–OH on C2, two carbons attached to the same carbon). Secondary alcohols are oxidised to KETONES by K₂Cr₂O₇/H⁺: butan-2-ol → butanone (CH₃COCH₂CH₃). Primary alcohols → aldehydes (then acids with excess oxidant). Tertiary alcohols RESIST oxidation entirely. Dehydration requires H₃PO₄ or H₂SO₄ as catalyst, not K₂Cr₂O₇.',
-    /* Level 5, Taxonomy: Logical */
-  },
-
-  {
-    id: 30, subject: 'Chemistry',
-    text: 'Nylon-6,6 is produced by condensation polymerisation. The two monomers and the type of linkage formed are',
-    options: {
-      A: 'Ethene + propene; C–C bond',
-      B: 'Hexane-1,6-dioic acid + hexane-1,6-diamine; amide bond (peptide linkage)',
-      C: 'Glucose + fructose; glycosidic bond',
-      D: 'Styrene + butadiene; ester bond'
-    },
-    answer: 'B',
-    explanation: 'Nylon-6,6: hexanedioic acid (adipic acid, 6C) + hexanediamine (6C) → polyamide via –CO–NH– (amide/peptide bond) with elimination of H₂O. The "6,6" indicates 6 carbons in each monomer. Ethene/propene form addition polymers (C–C). Glucose + fructose give sucrose (disaccharide). Styrene/butadiene form SBR rubber (addition). Condensation polymerisation always involves elimination of a small molecule (H₂O or HCl).',
-    /* Level 3/7, Taxonomy: Administrative */
-  },
-
-  {
-    id: 31, subject: 'Chemistry',
-    text: 'A compound with molecular formula C₄H₈ could be which pair of structural isomers?',
-    options: {
-      A: 'But-1-ene and cyclobutane',
-      B: 'Butane and isobutane',
-      C: 'But-1-yne and but-2-yne',
-      D: 'Butan-1-ol and diethyl ether'
-    },
-    answer: 'A',
-    explanation: 'C₄H₈ has degree of unsaturation = (2×4 + 2 − 8)/2 = 1. One degree = one double bond OR one ring. But-1-ene (CH₂=CHCH₂CH₃) has a double bond. Cyclobutane has a ring. Both are structural isomers with formula C₄H₈. Butane/isobutane are C₄H₁₀ (alkanes). But-1-yne/but-2-yne are C₄H₆ (alkynes, degree of unsaturation = 2). Butan-1-ol is C₄H₁₀O.',
-    /* Level 4, Taxonomy: Logical */
-  },
-
-  {
-    id: 32, subject: 'Chemistry',
-    text: 'In the addition polymerisation of chloroethene (vinyl chloride), the repeat unit of the polymer PVC is',
-    options: {
-      A: '–[CH₂–CH₂]n–',
-      B: '–[CHCl–CH₂]n–',
-      C: '–[CCl₂–CH₂]n–',
-      D: '–[CH₂–CCl₂]n–'
-    },
-    answer: 'B',
-    explanation: 'Chloroethene monomer: CH₂=CHCl. Addition polymerisation opens the double bond: –[CH₂–CHCl]n– = –[CHCl–CH₂]n–. Each repeat unit has one Cl atom. Option A is polyethene (ethene monomer). Options C and D have two Cl atoms per unit (would be from 1,1-dichloroethene). The structure is written with the substituted carbon first (CHCl) then CH₂, but both B representations are the same unit.',
-    /* Level 2, Taxonomy: Abstract */
-  },
-
-  {
-    id: 33, subject: 'Chemistry',
-    /* DIAGRAM: Activity series showing Na, Mg, Al, Zn, Fe, Sn, Pb, H, Cu, Ag with displacement */
-    diagramSVG: `<svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;font-family:inherit;">
+</svg>
+</div>
+<div class="q-text">From the four structural formulas shown, which compound gives a POSITIVE iodoform test (yellow precipitate of CHI₃ with I₂/NaOH)?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q28" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Compound A (propan-1-ol)</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q28" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Compound D (propanone)</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q28" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Compound B (propanal)</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q28" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Compound C (propanoic acid)</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — Compound D (propanone)</div>
+<div class="explanation">The iodoform test is positive for: methyl ketones (CH₃CO–), acetaldehyde (CH₃CHO), and secondary alcohols that can be oxidised to methyl ketones (e.g. propan-2-ol → propanone). Propanone (D) is a methyl ketone → CHI₃ (yellow precipitate). Propanal (B) lacks the methyl carbonyl group. Propanoic acid (C) does not react. Propan-1-ol (A) oxidises to propanal, not a methyl ketone. Only methyl ketones and CH₃CHO test positive.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q29">
+<div class="q-num">Question 29 of 40</div>
+<div class="q-text">Butan-2-ol is treated with excess acidified K₂Cr₂O₇. The product and the type of oxidation are</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q29" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Butanal; primary alcohol oxidation</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q29" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Butanone; secondary alcohol oxidation</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q29" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Butanoic acid; tertiary alcohol oxidation</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q29" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">But-2-ene; dehydration</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — Butanone; secondary alcohol oxidation</div>
+<div class="explanation">Butan-2-ol is a SECONDARY alcohol (–OH on C2, two carbons attached to the same carbon). Secondary alcohols are oxidised to KETONES by K₂Cr₂O₇/H⁺: butan-2-ol → butanone (CH₃COCH₂CH₃). Primary alcohols → aldehydes (then acids with excess oxidant). Tertiary alcohols RESIST oxidation entirely. Dehydration requires H₃PO₄ or H₂SO₄ as catalyst, not K₂Cr₂O₇.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q30">
+<div class="q-num">Question 30 of 40</div>
+<div class="q-text">Nylon-6,6 is produced by condensation polymerisation. The two monomers and the type of linkage formed are</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q30" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Styrene + butadiene; ester bond</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q30" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Glucose + fructose; glycosidic bond</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q30" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Ethene + propene; C–C bond</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q30" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Hexane-1,6-dioic acid + hexane-1,6-diamine; amide bond (peptide linkage)</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — Hexane-1,6-dioic acid + hexane-1,6-diamine; amide bond (peptide linkage)</div>
+<div class="explanation">Nylon-6,6: hexanedioic acid (adipic acid, 6C) + hexanediamine (6C) → polyamide via –CO–NH– (amide/peptide bond) with elimination of H₂O. The &quot;6,6&quot; indicates 6 carbons in each monomer. Ethene/propene form addition polymers (C–C). Glucose + fructose give sucrose (disaccharide). Styrene/butadiene form SBR rubber (addition). Condensation polymerisation always involves elimination of a small molecule (H₂O or HCl).</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q31">
+<div class="q-num">Question 31 of 40</div>
+<div class="q-text">A compound with molecular formula C₄H₈ could be which pair of structural isomers?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q31" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Butan-1-ol and diethyl ether</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q31" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">But-1-yne and but-2-yne</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q31" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Butane and isobutane</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q31" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">But-1-ene and cyclobutane</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — But-1-ene and cyclobutane</div>
+<div class="explanation">C₄H₈ has degree of unsaturation = (2×4 + 2 − 8)/2 = 1. One degree = one double bond OR one ring. But-1-ene (CH₂=CHCH₂CH₃) has a double bond. Cyclobutane has a ring. Both are structural isomers with formula C₄H₈. Butane/isobutane are C₄H₁₀ (alkanes). But-1-yne/but-2-yne are C₄H₆ (alkynes, degree of unsaturation = 2). Butan-1-ol is C₄H₁₀O.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q32">
+<div class="q-num">Question 32 of 40</div>
+<div class="q-text">In the addition polymerisation of chloroethene (vinyl chloride), the repeat unit of the polymer PVC is</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q32" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">–[CHCl–CH₂]n–</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q32" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">–[CH₂–CCl₂]n–</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q32" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">–[CH₂–CH₂]n–</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q32" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">–[CCl₂–CH₂]n–</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — –[CHCl–CH₂]n–</div>
+<div class="explanation">Chloroethene monomer: CH₂=CHCl. Addition polymerisation opens the double bond: –[CH₂–CHCl]n– = –[CHCl–CH₂]n–. Each repeat unit has one Cl atom. Option A is polyethene (ethene monomer). Options C and D have two Cl atoms per unit (would be from 1,1-dichloroethene). The structure is written with the substituted carbon first (CHCl) then CH₂, but both B representations are the same unit.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q33">
+<div class="q-num">Question 33 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;font-family:inherit;">
   <defs>
     <style>
       .row{font-size:13px;fill:var(--text,#e0e0e0);}
@@ -1139,79 +1695,190 @@ const QUESTIONS = [
   <line x1="440" y1="230" x2="460" y2="230" stroke="#f87171" stroke-width="1.5"/>
   <line x1="460" y1="155" x2="460" y2="230" stroke="#f87171" stroke-width="1.5"/>
   <text x="470" y="196" class="muted" style="fill:#f87171;font-size:10px;">✗</text>
-</svg>`,
-    text: 'From the activity series shown, which of the following reactions WILL occur?',
-    options: {
-      A: 'Copper displaces zinc from ZnSO₄ solution',
-      B: 'Silver displaces iron from FeSO₄ solution',
-      C: 'Zinc displaces copper from CuSO₄ solution',
-      D: 'Iron displaces magnesium from MgCl₂ solution'
-    },
-    answer: 'C',
-    explanation: 'A more reactive metal displaces a LESS reactive one from aqueous salt solutions. From the series: Zn > Cu (Zn is above Cu) → Zn + CuSO₄ → ZnSO₄ + Cu ✓. Copper is BELOW zinc and silver is below iron — neither can displace the metal above it. Iron is below magnesium — cannot displace Mg. This is a direct activity series application; the diagram confirms Zn > Cu.',
-    /* Level 4, Taxonomy: Logical */
-  },
+</svg>
+</div>
+<div class="q-text">From the activity series shown, which of the following reactions WILL occur?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q33" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Silver displaces iron from FeSO₄ solution</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q33" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Zinc displaces copper from CuSO₄ solution</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q33" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Copper displaces zinc from ZnSO₄ solution</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q33" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Iron displaces magnesium from MgCl₂ solution</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — Zinc displaces copper from CuSO₄ solution</div>
+<div class="explanation">A more reactive metal displaces a LESS reactive one from aqueous salt solutions. From the series: Zn &gt; Cu (Zn is above Cu) → Zn + CuSO₄ → ZnSO₄ + Cu ✓. Copper is BELOW zinc and silver is below iron — neither can displace the metal above it. Iron is below magnesium — cannot displace Mg. This is a direct activity series application; the diagram confirms Zn &gt; Cu.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q34">
+<div class="q-num">Question 34 of 40</div>
+<div class="q-text">For a first-order reaction, doubling the concentration of the reactant will</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q34" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Have no effect on the rate</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q34" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Quadruple the rate</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q34" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Halve the rate</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q34" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Double the rate</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — Double the rate</div>
+<div class="explanation">For a first-order reaction: rate = k[A]¹. If [A] doubles: new rate = k(2[A]) = 2k[A] = 2 × original rate. Doubling concentration doubles the rate. For second-order (rate ∝ [A]²), doubling concentration quadruples the rate. Zero-order reactions are unaffected. First-order vs second-order behaviour is a very common JAMB MCQ distinction.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q35">
+<div class="q-num">Question 35 of 40</div>
+<div class="q-text">In the Haber process: N₂(g) + 3H₂(g) ⇌ 2NH₃(g)  ΔH = −92 kJ/mol
 
-  /* ══════════════════════════════════════════
-     CLUSTER 6: RATES, EQUILIBRIUM & ENERGY
-     Q34–Q38
-  ══════════════════════════════════════════ */
+Which set of conditions gives the HIGHEST equilibrium yield of NH₃?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q35" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Low temperature, low pressure</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q35" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Low temperature, high pressure</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q35" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">High temperature, low pressure</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q35" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">High temperature, high pressure</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — Low temperature, high pressure</div>
+<div class="explanation">Le Chatelier&#x27;s principle: the reaction is exothermic (ΔH &lt; 0) → lowering temperature shifts equilibrium RIGHT (more NH₃). The forward reaction reduces moles of gas (4 → 2) → increasing pressure shifts equilibrium RIGHT. So low T + high P maximises equilibrium yield. In practice, 450°C is a compromise because low T gives too slow a rate. The question asks for equilibrium YIELD, not rate — always C in theory.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q36">
+<div class="q-num">Question 36 of 40</div>
+<div class="q-text">Use the following bond energies (kJ/mol) to calculate ΔH for the reaction:
+H₂(g) + Cl₂(g) → 2HCl(g)
 
-  {
-    id: 34, subject: 'Chemistry',
-    text: 'For a first-order reaction, doubling the concentration of the reactant will',
-    options: {
-      A: 'Double the rate',
-      B: 'Quadruple the rate',
-      C: 'Have no effect on the rate',
-      D: 'Halve the rate'
-    },
-    answer: 'A',
-    explanation: 'For a first-order reaction: rate = k[A]¹. If [A] doubles: new rate = k(2[A]) = 2k[A] = 2 × original rate. Doubling concentration doubles the rate. For second-order (rate ∝ [A]²), doubling concentration quadruples the rate. Zero-order reactions are unaffected. First-order vs second-order behaviour is a very common JAMB MCQ distinction.',
-    /* Level 3, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 35, subject: 'Chemistry',
-    text: 'In the Haber process: N₂(g) + 3H₂(g) ⇌ 2NH₃(g)  ΔH = −92 kJ/mol\n\nWhich set of conditions gives the HIGHEST equilibrium yield of NH₃?',
-    options: {
-      A: 'High temperature, high pressure',
-      B: 'Low temperature, low pressure',
-      C: 'Low temperature, high pressure',
-      D: 'High temperature, low pressure'
-    },
-    answer: 'C',
-    explanation: 'Le Chatelier\'s principle: the reaction is exothermic (ΔH < 0) → lowering temperature shifts equilibrium RIGHT (more NH₃). The forward reaction reduces moles of gas (4 → 2) → increasing pressure shifts equilibrium RIGHT. So low T + high P maximises equilibrium yield. In practice, 450°C is a compromise because low T gives too slow a rate. The question asks for equilibrium YIELD, not rate — always C in theory.',
-    /* Level 3, Taxonomy: Logical */
-  },
-
-  {
-    id: 36, subject: 'Chemistry',
-    text: 'Use the following bond energies (kJ/mol) to calculate ΔH for the reaction:\nH₂(g) + Cl₂(g) → 2HCl(g)\n\n[H–H = 436; Cl–Cl = 242; H–Cl = 431]',
-    options: { A: '−184 kJ', B: '+184 kJ', C: '−247 kJ', D: '+247 kJ' },
-    answer: 'A',
-    explanation: 'ΔH = Σ(bonds broken) − Σ(bonds formed). Bonds broken: H–H (436) + Cl–Cl (242) = 678 kJ. Bonds formed: 2 × H–Cl = 2 × 431 = 862 kJ. ΔH = 678 − 862 = −184 kJ. Exothermic: more energy released in forming products than absorbed in breaking reactants. Common error: reversing the formula (formed − broken) or forgetting the coefficient of 2 for HCl.',
-    /* Level 2, Taxonomy: Mathematical */
-  },
-
-  {
-    id: 37, subject: 'Chemistry',
-    text: 'A catalyst increases reaction rate WITHOUT being consumed. It achieves this by',
-    options: {
-      A: 'Increasing the temperature of the reaction mixture',
-      B: 'Providing an alternative reaction pathway with a LOWER activation energy',
-      C: 'Increasing the concentration of reactants',
-      D: 'Shifting the equilibrium position to the right'
-    },
-    answer: 'B',
-    explanation: 'A catalyst lowers the activation energy (Eₐ) by providing an alternative mechanistic pathway. More reactant molecules exceed the lower Eₐ → faster rate. The catalyst is regenerated. Crucially, a catalyst does NOT shift the equilibrium position — it speeds up BOTH forward and reverse reactions equally, reaching equilibrium faster but not changing Kc or the final yield. Options A, C, D are ways to change rate/yield without a catalyst.',
-    /* Level 3, Taxonomy: Abstract */
-  },
-
-  {
-    id: 38, subject: 'Chemistry',
-    /* DIAGRAM: Fractional distillation column with fractions labelled at different heights */
-    diagramSVG: `<svg viewBox="0 0 360 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:360px;font-family:inherit;">
+[H–H = 436; Cl–Cl = 242; H–Cl = 431]</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q36" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">−184 kJ</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q36" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">−247 kJ</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q36" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">+247 kJ</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q36" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">+184 kJ</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — −184 kJ</div>
+<div class="explanation">ΔH = Σ(bonds broken) − Σ(bonds formed). Bonds broken: H–H (436) + Cl–Cl (242) = 678 kJ. Bonds formed: 2 × H–Cl = 2 × 431 = 862 kJ. ΔH = 678 − 862 = −184 kJ. Exothermic: more energy released in forming products than absorbed in breaking reactants. Common error: reversing the formula (formed − broken) or forgetting the coefficient of 2 for HCl.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q37">
+<div class="q-num">Question 37 of 40</div>
+<div class="q-text">A catalyst increases reaction rate WITHOUT being consumed. It achieves this by</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q37" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Providing an alternative reaction pathway with a LOWER activation energy</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q37" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Increasing the concentration of reactants</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q37" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Shifting the equilibrium position to the right</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q37" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Increasing the temperature of the reaction mixture</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — Providing an alternative reaction pathway with a LOWER activation energy</div>
+<div class="explanation">A catalyst lowers the activation energy (Eₐ) by providing an alternative mechanistic pathway. More reactant molecules exceed the lower Eₐ → faster rate. The catalyst is regenerated. Crucially, a catalyst does NOT shift the equilibrium position — it speeds up BOTH forward and reverse reactions equally, reaching equilibrium faster but not changing Kc or the final yield. Options A, C, D are ways to change rate/yield without a catalyst.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q38">
+<div class="q-num">Question 38 of 40</div>
+<div class="q-diagram">
+<svg viewBox="0 0 360 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:360px;font-family:inherit;">
   <defs>
     <style>
       .hw{stroke:var(--text,#ccc);stroke-width:2;fill:none;}
@@ -1265,419 +1932,117 @@ const QUESTIONS = [
   <text x="160" y="395" class="lbl" style="text-anchor:middle;font-size:11px;fill:var(--muted,#888);">← hot                 cold →</text>
 
   <text x="180" y="18" class="lbl" style="text-anchor:middle;font-size:12px;fill:var(--muted,#888);">Fractionating Column</text>
-</svg>`,
-    text: 'From the fractional distillation column shown, which fraction has the LOWEST boiling point, the SHORTEST carbon chain, and the HIGHEST flammability?',
-    options: {
-      A: 'Kerosene',
-      B: 'Diesel',
-      C: 'Refinery gas',
-      D: 'Fuel oil'
-    },
-    answer: 'C',
-    explanation: 'Refinery gas (C₁–C₄ alkanes: methane, ethane, propane, butane) exits at the TOP of the column (coldest, ~20°C) — it has the LOWEST boiling point and shortest carbon chain. Short chains = weak van der Waals forces = low bp. They are highly flammable (propane/butane are sold as LPG fuel). Kerosene (C₁₀–C₁₆) and diesel (C₁₄–C₂₀) condense lower in the column. Fuel oil has long chains and high viscosity.',
-    /* Level 4/7, Taxonomy: Pragmatic */
-  },
-
-  /* ══════════════════════════════════════════
-     CLUSTER 7: ENVIRONMENTAL & INDUSTRIAL
-     Q39–Q40
-  ══════════════════════════════════════════ */
-
-  {
-    id: 39, subject: 'Chemistry',
-    text: 'In the Contact process for manufacturing sulphuric acid, sulphur trioxide (SO₃) is NOT dissolved directly in water. Instead it is absorbed by concentrated H₂SO₄ to form oleum (H₂S₂O₇), which is then diluted. The reason for this is',
-    options: {
-      A: 'SO₃ does not react with water at all',
-      B: 'Direct absorption in water produces an uncontrollable acidic mist that is difficult to condense',
-      C: 'Oleum has a lower sulphuric acid content than the direct product',
-      D: 'Concentrated H₂SO₄ acts as a catalyst for the reaction'
-    },
-    answer: 'B',
-    explanation: 'SO₃ + H₂O → H₂SO₄ is highly exothermic. Adding SO₃ directly to water produces a fine acid mist (aerosol) that cannot be condensed and would escape into the atmosphere as a pollutant. Absorbing SO₃ into conc. H₂SO₄ instead gives oleum (H₂S₂O₇) smoothly: SO₃ + H₂SO₄ → H₂S₂O₇. Oleum is then carefully diluted with water to give 98% H₂SO₄. This is a standard JAMB industrial chemistry procedure question.',
-    /* Level 7, Taxonomy: Pragmatic */
-  },
-
-  {
-    id: 40, subject: 'Chemistry',
-    text: 'Hard water contains dissolved Ca²⁺ and Mg²⁺ ions. Permanent hardness (caused by Ca²⁺/Mg²⁺ sulphates) can be removed by',
-    options: {
-      A: 'Boiling the water',
-      B: 'Adding washing soda (Na₂CO₃)',
-      C: 'Filtering through sand',
-      D: 'Adding slaked lime Ca(OH)₂'
-    },
-    answer: 'B',
-    explanation: 'PERMANENT hardness (sulphate salts) is NOT removed by boiling — only TEMPORARY hardness (bicarbonate salts) is. Adding Na₂CO₃ (washing soda) precipitates Ca²⁺ and Mg²⁺ as insoluble carbonates: Ca²⁺ + CO₃²⁻ → CaCO₃↓, removing the ions and softening the water. Slaked lime (D) removes temporary hardness (Clark\'s method). Sand filtration removes suspended solids, not dissolved ions. This is the most-tested water-treatment distinction in JAMB.',
-    /* Level 7, Taxonomy: Pragmatic */
-  },
-
-];
-</script>
-
-<!-- ═══ SCORE SCREEN ═══ -->
-<div id="scoreScreen">
-  <p class="score-label">Your Score</p>
-  <div class="score-circle">
-    <span class="score-number" id="sFinal">0/40</span>
-  </div>
-  <div class="score-pct" id="sPct">0%</div>
-  <div class="score-breakdown">
-    <div class="score-item score-correct">
-      <div class="score-item-val" id="sCorrect">0</div>
-      <div class="score-item-lbl">Correct</div>
-    </div>
-    <div class="score-item score-wrong">
-      <div class="score-item-val" id="sWrong">0</div>
-      <div class="score-item-lbl">Wrong</div>
-    </div>
-    <div class="score-item">
-      <div class="score-item-val" id="sUnanswered">0</div>
-      <div class="score-item-lbl">Skipped</div>
-    </div>
-  </div>
-  <button class="btn btn-primary" id="reviewBtn">Review Answers</button>
+</svg>
 </div>
-
-<!-- ═══ MAIN CONTENT ═══ -->
-<div id="mainContent">
-
-<!-- Header -->
-<header class="quiz-header">
-  <div class="quiz-header-container">
-    <div class="quiz-header-left">
-      <button class="btn-icon" id="menuBtn" aria-label="Menu"><i class="fas fa-bars"></i></button>
-      <div class="subject-info">
-        <div class="subject-name">Chemistry</div>
-        <div class="subject-meta">Q <span id="qNumH">1</span> of <span id="totalQ">40</span></div>
-      </div>
-    </div>
-    <div class="quiz-timer-container">
-      <div class="timer-progress-ring">
-        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/><circle id="timerCircle" cx="30" cy="30" r="26" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="163.36" stroke-dashoffset="0" transform="rotate(-90 30 30)" stroke-linecap="round"/></svg>
-      </div>
-      <div class="timer-display" id="timerDisplay">1:40:00</div>
-    </div>
-    <div class="quiz-header-right">
-      <button class="btn-icon" id="calcBtn" aria-label="Calculator"><i class="fas fa-calculator"></i></button>
-      <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
-    </div>
-  </div>
-</header>
-
-<!-- Layout -->
-<div class="quiz-container">
-  <!-- Sidebar -->
-  <aside class="quiz-sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h3>Navigator</h3>
-      <button class="btn-icon btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="sidebar-stats">
-      <div class="stat-item"><div class="stat-value" id="answeredCount">0</div><div class="stat-label">Done</div></div>
-      <div class="stat-item"><div class="stat-value" id="unansweredCount">40</div><div class="stat-label">Left</div></div>
-      <div class="stat-item"><div class="stat-value" id="flaggedCount">0</div><div class="stat-label">Flagged</div></div>
-    </div>
-    <div class="question-palette" id="palette"></div>
-    <div class="sidebar-legend">
-      <div class="legend-item"><span class="legend-dot current"></span>Current</div>
-      <div class="legend-item"><span class="legend-dot answered"></span>Answered</div>
-      <div class="legend-item"><span class="legend-dot flagged"></span>Flagged</div>
-      <div class="legend-item"><span class="legend-dot"></span>Unanswered</div>
-    </div>
-    <div style="padding:12px;border-top:1px solid var(--border);margin-top:auto">
-      <a href="science_clusters.html" class="btn btn-secondary" style="width:100%;text-align:center;display:block;text-decoration:none" onclick="return confirm('Leave? Progress lost.')">&#8592; Back</a>
-    </div>
-  </aside>
-
-  <!-- Main -->
-  <main class="quiz-main">
-    <div class="question-card" id="questionCard">
-      <div class="question-header">
-        <div class="question-number">Question <span id="qNum">1</span></div>
-        <button class="btn-flag" id="flagBtn"><i class="far fa-flag"></i> Flag</button>
-      </div>
-      <div class="question-text" id="qText">Loading...</div>
-      <div class="options-container" id="optCont"></div>
-      <div class="question-explanation hidden" id="explSection">
-        <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
-        <div class="explanation-content" id="explContent"></div>
-      </div>
-    </div>
-    <div class="quiz-navigation">
-      <button class="btn btn-secondary" id="prevBtn" disabled><i class="fas fa-arrow-left"></i> Previous</button>
-      <button class="btn btn-secondary" id="clearBtn"><i class="fas fa-eraser"></i> Clear</button>
-      <button class="btn btn-primary" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
-    </div>
-  </main>
+<div class="q-text">From the fractional distillation column shown, which fraction has the LOWEST boiling point, the SHORTEST carbon chain, and the HIGHEST flammability?</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q38" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Diesel</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q38" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Refinery gas</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q38" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Fuel oil</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q38" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Kerosene</span>
+</label>
 </div>
-
-<!-- Mobile trigger -->
-<button class="mobile-palette-trigger" id="mobileTrigger"><i class="fas fa-th"></i> Questions</button>
-
-<!-- Submit modal -->
-<div class="modal-overlay hidden" id="submitModal">
-  <div class="modal">
-    <div class="modal-header"><h3>Submit Test?</h3><button class="btn-icon" id="closeSubmit"><i class="fas fa-times"></i></button></div>
-    <div class="modal-body">
-      <div class="submit-summary">
-        <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="mTot">40</span></div>
-        <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="mAns">0</span></div>
-        <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="mUnans">40</span></div>
-        <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="mTime">1:40:00</span></div>
-      </div>
-      <div class="warning-message"><i class="fas fa-exclamation-triangle"></i> You cannot change answers after submission.</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" id="cancelSubmit">Cancel</button>
-      <button class="btn btn-danger" id="confirmSubmit"><i class="fas fa-check"></i> Submit</button>
-    </div>
-  </div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: B — Refinery gas</div>
+<div class="explanation">Refinery gas (C₁–C₄ alkanes: methane, ethane, propane, butane) exits at the TOP of the column (coldest, ~20°C) — it has the LOWEST boiling point and shortest carbon chain. Short chains = weak van der Waals forces = low bp. They are highly flammable (propane/butane are sold as LPG fuel). Kerosene (C₁₀–C₁₆) and diesel (C₁₄–C₂₀) condense lower in the column. Fuel oil has long chains and high viscosity.</div>
 </div>
-
-<!-- Time up modal -->
-<div class="modal-overlay hidden" id="timeUpModal">
-  <div class="modal">
-    <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
-    <div class="modal-body"><p style="color:var(--muted);font-size:.88rem">Your time has run out. Tap below to see your results.</p></div>
-    <div class="modal-footer"><button class="btn btn-primary" id="viewResults">View Results</button></div>
-  </div>
+</details>
 </div>
-
-<!-- Calculator modal -->
-<div class="modal-overlay hidden" id="calcModal">
-  <div class="modal calculator-modal">
-    <div class="modal-header"><h3>Calculator</h3><button class="btn-icon" id="closeCalc"><i class="fas fa-times"></i></button></div>
-    <div class="modal-body">
-      <div class="calculator">
-        <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
-        <div class="calculator-buttons">
-          <button class="calc-btn" data-action="clear">C</button>
-          <button class="calc-btn" data-action="delete">&#8592;</button>
-          <button class="calc-btn" data-action="divide">&#247;</button>
-          <button class="calc-btn" data-action="multiply">&#215;</button>
-          <button class="calc-btn" data-value="7">7</button>
-          <button class="calc-btn" data-value="8">8</button>
-          <button class="calc-btn" data-value="9">9</button>
-          <button class="calc-btn" data-action="subtract">&#8722;</button>
-          <button class="calc-btn" data-value="4">4</button>
-          <button class="calc-btn" data-value="5">5</button>
-          <button class="calc-btn" data-value="6">6</button>
-          <button class="calc-btn" data-action="add">+</button>
-          <button class="calc-btn" data-value="1">1</button>
-          <button class="calc-btn" data-value="2">2</button>
-          <button class="calc-btn" data-value="3">3</button>
-          <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
-          <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
-          <button class="calc-btn" data-value=".">.</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
-
-</div><!-- end #mainContent -->
-
-<!-- FontAwesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<!-- ═══ INLINE QUIZ ENGINE ═══ -->
-<script>
-(function(){
-  var TOTAL = QUESTIONS.length;
-  var current = 0;
-  var state = QUESTIONS.map(function(){ return {selected:null,flagged:false}; });
-  var remaining = DURATION;
-  var submitted = false;
-  var timerInterval = null;
-
-  function $(id){ return document.getElementById(id); }
-
-  /* ── Timer ── */
-  function fmtTime(s){
-    var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
-    return h+':'+pad(m)+':'+pad(sec);
-  }
-  function pad(n){ return n<10?'0'+n:String(n); }
-
-  function tick(){
-    if(remaining<=0){ clearInterval(timerInterval); if(!submitted) showTimeUp(); return; }
-    remaining--;
-    $('timerDisplay').textContent = fmtTime(remaining);
-    var pct = remaining/DURATION;
-    var circ = 163.36;
-    $('timerCircle').setAttribute('stroke-dashoffset', circ*(1-pct));
-    $('timerCircle').style.stroke = pct<0.25?'#ef4444':pct<0.5?'#f59e0b':'var(--accent)';
-  }
-  timerInterval = setInterval(tick, 1000);
-
-  /* ── Render ── */
-  function render(){
-    var q = QUESTIONS[current];
-    var s = state[current];
-
-    $('qNum').textContent   = current+1;
-    $('qNumH').textContent  = current+1;
-    $('qTotal').textContent = TOTAL;
-
-    /* Diagram */
-    var diag = '';
-    if(q.diagramSVG){
-      diag = '<div class="question-diagram">'+q.diagramSVG+'</div>';
-    }
-    /* Question text — newlines to <br> */
-    var txt = (q.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    $('qText').innerHTML = diag + txt;
-
-    /* Options */
-    var oc = $('optCont');
-    oc.innerHTML='';
-    ['A','B','C','D'].forEach(function(letter){
-      var btn = document.createElement('button');
-      btn.className = 'option-btn' + (s.selected===letter?' selected':'');
-      /* safe text for option */
-      var optTxt = (q.options[letter]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      btn.innerHTML = '<span class="option-letter">'+letter+'</span><span class="option-text">'+optTxt+'</span>';
-      if(submitted){
-        if(letter===q.answer) btn.classList.add('correct');
-        else if(s.selected===letter) btn.classList.add('incorrect');
-        btn.disabled=true;
-      } else {
-        (function(l){ btn.addEventListener('click',function(){ if(!submitted){state[current].selected=l;render();} }); })(letter);
-      }
-      oc.appendChild(btn);
-    });
-
-    /* Explanation */
-    var ex = $('explSection');
-    if(submitted){
-      ex.classList.remove('hidden');
-      $('explContent').textContent = q.explanation||'';
-    } else {
-      ex.classList.add('hidden');
-    }
-
-    /* Flag */
-    $('flagBtn').innerHTML = s.flagged
-      ? '<i class="fas fa-flag"></i> Flagged'
-      : '<i class="far fa-flag"></i> Flag';
-    $('flagBtn').classList.toggle('active', !!s.flagged);
-
-    /* Nav */
-    $('prevBtn').disabled = (current===0);
-    if(current===TOTAL-1){
-      $('nextBtn').innerHTML='Submit <i class="fas fa-check"></i>';
-    } else {
-      $('nextBtn').innerHTML='Next <i class="fas fa-arrow-right"></i>';
-    }
-
-    /* Stats */
-    updateStats();
-    updatePalette();
-  }
-
-  function updateStats(){
-    var ans = state.filter(function(s){return s.selected!==null;}).length;
-    var flg = state.filter(function(s){return s.flagged;}).length;
-    $('answeredCount').textContent  = ans;
-    $('unansweredCount').textContent= TOTAL-ans;
-    $('flaggedCount').textContent   = flg;
-    $('mTot').textContent  = TOTAL;
-    $('mAns').textContent  = ans;
-    $('mUnans').textContent= TOTAL-ans;
-    $('mTime').textContent = fmtTime(remaining);
-  }
-
-  function updatePalette(){
-    var pal = $('palette');
-    pal.innerHTML='';
-    QUESTIONS.forEach(function(q,i){
-      var btn=document.createElement('button');
-      btn.className='palette-btn';
-      btn.textContent=i+1;
-      if(i===current) btn.classList.add('current');
-      if(state[i].selected) btn.classList.add('answered');
-      if(state[i].flagged)  btn.classList.add('flagged');
-      (function(idx){ btn.addEventListener('click',function(){current=idx;render();}); })(i);
-      pal.appendChild(btn);
-    });
-  }
-
-  /* ── Buttons ── */
-  $('prevBtn').addEventListener('click',function(){if(current>0){current--;render();}});
-  $('nextBtn').addEventListener('click',function(){
-    if(current<TOTAL-1){current++;render();}
-    else{ $('submitModal').classList.remove('hidden'); }
-  });
-  $('clearBtn').addEventListener('click',function(){if(!submitted){state[current].selected=null;render();}});
-  $('flagBtn').addEventListener('click',function(){state[current].flagged=!state[current].flagged;render();});
-
-  /* ── Sidebar ── */
-  $('menuBtn').addEventListener('click',function(){$('sidebar').classList.toggle('open');});
-  $('closeSidebar').addEventListener('click',function(){$('sidebar').classList.remove('open');});
-  $('mobileTrigger').addEventListener('click',function(){$('sidebar').classList.toggle('open');});
-
-  /* ── Submit modal ── */
-  $('submitBtn').addEventListener('click',function(){$('submitModal').classList.remove('hidden');});
-  $('closeSubmit').addEventListener('click',function(){$('submitModal').classList.add('hidden');});
-  $('cancelSubmit').addEventListener('click',function(){$('submitModal').classList.add('hidden');});
-  $('confirmSubmit').addEventListener('click',function(){$('submitModal').classList.add('hidden');doSubmit();});
-  $('viewResults').addEventListener('click',function(){$('timeUpModal').classList.add('hidden');doSubmit();});
-
-  function showTimeUp(){ $('timeUpModal').classList.remove('hidden'); }
-
-  function doSubmit(){
-    submitted=true;
-    clearInterval(timerInterval);
-    /* show score screen */
-    var correct=0;
-    QUESTIONS.forEach(function(q,i){ if(state[i].selected===q.answer) correct++; });
-    var wrong = QUESTIONS.filter(function(q,i){return state[i].selected!==null && state[i].selected!==q.answer;}).length;
-    var unanswered = state.filter(function(s){return s.selected===null;}).length;
-    var pct = Math.round(correct/TOTAL*100);
-    $('sFinal').textContent  = correct+'/'+TOTAL;
-    $('sPct').textContent    = pct+'%';
-    $('sCorrect').textContent= correct;
-    $('sWrong').textContent  = wrong;
-    $('sUnanswered').textContent = unanswered;
-    $('scoreScreen').classList.add('visible');
-    $('mainContent').style.display='none';
-    window.scrollTo({top:0,behavior:'smooth'});
-  }
-
-  $('reviewBtn').addEventListener('click',function(){
-    $('scoreScreen').classList.remove('visible');
-    $('mainContent').style.display='';
-    current=0;
-    render();
-    window.scrollTo({top:0,behavior:'smooth'});
-  });
-
-  /* ── Calculator ── */
-  var calcExpr='';
-  $('calcBtn').addEventListener('click',function(){$('calcModal').classList.remove('hidden');});
-  $('closeCalc').addEventListener('click',function(){$('calcModal').classList.add('hidden');});
-  document.querySelectorAll('.calc-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var v=btn.dataset.value, a=btn.dataset.action;
-      if(v!==undefined){ calcExpr+=v; $('calcDisplay').value=calcExpr; }
-      else if(a==='clear'){ calcExpr=''; $('calcDisplay').value='0'; }
-      else if(a==='delete'){ calcExpr=calcExpr.slice(0,-1); $('calcDisplay').value=calcExpr||'0'; }
-      else if(a==='equals'){
-        try{
-          var expr=calcExpr.replace(/\u00d7/g,'*').replace(/\u00f7/g,'/').replace(/\u2212/g,'-');
-          $('calcDisplay').value=Function('"use strict";return('+expr+')')();
-          calcExpr=String($('calcDisplay').value);
-        }catch(e){ $('calcDisplay').value='Err'; calcExpr=''; }
-      } else {
-        var ops={add:'+',subtract:'-',multiply:'*',divide:'/'};
-        calcExpr+=ops[a]||'';
-        $('calcDisplay').value=calcExpr;
-      }
-    });
-  });
-
-  /* ── Init ── */
-  $('totalQ').textContent = TOTAL;
-  render();
-})();
-</script>
+<div class="q-block" id="q39">
+<div class="q-num">Question 39 of 40</div>
+<div class="q-text">In the Contact process for manufacturing sulphuric acid, sulphur trioxide (SO₃) is NOT dissolved directly in water. Instead it is absorbed by concentrated H₂SO₄ to form oleum (H₂S₂O₇), which is then diluted. The reason for this is</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q39" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Oleum has a lower sulphuric acid content than the direct product</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q39" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">SO₃ does not react with water at all</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q39" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Concentrated H₂SO₄ acts as a catalyst for the reaction</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q39" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Direct absorption in water produces an uncontrollable acidic mist that is difficult to condense</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: D — Direct absorption in water produces an uncontrollable acidic mist that is difficult to condense</div>
+<div class="explanation">SO₃ + H₂O → H₂SO₄ is highly exothermic. Adding SO₃ directly to water produces a fine acid mist (aerosol) that cannot be condensed and would escape into the atmosphere as a pollutant. Absorbing SO₃ into conc. H₂SO₄ instead gives oleum (H₂S₂O₇) smoothly: SO₃ + H₂SO₄ → H₂S₂O₇. Oleum is then carefully diluted with water to give 98% H₂SO₄. This is a standard JAMB industrial chemistry procedure question.</div>
+</div>
+</details>
+</div>
+</div>
+<div class="q-block" id="q40">
+<div class="q-num">Question 40 of 40</div>
+<div class="q-text">Hard water contains dissolved Ca²⁺ and Mg²⁺ ions. Permanent hardness (caused by Ca²⁺/Mg²⁺ sulphates) can be removed by</div>
+<div class="options" role="radiogroup">
+<label class="opt-label">
+<input type="radio" name="q40" value="A">
+<span class="opt-letter">A</span>
+<span class="opt-text">Adding washing soda (Na₂CO₃)</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q40" value="B">
+<span class="opt-letter">B</span>
+<span class="opt-text">Boiling the water</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q40" value="C">
+<span class="opt-letter">C</span>
+<span class="opt-text">Adding slaked lime Ca(OH)₂</span>
+</label>
+<label class="opt-label">
+<input type="radio" name="q40" value="D">
+<span class="opt-letter">D</span>
+<span class="opt-text">Filtering through sand</span>
+</label>
+</div>
+<div class="answer-reveal">
+<details>
+<summary>Show Answer &amp; Explanation</summary>
+<div class="answer-box">
+<div class="correct-ans">✓ Correct answer: A — Adding washing soda (Na₂CO₃)</div>
+<div class="explanation">PERMANENT hardness (sulphate salts) is NOT removed by boiling — only TEMPORARY hardness (bicarbonate salts) is. Adding Na₂CO₃ (washing soda) precipitates Ca²⁺ and Mg²⁺ as insoluble carbonates: Ca²⁺ + CO₃²⁻ → CaCO₃↓, removing the ions and softening the water. Slaked lime (D) removes temporary hardness (Clark&#x27;s method). Sand filtration removes suspended solids, not dissolved ions. This is the most-tested water-treatment distinction in JAMB.</div>
+</div>
+</details>
+</div>
+</div>
+</div>
+</form>
+<div class="submit-section">
+<div class="score-info">
+<strong>Finished?</strong> Open each <em>Show Answer</em> section above to review.
+ Count your correct answers for your score out of 40.
+</div>
+</div>
 </body></html>
