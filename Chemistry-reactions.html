@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Bonds & Reactions | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #22c55e;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0; opacity:0.5;
+    }
+    #watermark {
+      position:fixed; inset:0; z-index:9999; pointer-events:none; overflow:hidden;
+      display:flex; flex-direction:column; gap:2.2rem; padding:1rem;
+      transform:rotate(-20deg) scale(1.5); transform-origin:center center;
+      opacity:0.09; font-family:var(--mono); font-size:0.95rem; font-weight:700;
+      color:#f0eff4; letter-spacing:0.1em; white-space:nowrap;
+      user-select:none; -webkit-user-select:none;
+    }
+    .hdr {
+      background:rgba(10,14,26,0.92); border-bottom:1px solid var(--sep);
+      padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position:sticky; top:0; z-index:100;
+      backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+    }
+    .hdr-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .hdr-left { display:flex; flex-direction:column; gap:2px; }
+    .hdr-brand { font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); }
+    .hdr-title { font-family:var(--mono); font-size:15px; font-weight:700; letter-spacing:-0.3px; color:var(--text); }
+    .hdr-meta  { font-size:11px; color:var(--ter); margin-top:1px; }
+    .gtimer { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:20px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); flex-shrink:0; }
+    .gtimer-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; transition:background .3s; }
+    .gtimer-dot.warn { background:var(--warn); }
+    .gtimer-dot.dang { background:var(--red); animation:blink 1s infinite; }
+    .gtimer-txt { font-family:var(--mono); font-size:15px; font-weight:700; letter-spacing:1px; color:var(--accent); transition:color .3s; }
+    .gtimer-txt.warn { color:var(--warn); }
+    .gtimer-txt.dang { color:var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px 20px 8px; position:relative; z-index:1; }
+    .sc { background:var(--card); border-radius:10px; padding:10px 8px; text-align:center; border:1px solid var(--sep); }
+    .sc-v { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--text); }
+    .sc-v.c { color:var(--green); } .sc-v.w { color:var(--red); } .sc-v.s { color:var(--ter); }
+    .sc-l { font-size:10px; color:var(--ter); margin-top:2px; text-transform:uppercase; letter-spacing:0.5px; }
+    .prog-wrap { padding:0 20px 10px; position:relative; z-index:1; }
+    .prog-track { height:3px; background:var(--sep); border-radius:99px; overflow:hidden; }
+    .prog-fill { height:100%; background:linear-gradient(90deg, var(--accent2), var(--accent)); border-radius:99px; transition:width 0.4s ease; width:0%; }
+    #qc { padding:8px 20px 20px; position:relative; z-index:1; }
+    .qcard { background:var(--card); border:1px solid var(--sep); border-radius:var(--r); padding:20px; margin-bottom:14px; animation:fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .qcard-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--sep); gap:10px; }
+    .qnum  { font-family:var(--mono); font-size:11px; font-weight:700; color:var(--ter); letter-spacing:0.1em; text-transform:uppercase; }
+    .qtopic { font-size:10px; font-weight:600; padding:3px 9px; border-radius:99px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.18); color:var(--accent); letter-spacing:0.3px; }
+    .qtxt { font-size:15px; line-height:1.72; color:var(--text); font-weight:400; margin-bottom:16px; }
+    .opts { display:flex; flex-direction:column; gap:8px; }
+    .opt { display:flex; align-items:flex-start; gap:12px; padding:13px 16px; border-radius:10px; border:1px solid var(--sep); background:var(--card2); cursor:pointer; transition:all 0.15s; }
+    .opt:hover:not(.locked) { border-color:rgba(34,197,94,0.4); background:rgba(34,197,94,0.05); }
+    .opt.sel { border-color:rgba(34,197,94,0.5); background:rgba(34,197,94,0.08); }
+    .opt.ok  { border-color:var(--green); background:rgba(16,185,129,0.08); }
+    .opt.no  { border-color:var(--red);   background:rgba(239,68,68,0.08); }
+    .opt.locked { cursor:default; }
+    .opt-key { font-family:var(--mono); font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; width:18px; padding-top:1px; }
+    .opt.ok .opt-key  { color:var(--green); }
+    .opt.no .opt-key  { color:var(--red); }
+    .opt-txt { font-size:14px; color:var(--sec); line-height:1.55; }
+    .abtn { margin-top:12px; width:100%; padding:11px; border-radius:10px; background:var(--accent); color:#000; font-family:var(--sans); font-size:13px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.2s,transform 0.15s; letter-spacing:0.02em; }
+    .abtn:hover:not(:disabled) { opacity:0.88; transform:translateY(-1px); }
+    .abtn:disabled { opacity:0.28; cursor:not-allowed; transform:none; }
+    .exp { display:none; margin-top:12px; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.18); border-radius:10px; padding:14px; font-size:13px; line-height:1.68; color:var(--sec); }
+    .exp.show { display:block; }
+    .exp-mark { display:inline-block; margin-bottom:8px; font-family:var(--mono); font-size:12px; font-weight:700; padding:3px 10px; border-radius:6px; }
+    .exp-mark.pos { background:rgba(16,185,129,0.15); color:var(--green); }
+    .exp-mark.neg { background:rgba(239,68,68,0.12); color:var(--red); }
+    .exp-mark.nt  { background:rgba(34,197,94,0.12); color:var(--accent); }
+    .submit-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(10,14,26,0.96); border-top:1px solid var(--sep); padding:12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index:200; backdrop-filter:blur(16px); display:flex; gap:10px; align-items:center; }
+    .submit-btn { flex:1; padding:13px; background:var(--accent); color:#000; font-family:var(--sans); font-size:14px; font-weight:700; border:none; border-radius:10px; cursor:pointer; transition:opacity 0.2s; }
+    .submit-btn:hover { opacity:0.88; }
+    .submit-progress { font-family:var(--mono); font-size:11px; color:var(--ter); white-space:nowrap; }
+    .timeup { position:fixed; inset:0; z-index:5000; background:rgba(10,14,26,0.96); display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px); }
+    .timeup.show { display:flex; }
+    .timeup-box { background:var(--card); border:1px solid var(--sep); border-radius:20px; padding:36px 32px; text-align:center; max-width:360px; width:90%; box-shadow:0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size:2.5rem; margin-bottom:12px; }
+    .timeup-ttl { font-family:var(--mono); font-size:1.3rem; font-weight:700; color:var(--text); margin-bottom:8px; }
+    .timeup-score { font-family:var(--mono); font-size:2rem; font-weight:700; margin-bottom:6px; }
+    .timeup-score.pos { color:var(--green); } .timeup-score.neg { color:var(--red); }
+    .timeup-sub { font-size:13px; color:var(--ter); margin-bottom:20px; }
+    .timeup-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
+    .tu-stat-v { font-family:var(--mono); font-size:1.4rem; font-weight:700; color:var(--text); }
+    .tu-stat-v.c { color:var(--green); } .tu-stat-v.w { color:var(--red); } .tu-stat-v.s { color:var(--ter); }
+    .tu-stat-l { font-size:10px; color:var(--ter); text-transform:uppercase; margin-top:2px; }
+    .timeup-btn { width:100%; padding:13px; background:var(--accent); color:#000; font-family:var(--sans); font-size:14px; font-weight:700; border:none; border-radius:10px; cursor:pointer; margin-bottom:8px; }
+    .timeup-btn.sec { background:transparent; color:var(--ter); border:1px solid var(--sep); font-weight:400; font-size:13px; }
+    .modal-overlay { position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; padding:1rem; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:var(--card); border:1px solid var(--sep); border-radius:16px; width:100%; max-width:400px; padding:24px; box-shadow:0 24px 48px rgba(0,0,0,0.5); animation:modalIn 0.2s ease; }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.96) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .modal h3 { font-family:var(--mono); font-size:1rem; font-weight:700; margin-bottom:16px; color:var(--text); }
+    .modal-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--sep); font-size:13px; color:var(--ter); }
+    .modal-row b { color:var(--text); font-family:var(--mono); }
+    .modal-btns { display:flex; gap:8px; margin-top:20px; }
+    .modal-btn { flex:1; padding:11px; border-radius:10px; font-family:var(--sans); font-size:13px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.2s; }
+    .modal-btn.primary { background:var(--accent); color:#000; }
+    .modal-btn.primary:hover { opacity:0.88; }
+    .modal-btn.ghost { background:transparent; color:var(--ter); border:1px solid var(--sep); }
+    @media print {
+      body { background:#fff !important; color:#000 !important; font-size:12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display:none !important; }
+      .exp { display:block !important; background:#f9f9f9 !important; border:1px solid #ccc !important; color:#333 !important; }
+      .qcard { break-inside:avoid; border:1px solid #ddd !important; background:#fff !important; margin-bottom:20pt; page-break-inside:avoid; }
+      .opt { border:1px solid #ccc !important; background:#fff !important; }
+      .opt.ok { background:#e6f9f0 !important; border-color:#10b981 !important; }
+      .opt.no { background:#fef2f2 !important; border-color:#ef4444 !important; }
+      .opt-txt { color:#000 !important; } .qtxt { color:#000 !important; }
+      #print-header { display:block !important; text-align:center; margin-bottom:24pt; padding-bottom:12pt; border-bottom:2pt solid #000; }
+      #print-header h1 { font-size:18pt; font-weight:800; margin-bottom:4pt; }
+      #print-header .ph-meta { font-size:10pt; color:#555; }
+    }
+    @media (max-width:480px) {
+      .score-strip { grid-template-columns:repeat(2,1fr); }
+      .hdr-title { font-size:13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Bonds &amp; Reactions</h1>
+  <p class="ph-meta">30 Questions · 20 Minutes · UTME Preparation</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Bonds &amp; Reactions</span>
+      <span class="hdr-meta">30 questions · 20 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">20:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">30</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">30</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 30 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>30</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">30</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">20:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── WATERMARK ── */
+(function(){
+  var wm = document.getElementById('watermark');
+  var row = 'GrantApp AI · UTME · Bonds & Reactions ·  ';
+  for(var i=0;i<18;i++) wm.innerHTML += '<div>'+row+row+'</div>';
+})();
+
+/* ── PRINT ── */
+function doPrint(){
+  document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  window.print();
+}
+
+/* ── TIMER ── */
+const DURATION = 1200; // 20 minutes
+let timeLeft = DURATION, timerActive = true, submitted = false;
+function fmt(s){ return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+document.getElementById('gtime').textContent = fmt(DURATION);
+const timerInterval = setInterval(function(){
+  if(!timerActive) return;
+  timeLeft--;
+  document.getElementById('gtime').textContent = fmt(timeLeft);
+  const dot = document.getElementById('gdot');
+  const txt = document.getElementById('gtimer-txt') || document.querySelector('.gtimer-txt');
+  if(timeLeft <= 120){ dot.className='gtimer-dot dang'; txt && (txt.className='gtimer-txt dang'); }
+  else if(timeLeft <= 300){ dot.className='gtimer-dot warn'; txt && (txt.className='gtimer-txt warn'); }
+  if(timeLeft <= 0){ clearInterval(timerInterval); timeUp(); }
+}, 1000);
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+  /* ── BLOCK 1: BONDING ── */
+  {
+    id:1, topic:'Bonding',
+    text:'A sigma (σ) bond differs from a pi (π) bond in that sigma bonds:',
+    options:{A:'Are weaker than pi bonds',B:'Result from lateral (side-to-side) overlap of orbitals',C:'Allow free rotation around the bond axis',D:'Occur only in aromatic rings'},
+    answer:'C',
+    explanation:'Sigma bonds form by end-to-end overlap along the internuclear axis, allowing free rotation. Pi bonds require parallel p-orbitals and restrict rotation.',
+    exception:'Free rotation in sigma bonds is why single bonds rotate freely but double bonds cause geometric (cis/trans) isomerism.'
+  },
+  {
+    id:2, topic:'Bonding',
+    text:'Ethene (C₂H₄) contains how many sigma (σ) and pi (π) bonds in total?',
+    options:{A:'4 sigma, 2 pi',B:'5 sigma, 1 pi',C:'6 sigma, 1 pi',D:'4 sigma, 1 pi'},
+    answer:'B',
+    explanation:'C=C contributes 1σ + 1π; the four C–H bonds each contribute 1σ. Total = 5σ, 1π.',
+    exception:'Every double bond = 1σ + 1π. Every triple bond = 1σ + 2π. Count all bonds including C–H.'
+  },
+  {
+    id:3, topic:'Bonding',
+    text:'The bond angle in BF₃ is 120°. The best explanation is:',
+    options:{A:'B has 4 bonding pairs and no lone pairs',B:'F is highly electronegative, compressing the angles',C:'B is sp² hybridized — 3 bonding regions, zero lone pairs',D:'BF₃ has a trigonal pyramidal shape'},
+    answer:'C',
+    explanation:'sp² hybridization gives trigonal planar geometry. Three bonding regions with no lone pairs → 120° bond angles.',
+    exception:'BF₃ is an electron-deficient Lewis acid (only 6 electrons on B). It readily accepts a lone pair from donors like NH₃.'
+  },
+  {
+    id:4, topic:'Bonding',
+    text:'Which of the following has the shortest bond length?',
+    options:{A:'N–N (single bond)',B:'N=N (double bond)',C:'N≡N (triple bond)',D:'N–H bond in NH₃'},
+    answer:'C',
+    explanation:'Bond order increases from single to triple. Higher bond order = shorter bond length and greater bond strength. N≡N has bond order 3.',
+    exception:'N≡N (945 kJ/mol) is one of the strongest bonds in chemistry, explaining why N₂ is so kinetically unreactive.'
+  },
+  {
+    id:5, topic:'Bonding',
+    text:'The bond angle in NH₃ (107°) is slightly less than the tetrahedral angle (109.5°) because:',
+    options:{A:'N–H bonds are polar, causing bond-bond attraction',B:'One lone pair on nitrogen exerts greater repulsion than a bonding pair',C:'NH₃ has sp hybridization',D:'The three H atoms reinforce each other\'s positions'},
+    answer:'B',
+    explanation:'VSEPR: lone pair–bond pair repulsion is greater than bond pair–bond pair repulsion. The lone pair compresses the H–N–H angles below 109.5°.',
+    exception:'H₂O (104.5°) has TWO lone pairs on oxygen, causing even greater compression than in NH₃.'
+  },
+  {
+    id:6, topic:'Bonding',
+    text:'Which pair of molecules are BOTH sp³ hybridized?',
+    options:{A:'CO₂ and BeCl₂',B:'CH₄ and H₂O',C:'C₂H₄ and NH₃',D:'C₂H₂ and BF₃'},
+    answer:'B',
+    explanation:'Both CH₄ (4 bonding pairs) and H₂O (2 bonding + 2 lone pairs) have 4 electron domains → sp³ hybridization.',
+    exception:'Lone pairs count toward the hybridization (electron geometry) but NOT the molecular shape. H₂O is bent, not tetrahedral in shape.'
+  },
+  {
+    id:7, topic:'Bonding',
+    text:'Which bond is the most polar?',
+    options:{A:'C–H',B:'N–H',C:'O–H',D:'F–H'},
+    answer:'D',
+    explanation:'Bond polarity depends on electronegativity difference (ΔEN). F (EN = 4.0) has the largest ΔEN with H, making H–F the most polar.',
+    exception:'Despite F–H being the most polar bond, O–H hydrogen bonds are more biologically significant due to prevalence in water and biomolecules.'
+  },
+  {
+    id:8, topic:'Bonding',
+    text:'A dative (coordinate) bond is best described as a bond where:',
+    options:{A:'Both atoms each donate one electron to the shared pair',B:'Electrons are transferred completely from one atom to another',C:'One atom donates BOTH electrons to the shared pair',D:'The bond only exists in transition metal complexes'},
+    answer:'C',
+    explanation:'In a dative (coordinate) bond, one atom (the Lewis base/donor) provides both electrons. e.g., NH₄⁺ formation, [Cu(NH₃)₄]²⁺ complexes.',
+    exception:'Once formed, a dative bond is indistinguishable from a covalent bond in bond length or strength.'
+  },
+  {
+    id:9, topic:'Bonding',
+    text:'Benzene is more stable than a hypothetical cyclohexatriene because of:',
+    options:{A:'Stronger C–H sigma bonds',B:'Delocalization energy (resonance stabilization) of the π electrons',C:'Its planar hexagonal shape alone',D:'Rapidly alternating single and double bonds'},
+    answer:'B',
+    explanation:'Benzene\'s 6 π electrons are delocalized over the entire ring, lowering its energy by approximately 150 kJ/mol (resonance/delocalization energy).',
+    exception:'Because of this stability, benzene undergoes electrophilic SUBSTITUTION (preserving delocalization) rather than addition reactions.'
+  },
+  {
+    id:10, topic:'Bonding',
+    text:'Which correctly ranks these intermolecular forces from weakest to strongest?',
+    options:{A:'Van der Waals < Dipole–dipole < Hydrogen bond',B:'Hydrogen bond < Dipole–dipole < Van der Waals',C:'Dipole–dipole < Hydrogen bond < Van der Waals',D:'All intermolecular forces are equal in strength'},
+    answer:'A',
+    explanation:'London dispersion (Van der Waals) forces are weakest. Hydrogen bonds (F/O/N bonded to H) are the strongest intermolecular forces.',
+    exception:'In large nonpolar molecules, cumulative Van der Waals forces can be very large — e.g., higher alkanes have higher boiling points than low-MW polar molecules.'
+  },
+
+  /* ── BLOCK 2: ORGANIC REACTIONS & TESTS ── */
+  {
+    id:11, topic:'Organic Reactions',
+    text:'When ethene is passed into bromine water, the expected observation is:',
+    options:{A:'Bromine water turns blue',B:'Bromine water is decolorized',C:'A yellow-green gas is evolved',D:'No change — ethene is unreactive with bromine'},
+    answer:'B',
+    explanation:'Alkenes undergo electrophilic addition with Br₂. The C=C bond breaks and bromine adds across it, decolorizing the orange-brown bromine water.',
+    exception:'This test distinguishes alkenes from alkanes. Alkanes do NOT decolorize bromine water in the dark (no reaction without UV light).'
+  },
+  {
+    id:12, topic:'Organic Reactions',
+    text:'The reaction of methane with chlorine in the presence of UV light is called:',
+    options:{A:'Electrophilic substitution',B:'Nucleophilic addition',C:'Free radical substitution',D:'Elimination'},
+    answer:'C',
+    explanation:'UV light causes homolytic fission of Cl₂ → Cl• radicals. These substitute H atoms in methane via initiation, propagation, and termination steps.',
+    exception:'In the DARK, chlorine and alkanes do not react — UV light (or heat) is essential to initiate the reaction by generating radicals.'
+  },
+  {
+    id:13, topic:'Organic Reactions',
+    text:'Ethanol reacts with sodium metal to produce:',
+    options:{A:'Sodium ethanoate and water',B:'Sodium ethoxide and hydrogen gas',C:'Ethene and sodium hydroxide',D:'No reaction — alcohols are neutral compounds'},
+    answer:'B',
+    explanation:'2C₂H₅OH + 2Na → 2C₂H₅ONa + H₂↑. The –OH group is weakly acidic; Na displaces hydrogen.',
+    exception:'The reaction is less vigorous than water + Na (water is more acidic than ethanol), confirming the weaker acidity of alcohols.'
+  },
+  {
+    id:14, topic:'Organic Reactions',
+    text:'The conversion of an alcohol to an alkene by removing water is called:',
+    options:{A:'Hydration',B:'Esterification',C:'Dehydration (elimination)',D:'Oxidation'},
+    answer:'C',
+    explanation:'Dehydration uses conc. H₂SO₄ at ~170°C (e.g., ethanol → ethene + H₂O). H and OH are removed from adjacent carbons.',
+    exception:'At ~140°C, the same reagent (conc. H₂SO₄) favours ether formation instead — temperature determines the product.'
+  },
+  {
+    id:15, topic:'Organic Tests',
+    text:'Fehling\'s solution is used to distinguish between:',
+    options:{A:'Saturated and unsaturated compounds',B:'Primary and secondary alcohols',C:'Aldehydes and ketones',D:'Carboxylic acids and esters'},
+    answer:'C',
+    explanation:'Fehling\'s (blue Cu²⁺) is reduced by aldehydes to a brick-red Cu₂O precipitate. Ketones do NOT reduce Fehling\'s solution.',
+    exception:'Tollens\' reagent (silver mirror test) also distinguishes them: aldehydes produce a silver mirror; ketones give no reaction.'
+  },
+  {
+    id:16, topic:'Organic Reactions',
+    text:'Which reagent(s) convert a carboxylic acid into an ester?',
+    options:{A:'NaOH solution and heat',B:'Alcohol and concentrated H₂SO₄ as catalyst',C:'Bromine water',D:'K₂Cr₂O₇ / dilute H₂SO₄'},
+    answer:'B',
+    explanation:'RCOOH + R\'OH ⇌ RCOOR\' + H₂O (Fischer esterification). Conc. H₂SO₄ acts as both catalyst and dehydrating agent to shift equilibrium right.',
+    exception:'The reaction is reversible. Excess alcohol or removing water (Le Chatelier) drives greater ester yield.'
+  },
+  {
+    id:17, topic:'Organic Tests',
+    text:'The iodoform test gives a yellow precipitate (CHI₃) with:',
+    options:{A:'All primary alcohols',B:'Methanol only',C:'All carboxylic acids',D:'Ethanol and methyl ketones (CH₃CO– group)'},
+    answer:'D',
+    explanation:'The iodoform reaction requires a CH₃CO– or CH₃CHOH– group. Ethanol and acetaldehyde (CH₃CHO) give a positive result; methanol does not.',
+    exception:'Methanol does NOT give a positive iodoform test. Only ethanol (among the primary alcohols) gives CHI₃ yellow precipitate.'
+  },
+  {
+    id:18, topic:'Organic Reactions',
+    text:'Saponification is the reaction of a fat (ester) with:',
+    options:{A:'Dilute acid to form alcohol and a carboxylic acid',B:'Hot concentrated NaOH to form soap (sodium salt of fatty acid) and glycerol',C:'Bromine water to test for unsaturation',D:'Water alone at room temperature'},
+    answer:'B',
+    explanation:'Fat + NaOH → RCOONa (soap) + glycerol. Saponification is irreversible because the carboxylate salt is stable in alkaline conditions.',
+    exception:'Acid hydrolysis of esters IS reversible. Alkaline hydrolysis (saponification) is not — a key distinction in JAMB questions.'
+  },
+  {
+    id:19, topic:'Organic Nomenclature',
+    text:'The IUPAC name for CH₃CH₂COOH is:',
+    options:{A:'Ethanoic acid',B:'Butanoic acid',C:'Propanoic acid',D:'Methanoic acid'},
+    answer:'C',
+    explanation:'The chain has 3 carbons including the carboxyl carbon. 3 carbons = prop– prefix; carboxylic acid = –anoic acid. Hence propanoic acid.',
+    exception:'The COOH carbon IS counted in the chain. Methanoic (1C), ethanoic (2C), propanoic (3C), butanoic (4C) — common names still appear in JAMB.'
+  },
+  {
+    id:20, topic:'Organic Mechanisms',
+    text:'In the nucleophilic addition of HCN to ethanal (CH₃CHO), the attacking species is:',
+    options:{A:'H⁺ (proton)',B:'CN⁻ (cyanide ion)',C:'CH₃⁺ (methyl cation)',D:'Neutral HCN molecule'},
+    answer:'B',
+    explanation:'CN⁻ is an electron-rich nucleophile. It attacks the electron-deficient carbonyl carbon (C=O). H⁺ then adds to the oxygen to form a cyanohydrin.',
+    exception:'The product (a cyanohydrin) can be hydrolysed to an α-hydroxy acid — this is an important carbon chain-extending synthetic step.'
+  },
+
+  /* ── BLOCK 3: INORGANIC REACTIONS & TESTS ── */
+  {
+    id:21, topic:'Inorganic Tests',
+    text:'Lime water (Ca(OH)₂) turns milky when CO₂ is passed through it because:',
+    options:{A:'Ca(OH)₂ is reduced to Ca metal',B:'CO₂ reacts with Ca(OH)₂ to form insoluble CaCO₃',C:'CO₂ makes the water more acidic, dissolving Ca(OH)₂',D:'Excess CO₂ rehydrates the Ca²⁺ ions'},
+    answer:'B',
+    explanation:'Ca(OH)₂ + CO₂ → CaCO₃↓ (white/milky) + H₂O. Excess CO₂ dissolves the precipitate: CaCO₃ + CO₂ + H₂O → Ca(HCO₃)₂ (soluble).',
+    exception:'If excess CO₂ is bubbled in, the milky precipitate CLEARS. This is how caves form stalactites and stalagmites.'
+  },
+  {
+    id:22, topic:'Inorganic Tests',
+    text:'Which flame colour is produced by potassium (K) in a flame test?',
+    options:{A:'Brick red',B:'Yellow',C:'Lilac / pale violet',D:'Apple green'},
+    answer:'C',
+    explanation:'K burns with a characteristic lilac/pale violet flame. Li = crimson, Na = yellow (intense), Ca = brick-red, Ba = apple-green.',
+    exception:'Sodium contamination can mask the K flame. A blue cobalt glass filter absorbs the yellow sodium colour and reveals the violet of potassium.'
+  },
+  {
+    id:23, topic:'Inorganic Tests',
+    text:'When H₂S gas is passed into a solution of lead(II) nitrate, the observation is:',
+    options:{A:'A white precipitate of PbSO₄ forms',B:'A black precipitate of PbS forms',C:'A yellow precipitate of PbO forms',D:'The solution remains colourless — no reaction'},
+    answer:'B',
+    explanation:'Pb(NO₃)₂ + H₂S → PbS↓ (black, insoluble) + 2HNO₃. PbS is intensely black.',
+    exception:'This reaction tests for EITHER H₂S (using lead acetate paper) OR Pb²⁺ ions in solution — the logic works both ways.'
+  },
+  {
+    id:24, topic:'Inorganic Tests',
+    text:'A white precipitate that dissolves in excess NaOH solution but NOT in excess NH₃ solution indicates the presence of:',
+    options:{A:'Cu²⁺ ions',B:'Fe³⁺ ions',C:'Al³⁺ ions',D:'Zn²⁺ ions'},
+    answer:'C',
+    explanation:'Al(OH)₃ is amphoteric: it dissolves in excess NaOH → [Al(OH)₄]⁻ (aluminate). It does NOT dissolve in excess NH₃ solution.',
+    exception:'Zn(OH)₂ is also amphoteric (dissolves in excess NaOH) BUT also dissolves in excess NH₃ — use BOTH tests to distinguish Al³⁺ from Zn²⁺.'
+  },
+  {
+    id:25, topic:'Inorganic Reactions',
+    text:'Chlorine reacting with cold dilute NaOH solution produces:',
+    options:{A:'NaCl + O₂ + H₂O',B:'NaCl + NaOCl + H₂O',C:'NaClO₃ + NaCl + H₂O',D:'NaCl₃ + NaOH'},
+    answer:'B',
+    explanation:'Cl₂ + 2NaOH (cold, dilute) → NaCl + NaOCl + H₂O. NaOCl (sodium hypochlorite) is the bleaching agent in household bleach.',
+    exception:'With HOT concentrated NaOH: Cl₂ → NaCl + NaClO₃ (sodium chlorate). Temperature controls which product forms — a classic JAMB trap.'
+  },
+  {
+    id:26, topic:'Inorganic Tests',
+    text:'The brown ring test is used to confirm the presence of which ion?',
+    options:{A:'Sulfate ions (SO₄²⁻)',B:'Nitrate ions (NO₃⁻)',C:'Chloride ions (Cl⁻)',D:'Carbonate ions (CO₃²⁻)'},
+    answer:'B',
+    explanation:'FeSO₄ + conc. H₂SO₄ + NO₃⁻ produces a brown ring of [Fe(NO)]²⁺ at the interface between the two liquids. Positive test for nitrate.',
+    exception:'Nitrite (NO₂⁻) also gives a brown ring. Confirm nitrate using Devarda\'s alloy reduction or by first eliminating nitrite.'
+  },
+  {
+    id:27, topic:'Inorganic Tests',
+    text:'To confirm the presence of carbonate (CO₃²⁻) in a salt, the correct two-step test is:',
+    options:{A:'White precipitate with BaCl₂ insoluble in HCl',B:'Add dilute HCl → effervescence; pass gas through lime water → milky',C:'Brick-red flame colour',D:'Blue-black colour with starch solution'},
+    answer:'B',
+    explanation:'CO₃²⁻ + 2HCl → CO₂↑ + H₂O + 2Cl⁻. The CO₂ gas turns lime water milky (CaCO₃ precipitate). Both steps together confirm CO₃²⁻.',
+    exception:'Sulfite (SO₃²⁻) also effervesces with HCl, releasing SO₂ (pungent smell, turns acidified dichromate green). Distinguish by the lime water step.'
+  },
+  {
+    id:28, topic:'Inorganic Reactions',
+    text:'When concentrated H₂SO₄ is added to sugar (sucrose), the observation is:',
+    options:{A:'White crystals of glucose appear',B:'A black spongy mass of carbon forms (charring)',C:'A blue solution forms',D:'Yellow fumes of SO₃ are produced'},
+    answer:'B',
+    explanation:'Conc. H₂SO₄ removes water from C₁₂H₂₂O₁₁ → 12C (black solid) + 11H₂O. This is the dehydrating action of sulfuric acid.',
+    exception:'Here H₂SO₄ acts as a DEHYDRATING agent (removes H₂O), NOT as an oxidising agent. The distinction is important for JAMB.'
+  },
+  {
+    id:29, topic:'Inorganic Tests',
+    text:'A gas that turns moist red litmus paper blue is most likely:',
+    options:{A:'Chlorine (Cl₂)',B:'Sulfur dioxide (SO₂)',C:'Ammonia (NH₃)',D:'Hydrogen chloride (HCl)'},
+    answer:'C',
+    explanation:'NH₃ is the only common gaseous base. It dissolves in water to form NH₄OH (alkaline), turning moist red litmus blue.',
+    exception:'Cl₂ bleaches moist litmus paper (turns it colourless/white first), rather than simply turning it blue — a common JAMB distractor.'
+  },
+  {
+    id:30, topic:'Industrial Chemistry',
+    text:'In the Contact Process for manufacturing sulfuric acid, SO₂ is oxidised to SO₃ using:',
+    options:{A:'Platinum catalyst at 450°C',B:'Iron catalyst at 500°C',C:'Vanadium(V) oxide (V₂O₅) at ~450°C',D:'Concentrated HNO₃ as the oxidising agent'},
+    answer:'C',
+    explanation:'2SO₂ + O₂ ⇌ 2SO₃, catalysed by V₂O₅ at ~450°C. SO₃ is then absorbed in conc. H₂SO₄ (forming oleum), not water directly.',
+    exception:'SO₃ is NOT dissolved directly in water — the reaction is too violent and produces acid mist. Oleum (H₂S₂O₇) is used, then carefully diluted.'
+  }
+];
+
+/* ── STATE ── */
+const N = QUESTIONS.length;
+const state = {}; // {id: 'A'|'B'|'C'|'D'}
+let locked = false;
+
+/* ── RENDER ── */
+function render(){
+  const qc = document.getElementById('qc');
+  qc.innerHTML = '';
+  QUESTIONS.forEach(function(q, idx){
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'q'+q.id;
+
+    const sel = state[q.id];
+    const isAnswered = !!sel;
+    const isLocked = locked;
+    const isCorrect = sel === q.answer;
+
+    card.innerHTML =
+      '<div class="qcard-top">'+
+        '<span class="qnum">Q'+(idx+1)+' of '+N+'</span>'+
+        '<span class="qtopic">'+q.topic+'</span>'+
+      '</div>'+
+      '<div class="qtxt">'+q.text+'</div>'+
+      '<div class="opts" id="opts'+q.id+'">'+
+        ['A','B','C','D'].map(function(k){
+          var cls = 'opt';
+          if(isLocked){
+            cls += ' locked';
+            if(k === q.answer) cls += ' ok';
+            else if(k === sel) cls += ' no';
+          } else {
+            if(sel === k) cls += ' sel';
+          }
+          return '<div class="'+cls+'" data-q="'+q.id+'" data-k="'+k+'">'+
+            '<span class="opt-key">'+k+'</span>'+
+            '<span class="opt-txt">'+q.options[k]+'</span>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+      (isLocked ?
+        '<div class="exp show">'+
+          '<span class="exp-mark '+(isAnswered?(isCorrect?'pos':'neg'):'nt')+'">'+
+            (isAnswered?(isCorrect?'✓ Correct':'✗ Wrong'):'— Skipped')+
+          '</span><br>'+
+          q.explanation+
+          (q.exception ? '<br><br><span style="color:var(--accent);font-family:var(--mono);font-size:11px;font-weight:700;">EXCEPTION / NOTE:</span> '+q.exception : '')+
+        '</div>'
+      :
+        (isAnswered ?
+          '<button class="abtn" onclick="checkAnswer('+q.id+')">Check Answer</button>'+
+          '<div class="exp" id="exp'+q.id+'"></div>'
+        :
+          '<button class="abtn" disabled>Select an option first</button>'+
+          '<div class="exp" id="exp'+q.id+'"></div>'
+        )
+      );
+
+    qc.appendChild(card);
+  });
+
+  // Re-bind click events
+  document.querySelectorAll('.opt:not(.locked)').forEach(function(el){
+    el.addEventListener('click', function(){
+      var qid = parseInt(el.dataset.q);
+      var k = el.dataset.k;
+      selectOption(qid, k);
+    });
+  });
+
+  updateHUD();
+}
+
+function selectOption(qid, k){
+  if(locked) return;
+  state[qid] = k;
+
+  // Update opts in place
+  var opts = document.querySelectorAll('#opts'+qid+' .opt');
+  opts.forEach(function(o){ o.className = 'opt'+(o.dataset.k===k?' sel':''); });
+  opts.forEach(function(o){
+    o.addEventListener('click', function(){
+      selectOption(parseInt(o.dataset.q), o.dataset.k);
+    });
+  });
+
+  // Enable check button
+  var card = document.getElementById('q'+qid);
+  var btn = card.querySelector('.abtn');
+  if(btn){ btn.disabled = false; btn.textContent = 'Check Answer'; btn.onclick = function(){ checkAnswer(qid); }; }
+
+  updateHUD();
+}
+
+function checkAnswer(qid){
+  var q = QUESTIONS.find(function(x){ return x.id===qid; });
+  var sel = state[qid];
+  if(!sel) return;
+  var correct = sel === q.answer;
+
+  var opts = document.querySelectorAll('#opts'+qid+' .opt');
+  opts.forEach(function(o){
+    o.classList.add('locked');
+    if(o.dataset.k === q.answer) o.classList.add('ok');
+    else if(o.dataset.k === sel) o.classList.add('no');
+  });
+
+  var exp = document.getElementById('exp'+qid);
+  exp.innerHTML =
+    '<span class="exp-mark '+(correct?'pos':'neg')+'">'+(correct?'✓ Correct':'✗ Wrong')+'</span><br>'+
+    q.explanation+
+    (q.exception ? '<br><br><span style="color:var(--accent);font-family:var(--mono);font-size:11px;font-weight:700;">EXCEPTION / NOTE:</span> '+q.exception : '');
+  exp.classList.add('show');
+
+  var card = document.getElementById('q'+qid);
+  var btn = card.querySelector('.abtn');
+  if(btn) btn.style.display = 'none';
+
+  updateHUD();
+}
+
+/* ── HUD ── */
+function updateHUD(){
+  var answered = Object.keys(state).length;
+  var left = N - answered;
+  document.getElementById('answered-count').textContent = answered;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('sub-prog').textContent = answered+' / '+N+' answered';
+  document.getElementById('prog-fill').style.width = Math.round(answered/N*100)+'%';
+
+  if(locked){
+    var corr=0, wrong=0, skip=0;
+    QUESTIONS.forEach(function(q){
+      var s = state[q.id];
+      if(!s) skip++;
+      else if(s===q.answer) corr++;
+      else wrong++;
+    });
+    document.getElementById('sc-corr').textContent = corr;
+    document.getElementById('sc-wrong').textContent = wrong;
+    document.getElementById('sc-skip').textContent = skip;
+  }
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal(){
+  var ans = Object.keys(state).length;
+  document.getElementById('m-ans').textContent = ans;
+  document.getElementById('m-left').textContent = N - ans;
+  document.getElementById('m-time').textContent = fmt(timeLeft);
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal(){ document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz(){
+  hideSubmitModal();
+  locked = true;
+  timerActive = false;
+  render();
+}
+
+/* ── TIME UP ── */
+function timeUp(){
+  locked = true;
+  timerActive = false;
+  var corr=0,wrong=0,skip=0;
+  QUESTIONS.forEach(function(q){
+    var s = state[q.id];
+    if(!s) skip++;
+    else if(s===q.answer) corr++;
+    else wrong++;
+  });
+  document.getElementById('tu-co').textContent = corr;
+  document.getElementById('tu-wr').textContent = wrong;
+  document.getElementById('tu-sk').textContent = skip;
+  var pct = Math.round(corr/N*100);
+  var sc = document.getElementById('tu-score');
+  sc.textContent = pct+'%';
+  sc.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu').classList.add('show');
+  render();
+}
+
+/* ── INIT ── */
+render();
+</script>
+</body>
+</html>
