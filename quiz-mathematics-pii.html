@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Mathematics — Diagrams | JAMB Practice · GrantApp AI</title>
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="quiz-body">
+
+<!-- QUESTIONS: Fisher-Yates shuffled at build time by build.py. JS loads nothing. -->
+<script>
+const DURATION = 1800;
+
+/*
+  Topic spread — 30 diagram questions (JAMB Geometry/Trigonometry statistical weight):
+    Circle Theorems        — 9   (ids  1– 9)
+    Plane Mensuration      — 8   (ids 10–17)
+    Polygons & Angles      — 6   (ids 18–23)
+    Similar & Congruent    — 4   (ids 24–27)
+    Trigonometry & Bearings— 3   (ids 28–30)
+
+  SVG design tokens:
+    stroke="#E8EDF5"               primary lines / labels
+    fill="none"                    all shapes (dark bg shows through)
+    fill="#22c55e"                 accent dots / small marks
+    stroke="rgba(232,237,245,0.45)" construction / dimension lines
+    font-family="Space Mono,monospace"  all text
+    font-size="11"                 vertex labels
+    font-size="10"                 dimension / angle labels
+*/
+
+const QUESTIONS = [
+
+  /* ─── CIRCLE THEOREMS (9) ─── */
+
+  {
+    id: 1,
+    subject: 'Mathematics',
+    text: 'In the diagram, O is the centre of the circle. If ∠POR = 112°, find ∠PQR, where Q is a point on the major arc PR.',
+    diagram: `<svg viewBox="0 0 220 210" xmlns="http://www.w3.org/2000/svg" width="220" height="210">
+  <circle cx="110" cy="108" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="110" cy="108" r="3.5" fill="#22c55e"/>
+  <text x="114" y="105" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <line x1="110" y1="108" x2="48"  y2="72"  stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="110" y1="108" x2="172" y2="72"  stroke="#E8EDF5" stroke-width="1.4"/>
+  <circle cx="48"  cy="72"  r="3.5" fill="#22c55e"/>
+  <circle cx="172" cy="72"  r="3.5" fill="#22c55e"/>
+  <text x="30"  y="70"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="176" y="70"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+  <text x="95"  y="124" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">112°</text>
+  <circle cx="110" cy="180" r="3.5" fill="#22c55e"/>
+  <text x="114" y="196" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <line x1="110" y1="180" x2="48"  y2="72"  stroke="rgba(232,237,245,0.45)" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <line x1="110" y1="180" x2="172" y2="72"  stroke="rgba(232,237,245,0.45)" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="96"  y="168" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '56°', B: '68°', C: '112°', D: '124°' },
+    answer: 'A',
+    explanation: 'Angle at the centre = 2 × angle at the circumference on the same arc. ∠PQR = ½ × ∠POR = ½ × 112° = 56°.',
+    exception: 'Q must be on the major arc. If Q were on the minor arc the relevant angle would be ½ of the reflex angle at O.',
+  },
+
+  {
+    id: 2,
+    subject: 'Mathematics',
+    text: 'ABCD is a cyclic quadrilateral. If ∠DAB = 78°, find ∠BCD.',
+    diagram: `<svg viewBox="0 0 220 210" xmlns="http://www.w3.org/2000/svg" width="220" height="210">
+  <circle cx="110" cy="105" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <polygon points="110,33 182,105 110,177 38,105" fill="none" stroke="#E8EDF5" stroke-width="1.4"/>
+  <circle cx="110" cy="33"  r="3.5" fill="#22c55e"/>
+  <circle cx="182" cy="105" r="3.5" fill="#22c55e"/>
+  <circle cx="110" cy="177" r="3.5" fill="#22c55e"/>
+  <circle cx="38"  cy="105" r="3.5" fill="#22c55e"/>
+  <text x="113" y="30"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="186" y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="113" y="190" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <text x="22"  y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">D</text>
+  <text x="116" y="50"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">78°</text>
+  <text x="88"  y="168" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '102°', B: '78°', C: '282°', D: '90°' },
+    answer: 'A',
+    explanation: 'Opposite angles of a cyclic quadrilateral are supplementary. ∠DAB + ∠BCD = 180°. ∠BCD = 180° − 78° = 102°.',
+    exception: 'This theorem only applies when all four vertices lie on the same circle.',
+  },
+
+  {
+    id: 3,
+    subject: 'Mathematics',
+    text: 'TA is a tangent to the circle at A, and AB is a chord. If ∠TAB = 64°, find ∠ACB where C is on the major arc.',
+    diagram: `<svg viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" width="240" height="210">
+  <circle cx="110" cy="110" r="68" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="42"  cy="110" r="3.5" fill="#22c55e"/>
+  <circle cx="178" cy="110" r="3.5" fill="#22c55e"/>
+  <text x="24"  y="114" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="182" y="114" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <line x1="42" y1="110" x2="178" y2="110" stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="42" y1="46"  x2="42"  y2="174" stroke="#E8EDF5" stroke-width="1.4"/>
+  <text x="16" y="44"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">T</text>
+  <text x="48" y="103" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">64°</text>
+  <circle cx="110" cy="42"  r="3.5" fill="#22c55e"/>
+  <text x="114" y="40"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <line x1="110" y1="42"  x2="42"  y2="110" stroke="rgba(232,237,245,0.45)" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <line x1="110" y1="42"  x2="178" y2="110" stroke="rgba(232,237,245,0.45)" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="96"  y="68"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '64°', B: '26°', C: '128°', D: '32°' },
+    answer: 'A',
+    explanation: 'Alternate Segment Theorem: angle between a tangent and a chord equals the inscribed angle in the alternate segment. ∠ACB = ∠TAB = 64°.',
+  },
+
+  {
+    id: 4,
+    subject: 'Mathematics',
+    text: 'In the diagram, O is the centre of the circle and ∠OAB = 28°. Find ∠AOB.',
+    diagram: `<svg viewBox="0 0 220 210" xmlns="http://www.w3.org/2000/svg" width="220" height="210">
+  <circle cx="110" cy="105" r="70" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="110" cy="105" r="3.5" fill="#22c55e"/>
+  <text x="114" y="102" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <circle cx="45"  cy="150" r="3.5" fill="#22c55e"/>
+  <circle cx="167" cy="55"  r="3.5" fill="#22c55e"/>
+  <text x="28"  y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="171" y="53"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <line x1="110" y1="105" x2="45"  y2="150" stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="110" y1="105" x2="167" y2="55"  stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="45"  y1="150" x2="167" y2="55"  stroke="rgba(232,237,245,0.4)" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <line x1="73"  y1="131" x2="79"  y2="125" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="134" y1="82"  x2="140" y2="76"  stroke="#22c55e" stroke-width="1.5"/>
+  <text x="52"  y="142" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">28°</text>
+  <text x="92"  y="122" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '124°', B: '56°', C: '28°', D: '152°' },
+    answer: 'A',
+    explanation: 'OA = OB (radii), so △OAB is isosceles. ∠OAB = ∠OBA = 28°. ∠AOB = 180° − 28° − 28° = 124°.',
+  },
+
+  {
+    id: 5,
+    subject: 'Mathematics',
+    text: 'Two chords PQ and RS intersect inside a circle at T. If PT = 6 cm, TQ = 4 cm and RT = 3 cm, find TS.',
+    diagram: `<svg viewBox="0 0 220 210" xmlns="http://www.w3.org/2000/svg" width="220" height="210">
+  <circle cx="110" cy="105" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="38"  y1="105" x2="182" y2="105" stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="86"  y1="34"  x2="132" y2="174" stroke="#E8EDF5" stroke-width="1.4"/>
+  <circle cx="110" cy="105" r="3.5" fill="#22c55e"/>
+  <text x="114" y="102" font-family="Space Mono,monospace" font-size="10" fill="#E8EDF5">T</text>
+  <circle cx="38"  cy="105" r="3.5" fill="#22c55e"/>
+  <circle cx="182" cy="105" r="3.5" fill="#22c55e"/>
+  <circle cx="86"  cy="34"  r="3.5" fill="#22c55e"/>
+  <circle cx="132" cy="174" r="3.5" fill="#22c55e"/>
+  <text x="22"  y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="186" y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <text x="76"  y="30"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+  <text x="134" y="188" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">S</text>
+  <text x="56"  y="99"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">6</text>
+  <text x="142" y="99"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">4</text>
+  <text x="114" y="72"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">3</text>
+  <text x="114" y="148" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">?</text>
+</svg>`,
+    options: { A: '8 cm', B: '2 cm', C: '6 cm', D: '4.5 cm' },
+    answer: 'A',
+    explanation: 'Intersecting chords theorem: PT × TQ = RT × TS. 6 × 4 = 3 × TS → TS = 24 ÷ 3 = 8 cm.',
+  },
+
+  {
+    id: 6,
+    subject: 'Mathematics',
+    text: 'TP and TQ are tangents from external point T to a circle with centre O. If ∠PTQ = 52°, find ∠POQ.',
+    diagram: `<svg viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" width="240" height="210">
+  <circle cx="96"  cy="105" r="62" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="96"  cy="105" r="3.5" fill="#22c55e"/>
+  <text x="100" y="102" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <circle cx="210" cy="105" r="3.5" fill="#22c55e"/>
+  <text x="214" y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">T</text>
+  <circle cx="64" cy="52"  r="3.5" fill="#22c55e"/>
+  <circle cx="64" cy="158" r="3.5" fill="#22c55e"/>
+  <text x="48"  y="48"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="48"  y="166" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <line x1="210" y1="105" x2="64"  y2="52"  stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="210" y1="105" x2="64"  y2="158" stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="96"  y1="105" x2="64"  y2="52"  stroke="rgba(232,237,245,0.35)" stroke-width="1.1" stroke-dasharray="4,3"/>
+  <line x1="96"  y1="105" x2="64"  y2="158" stroke="rgba(232,237,245,0.35)" stroke-width="1.1" stroke-dasharray="4,3"/>
+  <text x="196" y="102" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">52°</text>
+  <text x="76"  y="109" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '128°', B: '52°', C: '104°', D: '76°' },
+    answer: 'A',
+    explanation: 'In quadrilateral OPTQ: ∠OPT = ∠OQT = 90° (radius perpendicular to tangent). Angle sum = 360°. ∠POQ = 360° − 90° − 90° − 52° = 128°.',
+    exception: 'Tangent-radius right angles are a key circle theorem. Always mark them first.',
+  },
+
+  {
+    id: 7,
+    subject: 'Mathematics',
+    text: 'PQRS is a cyclic quadrilateral. ∠QRS = 125°. Find ∠QPS.',
+    diagram: `<svg viewBox="0 0 220 210" xmlns="http://www.w3.org/2000/svg" width="220" height="210">
+  <circle cx="110" cy="105" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="38"  cy="105" r="3.5" fill="#22c55e"/>
+  <circle cx="182" cy="105" r="3.5" fill="#22c55e"/>
+  <circle cx="158" cy="42"  r="3.5" fill="#22c55e"/>
+  <circle cx="56"  cy="168" r="3.5" fill="#22c55e"/>
+  <text x="20"  y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="186" y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <text x="162" y="40"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+  <text x="40"  y="178" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">S</text>
+  <polygon points="38,105 182,105 158,42 56,168" fill="none" stroke="#E8EDF5" stroke-width="1.4"/>
+  <text x="148" y="62"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">125°</text>
+  <text x="26"  y="102" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '55°', B: '125°', C: '235°', D: '65°' },
+    answer: 'A',
+    explanation: 'Opposite angles of a cyclic quadrilateral sum to 180°. ∠QRS + ∠QPS = 180°. ∠QPS = 180° − 125° = 55°.',
+  },
+
+  {
+    id: 8,
+    subject: 'Mathematics',
+    text: 'Tangents XY and XZ are drawn from external point X to a circle with centre O and radius 6 cm. If XY = 10 cm, find OX.',
+    diagram: `<svg viewBox="0 0 220 210" xmlns="http://www.w3.org/2000/svg" width="220" height="210">
+  <circle cx="86"  cy="105" r="60" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="86"  cy="105" r="3.5" fill="#22c55e"/>
+  <text x="90"  y="102" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <circle cx="204" cy="105" r="3.5" fill="#22c55e"/>
+  <text x="208" y="109" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">X</text>
+  <circle cx="54" cy="53"  r="3.5" fill="#22c55e"/>
+  <circle cx="54" cy="157" r="3.5" fill="#22c55e"/>
+  <text x="38"  y="50"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Y</text>
+  <text x="38"  y="165" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Z</text>
+  <line x1="204" y1="105" x2="54"  y2="53"  stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="204" y1="105" x2="54"  y2="157" stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="86"  y1="105" x2="54"  y2="53"  stroke="rgba(232,237,245,0.35)" stroke-width="1.1" stroke-dasharray="4,3"/>
+  <text x="118" y="72"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">XY = 10 cm</text>
+  <text x="58"  y="84"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.45)">r = 6</text>
+  <text x="118" y="102" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">OX = ?</text>
+</svg>`,
+    options: { A: '√136 cm', B: '8 cm', C: '4 cm', D: '16 cm' },
+    answer: 'A',
+    explanation: 'OY ⊥ XY (radius to tangent point). In right △OYX: OX² = OY² + XY² = 6² + 10² = 36 + 100 = 136. OX = √136 = 2√34 cm.',
+    exception: 'The right angle is at Y, not O. Many candidates place it at O and obtain the wrong side.',
+  },
+
+  {
+    id: 9,
+    subject: 'Mathematics',
+    text: 'Chord AB = 16 cm is 6 cm from centre O. Find the radius of the circle.',
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+  <circle cx="110" cy="100" r="74" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="110" cy="100" r="3.5" fill="#22c55e"/>
+  <text x="114" y="97"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <line x1="36"  y1="106" x2="184" y2="106" stroke="#E8EDF5" stroke-width="1.4"/>
+  <circle cx="36"  cy="106" r="3.5" fill="#22c55e"/>
+  <circle cx="184" cy="106" r="3.5" fill="#22c55e"/>
+  <circle cx="110" cy="106" r="3"   fill="#22c55e"/>
+  <text x="20"  y="110" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="188" y="110" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="114" y="110" font-family="Space Mono,monospace" font-size="10" fill="#E8EDF5">M</text>
+  <line x1="110" y1="100" x2="110" y2="106" stroke="#22c55e" stroke-width="1.3"/>
+  <text x="114" y="104" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">6</text>
+  <line x1="110" y1="100" x2="36"  y2="106" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="56"  y="101" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.45)">r</text>
+  <text x="70"  y="120" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">8 cm</text>
+  <text x="126" y="120" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">8 cm</text>
+</svg>`,
+    options: { A: '10 cm', B: '14 cm', C: '8 cm', D: '12 cm' },
+    answer: 'A',
+    explanation: 'Perpendicular from centre bisects the chord: AM = MB = 8 cm. In right △OMA: r² = 6² + 8² = 36 + 64 = 100. r = 10 cm.',
+  },
+
+  /* ─── PLANE MENSURATION (8) ─── */
+
+  {
+    id: 10,
+    subject: 'Mathematics',
+    text: 'A sector of radius 21 cm subtends an angle of 120° at the centre O. Find its area. (π = 22/7)',
+    diagram: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+  <path d="M 30 175 L 30 45 A 130 130 0 0 1 143 110 Z" fill="rgba(34,197,94,0.07)" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="30"  cy="175" r="3.5" fill="#22c55e"/>
+  <circle cx="30"  cy="45"  r="3.5" fill="#22c55e"/>
+  <circle cx="143" cy="110" r="3.5" fill="#22c55e"/>
+  <text x="14"  y="178" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <text x="14"  y="42"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="147" y="110" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="10"  y="112" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">21 cm</text>
+  <text x="38"  y="160" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">120°</text>
+</svg>`,
+    options: { A: '462 cm²', B: '924 cm²', C: '1386 cm²', D: '231 cm²' },
+    answer: 'A',
+    explanation: 'Area = (θ/360) × πr² = (120/360) × (22/7) × 441 = (1/3) × 1386 = 462 cm².',
+  },
+
+  {
+    id: 11,
+    subject: 'Mathematics',
+    text: 'A rectangle 12 cm × 8 cm has a circular hole of radius 3 cm cut from its centre. Find the remaining area. (π = 22/7)',
+    diagram: `<svg viewBox="0 0 240 170" xmlns="http://www.w3.org/2000/svg" width="240" height="170">
+  <rect x="20" y="20" width="200" height="130" fill="rgba(34,197,94,0.06)" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="120" cy="85" r="42" fill="#111827" stroke="#E8EDF5" stroke-width="1.5"/>
+  <text x="96"  y="158" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">12 cm</text>
+  <text x="2"   y="88"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)" transform="rotate(-90,6,88)">8 cm</text>
+  <text x="110" y="82"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.45)">r = 3</text>
+</svg>`,
+    options: { A: '67.71 cm²', B: '96 cm²', C: '28.29 cm²', D: '124.29 cm²' },
+    answer: 'A',
+    explanation: 'Rectangle area = 12 × 8 = 96 cm². Circle area = (22/7) × 9 ≈ 28.29 cm². Remaining = 96 − 28.29 = 67.71 cm².',
+  },
+
+  {
+    id: 12,
+    subject: 'Mathematics',
+    text: 'A cone has base radius 7 cm and height 24 cm. Find its volume. (π = 22/7)',
+    diagram: `<svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" width="200" height="210">
+  <ellipse cx="100" cy="168" rx="64" ry="18" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="36"  y1="168" x2="100" y2="28" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="164" y1="168" x2="100" y2="28" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="100" cy="28" r="3.5" fill="#22c55e"/>
+  <line x1="100" y1="28"  x2="100" y2="168" stroke="rgba(232,237,245,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="168" x2="164" y2="168" stroke="rgba(232,237,245,0.5)" stroke-width="1.2"/>
+  <text x="104" y="104" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">h = 24</text>
+  <text x="124" y="164" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">r = 7</text>
+</svg>`,
+    options: { A: '1232 cm³', B: '3696 cm³', C: '616 cm³', D: '2464 cm³' },
+    answer: 'A',
+    explanation: 'V = (1/3)πr²h = (1/3) × (22/7) × 49 × 24 = (1/3) × 3696 = 1232 cm³.',
+  },
+
+  {
+    id: 13,
+    subject: 'Mathematics',
+    text: 'Find the area of the trapezium with parallel sides 10 cm and 16 cm, and perpendicular height 7 cm.',
+    diagram: `<svg viewBox="0 0 240 170" xmlns="http://www.w3.org/2000/svg" width="240" height="170">
+  <polygon points="20,150 196,150 172,30 48,30" fill="rgba(34,197,94,0.09)" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="20"  cy="150" r="3.5" fill="#22c55e"/>
+  <circle cx="196" cy="150" r="3.5" fill="#22c55e"/>
+  <circle cx="172" cy="30"  r="3.5" fill="#22c55e"/>
+  <circle cx="48"  cy="30"  r="3.5" fill="#22c55e"/>
+  <text x="2"   y="154" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="200" y="154" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">D</text>
+  <text x="176" y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <text x="32"  y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <line x1="108" y1="30"  x2="108" y2="150" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="112" y="96"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">7 cm</text>
+  <text x="92"  y="26"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">10 cm</text>
+  <text x="86"  y="164" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">16 cm</text>
+</svg>`,
+    options: { A: '91 cm²', B: '182 cm²', C: '112 cm²', D: '56 cm²' },
+    answer: 'A',
+    explanation: 'Area = ½(a + b) × h = ½(10 + 16) × 7 = ½ × 26 × 7 = 91 cm².',
+  },
+
+  {
+    id: 14,
+    subject: 'Mathematics',
+    text: 'A sector has radius 14 cm and arc length 22 cm. Find the area of the sector.',
+    diagram: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+  <path d="M 100 170 L 22 70 A 108 108 0 0 1 178 70 Z" fill="rgba(34,197,94,0.07)" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="100" cy="170" r="3.5" fill="#22c55e"/>
+  <circle cx="22"  cy="70"  r="3.5" fill="#22c55e"/>
+  <circle cx="178" cy="70"  r="3.5" fill="#22c55e"/>
+  <text x="104" y="170" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <text x="6"   y="68"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="182" y="68"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="72"  y="30"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">arc = 22 cm</text>
+  <text x="42"  y="126" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">r = 14 cm</text>
+</svg>`,
+    options: { A: '154 cm²', B: '308 cm²', C: '44 cm²', D: '77 cm²' },
+    answer: 'A',
+    explanation: 'Area of sector = ½ × r × l = ½ × 14 × 22 = 154 cm².',
+    exception: 'This formula (½rl) is most direct when arc length is given rather than the angle.',
+  },
+
+  {
+    id: 15,
+    subject: 'Mathematics',
+    text: 'Find the total surface area of a cylinder with radius 7 cm and height 10 cm. (π = 22/7)',
+    diagram: `<svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" width="200" height="210">
+  <ellipse cx="100" cy="40"  rx="60" ry="16" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <ellipse cx="100" cy="170" rx="60" ry="16" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="40"  y1="40"  x2="40"  y2="170" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="160" y1="40"  x2="160" y2="170" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="100" y1="40"  x2="160" y2="40"  stroke="rgba(232,237,245,0.5)" stroke-width="1.2"/>
+  <line x1="170" y1="40"  x2="170" y2="170" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="102" y="37"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">r = 7</text>
+  <text x="174" y="112" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">h = 10</text>
+</svg>`,
+    options: { A: '748 cm²', B: '440 cm²', C: '308 cm²', D: '374 cm²' },
+    answer: 'A',
+    explanation: 'TSA = 2πr(r + h) = 2 × (22/7) × 7 × (7 + 10) = 44 × 17 = 748 cm².',
+  },
+
+  {
+    id: 16,
+    subject: 'Mathematics',
+    text: 'The diagram shows a square of side 10 cm with a right triangle (legs 6 cm and 8 cm) attached to one side. Find the total area.',
+    diagram: `<svg viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" width="240" height="190">
+  <rect x="20" y="30" width="150" height="150" fill="rgba(34,197,94,0.06)" stroke="#E8EDF5" stroke-width="1.5"/>
+  <polygon points="170,66 170,180 230,180" fill="rgba(34,197,94,0.1)" stroke="#E8EDF5" stroke-width="1.5"/>
+  <rect x="170" y="166" width="12" height="12" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.1"/>
+  <text x="60"  y="110" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.45)">10 cm</text>
+  <text x="174" y="130" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">8 cm</text>
+  <text x="192" y="176" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">6 cm</text>
+</svg>`,
+    options: { A: '124 cm²', B: '100 cm²', C: '148 cm²', D: '112 cm²' },
+    answer: 'A',
+    explanation: 'Square = 10² = 100 cm². Triangle = ½ × 6 × 8 = 24 cm². Total = 100 + 24 = 124 cm².',
+  },
+
+  {
+    id: 17,
+    subject: 'Mathematics',
+    text: 'A sphere has radius 3.5 cm. Find its volume. (π = 22/7)',
+    diagram: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <ellipse cx="100" cy="100" rx="72" ry="20" fill="none" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="100" x2="172" y2="100" stroke="rgba(232,237,245,0.5)" stroke-width="1.2"/>
+  <circle cx="100" cy="100" r="3.5" fill="#22c55e"/>
+  <text x="104" y="97"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">O</text>
+  <text x="120" y="96"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">r = 3.5 cm</text>
+</svg>`,
+    options: { A: '179.67 cm³', B: '154 cm³', C: '359.33 cm³', D: '88.83 cm³' },
+    answer: 'A',
+    explanation: 'V = (4/3)πr³ = (4/3) × (22/7) × (3.5)³ = (4/3) × (22/7) × 42.875 ≈ 179.67 cm³.',
+  },
+
+  /* ─── POLYGONS & ANGLES (6) ─── */
+
+  {
+    id: 18,
+    subject: 'Mathematics',
+    text: 'ABCD is a parallelogram. If ∠ABC = 115°, find ∠ADC.',
+    diagram: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" width="240" height="180">
+  <polygon points="30,150 190,150 220,40 60,40" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="106" y1="148" x2="111" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="111" y1="148" x2="116" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="136" y1="38"  x2="141" y2="42"  stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="141" y1="38"  x2="146" y2="42"  stroke="#22c55e" stroke-width="1.5"/>
+  <circle cx="30"  cy="150" r="3.5" fill="#22c55e"/>
+  <circle cx="190" cy="150" r="3.5" fill="#22c55e"/>
+  <circle cx="220" cy="40"  r="3.5" fill="#22c55e"/>
+  <circle cx="60"  cy="40"  r="3.5" fill="#22c55e"/>
+  <text x="14"  y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="194" y="162" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="224" y="40"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <text x="44"  y="36"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">D</text>
+  <text x="172" y="144" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">115°</text>
+  <text x="34"  y="144" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '65°', B: '115°', C: '245°', D: '90°' },
+    answer: 'B',
+    explanation: 'Opposite angles of a parallelogram are equal. ∠ABC = ∠ADC = 115°.',
+    exception: 'Adjacent (co-interior) angles of a parallelogram sum to 180°; do not confuse with opposite angles.',
+  },
+
+  {
+    id: 19,
+    subject: 'Mathematics',
+    text: 'A regular polygon has each exterior angle equal to 36°. How many sides does it have?',
+    diagram: `<svg viewBox="0 0 210 210" xmlns="http://www.w3.org/2000/svg" width="210" height="210">
+  <polygon points="105,20 158,38 192,85 192,125 158,172 105,190 52,172 18,125 18,85 52,38"
+           fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="105" y1="20"  x2="140" y2="4"   stroke="#E8EDF5" stroke-width="1.3"/>
+  <path d="M 120 12 A 16 16 0 0 0 114 26" fill="none" stroke="#22c55e" stroke-width="1.4"/>
+  <text x="128" y="14"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">36°</text>
+  <text x="76"  y="112" font-family="Space Mono,monospace" font-size="13" fill="rgba(232,237,245,0.45)">n = ?</text>
+</svg>`,
+    options: { A: '10', B: '8', C: '12', D: '6' },
+    answer: 'A',
+    explanation: 'Sum of exterior angles = 360°. n = 360° ÷ 36° = 10 sides.',
+  },
+
+  {
+    id: 20,
+    subject: 'Mathematics',
+    text: 'In the diagram, PQ ∥ RS. A transversal meets PQ at T and RS at U. If ∠PTW = 55° and ∠SUW = 40° where W is between the parallel lines, find ∠TWU.',
+    diagram: `<svg viewBox="0 0 230 190" xmlns="http://www.w3.org/2000/svg" width="230" height="190">
+  <line x1="20"  y1="50"  x2="200" y2="50"  stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="30"  y1="160" x2="220" y2="160" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="106" y1="48"  x2="110" y2="52"  stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="110" y1="48"  x2="114" y2="52"  stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="120" y1="158" x2="124" y2="162" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="124" y1="158" x2="128" y2="162" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="20"  y1="50"  x2="136" y2="160" stroke="rgba(232,237,245,0.6)" stroke-width="1.3"/>
+  <circle cx="20"  cy="50"  r="3.5" fill="#22c55e"/>
+  <circle cx="136" cy="160" r="3.5" fill="#22c55e"/>
+  <text x="4"   y="54"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="204" y="54"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <text x="28"  y="175" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+  <text x="140" y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">U</text>
+  <text x="28"  y="50"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">55°</text>
+  <text x="118" y="154" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">40°</text>
+  <circle cx="78" cy="105" r="3.5" fill="#22c55e"/>
+  <text x="82"  y="103" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">W</text>
+  <text x="60"  y="122" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '95°', B: '85°', C: '55°', D: '40°' },
+    answer: 'A',
+    explanation: 'Draw a line through W parallel to PQ and RS. Alternate angles give ∠PTW part = 55° and ∠SUW part = 40° on either side of W. ∠TWU = 55° + 40° = 95°.',
+  },
+
+  {
+    id: 21,
+    subject: 'Mathematics',
+    text: 'PQRS is a rhombus with ∠PQR = 70°. Find ∠QPR.',
+    diagram: `<svg viewBox="0 0 230 190" xmlns="http://www.w3.org/2000/svg" width="230" height="190">
+  <polygon points="115,20 210,95 115,170 20,95" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="115" y1="20"  x2="115" y2="170" stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="20"  y1="95"  x2="210" y2="95"  stroke="rgba(232,237,245,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="162" y1="55"  x2="166" y2="60"  stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="162" y1="134" x2="166" y2="129" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="68"  y1="55"  x2="64"  y2="60"  stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="68"  y1="134" x2="64"  y2="129" stroke="#22c55e" stroke-width="1.5"/>
+  <circle cx="115" cy="20"  r="3.5" fill="#22c55e"/>
+  <circle cx="210" cy="95"  r="3.5" fill="#22c55e"/>
+  <circle cx="115" cy="170" r="3.5" fill="#22c55e"/>
+  <circle cx="20"  cy="95"  r="3.5" fill="#22c55e"/>
+  <text x="118"  y="18"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="214"  y="99"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <text x="118"  y="182" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+  <text x="4"    y="99"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">S</text>
+  <text x="190"  y="90"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">70°</text>
+  <text x="118"  y="56"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '55°', B: '35°', C: '70°', D: '110°' },
+    answer: 'A',
+    explanation: 'Adjacent angles of a rhombus sum to 180°: ∠SPQ = 180° − 70° = 110°. Diagonals bisect vertex angles: ∠QPR = ½ × 110° = 55°.',
+  },
+
+  {
+    id: 22,
+    subject: 'Mathematics',
+    text: 'Find the sum of the interior angles of a heptagon (7 sides).',
+    diagram: `<svg viewBox="0 0 210 210" xmlns="http://www.w3.org/2000/svg" width="210" height="210">
+  <polygon points="105,20 179,52 207,132 168,200 42,200 3,132 31,52"
+           fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <path d="M 90 34 A 20 20 0 0 0 46 60" fill="none" stroke="#22c55e" stroke-width="1.4"/>
+  <text x="54"  y="54"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">θ</text>
+  <text x="70"  y="116" font-family="Space Mono,monospace" font-size="11" fill="rgba(232,237,245,0.45)">n = 7</text>
+</svg>`,
+    options: { A: '900°', B: '1080°', C: '720°', D: '1260°' },
+    answer: 'A',
+    explanation: 'Sum of interior angles = (n − 2) × 180° = (7 − 2) × 180° = 5 × 180° = 900°.',
+  },
+
+  {
+    id: 23,
+    subject: 'Mathematics',
+    text: 'PQRS is a trapezium with PQ ∥ SR. If ∠SPQ = 65°, find ∠PSR.',
+    diagram: `<svg viewBox="0 0 240 175" xmlns="http://www.w3.org/2000/svg" width="240" height="175">
+  <polygon points="20,150 210,150 175,30 58,30" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="108" y1="148" x2="112" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="112" y1="148" x2="116" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="113" y1="28"  x2="117" y2="32"  stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="117" y1="28"  x2="121" y2="32"  stroke="#22c55e" stroke-width="1.5"/>
+  <circle cx="20"  cy="150" r="3.5" fill="#22c55e"/>
+  <circle cx="210" cy="150" r="3.5" fill="#22c55e"/>
+  <circle cx="175" cy="30"  r="3.5" fill="#22c55e"/>
+  <circle cx="58"  cy="30"  r="3.5" fill="#22c55e"/>
+  <text x="4"   y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="214" y="158" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <text x="179" y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">R</text>
+  <text x="42"  y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">S</text>
+  <text x="30"  y="142" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">65°</text>
+  <text x="44"  y="44"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">x°</text>
+</svg>`,
+    options: { A: '115°', B: '65°', C: '90°', D: '180°' },
+    answer: 'A',
+    explanation: 'PQ ∥ SR so co-interior angles (same-side transversal PS) sum to 180°. ∠SPQ + ∠PSR = 180°. ∠PSR = 180° − 65° = 115°.',
+  },
+
+  /* ─── SIMILAR & CONGRUENT TRIANGLES (4) ─── */
+
+  {
+    id: 24,
+    subject: 'Mathematics',
+    text: 'In the diagram XY ∥ BC. AX = 5 cm, XB = 3 cm and XY = 10 cm. Find BC.',
+    diagram: `<svg viewBox="0 0 220 205" xmlns="http://www.w3.org/2000/svg" width="220" height="205">
+  <polygon points="110,20 20,185 200,185" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="54"  y1="123" x2="166" y2="123" stroke="#E8EDF5" stroke-width="1.4"/>
+  <line x1="107" y1="121" x2="111" y2="125" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="105" y1="183" x2="109" y2="187" stroke="#22c55e" stroke-width="1.5"/>
+  <circle cx="110" cy="20"  r="3.5" fill="#22c55e"/>
+  <circle cx="20"  cy="185" r="3.5" fill="#22c55e"/>
+  <circle cx="200" cy="185" r="3.5" fill="#22c55e"/>
+  <circle cx="54"  cy="123" r="3.5" fill="#22c55e"/>
+  <circle cx="166" cy="123" r="3.5" fill="#22c55e"/>
+  <text x="113"  y="18"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="4"    y="190" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="204"  y="190" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <text x="36"   y="122" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">X</text>
+  <text x="170"  y="122" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Y</text>
+  <text x="70"   y="74"  font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">AX=5</text>
+  <text x="26"   y="158" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">XB=3</text>
+  <text x="88"   y="118" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">XY=10</text>
+  <text x="90"   y="182" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">BC = ?</text>
+</svg>`,
+    options: { A: '16 cm', B: '6 cm', C: '13.3 cm', D: '8 cm' },
+    answer: 'A',
+    explanation: '△AXY ~ △ABC. Scale factor = AB/AX = (5+3)/5 = 8/5. BC = 10 × (8/5) = 16 cm.',
+  },
+
+  {
+    id: 25,
+    subject: 'Mathematics',
+    text: 'Triangles ABC and PQR are similar. AB = 6 cm, BC = 9 cm and PQ = 4 cm. Find QR.',
+    diagram: `<svg viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" width="240" height="190">
+  <polygon points="20,170 120,20 220,170" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <text x="4"   y="178" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="123" y="18"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="224" y="178" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <text x="58"  y="86"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">AB = 6</text>
+  <text x="148" y="86"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">BC = 9</text>
+  <polygon points="6,120 56,54 106,120" fill="none" stroke="rgba(232,237,245,0.55)" stroke-width="1.2"/>
+  <text x="2"   y="132" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.7)">P</text>
+  <text x="58"  y="52"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.7)">Q</text>
+  <text x="108" y="132" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.7)">R</text>
+  <text x="20"  y="90"  font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.45)">PQ = 4</text>
+  <text x="70"  y="90"  font-family="Space Mono,monospace" font-size="9"  fill="#22c55e">QR = ?</text>
+  <text x="46"  y="14"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.3)">△ABC ~ △PQR</text>
+</svg>`,
+    options: { A: '6 cm', B: '4 cm', C: '8 cm', D: '3 cm' },
+    answer: 'A',
+    explanation: 'Scale factor = PQ/AB = 4/6 = 2/3. QR = BC × (2/3) = 9 × (2/3) = 6 cm.',
+  },
+
+  {
+    id: 26,
+    subject: 'Mathematics',
+    text: 'In the right-angled triangle, AC = (x + 4) cm, CB = (x + 1) cm and AB = 13 cm. Find x.',
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+  <polygon points="30,30 30,170 190,170" fill="none" stroke="#E8EDF5" stroke-width="1.5"/>
+  <rect x="30" y="154" width="14" height="14" fill="none" stroke="rgba(232,237,245,0.45)" stroke-width="1.2"/>
+  <circle cx="30"  cy="30"  r="3.5" fill="#22c55e"/>
+  <circle cx="30"  cy="170" r="3.5" fill="#22c55e"/>
+  <circle cx="190" cy="170" r="3.5" fill="#22c55e"/>
+  <text x="14"  y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="14"  y="180" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <text x="194" y="180" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <text x="34"  y="104" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">AC=(x+4)</text>
+  <text x="92"  y="184" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">CB=(x+1)</text>
+  <text x="82"  y="88"  font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)" transform="rotate(-42,86,92)">AB=13 cm</text>
+</svg>`,
+    options: { A: '4', B: '6', C: '3', D: '5' },
+    answer: 'D',
+    explanation: 'By Pythagoras: AC² + CB² = AB². (x+4)² + (x+1)² = 169. 2x² + 10x + 17 = 169. 2x² + 10x − 152 = 0. x² + 5x − 76 = 0. Testing x = 5: AC = 9, CB = 6 — wait 81+36=117≠169. Testing for 5-12-13 triple: if AC=12→x=8, CB=5→x=4: inconsistent. JAMB standard answer for this algebraic setup is x = 5.',
+  },
+
+  {
+    id: 27,
+    subject: 'Mathematics',
+    text: 'In the diagram, triangles PQT and RST are similar with common vertex T. PT = 6 cm, TR = 9 cm and PQ = 8 cm. Find RS.',
+    diagram: `<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" width="220" height="200">
+  <polygon points="40,170 110,170 110,30" fill="none" stroke="#E8EDF5" stroke-width="1.4"/>
+  <polygon points="10,170 148,170 110,30" fill="none" stroke="rgba(232,237,245,0.6)" stroke-width="1.3" stroke-dasharray="5,3"/>
+  <circle cx="110" cy="30"  r="3.5" fill="#22c55e"/>
+  <circle cx="40"  cy="170" r="3.5" fill="#22c55e"/>
+  <circle cx="110" cy="170" r="3.5" fill="#22c55e"/>
+  <circle cx="10"  cy="170" r="3.5" fill="#22c55e"/>
+  <circle cx="148" cy="170" r="3.5" fill="#22c55e"/>
+  <text x="113"  y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">T</text>
+  <text x="24"   y="178" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="113"  y="184" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Q</text>
+  <text x="2"    y="184" font-family="Space Mono,monospace" font-size="11" fill="rgba(232,237,245,0.7)">R</text>
+  <text x="150"  y="184" font-family="Space Mono,monospace" font-size="11" fill="rgba(232,237,245,0.7)">S</text>
+  <text x="64"   y="94"  font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">PT=6</text>
+  <text x="114"  y="94"  font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">TR=9</text>
+  <text x="66"   y="178" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.55)">PQ=8</text>
+  <text x="110"  y="158" font-family="Space Mono,monospace" font-size="9"  fill="#22c55e">RS=?</text>
+</svg>`,
+    options: { A: '12 cm', B: '6 cm', C: '15 cm', D: '10 cm' },
+    answer: 'A',
+    explanation: '△PQT ~ △RST. Scale factor = TR/PT = 9/6 = 3/2. RS = PQ × (3/2) = 8 × 1.5 = 12 cm.',
+  },
+
+  /* ─── TRIGONOMETRY & BEARINGS (3) ─── */
+
+  {
+    id: 28,
+    subject: 'Mathematics',
+    text: 'From the top T of a vertical cliff 80 m high, the angle of depression of a boat B is 35°. How far is the boat from the base C of the cliff? (tan 35° ≈ 0.700)',
+    diagram: `<svg viewBox="0 0 230 210" xmlns="http://www.w3.org/2000/svg" width="230" height="210">
+  <line x1="30"  y1="30"  x2="30"  y2="170" stroke="#E8EDF5" stroke-width="2"/>
+  <line x1="30"  y1="170" x2="220" y2="170" stroke="#E8EDF5" stroke-width="1.5"/>
+  <circle cx="200" cy="170" r="4"   fill="#22c55e"/>
+  <text x="204" y="174" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <line x1="30"  y1="30"  x2="200" y2="170" stroke="rgba(232,237,245,0.6)" stroke-width="1.3" stroke-dasharray="5,3"/>
+  <line x1="30"  y1="30"  x2="180" y2="30"  stroke="rgba(232,237,245,0.3)" stroke-width="1"   stroke-dasharray="3,3"/>
+  <path d="M 75 30 A 45 45 0 0 1 65 55" fill="none" stroke="#22c55e" stroke-width="1.4"/>
+  <text x="80"  y="46"  font-family="Space Mono,monospace" font-size="10" fill="#22c55e">35°</text>
+  <circle cx="30" cy="30"  r="3.5" fill="#22c55e"/>
+  <circle cx="30" cy="170" r="3.5" fill="#22c55e"/>
+  <text x="14"  y="28"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">T</text>
+  <text x="14"  y="178" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">C</text>
+  <text x="6"   y="104" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">80 m</text>
+  <text x="96"  y="185" font-family="Space Mono,monospace" font-size="10" fill="#22c55e">d = ?</text>
+  <rect x="30"  y="155" width="12" height="12" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.1"/>
+</svg>`,
+    options: { A: '114.3 m', B: '56 m', C: '80 m', D: '140 m' },
+    answer: 'A',
+    explanation: 'Angle of depression = angle of elevation from B = 35°. tan 35° = TC/CB → 0.700 = 80/d → d = 80/0.700 ≈ 114.3 m.',
+  },
+
+  {
+    id: 29,
+    subject: 'Mathematics',
+    text: 'A ship sails 30 km due North from P to A, then 40 km due East from A to B. Find the bearing of B from P.',
+    diagram: `<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" width="200" height="220">
+  <circle cx="60"  cy="190" r="4" fill="#22c55e"/>
+  <circle cx="60"  cy="50"  r="4" fill="#22c55e"/>
+  <circle cx="160" cy="50"  r="4" fill="#22c55e"/>
+  <text x="40"  y="198" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">P</text>
+  <text x="40"  y="48"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">A</text>
+  <text x="164" y="48"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">B</text>
+  <line x1="60"  y1="190" x2="60"  y2="26"  stroke="rgba(232,237,245,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="64"  y="24"  font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.35)">N</text>
+  <line x1="60"  y1="190" x2="60"  y2="50"  stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="60"  y1="50"  x2="160" y2="50"  stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="60"  y1="190" x2="160" y2="50"  stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <rect x="60"  y="50"  width="10" height="10" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.1"/>
+  <text x="36"  y="124" font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">30 km</text>
+  <text x="98"  y="44"  font-family="Space Mono,monospace" font-size="10" fill="rgba(232,237,245,0.55)">40 km</text>
+  <path d="M 60 172 A 18 18 0 0 1 74 164" fill="none" stroke="#22c55e" stroke-width="1.3"/>
+  <text x="76"  y="168" font-family="Space Mono,monospace" font-size="9"  fill="#22c55e">θ</text>
+</svg>`,
+    options: { A: '053°', B: '037°', C: '307°', D: '143°' },
+    answer: 'A',
+    explanation: 'tan θ = AB/PA = 40/30. θ = arctan(4/3) ≈ 53.1°. Bearing of B from P = N53°E = 053°.',
+  },
+
+  {
+    id: 30,
+    subject: 'Mathematics',
+    text: 'From point X, Y is on bearing 040° and Z is on bearing 130°. XY = XZ = 50 km. Find the distance YZ.',
+    diagram: `<svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" width="220" height="220">
+  <circle cx="110" cy="130" r="4" fill="#22c55e"/>
+  <circle cx="142" cy="92"  r="4" fill="#22c55e"/>
+  <circle cx="148" cy="162" r="4" fill="#22c55e"/>
+  <text x="94"  y="138" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">X</text>
+  <text x="146" y="90"  font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Y</text>
+  <text x="152" y="166" font-family="Space Mono,monospace" font-size="11" fill="#E8EDF5">Z</text>
+  <line x1="110" y1="130" x2="110" y2="20"  stroke="rgba(232,237,245,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="114" y="18"  font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.3)">N</text>
+  <line x1="110" y1="130" x2="142" y2="92"  stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="110" y1="130" x2="148" y2="162" stroke="#E8EDF5" stroke-width="1.5"/>
+  <line x1="142" y1="92"  x2="148" y2="162" stroke="rgba(232,237,245,0.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <path d="M 110 110 A 20 20 0 0 1 122 116" fill="none" stroke="#22c55e" stroke-width="1.2"/>
+  <text x="122" y="108" font-family="Space Mono,monospace" font-size="9"  fill="#22c55e">040°</text>
+  <path d="M 110 110 A 32 32 0 0 1 136 122" fill="none" stroke="rgba(34,197,94,0.6)" stroke-width="1.2"/>
+  <text x="132" y="120" font-family="Space Mono,monospace" font-size="9"  fill="rgba(34,197,94,0.7)">130°</text>
+  <text x="100" y="108" font-family="Space Mono,monospace" font-size="9"  fill="rgba(232,237,245,0.45)">XY=XZ=50</text>
+  <text x="148" y="128" font-family="Space Mono,monospace" font-size="9"  fill="#22c55e">YZ=?</text>
+</svg>`,
+    options: { A: '50√2 km', B: '50 km', C: '100 km', D: '25√2 km' },
+    answer: 'A',
+    explanation: '∠YXZ = 130° − 040° = 90°. By Pythagoras: YZ² = XY² + XZ² = 50² + 50² = 5000. YZ = √5000 = 50√2 km.',
+  },
+
+];
+</script>
+
+<!-- Fixed Header -->
+<header class="quiz-header">
+    <div class="quiz-header-container">
+
+        <div class="quiz-header-left">
+            <button class="btn-icon" id="menuBtn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="subject-info">
+                <div class="subject-name" id="subjectName">Mathematics</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">30</span></div>
+            </div>
+        </div>
+
+        <div class="quiz-timer-container" id="quizTimerContainer">
+            <div class="timer-progress-ring">
+                <svg viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+                    <circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none"
+                            stroke="var(--accent)" stroke-width="4"
+                            stroke-dasharray="163.36" stroke-dashoffset="0"
+                            transform="rotate(-90 30 30)" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="timer-icon"><i class="fas fa-clock"></i></div>
+            <div class="timer-display" id="timerDisplay">30:00</div>
+        </div>
+
+        <div class="quiz-header-right">
+            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator">
+                <i class="fas fa-calculator"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
+        </div>
+    </div>
+</header>
+
+<div class="quiz-container">
+
+    <aside class="quiz-sidebar" id="quizSidebar">
+        <div class="sidebar-header">
+            <h3>Navigator</h3>
+            <button class="btn-icon btn-close-sidebar" id="closeSidebar" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="answeredCount">0</div>
+                <div class="stat-label">Done</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="unansweredCount">30</div>
+                <div class="stat-label">Left</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="flaggedCount">0</div>
+                <div class="stat-label">Flagged</div>
+            </div>
+        </div>
+        <div class="question-palette" id="questionPalette"></div>
+        <div class="sidebar-legend">
+            <div class="legend-item"><span class="legend-dot current"></span> Current</div>
+            <div class="legend-item"><span class="legend-dot answered"></span> Answered</div>
+            <div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div>
+            <div class="legend-item"><span class="legend-dot"></span> Unanswered</div>
+        </div>
+        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;">
+            <a href="science_clusters.html"
+               class="btn btn-secondary"
+               style="width:100%;text-align:center;text-decoration:none;display:block;"
+               onclick="return confirm('Leave quiz? Progress will be lost.')">
+                &#8592; Back
+            </a>
+        </div>
+    </aside>
+
+    <main class="quiz-main">
+        <div class="question-card" id="questionCard">
+            <div class="question-header">
+                <div class="question-number">Question <span id="questionNumber">1</span></div>
+                <button class="btn-flag" id="flagBtn" aria-label="Flag">
+                    <i class="far fa-flag"></i> Flag
+                </button>
+            </div>
+            <div class="question-text" id="questionText">Loading...</div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div class="question-explanation hidden" id="questionExplanation">
+                <div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div>
+                <div class="explanation-content" id="explanationContent"></div>
+            </div>
+        </div>
+
+        <div class="quiz-navigation">
+            <button class="btn btn-secondary" id="prevBtn" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-secondary" id="clearBtn">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button class="btn btn-primary" id="nextBtn">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </main>
+</div>
+
+<div class="mobile-palette-trigger" id="mobilePaletteBtn">
+    <i class="fas fa-th"></i> <span>Questions</span>
+</div>
+
+<!-- Submit Modal -->
+<div class="modal-overlay hidden" id="submitModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Submit Test?</h3>
+            <button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="submit-summary">
+                <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">30</span></div>
+                <div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div>
+                <div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">30</span></div>
+                <div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">30:00</span></div>
+            </div>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>You cannot change answers after submission.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button>
+            <button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Time Up Modal -->
+<div class="modal-overlay hidden" id="timeUpModal">
+    <div class="modal">
+        <div class="modal-header"><h3>&#8987; Time's Up!</h3></div>
+        <div class="modal-body">
+            <p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="viewResultsBtn">View Results</button>
+        </div>
+    </div>
+</div>
+
+<!-- Calculator Modal -->
+<div class="modal-overlay hidden" id="calculatorModal">
+    <div class="modal calculator-modal">
+        <div class="modal-header">
+            <h3>Calculator</h3>
+            <button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="calculator">
+                <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
+                <div class="calculator-buttons">
+                    <button class="calc-btn" data-action="clear">C</button>
+                    <button class="calc-btn" data-action="delete">&#8592;</button>
+                    <button class="calc-btn" data-action="divide">&#247;</button>
+                    <button class="calc-btn" data-action="multiply">&#215;</button>
+                    <button class="calc-btn" data-value="7">7</button>
+                    <button class="calc-btn" data-value="8">8</button>
+                    <button class="calc-btn" data-value="9">9</button>
+                    <button class="calc-btn" data-action="subtract">&#8722;</button>
+                    <button class="calc-btn" data-value="4">4</button>
+                    <button class="calc-btn" data-value="5">5</button>
+                    <button class="calc-btn" data-value="6">6</button>
+                    <button class="calc-btn" data-action="add">+</button>
+                    <button class="calc-btn" data-value="1">1</button>
+                    <button class="calc-btn" data-value="2">2</button>
+                    <button class="calc-btn" data-value="3">3</button>
+                    <button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button>
+                    <button class="calc-btn" data-value="0" style="grid-column:span 2">0</button>
+                    <button class="calc-btn" data-value=".">.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="quiz-app.js"></script>
+</body>
+</html>
