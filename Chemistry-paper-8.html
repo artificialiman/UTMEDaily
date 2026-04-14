@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Paper 8 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A;--card:#111827;--card2:#161E2E;--text:#E8EDF5;
+      --sec:rgba(232,237,245,0.75);--ter:rgba(232,237,245,0.45);
+      --accent:#22c55e;--accent2:#16a34a;--warn:#22c55e;--red:#EF4444;
+      --green:#10B981;--sep:rgba(255,255,255,0.08);--hov:rgba(255,255,255,0.05);
+      --r:14px;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;
+      padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none;z-index:0;opacity:0.5}
+    #watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;display:flex;
+      flex-direction:column;gap:2.2rem;padding:1rem;transform:rotate(-20deg) scale(1.5);
+      transform-origin:center center;opacity:0.09;font-family:var(--mono);font-size:0.95rem;
+      font-weight:700;color:#f0eff4;letter-spacing:0.1em;white-space:nowrap;
+      user-select:none;-webkit-user-select:none}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);
+      padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;
+      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .hdr-greeting{font-size:11px;color:var(--ter);background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);
+      padding:3px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:0.05em}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;
+      background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)}.gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--accent);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)}.gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)}.sc-v.w{color:var(--red)}.sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;
+      margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+      padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;
+      background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);color:var(--accent);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;
+      border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.05)}
+    .opt.sel{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)}.opt.no .opt-key{color:var(--red)}.opt.sel .opt-key{color:var(--accent)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--accent);color:#000;
+      font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;
+      transition:opacity 0.2s,transform 0.15s;letter-spacing:0.02em}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}
+    .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.18);
+      border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);
+      border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);
+      font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;
+      align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;
+      text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)}.timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)}.tu-stat-v.w{color:var(--red)}.tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);
+      font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .timeup-btn.sec{background:transparent;color:var(--ter);border:1px solid var(--sep);font-weight:400;font-size:13px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+      display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;
+      padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;
+      border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--accent);color:#000}
+    .modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    .dia{background:rgba(0,0,0,0.32);border-radius:9px;padding:10px;margin-bottom:13px;
+      border:1px solid rgba(255,255,255,0.09);overflow-x:auto}
+    .dia svg{display:block;width:100%;max-width:100%;height:auto}
+    @media print{
+      body{background:#fff!important;color:#000!important;font-size:12pt}
+      body::before,#watermark,.hdr,.gtimer,.submit-bar,.timeup,.modal-overlay,.abtn,.score-strip,.prog-wrap{display:none!important}
+      .exp{display:block!important;background:#f9f9f9!important;border:1px solid #ccc!important;color:#333!important}
+      .qcard{break-inside:avoid;border:1px solid #ddd!important;background:#fff!important;margin-bottom:20pt;page-break-inside:avoid}
+      .opt{border:1px solid #ccc!important;background:#fff!important}
+      .opt.ok{background:#e6f9f0!important;border-color:#10b981!important}
+      .opt.no{background:#fef2f2!important;border-color:#ef4444!important}
+      .opt-txt{color:#000!important}.qtxt{color:#000!important}
+      #print-header{display:block!important;text-align:center;margin-bottom:24pt;padding-bottom:12pt;border-bottom:2pt solid #000}
+      #print-header h1{font-size:18pt;font-weight:800;margin-bottom:4pt}
+      #print-header .ph-meta{font-size:10pt;color:#555;margin-bottom:4pt}
+      #print-header .ph-student{font-size:13pt;font-weight:700;color:#000}
+    }
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)}.hdr-title{font-size:13px}}
+    #auth-gate{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+    #auth-gate.unlocked{display:none}
+    .gate-box{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:16px;
+      padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6)}
+    .gate-logo{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;font-family:var(--mono)}
+    .gate-title{font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text)}
+    .gate-sub{font-size:0.85rem;color:var(--ter);margin:0 0 1.5rem}
+    .gate-input{width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;
+      border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text);
+      font-size:1rem;margin-bottom:0.5rem;outline:none}
+    .gate-input:focus{border-color:var(--accent)}
+    .gate-error{font-size:0.82rem;color:#f85149;margin:0 0 0.75rem}
+    .gate-btn{width:100%;padding:0.8rem;background:var(--accent);color:#000;border:none;border-radius:8px;
+      font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans)}
+    .gate-btn:hover{opacity:0.88}
+    .gate-pw-wrap{position:relative;margin-bottom:0.5rem}
+    .gate-toggle{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;
+      color:rgba(232,237,245,0.45);cursor:pointer;font-size:0.9rem;padding:0.25rem;line-height:1}
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Chemistry Paper 8</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Chemistry · Paper 8</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <div class="gate-pw-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password" style="margin-bottom:0;padding-right:2.75rem;">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Paper 8</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#11015; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#9201;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#11015; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH ── */
+(function(){
+  var R={
+    "de871e73f7929b1a6b8f68f738bafefe3c79b1e71f73023b0943a7a91949ab0c":"Conve",
+    "f1b59c2f184d07435dea624e624dcff601e02b33b59e222d68cb2e784828ee68":"Kaosara",
+    "6c3ab4f30db51e16a0625fe26d9ee6739e6bafb5d016d11c3282840068ffe86c":"Habibat",
+    "1b6eda2ab79d40ba25f9151a33b17cc384cd4bdc87edd643fae0e3290fb8fe73":"Oyin",
+    "09fb65294072fd74ffb850ab6ba07fc463d35684937a502ba106bfcff13eb21a":"Dorcas",
+    "112bcfee75a5f38c097a785b83c2965da86de6cc94ef6e768c7aba429d6acd28":"Famous",
+    "b8815d7f6d60c4e65275059ebabf132e0f5eb03b9491409f7dd5b71ca3cf5bc2":"Obasesam",
+    "b22064841c21b9751160df8edce2c81fdeb65bb456befe86a3b85759a619d95d":"Prosper",
+    "bf645fa0f9c80170a8b4035c3d0c6faaa52bd30ec65078111b7c0bdb2711376b":"Temi",
+    "390f4f0dba14f3f3f534b29540387ee588e79774ed54845e487bb71e7a6464d1":"Murphy",
+    "324fd213d710a964427386f2b097eac7191ee106627d4fb91b9105d81405e37e":"Improve",
+    "d8cab52a94eaba0196b5aa170142551a5006aade919e78c9e77d8e8767eaed65":"Zainab",
+    "57e296eadaf2f13a1d26ac6e82545e61517f5e28798f86174f10bb4a7eb95b44":"Fiyin",
+    "554d5052b5f9f55f971d616d2f6b8c4eff87fc2a5cd597b5f2069bff56f60286":"Aliyah",
+    "b5a2a45e79219cb8da934417435ca80e90dba6da17d9e2aba8881fc8f2764935":"Aremu Ella",
+    "470e2ab1f8add8362879614a82fbcf4262451a6c2e8fa2377eede7f497f20280":"Taiwo"
+  };
+  async function sha256(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+  window.attemptUnlock=async function(){
+    var pw=document.getElementById('gate-input').value.trim();if(!pw)return;
+    var h=await sha256(pw);
+    if(R[h]){
+      var n=R[h];document.getElementById('auth-gate').classList.add('unlocked');
+      var wm=document.getElementById('watermark');
+      if(wm){var t=n+' · GrantApp AI · ',row='';for(var r=0;r<8;r++)row+=t;var html='';for(var i=0;i<14;i++)html+='<span>'+row+'</span>';wm.innerHTML=html}
+      var g=document.getElementById('greeting');if(g){g.textContent='Hey, '+n;g.style.display='block'}
+      var ps=document.getElementById('print-student-name');if(ps)ps.textContent='Student: '+n;
+      var pd=document.getElementById('print-date');if(pd)pd.textContent='Printed: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    }else{document.getElementById('gate-error').style.display='block';document.getElementById('gate-input').value='';document.getElementById('gate-input').focus()}
+  };
+  document.addEventListener('DOMContentLoaded',function(){
+    var inp=document.getElementById('gate-input');
+    if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter')window.attemptUnlock()});
+    var tog=document.getElementById('gate-toggle');
+    if(tog)tog.addEventListener('click',function(){var h=inp.type==='password';inp.type=h?'text':'password';tog.innerHTML=h?'&#128584;':'&#128065;'});
+  });
+})();
+
+/* ── QUESTIONS ── */
+const QUESTIONS = [
+
+/* ══════════════════════════════════════════
+   SECTION A — CHEMICAL TESTS  Q1–Q16
+══════════════════════════════════════════ */
+
+{id:1,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 440 145" xmlns="http://www.w3.org/2000/svg">
+<text x="220" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Flame Test — Cation Colour Reference</text>
+<ellipse cx="60" cy="70" rx="26" ry="38" fill="#fbbf24" opacity="0.9"/>
+<ellipse cx="60" cy="55" rx="13" ry="22" fill="#fde68a" opacity="0.6"/>
+<rect x="49" y="107" width="22" height="7" rx="2" fill="#374151"/>
+<text x="60" y="128" text-anchor="middle" font-size="11" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">Na&#x207A;</text>
+<text x="60" y="142" text-anchor="middle" font-size="10" fill="#fbbf24" font-family="DM Sans,sans-serif">yellow</text>
+<ellipse cx="155" cy="70" rx="26" ry="38" fill="#c084fc" opacity="0.9"/>
+<ellipse cx="155" cy="55" rx="13" ry="22" fill="#e9d5ff" opacity="0.6"/>
+<rect x="144" y="107" width="22" height="7" rx="2" fill="#374151"/>
+<text x="155" y="128" text-anchor="middle" font-size="11" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">K&#x207A;</text>
+<text x="155" y="142" text-anchor="middle" font-size="10" fill="#c084fc" font-family="DM Sans,sans-serif">lilac</text>
+<ellipse cx="250" cy="70" rx="26" ry="38" fill="#dc2626" opacity="0.9"/>
+<ellipse cx="250" cy="55" rx="13" ry="22" fill="#fca5a5" opacity="0.6"/>
+<rect x="239" y="107" width="22" height="7" rx="2" fill="#374151"/>
+<text x="250" y="128" text-anchor="middle" font-size="11" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">Ca&#x00B2;&#x207A;</text>
+<text x="250" y="142" text-anchor="middle" font-size="10" fill="#ef4444" font-family="DM Sans,sans-serif">brick-red</text>
+<ellipse cx="345" cy="70" rx="26" ry="38" fill="#16a34a" opacity="0.9"/>
+<ellipse cx="345" cy="55" rx="13" ry="22" fill="#86efac" opacity="0.6"/>
+<rect x="334" y="107" width="22" height="7" rx="2" fill="#374151"/>
+<text x="345" y="128" text-anchor="middle" font-size="11" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">Ba&#x00B2;&#x207A;</text>
+<text x="345" y="142" text-anchor="middle" font-size="10" fill="#4ade80" font-family="DM Sans,sans-serif">apple-green</text>
+</svg></div>
+A wire dipped in a solution gives a <strong>persistent yellow</strong> flame. Using the chart above, the cation present is:`,
+opts:{A:"K&#x207A; ion",B:"Ba&#x00B2;&#x207A; ion",C:"Ca&#x00B2;&#x207A; ion",D:"Na&#x207A; ion"},ans:"D",
+exp:"Na&#x207A; gives a persistent yellow flame — the most recognisable of all flame tests. K&#x207A; gives lilac (needs blue cobalt glass to see it clearly). Ca&#x00B2;&#x207A; gives brick-red; Ba&#x00B2;&#x207A; gives apple-green. Yellow from Na&#x207A; is caused by electrons in sodium atoms emitting photons at ~589 nm as they relax from 3p to 3s orbitals after thermal excitation."},
+
+{id:2,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 320 165" xmlns="http://www.w3.org/2000/svg">
+<text x="160" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">NaOH(aq) added to Fe&#x00B2;&#x207A; and Fe&#x00B3;&#x207A;</text>
+<rect x="35" y="25" width="56" height="95" rx="6" fill="#14532d" opacity="0.45" stroke="#22c55e" stroke-width="1.2"/>
+<rect x="37" y="72" width="52" height="46" rx="4" fill="#4ade80" opacity="0.6"/>
+<text x="63" y="94" text-anchor="middle" font-size="9" fill="#111827" font-weight="700" font-family="DM Sans,sans-serif">Fe(OH)&#x2082;</text>
+<text x="63" y="107" text-anchor="middle" font-size="9" fill="#166534" font-family="DM Sans,sans-serif">green ppt</text>
+<text x="63" y="135" text-anchor="middle" font-size="11" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">Fe&#x00B2;&#x207A;</text>
+<text x="63" y="149" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">+ NaOH(aq)</text>
+<rect x="170" y="25" width="56" height="95" rx="6" fill="#7c2d12" opacity="0.45" stroke="#f97316" stroke-width="1.2"/>
+<rect x="172" y="68" width="52" height="50" rx="4" fill="#b45309" opacity="0.75"/>
+<text x="198" y="91" text-anchor="middle" font-size="9" fill="#fde68a" font-weight="700" font-family="DM Sans,sans-serif">Fe(OH)&#x2083;</text>
+<text x="198" y="104" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">red-brown ppt</text>
+<text x="198" y="135" text-anchor="middle" font-size="11" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">Fe&#x00B3;&#x207A;</text>
+<text x="198" y="149" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">+ NaOH(aq)</text>
+<text x="135" y="80" text-anchor="middle" font-size="13" fill="#64748b" font-weight="700" font-family="DM Sans,sans-serif">vs</text>
+</svg></div>
+From the diagram, which statement correctly describes both iron ion reactions with NaOH?`,
+opts:{A:"Fe&#x00B2;&#x207A; gives red-brown ppt; Fe&#x00B3;&#x207A; gives green ppt",B:"Fe&#x00B2;&#x207A; gives green ppt; Fe&#x00B3;&#x207A; gives red-brown ppt",C:"Both give identical white precipitates insoluble in excess NaOH",D:"Fe&#x00B2;&#x207A; dissolves in excess NaOH; Fe&#x00B3;&#x207A; gives red-brown ppt"},ans:"B",
+exp:"Fe&#x00B2;&#x207A; + 2OH&#x207B; &#x2192; Fe(OH)&#x2082;&#x2193; (green/pale green). Fe&#x00B3;&#x207A; + 3OH&#x207B; &#x2192; Fe(OH)&#x2083;&#x2193; (red-brown). Neither dissolves in excess NaOH, distinguishing them from Al(OH)&#x2083; and Zn(OH)&#x2082; which are amphoteric. The green Fe(OH)&#x2082; oxidises slowly in air to red-brown Fe(OH)&#x2083;, so results should be read immediately."},
+
+{id:3,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a3" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+<text x="200" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Limewater test — gas identification</text>
+<ellipse cx="65" cy="105" rx="36" ry="45" fill="#1e3a5f" opacity="0.55" stroke="#60a5fa" stroke-width="1.2"/>
+<ellipse cx="65" cy="80" rx="18" ry="22" fill="#1e3a5f" opacity="0.55" stroke="#60a5fa" stroke-width="1.2"/>
+<text x="65" y="115" text-anchor="middle" font-size="9" fill="#93c5fd" font-family="DM Sans,sans-serif">marble + HCl</text>
+<line x1="83" y1="70" x2="195" y2="70" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="195" y1="70" x2="195" y2="88" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="130" cy="64" r="4" fill="#e8edf5" opacity="0.2"/>
+<circle cx="155" cy="62" r="3" fill="#e8edf5" opacity="0.2"/>
+<text x="145" y="55" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">CO&#x2082;</text>
+<rect x="174" y="88" width="44" height="68" rx="5" fill="#334155" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="176" y="118" width="40" height="36" rx="3" fill="#d1d5db" opacity="0.55"/>
+<text x="196" y="138" text-anchor="middle" font-size="9" fill="#1e293b" font-weight="700" font-family="DM Sans,sans-serif">milky</text>
+<text x="196" y="150" text-anchor="middle" font-size="8" fill="#374151" font-family="DM Sans,sans-serif">CaCO&#x2083;&#x2193;</text>
+<text x="196" y="168" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">limewater</text>
+<text x="320" y="82" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">excess CO&#x2082;</text>
+<text x="320" y="95" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">&#x2192; clears</text>
+<text x="320" y="108" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">Ca(HCO&#x2083;)&#x2082;</text>
+<text x="320" y="119" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">(soluble)</text>
+<line x1="222" y1="100" x2="290" y2="100" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#a3)"/>
+</svg></div>
+The diagram shows a gas turning limewater milky, then clearing with excess gas. The gas is:`,
+opts:{A:"SO&#x2082; gas",B:"HCl gas",C:"CO&#x2082; gas",D:"NH&#x2083; gas"},ans:"C",
+exp:"CO&#x2082; + Ca(OH)&#x2082; &#x2192; CaCO&#x2083;&#x2193; (milky) + H&#x2082;O. With excess CO&#x2082;: CaCO&#x2083; + CO&#x2082; + H&#x2082;O &#x2192; Ca(HCO&#x2083;)&#x2082; (soluble, clears). This clearing with excess is unique to CO&#x2082; among common lab gases. SO&#x2082; also turns limewater milky (CaSO&#x2083;) but does not readily clear. NH&#x2083; turns red litmus blue. HCl gives white fumes with ammonia."},
+
+{id:4,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 430 170" xmlns="http://www.w3.org/2000/svg">
+<text x="215" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Halide identification — AgNO&#x2083; + NH&#x2083; test sequence</text>
+<rect x="8" y="22" width="96" height="24" rx="3" fill="#1e293b"/>
+<rect x="110" y="22" width="96" height="24" rx="3" fill="#1e293b"/>
+<rect x="212" y="22" width="96" height="24" rx="3" fill="#1e293b"/>
+<rect x="314" y="22" width="108" height="24" rx="3" fill="#1e293b"/>
+<text x="56" y="38" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">Test</text>
+<text x="158" y="38" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">Cl&#x207B;</text>
+<text x="260" y="38" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">Br&#x207B;</text>
+<text x="368" y="38" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">I&#x207B;</text>
+<rect x="8" y="50" width="96" height="30" rx="2" fill="#0f172a" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+<text x="56" y="62" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">+ AgNO&#x2083;</text>
+<text x="56" y="75" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">(acidified)</text>
+<rect x="120" y="57" width="76" height="18" rx="3" fill="#f1f5f9" opacity="0.85"/>
+<text x="158" y="70" text-anchor="middle" font-size="9" fill="#111827" font-weight="700" font-family="DM Sans,sans-serif">White ppt</text>
+<rect x="222" y="57" width="76" height="18" rx="3" fill="#d4c5a9" opacity="0.85"/>
+<text x="260" y="70" text-anchor="middle" font-size="9" fill="#111827" font-weight="700" font-family="DM Sans,sans-serif">Cream ppt</text>
+<rect x="324" y="57" width="88" height="18" rx="3" fill="#fbbf24" opacity="0.85"/>
+<text x="368" y="70" text-anchor="middle" font-size="9" fill="#111827" font-weight="700" font-family="DM Sans,sans-serif">Yellow ppt</text>
+<rect x="8" y="85" width="96" height="28" rx="2" fill="#0f172a" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+<text x="56" y="97" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">+ dil. NH&#x2083;</text>
+<text x="158" y="100" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="DM Sans,sans-serif">Dissolves</text>
+<text x="260" y="100" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">Insoluble</text>
+<text x="368" y="100" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">Insoluble</text>
+<rect x="8" y="118" width="96" height="28" rx="2" fill="#0f172a" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+<text x="56" y="130" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">+ conc. NH&#x2083;</text>
+<text x="158" y="133" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="DM Sans,sans-serif">Dissolves</text>
+<text x="260" y="133" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="DM Sans,sans-serif">Dissolves</text>
+<text x="368" y="133" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">Insoluble</text>
+<text x="215" y="158" text-anchor="middle" font-size="8" fill="#475569" font-family="DM Sans,sans-serif">AgCl (white) · AgBr (cream) · AgI (yellow) precipitates formed with acidified AgNO&#x2083;</text>
+</svg></div>
+A solution gives a <strong>cream precipitate</strong> with AgNO&#x2083; that is <strong>insoluble in dilute NH&#x2083; but dissolves in concentrated NH&#x2083;</strong>. The halide ion is:`,
+opts:{A:"Cl&#x207B; (chloride)",B:"F&#x207B; (fluoride)",C:"I&#x207B; (iodide)",D:"Br&#x207B; (bromide)"},ans:"D",
+exp:"AgBr is cream/pale yellow, insoluble in dilute NH&#x2083;, but dissolves in concentrated NH&#x2083;. The NH&#x2083; solubility ladder: AgCl dissolves in dilute NH&#x2083;; AgBr dissolves in conc. NH&#x2083; only; AgI is insoluble in both dilute and concentrated NH&#x2083;. AgF is soluble in water (no precipitate). This sequence is the standard JAMB halide identification test."},
+
+{id:5,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 340 148" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a5" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#fbbf24"/></marker></defs>
+<text x="170" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Fehling's Test — Reducing Sugar</text>
+<polygon points="36,28 106,28 114,118 28,118" fill="#1d4ed8" opacity="0.5" stroke="#60a5fa" stroke-width="1.2"/>
+<text x="71" y="72" text-anchor="middle" font-size="10" fill="#93c5fd" font-family="DM Sans,sans-serif">Deep blue</text>
+<text x="71" y="85" text-anchor="middle" font-size="9" fill="#64748b" font-family="DM Sans,sans-serif">Cu&#x00B2;&#x207A; solution</text>
+<text x="71" y="138" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">Before heating</text>
+<line x1="120" y1="73" x2="182" y2="73" stroke="#fbbf24" stroke-width="2" marker-end="url(#a5)"/>
+<text x="151" y="62" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">+ reducing</text>
+<text x="151" y="74" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">sugar, heat</text>
+<polygon points="196,28 266,28 274,118 188,118" fill="#7c2d12" opacity="0.55" stroke="#f97316" stroke-width="1.2"/>
+<rect x="190" y="96" width="82" height="20" rx="3" fill="#b45309" opacity="0.85"/>
+<text x="231" y="72" text-anchor="middle" font-size="9" fill="#fdba74" font-family="DM Sans,sans-serif">Blue clears;</text>
+<text x="231" y="85" text-anchor="middle" font-size="9" fill="#fde68a" font-family="DM Sans,sans-serif">brick-red &#x2193;</text>
+<text x="231" y="110" text-anchor="middle" font-size="8" fill="#fde68a" font-family="DM Sans,sans-serif">Cu&#x2082;O ppt</text>
+<text x="231" y="138" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">After heating</text>
+</svg></div>
+Which substance gives the <strong>positive brick-red result</strong> shown when heated with Fehling's solution?`,
+opts:{A:"Sucrose (table sugar)",B:"Glucose (a reducing sugar)",C:"Starch polymer",D:"Vegetable oil (triglyceride)"},ans:"B",
+exp:"Reducing sugars (glucose, fructose, maltose, lactose) reduce Cu&#x00B2;&#x207A; (Fehling's blue solution) to Cu&#x2082;O (brick-red precipitate). The aldehyde or alpha-keto group is oxidised to a carboxylate in the process. Sucrose is a non-reducing disaccharide — no free aldehyde/ketone group — gives no colour change. Starch and triglycerides do not react. Benedict's solution works by the same mechanism."},
+
+{id:6,topic:"Chemical Tests",
+text:"Butan-2-ol is warmed with I&#x2082;/NaOH (alkaline iodine solution). The observation and correct conclusion are:",
+opts:{A:"No reaction; butan-2-ol is a primary alcohol and does not react with I&#x2082;/NaOH",B:"White precipitate forms; NaOH neutralises the alcohol directly",C:"Yellow CHI&#x2083; precipitate forms; butan-2-ol oxidises to a methyl ketone which reacts",D:"Red-brown colour persists; I&#x2082; cannot oxidise secondary alcohols"},ans:"C",
+exp:"Butan-2-ol (secondary alcohol) is first oxidised by I&#x2082;/NaOH to butanone (CH&#x2083;COCH&#x2082;CH&#x2083;). Butanone is a methyl ketone (CH&#x2083;CO&#x2013;) and reacts with excess I&#x2082;/NaOH to give CHI&#x2083; (iodoform — yellow crystals with antiseptic smell). Iodoform test is positive for: methyl ketones, ethanal (CH&#x2083;CHO), and secondary alcohols oxidisable to methyl ketones. Butan-1-ol gives a negative result."},
+
+{id:7,topic:"Chemical Tests",
+text:"Bromine water is added separately to cyclohexane and cyclohexene at room temperature in the dark. The correct pair of observations is:",
+opts:{A:"Both decolourise bromine water rapidly",B:"Cyclohexane decolourises slowly; cyclohexene has no effect",C:"Neither compound reacts with bromine water in the dark",D:"Cyclohexene decolourises bromine water; cyclohexane gives no reaction"},ans:"D",
+exp:"Cyclohexene has a C=C double bond and undergoes rapid electrophilic addition with Br&#x2082;: C&#x2086;H&#x2081;&#x2080; + Br&#x2082; &#x2192; C&#x2086;H&#x2081;&#x2080;Br&#x2082; (orange-brown &#x2192; colourless). Cyclohexane is fully saturated; it does not react with bromine water in the dark (only via free-radical substitution under UV light). Bromine water decolourisation is the standard JAMB unsaturation test for C=C bonds."},
+
+{id:8,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 430 155" xmlns="http://www.w3.org/2000/svg">
+<text x="215" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">pH Indicator Colour Ranges</text>
+<line x1="28" y1="26" x2="422" y2="26" stroke="#475569" stroke-width="1"/>
+<text x="28" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">0</text>
+<text x="56" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">1</text>
+<text x="84" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">2</text>
+<text x="112" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">3</text>
+<text x="140" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">4</text>
+<text x="168" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">5</text>
+<text x="196" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">6</text>
+<text x="224" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">7</text>
+<text x="252" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">8</text>
+<text x="280" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">9</text>
+<text x="308" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">10</text>
+<text x="336" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">11</text>
+<text x="364" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">12</text>
+<text x="392" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">13</text>
+<text x="420" y="22" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">14</text>
+<text x="8" y="49" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">MO</text>
+<rect x="28" y="35" width="84" height="20" rx="3" fill="#ef4444" opacity="0.8"/>
+<text x="70" y="49" text-anchor="middle" font-size="8" fill="#fff" font-family="DM Sans,sans-serif">red</text>
+<rect x="112" y="35" width="42" height="20" rx="3" fill="#f97316" opacity="0.85"/>
+<text x="133" y="49" text-anchor="middle" font-size="8" fill="#fff" font-family="DM Sans,sans-serif">org</text>
+<rect x="154" y="35" width="268" height="20" rx="3" fill="#fbbf24" opacity="0.8"/>
+<text x="288" y="49" text-anchor="middle" font-size="8" fill="#111" font-family="DM Sans,sans-serif">yellow</text>
+<text x="8" y="82" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Lit</text>
+<rect x="28" y="68" width="182" height="20" rx="3" fill="#ef4444" opacity="0.8"/>
+<text x="119" y="82" text-anchor="middle" font-size="8" fill="#fff" font-family="DM Sans,sans-serif">red</text>
+<rect x="210" y="68" width="56" height="20" rx="3" fill="#a855f7" opacity="0.8"/>
+<text x="238" y="82" text-anchor="middle" font-size="8" fill="#fff" font-family="DM Sans,sans-serif">purp</text>
+<rect x="266" y="68" width="156" height="20" rx="3" fill="#3b82f6" opacity="0.8"/>
+<text x="344" y="82" text-anchor="middle" font-size="8" fill="#fff" font-family="DM Sans,sans-serif">blue</text>
+<text x="8" y="116" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">PP</text>
+<rect x="28" y="102" width="238" height="20" rx="3" fill="#334155" opacity="0.65"/>
+<text x="147" y="116" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">colourless</text>
+<rect x="266" y="102" width="156" height="20" rx="3" fill="#f472b6" opacity="0.8"/>
+<text x="344" y="116" text-anchor="middle" font-size="8" fill="#fff" font-family="DM Sans,sans-serif">pink / red</text>
+<line x1="168" y1="26" x2="168" y2="130" stroke="#22c55e" stroke-width="1.8" stroke-dasharray="5,3"/>
+<text x="168" y="142" text-anchor="middle" font-size="8" fill="#22c55e" font-family="DM Sans,sans-serif">EP &#x2248; pH 5</text>
+<text x="215" y="154" text-anchor="middle" font-size="7" fill="#475569" font-family="DM Sans,sans-serif">MO = Methyl Orange  Lit = Litmus  PP = Phenolphthalein  EP = equivalence point</text>
+</svg></div>
+The green dashed line shows the equivalence point (pH &#x2248; 5) for a <strong>strong acid + weak base</strong> titration. From the chart, the <strong>suitable</strong> indicator is:`,
+opts:{A:"Phenolphthalein only",B:"Litmus only",C:"Methyl orange only",D:"Both litmus and phenolphthalein"},ans:"C",
+exp:"The equivalence point for strong acid + weak base is at pH ~5 (acidic side). The indicator must change within the steep region near this pH. Methyl orange (transition pH 3.1&#x2013;4.4) falls in this region and gives a sharp end-point. Phenolphthalein (pH 8.2&#x2013;10) and litmus (pH 6.5&#x2013;8.3) both straddle pH values well above 5 and would give a very gradual, imprecise colour change."},
+
+{id:9,topic:"Chemical Tests",
+text:"To confirm SO&#x2084;&#x00B2;&#x207B; in a solution that may also contain CO&#x2083;&#x00B2;&#x207B;, a student first adds dilute HCl before adding BaCl&#x2082;. The reason for acidification is:",
+opts:{A:"HCl converts SO&#x2084;&#x00B2;&#x207B; to H&#x2082;SO&#x2084; which precipitates more readily with Ba&#x00B2;&#x207A;",B:"HCl destroys CO&#x2083;&#x00B2;&#x207B; (as CO&#x2082; gas) so BaCO&#x2083; (also white) cannot give a false positive",C:"HCl lowers pH so BaSO&#x2084; precipitates more completely from solution",D:"HCl prevents BaSO&#x2084; from dissolving in excess BaCl&#x2082; solution"},ans:"B",
+exp:"BaCO&#x2083; is also a white precipitate (Ba&#x00B2;&#x207A; + CO&#x2083;&#x00B2;&#x207B; &#x2192; BaCO&#x2083;&#x2193;). Without acidification, carbonate would give a false positive. Adding HCl first: CO&#x2083;&#x00B2;&#x207B; + 2H&#x207A; &#x2192; H&#x2082;O + CO&#x2082;&#x2191; (effervescence). BaSO&#x2084; is unaffected by HCl (insoluble in acid), so it still precipitates. The white BaSO&#x2084; ppt insoluble in dilute HCl is then conclusive for sulfate."},
+
+{id:10,topic:"Chemical Tests",
+text:"Lucas reagent (ZnCl&#x2082;/conc. HCl) is added to three alcohols at room temperature. X &#x2014; immediate cloudiness; Y &#x2014; cloudiness after ~5 minutes; Z &#x2014; no cloudiness after 5 minutes. The correct assignment is:",
+opts:{A:"X = primary; Y = tertiary; Z = secondary",B:"X = secondary; Y = primary; Z = tertiary",C:"X = tertiary; Y = secondary; Z = primary",D:"X = primary; Y = secondary; Z = tertiary"},ans:"C",
+exp:"Lucas test detects alcohol class by rate of reaction forming insoluble alkyl chloride (cloudiness). Tertiary alcohols react immediately (most stable 3&#x00B0; carbocation intermediate). Secondary alcohols react in ~5 minutes. Primary alcohols do not react at room temperature (1&#x00B0; carbocation too unstable). X (immediate) = tertiary; Y (~5 min) = secondary; Z (no reaction) = primary."},
+
+{id:11,topic:"Chemical Tests",
+text:"Tollens' reagent ([Ag(NH&#x2083;)&#x2082;]&#x207A;) is warmed with butanal and butanone in separate test tubes. The result is:",
+opts:{A:"Both give a silver mirror because all carbonyl compounds reduce Tollens' reagent",B:"Butanal gives no change; butanone gives a silver mirror",C:"Butanal gives a silver mirror; butanone gives no change",D:"Both give a black precipitate of Ag&#x2082;O under heating"},ans:"C",
+exp:"Tollens' reagent oxidises aldehydes: RCHO + 2[Ag(NH&#x2083;)&#x2082;]&#x207A; + 2OH&#x207B; &#x2192; RCOO&#x207B; + 2Ag&#x2193; (silver mirror). Butanal (an aldehyde, &#x2013;CHO) gives a positive silver mirror. Butanone (a ketone, &#x2013;CO&#x2013;) cannot be oxidised under these mild conditions. This test distinguishes aldehydes from ketones. The same distinction applies with Fehling's / Benedict's reagent."},
+
+{id:12,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 400 145" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a12" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#fbbf24"/></marker></defs>
+<text x="200" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Acidified K&#x2082;Cr&#x2082;O&#x2087; test — butan-2-ol</text>
+<text x="20" y="44" font-size="11" fill="#e8edf5" font-family="DM Sans,sans-serif">CH&#x2083;&#x2013;CH(OH)&#x2013;CH&#x2082;&#x2013;CH&#x2083;</text>
+<text x="95" y="62" text-anchor="middle" font-size="9" fill="#22c55e" font-family="DM Sans,sans-serif">butan-2-ol (secondary)</text>
+<line x1="195" y1="44" x2="248" y2="44" stroke="#fbbf24" stroke-width="2" marker-end="url(#a12)"/>
+<text x="222" y="36" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">K&#x2082;Cr&#x2082;O&#x2087;/H&#x207A;</text>
+<text x="222" y="48" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">gentle heat</text>
+<rect x="258" y="22" width="30" height="52" rx="4" fill="#f97316" opacity="0.9" stroke="#fb923c" stroke-width="1"/>
+<text x="273" y="82" text-anchor="middle" font-size="8" fill="#fb923c" font-family="DM Sans,sans-serif">orange</text>
+<text x="273" y="93" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">Cr&#x2082;O&#x2087;&#x00B2;&#x207B;</text>
+<line x1="292" y1="47" x2="314" y2="47" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a12)"/>
+<rect x="318" y="22" width="30" height="52" rx="4" fill="#16a34a" opacity="0.9" stroke="#4ade80" stroke-width="1"/>
+<text x="333" y="82" text-anchor="middle" font-size="8" fill="#4ade80" font-family="DM Sans,sans-serif">green</text>
+<text x="333" y="93" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">Cr&#x00B3;&#x207A;</text>
+<text x="300" y="115" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="DM Sans,sans-serif">Product:</text>
+<text x="300" y="130" text-anchor="middle" font-size="10" fill="#22c55e" font-family="DM Sans,sans-serif">butanone (ketone)</text>
+</svg></div>
+The diagram shows butan-2-ol being oxidised by acidified K&#x2082;Cr&#x2082;O&#x2087;. This colour change and product are consistent with butan-2-ol being a:`,
+opts:{A:"Primary alcohol oxidised to a carboxylic acid",B:"Tertiary alcohol that resists oxidation entirely",C:"Primary alcohol oxidised to an aldehyde",D:"Secondary alcohol oxidised to a ketone"},ans:"D",
+exp:"Butan-2-ol is a secondary alcohol (&#x2013;OH on C2, flanked by two carbon groups). K&#x2082;Cr&#x2082;O&#x2087;/H&#x207A; oxidises secondary alcohols to ketones only. Cr&#x2082;O&#x2087;&#x00B2;&#x207B; (orange) &#x2192; Cr&#x00B3;&#x207A; (green) confirms oxidation has occurred. Primary alcohols are oxidised to aldehydes, then carboxylic acids with excess oxidant. Tertiary alcohols have no alpha-hydrogen and resist K&#x2082;Cr&#x2082;O&#x2087; oxidation &#x2014; colour stays orange."},
+
+{id:13,topic:"Chemical Tests",
+text:"Both CO&#x2082; and SO&#x2082; turn limewater milky. To distinguish them, each gas is passed through acidified KMnO&#x2084; (purple). The correct observation is:",
+opts:{A:"CO&#x2082; decolourises KMnO&#x2084;; SO&#x2082; has no effect",B:"Both gases decolourise KMnO&#x2084; at the same rate",C:"Neither gas reacts with acidified KMnO&#x2084;",D:"SO&#x2082; decolourises KMnO&#x2084;; CO&#x2082; has no effect"},ans:"D",
+exp:"SO&#x2082; is a reducing agent and decolourises acidified KMnO&#x2084; (purple &#x2192; colourless): 5SO&#x2082; + 2KMnO&#x2084; + 2H&#x2082;O &#x2192; K&#x2082;SO&#x2084; + 2MnSO&#x2084; + 2H&#x2082;SO&#x2084;. CO&#x2082; is neither a reducing nor oxidising agent and has no effect on KMnO&#x2084;. Acidified KMnO&#x2084; is the standard test to distinguish SO&#x2082; from CO&#x2082; in JAMB practical contexts."},
+
+{id:14,topic:"Chemical Tests",
+text:"Damp starch-iodide paper held at the mouth of a test tube turns blue-black immediately. The gas responsible is:",
+opts:{A:"SO&#x2082; gas",B:"NH&#x2083; gas",C:"Cl&#x2082; gas",D:"CO&#x2082; gas"},ans:"C",
+exp:"Cl&#x2082; oxidises I&#x207B; in starch-KI paper to I&#x2082;: Cl&#x2082; + 2KI &#x2192; 2KCl + I&#x2082;. I&#x2082; forms an intense blue-black inclusion complex with starch amylose chains. This is the standard qualitative test for chlorine gas. SO&#x2082; bleaches the blue-black colour (reduces I&#x2082; back to I&#x207B;). NH&#x2083; turns moist red litmus blue. CO&#x2082; turns limewater milky."},
+
+{id:15,topic:"Chemical Tests",
+text:"The Biuret test (dilute NaOH then dilute CuSO&#x2084;) is applied to glycine (free amino acid), glycylglycine (dipeptide), and albumin (protein). The results in order are:",
+opts:{A:"All three give identical violet colours with equal intensity",B:"Glycine violet; dipeptide pink; albumin blue",C:"Glycine blue (no peptide bonds); dipeptide faint pink; albumin violet",D:"Glycine no change; dipeptide violet; albumin no change"},ans:"C",
+exp:"The Biuret test detects peptide (&#x2013;CO&#x2013;NH&#x2013;) bonds. Proteins (many peptide bonds) give intense violet. Dipeptides (one peptide bond) give faint pink. Free amino acids (no peptide bonds) give only the blue colour of Cu&#x00B2;&#x207A; in alkali &#x2014; no complex forms. Rule: more peptide bonds = deeper violet. JAMB may specify which fraction gives which colour in food/biochemistry contexts."},
+
+{id:16,topic:"Chemical Tests",
+text:`<div class="dia"><svg viewBox="0 0 430 175" xmlns="http://www.w3.org/2000/svg">
+<text x="215" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Food Test Summary Table</text>
+<rect x="8" y="22" width="104" height="22" rx="3" fill="#1e293b"/>
+<rect x="116" y="22" width="118" height="22" rx="3" fill="#1e293b"/>
+<rect x="238" y="22" width="110" height="22" rx="3" fill="#1e293b"/>
+<rect x="352" y="22" width="70" height="22" rx="3" fill="#1e293b"/>
+<text x="60" y="37" text-anchor="middle" font-size="9" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">Substance</text>
+<text x="175" y="37" text-anchor="middle" font-size="9" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">Reagent</text>
+<text x="293" y="37" text-anchor="middle" font-size="9" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">Positive result</text>
+<text x="387" y="37" text-anchor="middle" font-size="9" fill="#94a3b8" font-weight="700" font-family="DM Sans,sans-serif">Colour</text>
+<text x="60" y="59" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Starch</text>
+<text x="175" y="59" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Iodine (I&#x2082;/KI)</text>
+<text x="293" y="59" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Blue-black complex</text>
+<rect x="358" y="48" width="64" height="17" rx="3" fill="#1e3a5f"/>
+<text x="390" y="60" text-anchor="middle" font-size="9" fill="#93c5fd" font-weight="700" font-family="DM Sans,sans-serif">blue-black</text>
+<line x1="8" y1="67" x2="422" y2="67" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+<text x="60" y="86" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Reducing sugar</text>
+<text x="175" y="86" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Fehling's / Benedict's</text>
+<text x="293" y="86" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Brick-red ppt (Cu&#x2082;O)</text>
+<rect x="358" y="75" width="64" height="17" rx="3" fill="#7c2d12"/>
+<text x="390" y="87" text-anchor="middle" font-size="9" fill="#fde68a" font-weight="700" font-family="DM Sans,sans-serif">brick-red</text>
+<line x1="8" y1="95" x2="422" y2="95" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+<text x="60" y="114" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Protein</text>
+<text x="175" y="114" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Biuret (NaOH+CuSO&#x2084;)</text>
+<text x="293" y="114" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Violet colour</text>
+<rect x="358" y="103" width="64" height="17" rx="3" fill="#4c1d95"/>
+<text x="390" y="115" text-anchor="middle" font-size="9" fill="#e9d5ff" font-weight="700" font-family="DM Sans,sans-serif">violet</text>
+<line x1="8" y1="123" x2="422" y2="123" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+<text x="60" y="142" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">Lipid (fat/oil)</text>
+<text x="175" y="142" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">Emulsion test</text>
+<text x="293" y="142" text-anchor="middle" font-size="9" fill="#fbbf24" font-family="DM Sans,sans-serif">White emulsion in water</text>
+<rect x="358" y="131" width="64" height="17" rx="3" fill="#f1f5f9" opacity="0.85"/>
+<text x="390" y="143" text-anchor="middle" font-size="9" fill="#111827" font-weight="700" font-family="DM Sans,sans-serif">white milky</text>
+<text x="215" y="163" text-anchor="middle" font-size="8" fill="#475569" font-family="DM Sans,sans-serif">Emulsion test: dissolve food in ethanol &#x2192; add cold water &#x2192; cloudy white if lipid present</text>
+</svg></div>
+From the food test table, the highlighted row identifies lipids (fats/oils). Which procedure correctly performs the emulsion test?`,
+opts:{A:"Add iodine solution directly to the food &#x2014; lipids give a blue-black colour",B:"Dissolve food in ethanol, then add cold water &#x2014; lipids give a white cloudy emulsion",C:"Warm food with Fehling's solution &#x2014; lipids give a brick-red precipitate",D:"Add NaOH then CuSO&#x2084; &#x2014; lipids give a violet colour"},ans:"B",
+exp:"The emulsion test for lipids: dissolve the food sample in absolute ethanol (which dissolves fats), then pour into cold water. If lipid is present, a white cloudy emulsion forms as fat droplets become suspended. The other tests detect starch (iodine &#x2192; blue-black), reducing sugars (Fehling's &#x2192; brick-red), and protein (Biuret &#x2192; violet). The emulsion test is the specific JAMB test for fats and oils."},
+
+/* ══════════════════════════════════════════
+   SECTION B — INDUSTRIAL CHEMISTRY  Q17–Q32
+══════════════════════════════════════════ */
+
+{id:17,topic:"Industrial Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 450 155" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a17" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker>
+<marker id="a17g" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#22c55e"/></marker></defs>
+<text x="225" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Haber Process — Industrial Flow Diagram</text>
+<rect x="6" y="36" width="66" height="30" rx="4" fill="#1e293b" stroke="#60a5fa" stroke-width="1.2"/>
+<text x="39" y="49" text-anchor="middle" font-size="9" fill="#93c5fd" font-family="DM Sans,sans-serif">N&#x2082; (air)</text>
+<text x="39" y="61" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">frac. dist.</text>
+<rect x="6" y="82" width="66" height="30" rx="4" fill="#1e293b" stroke="#f97316" stroke-width="1.2"/>
+<text x="39" y="95" text-anchor="middle" font-size="9" fill="#fdba74" font-family="DM Sans,sans-serif">H&#x2082; (gas)</text>
+<text x="39" y="107" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">steam reform.</text>
+<line x1="72" y1="51" x2="104" y2="72" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a17)"/>
+<line x1="72" y1="97" x2="104" y2="82" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a17)"/>
+<rect x="106" y="58" width="72" height="34" rx="4" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1.2"/>
+<text x="142" y="73" text-anchor="middle" font-size="9" fill="#93c5fd" font-weight="700" font-family="DM Sans,sans-serif">Compressor</text>
+<text x="142" y="85" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">200 atm</text>
+<line x1="178" y1="75" x2="206" y2="75" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a17)"/>
+<rect x="208" y="50" width="82" height="50" rx="4" fill="#14532d" stroke="#22c55e" stroke-width="1.4"/>
+<text x="249" y="69" text-anchor="middle" font-size="9" fill="#86efac" font-weight="700" font-family="DM Sans,sans-serif">Reactor</text>
+<text x="249" y="81" text-anchor="middle" font-size="8" fill="#4ade80" font-family="DM Sans,sans-serif">Fe catalyst</text>
+<text x="249" y="93" text-anchor="middle" font-size="8" fill="#4ade80" font-family="DM Sans,sans-serif">450&#xB0;C</text>
+<line x1="290" y1="75" x2="318" y2="75" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a17)"/>
+<rect x="320" y="58" width="72" height="34" rx="4" fill="#1e293b" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="356" y="73" text-anchor="middle" font-size="9" fill="#e8edf5" font-family="DM Sans,sans-serif">Condenser</text>
+<text x="356" y="85" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">NH&#x2083; liquefied</text>
+<line x1="392" y1="82" x2="392" y2="118" stroke="#22c55e" stroke-width="1.8" marker-end="url(#a17g)"/>
+<rect x="364" y="120" width="56" height="24" rx="4" fill="#14532d" stroke="#22c55e" stroke-width="1.2"/>
+<text x="392" y="136" text-anchor="middle" font-size="9" fill="#86efac" font-weight="700" font-family="DM Sans,sans-serif">NH&#x2083;(l)</text>
+<line x1="320" y1="64" x2="320" y2="34" stroke="#f97316" stroke-width="1.3" stroke-dasharray="5,3"/>
+<line x1="320" y1="34" x2="208" y2="34" stroke="#f97316" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#a17)"/>
+<text x="264" y="28" text-anchor="middle" font-size="8" fill="#f97316" font-family="DM Sans,sans-serif">recycle unreacted N&#x2082; + H&#x2082;</text>
+</svg></div>
+In the Haber process flow diagram, the feed gases enter the reactor in the ratio N&#x2082; : H&#x2082; =`,
+opts:{A:"1 : 2 by volume",B:"3 : 1 by volume",C:"1 : 1 by volume",D:"1 : 3 by volume"},ans:"D",
+exp:"N&#x2082; + 3H&#x2082; &#x21CC; 2NH&#x2083;. The stoichiometric feed ratio is 1:3 (N&#x2082;:H&#x2082;) by moles or volume. This matches the equation exactly and gives the optimal equilibrium composition. In practice the feed is close to 1:3 — excess H&#x2082; is used in some plants to maximise conversion. Unreacted gases are recycled continuously, so overall efficiency is high despite only ~15% per-pass yield at 450&#xB0;C and 200 atm."},
+
+{id:18,topic:"Industrial Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 450 122" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a18" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+<text x="225" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Contact Process — Flow Diagram</text>
+<rect x="6" y="28" width="62" height="72" rx="4" fill="#7c2d12" stroke="#f97316" stroke-width="1.2"/>
+<text x="37" y="55" text-anchor="middle" font-size="9" fill="#fdba74" font-family="DM Sans,sans-serif">S Burner</text>
+<text x="37" y="68" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">S + O&#x2082;</text>
+<text x="37" y="80" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">&#x2192; SO&#x2082;</text>
+<line x1="68" y1="64" x2="92" y2="64" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a18)"/>
+<rect x="94" y="28" width="78" height="72" rx="4" fill="#14532d" stroke="#22c55e" stroke-width="1.3"/>
+<text x="133" y="52" text-anchor="middle" font-size="9" fill="#86efac" font-weight="700" font-family="DM Sans,sans-serif">Converter</text>
+<text x="133" y="65" text-anchor="middle" font-size="8" fill="#4ade80" font-family="DM Sans,sans-serif">V&#x2082;O&#x2085;, 450&#xB0;C</text>
+<text x="133" y="78" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">SO&#x2082;&#x2192;SO&#x2083;</text>
+<line x1="172" y1="64" x2="196" y2="64" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a18)"/>
+<rect x="198" y="28" width="78" height="72" rx="4" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1.3"/>
+<text x="237" y="52" text-anchor="middle" font-size="9" fill="#93c5fd" font-weight="700" font-family="DM Sans,sans-serif">Absorber</text>
+<text x="237" y="65" text-anchor="middle" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">conc. H&#x2082;SO&#x2084;</text>
+<text x="237" y="78" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">&#x2192; oleum</text>
+<line x1="276" y1="64" x2="300" y2="64" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a18)"/>
+<rect x="302" y="28" width="78" height="72" rx="4" fill="#1e293b" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="341" y="52" text-anchor="middle" font-size="9" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">Dilution</text>
+<text x="341" y="65" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">+ H&#x2082;O (careful)</text>
+<text x="341" y="78" text-anchor="middle" font-size="8" fill="#22c55e" font-family="DM Sans,sans-serif">&#x2192; H&#x2082;SO&#x2084; 98%</text>
+<line x1="380" y1="64" x2="404" y2="64" stroke="#22c55e" stroke-width="1.8" marker-end="url(#a18)"/>
+<text x="428" y="61" text-anchor="middle" font-size="11" fill="#22c55e" font-weight="700" font-family="DM Sans,sans-serif">H&#x2082;SO&#x2084;</text>
+</svg></div>
+From the Contact process diagram, what is produced in the <strong>Absorber</strong> stage?`,
+opts:{A:"Dilute H&#x2082;SO&#x2084; solution (10%)",B:"Pure SO&#x2083; gas stored under pressure",C:"Oleum (H&#x2082;S&#x2082;O&#x2087;) &#x2014; SO&#x2083; dissolved in concentrated H&#x2082;SO&#x2084;",D:"SO&#x2082; recycled back to the converter"},ans:"C",
+exp:"SO&#x2083; is absorbed into concentrated H&#x2082;SO&#x2084; (not water) to form oleum (pyrosulfuric acid, H&#x2082;S&#x2082;O&#x2087;): SO&#x2083; + H&#x2082;SO&#x2084; &#x2192; H&#x2082;S&#x2082;O&#x2087;. Direct absorption in water would produce an uncontrollable acid mist. Oleum is then carefully diluted: H&#x2082;S&#x2082;O&#x2087; + H&#x2082;O &#x2192; 2H&#x2082;SO&#x2084;. This two-step process yields 98%+ purity sulfuric acid without mist formation."},
+
+{id:19,topic:"Industrial Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 330 225" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a19" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker>
+<marker id="a19u" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<text x="165" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Blast Furnace &#x2014; Cross-section</text>
+<polygon points="82,24 248,24 276,198 54,198" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+<polygon points="84,26 246,26 256,78 74,78" fill="#334155" opacity="0.7"/>
+<polygon points="74,78 256,78 268,138 62,138" fill="#7c2d12" opacity="0.7"/>
+<polygon points="62,138 268,138 276,198 54,198" fill="#dc2626" opacity="0.55"/>
+<text x="165" y="56" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">Reduction zone</text>
+<text x="165" y="68" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">Fe&#x2082;O&#x2083; + 3CO &#x2192; 2Fe + 3CO&#x2082;</text>
+<text x="165" y="110" text-anchor="middle" font-size="9" fill="#fdba74" font-family="DM Sans,sans-serif">Calcination zone</text>
+<text x="165" y="122" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">CaCO&#x2083; &#x2192; CaO + CO&#x2082;</text>
+<text x="165" y="163" text-anchor="middle" font-size="9" fill="#fca5a5" font-family="DM Sans,sans-serif">Combustion zone (hottest)</text>
+<text x="165" y="175" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">C + O&#x2082; &#x2192; CO&#x2082; &#x2192; CO</text>
+<rect x="118" y="17" width="94" height="11" rx="3" fill="#475569"/>
+<text x="165" y="26" text-anchor="middle" font-size="8" fill="#e8edf5" font-family="DM Sans,sans-serif">ore + coke + limestone</text>
+<line x1="28" y1="174" x2="60" y2="174" stroke="#f97316" stroke-width="2.5" marker-end="url(#a19)"/>
+<text x="44" y="168" text-anchor="middle" font-size="7" fill="#f97316" font-family="DM Sans,sans-serif">hot air</text>
+<rect x="270" y="188" width="52" height="16" rx="3" fill="#92400e" stroke="#fbbf24" stroke-width="1"/>
+<text x="296" y="200" text-anchor="middle" font-size="8" fill="#fde68a" font-family="DM Sans,sans-serif">Fe(l) tap</text>
+<rect x="270" y="168" width="52" height="16" rx="3" fill="#334155" stroke="#94a3b8" stroke-width="1"/>
+<text x="296" y="180" text-anchor="middle" font-size="8" fill="#e8edf5" font-family="DM Sans,sans-serif">slag tap</text>
+<line x1="165" y1="24" x2="165" y2="8" stroke="#64748b" stroke-width="1.8" marker-end="url(#a19u)"/>
+<text x="220" y="9" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">waste gases</text>
+</svg></div>
+From the blast furnace diagram, limestone (CaCO&#x2083;) is added primarily to:`,
+opts:{A:"Supply extra carbon monoxide as an additional reductant for Fe&#x2082;O&#x2083;",B:"Decompose into CaO which reacts with silica gangue (SiO&#x2082;) to form removable slag",C:"Act as a fuel in the combustion zone and raise the temperature",D:"Absorb excess CO&#x2082; produced in the reduction zone"},ans:"B",
+exp:"CaCO&#x2083; &#x2192; CaO + CO&#x2082; (calcination). CaO + SiO&#x2082; &#x2192; CaSiO&#x2083; (calcium silicate slag). Slag is less dense than molten iron, floats on top, and is tapped off separately. Without limestone, silica impurities would remain in the iron making it brittle and unusable. Coke (not limestone) provides fuel and generates CO reductant."},
+
+{id:20,topic:"Industrial Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 330 228" xmlns="http://www.w3.org/2000/svg">
+<text x="165" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Fractional Distillation of Crude Oil</text>
+<rect x="100" y="20" width="86" height="198" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+<text x="80" y="30" text-anchor="end" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">25&#xB0;C</text>
+<text x="80" y="57" text-anchor="end" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">70&#xB0;C</text>
+<text x="80" y="85" text-anchor="end" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">120&#xB0;C</text>
+<text x="80" y="113" text-anchor="end" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">175&#xB0;C</text>
+<text x="80" y="141" text-anchor="end" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">250&#xB0;C</text>
+<text x="80" y="169" text-anchor="end" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">340&#xB0;C</text>
+<text x="80" y="210" text-anchor="end" font-size="8" fill="#ef4444" font-family="DM Sans,sans-serif">350+&#xB0;C</text>
+<rect x="101" y="21" width="84" height="27" rx="2" fill="#e0f2fe" opacity="0.3"/>
+<text x="230" y="36" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">Refinery gases C&#x2081;&#x2013;C&#x2084;</text>
+<rect x="101" y="48" width="84" height="27" rx="2" fill="#fef08a" opacity="0.3"/>
+<text x="230" y="63" font-size="8" fill="#fde047" font-family="DM Sans,sans-serif">Petrol C&#x2085;&#x2013;C&#x2081;&#x2080;</text>
+<rect x="101" y="75" width="84" height="27" rx="2" fill="#fed7aa" opacity="0.3"/>
+<text x="230" y="90" font-size="8" fill="#fdba74" font-family="DM Sans,sans-serif">Naphtha C&#x2086;&#x2013;C&#x2081;&#x2080;</text>
+<rect x="101" y="102" width="84" height="27" rx="2" fill="#fef3c7" opacity="0.45"/>
+<text x="230" y="117" font-size="8" fill="#fbbf24" font-weight="700" font-family="DM Sans,sans-serif">Kerosene C&#x2081;&#x2080;&#x2013;C&#x2081;&#x2086; &#x25C0;</text>
+<rect x="101" y="129" width="84" height="27" rx="2" fill="#d4c5a9" opacity="0.3"/>
+<text x="230" y="144" font-size="8" fill="#a8a29e" font-family="DM Sans,sans-serif">Diesel C&#x2081;&#x2084;&#x2013;C&#x2082;&#x2080;</text>
+<rect x="101" y="156" width="84" height="27" rx="2" fill="#92400e" opacity="0.3"/>
+<text x="230" y="171" font-size="8" fill="#a16207" font-family="DM Sans,sans-serif">Fuel oil C&#x2082;&#x2080;&#x2013;C&#x2085;&#x2080;</text>
+<rect x="101" y="197" width="84" height="20" rx="2" fill="#1c1917" opacity="0.8"/>
+<text x="230" y="210" font-size="8" fill="#78716c" font-family="DM Sans,sans-serif">Bitumen / residue</text>
+<line x1="48" y1="188" x2="100" y2="188" stroke="#f97316" stroke-width="2" marker-end="url(#a19)"/>
+<text x="74" y="180" text-anchor="middle" font-size="7" fill="#f97316" font-family="DM Sans,sans-serif">crude oil</text>
+<line x1="228" y1="115" x2="188" y2="115" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#a19)"/>
+</svg></div>
+The highlighted fraction (&#x25C0;) in the distillation column is collected between 150&#xB0;C and 250&#xB0;C and is used as aviation (jet) fuel. This fraction is:`,
+opts:{A:"Petrol (gasoline)",B:"Naphtha",C:"Kerosene",D:"Diesel / gas oil"},ans:"C",
+exp:"Kerosene (C&#x2081;&#x2080;&#x2013;C&#x2081;&#x2086;, bp 150&#x2013;250&#xB0;C) is used as jet fuel (Jet-A/Avtur) and domestic heating oil (paraffin). Petrol/gasoline (C&#x2085;&#x2013;C&#x2081;&#x2080;, bp 40&#x2013;120&#xB0;C) powers cars. Naphtha is a chemical feedstock. Diesel (bp 250&#x2013;340&#xB0;C) powers heavy vehicles. Boiling point increases with chain length due to greater London dispersion forces between longer molecules."},
+
+{id:21,topic:"Industrial Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 390 188" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a21" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+<text x="195" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Chlor-alkali Membrane Cell</text>
+<rect x="18" y="22" width="354" height="148" rx="5" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+<line x1="195" y1="22" x2="195" y2="170" stroke="#fbbf24" stroke-width="3" stroke-dasharray="6,3"/>
+<text x="195" y="182" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">Ion-exchange membrane (Na&#x207A; passes through &#x2192;)</text>
+<rect x="20" y="24" width="173" height="144" rx="3" fill="#1e3a5f" opacity="0.45"/>
+<text x="106" y="42" text-anchor="middle" font-size="10" fill="#60a5fa" font-weight="700" font-family="DM Sans,sans-serif">Anode (+)</text>
+<text x="106" y="55" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Conc. NaCl brine</text>
+<rect x="68" y="22" width="10" height="38" rx="2" fill="#94a3b8"/>
+<rect x="90" y="22" width="10" height="38" rx="2" fill="#94a3b8"/>
+<rect x="112" y="22" width="10" height="38" rx="2" fill="#94a3b8"/>
+<circle cx="78" cy="75" r="5" fill="#22c55e" opacity="0.6"/>
+<circle cx="100" cy="70" r="6" fill="#22c55e" opacity="0.6"/>
+<circle cx="122" cy="72" r="4" fill="#22c55e" opacity="0.6"/>
+<text x="55" y="105" text-anchor="middle" font-size="9" fill="#22c55e" font-weight="700" font-family="DM Sans,sans-serif">Cl&#x2082; &#x2191;</text>
+<text x="55" y="117" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">2Cl&#x207B;&#x2192;Cl&#x2082;+2e&#x207B;</text>
+<line x1="166" y1="90" x2="190" y2="90" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="3,2" marker-end="url(#a21)"/>
+<text x="155" y="84" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">Na&#x207A;&#x2192;</text>
+<rect x="197" y="24" width="173" height="144" rx="3" fill="#14532d" opacity="0.35"/>
+<text x="284" y="42" text-anchor="middle" font-size="10" fill="#86efac" font-weight="700" font-family="DM Sans,sans-serif">Cathode (&#x2212;)</text>
+<text x="284" y="55" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Water enters</text>
+<rect x="260" y="22" width="10" height="38" rx="2" fill="#94a3b8"/>
+<rect x="282" y="22" width="10" height="38" rx="2" fill="#94a3b8"/>
+<rect x="304" y="22" width="10" height="38" rx="2" fill="#94a3b8"/>
+<circle cx="272" cy="75" r="5" fill="#f87171" opacity="0.6"/>
+<circle cx="294" cy="70" r="6" fill="#f87171" opacity="0.6"/>
+<text x="340" y="105" text-anchor="middle" font-size="9" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">H&#x2082; &#x2191;</text>
+<text x="340" y="117" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">2H&#x2082;O+2e&#x207B;&#x2192;H&#x2082;+2OH&#x207B;</text>
+<text x="284" y="148" text-anchor="middle" font-size="9" fill="#22c55e" font-family="DM Sans,sans-serif">NaOH remains</text>
+</svg></div>
+From the chlor-alkali membrane cell diagram, the three industrial products of this process are:`,
+opts:{A:"Na(s), Cl&#x2082;(g), and H&#x2082;O(l)",B:"NaOH(aq), Cl&#x2082;(g), and H&#x2082;(g)",C:"Na&#x2082;CO&#x2083;(aq), HCl(g), and O&#x2082;(g)",D:"NaCl(aq), Cl&#x2082;(g), and NaOH(aq)"},ans:"B",
+exp:"Anode (+): 2Cl&#x207B; &#x2192; Cl&#x2082; + 2e&#x207B;. Cathode (&#x2212;): 2H&#x2082;O + 2e&#x207B; &#x2192; H&#x2082; + 2OH&#x207B;. Na&#x207A; migrates through the ion-exchange membrane and combines with OH&#x207B; to form NaOH. Products: NaOH (important industrial alkali), Cl&#x2082; (PVC/disinfectants), H&#x2082; (fuel/Haber process). The membrane prevents Cl&#x2082; from mixing with NaOH and forming hypochlorite."},
+
+{id:22,topic:"Industrial Chemistry",
+text:"A current of 3 A is passed through CuSO&#x2084; solution for 53 min 40 s. What mass of Cu deposits at the cathode? [Cu = 63.5; F = 96 500 C mol&#x207B;&#xB9;]",
+opts:{A:"3.18 g",B:"6.35 g",C:"1.59 g",D:"12.70 g"},ans:"A",
+exp:"Time = (53 &#xD7; 60) + 40 = 3220 s. Charge = I &#xD7; t = 3 &#xD7; 3220 = 9660 C. Cu&#x00B2;&#x207A; + 2e&#x207B; &#x2192; Cu (n = 2 electrons per Cu). Moles e&#x207B; = 9660 / 96500 = 0.1001 mol. Moles Cu = 0.1001 / 2 = 0.0500 mol. Mass = 0.0500 &#xD7; 63.5 = 3.175 g &#x2248; 3.18 g. The trap: forgetting n = 2 for Cu&#x00B2;&#x207A; gives double the mass (6.35 g)."},
+
+{id:23,topic:"Industrial Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 350 202" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a23" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f97316"/></marker></defs>
+<text x="175" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Down's Cell &#x2014; Na extraction from molten NaCl</text>
+<ellipse cx="175" cy="140" rx="140" ry="48" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+<rect x="35" y="68" width="280" height="72" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+<ellipse cx="175" cy="68" rx="140" ry="48" fill="#334155" opacity="0.9" stroke="#475569" stroke-width="1.5"/>
+<ellipse cx="175" cy="68" rx="137" ry="45" fill="#334155" opacity="0.8"/>
+<rect x="38" y="68" width="274" height="58" fill="#334155" opacity="0.8"/>
+<text x="175" y="98" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">Molten NaCl + CaCl&#x2082; (~600&#xB0;C)</text>
+<ellipse cx="175" cy="68" rx="46" ry="16" fill="#64748b" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="129" y="68" width="92" height="58" fill="#64748b"/>
+<ellipse cx="175" cy="126" rx="46" ry="16" fill="#475569" stroke="#94a3b8" stroke-width="1.4"/>
+<text x="175" y="98" text-anchor="middle" font-size="9" fill="#e8edf5" font-weight="700" font-family="DM Sans,sans-serif">Cathode (&#x2212;)</text>
+<text x="175" y="110" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">steel</text>
+<ellipse cx="175" cy="68" rx="78" ry="28" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="260" y="60" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">iron gauze</text>
+<text x="48" y="86" text-anchor="middle" font-size="9" fill="#60a5fa" font-family="DM Sans,sans-serif">Anode</text>
+<text x="48" y="98" text-anchor="middle" font-size="8" fill="#60a5fa" font-family="DM Sans,sans-serif">(+) graphite</text>
+<line x1="175" y1="52" x2="175" y2="24" stroke="#f97316" stroke-width="2" marker-end="url(#a23)"/>
+<text x="215" y="20" font-size="9" fill="#f97316" font-family="DM Sans,sans-serif">Na(l) rises</text>
+<text x="215" y="31" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">Na&#x207A;+e&#x207B;&#x2192;Na</text>
+<line x1="50" y1="50" x2="30" y2="30" stroke="#22c55e" stroke-width="2" marker-end="url(#a23)"/>
+<text x="8" y="27" font-size="8" fill="#22c55e" font-family="DM Sans,sans-serif">Cl&#x2082;&#x2191;</text>
+<text x="8" y="37" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">2Cl&#x207B;&#x2192;Cl&#x2082;</text>
+</svg></div>
+In the Down's cell, CaCl&#x2082; is mixed with the NaCl electrolyte. The reason is:`,
+opts:{A:"CaCl&#x2082; provides extra Cl&#x207B; ions to increase the yield of Cl&#x2082; at the anode",B:"CaCl&#x2082; reacts with Na formed at the cathode to produce a useful CaNa alloy",C:"CaCl&#x2082; lowers the melting point of NaCl from ~800&#xB0;C to ~600&#xB0;C, saving energy",D:"CaCl&#x2082; prevents the graphite anodes from oxidising in the molten salt"},ans:"C",
+exp:"Pure NaCl melts at ~800&#xB0;C — prohibitively energy-intensive. Adding CaCl&#x2082; depresses the melting point to ~600&#xB0;C, drastically cutting energy costs. The iron gauze separator between cathode and anode prevents liquid Na and Cl&#x2082; gas from recombining. Ca&#x00B2;&#x207A; is not reduced at the cathode under these conditions as Na&#x207A; is preferentially discharged."},
+
+{id:24,topic:"Industrial Chemistry",
+text:"In the Solvay process, spent NH&#x2084;Cl liquor is treated with Ca(OH)&#x2082; (slaked lime). This step is designed to:",
+opts:{A:"Produce CaCl&#x2082; as the main saleable by-product of the process",B:"Recover NH&#x2083; by heating so it can be recycled back into the carbonation tower",C:"Neutralise HCl remaining from NaHCO&#x2083; decomposition",D:"Decompose NaHCO&#x2083; into Na&#x2082;CO&#x2083; and CO&#x2082;"},ans:"B",
+exp:"2NH&#x2084;Cl + Ca(OH)&#x2082; &#x2192; CaCl&#x2082; + 2NH&#x2083;&#x2191; + 2H&#x2082;O. Released NH&#x2083; is recovered and recycled to react with more CO&#x2082; and NaCl in the carbonation tower. This recycling makes the process economical — NH&#x2083; is not consumed overall. NaHCO&#x2083; decomposition (2NaHCO&#x2083; &#x2192; Na&#x2082;CO&#x2083; + H&#x2082;O + CO&#x2082;) is a separate calcination step."},
+
+{id:25,topic:"Industrial Chemistry",
+text:"The final absorption step in the Ostwald process is: 4NO&#x2082; + O&#x2082; + 2H&#x2082;O &#x2192; 4HNO&#x2083;. This step follows which two previous reactions?",
+opts:{A:"N&#x2082; + O&#x2082; &#x2192; 2NO; then 2NO + H&#x2082;O &#x2192; 2HNO&#x2082;",B:"4NH&#x2083; + 5O&#x2082; &#x2192; 4NO + 6H&#x2082;O; then 2NO + O&#x2082; &#x2192; 2NO&#x2082;",C:"N&#x2082; + 3H&#x2082; &#x2192; 2NH&#x2083;; then 2NH&#x2083; + O&#x2082; &#x2192; 2NO + 3H&#x2082;",D:"4NH&#x2083; + 3O&#x2082; &#x2192; 2N&#x2082; + 6H&#x2082;O; then 2N&#x2082; + 5O&#x2082; &#x2192; 2N&#x2082;O&#x2085;"},ans:"B",
+exp:"Ostwald process: Step 1 &#x2014; 4NH&#x2083; + 5O&#x2082; &#x2192; 4NO + 6H&#x2082;O (Pt-Rh catalyst, ~850&#xB0;C). Step 2 &#x2014; 2NO + O&#x2082; &#x2192; 2NO&#x2082; (cooled, uncatalysed). Step 3 &#x2014; 4NO&#x2082; + O&#x2082; + 2H&#x2082;O &#x2192; 4HNO&#x2083; (absorption tower). Product is ~60% HNO&#x2083;, concentrated further with H&#x2082;SO&#x2084;. The process converts cheap NH&#x2083; (from Haber) into valuable nitric acid for fertilisers and explosives."},
+
+{id:26,topic:"Industrial Chemistry",
+text:"The key advantage of catalytic cracking over thermal cracking for producing petrol is that catalytic cracking:",
+opts:{A:"Operates at much higher temperatures (>700&#xB0;C) giving faster throughput",B:"Cracks only the heaviest tar fractions into bitumen and wax",C:"Uses a zeolite catalyst at ~500&#xB0;C producing more branched alkanes and alkenes with higher octane rating",D:"Produces only straight-chain alkanes giving the cleanest combustion"},ans:"C",
+exp:"Catalytic cracking uses an acidic zeolite catalyst at ~500&#xB0;C (vs >700&#xB0;C for thermal cracking). It produces more branched-chain alkanes and alkenes, giving petrol with a higher octane number (better anti-knock performance). Thermal cracking produces more straight-chain products and is used mainly for alkene feedstocks (ethene, propene) for polymer production. Catalytic cracking also produces less unwanted coke deposits."},
+
+{id:27,topic:"Industrial Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 390 185" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a27" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#fbbf24"/></marker></defs>
+<text x="195" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Hall-H&#xe9;roult Cell &#x2014; Aluminium Extraction</text>
+<rect x="18" y="76" width="354" height="95" rx="5" fill="#292524" stroke="#57534e" stroke-width="2"/>
+<rect x="20" y="150" width="350" height="19" rx="3" fill="#374151" opacity="0.9"/>
+<text x="195" y="163" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Carbon cathode lining (&#x2212;)</text>
+<rect x="20" y="78" width="350" height="70" rx="3" fill="#1e3a5f" opacity="0.6"/>
+<text x="195" y="100" text-anchor="middle" font-size="9" fill="#93c5fd" font-family="DM Sans,sans-serif">Al&#x2082;O&#x2083; dissolved in molten cryolite (Na&#x2083;AlF&#x2086;)</text>
+<text x="195" y="114" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">~950&#xB0;C</text>
+<rect x="20" y="132" width="350" height="17" rx="2" fill="#92400e" opacity="0.9"/>
+<text x="195" y="144" text-anchor="middle" font-size="8" fill="#fde68a" font-weight="700" font-family="DM Sans,sans-serif">Molten Al(l) &#x2014; Al&#x00B3;&#x207A; + 3e&#x207B; &#x2192; Al</text>
+<rect x="56"  y="28" width="38" height="52" rx="3" fill="#374151" stroke="#64748b" stroke-width="1.2"/>
+<rect x="126" y="28" width="38" height="52" rx="3" fill="#374151" stroke="#64748b" stroke-width="1.2"/>
+<rect x="196" y="28" width="38" height="52" rx="3" fill="#374151" stroke="#64748b" stroke-width="1.2"/>
+<rect x="266" y="28" width="38" height="52" rx="3" fill="#374151" stroke="#64748b" stroke-width="1.2"/>
+<text x="195" y="22" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Carbon anodes (+) &#x2014; consumed: C + O&#x2082; &#x2192; CO&#x2082;</text>
+<circle cx="75"  cy="67" r="4" fill="#22c55e" opacity="0.5"/>
+<circle cx="145" cy="65" r="5" fill="#22c55e" opacity="0.5"/>
+<circle cx="215" cy="68" r="4" fill="#22c55e" opacity="0.5"/>
+<circle cx="285" cy="66" r="5" fill="#22c55e" opacity="0.5"/>
+<text x="350" y="48" text-anchor="end" font-size="8" fill="#22c55e" font-family="DM Sans,sans-serif">CO&#x2082;/O&#x2082; &#x2191;</text>
+<line x1="372" y1="142" x2="390" y2="142" stroke="#fbbf24" stroke-width="2" marker-end="url(#a27)"/>
+<text x="372" y="136" text-anchor="end" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">Al tap</text>
+</svg></div>
+In the Hall-H&#xe9;roult cell, Al&#x2082;O&#x2083; is dissolved in molten cryolite (Na&#x2083;AlF&#x2086;) rather than electrolysed as a pure melt because:`,
+opts:{A:"Cryolite supplies extra Al&#x00B3;&#x207A; ions increasing the yield of aluminium",B:"Pure Al&#x2082;O&#x2083; melts at ~2050&#xB0;C; cryolite reduces this to ~950&#xB0;C, making the process economic",C:"Cryolite reacts with Al&#x2082;O&#x2083; to form a compound easier to reduce chemically",D:"Carbon anodes would oxidise Al&#x2082;O&#x2083; directly without the cryolite solvent"},ans:"B",
+exp:"Pure Al&#x2082;O&#x2083; melts at ~2050&#xB0;C &#x2014; maintaining this temperature would be prohibitively expensive. Dissolving Al&#x2082;O&#x2083; in molten cryolite (Na&#x2083;AlF&#x2086;) lowers the working temperature to ~950&#xB0;C, drastically reducing energy costs. Cryolite is not consumed (it is recycled). Carbon anodes are gradually consumed as oxygen reacts with them: C + O&#x2082; &#x2192; CO&#x2082;, requiring periodic replacement."},
+
+{id:28,topic:"Industrial Chemistry",
+text:"After steam reforming (CH&#x2084; + H&#x2082;O &#x21CC; CO + 3H&#x2082;), the syngas undergoes the water-gas shift reaction to maximise H&#x2082; yield. The equation for this shift reaction is:",
+opts:{A:"CO + H&#x2082; &#x2192; C + H&#x2082;O (methanation)",B:"2H&#x2082; + O&#x2082; &#x2192; 2H&#x2082;O",C:"CO + H&#x2082;O &#x21CC; CO&#x2082; + H&#x2082;",D:"CH&#x2084; + 2H&#x2082;O &#x2192; CO&#x2082; + 4H&#x2082;"},ans:"C",
+exp:"Water-gas shift reaction: CO + H&#x2082;O &#x21CC; CO&#x2082; + H&#x2082; (exothermic, Fe/Cr catalyst at ~350&#xB0;C). It converts CO from steam reforming into additional H&#x2082;, maximising hydrogen yield. CO&#x2082; is then absorbed by alkali (e.g. K&#x2082;CO&#x2083;). This combined process is the main industrial route to H&#x2082; for the Haber process and fuel cells."},
+
+{id:29,topic:"Industrial Chemistry",
+text:"In the basic oxygen furnace (BOF), powdered lime (CaO) is injected with the O&#x2082; blast. Its specific role is to:",
+opts:{A:"Supply additional carbon to strengthen the steel product",B:"Act as catalyst for oxidation of carbon to CO and CO&#x2082;",C:"Lower the temperature of the melt to protect the furnace lining",D:"React with acidic oxides (SiO&#x2082;, P&#x2082;O&#x2085;) formed during oxidation to make fluid slag"},ans:"D",
+exp:"O&#x2082; oxidises impurities: C &#x2192; CO/CO&#x2082;; Si &#x2192; SiO&#x2082;; Mn &#x2192; MnO; P &#x2192; P&#x2082;O&#x2085;. These acidic oxides must be removed. CaO (basic) reacts with them: CaO + SiO&#x2082; &#x2192; CaSiO&#x2083;; 3CaO + P&#x2082;O&#x2085; &#x2192; Ca&#x2083;(PO&#x2084;)&#x2082;. Products dissolve in the slag layer which floats on the steel and is poured off. Without lime, silica and phosphorus impurities would make the steel brittle."},
+
+{id:30,topic:"Industrial Chemistry",
+text:"Branched-chain alkanes have higher octane numbers than their straight-chain isomers because they:",
+opts:{A:"Have lower boiling points and vaporise faster in the engine cylinder",B:"Contain more carbon atoms per molecule than straight-chain alkanes",C:"Combust more slowly and evenly, avoiding pressure spikes that cause engine knock",D:"React with oxygen at lower temperature requiring no spark for ignition"},ans:"C",
+exp:"Engine knock (pre-ignition) occurs when fuel&#x2013;air mix ignites prematurely from compression alone. Straight-chain alkanes (e.g. n-heptane, ON = 0) are very prone to this because radical propagation is rapid along the chain. Branched alkanes (e.g. iso-octane, ON = 100) combust more smoothly and evenly, suppressing knock. Catalytic cracking and isomerisation increase the branched-alkane proportion in petrol."},
+
+{id:31,topic:"Industrial Chemistry",
+text:"Compared to catalytic hydration of ethene, the advantage of fermentation for producing ethanol is:",
+opts:{A:"Fermentation is a continuous process running at 300&#xB0;C with >95% yield per pass",B:"Fermentation produces purer ethanol requiring less distillation than hydration",C:"Fermentation uses renewable biomass feedstock with a near-zero net carbon footprint",D:"Fermentation proceeds without any catalyst and at atmospheric pressure without heating"},ans:"C",
+exp:"Fermentation: C&#x2086;H&#x2081;&#x2082;O&#x2086; &#x2192; 2C&#x2082;H&#x2085;OH + 2CO&#x2082; (yeast, 25&#x2013;37&#xB0;C). Feedstock (sugarcane, corn) is renewable &#x2014; CO&#x2082; released was recently fixed by photosynthesis, giving near-zero net carbon. Hydration uses ethene from non-renewable crude oil. However, hydration gives a purer, continuous product. Fermentation gives only ~5&#x2013;14% ethanol requiring extensive distillation."},
+
+{id:32,topic:"Industrial Chemistry",
+text:"The Contact process uses only ~1&#x2013;2 atm pressure despite Le Chatelier's principle predicting higher SO&#x2083; yield at high pressure. The reason is:",
+opts:{A:"V&#x2082;O&#x2085; catalyst is completely deactivated above 2 atm pressure",B:"SO&#x2083; condenses to liquid at high pressure and cannot be absorbed into H&#x2082;SO&#x2084;",C:"The equilibrium conversion is already ~97% at low pressure, making costly high-pressure equipment unjustified",D:"Higher pressure shifts equilibrium left, reducing SO&#x2083; yield in this specific reaction"},ans:"C",
+exp:"2SO&#x2082; + O&#x2082; &#x21CC; 2SO&#x2083; has 3 moles gas on left and 2 on right, so higher pressure does increase yield. However, with multi-bed catalysis and intermediate cooling, conversion already reaches ~97% at atmospheric pressure. The marginal yield gain from high-pressure equipment cannot justify the enormous capital cost. Compare the Haber process where low equilibrium yield (~15%) makes 200 atm economically necessary."},
+
+/* ══════════════════════════════════════════
+   SECTION C — ENVIRONMENTAL CHEMISTRY  Q33–Q42
+══════════════════════════════════════════ */
+
+{id:33,topic:"Environmental Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 420 172" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a33y" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#fbbf24"/></marker>
+<marker id="a33r" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/></marker>
+<marker id="a33o" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f97316"/></marker></defs>
+<text x="210" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">The Greenhouse Effect</text>
+<circle cx="44" cy="62" r="26" fill="#fbbf24" opacity="0.9"/>
+<text x="44" y="59" text-anchor="middle" font-size="9" fill="#111" font-weight="700" font-family="DM Sans,sans-serif">Sun</text>
+<text x="44" y="71" text-anchor="middle" font-size="8" fill="#111" font-family="DM Sans,sans-serif">UV/vis</text>
+<ellipse cx="278" cy="55" rx="118" ry="38" fill="#1e3a5f" opacity="0.35" stroke="#60a5fa" stroke-width="1.2"/>
+<text x="278" y="40" text-anchor="middle" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">Atmosphere: CO&#x2082; CH&#x2084; H&#x2082;O N&#x2082;O</text>
+<ellipse cx="278" cy="148" rx="118" ry="20" fill="#16a34a" opacity="0.7" stroke="#4ade80" stroke-width="1"/>
+<text x="278" y="152" text-anchor="middle" font-size="8" fill="#86efac" font-family="DM Sans,sans-serif">Earth's surface (warmed)</text>
+<line x1="70" y1="68" x2="178" y2="108" stroke="#fbbf24" stroke-width="2.5" marker-end="url(#a33y)"/>
+<text x="115" y="78" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">solar radiation</text>
+<line x1="238" y1="128" x2="228" y2="82" stroke="#ef4444" stroke-width="2" marker-end="url(#a33r)"/>
+<text x="216" y="106" text-anchor="end" font-size="8" fill="#ef4444" font-family="DM Sans,sans-serif">IR emitted</text>
+<path d="M 226 80 Q 300 52 318 102" fill="none" stroke="#f97316" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#a33o)"/>
+<text x="310" y="68" text-anchor="middle" font-size="8" fill="#f97316" font-family="DM Sans,sans-serif">GHG absorb</text>
+<text x="310" y="80" text-anchor="middle" font-size="8" fill="#f97316" font-family="DM Sans,sans-serif">+ re-emit IR</text>
+<text x="310" y="92" text-anchor="middle" font-size="8" fill="#f97316" font-family="DM Sans,sans-serif">&#x2193; warming</text>
+</svg></div>
+From the greenhouse effect diagram, what type of radiation does Earth's warmed surface emit that is trapped by greenhouse gases?`,
+opts:{A:"Ultraviolet (UV) radiation reflected from clouds",B:"Visible light re-emitted from the surface",C:"Infrared (heat/IR) radiation from the warmed surface",D:"X-rays from radioactive decay in Earth's crust"},ans:"C",
+exp:"Solar UV and visible radiation pass through the atmosphere and warm Earth's surface. The warmed surface re-emits energy as longer-wavelength infrared (IR/heat) radiation. Greenhouse gases (CO&#x2082;, CH&#x2084;, H&#x2082;O, N&#x2082;O) absorb and re-emit this IR, warming the lower atmosphere. Without the natural greenhouse effect, Earth's mean surface temperature would be &#x2013;18&#xB0;C instead of +15&#xB0;C."},
+
+{id:34,topic:"Environmental Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 420 168" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a34" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker>
+<marker id="a34b" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#60a5fa"/></marker></defs>
+<text x="210" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Acid Rain &#x2014; Formation and Effects</text>
+<rect x="28" y="118" width="34" height="42" rx="2" fill="#334155" stroke="#475569" stroke-width="1"/>
+<rect x="38" y="98" width="14" height="28" rx="2" fill="#475569"/>
+<rect x="72" y="146" width="48" height="18" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+<circle cx="82" cy="164" r="6" fill="#64748b"/>
+<circle cx="110" cy="164" r="6" fill="#64748b"/>
+<line x1="45" y1="98" x2="45" y2="70" stroke="#f97316" stroke-width="2" marker-end="url(#a34)"/>
+<text x="22" y="70" font-size="8" fill="#f97316" font-family="DM Sans,sans-serif">SO&#x2082;</text>
+<text x="22" y="81" font-size="8" fill="#f97316" font-family="DM Sans,sans-serif">NO&#x2093;</text>
+<ellipse cx="215" cy="52" rx="88" ry="30" fill="#334155" opacity="0.8" stroke="#60a5fa" stroke-width="1.2"/>
+<ellipse cx="178" cy="44" rx="48" ry="20" fill="#334155" opacity="0.85"/>
+<ellipse cx="250" cy="46" rx="42" ry="18" fill="#334155" opacity="0.85"/>
+<text x="215" y="44" text-anchor="middle" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">SO&#x2082;+H&#x2082;O&#x2192;H&#x2082;SO&#x2083;&#x2192;H&#x2082;SO&#x2084;</text>
+<text x="215" y="57" text-anchor="middle" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">NO&#x2093;+H&#x2082;O&#x2192;HNO&#x2083;</text>
+<text x="215" y="70" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">pH &lt; 5.6</text>
+<line x1="78" y1="68" x2="132" y2="52" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#a34)"/>
+<line x1="170" y1="82" x2="160" y2="112" stroke="#60a5fa" stroke-width="2" marker-end="url(#a34b)"/>
+<line x1="196" y1="82" x2="192" y2="112" stroke="#60a5fa" stroke-width="2" marker-end="url(#a34b)"/>
+<line x1="224" y1="82" x2="224" y2="112" stroke="#60a5fa" stroke-width="2" marker-end="url(#a34b)"/>
+<line x1="252" y1="82" x2="256" y2="112" stroke="#60a5fa" stroke-width="2" marker-end="url(#a34b)"/>
+<rect x="148" y="114" width="78" height="44" rx="4" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1"/>
+<text x="187" y="128" text-anchor="middle" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">Lake: fish die</text>
+<text x="187" y="140" text-anchor="middle" font-size="8" fill="#ef4444" font-family="DM Sans,sans-serif">pH&#x2193; Al&#x00B3;&#x207A; mobilised</text>
+<rect x="242" y="114" width="78" height="44" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+<text x="281" y="128" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Buildings:</text>
+<text x="281" y="140" text-anchor="middle" font-size="8" fill="#ef4444" font-family="DM Sans,sans-serif">CaCO&#x2083; corroded</text>
+</svg></div>
+From the acid rain diagram, which equation correctly describes the formation of sulfuric acid from SO&#x2082; in the atmosphere?`,
+opts:{A:"SO&#x2082; + CaCO&#x2083; &#x2192; CaSO&#x2083; + CO&#x2082;",B:"SO&#x2082; + H&#x2082;O &#x2192; H&#x2082;SO&#x2083;; then 2H&#x2082;SO&#x2083; + O&#x2082; &#x2192; 2H&#x2082;SO&#x2084;",C:"SO&#x2082; + O&#x2082; &#x2192; SO&#x2083; (only in rainwater)",D:"SO&#x2082; + NaOH &#x2192; Na&#x2082;SO&#x2083; + H&#x2082;O"},ans:"B",
+exp:"SO&#x2082; dissolves in rainwater: SO&#x2082; + H&#x2082;O &#x2192; H&#x2082;SO&#x2083; (sulfurous acid). Atmospheric oxidation then gives: 2H&#x2082;SO&#x2083; + O&#x2082; &#x2192; 2H&#x2082;SO&#x2084;. Similarly NO&#x2082; + H&#x2082;O &#x2192; HNO&#x2083;. These acids lower rainfall pH below 5.6. Effects include acidification of lakes (mobilising toxic Al&#x00B3;&#x207A;), corrosion of limestone/marble (CaCO&#x2083; + H&#x2082;SO&#x2084; &#x2192; CaSO&#x2084; + H&#x2082;O + CO&#x2082;), and damage to forests and vegetation."},
+
+{id:35,topic:"Environmental Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 390 180" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a35" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+<text x="195" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">CFC Ozone Depletion Catalytic Cycle</text>
+<rect x="8" y="26" width="170" height="36" rx="4" fill="#1e293b" stroke="#60a5fa" stroke-width="1.2"/>
+<text x="93" y="41" text-anchor="middle" font-size="9" fill="#93c5fd" font-family="DM Sans,sans-serif">UV + CF&#x2082;Cl&#x2082; &#x2192; CF&#x2082;Cl&#x2022; + </text>
+<text x="145" y="41" font-size="10" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">Cl&#x2022;</text>
+<text x="93" y="54" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">(CFC photolysis by UV-B)</text>
+<line x1="93" y1="62" x2="93" y2="78" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a35)"/>
+<rect x="8" y="80" width="170" height="36" rx="4" fill="#1e293b" stroke="#ef4444" stroke-width="1.2"/>
+<text x="93" y="96" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">Cl&#x2022; + O&#x2083; &#x2192; ClO&#x2022; + O&#x2082;</text>
+<text x="93" y="109" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">(ozone destroyed)</text>
+<line x1="93" y1="116" x2="93" y2="132" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a35)"/>
+<rect x="8" y="134" width="170" height="36" rx="4" fill="#1e293b" stroke="#f97316" stroke-width="1.2"/>
+<text x="93" y="150" text-anchor="middle" font-size="10" fill="#f97316" font-weight="700" font-family="DM Sans,sans-serif">ClO&#x2022; + O&#x2022; &#x2192; </text>
+<text x="118" y="150" font-size="10" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">Cl&#x2022;</text>
+<text x="134" y="150" font-size="10" fill="#f97316" font-weight="700" font-family="DM Sans,sans-serif"> + O&#x2082;</text>
+<text x="93" y="163" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">(Cl&#x2022; regenerated)</text>
+<line x1="178" y1="152" x2="210" y2="152" stroke="#ef4444" stroke-width="1.5"/>
+<line x1="210" y1="152" x2="210" y2="98" stroke="#ef4444" stroke-width="1.5"/>
+<line x1="210" y1="98" x2="178" y2="98" stroke="#ef4444" stroke-width="1.5" marker-end="url(#a35)"/>
+<text x="228" y="126" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">Cl&#x2022;</text>
+<text x="228" y="138" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">catalytic</text>
+<rect x="242" y="26" width="140" height="60" rx="4" fill="#14532d" stroke="#22c55e" stroke-width="1"/>
+<text x="312" y="44" text-anchor="middle" font-size="8" fill="#86efac" font-weight="700" font-family="DM Sans,sans-serif">Net reaction:</text>
+<text x="312" y="57" text-anchor="middle" font-size="9" fill="#4ade80" font-family="DM Sans,sans-serif">2O&#x2083; &#x2192; 3O&#x2082;</text>
+<text x="312" y="70" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">1 Cl&#x2022; destroys ~100 000 O&#x2083;</text>
+<rect x="242" y="100" width="140" height="60" rx="4" fill="#1e293b" stroke="#f97316" stroke-width="1"/>
+<text x="312" y="118" text-anchor="middle" font-size="8" fill="#f97316" font-weight="700" font-family="DM Sans,sans-serif">O&#x2083; absorbs UV-B</text>
+<text x="312" y="131" text-anchor="middle" font-size="8" fill="#fdba74" font-family="DM Sans,sans-serif">Depletion &#x2192; more</text>
+<text x="312" y="143" text-anchor="middle" font-size="8" fill="#fdba74" font-family="DM Sans,sans-serif">UV reaches Earth</text>
+<text x="312" y="155" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">&#x2191; skin cancer, cataracts</text>
+</svg></div>
+From the ozone depletion cycle, the Cl&#x2022; radical is described as catalytic because:`,
+opts:{A:"It is consumed permanently in the first reaction step as ClO&#x2022;",B:"It reacts more quickly at the cold stratospheric temperatures",C:"It is regenerated at the end of each cycle and can destroy thousands of O&#x2083; molecules",D:"It directly absorbs UV-B radiation thereby protecting Earth's surface"},ans:"C",
+exp:"Cl&#x2022; is regenerated in step 3 (ClO&#x2022; + O&#x2022; &#x2192; Cl&#x2022; + O&#x2082;), making it a catalyst &#x2014; not consumed overall. One Cl&#x2022; radical can destroy ~100,000 O&#x2083; molecules before being removed by side reactions (e.g. forming reservoir species like HCl or ClONO&#x2082;). This catalytic chain mechanism explains why even trace CFC concentrations cause disproportionate ozone destruction. The Montreal Protocol (1987) phased out CFCs globally."},
+
+{id:36,topic:"Environmental Chemistry",
+text:`<div class="dia"><svg viewBox="0 0 420 115" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a36" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+<text x="210" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Eutrophication &#x2014; Sequence of Events</text>
+<rect x="4"   y="26" width="64" height="76" rx="3" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1"/>
+<text x="36"  y="44" text-anchor="middle" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">Fertiliser</text>
+<text x="36"  y="55" text-anchor="middle" font-size="8" fill="#93c5fd" font-family="DM Sans,sans-serif">runoff</text>
+<text x="36"  y="68" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">NO&#x2083;&#x207B; PO&#x2084;&#x00B3;&#x207B;</text>
+<text x="36"  y="80" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">enter water</text>
+<line x1="68" y1="64" x2="78" y2="64" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#a36)"/>
+<rect x="80"  y="26" width="64" height="76" rx="3" fill="#14532d" stroke="#22c55e" stroke-width="1"/>
+<text x="112" y="44" text-anchor="middle" font-size="8" fill="#86efac" font-family="DM Sans,sans-serif">Algal</text>
+<text x="112" y="55" text-anchor="middle" font-size="8" fill="#86efac" font-family="DM Sans,sans-serif">bloom</text>
+<text x="112" y="68" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">surface</text>
+<text x="112" y="80" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">covered</text>
+<line x1="144" y1="64" x2="154" y2="64" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#a36)"/>
+<rect x="156" y="26" width="64" height="76" rx="3" fill="#292524" stroke="#78716c" stroke-width="1"/>
+<text x="188" y="44" text-anchor="middle" font-size="8" fill="#d6d3d1" font-family="DM Sans,sans-serif">Algae</text>
+<text x="188" y="55" text-anchor="middle" font-size="8" fill="#d6d3d1" font-family="DM Sans,sans-serif">die</text>
+<text x="188" y="68" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">light blocked</text>
+<text x="188" y="80" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="DM Sans,sans-serif">decompose</text>
+<line x1="220" y1="64" x2="230" y2="64" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#a36)"/>
+<rect x="232" y="26" width="64" height="76" rx="3" fill="#1c0a0a" stroke="#ef4444" stroke-width="1"/>
+<text x="264" y="44" text-anchor="middle" font-size="8" fill="#fca5a5" font-family="DM Sans,sans-serif">Bacteria</text>
+<text x="264" y="55" text-anchor="middle" font-size="8" fill="#fca5a5" font-family="DM Sans,sans-serif">decompose</text>
+<text x="264" y="68" text-anchor="middle" font-size="8" fill="#ef4444" font-family="DM Sans,sans-serif">O&#x2082; depleted</text>
+<text x="264" y="80" text-anchor="middle" font-size="7" fill="#fbbf24" font-family="DM Sans,sans-serif">&#x2191; BOD</text>
+<line x1="296" y1="64" x2="306" y2="64" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#a36)"/>
+<rect x="308" y="26" width="108" height="76" rx="3" fill="#3b0764" stroke="#a855f7" stroke-width="1"/>
+<text x="362" y="44" text-anchor="middle" font-size="8" fill="#e9d5ff" font-family="DM Sans,sans-serif">Aquatic life</text>
+<text x="362" y="55" text-anchor="middle" font-size="8" fill="#e9d5ff" font-family="DM Sans,sans-serif">dies (anoxia)</text>
+<text x="362" y="68" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">fish, invertebrates</text>
+<text x="362" y="80" text-anchor="middle" font-size="7" fill="#a855f7" font-family="DM Sans,sans-serif">suffocate</text>
+</svg></div>
+From the eutrophication diagram, a <strong>high BOD</strong> (Biological Oxygen Demand) value indicates:`,
+opts:{A:"High dissolved O&#x2082; content &#x2014; the water is clean and well-oxygenated",B:"High concentration of inorganic salts raising the water's ionic strength",C:"Large amount of organic matter requiring much O&#x2082; for bacterial decomposition",D:"High algal photosynthesis rate producing excess oxygen in the water"},ans:"C",
+exp:"BOD measures O&#x2082; consumed by microorganisms decomposing organic matter over 5 days at 20&#xB0;C. High BOD = lots of organic pollutants (sewage, dead algae) being aerobically decomposed &#x2192; O&#x2082; depleted &#x2192; fish and invertebrates suffocate (anoxia). Clean water: BOD &lt; 2 mg/L; heavily polluted: BOD &gt; 8 mg/L. BOD is the standard JAMB water quality / pollution indicator."},
+
+{id:37,topic:"Environmental Chemistry",
+text:"A CO poisoning patient is treated with 100% hyperbaric O&#x2082; therapy. This works because:",
+opts:{A:"O&#x2082; oxidises CO inside red blood cells to CO&#x2082; which is exhaled",B:"High [O&#x2082;] competitively displaces CO from haemoglobin, restoring O&#x2082; transport",C:"O&#x2082; reverses the reduction of Fe&#x00B2;&#x207A; to Fe&#x00B3;&#x207A; in haem groups",D:"O&#x2082; lowers blood pH, making haemoglobin release CO spontaneously"},ans:"B",
+exp:"CO binds ~240&#xD7; more tightly to haemoglobin than O&#x2082;, forming carboxyhaemoglobin (HbCO) which cannot carry O&#x2082;. Breathing 100% O&#x2082; under hyperbaric pressure massively increases [O&#x2082;] in blood, shifting equilibrium: HbCO + O&#x2082; &#x21CC; HbO&#x2082; + CO. The high [O&#x2082;] competitively reverses CO binding. HbCO half-life falls from ~5 hours (in air) to ~60&#x2013;90 min on pure O&#x2082;."},
+
+{id:38,topic:"Environmental Chemistry",
+text:"Cl&#x2082; added to drinking water forms HOCl: Cl&#x2082; + H&#x2082;O &#x21CC; H&#x207A; + Cl&#x207B; + HOCl. At pH &gt; 8, HOCl dissociates: HOCl &#x21CC; H&#x207A; + OCl&#x207B;. For optimal disinfection, the recommended pH is:",
+opts:{A:"pH 2&#x2013;3 to maximise Cl&#x2082; gas concentration as the active species",B:"pH 6&#x2013;8 to maintain HOCl as the dominant, most bactericidal species",C:"pH 10&#x2013;12 because OCl&#x207B; penetrates cell walls better than HOCl",D:"pH 9&#x2013;10 to balance HOCl and OCl&#x207B; in equal concentrations"},ans:"B",
+exp:"HOCl (hypochlorous acid) is ~80&#xD7; more effective as a bactericide than OCl&#x207B; (hypochlorite ion) because it is uncharged and penetrates bacterial cell walls more easily. At pH &lt; 6, most chlorine exists as Cl&#x2082; (corrosive, volatilises). At pH &gt; 8, equilibrium shifts to OCl&#x207B; (less effective). pH 6&#x2013;8 maximises HOCl concentration for optimal drinking water disinfection."},
+
+{id:39,topic:"Environmental Chemistry",
+text:"Modern three-way catalytic converters use Pt, Pd, and Rh. Rhodium (Rh) is specifically required to catalyse:",
+opts:{A:"2CO + O&#x2082; &#x2192; 2CO&#x2082; (CO oxidation)",B:"C&#x2093;H&#x2093; + O&#x2082; &#x2192; CO&#x2082; + H&#x2082;O (hydrocarbon oxidation)",C:"SO&#x2082; + O&#x2082; &#x2192; SO&#x2083; (sulfur dioxide oxidation)",D:"2NO + 2CO &#x2192; N&#x2082; + 2CO&#x2082; (NO reduction to N&#x2082;)"},ans:"D",
+exp:"Rhodium catalyses the reduction of NOₓ: 2NO + 2CO &#x2192; N&#x2082; + 2CO&#x2082;. Pt and Pd are excellent at oxidising CO and unburnt hydrocarbons but poor at NO reduction. Rh provides surface sites that weaken the N&#x2013;O bond and allow N&#x2082; formation. The three-way converter simultaneously: (1) oxidises CO &#x2192; CO&#x2082;; (2) oxidises hydrocarbons &#x2192; CO&#x2082; + H&#x2082;O; (3) reduces NOₓ &#x2192; N&#x2082;."},
+
+{id:40,topic:"Environmental Chemistry",
+text:"An ion-exchange resin removes both temporary and permanent hardness from water. The mechanism involves:",
+opts:{A:"Ca&#x00B2;&#x207A; and Mg&#x00B2;&#x207A; being oxidised to their oxides by the resin material",B:"CO&#x2083;&#x00B2;&#x207B; being added by the resin to precipitate Ca&#x00B2;&#x207A; as CaCO&#x2083;",C:"Ca&#x00B2;&#x207A; and Mg&#x00B2;&#x207A; being exchanged for H&#x207A; or Na&#x207A; released by the resin",D:"Ca&#x00B2;&#x207A; and Mg&#x00B2;&#x207A; being absorbed by activated carbon in the column"},ans:"C",
+exp:"Ion-exchange resins contain fixed &#x2013;SO&#x2083;H groups (H&#x207A; form) or &#x2013;SO&#x2083;Na groups (Na&#x207A; form). As hard water flows through, Ca&#x00B2;&#x207A; and Mg&#x00B2;&#x207A; are attracted to the resin, releasing H&#x207A; or Na&#x207A; into the water. The resin is regenerated with NaCl brine. This removes both temporary hardness (bicarbonates) and permanent hardness (sulfates, chlorides) &#x2014; unlike boiling which only removes temporary hardness."},
+
+{id:41,topic:"Environmental Chemistry",
+text:"Photochemical smog (common in Lagos, Los Angeles) differs from classic London smog because photochemical smog:",
+opts:{A:"Contains mainly SO&#x2082; and smoke from coal combustion, worsened by cold foggy conditions",B:"Forms at night when temperature inversions trap smoke from domestic fires",C:"Is caused by UV-driven reactions of NO&#x2093; and hydrocarbons producing ground-level O&#x2083; and PAN",D:"Is caused by fog reacting with HCl from industrial chlorination plants"},ans:"C",
+exp:"Photochemical smog: vehicle NO&#x2093; + unburnt hydrocarbons + UV sunlight &#x2192; ground-level ozone (O&#x2083;), peroxyacetyl nitrate (PAN), and aldehydes. Worst in warm, sunny, traffic-dense cities. Classic London smog was formed by SO&#x2082; + fog + coal smoke particles &#x2014; worst in cold, damp, still conditions. The two types have different precursors, chemistry, and weather requirements."},
+
+{id:42,topic:"Environmental Chemistry",
+text:"Which of the following is NOT a significant anthropogenic (human-caused) source of atmospheric methane (CH&#x2084;)?",
+opts:{A:"Enteric fermentation in cattle (livestock)",B:"Anaerobic decomposition in flooded rice paddies",C:"Volcanic eruptions releasing gases from Earth's mantle",D:"Landfill sites where organic waste decomposes without oxygen"},ans:"C",
+exp:"Major anthropogenic CH&#x2084; sources: (1) enteric fermentation &#x2014; cattle gut bacteria; (2) rice paddies &#x2014; anaerobic decomposition in waterlogged soil; (3) landfills &#x2014; anaerobic breakdown of food waste; (4) natural gas leaks from pipelines and fossil fuel extraction. Volcanic eruptions are a natural (not anthropogenic) source and contribute far less CH&#x2084; than human activities. JAMB tests the distinction between natural and human-caused greenhouse gas sources."},
+
+/* ══════════════════════════════════════════
+   SECTION D — CATALYSIS  Q43–Q50
+══════════════════════════════════════════ */
+
+{id:43,topic:"Catalysis",
+text:`<div class="dia"><svg viewBox="0 0 400 182" xmlns="http://www.w3.org/2000/svg">
+<text x="200" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Energy Profile &#x2014; Effect of a Catalyst</text>
+<line x1="38" y1="18" x2="38" y2="162" stroke="#475569" stroke-width="1.5"/>
+<line x1="38" y1="162" x2="382" y2="162" stroke="#475569" stroke-width="1.5"/>
+<text x="12" y="90" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif" transform="rotate(-90,12,90)">Potential energy</text>
+<text x="210" y="176" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">Reaction coordinate &#x2192;</text>
+<path d="M 52 132 Q 96 128 132 56 Q 162 26 192 56 Q 222 86 252 126 Q 292 142 368 134" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="7,4"/>
+<path d="M 52 132 Q 96 128 132 88 Q 162 66 192 84 Q 222 102 252 126 Q 292 142 368 134" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+<line x1="38" y1="132" x2="78" y2="132" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="36" y="135" text-anchor="end" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Reactants</text>
+<line x1="342" y1="134" x2="382" y2="134" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="384" y="137" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif">Products</text>
+<line x1="192" y1="26" x2="192" y2="132" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="3,2"/>
+<text x="112" y="80" text-anchor="middle" font-size="9" fill="#ef4444" font-family="DM Sans,sans-serif">E&#x2090; (no cat)</text>
+<line x1="192" y1="84" x2="192" y2="132" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2"/>
+<text x="110" y="110" text-anchor="middle" font-size="9" fill="#22c55e" font-family="DM Sans,sans-serif">E&#x2090;&#x2019; (with cat)</text>
+<text x="352" y="118" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">&#x0394;H same</text>
+<text x="352" y="128" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">for both</text>
+<line x1="48" y1="18" x2="78" y2="18" stroke="#ef4444" stroke-width="2" stroke-dasharray="7,4"/>
+<text x="82" y="21" font-size="8" fill="#ef4444" font-family="DM Sans,sans-serif">Without catalyst</text>
+<line x1="48" y1="30" x2="78" y2="30" stroke="#22c55e" stroke-width="2"/>
+<text x="82" y="33" font-size="8" fill="#22c55e" font-family="DM Sans,sans-serif">With catalyst</text>
+</svg></div>
+From the energy profile diagram, which statement about the catalyst is <strong>correct</strong>?`,
+opts:{A:"The catalyst lowers E&#x2090; for the forward reaction but raises it for the reverse reaction",B:"The catalyst lowers E&#x2090; for both forward and reverse reactions; &#x0394;H is unchanged",C:"The catalyst lowers E&#x2090; and also makes &#x0394;H more negative (more exothermic)",D:"The catalyst shifts the equilibrium position to the right, increasing product yield"},ans:"B",
+exp:"As the diagram shows, the catalyst lowers E&#x2090; for both forward and reverse reactions by the same amount. The energy levels of reactants and products are unchanged, so &#x0394;H is the same with or without the catalyst. Consequently Kc and equilibrium yield are unaffected &#x2014; only the rate of reaching equilibrium increases. This is a fundamental JAMB principle that distinguishes catalyst effects from temperature or concentration changes."},
+
+{id:44,topic:"Catalysis",
+text:`<div class="dia"><svg viewBox="0 0 400 182" xmlns="http://www.w3.org/2000/svg">
+<text x="200" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Maxwell-Boltzmann Distribution &#x2014; Temperature Effect</text>
+<line x1="38" y1="18" x2="38" y2="158" stroke="#475569" stroke-width="1.5"/>
+<line x1="38" y1="158" x2="382" y2="158" stroke="#475569" stroke-width="1.5"/>
+<text x="12" y="88" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans,sans-serif" transform="rotate(-90,12,88)">Fraction of molecules</text>
+<text x="210" y="172" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">Kinetic energy &#x2192;</text>
+<path d="M 42 156 Q 76 150 108 112 Q 128 82 148 66 Q 162 54 172 66 Q 186 84 206 112 Q 240 146 300 155 L 378 157" fill="none" stroke="#60a5fa" stroke-width="2.5"/>
+<text x="160" y="48" text-anchor="middle" font-size="9" fill="#60a5fa" font-weight="700" font-family="DM Sans,sans-serif">T&#x2081; (lower)</text>
+<path d="M 42 156 Q 82 152 122 134 Q 158 116 188 103 Q 208 96 228 103 Q 258 116 296 136 Q 340 152 378 156" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+<text x="240" y="88" text-anchor="middle" font-size="9" fill="#ef4444" font-weight="700" font-family="DM Sans,sans-serif">T&#x2082; (higher)</text>
+<line x1="298" y1="18" x2="298" y2="158" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="5,3"/>
+<text x="306" y="28" font-size="8" fill="#fbbf24" font-family="DM Sans,sans-serif">E&#x2090;</text>
+<path d="M 298 136 Q 340 152 378 156 L 378 158 L 298 158 Z" fill="#60a5fa" opacity="0.22"/>
+<path d="M 298 103 Q 258 116 298 136 Q 340 152 378 156 L 378 158 L 298 158 Z" fill="#ef4444" opacity="0.22"/>
+<text x="345" y="145" text-anchor="middle" font-size="7" fill="#fbbf24" font-family="DM Sans,sans-serif">larger area</text>
+<text x="345" y="155" text-anchor="middle" font-size="7" fill="#fbbf24" font-family="DM Sans,sans-serif">at T&#x2082;</text>
+<text x="210" y="180" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">Shaded area = fraction of molecules with energy &#x2265; E&#x2090; (able to react)</text>
+</svg></div>
+At T&#x2082; (higher temperature), the rate of reaction is greater than at T&#x2081; primarily because:`,
+opts:{A:"The activation energy E&#x2090; decreases at higher temperatures",B:"Total number of molecules in the system increases at T&#x2082;",C:"The distribution peak shifts left, slowing average molecular speed",D:"A larger fraction of molecules possesses kinetic energy &#x2265; E&#x2090; at T&#x2082;"},ans:"D",
+exp:"At higher temperature T&#x2082;, the Maxwell&#x2013;Boltzmann distribution shifts right (peak at higher energy) and flattens. The shaded area beyond E&#x2090; is significantly larger at T&#x2082; &#x2014; more molecules have enough energy to react per second. The total number of molecules in a sealed vessel is fixed. E&#x2090; itself is unchanged by temperature; that is what a catalyst changes."},
+
+{id:45,topic:"Catalysis",
+text:`<div class="dia"><svg viewBox="0 0 380 145" xmlns="http://www.w3.org/2000/svg">
+<text x="190" y="13" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans,sans-serif">Enzyme &#x2014; Lock and Key Specificity</text>
+<ellipse cx="95" cy="82" rx="72" ry="48" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1.5"/>
+<rect x="55" y="54" width="80" height="40" rx="6" fill="#0f172a"/>
+<text x="95" y="45" text-anchor="middle" font-size="9" fill="#93c5fd" font-family="DM Sans,sans-serif">ENZYME</text>
+<text x="95" y="76" text-anchor="middle" font-size="8" fill="#60a5fa" font-family="DM Sans,sans-serif">active site</text>
+<text x="95" y="88" text-anchor="middle" font-size="7" fill="#64748b" font-family="DM Sans,sans-serif">(specific shape)</text>
+<ellipse cx="144" cy="62" rx="26" ry="16" fill="#22c55e" opacity="0.8" stroke="#4ade80" stroke-width="1.2"/>
+<text x="144" y="58" text-anchor="middle" font-size="8" fill="#111827" font-weight="700" font-family="DM Sans,sans-serif">substrate</text>
+<text x="144" y="69" text-anchor="middle" font-size="7" fill="#166534" font-family="DM Sans,sans-serif">fits perfectly</text>
+<text x="95" y="110" text-anchor="middle" font-size="8" fill="#22c55e" font-family="DM Sans,sans-serif">&#x2713; correct substrate &#x2192; reaction occurs</text>
+<ellipse cx="285" cy="82" rx="72" ry="48" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+<rect x="248" y="54" width="75" height="40" rx="6" fill="#0f172a"/>
+<text x="285" y="45" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans,sans-serif">ENZYME</text>
+<rect x="260" y="48" width="52" height="28" rx="5" fill="#334155" stroke="#ef4444" stroke-width="1.2"/>
+<text x="286" y="66" text-anchor="middle" font-size="7" fill="#ef4444" font-family="DM Sans,sans-serif">wrong shape</text>
+<text x="285" y="110" text-anchor="middle" font-size="8" fill="#ef4444" font-family="DM Sans,sans-serif">&#x2717; wrong substrate &#x2192; no reaction</text>
+<text x="190" y="135" text-anchor="middle" font-size="8" fill="#64748b" font-family="DM Sans,sans-serif">Each enzyme has a unique active site &#x2014; only the complementary substrate fits</text>
+</svg></div>
+The enzyme diagram illustrates the lock-and-key model. Enzymes differ from inorganic catalysts primarily in their:`,
+opts:{A:"Greater stability at temperatures above 80&#xB0;C than any metal catalyst",B:"High substrate specificity &#x2014; each enzyme catalyses only one or very few reactions",C:"Ability to function without any change in activation energy",D:"Independence from pH changes in biological environments"},ans:"B",
+exp:"Enzymes are highly specific &#x2014; the active site has a complementary three-dimensional shape to one or a few substrates (lock-and-key or induced-fit models). This specificity is unmatched by inorganic catalysts. Enzymes are denatured above ~40&#x2013;50&#xB0;C (shape of active site is lost) and have an optimal pH (denaturing outside this range). Their specificity makes them essential to living systems where precise control of reactions is critical."},
+
+{id:46,topic:"Catalysis",
+text:"A catalyst does NOT change which of the following?",
+opts:{A:"Activation energy (E&#x2090;) of the reaction pathway",B:"Rate constant (k) at a given temperature",C:"Enthalpy change (&#x0394;H) of the overall reaction",D:"Fraction of molecules with energy &#x2265; E&#x2090;"},ans:"C",
+exp:"A catalyst lowers E&#x2090;, increases k, and increases the fraction of molecules exceeding E&#x2090;. However, &#x0394;H (the difference in energy between reactants and products) is unchanged &#x2014; the energy landscape start and end points are identical. Only the height of the barrier changes. This is why a catalyst cannot change the equilibrium position or the thermodynamics of a reaction."},
+
+{id:47,topic:"Catalysis",
+text:"K&#x2082;O and Al&#x2082;O&#x2083; are added to the iron catalyst in the Haber process. These substances are called promoters. Their roles are:",
+opts:{A:"K&#x2082;O decomposes at 450&#xB0;C to provide extra O&#x2082; for the reaction; Al&#x2082;O&#x2083; catalyses NH&#x2083; decomposition",B:"Both act as secondary catalysts that convert N&#x2082; independently of iron",C:"K&#x2082;O (electronic promoter) enhances N&#x2082; adsorption; Al&#x2082;O&#x2083; (structural promoter) prevents Fe sintering and maintains surface area",D:"Both inhibit the reverse decomposition reaction, shifting equilibrium toward NH&#x2083;"},ans:"C",
+exp:"Promoters enhance the primary iron catalyst without being catalytic themselves. K&#x2082;O is an electronic promoter &#x2014; it increases electron density on Fe surface atoms, improving N&#x2082; adsorption and dissociation (the rate-limiting step). Al&#x2082;O&#x2083; is a structural promoter &#x2014; it prevents Fe particles from sintering (fusing together) at 450&#xB0;C, maintaining a high surface area for catalysis."},
+
+{id:48,topic:"Catalysis",
+text:"In autocatalysis, a reaction initially proceeds slowly then accelerates noticeably. This occurs because:",
+opts:{A:"The reaction becomes exothermic only after the initial slow phase",B:"A product of the reaction acts as a catalyst, accelerating the same reaction",C:"The reactant concentration is highest at the start, slowing the rate",D:"Temperature rises automatically above the activation energy threshold after an induction period"},ans:"B",
+exp:"Autocatalysis: a product catalyses the reaction producing it. Classic JAMB example &#x2014; MnO&#x2084;&#x207B; + C&#x2082;H&#x2082;O&#x2084;: Mn&#x00B2;&#x207A; produced in the reaction catalyses further KMnO&#x2084; reduction. As Mn&#x00B2;&#x207A; accumulates, the rate accelerates. The sigmoidal rate-time curve (slow induction &#x2192; fast &#x2192; slow as reactants deplete) is diagnostic of autocatalysis. This distinguishes it from normal reactions where rate decreases monotonically with time."},
+
+{id:49,topic:"Catalysis",
+text:"A catalyst is added to the equilibrium: N&#x2082;(g) + 3H&#x2082;(g) &#x21CC; 2NH&#x2083;(g). The effect is:",
+opts:{A:"Equilibrium shifts right, increasing the percentage yield of NH&#x2083;",B:"The forward reaction is speeded up only, giving more NH&#x2083; per unit time initially",C:"Equilibrium is reached faster but the equilibrium position and % yield are unchanged",D:"E&#x2090; for the forward reaction is lowered but E&#x2090; for the reverse reaction is unchanged"},ans:"C",
+exp:"A catalyst lowers E&#x2090; for both forward and reverse reactions equally. It speeds up both rates, reaching equilibrium faster &#x2014; but the equilibrium constant Kc and therefore the percentage yield at that temperature are unchanged. To change yield, you must change temperature, pressure, or concentration (Le Chatelier). The catalyst is used in the Haber process not to improve yield but to make the low-yield equilibrium position (15% at 450&#xB0;C) economically viable by reaching it rapidly."},
+
+{id:50,topic:"Catalysis",
+text:"The V&#x2082;O&#x2085; catalyst in the Contact process works by a redox cycle. The correct sequence is:",
+opts:{A:"V&#x2082;O&#x2085; permanently absorbs SO&#x2082; then decomposes on cooling to release SO&#x2083;",B:"V&#x2082;O&#x2085; oxidises SO&#x2082; to SO&#x2083; and is reduced to V&#x2082;O&#x2084;; O&#x2082; then re-oxidises V&#x2082;O&#x2084; back to V&#x2082;O&#x2085;",C:"V&#x2082;O&#x2085; donates vanadium ions that carry electrons from SO&#x2082; to O&#x2082; irreversibly",D:"V&#x2082;O&#x2085; dissolves in molten SO&#x2082; and precipitates SO&#x2083; on cooling"},ans:"B",
+exp:"V&#x2082;O&#x2085; mechanism: (1) SO&#x2082; + V&#x2082;O&#x2085; &#x2192; SO&#x2083; + V&#x2082;O&#x2084; (V: +5 &#x2192; +4, reduced). (2) V&#x2082;O&#x2084; + &#xBD;O&#x2082; &#x2192; V&#x2082;O&#x2085; (V: +4 &#x2192; +5, re-oxidised). The catalyst is regenerated. This is a textbook example of a variable-oxidation-state transition metal acting as a heterogeneous redox catalyst. The Pt-Rh catalyst in the Ostwald process works by a similar surface adsorption mechanism."}
+
+];
+
+/* ── SHUFFLE & RENDER ── */
+var SHUFFLED_ANS={};
+function buildShuffledOpts(q){
+  var entries=['A','B','C','D'].map(function(k){return{origKey:k,text:q.opts[k]}});
+  for(var i=entries.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=entries[i];entries[i]=entries[j];entries[j]=t}
+  var newOpts={},newAns=q.ans;
+  ['A','B','C','D'].forEach(function(lbl,idx){newOpts[lbl]=entries[idx].text;if(entries[idx].origKey===q.ans)newAns=lbl});
+  return{opts:newOpts,ans:newAns}
+}
+
+var ST={correct:0,wrong:0,answered:0};
+var UA={};
+var globalDone=false;
+var GLOBAL_SECS=1800;
+var timerInterval=null;
+
+function startTimer(){
+  var remaining=GLOBAL_SECS;
+  var dot=document.getElementById('gdot'),txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn'}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang'}
+    if(remaining<=0){clearInterval(timerInterval);timeUp()}
+  },1000)
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval)}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—'}
+
+function render(){
+  var container=document.getElementById('qc'),html='';
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i];
+    var shuffled=buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id]=shuffled.ans;
+    var optsHtml='';
+    ['A','B','C','D'].forEach(function(lbl){
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">'+'<span class="opt-key">'+lbl+'.</span>'+'<span class="opt-txt">'+shuffled.opts[lbl]+'</span>'+'</div>'
+    });
+    html+='<div class="qcard" style="animation-delay:'+(i*0.03)+'s">'+'<div class="qcard-top"><span class="qnum">Q'+q.id+' of 50</span>'+(q.topic?'<span class="qtopic">'+q.topic+'</span>':'')+'</div>'+'<div class="qtxt">'+q.text+'</div>'+'<div class="opts">'+optsHtml+'</div>'+'<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>'+'<div class="exp" id="exp'+q.id+'"></div>'+'</div>'
+  }
+  container.innerHTML=html;
+  attachListeners()
+}
+
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel')});
+      this.classList.add('sel');UA[qid]=this.dataset.a;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if(btn)btn.disabled=false
+    })
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid});
+      var chosen=UA[qid],correctLabel=SHUFFLED_ANS[qid],ok=(chosen===correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===correctLabel)o.classList.add('ok');
+        else if(o.dataset.a===chosen)o.classList.add('no')
+      });
+      var expEl=document.getElementById('exp'+qid);
+      var markTxt=ok?'&#x2713; Correct':'&#x2717; Incorrect &#x2014; correct answer: '+correctLabel;
+      expEl.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+markTxt+'</span>'+(q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');this.disabled=true;
+      if(!ST.answeredIds)ST.answeredIds=new Set();
+      if(!ST.answeredIds.has(qid)){
+        ST.answered++;ST.answeredIds.add(qid);
+        if(ok)ST.correct++;else ST.wrong++;
+        updateStats()
+      }
+    })
+  })
+}
+
+function updateStats(){
+  var left=QUESTIONS.length-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/QUESTIONS.length*100)+'%'
+}
+
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show')}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show')}
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(b){if(!b.disabled)b.click()});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show')
+}
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked')});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true});
+  var pct=Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show')
+}
+function doPrint(){
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){document.getElementById('print-header').style.display='none'},1000)
+}
+
+render();startTimer();
+</script>
+</body>
+</html>
