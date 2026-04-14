@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chemistry — Paper 7 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #22c55e;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .hdr-greeting { font-size: 11px; color: var(--ter); background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: 0.05em; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .exp-mark.nt  { background: rgba(34,197,94,0.12); color: var(--accent); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+      #print-header .ph-student { font-size: 13pt; font-weight: 700; color: #000; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+    /* ── AUTH GATE ── */
+    #auth-gate { position:fixed;inset:0;z-index:99999;background:var(--bg,#0d1117);display:flex;align-items:center;justify-content:center; }
+    #auth-gate.unlocked { display:none; }
+    .gate-box { background:var(--card2,#161b22);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+    .gate-logo { font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent,#22c55e);margin-bottom:1rem;font-family:var(--mono); }
+    .gate-title { font-size:1.3rem;font-weight:700;margin:0 0 0.4rem;color:var(--text,#e8edf5); }
+    .gate-sub { font-size:0.85rem;color:var(--ter,#8b949e);margin:0 0 1.5rem; }
+    .gate-input { width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text,#e8edf5);font-size:1rem;margin-bottom:0.5rem;outline:none; }
+    .gate-input:focus { border-color:var(--accent,#22c55e); }
+    .gate-error { font-size:0.82rem;color:#f85149;margin:0 0 0.75rem; }
+    .gate-btn { width:100%;padding:0.8rem;background:var(--accent,#22c55e);color:#000;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;font-family:var(--sans); }
+    .gate-btn:hover { opacity:0.88; }
+    .gate-pw-wrap { position:relative; margin-bottom:0.5rem; }
+    .gate-toggle { position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(232,237,245,0.45);cursor:pointer;font-size:0.9rem;padding:0.25rem;line-height:1; }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>GrantApp AI — Chemistry Paper 7</h1>
+  <p class="ph-meta">50 Questions · 30 Minutes · UTME Preparation</p>
+  <p class="ph-student" id="print-student-name"></p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">GrantApp AI</div>
+    <h2 class="gate-title">Chemistry · Paper 7</h2>
+    <p class="gate-sub">Enter your access password to continue</p>
+    <div class="gate-pw-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Password" autocomplete="current-password" style="margin-bottom:0;padding-right:2.75rem;">
+      <button class="gate-toggle" id="gate-toggle" type="button" aria-label="Show password">&#128065;</button>
+    </div>
+    <p id="gate-error" class="gate-error" style="display:none">Incorrect password. Try again.</p>
+    <button class="gate-btn" onclick="attemptUnlock()">Unlock Paper</button>
+  </div>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Chemistry · Paper 7</span>
+      <span class="hdr-meta">50 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span class="hdr-greeting" id="greeting" style="display:none"></span>
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">50</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">50</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 50 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" id="pdf-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">⬇ PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>50</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">50</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">⬇ Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── AUTH GATE ── */
+(function() {
+  var REGISTRY = {
+    "de871e73f7929b1a6b8f68f738bafefe3c79b1e71f73023b0943a7a91949ab0c": "Conve",
+    "f1b59c2f184d07435dea624e624dcff601e02b33b59e222d68cb2e784828ee68": "Kaosara",
+    "6c3ab4f30db51e16a0625fe26d9ee6739e6bafb5d016d11c3282840068ffe86c": "Habibat",
+    "1b6eda2ab79d40ba25f9151a33b17cc384cd4bdc87edd643fae0e3290fb8fe73": "Oyin",
+    "09fb65294072fd74ffb850ab6ba07fc463d35684937a502ba106bfcff13eb21a": "Dorcas",
+    "112bcfee75a5f38c097a785b83c2965da86de6cc94ef6e768c7aba429d6acd28": "Famous",
+    "b8815d7f6d60c4e65275059ebabf132e0f5eb03b9491409f7dd5b71ca3cf5bc2": "Obasesam",
+    "b22064841c21b9751160df8edce2c81fdeb65bb456befe86a3b85759a619d95d": "Prosper",
+    "bf645fa0f9c80170a8b4035c3d0c6faaa52bd30ec65078111b7c0bdb2711376b": "Temi",
+    "390f4f0dba14f3f3f534b29540387ee588e79774ed54845e487bb71e7a6464d1": "Murphy",
+    "324fd213d710a964427386f2b097eac7191ee106627d4fb91b9105d81405e37e": "Improve",
+    "d8cab52a94eaba0196b5aa170142551a5006aade919e78c9e77d8e8767eaed65": "Zainab",
+    "57e296eadaf2f13a1d26ac6e82545e61517f5e28798f86174f10bb4a7eb95b44": "Fiyin",
+    "554d5052b5f9f55f971d616d2f6b8c4eff87fc2a5cd597b5f2069bff56f60286": "Aliyah",
+    "b5a2a45e79219cb8da934417435ca80e90dba6da17d9e2aba8881fc8f2764935": "Aremu Ella",
+    "470e2ab1f8add8362879614a82fbcf4262451a6c2e8fa2377eede7f497f20280": "Taiwo"
+  };
+  async function sha256(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  window.attemptUnlock = async function() {
+    var pw = document.getElementById('gate-input').value.trim();
+    if (!pw) return;
+    var hash = await sha256(pw);
+    if (REGISTRY[hash]) {
+      var name = REGISTRY[hash];
+      document.getElementById('auth-gate').classList.add('unlocked');
+      var wm = document.getElementById('watermark');
+      if (wm) {
+        var tile = name + ' · GrantApp AI · ';
+        var row = ''; for (var r=0;r<8;r++) row += tile;
+        var html = ''; for (var i=0;i<14;i++) html += '<span>' + row + '</span>';
+        wm.innerHTML = html;
+      }
+      var greet = document.getElementById('greeting');
+      if (greet) { greet.textContent = 'Hey, ' + name; greet.style.display = 'block'; }
+      var psn = document.getElementById('print-student-name');
+      if (psn) psn.textContent = 'Student: ' + name;
+      var pd = document.getElementById('print-date');
+      if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('gate-input');
+    if (inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.attemptUnlock(); });
+    var tog = document.getElementById('gate-toggle');
+    if (tog) tog.addEventListener('click', function() {
+      var hide = inp.type === 'password'; inp.type = hide ? 'text' : 'password';
+      tog.innerHTML = hide ? '&#128584;' : '&#128065;';
+    });
+  });
+})();
+
+/* ── FISHER-YATES SHUFFLE ── */
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+const QUESTIONS = [
+
+  /* ── SECTION A: CHEMICAL TESTS (Q1–Q16) ── */
+
+  {
+    id: 1,
+    text: "A platinum wire dipped in a solution gives a persistent yellow flame in a Bunsen burner. The cation present is:",
+    opts: { A:"K⁺ ion", B:"Ca²⁺ ion", C:"Na⁺ ion", D:"Ba²⁺ ion" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "Na⁺ gives a persistent yellow flame — the most recognisable flame test. K⁺ gives lilac (seen through blue cobalt glass to filter Na⁺ contamination); Ca²⁺ gives brick-red; Ba²⁺ gives apple-green."
+  },
+  {
+    id: 2,
+    text: "A brick-red (orange-red) flame is produced in a flame test. The cation responsible is:",
+    opts: { A:"K⁺ ion", B:"Ba²⁺ ion", C:"Li⁺ ion", D:"Ca²⁺ ion" },
+    ans: "D",
+    topic: "Chemical Tests",
+    exp: "Ca²⁺ gives brick-red. Li⁺ gives crimson/scarlet; K⁺ gives lilac; Ba²⁺ gives apple-green. Flame colours arise from electrons emitting photons as they fall back to ground state after thermal excitation."
+  },
+  {
+    id: 3,
+    text: "NaOH solution is added to two separate test tubes containing Fe²⁺ and Fe³⁺ respectively. The correct pair of observations is:",
+    opts: { A:"Fe²⁺ → red-brown ppt; Fe³⁺ → white ppt", B:"Fe²⁺ → green ppt; Fe³⁺ → red-brown ppt", C:"Both give identical white precipitates", D:"Fe²⁺ dissolves in excess NaOH; Fe³⁺ gives blue ppt" },
+    ans: "B",
+    topic: "Chemical Tests",
+    exp: "Fe²⁺ + 2OH⁻ → Fe(OH)₂, a green/pale precipitate that slowly turns brown on oxidation. Fe³⁺ + 3OH⁻ → Fe(OH)₃, a red-brown precipitate. Neither dissolves in excess NaOH — distinguishing them from Al³⁺ and Zn²⁺."
+  },
+  {
+    id: 4,
+    text: "Limewater turns milky when gas X is bubbled through it. On passing excess gas, the milkiness clears. Gas X is:",
+    opts: { A:"Cl₂ gas", B:"SO₂ gas", C:"CO₂ gas", D:"NH₃ gas" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "CO₂ + Ca(OH)₂ → CaCO₃↓ (milky) + H₂O. Excess CO₂: CaCO₃ + CO₂ + H₂O → Ca(HCO₃)₂ (soluble → clear). This reversible clearing is unique to CO₂ among common lab gases."
+  },
+  {
+    id: 5,
+    text: "Damp starch-iodide paper turns blue-black when exposed to a gas. The gas is:",
+    opts: { A:"CO₂ gas", B:"SO₂ gas", C:"Cl₂ gas", D:"HCl gas" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "Cl₂ oxidises I⁻ in starch-KI paper to I₂: Cl₂ + 2KI → 2KCl + I₂. I₂ forms an intense blue-black complex with starch amylose. This is the standard qualitative test for chlorine gas."
+  },
+  {
+    id: 6,
+    text: "Moist red litmus paper held at the mouth of a test tube turns blue. The gas evolved is:",
+    opts: { A:"HCl gas", B:"SO₂ gas", C:"CO gas", D:"NH₃ gas" },
+    ans: "D",
+    topic: "Chemical Tests",
+    exp: "NH₃ is the only common lab gas that is alkaline. It dissolves in moisture: NH₃ + H₂O → NH₄⁺ + OH⁻, turning red litmus blue. A pungent smell confirms ammonia."
+  },
+  {
+    id: 7,
+    text: "A food sample warmed with Fehling's solution produces a brick-red precipitate. This confirms the presence of:",
+    opts: { A:"Sucrose (table sugar)", B:"Starch polymer", C:"A reducing sugar", D:"A polypeptide chain" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "Reducing sugars (glucose, fructose, maltose, lactose) reduce Cu²⁺ in Fehling's (blue) to Cu₂O (brick-red ppt). Sucrose is non-reducing and gives no change. Starch does not reduce Fehling's. Benedict's solution works by the same principle."
+  },
+  {
+    id: 8,
+    text: "A drop of iodine solution added to a food sample gives an intense blue-black colour. The substance present is:",
+    opts: { A:"Glucose sugar", B:"Starch polymer", C:"Cellulose fibre", D:"Glycogen only" },
+    ans: "B",
+    topic: "Chemical Tests",
+    exp: "I₂/KI solution reacts with the helical amylose chains in starch to form a deep blue-black inclusion complex. Glucose, cellulose, glycogen (weakly), and proteins do not give this colour with iodine. Heating destroys the complex (colour fades)."
+  },
+  {
+    id: 9,
+    text: "The Biuret test uses dilute NaOH then dilute CuSO₄ solution. A violet/purple colour is a positive result for:",
+    opts: { A:"Reducing sugars", B:"Proteins or peptides", C:"Unsaturated fatty acids", D:"Starch polymer" },
+    ans: "B",
+    topic: "Chemical Tests",
+    exp: "Cu²⁺ in alkaline solution coordinates with nitrogen atoms of two or more peptide bonds (–CO–NH–) to give a violet complex. Amino acids give blue (one peptide bond equivalent); dipeptides give pink. Absence of colour = no peptide bonds."
+  },
+  {
+    id: 10,
+    text: "AgNO₃(aq) acidified with dilute HNO₃ gives a yellow precipitate that is insoluble in both dilute and concentrated NH₃ solution. The halide ion present is:",
+    opts: { A:"Cl⁻ (chloride)", B:"F⁻ (fluoride)", C:"Br⁻ (bromide)", D:"I⁻ (iodide)" },
+    ans: "D",
+    topic: "Chemical Tests",
+    exp: "AgI is yellow and insoluble in NH₃ (concentrated or dilute). AgCl is white, soluble in dilute NH₃. AgBr is cream/pale yellow, soluble only in concentrated NH₃. This NH₃ solubility pattern is the standard JAMB halide identification sequence."
+  },
+  {
+    id: 11,
+    text: "Bromine water is decolourised when added to compound X but NOT when added to compound Y. Compound X most likely contains:",
+    opts: { A:"A carbonyl (C=O) group only", B:"A hydroxyl (–OH) group only", C:"A carbon–carbon double or triple bond", D:"A carboxylate (–COO⁻) group" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "Bromine water (orange-brown) is decolourised by unsaturated compounds via electrophilic addition across C=C or C≡C bonds. Aldehydes also decolourise it (by oxidation), but the primary unsaturation test in JAMB contexts refers to C=C detection in alkenes."
+  },
+  {
+    id: 12,
+    text: "BaCl₂ solution acidified with dilute HCl is added to a solution. A white precipitate insoluble in dilute HCl forms. The anion present is:",
+    opts: { A:"Cl⁻ ion", B:"CO₃²⁻ ion", C:"SO₄²⁻ ion", D:"NO₃⁻ ion" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "Ba²⁺ + SO₄²⁻ → BaSO₄↓ (white, insoluble in HCl). Acidification with HCl destroys CO₃²⁻ (which would also give a white BaCO₃ precipitate but dissolves in HCl). BaSO₄ persistence in HCl is the confirmatory step."
+  },
+  {
+    id: 13,
+    text: "A yellow crystalline solid with a distinctive odour forms when propanone is treated with I₂ in NaOH solution. This reaction is the:",
+    opts: { A:"Tollen's silver mirror reaction", B:"Lucas test for alcohol class", C:"Iodoform (CHI₃) reaction", D:"Fehling's reduction test" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "The iodoform test: methyl ketones (CH₃CO–) react with I₂/NaOH to give CHI₃ (yellow crystals, antiseptic smell). Propanone (CH₃COCH₃) is a methyl ketone → positive. Also positive: ethanal (CH₃CHO) and secondary alcohols oxidisable to methyl ketones (e.g. propan-2-ol)."
+  },
+  {
+    id: 14,
+    text: "Acidified K₂Cr₂O₇ (orange) turns green on gentle warming with alcohol X, but remains orange with alcohol Y. This shows that:",
+    opts: { A:"Y is a primary alcohol; X is tertiary", B:"X is a primary or secondary alcohol; Y is tertiary", C:"Both alcohols are secondary alcohols", D:"X is a phenol; Y is an aliphatic alcohol" },
+    ans: "B",
+    topic: "Chemical Tests",
+    exp: "Cr₂O₇²⁻ (orange) is reduced to Cr³⁺ (green) only by primary and secondary alcohols (which can be oxidised). Tertiary alcohols have no H on the carbon bearing –OH and resist oxidation — dichromate stays orange. The test does not distinguish primary from secondary."
+  },
+  {
+    id: 15,
+    text: "A pale blue precipitate forms with NaOH. It dissolves in excess NH₃ giving a deep blue solution. The cation is:",
+    opts: { A:"Fe³⁺ ion", B:"Cu²⁺ ion", C:"Al³⁺ ion", D:"Zn²⁺ ion" },
+    ans: "B",
+    topic: "Chemical Tests",
+    exp: "Cu²⁺ + 2OH⁻ → Cu(OH)₂↓ (pale blue). Cu(OH)₂ + 4NH₃ → [Cu(NH₃)₄]²⁺ (deep royal blue, Schweitzer's reagent) + 2OH⁻. Al(OH)₃ and Zn(OH)₂ dissolve in excess NaOH (not NH₃). Fe(OH)₃ does not dissolve in NH₃."
+  },
+  {
+    id: 16,
+    text: "The Lucas test uses anhydrous ZnCl₂ in concentrated HCl. A tertiary alcohol gives a cloudy layer:",
+    opts: { A:"Only after heating for several minutes", B:"After 5 minutes at room temperature", C:"Immediately at room temperature", D:"Only on addition of H₂SO₄ catalyst" },
+    ans: "C",
+    topic: "Chemical Tests",
+    exp: "Lucas test distinguishes alcohol classes by rate of reaction with ZnCl₂/HCl (forms insoluble alkyl chloride = cloudiness). Tertiary alcohols react immediately (most stable carbocation). Secondary: ~5 minutes. Primary: no reaction at room temperature (or requires heat). The sequence: immediate → tertiary; ~5 min → secondary; no reaction → primary."
+  },
+
+  /* ── SECTION B: INDUSTRIAL CHEMISTRY (Q17–Q32) ── */
+
+  {
+    id: 17,
+    text: "The Haber process uses a temperature of ~450°C rather than a lower temperature because:",
+    opts: { A:"The iron catalyst only activates above 450°C", B:"Lower temperature gives too slow a rate despite a higher equilibrium yield", C:"Higher temperature increases the equilibrium yield of NH₃", D:"N₂ only dissociates into atoms above 400°C" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "N₂ + 3H₂ ⇌ 2NH₃ is exothermic. A lower T gives more NH₃ at equilibrium (Le Chatelier) but the rate is prohibitively slow. 450°C is a compromise: the rate is industrially acceptable (~15% yield per pass), and unconverted gases are recycled."
+  },
+  {
+    id: 18,
+    text: "In the Contact Process, the catalyst used to oxidise SO₂ to SO₃ is:",
+    opts: { A:"Iron(III) oxide at 800°C", B:"Vanadium(V) oxide (V₂O₅) at ~450°C", C:"Platinum gauze at 900°C", D:"Nickel at 300°C and 50 atm" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "2SO₂ + O₂ ⇌ 2SO₃. V₂O₅ is the catalyst at ~450°C and 1–2 atm. Platinum is more active but is poisoned by impurities. Again, 450°C balances reaction rate against equilibrium yield (~97% conversion in multiple bed passes)."
+  },
+  {
+    id: 19,
+    text: "In the Ostwald process, the catalyst for oxidising ammonia to NO is:",
+    opts: { A:"Iron oxide (Fe₂O₃) at 700°C", B:"Platinum-rhodium gauze at ~850°C", C:"Vanadium pentoxide at 450°C", D:"Nickel gauze at 300°C" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "4NH₃ + 5O₂ → 4NO + 6H₂O on Pt-Rh gauze at 850–900°C. Conversion ~96%. NO is then oxidised: 2NO + O₂ → 2NO₂, then absorbed: 3NO₂ + H₂O → 2HNO₃ + NO. Product is concentrated nitric acid."
+  },
+  {
+    id: 20,
+    text: "The Solvay (ammonia-soda) process is used to manufacture:",
+    opts: { A:"Sodium hydroxide from brine", B:"Sodium carbonate (Na₂CO₃) from NaCl and CaCO₃", C:"Sodium chloride from sea water", D:"Sodium sulfate from NaOH and H₂SO₄" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "Key reactions: NaCl + NH₃ + CO₂ + H₂O → NaHCO₃↓ + NH₄Cl. Then 2NaHCO₃ → Na₂CO₃ + H₂O + CO₂. NH₃ is recovered by treating NH₄Cl with lime: 2NH₄Cl + Ca(OH)₂ → CaCl₂ + 2NH₃ + 2H₂O. Na₂CO₃ is used in glass, soap, and water softening."
+  },
+  {
+    id: 21,
+    text: "In the blast furnace, coke serves which two functions?",
+    opts: { A:"Acts as catalyst and provides the carbon in steel", B:"Provides heat by combustion and generates CO reductant", C:"Reduces iron ore directly and supplies oxygen", D:"Melts limestone and decomposes iron ore thermally" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "C + O₂ → CO₂ (exothermic — provides heat). CO₂ + C → 2CO (at high temperature). Then CO reduces iron ore: Fe₂O₃ + 3CO → 2Fe + 3CO₂. Coke thus acts as both fuel and indirect reductant — a double role tested repeatedly in JAMB."
+  },
+  {
+    id: 22,
+    text: "Limestone is added to the blast furnace to:",
+    opts: { A:"Provide additional carbon for iron reduction", B:"Remove acidic silica gangue as molten slag", C:"Act as a catalyst for iron reduction", D:"Supply oxygen to combust the coke" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "CaCO₃ → CaO + CO₂ (thermal decomposition). CaO + SiO₂ → CaSiO₃ (calcium silicate slag). Slag is less dense than molten iron and floats on top, being tapped off separately. Without limestone, silica impurities would remain in the iron."
+  },
+  {
+    id: 23,
+    text: "Catalytic cracking of long-chain alkanes mainly produces:",
+    opts: { A:"Only shorter-chain alkanes as petrol", B:"Shorter alkanes and alkenes useful as fuels and polymer feedstocks", C:"Only hydrogen gas and carbon black", D:"Exclusively cycloalkanes and arenes" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "Catalytic cracking (zeolite catalyst, ~500°C) breaks C–C bonds in heavy oil to give short-chain alkanes (high-octane petrol) and alkenes (ethene, propene — monomers for plastics). This process is central to meeting demand for lighter fuels and chemical feedstocks."
+  },
+  {
+    id: 24,
+    text: "The three products of the chlor-alkali process (electrolysis of concentrated brine) are:",
+    opts: { A:"Na metal, Cl₂, and H₂O only", B:"NaOH solution, Cl₂ gas, and H₂ gas", C:"NaCl, HCl gas, and O₂ gas", D:"Na₂CO₃, Cl₂ gas, and O₂ gas" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "Cathode: 2H₂O + 2e⁻ → H₂ + 2OH⁻. Anode: 2Cl⁻ → Cl₂ + 2e⁻. Na⁺ + OH⁻ remains as NaOH solution. Products: NaOH (important industrial alkali), Cl₂ (disinfectant, PVC, bleach), H₂ (fuel, margarine, ammonia feedstock)."
+  },
+  {
+    id: 25,
+    text: "Industrial ethanol by catalytic hydration of ethene gives a product that differs from fermentation ethanol mainly because it is:",
+    opts: { A:"Impure and requires yeast removal before use", B:"Produced in a batch process giving ~14% ethanol", C:"Produced continuously at nearly 100% purity", D:"Mixed with methanol requiring further purification" },
+    ans: "C",
+    topic: "Industrial Chemistry",
+    exp: "Hydration: CH₂=CH₂ + H₂O → C₂H₅OH (H₃PO₄ catalyst, ~300°C, 60–70 atm). Continuous process → high purity. Fermentation (yeast + glucose, 25–37°C) gives ~5–14% ethanol, needs fractional distillation, but uses renewable feedstock (sugarcane, corn)."
+  },
+  {
+    id: 26,
+    text: "Fractional distillation of crude oil separates fractions primarily on the basis of:",
+    opts: { A:"Solubility in water", B:"Boiling point, which increases with chain length", C:"Carbon number alone, not boiling point", D:"Colour and viscosity of each fraction" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "Longer alkane chains have greater London (dispersion) forces → higher boiling points. The fractionating column maintains a temperature gradient; fractions condense at their respective boiling point levels: gases (top) → petrol → naphtha → kerosene → diesel → fuel oil → bitumen (bottom)."
+  },
+  {
+    id: 27,
+    text: "In the Down's cell used to extract sodium, the electrolyte and the electrode at which Na forms are:",
+    opts: { A:"Molten NaCl; Na forms at the cathode", B:"NaCl(aq) solution; Na forms at the anode", C:"Molten NaOH; Na forms at the cathode", D:"Molten NaCl; Na forms at the anode" },
+    ans: "A",
+    topic: "Industrial Chemistry",
+    exp: "Molten NaCl (aqueous NaCl gives H₂ not Na). Cathode: Na⁺ + e⁻ → Na. Anode: 2Cl⁻ → Cl₂ + 2e⁻. CaCl₂ is added to lower the melting point from 800°C to ~600°C. An iron gauze keeps Na and Cl₂ separate to prevent re-combination."
+  },
+  {
+    id: 28,
+    text: "Al₂O₃ is dissolved in molten cryolite (Na₃AlF₆) during aluminium extraction because cryolite:",
+    opts: { A:"Provides extra Al³⁺ ions for reduction", B:"Lowers the operating temperature from ~2050°C to ~950°C", C:"Prevents the carbon anodes from oxidising", D:"Increases the purity of the aluminium deposited" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "Pure Al₂O₃ melts at 2050°C, making electrolysis economically unviable. Dissolving it in molten cryolite reduces the melt temperature to ~950°C, drastically cutting energy costs. Cryolite itself is not decomposed in the process."
+  },
+  {
+    id: 29,
+    text: "The petroleum fraction used as aviation fuel (jet fuel) is:",
+    opts: { A:"Naphtha (C₆–C₁₀)", B:"Kerosene (C₁₀–C₁₆)", C:"Gasoline/petrol (C₅–C₁₀)", D:"Diesel/gas oil (C₁₄–C₂₀)" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "Kerosene (paraffin), boiling range ~150–250°C, is used as jet fuel (Jet-A, Avtur) and domestic heating oil. Petrol (gasoline) powers car engines; diesel powers heavy vehicles; naphtha is used as a chemical feedstock."
+  },
+  {
+    id: 30,
+    text: "Steam reforming of methane (the main industrial H₂ source) proceeds as:",
+    opts: { A:"CH₄ + 2O₂ → CO₂ + 2H₂O", B:"CH₄ + H₂O ⇌ CO + 3H₂", C:"CH₄ → C + 2H₂", D:"2CH₄ + O₂ → 2CO + 4H₂" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "CH₄ + H₂O ⇌ CO + 3H₂ (Ni catalyst, ~850°C). The CO + H₂ (syngas) undergoes the water-gas shift: CO + H₂O → CO₂ + H₂ to maximise H₂. This H₂ feeds the Haber process, oil refining (hydrocracking), and fuel cells."
+  },
+  {
+    id: 31,
+    text: "In the Contact Process, SO₃ is absorbed in concentrated H₂SO₄ rather than water because:",
+    opts: { A:"Water cannot dissolve SO₃ at industrial scale", B:"SO₃ + H₂O produces an uncontrollable acid mist", C:"Water reacts with V₂O₅ catalyst and deactivates it", D:"Concentrated H₂SO₄ shifts equilibrium to give more SO₃" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "SO₃ + H₂O is violently exothermic and produces a fine acid mist that cannot be condensed efficiently. Instead SO₃ + H₂SO₄ → H₂S₂O₇ (oleum), then H₂S₂O₇ + H₂O → 2H₂SO₄. This controlled absorption avoids mist and gives 98%+ purity acid."
+  },
+  {
+    id: 32,
+    text: "In steel making, the oxygen blown into the Bessemer converter mainly removes:",
+    opts: { A:"Sulfur and silicon impurities only", B:"Excess carbon, silicon, and manganese by oxidation", C:"The slag produced by limestone decomposition", D:"Phosphorus impurities by reduction" },
+    ans: "B",
+    topic: "Industrial Chemistry",
+    exp: "In the basic oxygen furnace (BOF), pure O₂ is blown at high pressure into molten pig iron. It oxidises excess carbon (→ CO/CO₂), silicon (→ SiO₂), manganese (→ MnO), and phosphorus (→ P₂O₅). Lime reacts with the acidic oxides to form slag. The result is low-carbon steel."
+  },
+
+  /* ── SECTION C: ENVIRONMENTAL CHEMISTRY (Q33–Q42) ── */
+
+  {
+    id: 33,
+    text: "The primary atmospheric pollutants responsible for acid rain are:",
+    opts: { A:"CO₂ and methane from combustion", B:"SO₂ and NOₓ from fossil fuel combustion", C:"HCl released from industrial stacks", D:"Ground-level ozone and particulate matter" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "Acid rain (pH < 5.6) is caused by SO₂ (from coal/oil combustion) and NOₓ (from vehicle engines and power plants) dissolving in rainwater: SO₂ + H₂O → H₂SO₃; 4NO₂ + 2H₂O + O₂ → 4HNO₃. Effects: kills aquatic life, corrodes limestone buildings, harms vegetation."
+  },
+  {
+    id: 34,
+    text: "Methane (CH₄) is a greenhouse gas with a global warming potential (GWP) approximately:",
+    opts: { A:"Equal to that of CO₂ (GWP = 1)", B:"25 times that of CO₂ over 100 years", C:"100 times that of CO₂ over 100 years", D:"Lower than that of CO₂ (GWP < 1)" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "CH₄ has GWP ≈ 25–28 over 100 years (i.e., 25× more warming per kg than CO₂). Major sources: cattle, rice paddies, landfills, natural gas leaks. Although CO₂ is more abundant and thus contributes more total warming, each CH₄ molecule is more potent."
+  },
+  {
+    id: 35,
+    text: "CFCs deplete stratospheric ozone because they release which reactive species under UV radiation?",
+    opts: { A:"Fluoride ions (F⁻)", B:"Chlorine free radicals (Cl•)", C:"Carbon dioxide (CO₂)", D:"Nitrogen oxides (NOₓ)" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "UV breaks C–Cl bonds in CFCs: CF₂Cl₂ → CF₂Cl• + Cl•. The Cl radical: Cl• + O₃ → ClO• + O₂; ClO• + O• → Cl• + O₂. One Cl• catalytically destroys thousands of O₃ molecules. The Montreal Protocol (1987) phased out CFCs globally."
+  },
+  {
+    id: 36,
+    text: "Eutrophication is triggered by excess nitrates and phosphates entering water bodies. The sequence of events that follows is:",
+    opts: { A:"Algal bloom → more O₂ → fish population increase", B:"Algal bloom → algae die → bacterial decomposition consumes O₂ → aquatic life dies", C:"Toxic algae → direct fish poisoning → algae die", D:"Phosphate binds O₂ → water becomes anoxic immediately" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "Nutrients → algal bloom (surface covered) → algae block sunlight → lower plants die → algae die → bacteria decompose all organic matter → bacterial respiration uses up O₂ (high BOD) → fish and other aquatic animals die from deoxygenation. Eutrophication is a cascade."
+  },
+  {
+    id: 37,
+    text: "Carbon monoxide is toxic primarily because it:",
+    opts: { A:"Dissolves in blood to form carbonic acid", B:"Binds to haemoglobin ~200× more strongly than O₂", C:"Reduces blood pH to lethal levels", D:"Blocks the transport of CO₂ from tissues" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "CO has ~200–240× greater affinity for haemoglobin than O₂. Carboxyhaemoglobin (HbCO) cannot carry O₂ → tissues are starved of oxygen → unconsciousness and death at high concentrations. Sources: incomplete combustion of carbon fuels in poorly ventilated spaces."
+  },
+  {
+    id: 38,
+    text: "Chlorination of drinking water kills pathogens. The active disinfecting species produced from Cl₂ in water is:",
+    opts: { A:"Cl⁻ ions in solution", B:"Hypochlorous acid (HOCl)", C:"HCl formed at low pH", D:"ClO₃⁻ (chlorate ion)" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "Cl₂ + H₂O → H⁺ + Cl⁻ + HOCl. Hypochlorous acid (HOCl) is the active bactericide — it penetrates bacterial cell walls and disrupts metabolism. At higher pH it dissociates to OCl⁻, which is less effective. Optimal disinfection occurs at pH 6–8."
+  },
+  {
+    id: 39,
+    text: "The catalytic converter in a car exhaust converts CO and NOₓ. The reaction that removes NO is:",
+    opts: { A:"2NO + O₂ → 2NO₂", B:"2NO + 2CO → N₂ + 2CO₂", C:"NO + H₂O → HNO₂", D:"4NO + 3O₂ → 2N₂O₆" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "On the Pt-Rh catalyst surface: 2NO + 2CO → N₂ + 2CO₂. Simultaneously 2CO + O₂ → 2CO₂ and CₓHᵧ + O₂ → CO₂ + H₂O. The three-way catalytic converter simultaneously removes CO, unburnt hydrocarbons, and NOₓ — converting all to N₂, CO₂, and H₂O."
+  },
+  {
+    id: 40,
+    text: "The greenhouse effect refers to atmospheric gases trapping:",
+    opts: { A:"Incoming ultraviolet radiation from the Sun", B:"Outgoing infrared (heat) radiation from Earth's surface", C:"Incoming visible light radiation from the Sun", D:"Incoming X-rays blocked by the ozone layer" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "Solar UV/visible light passes through the atmosphere and warms Earth's surface. Earth re-emits energy as infrared (IR) radiation. Greenhouse gases (CO₂, CH₄, H₂O, N₂O) absorb and re-emit this IR, warming the lower atmosphere. Without any greenhouse effect, Earth's surface would be ~−18°C."
+  },
+  {
+    id: 41,
+    text: "Permanent hardness in water (not removed by boiling) is caused by dissolved:",
+    opts: { A:"Ca(HCO₃)₂ and Mg(HCO₃)₂", B:"CaSO₄ and MgCl₂ or MgSO₄", C:"NaCl and KCl salts", D:"CO₂ and H₂S dissolved gases" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "Temporary hardness (Ca/Mg bicarbonates) is removed by boiling: Ca(HCO₃)₂ → CaCO₃↓ + H₂O + CO₂. Permanent hardness (CaSO₄, MgSO₄, MgCl₂, CaCl₂) is not removed by boiling — it requires Na₂CO₃ (washing soda) or ion-exchange resin or distillation."
+  },
+  {
+    id: 42,
+    text: "Photochemical smog is mainly formed in cities when:",
+    opts: { A:"SO₂ reacts with fog water to form sulfuric acid mist", B:"NOₓ and unburnt hydrocarbons react photochemically in sunlight to form O₃", C:"CO₂ reacts with O₃ under UV to form CO and O₂", D:"CFC residues accumulate at ground level in still air" },
+    ans: "B",
+    topic: "Environmental Chemistry",
+    exp: "Photochemical smog: vehicle-emitted NOₓ and hydrocarbons react under UV to form ground-level ozone (O₃), peroxyacetyl nitrate (PAN), and aldehydes. These irritate eyes and lungs and damage rubber and plants. Common in warm, sunny, traffic-dense cities (e.g., Los Angeles, Lagos)."
+  },
+
+  /* ── SECTION D: CATALYSIS (Q43–Q50) ── */
+
+  {
+    id: 43,
+    text: "A catalyst increases reaction rate by:",
+    opts: { A:"Raising the temperature of the system", B:"Providing an alternative lower-Eₐ pathway", C:"Increasing the concentration of reactants", D:"Shifting the equilibrium position to the right" },
+    ans: "B",
+    topic: "Catalysis",
+    exp: "A catalyst provides an alternative mechanism with lower activation energy. More molecules in the Maxwell–Boltzmann distribution then exceed Eₐ → faster rate. The catalyst is not consumed, does not alter ΔH, and does not change the equilibrium position — only the rate to reach it."
+  },
+  {
+    id: 44,
+    text: "A homogeneous catalyst is in the same phase as its reactants. An example is:",
+    opts: { A:"Fe(s) catalysing N₂(g) + H₂(g) in the Haber process", B:"H₂SO₄(aq) catalysing esterification in solution", C:"V₂O₅(s) catalysing SO₂(g) + O₂(g)", D:"MnO₂(s) decomposing H₂O₂(aq)" },
+    ans: "B",
+    topic: "Catalysis",
+    exp: "H₂SO₄(aq) and the reactants (alcohol + acid, both liquid/dissolved) are in the same phase → homogeneous. Fe(s), V₂O₅(s), and MnO₂(s) are all solids catalysing gases or liquids → heterogeneous. Homogeneous catalysts often allow better contact but are harder to separate from products."
+  },
+  {
+    id: 45,
+    text: "In autocatalysis, the reaction is initially slow and then accelerates. This is because:",
+    opts: { A:"Temperature increases as the reaction proceeds", B:"A product of the reaction acts as a catalyst for the same reaction", C:"The reactants become more concentrated over time", D:"The activation energy decreases spontaneously as T rises" },
+    ans: "B",
+    topic: "Catalysis",
+    exp: "Autocatalysis: a product catalyses the reaction. Classic example — KMnO₄ + C₂H₂O₄: Mn²⁺ produced is the catalyst. As Mn²⁺ accumulates, the rate accelerates. The sigmoidal rate-time curve (slow–fast–slow) is diagnostic of autocatalysis."
+  },
+  {
+    id: 46,
+    text: "A catalyst does NOT change which of the following quantities?",
+    opts: { A:"Activation energy (Eₐ) of the reaction", B:"Enthalpy change (ΔH) of the reaction", C:"Rate constant (k) at a given temperature", D:"Fraction of molecules exceeding Eₐ" },
+    ans: "B",
+    topic: "Catalysis",
+    exp: "A catalyst lowers Eₐ, increases k, and increases the fraction of molecules exceeding Eₐ. However, ΔH (difference in energy between reactants and products) is unchanged — the energy landscape start and end points are the same, only the barrier height is reduced."
+  },
+  {
+    id: 47,
+    text: "K₂O and Al₂O₃ are added to the iron catalyst in the Haber process. These substances are called:",
+    opts: { A:"Inhibitors (negative catalysts)", B:"Catalyst promoters", C:"Substrates of the reaction", D:"Secondary catalysts that replace iron" },
+    ans: "B",
+    topic: "Catalysis",
+    exp: "Promoters (K₂O, Al₂O₃) enhance the activity of the primary iron catalyst without themselves being catalytic. K₂O (electronic promoter) increases electron density on Fe, improving N₂ adsorption and dissociation. Al₂O₃ (structural promoter) prevents sintering and keeps Fe surface area high."
+  },
+  {
+    id: 48,
+    text: "Enzymes differ from inorganic catalysts primarily in their:",
+    opts: { A:"Greater stability at temperatures above 80°C", B:"High substrate specificity due to their active site shape", C:"Faster overall action than all metal catalysts", D:"Independence from pH changes in biological systems" },
+    ans: "B",
+    topic: "Catalysis",
+    exp: "Enzymes are highly specific — the active site has a complementary shape to one or a few substrates (lock-and-key / induced-fit models). They are denatured by high temperature (>~40–50°C) and have an optimal pH. Their specificity is unmatched by any inorganic catalyst."
+  },
+  {
+    id: 49,
+    text: "Adding a catalyst to the equilibrium N₂(g) + 3H₂(g) ⇌ 2NH₃(g) will:",
+    opts: { A:"Shift equilibrium right, increasing NH₃ percentage yield", B:"Speed up the forward reaction only", C:"Allow equilibrium to be reached faster without changing its position", D:"Lower Eₐ for the forward reaction but not the reverse" },
+    ans: "C",
+    topic: "Catalysis",
+    exp: "A catalyst lowers Eₐ for both forward and reverse reactions by the same amount. The equilibrium constant Kc (and thus the yield at that temperature) is unchanged — only the time to reach equilibrium is reduced. To change yield, you must change temperature, pressure, or concentration."
+  },
+  {
+    id: 50,
+    text: "Vanadium(V) oxide works in the Contact Process via a redox cycle. The correct sequence is:",
+    opts: { A:"V₂O₅ oxidises SO₂ to SO₃ and is reduced to V₂O₄; then O₂ re-oxidises V₂O₄ back to V₂O₅", B:"V₂O₅ absorbs SO₂ permanently then decomposes on cooling to release SO₃", C:"V₂O₅ dissolves in molten SO₂ and releases SO₃ on solidification", D:"V₂O₅ donates vanadium ions that carry electrons from SO₂ to O₂ irreversibly" },
+    ans: "A",
+    topic: "Catalysis",
+    exp: "V₂O₅ mechanism: SO₂ + V₂O₅ → SO₃ + V₂O₄ (V: +5 → +4 reduced). V₂O₄ + ½O₂ → V₂O₅ (V: +4 → +5 re-oxidised). This cycle regenerates the catalyst. It is a textbook example of a variable-oxidation-state transition metal acting as a heterogeneous redox catalyst."
+  }
+
+];
+
+/* ── SHUFFLE OPTIONS (Fisher-Yates at render time) ──
+   Converts opts object to array, shuffles, re-labels A-D,
+   tracks the new correct-answer label. Scoring uses SHUFFLED_ANS.
+*/
+var SHUFFLED_ANS = {};
+
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return { origKey: k, text: q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp;
+  }
+  var newOpts = {}; var newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) {
+    newOpts[lbl] = entries[idx].text;
+    if (entries[idx].origKey === q.ans) newAns = lbl;
+  });
+  return { opts: newOpts, ans: newAns };
+}
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0 };
+var UA = {};
+var globalDone = false;
+var GLOBAL_SECS = 1800;
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) { var m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el?el.textContent:'—'; }
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    var optsHtml = '';
+    ['A','B','C','D'].forEach(function(lbl) {
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+shuffled.opts[lbl]+'</span>' +
+        '</div>';
+    });
+    html += '<div class="qcard" style="animation-delay:'+(i*0.03)+'s">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q'+q.id+' of 50</span>' +
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'') +
+      '</div>' +
+      '<div class="qtxt">'+q.text+'</div>' +
+      '<div class="opts">'+optsHtml+'</div>' +
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp'+q.id+'"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid = parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid = parseInt(this.dataset.qid);
+      var q = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var correctLabel = SHUFFLED_ANS[qid];
+      var ok = (chosen === correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      var expEl = document.getElementById('exp'+qid);
+      var markCls = ok?'pos':'neg';
+      var markTxt = ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel;
+      expEl.innerHTML = '<span class="exp-mark '+markCls+'">'+markTxt+'</span>' +
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds) ST.answeredIds = new Set();
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = QUESTIONS.length - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = ST.answered+' / 50 answered';
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered/QUESTIONS.length*100)+'%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() { document.getElementById('m-time').textContent=getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() {
+  hideSubmitModal(); globalDone = true; stopTimer();
+  document.querySelectorAll('.abtn:not(:disabled)').forEach(function(b){ if(!b.disabled) b.click(); });
+  var pct = Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  document.querySelectorAll('.opt').forEach(function(o){ o.style.pointerEvents='none'; o.classList.add('locked'); });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled=true; });
+  var pct = Math.round((ST.correct/QUESTIONS.length)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = QUESTIONS.length-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── PDF ── */
+function doPrint() {
+  document.getElementById('print-header').style.display='block';
+  window.print();
+  setTimeout(function(){ document.getElementById('print-header').style.display='none'; },1000);
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
