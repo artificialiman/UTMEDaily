@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>UTME Sprint 1 — 2026 | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #f59e0b;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-left { display: flex; flex-direction: column; gap: 2px; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); overflow: hidden;
+      display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .qdiagram svg { max-width: 100%; height: auto; display: block; }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap, .subj-divider { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { border: 1px solid #ccc !important; background: #fff !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>UTMEDaily · GrantApp AI — UTME Sprint 1 (2026)</h1>
+  <p class="ph-meta">40 Questions · 30 Minutes · English · Economics · Mathematics · Government</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">UTMEDaily · GrantApp AI</span>
+      <span class="hdr-title">UTME Sprint 1 — 2026</span>
+      <span class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#x2B07; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#x23F1;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">&#x2014;</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#x2B07; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── WATERMARK ── */
+(function() {
+  var wm = document.getElementById('watermark');
+  if (!wm) return;
+  var tile = 'GrantApp AI \u00b7 UTME Sprint 1 \u00b7 ';
+  var row = ''; for (var r = 0; r < 8; r++) row += tile;
+  var html = ''; for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+  wm.innerHTML = html;
+  var pd = document.getElementById('print-date');
+  if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric'
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   SVG DIAGRAMS (unused for this Sprint — kept for compatibility)
+   ══════════════════════════════════════════════════════════════ */
+var DIAGRAMS = {};
+
+/* ══════════════════════════════════════════════════════════════
+   QUESTIONS — UTME SPRINT 1 (English, Economics, Mathematics, Government)
+   ══════════════════════════════════════════════════════════════ */
+const QUESTIONS = [
+  // ENGLISH 1–12
+  { id:1, subj:'English', topic:'Comprehension', text:'Choose the option closest in meaning to the underlined word: "Her remarks during the meeting were quite <u>acerbic</u>."', opts:{ A:'sharp and bitter', B:'long and tedious', C:'soft and gentle', D:'confusing and vague' }, ans:'A', exp:'Acerbic means sharp, biting, or harsh in tone. The other options describe unrelated qualities.' },
+  { id:2, subj:'English', topic:'Lexis & Structure', text:'"Neither the principal nor the teachers _____ satisfied with the new policy." Choose the correct verb.', opts:{ A:'is', B:'was', C:'are', D:'has been' }, ans:'C', exp:'With "neither…nor", the verb agrees with the noun closest to it (proximity rule). "Teachers" is plural, so "are" is correct.' },
+  { id:3, subj:'English', topic:'Oral English', text:'Which word has its stress on the FIRST syllable?', opts:{ A:'police', B:'hotel', C:'picture', D:'appeal' }, ans:'C', exp:'"Picture" is stressed on the first syllable: /ˈpɪk.tʃə/. "Police", "hotel", and "appeal" carry stress on the second syllable.' },
+  { id:4, subj:'English', topic:'Lexis & Structure', text:'"The flock of sheep _____ grazing when the storm began." Select the correct form.', opts:{ A:'was', B:'were', C:'have been', D:'are' }, ans:'A', exp:'When a collective noun acts as a single unit ("flock"), British usage requires a singular verb: "was". "Were" would treat individual members separately.' },
+  { id:5, subj:'English', topic:'Comprehension', text:'"The CEO\'s speech was <u>pedestrian</u> and failed to inspire the staff." This means the speech was:', opts:{ A:'brilliant and innovative', B:'dull and ordinary', C:'very long and boring', D:'full of walking metaphors' }, ans:'B', exp:'Pedestrian (adj.) means commonplace, unimaginative, or dull. It derives from "on foot" but here describes lack of inspiration.' },
+  { id:6, subj:'English', topic:'Oral English', text:'Which of the following contains a voiced dental fricative?', opts:{ A:'think', B:'this', C:'batch', D:'sharp' }, ans:'B', exp:'"This" contains /ð/ (voiced dental fricative). "Think" has /θ/ (voiceless). "Batch" has /tʃ/; "sharp" has /ʃ/.' },
+  { id:7, subj:'English', topic:'Lexis & Structure', text:'"The politician\'s promises turned out to be a <u>chimera</u>." The figure of speech used here is:', opts:{ A:'simile', B:'metaphor', C:'personification', D:'hyperbole' }, ans:'B', exp:'A metaphor directly equates promises to a chimera (mythical illusion) without "like" or "as". Personification gives human traits; hyperbole is exaggeration.' },
+  { id:8, subj:'English', topic:'Lexis & Structure', text:'"By next year, she _____ here for a decade." Select the correct verb form.', opts:{ A:'works', B:'will work', C:'will have worked', D:'would work' }, ans:'C', exp:'"By next year" + future reference requires the future perfect tense: "will have worked". This expresses completion before a future point.' },
+  { id:9, subj:'English', topic:'Comprehension', text:'Choose the word most OPPOSITE in meaning to "ephemeral":', opts:{ A:'temporary', B:'fleeting', C:'permanent', D:'brief' }, ans:'C', exp:'Ephemeral means short-lived or transient. Its antonym is "permanent" — lasting indefinitely. Options A, B, and D are synonyms, not antonyms.' },
+  { id:10, subj:'English', topic:'Oral English', text:'Which of the following words DOES NOT have the same vowel sound as "heat"?', opts:{ A:'beat', B:'seat', C:'great', D:'feet' }, ans:'C', exp:'"Great" is pronounced /ɡreɪt/ — the "ea" maps to the /eɪ/ sound. "Heat", "beat", "seat", and "feet" all have the /iː/ vowel sound.' },
+  { id:11, subj:'English', topic:'Lexis & Structure', text:'"She is allergic _____ nuts and was advised to abstain _____ them completely." Select the correct prepositions.', opts:{ A:'to / from', B:'for / of', C:'with / to', D:'at / against' }, ans:'A', exp:'"Allergic to" indicates sensitivity; "abstain from" indicates voluntary avoidance. These are fixed collocations.' },
+  { id:12, subj:'English', topic:'Lexis & Structure', text:'"Mathematics _____ always been my strongest subject." Choose the correct verb.', opts:{ A:'have', B:'has', C:'were', D:'are' }, ans:'B', exp:'"Mathematics" is an uncountable noun that always takes a singular verb, despite ending in "s". Plural verbs (have, were, are) are a common concord trap here.' },
+  // ECONOMICS 13–22
+  { id:13, subj:'Economics', topic:'Scarcity & Choice', text:'The basic economic problem of scarcity arises because:', opts:{ A:'human wants are unlimited but resources are limited', B:'money is unevenly distributed', C:'governments print too much currency', D:'people are naturally greedy' }, ans:'A', exp:'Scarcity is the fundamental economic problem: unlimited wants vs. limited resources. Distribution (B), currency (C), and greed (D) are secondary or incorrect.' },
+  { id:14, subj:'Economics', topic:'Demand & Supply', text:'If a 10% increase in price leads to a 5% decrease in quantity demanded, demand is:', opts:{ A:'perfectly inelastic', B:'inelastic', C:'unit elastic', D:'elastic' }, ans:'B', exp:'PED = %ΔQd/%ΔP = 5/10 = 0.5 (<1) → inelastic demand. Perfectly inelastic = 0, unit elastic = 1, elastic >1.' },
+  { id:15, subj:'Economics', topic:'Production', text:'In the short run, at least one factor of production is:', opts:{ A:'variable', B:'fixed', C:'irrelevant', D:'infinitely elastic' }, ans:'B', exp:'Short run = period where at least one input (e.g., capital, land) is fixed. Long run = all inputs variable. This is a core definition.' },
+  { id:16, subj:'Economics', topic:'Market Structures', text:'Which market structure is characterized by many sellers, differentiated products, and easy entry/exit?', opts:{ A:'perfect competition', B:'monopoly', C:'monopolistic competition', D:'oligopoly' }, ans:'C', exp:'Monopolistic competition: many firms, product differentiation, low barriers. Perfect comp = identical products. Oligopoly = few sellers. Monopoly = one seller.' },
+  { id:17, subj:'Economics', topic:'National Income', text:'GDP measured using the expenditure approach includes:', opts:{ A:'C + I + G + (X − M)', B:'wages + rent + interest + profit', C:'value of all intermediate goods', D:'only government spending' }, ans:'A', exp:'Expenditure approach: Consumption + Investment + Government + Net Exports. Option B is income approach. Option C double-counts intermediate goods.' },
+  { id:18, subj:'Economics', topic:'Money & Inflation', text:'Demand‑pull inflation is caused by:', opts:{ A:'increase in production costs', B:'excessive aggregate demand', C:'decrease in money supply', D:'fall in export demand' }, ans:'B', exp:'Demand-pull = too much money chasing too few goods → AD > AS. Option A = cost-push. Option C = deflationary. Option D = recessionary.' },
+  { id:19, subj:'Economics', topic:'International Trade', text:'According to the theory of comparative advantage, a country should:', opts:{ A:'produce only what it can produce absolutely cheaper', B:'produce goods where it has the lowest opportunity cost', C:'ban all imports to protect local jobs', D:'export only raw materials' }, ans:'B', exp:'Comparative advantage = lower opportunity cost, not absolute cost (A). Options C and D are protectionist or developmental, not comparative advantage.' },
+  { id:20, subj:'Economics', topic:'Economic Systems', text:'In a mixed economy, most economic decisions are made by:', opts:{ A:'only the government', B:'only private firms', C:'both markets and government', D:'traditional customs' }, ans:'C', exp:'Mixed economy = market mechanisms + government intervention. A = command, B = free market, D = traditional economy.' },
+  { id:21, subj:'Economics', topic:'Development Economics', text:'Which of the following is NOT a characteristic of a developing economy?', opts:{ A:'high dependency on agriculture', B:'low per capita income', C:'high level of industrialisation', D:'high population growth rate' }, ans:'C', exp:'Developing economies typically have LOW industrialisation. High industrialisation is characteristic of developed economies, not developing ones.' },
+  { id:22, subj:'Economics', topic:'Elasticity', text:'If the cross‑price elasticity of demand between two goods is negative, the goods are:', opts:{ A:'substitutes', B:'complements', C:'inferior goods', D:'luxury goods' }, ans:'B', exp:'Negative XED = price of A up → quantity of B down → complements (e.g., cars & fuel). Positive XED = substitutes. C/D refer to income elasticity.' },
+  // MATHEMATICS 23–32
+  { id:23, subj:'Mathematics', topic:'Algebra', text:'Solve for x: 3(x − 4) = 2(x + 5)', opts:{ A:'22', B:'2', C:'−2', D:'10' }, ans:'A', exp:'3x − 12 = 2x + 10 → 3x − 2x = 10 + 12 → x = 22.' },
+  { id:24, subj:'Mathematics', topic:'Logarithms', text:'If log₁₀ 2 = 0.3010, find log₁₀ 8.', opts:{ A:'0.6020', B:'0.9030', C:'1.2040', D:'0.4515' }, ans:'B', exp:'log₁₀ 8 = log₁₀ (2³) = 3 × 0.3010 = 0.9030.' },
+  { id:25, subj:'Mathematics', topic:'Trigonometry', text:'If sin θ = 3/5 and θ is acute, find cos θ.', opts:{ A:'4/5', B:'3/4', C:'5/4', D:'2/5' }, ans:'A', exp:'sin²θ + cos²θ = 1 → (9/25) + cos²θ = 1 → cos²θ = 16/25 → cosθ = 4/5.' },
+  { id:26, subj:'Mathematics', topic:'Geometry', text:'The angles of a triangle are in the ratio 2:3:5. The largest angle is:', opts:{ A:'90°', B:'54°', C:'36°', D:'72°' }, ans:'A', exp:'Sum of ratios = 10. Largest angle = (5/10) × 180° = 90°.' },
+  { id:27, subj:'Mathematics', topic:'Statistics', text:'Find the mean of: 4, 8, 6, 5, 7', opts:{ A:'6', B:'5', C:'7', D:'8' }, ans:'A', exp:'Sum = 30, mean = 30/5 = 6.' },
+  { id:28, subj:'Mathematics', topic:'Probability', text:'A fair die is rolled once. What is the probability of obtaining a prime number?', opts:{ A:'1/2', B:'1/3', C:'2/3', D:'1/6' }, ans:'A', exp:'Prime numbers on a die: 2, 3, 5 → 3/6 = 1/2.' },
+  { id:29, subj:'Mathematics', topic:'Variation', text:'If y varies inversely as x² and y = 4 when x = 2, find y when x = 4.', opts:{ A:'1', B:'2', C:'8', D:'16' }, ans:'A', exp:'y = k/x² → 4 = k/4 → k = 16. Then y = 16/16 = 1.' },
+  { id:30, subj:'Mathematics', topic:'Mensuration', text:'The area of a circle is 154 cm². Find its radius. (π = 22/7)', opts:{ A:'7 cm', B:'3.5 cm', C:'14 cm', D:'49 cm' }, ans:'A', exp:'πr² = 154 → (22/7)r² = 154 → r² = 49 → r = 7 cm.' },
+  { id:31, subj:'Mathematics', topic:'Algebra', text:'Factorise completely: x² − 9x + 20', opts:{ A:'(x − 4)(x − 5)', B:'(x + 4)(x + 5)', C:'(x − 2)(x − 10)', D:'(x + 2)(x + 10)' }, ans:'A', exp:'Factors of 20 that sum to −9: −4 and −5 → (x − 4)(x − 5).' },
+  { id:32, subj:'Mathematics', topic:'Trigonometry', text:'If tan θ = 1, find θ (0° ≤ θ ≤ 90°).', opts:{ A:'45°', B:'30°', C:'60°', D:'90°' }, ans:'A', exp:'tan 45° = 1. tan 30° ≈ 0.577, tan 60° ≈ 1.732, tan 90° undefined.' },
+  // GOVERNMENT 33–40
+  { id:33, subj:'Government', topic:'Political Systems', text:'A system where power is shared between central and regional governments is called:', opts:{ A:'unitary', B:'confederal', C:'federal', D:'parliamentary' }, ans:'C', exp:'Federalism divides power constitutionally between central and regional governments.' },
+  { id:34, subj:'Government', topic:'Constitution', text:'A constitution that requires a special procedure to amend is described as:', opts:{ A:'written', B:'rigid', C:'flexible', D:'unwritten' }, ans:'B', exp:'Rigid constitution = amendment requires more than a simple majority (e.g., 2/3 vote). Flexible = ordinary law process.' },
+  { id:35, subj:'Government', topic:'Citizenship', text:'The right to vote in a country is known as:', opts:{ A:'habeas corpus', B:'suffrage', C:'plebiscite', D:'referendum' }, ans:'B', exp:'Suffrage (or franchise) = the right to vote. Habeas corpus = protection against unlawful detention.' },
+  { id:36, subj:'Government', topic:'Arms of Government', text:'Which arm of government is responsible for interpreting laws?', opts:{ A:'Executive', B:'Legislature', C:'Judiciary', D:'Civil Service' }, ans:'C', exp:'Judiciary interprets laws and settles disputes. Executive implements laws. Legislature makes laws.' },
+  { id:37, subj:'Government', topic:'Public Administration', text:'The permanent, non‑political officials who implement government policies form the:', opts:{ A:'cabinet', B:'civil service', C:'judiciary', D:'parliament' }, ans:'B', exp:'Civil service = permanent bureaucracy. Cabinet = political ministers. Judiciary = courts. Parliament = legislature.' },
+  { id:38, subj:'Government', topic:'Nigerian Politics', text:'The Nigerian legislative body during the First Republic (1960–1966) was known as:', opts:{ A:'National Assembly', B:'Parliament', C:'Supreme Council', D:'Provisional Ruling Council' }, ans:'B', exp:'First Republic Nigeria had a Parliament (Senate + House of Representatives). "National Assembly" came later (1979).' },
+  { id:39, subj:'Government', topic:'International Organisations', text:'Which of the following is NOT a permanent member of the UN Security Council?', opts:{ A:'France', B:'Germany', C:'China', D:'Russia' }, ans:'B', exp:'Permanent five (P5): US, UK, France, Russia, China. Germany is not a permanent member.' },
+  { id:40, subj:'Government', topic:'Political Systems', text:'In a presidential system, the executive and legislature are:', opts:{ A:'fused together', B:'separate and independent', C:'controlled by the monarchy', D:'elected by the judiciary' }, ans:'B', exp:'Presidential system = separation of powers (e.g., US, Nigeria). Parliamentary system = fusion of powers.' }
+];
+
+const SECTIONS = [
+  { beforeId: 1, icon: '📝', title: 'English Language', meta: 'Questions 1–12 · Comprehension, Lexis & Structure, Oral English' },
+  { beforeId: 13, icon: '📊', title: 'Economics', meta: 'Questions 13–22 · Scarcity, Demand/Supply, Elasticity, National Income, Trade' },
+  { beforeId: 23, icon: '📐', title: 'Mathematics', meta: 'Questions 23–32 · Algebra, Logarithms, Trigonometry, Statistics, Probability' },
+  { beforeId: 33, icon: '🏛️', title: 'Government', meta: 'Questions 33–40 · Political Systems, Constitution, Citizenship, Nigerian Politics' }
+];
+
+/* ── ANSWER SHUFFLE ── */
+var SHUFFLED_ANS = {};
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return { origKey:k, text:q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp; }
+  var newOpts = {}; var newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) { newOpts[lbl] = entries[idx].text; if (entries[idx].origKey === q.ans) newAns = lbl; });
+  return { opts: newOpts, ans: newAns };
+}
+
+/* ── STATE ── */
+var ST = { correct:0, wrong:0, answered:0, answeredIds: new Set() };
+var UA = {};
+var globalDone = false;
+var GLOBAL_SECS = 1800;
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) { var m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--; txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el ? el.textContent : '—'; }
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var TOTAL = QUESTIONS.length;
+  var sectionMap = {};
+  SECTIONS.forEach(function(s){ sectionMap[s.beforeId] = s; });
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    if (sectionMap[q.id]) {
+      var s = sectionMap[q.id];
+      html += '<div class="subj-divider"><span class="subj-divider-icon">' + s.icon + '</span><div class="subj-divider-left"><span class="subj-divider-title">' + s.title + '</span><span class="subj-divider-meta">' + s.meta + '</span></div></div>';
+    }
+    var shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    var optsHtml = '';
+    ['A','B','C','D'].forEach(function(lbl) { optsHtml += '<div class="opt" data-id="' + q.id + '" data-a="' + lbl + '"><span class="opt-key">' + lbl + '.</span><span class="opt-txt">' + shuffled.opts[lbl] + '</span></div>'; });
+    html += '<div class="qcard"><div class="qcard-top"><span class="qnum">Q' + q.id + ' of ' + TOTAL + '</span>' + (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '') + '</div><div class="qtxt">' + q.text + '</div><div class="opts">' + optsHtml + '</div><button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button><div class="exp" id="exp' + q.id + '"></div></div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid = parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="' + qid + '"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      var btn = document.querySelector('.abtn[data-qid="' + qid + '"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid = parseInt(this.dataset.qid);
+      var q = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var correctLabel = SHUFFLED_ANS[qid];
+      var ok = (chosen === correctLabel);
+      document.querySelectorAll('.opt[data-id="' + qid + '"]').forEach(function(o) {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      var expEl = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + correctLabel;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>' + (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  var TOTAL = QUESTIONS.length;
+  var left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = ST.answered + ' / ' + TOTAL + ' answered';
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered / TOTAL * 100) + '%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() { hideSubmitModal(); globalDone = true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(function(b){ b.click(); }); showResults(); }
+function showResults() {
+  var TOTAL = QUESTIONS.length;
+  var pct = Math.round((ST.correct / TOTAL) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp() { globalDone = true; document.querySelectorAll('.opt').forEach(function(o){ o.style.pointerEvents = 'none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; }); showResults(); }
+function doPrint() { document.getElementById('print-header').style.display = 'block'; window.print(); setTimeout(function(){ document.getElementById('print-header').style.display = 'none'; }, 1000); }
+
+render();
+startTimer();
+</script>
+</body>
+</html>
