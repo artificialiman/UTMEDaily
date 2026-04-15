@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>UTME Sprint 8 — Advanced Diagrams | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #f59e0b;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-left { display: flex; flex-direction: column; gap: 2px; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); overflow: hidden;
+      display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .qdiagram svg { max-width: 100%; height: auto; display: block; }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap, .subj-divider { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { border: 1px solid #ccc !important; background: #fff !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>UTMEDaily · GrantApp AI — UTME Sprint 8 (Advanced Diagrams)</h1>
+  <p class="ph-meta">40 Questions · 30 Minutes · English · Chemistry · Physics · Mathematics</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">UTMEDaily · GrantApp AI</span>
+      <span class="hdr-title">UTME Sprint 8 — Advanced Diagrams</span>
+      <span class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#x2B07; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#x23F1;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">&#x2014;</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#x2B07; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function() {
+  var wm = document.getElementById('watermark');
+  if (wm) {
+    var tile = 'GrantApp AI \u00b7 UTME Sprint 8 \u00b7 Advanced Diagrams \u00b7 ';
+    var row = ''; for (var r = 0; r < 6; r++) row += tile;
+    var html = ''; for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+  var pd = document.getElementById('print-date');
+  if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+})();
+
+// RICH SVG DIAGRAMS: solubility curves, dot/cross, ionization energy, gas apparatus, isomerism, projectiles, machines, mirrors, heat, waves, circles
+var DIAGRAMS = {
+  // CHEMISTRY
+  13: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Solubility Curves — KNO₃ &amp; NaCl</text><line x1="40" y1="130" x2="370" y2="130" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="40" y1="20" x2="40" y2="130" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><text x="30" y="75" text-anchor="middle" fill="var(--ter)" font-size="8" transform="rotate(-90,30,75)">Solubility (g/100g H₂O)</text><text x="200" y="145" text-anchor="middle" fill="var(--ter)" font-size="8">Temperature (°C)</text><path d="M40,125 Q120,110 200,90 Q280,70 370,40" fill="none" stroke="#EF4444" stroke-width="2.5"/><text x="300" y="55" fill="#EF4444" font-size="9">KNO₃</text><path d="M40,115 Q120,112 200,108 Q280,105 370,100" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="300" y="95" fill="#3b82f6" font-size="9">NaCl</text><text x="200" y="125" text-anchor="middle" fill="rgba(232,237,245,0.4)" font-size="8">Solubility increases sharply with T for KNO₃</text></svg>',
+  14: '<svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Dot &amp; Cross Diagram — NaCl (Ionic Bonding)</text><text x="120" y="45" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="10">Sodium (Na)</text><text x="280" y="45" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="10">Chlorine (Cl)</text><circle cx="120" cy="85" r="28" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="120" y="82" text-anchor="middle" fill="#3b82f6" font-size="14">Na</text><circle cx="120" cy="85" r="12" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="1"/><circle cx="120" cy="85" r="6" fill="#3b82f6"/><circle cx="280" cy="85" r="28" fill="none" stroke="#f59e0b" stroke-width="2"/><text x="280" y="82" text-anchor="middle" fill="#f59e0b" font-size="14">Cl</text><circle cx="280" cy="75" r="3" fill="#f59e0b"/><circle cx="290" cy="80" r="3" fill="#f59e0b"/><circle cx="270" cy="80" r="3" fill="#f59e0b"/><circle cx="280" cy="95" r="3" fill="#f59e0b"/><circle cx="290" cy="90" r="3" fill="#f59e0b"/><circle cx="270" cy="90" r="3" fill="#f59e0b"/><text x="120" y="130" text-anchor="middle" fill="#3b82f6" font-size="10">[Ne]3s¹</text><text x="280" y="130" text-anchor="middle" fill="#f59e0b" font-size="10">[Ne]3s²3p⁵</text><path d="M148,85 L252,85" stroke="#22c55e" stroke-width="2" stroke-dasharray="6,3"/><text x="200" y="100" text-anchor="middle" fill="#22c55e" font-size="9">Electron transfer</text></svg>',
+  15: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Ionisation Energy — Period 3</text><line x1="40" y1="130" x2="370" y2="130" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="40" y1="20" x2="40" y2="130" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><text x="30" y="75" text-anchor="middle" fill="var(--ter)" font-size="8" transform="rotate(-90,30,75)">Ionisation Energy (kJ/mol)</text><text x="200" y="145" text-anchor="middle" fill="var(--ter)" font-size="8">Element (Period 3)</text><circle cx="80" cy="110" r="4" fill="#EF4444"/><text x="80" y="100" text-anchor="middle" fill="#EF4444" font-size="9">Na</text><circle cx="130" cy="100" r="4" fill="#EF4444"/><text x="130" y="90" text-anchor="middle" fill="#EF4444" font-size="9">Mg</text><circle cx="180" cy="95" r="4" fill="#EF4444"/><text x="180" y="85" text-anchor="middle" fill="#EF4444" font-size="9">Al</text><circle cx="230" cy="85" r="4" fill="#EF4444"/><text x="230" y="75" text-anchor="middle" fill="#EF4444" font-size="9">Si</text><circle cx="280" cy="75" r="4" fill="#EF4444"/><text x="280" y="65" text-anchor="middle" fill="#EF4444" font-size="9">P</text><circle cx="330" cy="65" r="4" fill="#EF4444"/><text x="330" y="55" text-anchor="middle" fill="#EF4444" font-size="9">S</text><circle cx="350" cy="40" r="4" fill="#22c55e"/><text x="350" y="30" text-anchor="middle" fill="#22c55e" font-size="9">Ar</text><text x="200" y="50" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">General increase across period with dips at Al and S</text></svg>',
+  16: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Gas Liberation — CO₂ Apparatus (Kipp\'s)</text><rect x="80" y="70" width="100" height="60" rx="6" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="130" y="95" text-anchor="middle" fill="#22c55e" font-size="9">Marble chips</text><text x="130" y="110" text-anchor="middle" fill="#22c55e" font-size="9">(CaCO₃)</text><rect x="220" y="70" width="100" height="60" rx="6" fill="rgba(239,68,68,0.1)" stroke="#EF4444" stroke-width="1.5"/><text x="270" y="95" text-anchor="middle" fill="#EF4444" font-size="9">Dil. HCl</text><line x1="180" y1="85" x2="220" y2="85" stroke="#f59e0b" stroke-width="2"/><text x="200" y="80" text-anchor="middle" fill="#f59e0b" font-size="9">↓</text><text x="200" y="135" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">CO₂ gas liberated</text><path d="M270,70 L270,40 L350,40" stroke="#3b82f6" stroke-width="1.5" fill="none"/><circle cx="350" cy="40" r="8" fill="none" stroke="#3b82f6" stroke-width="1.5"/><text x="350" y="44" text-anchor="middle" fill="#3b82f6" font-size="8">gas</text></svg>',
+  17: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Structural Isomerism — C₄H₁₀</text><text x="100" y="45" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="10">Butane (straight chain)</text><text x="300" y="45" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="10">2-Methylpropane (branched)</text><g transform="translate(60,75)"><line x1="0" y1="0" x2="20" y2="0" stroke="#22c55e" stroke-width="2"/><circle cx="0" cy="0" r="3" fill="#EF4444"/><circle cx="10" cy="0" r="3" fill="#3b82f6"/><circle cx="20" cy="0" r="3" fill="#EF4444"/><line x1="20" y1="0" x2="40" y2="0" stroke="#22c55e" stroke-width="2"/><circle cx="30" cy="0" r="3" fill="#3b82f6"/><circle cx="40" cy="0" r="3" fill="#EF4444"/><line x1="40" y1="0" x2="60" y2="0" stroke="#22c55e" stroke-width="2"/><circle cx="50" cy="0" r="3" fill="#3b82f6"/><circle cx="60" cy="0" r="3" fill="#EF4444"/></g><g transform="translate(250,75)"><line x1="0" y1="0" x2="20" y2="-15" stroke="#22c55e" stroke-width="2"/><line x1="20" y1="-15" x2="40" y2="-15" stroke="#22c55e" stroke-width="2"/><circle cx="0" cy="0" r="3" fill="#EF4444"/><circle cx="20" cy="-15" r="3" fill="#3b82f6"/><circle cx="40" cy="-15" r="3" fill="#EF4444"/><line x1="20" y1="-15" x2="20" y2="15" stroke="#22c55e" stroke-width="2"/><circle cx="20" cy="15" r="3" fill="#EF4444"/><line x1="20" y1="0" x2="40" y2="0" stroke="#22c55e" stroke-width="2"/><circle cx="40" cy="0" r="3" fill="#EF4444"/></g><text x="200" y="135" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Same molecular formula, different structural arrangement</text></svg>',
+  18: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Geometric Isomerism — Cis/Trans (But-2-ene)</text><g transform="translate(100,60)"><text x="0" y="-15" text-anchor="middle" fill="#3b82f6" font-size="10">Cis</text><line x1="0" y1="0" x2="30" y2="0" stroke="#22c55e" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#EF4444"/><circle cx="15" cy="0" r="3" fill="#3b82f6"/><circle cx="30" cy="0" r="4" fill="#EF4444"/><line x1="0" y1="0" x2="-10" y2="15" stroke="#f59e0b" stroke-width="1.5"/><text x="-15" y="20" text-anchor="middle" fill="#f59e0b" font-size="8">CH₃</text><line x1="30" y1="0" x2="40" y2="15" stroke="#f59e0b" stroke-width="1.5"/><text x="45" y="20" text-anchor="middle" fill="#f59e0b" font-size="8">CH₃</text><line x1="0" y1="0" x2="-10" y2="-12" stroke="#3b82f6" stroke-width="1"/><text x="-15" y="-8" text-anchor="middle" fill="#3b82f6" font-size="8">H</text><line x1="30" y1="0" x2="40" y2="-12" stroke="#3b82f6" stroke-width="1"/><text x="45" y="-8" text-anchor="middle" fill="#3b82f6" font-size="8">H</text></g><g transform="translate(250,60)"><text x="0" y="-15" text-anchor="middle" fill="#EF4444" font-size="10">Trans</text><line x1="0" y1="0" x2="30" y2="0" stroke="#22c55e" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#EF4444"/><circle cx="15" cy="0" r="3" fill="#3b82f6"/><circle cx="30" cy="0" r="4" fill="#EF4444"/><line x1="0" y1="0" x2="-10" y2="15" stroke="#f59e0b" stroke-width="1.5"/><text x="-15" y="20" text-anchor="middle" fill="#f59e0b" font-size="8">CH₃</text><line x1="30" y1="0" x2="40" y2="-12" stroke="#f59e0b" stroke-width="1.5"/><text x="45" y="-8" text-anchor="middle" fill="#f59e0b" font-size="8">CH₃</text><line x1="0" y1="0" x2="-10" y2="-12" stroke="#3b82f6" stroke-width="1"/><text x="-15" y="-8" text-anchor="middle" fill="#3b82f6" font-size="8">H</text><line x1="30" y1="0" x2="40" y2="15" stroke="#3b82f6" stroke-width="1"/><text x="45" y="20" text-anchor="middle" fill="#3b82f6" font-size="8">H</text></g></svg>',
+  // PHYSICS
+  23: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Projectile Motion — Parabolic Trajectory</text><path d="M40,110 Q150,20 360,110" fill="none" stroke="#22c55e" stroke-width="2.5"/><circle cx="100" cy="80" r="5" fill="#EF4444"/><circle cx="150" cy="55" r="5" fill="#EF4444"/><circle cx="200" cy="40" r="6" fill="#f59e0b"/><text x="205" y="35" fill="#f59e0b" font-size="10">Max height</text><circle cx="250" cy="55" r="5" fill="#EF4444"/><circle cx="300" cy="80" r="5" fill="#EF4444"/><line x1="40" y1="110" x2="40" y2="125" stroke="#3b82f6" stroke-width="1.5"/><text x="40" y="135" text-anchor="middle" fill="#3b82f6" font-size="9">Launch</text><line x1="360" y1="110" x2="360" y2="125" stroke="#3b82f6" stroke-width="1.5"/><text x="360" y="135" text-anchor="middle" fill="#3b82f6" font-size="9">Land</text><text x="200" y="120" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Range →</text></svg>',
+  24: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Simple Machines — Lever Classes</text><line x1="30" y1="80" x2="370" y2="80" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><polygon points="180,60 220,60 220,80 180,80" fill="rgba(245,158,11,0.3)"/><text x="200" y="75" text-anchor="middle" fill="#f59e0b" font-size="9">Fulcrum</text><text x="100" y="60" text-anchor="middle" fill="#EF4444" font-size="10">Load (L)</text><circle cx="100" cy="80" r="12" fill="none" stroke="#EF4444" stroke-width="2"/><text x="300" y="60" text-anchor="middle" fill="#3b82f6" font-size="10">Effort (E)</text><circle cx="300" cy="80" r="12" fill="none" stroke="#3b82f6" stroke-width="2"/><line x1="100" y1="80" x2="300" y2="80" stroke="#22c55e" stroke-width="2"/><text x="200" y="105" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">Mechanical Advantage = Load/Effort</text><text x="200" y="120" text-anchor="middle" fill="rgba(232,237,245,0.4)" font-size="8">First class lever: Fulcrum between Load and Effort</text></svg>',
+  25: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Mirrors — Concave Mirror Ray Diagram</text><path d="M60,110 Q200,20 340,110" fill="none" stroke="#22c55e" stroke-width="2.5"/><line x1="60" y1="110" x2="340" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><text x="200" y="125" text-anchor="middle" fill="var(--ter)" font-size="9">Principal Axis</text><circle cx="140" cy="110" r="5" fill="#EF4444"/><text x="140" y="135" text-anchor="middle" fill="#EF4444" font-size="9">Object</text><circle cx="260" cy="75" r="5" fill="#3b82f6"/><text x="260" y="65" text-anchor="middle" fill="#3b82f6" font-size="9">Image</text><line x1="140" y1="110" x2="200" y2="40" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5,3"/><line x1="140" y1="110" x2="260" y2="75" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5,3"/><text x="200" y="38" text-anchor="middle" fill="#f59e0b" font-size="9">F</text><text x="200" y="52" text-anchor="middle" fill="#f59e0b" font-size="9">C</text><text x="200" y="145" text-anchor="middle" fill="rgba(232,237,245,0.4)" font-size="8">Real, inverted image formed beyond C</text></svg>',
+  26: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Heat Transfer — Conduction, Convection, Radiation</text><rect x="40" y="40" width="100" height="70" rx="6" fill="rgba(239,68,68,0.15)" stroke="#EF4444" stroke-width="1.5"/><text x="90" y="65" text-anchor="middle" fill="#EF4444" font-size="10">Conduction</text><text x="90" y="85" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">(solids)</text><path d="M50,95 L130,95" stroke="#EF4444" stroke-width="2"/><rect x="150" y="40" width="100" height="70" rx="6" fill="rgba(34,197,94,0.15)" stroke="#22c55e" stroke-width="1.5"/><text x="200" y="65" text-anchor="middle" fill="#22c55e" font-size="10">Convection</text><text x="200" y="85" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">(fluids)</text><path d="M170,95 Q200,75 230,95" fill="none" stroke="#22c55e" stroke-width="2" marker-end="url(#arrow)"/><rect x="260" y="40" width="100" height="70" rx="6" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1.5"/><text x="310" y="65" text-anchor="middle" fill="#f59e0b" font-size="10">Radiation</text><text x="310" y="85" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">(vacuum)</text><path d="M280,55 L300,75" stroke="#f59e0b" stroke-width="1.5"/><path d="M300,55 L320,75" stroke="#f59e0b" stroke-width="1.5"/></svg>',
+  27: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Wave Parameters — Transverse Wave</text><line x1="20" y1="70" x2="390" y2="70" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><path d="M20,70 C50,25 90,25 120,70 C150,115 190,115 220,70 C250,25 290,25 320,70 C350,115 380,115 390,70" fill="none" stroke="#22c55e" stroke-width="2.2"/><line x1="70" y1="70" x2="70" y2="25" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="4,3"/><text x="74" y="50" fill="#EF4444" font-size="10">Amplitude</text><line x1="20" y1="95" x2="220" y2="95" stroke="#3b82f6" stroke-width="1.2"/><text x="120" y="110" text-anchor="middle" fill="#3b82f6" font-size="10">Wavelength (λ)</text><text x="300" y="45" fill="rgba(232,237,245,0.6)" font-size="11">v = fλ</text><text x="300" y="60" fill="rgba(232,237,245,0.6)" font-size="11">T = 1/f</text></svg>',
+  28: '<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Circle Theorem — Angle at Centre</text><circle cx="180" cy="90" r="60" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/><circle cx="180" cy="90" r="3" fill="#22c55e"/><text x="185" y="88" fill="#22c55e" font-size="10">O</text><circle cx="125" cy="135" r="3" fill="#f59e0b"/><text x="113" y="145" fill="#f59e0b" font-size="10">A</text><circle cx="235" cy="135" r="3" fill="#f59e0b"/><text x="238" y="145" fill="#f59e0b" font-size="10">B</text><circle cx="180" cy="35" r="3" fill="#3b82f6"/><text x="185" y="35" fill="#3b82f6" font-size="10">P</text><line x1="180" y1="90" x2="125" y2="135" stroke="#22c55e" stroke-width="1.5"/><line x1="180" y1="90" x2="235" y2="135" stroke="#22c55e" stroke-width="1.5"/><line x1="180" y1="35" x2="125" y2="135" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/><line x1="180" y1="35" x2="235" y2="135" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/><text x="163" y="105" fill="#22c55e" font-size="12">2θ</text><text x="172" y="55" fill="#3b82f6" font-size="12">θ</text><text x="180" y="155" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Angle at centre = 2 × angle at circumference</text></svg>'
+};
+
+const QUESTIONS = [
+  { id:1, subj:'English', topic:'Stress', text:'Which word has primary stress on the FIRST syllable?', opts:{ A:'admire', B:'distant', C:'between', D:'contain' }, ans:'B', exp:'Distant: /ˈdɪs.tənt/ — first syllable.' },
+  { id:2, subj:'English', topic:'Oral', text:'Which contains the /ʃ/ sound?', opts:{ A:'pleasure', B:'vision', C:'nation', D:'measure' }, ans:'C', exp:'"Nation" — "ti" = /ʃ/.' },
+  { id:3, subj:'English', topic:'Stress', text:'Stress on SECOND syllable?', opts:{ A:'comfort', B:'mountain', C:'hotel', D:'television' }, ans:'C', exp:'Hotel: /hoʊˈtel/.' },
+  { id:4, subj:'English', topic:'Oral', text:'Vowel sound /æ/ as in "cat"?', opts:{ A:'father', B:'ball', C:'man', D:'car' }, ans:'C', exp:'Man = /mæn/.' },
+  { id:5, subj:'English', topic:'Stress', text:'"Refuse" as NOUN stress?', opts:{ A:'first', B:'second', C:'both', D:'neither' }, ans:'A', exp:'Noun: REF-use.' },
+  { id:6, subj:'English', topic:'Oral', text:'Voiced alveolar plosive /d/?', opts:{ A:'top', B:'stop', C:'dog', D:'think' }, ans:'C', exp:'Dog begins with /d/.' },
+  { id:7, subj:'English', topic:'Stress', text:'Stress on THIRD syllable?', opts:{ A:'education', B:'election', C:'engineering', D:'electric' }, ans:'C', exp:'Engineering: /ˌen.dʒɪˈnɪə.rɪŋ/.' },
+  { id:8, subj:'English', topic:'Oral', text:'Vowel in "boot"?', opts:{ A:'/ʊ/', B:'/uː/', C:'/ʌ/', D:'/əʊ/' }, ans:'B', exp:'Boot = /buːt/.' },
+  { id:9, subj:'English', topic:'Stress', text:'"Record" as VERB stress?', opts:{ A:'first', B:'second', C:'same', D:'final' }, ans:'B', exp:'Verb: re-CORD.' },
+  { id:10, subj:'English', topic:'Oral', text:'Consonant cluster /ks/?', opts:{ A:'box', B:'taxi', C:'both', D:'six' }, ans:'C', exp:'Box and taxi both contain /ks/.' },
+  { id:11, subj:'English', topic:'Stress', text:'Stress shift changes function?', opts:{ A:'perfect', B:'yellow', C:'silent', D:'mountain' }, ans:'A', exp:'Perfect: verb vs adjective.' },
+  { id:12, subj:'English', topic:'Oral', text:'End sound of "rouge"?', opts:{ A:'/dʒ/', B:'/ʒ/', C:'/ʃ/', D:'/g/' }, ans:'B', exp:'Rouge ends with /ʒ/.' },
+  // CHEMISTRY (all diagram:true)
+  { id:13, subj:'Chemistry', diagram:true, topic:'Solubility', text:'From the solubility curve, which salt shows the greatest increase in solubility with temperature?', opts:{ A:'NaCl', B:'KNO₃', C:'KCl', D:'CaSO₄' }, ans:'B', exp:'KNO₃ solubility increases sharply with temperature.' },
+  { id:14, subj:'Chemistry', diagram:true, topic:'Bonding', text:'In the dot and cross diagram for NaCl, what is transferred?', opts:{ A:'Proton', B:'Neutron', C:'Electron', D:'Nucleus' }, ans:'C', exp:'Na donates one electron to Cl forming ionic bond.' },
+  { id:15, subj:'Chemistry', diagram:true, topic:'Periodicity', text:'Across Period 3, ionisation energy generally:', opts:{ A:'decreases', B:'increases', C:'remains constant', D:'varies randomly' }, ans:'B', exp:'Ionisation energy increases across period due to higher nuclear charge.' },
+  { id:16, subj:'Chemistry', diagram:true, topic:'Gas Prep', text:'In the Kipp\'s apparatus, which gas is liberated from marble chips and HCl?', opts:{ A:'O₂', B:'H₂', C:'CO₂', D:'Cl₂' }, ans:'C', exp:'CaCO₃ + 2HCl → CaCl₂ + CO₂ + H₂O.' },
+  { id:17, subj:'Chemistry', diagram:true, topic:'Isomerism', text:'Butane and 2-methylpropane are examples of:', opts:{ A:'geometric isomers', B:'structural isomers', C:'optical isomers', D:'tautomers' }, ans:'B', exp:'Same formula C₄H₁₀, different structural arrangement.' },
+  { id:18, subj:'Chemistry', diagram:true, topic:'Isomerism', text:'Cis- and trans-but-2-ene are examples of:', opts:{ A:'chain isomers', B:'position isomers', C:'geometric isomers', D:'functional isomers' }, ans:'C', exp:'Geometric (cis-trans) isomerism due to restricted rotation about double bond.' },
+  { id:19, subj:'Chemistry', diagram:true, topic:'Atomic', text:'The azimuthal quantum number (l) describes:', opts:{ A:'orbital size', B:'orbital shape', C:'orbital orientation', D:'electron spin' }, ans:'B', exp:'l = 0 (s), 1 (p), 2 (d), 3 (f) defines shape.' },
+  { id:20, subj:'Chemistry', diagram:true, topic:'Bonding', text:'Which molecule exhibits both sigma and pi bonds?', opts:{ A:'H₂', B:'Cl₂', C:'O₂', D:'CH₄' }, ans:'C', exp:'O₂ has a double bond: one σ and one π.' },
+  { id:21, subj:'Chemistry', diagram:true, topic:'Kinetics', text:'A catalyst works by:', opts:{ A:'increasing temperature', B:'lowering activation energy', C:'increasing ΔH', D:'shifting equilibrium' }, ans:'B', exp:'Provides alternative pathway with lower Ea.' },
+  { id:22, subj:'Chemistry', diagram:true, topic:'Equilibrium', text:'Le Chatelier\'s principle: increasing pressure favours:', opts:{ A:'side with more gas moles', B:'side with fewer gas moles', C:'endothermic direction', D:'exothermic direction' }, ans:'B', exp:'Equilibrium shifts to reduce pressure by favouring fewer gas moles.' },
+  // PHYSICS (all diagram:true)
+  { id:23, subj:'Physics', diagram:true, topic:'Projectiles', text:'At the maximum height of a projectile, the vertical velocity is:', opts:{ A:'maximum', B:'zero', C:'equal to horizontal velocity', D:'negative' }, ans:'B', exp:'Vertical component becomes zero at apex.' },
+  { id:24, subj:'Physics', diagram:true, topic:'Machines', text:'In a first-class lever, the fulcrum is located:', opts:{ A:'between load and effort', B:'at the load', C:'at the effort', D:'outside both' }, ans:'A', exp:'Fulcrum between load and effort (e.g., seesaw).' },
+  { id:25, subj:'Physics', diagram:true, topic:'Mirrors', text:'A concave mirror forms a real, inverted image when object is:', opts:{ A:'between F and P', B:'at F', C:'beyond C', D:'at infinity' }, ans:'C', exp:'Object beyond centre gives real, inverted, diminished image.' },
+  { id:26, subj:'Physics', diagram:true, topic:'Heat', text:'Which heat transfer method does NOT require a medium?', opts:{ A:'conduction', B:'convection', C:'radiation', D:'all require medium' }, ans:'C', exp:'Radiation transfers heat via electromagnetic waves.' },
+  { id:27, subj:'Physics', diagram:true, topic:'Waves', text:'The distance between two consecutive crests is the:', opts:{ A:'amplitude', B:'frequency', C:'wavelength', D:'period' }, ans:'C', exp:'Wavelength λ — distance between successive crests.' },
+  { id:28, subj:'Physics', diagram:true, topic:'Waves', text:'If wave speed is 300 m/s and frequency 150 Hz, wavelength is:', opts:{ A:'0.5 m', B:'2 m', C:'450 m', D:'150 m' }, ans:'B', exp:'λ = v/f = 300/150 = 2 m.' },
+  { id:29, subj:'Physics', diagram:true, topic:'Mirrors', text:'A convex mirror always produces an image that is:', opts:{ A:'real and inverted', B:'virtual and diminished', C:'real and magnified', D:'virtual and magnified' }, ans:'B', exp:'Convex mirrors give virtual, upright, diminished images.' },
+  { id:30, subj:'Physics', diagram:true, topic:'Mechanics', text:'A 5 kg mass accelerates at 4 m/s². Net force is:', opts:{ A:'1.25 N', B:'9 N', C:'20 N', D:'0.8 N' }, ans:'C', exp:'F = ma = 5 × 4 = 20 N.' },
+  { id:31, subj:'Physics', diagram:true, topic:'Thermal', text:'Specific latent heat of fusion is energy to:', opts:{ A:'raise temperature 1°C', B:'melt 1 kg solid to liquid at constant T', C:'vaporise 1 kg liquid', D:'increase internal energy' }, ans:'B', exp:'Latent heat of fusion: solid → liquid at melting point.' },
+  { id:32, subj:'Physics', diagram:true, topic:'Optics', text:'The unit of power of a lens is:', opts:{ A:'dioptre', B:'metre', C:'watt', D:'candela' }, ans:'A', exp:'Power = 1/f (in metres) — unit is dioptre (D).' },
+  // MATHEMATICS (fresh)
+  { id:33, subj:'Mathematics', topic:'Algebra', text:'Solve: 8x - 5 = 3x + 10', opts:{ A:'2', B:'3', C:'4', D:'5' }, ans:'B', exp:'8x - 3x = 10 + 5 → 5x = 15 → x = 3.' },
+  { id:34, subj:'Mathematics', topic:'Sets', text:'If A = {2,4,6,8} and B = {4,8,12,16}, find A ∩ B.', opts:{ A:'{2,6}', B:'{4,8}', C:'{12,16}', D:'{2,4,6,8,12,16}' }, ans:'B', exp:'Intersection = common elements {4,8}.' },
+  { id:35, subj:'Mathematics', topic:'Logarithms', text:'If log₁₀ 2 = 0.3010, log₁₀ 8 = ?', opts:{ A:'0.6020', B:'0.9030', C:'1.2040', D:'0.4515' }, ans:'B', exp:'log₁₀ 8 = log₁₀ 2³ = 3 × 0.3010 = 0.9030.' },
+  { id:36, subj:'Mathematics', topic:'Quadratics', text:'Sum of roots of 3x² - 6x + 9 = 0 is:', opts:{ A:'2', B:'-2', C:'3', D:'-3' }, ans:'A', exp:'Sum = -b/a = -(-6)/3 = 2.' },
+  { id:37, subj:'Mathematics', topic:'Probability', text:'A die rolled once. Probability of an even number?', opts:{ A:'1/6', B:'1/3', C:'1/2', D:'2/3' }, ans:'C', exp:'Even: 2,4,6 → 3/6 = 1/2.' },
+  { id:38, subj:'Mathematics', topic:'Mensuration', text:'Circumference of circle radius 14 cm? (π=22/7)', opts:{ A:'44 cm', B:'88 cm', C:'176 cm', D:'616 cm' }, ans:'B', exp:'C = 2πr = 2 × 22/7 × 14 = 88 cm.' },
+  { id:39, subj:'Mathematics', topic:'Trigonometry', text:'tan 45° = ?', opts:{ A:'0', B:'1', C:'√3', D:'1/√3' }, ans:'B', exp:'tan 45° = 1.' },
+  { id:40, subj:'Mathematics', topic:'Variation', text:'If y ∝ 1/x² and y=4 when x=2, find y when x=4.', opts:{ A:'1', B:'2', C:'4', D:'8' }, ans:'A', exp:'y = k/x² → 4 = k/4 → k=16 → y = 16/16 = 1.' }
+];
+
+const SECTIONS = [
+  { beforeId: 1, icon: '🗣️', title: 'English Language', meta: 'Questions 1–12 · Stress Patterns & Oral English' },
+  { beforeId: 13, icon: '⚗️', title: 'Chemistry', meta: 'Questions 13–22 · Solubility, Dot & Cross, Ionisation Energy, Isomerism (x3), Gas Apparatus' },
+  { beforeId: 23, icon: '⚡', title: 'Physics', meta: 'Questions 23–32 · Projectiles, Machines, Mirrors (x2), Heat, Waves' },
+  { beforeId: 33, icon: '📐', title: 'Mathematics', meta: 'Questions 33–40 · Algebra, Sets, Logarithms, Quadratics, Probability, Mensuration, Circle Theorem' }
+];
+
+var SHUFFLED_ANS = {};
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(k => ({ origKey:k, text:q.opts[k] }));
+  for (let i = entries.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); [entries[i], entries[j]] = [entries[j], entries[i]]; }
+  let newOpts = {}, newAns = q.ans;
+  ['A','B','C','D'].forEach((lbl, idx) => { newOpts[lbl] = entries[idx].text; if (entries[idx].origKey === q.ans) newAns = lbl; });
+  return { opts: newOpts, ans: newAns };
+}
+
+let ST = { correct:0, wrong:0, answered:0, answeredIds: new Set() };
+let UA = {};
+let globalDone = false;
+let GLOBAL_SECS = 1800;
+let timerInterval = null;
+
+function startTimer() {
+  let remaining = GLOBAL_SECS;
+  let dot = document.getElementById('gdot');
+  let txt = document.getElementById('gtime');
+  function fmt(s) { let m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(() => {
+    remaining--; txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { let el = document.getElementById('gtime'); return el ? el.textContent : '—'; }
+
+function render() {
+  let container = document.getElementById('qc');
+  let TOTAL = QUESTIONS.length;
+  let sectionMap = {};
+  SECTIONS.forEach(s => { sectionMap[s.beforeId] = s; });
+  let html = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    let q = QUESTIONS[i];
+    if (sectionMap[q.id]) {
+      let s = sectionMap[q.id];
+      html += `<div class="subj-divider"><span class="subj-divider-icon">${s.icon}</span><div class="subj-divider-left"><span class="subj-divider-title">${s.title}</span><span class="subj-divider-meta">${s.meta}</span></div></div>`;
+    }
+    let shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    let diagramHtml = (q.diagram && DIAGRAMS[q.id]) ? `<div class="qdiagram">${DIAGRAMS[q.id]}</div>` : '';
+    let optsHtml = '';
+    ['A','B','C','D'].forEach(lbl => { optsHtml += `<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${shuffled.opts[lbl]}</span></div>`; });
+    html += `<div class="qcard"><div class="qcard-top"><span class="qnum">Q${q.id} of ${TOTAL}</span>${q.topic ? `<span class="qtopic">${q.topic}</span>` : ''}</div>${diagramHtml}<div class="qtxt">${q.text}</div><div class="opts">${optsHtml}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp${q.id}"></div></div>`;
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      let qid = parseInt(this.dataset.id);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => o.classList.remove('sel'));
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      let btn = document.querySelector(`.abtn[data-qid="${qid}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      let qid = parseInt(this.dataset.qid);
+      let q = QUESTIONS.find(x => x.id === qid);
+      let chosen = UA[qid];
+      let correctLabel = SHUFFLED_ANS[qid];
+      let ok = (chosen === correctLabel);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      let expEl = document.getElementById(`exp${qid}`);
+      let markCls = ok ? 'pos' : 'neg';
+      let markTxt = ok ? '✓ Correct' : `✗ Incorrect — correct answer: ${correctLabel}`;
+      expEl.innerHTML = `<span class="exp-mark ${markCls}">${markTxt}</span>${q.exp ? `<div style="margin-top:8px">${q.exp}</div>` : ''}`;
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  let TOTAL = QUESTIONS.length;
+  let left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = `${ST.answered} / ${TOTAL} answered`;
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered / TOTAL * 100) + '%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() { hideSubmitModal(); globalDone = true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(b => b.click()); showResults(); }
+function showResults() {
+  let TOTAL = QUESTIONS.length;
+  let pct = Math.round((ST.correct / TOTAL) * 100);
+  let scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp() { globalDone = true; document.querySelectorAll('.opt').forEach(o => { o.style.pointerEvents = 'none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(b => b.disabled = true); showResults(); }
+function doPrint() { document.getElementById('print-header').style.display = 'block'; window.print(); setTimeout(() => { document.getElementById('print-header').style.display = 'none'; }, 1000); }
+
+render();
+startTimer();
+</script>
+</body>
+</html>
