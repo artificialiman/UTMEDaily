@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>UTME Sprint 7 — Full Diagrams (Chem/Phys) | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #f59e0b;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-left { display: flex; flex-direction: column; gap: 2px; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); overflow: hidden;
+      display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .qdiagram svg { max-width: 100%; height: auto; display: block; }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap, .subj-divider { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { border: 1px solid #ccc !important; background: #fff !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>UTMEDaily · GrantApp AI — UTME Sprint 7 (Full Diagrams)</h1>
+  <p class="ph-meta">40 Questions · 30 Minutes · English(Oral/Stress) · Chemistry · Physics · Mathematics</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">UTMEDaily · GrantApp AI</span>
+      <span class="hdr-title">UTME Sprint 7 — Full Diagrams (All Science)</span>
+      <span class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#x2B07; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#x23F1;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">&#x2014;</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#x2B07; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function() {
+  var wm = document.getElementById('watermark');
+  if (wm) {
+    var tile = 'GrantApp AI \u00b7 UTME Sprint 7 \u00b7 Full Diagrams \u00b7 ';
+    var row = ''; for (var r = 0; r < 6; r++) row += tile;
+    var html = ''; for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+  var pd = document.getElementById('print-date');
+  if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+})();
+
+// SVG DIAGRAMS for EVERY Chemistry (13-22) and EVERY Physics (23-32) question
+var DIAGRAMS = {
+  // CHEMISTRY DIAGRAMS (10 diagrams)
+  13: '<svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Atomic Orbitals — s, p, d</text><circle cx="80" cy="65" r="25" fill="none" stroke="#22c55e" stroke-width="1.5"/><text x="80" y="70" text-anchor="middle" fill="#22c55e" font-size="10">s</text><g transform="translate(180,65)"><ellipse cx="0" cy="0" rx="30" ry="12" fill="none" stroke="#f59e0b" stroke-width="1.5"/><ellipse cx="0" cy="0" rx="12" ry="30" fill="none" stroke="#f59e0b" stroke-width="1.5"/></g><text x="180" y="70" text-anchor="middle" fill="#f59e0b" font-size="10">p</text><g transform="translate(290,65)"><ellipse cx="0" cy="0" rx="20" ry="8" fill="none" stroke="#3b82f6" stroke-width="1.2"/><ellipse cx="0" cy="0" rx="8" ry="20" fill="none" stroke="#3b82f6" stroke-width="1.2"/><ellipse cx="0" cy="0" rx="15" ry="15" fill="none" stroke="#3b82f6" stroke-width="1.2" transform="rotate(45)"/></g><text x="290" y="70" text-anchor="middle" fill="#3b82f6" font-size="10">d</text><text x="180" y="115" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Azimuthal quantum number l defines shape</text></svg>',
+  14: '<svg viewBox="0 0 380 140" xmlns="http://www.w3.org/2000/svg"><text x="190" y="16" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Benzene — Delocalised π System</text><g transform="translate(190,80)"><polygon points="0,-36 31,-18 31,18 0,36 -31,18 -31,-18" fill="none" stroke="#22c55e" stroke-width="1.5"/><circle cx="0" cy="0" r="22" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,3"/></g><text x="190" y="130" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="10">Delocalised π electrons above/below ring</text></svg>',
+  15: '<svg viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Mole Concept — H₂O</text><circle cx="120" cy="65" r="22" fill="rgba(34,197,94,0.15)" stroke="#22c55e" stroke-width="1.5"/><text x="120" y="70" text-anchor="middle" fill="#22c55e" font-size="12">H₂O</text><text x="120" y="100" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="10">18 g/mol</text><circle cx="240" cy="65" r="22" fill="rgba(239,68,68,0.15)" stroke="#EF4444" stroke-width="1.5"/><text x="240" y="70" text-anchor="middle" fill="#EF4444" font-size="12">18 g</text><text x="240" y="100" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="10">= 1 mole</text></svg>',
+  16: '<svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Period 2 — Atomic Radius Trend</text><line x1="40" y1="90" x2="320" y2="90" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><circle cx="70" cy="70" r="18" fill="none" stroke="#22c55e" stroke-width="1.5"/><text x="70" y="74" text-anchor="middle" fill="#22c55e" font-size="9">Li</text><circle cx="130" cy="75" r="15" fill="none" stroke="#22c55e" stroke-width="1.5"/><text x="130" y="79" text-anchor="middle" fill="#22c55e" font-size="9">Be</text><circle cx="190" cy="80" r="12" fill="none" stroke="#22c55e" stroke-width="1.5"/><text x="190" y="84" text-anchor="middle" fill="#22c55e" font-size="9">N</text><circle cx="250" cy="85" r="9" fill="none" stroke="#EF4444" stroke-width="2"/><text x="250" y="89" text-anchor="middle" fill="#EF4444" font-size="9">Ne</text><text x="180" y="120" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Atomic radius decreases → Neon (Ne) smallest</text></svg>',
+  17: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Galvanic Cell — Reduction at Cathode</text><rect x="50" y="40" width="130" height="75" rx="6" fill="none" stroke="rgba(239,68,68,0.5)" stroke-width="1.5"/><text x="115" y="60" text-anchor="middle" fill="#EF4444" font-size="10">Anode (−)</text><text x="115" y="95" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="9">Oxidation</text><rect x="220" y="40" width="130" height="75" rx="6" fill="none" stroke="rgba(34,197,94,0.5)" stroke-width="1.5"/><text x="285" y="60" text-anchor="middle" fill="#22c55e" font-size="10">Cathode (+)</text><text x="285" y="95" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="9">Reduction</text><line x1="180" y1="55" x2="220" y2="55" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/><text x="200" y="50" text-anchor="middle" fill="#f59e0b" font-size="8">Salt bridge</text><path d="M180,100 L220,100" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arrow)"/><text x="200" y="135" text-anchor="middle" fill="var(--ter)" font-size="9">Electrons flow anode → cathode</text></svg>',
+  18: '<svg viewBox="0 0 360 140" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Charles\' Law — V ∝ T</text><line x1="40" y1="110" x2="320" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><line x1="40" y1="20" x2="40" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><path d="M40,95 L160,50 L280,20" stroke="#22c55e" stroke-width="2.5" fill="none"/><text x="180" y="132" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="10">Volume ↑ as Temperature ↑ (P constant)</text></svg>',
+  19: '<svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Brønsted-Lowry Acid — Proton Donor</text><rect x="80" y="45" width="100" height="50" rx="8" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="130" y="72" text-anchor="middle" fill="#22c55e" font-size="12">HA (acid)</text><text x="130" y="88" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">H⁺ donor</text><line x1="180" y1="70" x2="230" y2="70" stroke="#f59e0b" stroke-width="2"/><text x="205" y="65" text-anchor="middle" fill="#f59e0b" font-size="14">→</text><text x="205" y="85" text-anchor="middle" fill="#f59e0b" font-size="9">H⁺</text><rect x="230" y="45" width="100" height="50" rx="8" fill="rgba(239,68,68,0.1)" stroke="#EF4444" stroke-width="1.5"/><text x="280" y="72" text-anchor="middle" fill="#EF4444" font-size="12">A⁻ (base)</text><text x="280" y="88" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">conjugate</text></svg>',
+  20: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Maxwell-Boltzmann — ΔH vs Rate</text><line x1="30" y1="120" x2="380" y2="120" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><path d="M30,118 Q80,40 180,50 Q280,65 380,118" fill="none" stroke="#22c55e" stroke-width="2"/><text x="200" y="135" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Energy →</text><text x="300" y="50" fill="rgba(232,237,245,0.6)" font-size="9">ΔH affects equilibrium, not rate</text></svg>',
+  21: '<svg viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Stoichiometry — 2Mg + O₂ → 2MgO</text><rect x="40" y="35" width="80" height="50" rx="6" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="80" y="62" text-anchor="middle" fill="#22c55e" font-size="11">4 mol Mg</text><line x1="120" y1="60" x2="150" y2="60" stroke="#f59e0b" stroke-width="2"/><text x="135" y="55" text-anchor="middle" fill="#f59e0b" font-size="12">→</text><rect x="150" y="35" width="80" height="50" rx="6" fill="rgba(239,68,68,0.1)" stroke="#EF4444" stroke-width="1.5"/><text x="190" y="62" text-anchor="middle" fill="#EF4444" font-size="11">2 mol O₂</text></svg>',
+  22: '<svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Le Chatelier — Equilibrium Shift</text><line x1="50" y1="70" x2="180" y2="70" stroke="#22c55e" stroke-width="2"/><line x1="220" y1="70" x2="350" y2="70" stroke="#22c55e" stroke-width="2"/><circle cx="200" cy="70" r="15" fill="rgba(34,197,94,0.2)" stroke="#22c55e" stroke-width="1.5"/><text x="200" y="74" text-anchor="middle" fill="#22c55e" font-size="10">⇌</text><text x="115" y="55" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="9">Stress applied</text><text x="285" y="55" text-anchor="middle" fill="rgba(232,237,245,0.6)" font-size="9">Shift to oppose</text></svg>',
+  // PHYSICS DIAGRAMS (10 diagrams)
+  23: '<svg viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">F = ma — Newton\'s Second Law</text><rect x="80" y="40" width="100" height="50" rx="6" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="130" y="60" text-anchor="middle" fill="#22c55e" font-size="12">m = 2 kg</text><text x="130" y="78" text-anchor="middle" fill="#22c55e" font-size="12">F = 10 N</text><line x1="180" y1="65" x2="220" y2="65" stroke="#f59e0b" stroke-width="2.5"/><text x="200" y="60" text-anchor="middle" fill="#f59e0b" font-size="14">→</text><text x="200" y="100" text-anchor="middle" fill="#f59e0b" font-size="10">a = F/m = 5 m/s²</text></svg>',
+  24: '<svg viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg"><text x="210" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Moments — Seesaw Balance</text><polygon points="30,100 390,100 400,110 20,110" fill="rgba(34,197,94,0.15)"/><polygon points="190,60 230,60 230,100 190,100" fill="rgba(245,158,11,0.3)"/><text x="210" y="85" text-anchor="middle" fill="#f59e0b" font-size="10">Pivot</text><circle cx="90" cy="80" r="18" fill="none" stroke="#EF4444" stroke-width="2"/><text x="90" y="84" text-anchor="middle" fill="#EF4444" font-size="10">40kg</text><line x1="90" y1="100" x2="90" y2="120" stroke="#EF4444" stroke-width="2"/><text x="90" y="135" text-anchor="middle" fill="#EF4444" font-size="9">2m</text><circle cx="330" cy="80" r="18" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="330" y="84" text-anchor="middle" fill="#3b82f6" font-size="10">50kg</text><line x1="330" y1="100" x2="330" y2="120" stroke="#3b82f6" stroke-width="2"/><text x="330" y="135" text-anchor="middle" fill="#3b82f6" font-size="9">d = 1.6m</text></svg>',
+  25: '<svg viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Gravitational Potential Energy</text><rect x="100" y="40" width="80" height="40" rx="4" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="140" y="62" text-anchor="middle" fill="#22c55e" font-size="11">m = 10 kg</text><line x1="140" y1="80" x2="140" y2="100" stroke="#f59e0b" stroke-width="2"/><text x="140" y="115" text-anchor="middle" fill="#f59e0b" font-size="10">h = 2 m</text><text x="260" y="62" text-anchor="middle" fill="#EF4444" font-size="12">PE = mgh</text><text x="260" y="80" text-anchor="middle" fill="#EF4444" font-size="12">= 200 J</text></svg>',
+  26: '<svg viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg"><text x="210" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Parallel Resistors — Equivalent</text><line x1="40" y1="50" x2="380" y2="50" stroke="#22c55e" stroke-width="1.5"/><line x1="40" y1="100" x2="380" y2="100" stroke="#22c55e" stroke-width="1.5"/><line x1="40" y1="50" x2="40" y2="100" stroke="#22c55e" stroke-width="1.5"/><line x1="130" y1="50" x2="130" y2="68" stroke="#22c55e" stroke-width="1.5"/><rect x="110" y="68" width="40" height="16" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.5"/><text x="130" y="80" text-anchor="middle" fill="#f59e0b" font-size="10">6Ω</text><line x1="130" y1="84" x2="130" y2="100" stroke="#22c55e" stroke-width="1.5"/><line x1="210" y1="50" x2="210" y2="68" stroke="#22c55e" stroke-width="1.5"/><rect x="190" y="68" width="40" height="16" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.5"/><text x="210" y="80" text-anchor="middle" fill="#f59e0b" font-size="10">6Ω</text><line x1="210" y1="84" x2="210" y2="100" stroke="#22c55e" stroke-width="1.5"/><line x1="290" y1="50" x2="290" y2="68" stroke="#22c55e" stroke-width="1.5"/><rect x="270" y="68" width="40" height="16" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.5"/><text x="290" y="80" text-anchor="middle" fill="#f59e0b" font-size="10">6Ω</text><line x1="290" y1="84" x2="290" y2="100" stroke="#22c55e" stroke-width="1.5"/><line x1="380" y1="50" x2="380" y2="100" stroke="#22c55e" stroke-width="1.5"/><text x="210" y="135" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="10">Rₑ = 2 Ω</text></svg>',
+  27: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Wave Speed — v = fλ</text><line x1="20" y1="70" x2="390" y2="70" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><path d="M20,70 C50,30 90,30 120,70 C150,110 190,110 220,70 C250,30 290,30 320,70 C350,110 380,110 390,70" fill="none" stroke="#22c55e" stroke-width="2"/><line x1="70" y1="70" x2="70" y2="30" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="4,3"/><text x="74" y="50" fill="#EF4444" font-size="9">A</text><line x1="20" y1="95" x2="220" y2="95" stroke="#3b82f6" stroke-width="1.2"/><text x="120" y="110" text-anchor="middle" fill="#3b82f6" font-size="9">λ = 2 m</text><text x="300" y="45" fill="rgba(232,237,245,0.6)" font-size="11">v = 100 × 2</text><text x="300" y="60" fill="rgba(232,237,245,0.6)" font-size="11">= 200 m/s</text></svg>',
+  28: '<svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Concave Mirror — Image Formation</text><path d="M60,120 Q200,20 340,120" fill="none" stroke="#22c55e" stroke-width="2.5"/><line x1="60" y1="120" x2="340" y2="120" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><text x="200" y="135" text-anchor="middle" fill="var(--ter)" font-size="9">Principal Axis</text><circle cx="140" cy="120" r="6" fill="#EF4444"/><text x="140" y="145" text-anchor="middle" fill="#EF4444" font-size="9">Object (beyond C)</text><circle cx="260" cy="80" r="6" fill="#3b82f6"/><text x="260" y="68" text-anchor="middle" fill="#3b82f6" font-size="9">Real Image</text><text x="200" y="45" text-anchor="middle" fill="#f59e0b" font-size="9">C (centre)</text><text x="200" y="32" text-anchor="middle" fill="#f59e0b" font-size="9">F (focus)</text></svg>',
+  29: '<svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Specific Heat Capacity — Q = mcΔT</text><rect x="60" y="40" width="100" height="50" rx="6" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="110" y="60" text-anchor="middle" fill="#22c55e" font-size="11">Water</text><text x="110" y="78" text-anchor="middle" fill="#22c55e" font-size="10">m = 1 kg</text><text x="230" y="55" text-anchor="middle" fill="#f59e0b" font-size="11">ΔT = 10°C</text><text x="230" y="75" text-anchor="middle" fill="#f59e0b" font-size="11">c = 4200 J/kg°C</text><text x="230" y="95" text-anchor="middle" fill="#EF4444" font-size="12">Q = 42,000 J</text></svg>',
+  30: '<svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Alpha Decay — Helium Nucleus</text><circle cx="100" cy="65" r="30" fill="rgba(239,68,68,0.15)" stroke="#EF4444" stroke-width="2"/><text x="100" y="60" text-anchor="middle" fill="#EF4444" font-size="14">⁴₂He</text><text x="100" y="78" text-anchor="middle" fill="#EF4444" font-size="10">α particle</text><circle cx="240" cy="65" r="18" fill="rgba(34,197,94,0.15)" stroke="#22c55e" stroke-width="1.5"/><text x="240" y="62" text-anchor="middle" fill="#22c55e" font-size="10">2p</text><text x="240" y="78" text-anchor="middle" fill="#22c55e" font-size="10">2n</text></svg>',
+  31: '<svg viewBox="0 0 360 140" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Projectile — Maximum Height</text><path d="M60,110 Q180,30 300,110" fill="none" stroke="#22c55e" stroke-width="2"/><circle cx="180" cy="45" r="5" fill="#EF4444"/><text x="185" y="40" fill="#EF4444" font-size="10">v = 0</text><text x="180" y="125" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="10">a = g = 9.8 m/s² downward at all points</text></svg>',
+  32: '<svg viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Ohm\'s Law — V = IR</text><rect x="80" y="40" width="80" height="50" rx="6" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="120" y="60" text-anchor="middle" fill="#22c55e" font-size="12">V</text><text x="120" y="78" text-anchor="middle" fill="#22c55e" font-size="12">I</text><rect x="200" y="40" width="80" height="50" rx="6" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1.5"/><text x="240" y="60" text-anchor="middle" fill="#f59e0b" font-size="12">R</text><text x="240" y="78" text-anchor="middle" fill="#f59e0b" font-size="10">resistance</text><text x="180" y="65" text-anchor="middle" fill="var(--ter)" font-size="16">=</text></svg>'
+};
+
+const QUESTIONS = [
+  // ENGLISH (12) — Stress & Oral only, no repetition
+  { id:1, subj:'English', topic:'Stress', text:'Which word has primary stress on the FIRST syllable?', opts:{ A:'admire', B:'distant', C:'between', D:'contain' }, ans:'B', exp:'Distant: /ˈdɪs.tənt/ (first syllable). Others have second syllable stress.' },
+  { id:2, subj:'English', topic:'Oral', text:'Which contains the /ʃ/ sound (voiceless palato-alveolar fricative)?', opts:{ A:'pleasure', B:'vision', C:'nation', D:'measure' }, ans:'C', exp:'"Nation" contains /ʃ/ as "ti" = /ʃ/. Pleasure, vision, measure have /ʒ/.' },
+  { id:3, subj:'English', topic:'Stress', text:'Identify the word stressed on the SECOND syllable.', opts:{ A:'comfort', B:'mountain', C:'hotel', D:'television' }, ans:'C', exp:'Hotel: /hoʊˈtel/ (second syllable). Comfort, mountain (1st), television (1st).' },
+  { id:4, subj:'English', topic:'Oral', text:'Which word contains the vowel sound /æ/ as in "cat"?', opts:{ A:'father', B:'ball', C:'man', D:'car' }, ans:'C', exp:'"Man" has /æ/. Father = /ɑː/, ball = /ɔː/, car = /ɑː/.' },
+  { id:5, subj:'English', topic:'Stress', text:'The word "refuse" as a NOUN has stress on which syllable?', opts:{ A:'first', B:'second', C:'both equally', D:'neither' }, ans:'A', exp:'Noun: REF-use (first syllable). Verb: re-FUSE (second syllable).' },
+  { id:6, subj:'English', topic:'Oral', text:'Which contains the voiced alveolar plosive /d/?', opts:{ A:'top', B:'stop', C:'dog', D:'think' }, ans:'C', exp:'"Dog" begins with /d/. Top = /t/ (voiceless), stop = /t/, think = /θ/.' },
+  { id:7, subj:'English', topic:'Stress', text:'Which word has stress on the THIRD syllable?', opts:{ A:'education', B:'election', C:'engineering', D:'electric' }, ans:'C', exp:'Engineering: /ˌen.dʒɪˈnɪə.rɪŋ/ (third syllable "neer" stressed).' },
+  { id:8, subj:'English', topic:'Oral', text:'The vowel sound in "boot" is:', opts:{ A:'/ʊ/', B:'/uː/', C:'/ʌ/', D:'/əʊ/' }, ans:'B', exp:'Boot has the long vowel /uː/. /ʊ/ is "book", /ʌ/ is "but".' },
+  { id:9, subj:'English', topic:'Stress', text:'"Record" as a VERB is pronounced with stress on the:', opts:{ A:'first syllable', B:'second syllable', C:'same as noun', D:'final syllable' }, ans:'B', exp:'Verb: re-CORD (second syllable). Noun: RE-cord (first).' },
+  { id:10, subj:'English', topic:'Oral', text:'Which contains the consonant cluster /ks/?', opts:{ A:'box', B:'taxi', C:'both A and B', D:'six' }, ans:'C', exp:'Box /bɒks/ and taxi /ˈtæk.si/ both contain /ks/ (spelled "x" and "x").' },
+  { id:11, subj:'English', topic:'Stress', text:'Choose the word where stress shift changes grammatical function.', opts:{ A:'perfect', B:'yellow', C:'silent', D:'mountain' }, ans:'A', exp:'Perfect: verb (per-FECT) vs adjective (PER-fect). Stress shift changes word class.' },
+  { id:12, subj:'English', topic:'Oral', text:'The sound at the end of "rouge" is:', opts:{ A:'/dʒ/', B:'/ʒ/', C:'/ʃ/', D:'/g/' }, ans:'B', exp:'Rouge ends with the voiced palato-alveolar fricative /ʒ/.' },
+  // CHEMISTRY (10) — all with diagram:true
+  { id:13, subj:'Chemistry', diagram:true, topic:'Atomic', text:'The quantum number that describes orbital shape is:', opts:{ A:'principal (n)', B:'azimuthal (l)', C:'magnetic (mₗ)', D:'spin (mₛ)' }, ans:'B', exp:'Azimuthal quantum number (l) defines orbital shape: s(l=0), p(l=1), d(l=2), f(l=3).' },
+  { id:14, subj:'Chemistry', diagram:true, topic:'Organic', text:'Benzene\'s unusual stability is due to:', opts:{ A:'alternating single/double bonds', B:'localised π electrons', C:'delocalised π electron cloud', D:'ionic bonding' }, ans:'C', exp:'Delocalisation of six π electrons above and below the ring gives equal bond lengths and extra stability.' },
+  { id:15, subj:'Chemistry', diagram:true, topic:'Mole', text:'The molar mass of water (H₂O) is:', opts:{ A:'16 g/mol', B:'18 g/mol', C:'20 g/mol', D:'2 g/mol' }, ans:'B', exp:'H₂O = (2×1) + 16 = 18 g/mol. 18 grams = 1 mole.' },
+  { id:16, subj:'Chemistry', diagram:true, topic:'Periodic', text:'Across Period 2, atomic radius:', opts:{ A:'increases', B:'decreases', C:'stays constant', D:'varies randomly' }, ans:'B', exp:'Atomic radius decreases across a period due to increased nuclear charge pulling electrons inward.' },
+  { id:17, subj:'Chemistry', diagram:true, topic:'Electrochem', text:'In a galvanic cell, reduction occurs at the:', opts:{ A:'anode', B:'cathode', C:'salt bridge', D:'external circuit' }, ans:'B', exp:'Reduction (gain of electrons) occurs at the cathode. Oxidation at the anode.' },
+  { id:18, subj:'Chemistry', diagram:true, topic:'Gas Laws', text:'At constant pressure, volume is directly proportional to absolute temperature. This is:', opts:{ A:'Boyle\'s Law', B:'Charles\' Law', C:'Avogadro\'s Law', D:'Gay-Lussac\'s Law' }, ans:'B', exp:'Charles\' Law: V₁/T₁ = V₂/T₂ at constant pressure.' },
+  { id:19, subj:'Chemistry', diagram:true, topic:'Acids', text:'A Brønsted-Lowry acid is defined as a:', opts:{ A:'proton donor', B:'proton acceptor', C:'electron pair donor', D:'electron pair acceptor' }, ans:'A', exp:'Brønsted-Lowry acid = H⁺ (proton) donor. Base = proton acceptor.' },
+  { id:20, subj:'Chemistry', diagram:true, topic:'Kinetics', text:'Which factor does NOT affect reaction rate?', opts:{ A:'temperature', B:'catalyst', C:'enthalpy change (ΔH)', D:'concentration' }, ans:'C', exp:'ΔH affects thermodynamics (equilibrium position), not kinetics (rate).' },
+  { id:21, subj:'Chemistry', diagram:true, topic:'Stoichiometry', text:'2Mg + O₂ → 2MgO. Moles of O₂ needed for 4 mol Mg:', opts:{ A:'1 mol', B:'2 mol', C:'3 mol', D:'4 mol' }, ans:'B', exp:'Mole ratio Mg:O₂ = 2:1 → 4 mol Mg requires 2 mol O₂.' },
+  { id:22, subj:'Chemistry', diagram:true, topic:'Equilibrium', text:'Le Chatelier\'s principle states that a system at equilibrium will:', opts:{ A:'remain unchanged when stressed', B:'shift to oppose any stress', C:'always shift toward products', D:'always shift toward reactants' }, ans:'B', exp:'When a stress is applied, equilibrium shifts to counteract that change.' },
+  // PHYSICS (10) — all with diagram:true
+  { id:23, subj:'Physics', diagram:true, topic:'Mechanics', text:'A net force of 10 N acts on a 2 kg mass. Acceleration is:', opts:{ A:'2 m/s²', B:'5 m/s²', C:'10 m/s²', D:'20 m/s²' }, ans:'B', exp:'F = ma → a = F/m = 10/2 = 5 m/s².' },
+  { id:24, subj:'Physics', diagram:true, topic:'Moments', text:'A 40 kg child sits 2 m from pivot. Where must 50 kg child sit to balance?', opts:{ A:'1.2 m', B:'1.6 m', C:'2.0 m', D:'2.5 m' }, ans:'B', exp:'40×2 = 50×d → d = 80/50 = 1.6 m.' },
+  { id:25, subj:'Physics', diagram:true, topic:'Energy', text:'A 10 kg mass lifted 2 m gains PE of: (g=10 m/s²)', opts:{ A:'50 J', B:'100 J', C:'200 J', D:'400 J' }, ans:'C', exp:'PE = mgh = 10 × 10 × 2 = 200 J.' },
+  { id:26, subj:'Physics', diagram:true, topic:'Electricity', text:'Three 6 Ω resistors in parallel have equivalent resistance:', opts:{ A:'2 Ω', B:'3 Ω', C:'6 Ω', D:'18 Ω' }, ans:'A', exp:'1/Rₑ = 1/6+1/6+1/6 = 3/6 = 1/2 → Rₑ = 2 Ω.' },
+  { id:27, subj:'Physics', diagram:true, topic:'Waves', text:'Wave frequency 100 Hz, wavelength 2 m. Speed is:', opts:{ A:'50 m/s', B:'102 m/s', C:'200 m/s', D:'0.5 m/s' }, ans:'C', exp:'v = fλ = 100 × 2 = 200 m/s.' },
+  { id:28, subj:'Physics', diagram:true, topic:'Optics', text:'A concave mirror forms a real, inverted image when object is:', opts:{ A:'between F and P', B:'at F', C:'beyond C', D:'at infinity' }, ans:'C', exp:'Object beyond centre (C) gives real, inverted, diminished image.' },
+  { id:29, subj:'Physics', diagram:true, topic:'Thermal', text:'Heat to raise 1 kg water from 20°C to 30°C? (c=4200 J/kg°C)', opts:{ A:'4200 J', B:'42000 J', C:'420 J', D:'420000 J' }, ans:'B', exp:'Q = mcΔT = 1 × 4200 × 10 = 42000 J.' },
+  { id:30, subj:'Physics', diagram:true, topic:'Nuclear', text:'An alpha particle consists of:', opts:{ A:'2 protons, 2 neutrons', B:'1 proton, 1 neutron', C:'2 protons, 0 neutrons', D:'1 proton, 2 neutrons' }, ans:'A', exp:'Alpha = ⁴₂He nucleus = 2 protons + 2 neutrons.' },
+  { id:31, subj:'Physics', diagram:true, topic:'Mechanics', text:'At maximum height of a projectile, acceleration is:', opts:{ A:'0 m/s²', B:'9.8 m/s² upward', C:'9.8 m/s² downward', D:'-9.8 m/s² upward' }, ans:'C', exp:'Gravity acts throughout: a = g = 9.8 m/s² downward at all points.' },
+  { id:32, subj:'Physics', diagram:true, topic:'Electricity', text:'Ohm\'s law states the relationship V =', opts:{ A:'I/R', B:'IR', C:'R/I', D:'I²R' }, ans:'B', exp:'Ohm\'s law: Voltage = Current × Resistance (V = IR).' },
+  // MATHEMATICS (8) — fresh, no repetition
+  { id:33, subj:'Mathematics', topic:'Algebra', text:'Solve: 7x - 4 = 3x + 12', opts:{ A:'2', B:'3', C:'4', D:'5' }, ans:'C', exp:'7x - 3x = 12 + 4 → 4x = 16 → x = 4.' },
+  { id:34, subj:'Mathematics', topic:'Sets', text:'If P = {2,4,6,8} and Q = {4,8,12,16}, find P ∪ Q.', opts:{ A:'{4,8}', B:'{2,4,6,8,12,16}', C:'{2,6}', D:'{12,16}' }, ans:'B', exp:'Union = all elements in either set = {2,4,6,8,12,16}.' },
+  { id:35, subj:'Mathematics', topic:'Logarithms', text:'If log₁₀ 3 = 0.4771, log₁₀ 9 = ?', opts:{ A:'0.4771', B:'0.9542', C:'1.4313', D:'0.2386' }, ans:'B', exp:'log₁₀ 9 = log₁₀ (3²) = 2 × 0.4771 = 0.9542.' },
+  { id:36, subj:'Mathematics', topic:'Quadratics', text:'Find the product of roots of x² - 7x + 12 = 0.', opts:{ A:'7', B:'-7', C:'12', D:'-12' }, ans:'C', exp:'Product of roots = c/a = 12/1 = 12.' },
+  { id:37, subj:'Mathematics', topic:'Probability', text:'A coin tossed three times. Probability of exactly two heads?', opts:{ A:'1/8', B:'3/8', C:'1/2', D:'5/8' }, ans:'B', exp:'Favorable: HHT, HTH, THH → 3/8.' },
+  { id:38, subj:'Mathematics', topic:'Mensuration', text:'Area of circle radius 14 cm? (π=22/7)', opts:{ A:'88 cm²', B:'308 cm²', C:'616 cm²', D:'1232 cm²' }, ans:'C', exp:'Area = πr² = 22/7 × 196 = 22 × 28 = 616 cm².' },
+  { id:39, subj:'Mathematics', topic:'Trigonometry', text:'cos 60° = ?', opts:{ A:'0', B:'1/2', C:'√2/2', D:'1' }, ans:'B', exp:'cos 60° = 1/2 (exact trigonometric value).' },
+  { id:40, subj:'Mathematics', topic:'Variation', text:'If y ∝ x and y=12 when x=3, find y when x=7.', opts:{ A:'21', B:'28', C:'4', D:'19' }, ans:'B', exp:'y = kx → 12 = 3k → k=4. Then y = 4×7 = 28.' }
+];
+
+const SECTIONS = [
+  { beforeId: 1, icon: '🗣️', title: 'English Language', meta: 'Questions 1–12 · Stress Patterns & Oral English (Phonetics)' },
+  { beforeId: 13, icon: '⚗️', title: 'Chemistry', meta: 'Questions 13–22 · ALL with diagrams — Atomic, Organic, Electrochem, Gas Laws, Kinetics' },
+  { beforeId: 23, icon: '⚡', title: 'Physics', meta: 'Questions 23–32 · ALL with diagrams — Mechanics, Moments, Electricity, Waves, Optics' },
+  { beforeId: 33, icon: '📐', title: 'Mathematics', meta: 'Questions 33–40 · Algebra, Sets, Logarithms, Quadratics, Probability, Mensuration' }
+];
+
+var SHUFFLED_ANS = {};
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(k => ({ origKey:k, text:q.opts[k] }));
+  for (let i = entries.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); [entries[i], entries[j]] = [entries[j], entries[i]]; }
+  let newOpts = {}, newAns = q.ans;
+  ['A','B','C','D'].forEach((lbl, idx) => { newOpts[lbl] = entries[idx].text; if (entries[idx].origKey === q.ans) newAns = lbl; });
+  return { opts: newOpts, ans: newAns };
+}
+
+let ST = { correct:0, wrong:0, answered:0, answeredIds: new Set() };
+let UA = {};
+let globalDone = false;
+let GLOBAL_SECS = 1800;
+let timerInterval = null;
+
+function startTimer() {
+  let remaining = GLOBAL_SECS;
+  let dot = document.getElementById('gdot');
+  let txt = document.getElementById('gtime');
+  function fmt(s) { let m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(() => {
+    remaining--; txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { let el = document.getElementById('gtime'); return el ? el.textContent : '—'; }
+
+function render() {
+  let container = document.getElementById('qc');
+  let TOTAL = QUESTIONS.length;
+  let sectionMap = {};
+  SECTIONS.forEach(s => { sectionMap[s.beforeId] = s; });
+  let html = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    let q = QUESTIONS[i];
+    if (sectionMap[q.id]) {
+      let s = sectionMap[q.id];
+      html += `<div class="subj-divider"><span class="subj-divider-icon">${s.icon}</span><div class="subj-divider-left"><span class="subj-divider-title">${s.title}</span><span class="subj-divider-meta">${s.meta}</span></div></div>`;
+    }
+    let shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    let diagramHtml = (q.diagram && DIAGRAMS[q.id]) ? `<div class="qdiagram">${DIAGRAMS[q.id]}</div>` : '';
+    let optsHtml = '';
+    ['A','B','C','D'].forEach(lbl => { optsHtml += `<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${shuffled.opts[lbl]}</span></div>`; });
+    html += `<div class="qcard"><div class="qcard-top"><span class="qnum">Q${q.id} of ${TOTAL}</span>${q.topic ? `<span class="qtopic">${q.topic}</span>` : ''}</div>${diagramHtml}<div class="qtxt">${q.text}</div><div class="opts">${optsHtml}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp${q.id}"></div></div>`;
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      let qid = parseInt(this.dataset.id);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => o.classList.remove('sel'));
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      let btn = document.querySelector(`.abtn[data-qid="${qid}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      let qid = parseInt(this.dataset.qid);
+      let q = QUESTIONS.find(x => x.id === qid);
+      let chosen = UA[qid];
+      let correctLabel = SHUFFLED_ANS[qid];
+      let ok = (chosen === correctLabel);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      let expEl = document.getElementById(`exp${qid}`);
+      let markCls = ok ? 'pos' : 'neg';
+      let markTxt = ok ? '✓ Correct' : `✗ Incorrect — correct answer: ${correctLabel}`;
+      expEl.innerHTML = `<span class="exp-mark ${markCls}">${markTxt}</span>${q.exp ? `<div style="margin-top:8px">${q.exp}</div>` : ''}`;
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  let TOTAL = QUESTIONS.length;
+  let left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = `${ST.answered} / ${TOTAL} answered`;
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered / TOTAL * 100) + '%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() { hideSubmitModal(); globalDone = true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(b => b.click()); showResults(); }
+function showResults() {
+  let TOTAL = QUESTIONS.length;
+  let pct = Math.round((ST.correct / TOTAL) * 100);
+  let scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp() { globalDone = true; document.querySelectorAll('.opt').forEach(o => { o.style.pointerEvents = 'none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(b => b.disabled = true); showResults(); }
+function doPrint() { document.getElementById('print-header').style.display = 'block'; window.print(); setTimeout(() => { document.getElementById('print-header').style.display = 'none'; }, 1000); }
+
+render();
+startTimer();
+</script>
+</body>
+</html>

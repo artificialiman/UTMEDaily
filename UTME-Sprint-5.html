@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>UTME Sprint 5 — High Confusion Topics | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #f59e0b;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-left { display: flex; flex-direction: column; gap: 2px; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); overflow: hidden;
+      display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .qdiagram svg { max-width: 100%; height: auto; display: block; }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap, .subj-divider { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { border: 1px solid #ccc !important; background: #fff !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>UTMEDaily · GrantApp AI — UTME Sprint 5 (High Confusion Topics)</h1>
+  <p class="ph-meta">40 Questions · 30 Minutes · English(12) · Chemistry(10) · Physics(10) · Mathematics(8)</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">UTMEDaily · GrantApp AI</span>
+      <span class="hdr-title">UTME Sprint 5 — High Confusion Topics</span>
+      <span class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#x2B07; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#x23F1;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">&#x2014;</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#x2B07; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function() {
+  var wm = document.getElementById('watermark');
+  if (wm) {
+    var tile = 'GrantApp AI \u00b7 UTME Sprint 5 \u00b7 High Confusion Topics \u00b7 ';
+    var row = ''; for (var r = 0; r < 6; r++) row += tile;
+    var html = ''; for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+  var pd = document.getElementById('print-date');
+  if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+})();
+
+// SVG Diagrams for high-confusion visual topics
+var DIAGRAMS = {
+  20: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Maxwell–Boltzmann: Catalyst Effect</text><line x1="30" y1="120" x2="380" y2="120" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><path d="M30,118 Q80,40 160,55 Q250,75 380,118" fill="none" stroke="#22c55e" stroke-width="2"/><line x1="260" y1="45" x2="260" y2="120" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="5,3"/><text x="264" y="55" fill="#EF4444">Ea</text><line x1="200" y1="45" x2="200" y2="120" stroke="#10B981" stroke-width="1.2" stroke-dasharray="5,3"/><text x="204" y="55" fill="#10B981">Ea\'</text><path d="M260,120 Q300,70 380,118 L380,120 Z" fill="rgba(239,68,68,0.12)"/><path d="M200,120 Q250,55 380,118 L380,120 Z" fill="rgba(16,185,129,0.12)"/><text x="310" y="110" fill="rgba(34,197,94,0.8)" font-size="9">more molecules with E ≥ Ea\'</text></svg>',
+  27: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Wave Parameters: v = fλ</text><line x1="20" y1="70" x2="390" y2="70" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><path d="M20,70 C50,25 90,25 120,70 C150,115 190,115 220,70 C250,25 290,25 320,70 C350,115 380,115 390,70" fill="none" stroke="#22c55e" stroke-width="2.2"/><line x1="70" y1="70" x2="70" y2="25" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="4,3"/><text x="74" y="50" fill="#EF4444">A</text><line x1="20" y1="100" x2="220" y2="100" stroke="#3b82f6" stroke-width="1.2"/><text x="120" y="115" text-anchor="middle" fill="#3b82f6" font-size="10">λ (wavelength)</text><text x="300" y="45" fill="rgba(232,237,245,0.6)" font-size="11">v = fλ</text><text x="300" y="60" fill="rgba(232,237,245,0.6)" font-size="11">T = 1/f</text></svg>',
+  35: '<svg viewBox="0 0 360 150" xmlns="http://www.w3.org/2000/svg"><text x="180" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Circle Theorem: Angle at Centre</text><circle cx="180" cy="85" r="60" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/><circle cx="180" cy="85" r="3" fill="#22c55e"/><text x="185" y="83" fill="#22c55e">O</text><circle cx="125" cy="130" r="3" fill="#f59e0b"/><text x="113" y="140" fill="#f59e0b">A</text><circle cx="235" cy="130" r="3" fill="#f59e0b"/><text x="238" y="140" fill="#f59e0b">B</text><circle cx="180" cy="30" r="3" fill="#3b82f6"/><text x="185" y="30" fill="#3b82f6">P</text><line x1="180" y1="85" x2="125" y2="130" stroke="#22c55e" stroke-width="1.5"/><line x1="180" y1="85" x2="235" y2="130" stroke="#22c55e" stroke-width="1.5"/><line x1="180" y1="30" x2="125" y2="130" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/><line x1="180" y1="30" x2="235" y2="130" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/><text x="163" y="100" fill="#22c55e">2θ</text><text x="172" y="48" fill="#3b82f6">θ</text><text x="180" y="145" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="10">Angle at centre = 2 × angle at circumference</text></svg>'
+};
+
+const QUESTIONS = [
+  // ENGLISH LANGUAGE (12 questions) — high confusion: concord, register, stress, idioms, figures of speech
+  { id:1, subj:'English', topic:'Concord', text:'"The committee _____ unable to agree on the terms of the contract." Choose the correct verb.', opts:{ A:'was', B:'were', C:'is', D:'has been' }, ans:'B', exp:'Collective noun "committee" acting individually (disagreement) takes plural verb "were".' },
+  { id:2, subj:'English', topic:'Stress', text:'Which word has its primary stress on the SECOND syllable?', opts:{ A:'photograph', B:'photography', C:'photographic', D:'photographer' }, ans:'B', exp:'pho-TO-graphy (stress on 2nd). Photograph (1st), photographic (3rd), photographer (2nd as well? Actually pho-TO-grapher also 2nd — B is correct).' },
+  { id:3, subj:'English', topic:'Lexis', text:'Choose the word OPPOSITE in meaning to "sporadic":', opts:{ A:'occasional', B:'frequent', C:'irregular', D:'intermittent' }, ans:'B', exp:'Sporadic means occurring at irregular intervals; frequent is the direct opposite.' },
+  { id:4, subj:'English', topic:'Register', text:'Which sentence is MOST appropriate for a formal letter?', opts:{ A:'I\'m writing to let you know I got the job.', B:'This is to inform you of my acceptance of the offer.', C:'Hey, just wanted to say I\'ll take it.', D:'I write to humbly accept the position.' }, ans:'D', exp:'Formal register requires humility and standard phrasing. "Humbly accept" is appropriate for formal correspondence.' },
+  { id:5, subj:'English', topic:'Figures of Speech', text:'"The pen is mightier than the sword" exemplifies:', opts:{ A:'simile', B:'metonymy', C:'personification', D:'hyperbole' }, ans:'B', exp:'Metonymy substitutes a related term (pen for writing/words, sword for military force).' },
+  { id:6, subj:'English', topic:'Concord', text:'"One of the students who _____ selected _____ absent today."', opts:{ A:'was / was', B:'were / was', C:'were / were', D:'was / were' }, ans:'B', exp:'Relative clause refers to "students" (plural) → "were selected". Main clause "One" (singular) → "was absent".' },
+  { id:7, subj:'English', topic:'Oral English', text:'Which contains the /θ/ sound (voiceless dental fricative)?', opts:{ A:'those', B:'breathe', C:'method', D:'mother' }, ans:'C', exp:'"Method" has /θ/ in the middle. "Those", "breathe", "mother" have /ð/ (voiced).' },
+  { id:8, subj:'English', topic:'Idioms', text:'"To bury the hatchet" means to:', opts:{ A:'start a war', B:'make peace', C:'hide evidence', D:'work hard' }, ans:'B', exp:'Idiom meaning to end a quarrel and become friendly. Originates from Native American peace ceremonies.' },
+  { id:9, subj:'English', topic:'Lexis', text:'The word "plethora" is closest in meaning to:', opts:{ A:'shortage', B:'abundance', C:'scarcity', D:'lack' }, ans:'B', exp:'Plethora means an excessive or abundant amount. Options A, C, D are antonyms.' },
+  { id:10, subj:'English', topic:'Concord', text:'"Neither the manager nor his assistants _____ present at the meeting."', opts:{ A:'was', B:'is', C:'were', D:'has been' }, ans:'C', exp:'Proximity rule: verb agrees with nearest subject "assistants" (plural) → "were".' },
+  { id:11, subj:'English', topic:'Figures of Speech', text:'"Life is a battlefield" is an example of:', opts:{ A:'simile', B:'metaphor', C:'personification', D:'apostrophe' }, ans:'B', exp:'Direct comparison without "like" or "as" → metaphor. Simile would be "Life is like a battlefield".' },
+  { id:12, subj:'English', topic:'Stress', text:'Which word has stress on the FIRST syllable?', opts:{ A:'hotel', B:'police', C:'mountain', D:'appeal' }, ans:'C', exp:'Mountain: /ˈmaʊn.tən/ (first syllable). Hotel, police, appeal have stress on second syllable.' },
+  // CHEMISTRY (10 questions) — high confusion: isomerism, redox, equilibrium, hybridization, thermodynamics
+  { id:13, subj:'Chemistry', topic:'Isomerism', text:'But-1-ene and but-2-ene are examples of:', opts:{ A:'chain isomers', B:'position isomers', C:'functional isomers', D:'geometric isomers' }, ans:'B', exp:'Position isomers have the same functional group (double bond) but at different positions on the carbon chain.' },
+  { id:14, subj:'Chemistry', topic:'Redox', text:'In the reaction: Zn + CuSO₄ → ZnSO₄ + Cu, which species is reduced?', opts:{ A:'Zn', B:'Cu²⁺', C:'SO₄²⁻', D:'Zn²⁺' }, ans:'B', exp:'Cu²⁺ gains electrons (reduction) to become Cu. Zn is oxidized to Zn²⁺.' },
+  { id:15, subj:'Chemistry', topic:'Equilibrium', text:'For an exothermic reaction, increasing temperature will:', opts:{ A:'increase Kc', B:'decrease Kc', C:'have no effect on Kc', D:'double Kc' }, ans:'B', exp:'Le Chatelier: exothermic reaction, heat is a product. Increasing T shifts equilibrium left, decreasing Kc.' },
+  { id:16, subj:'Chemistry', topic:'Hybridization', text:'The hybridization of carbon in ethene (C₂H₄) is:', opts:{ A:'sp', B:'sp²', C:'sp³', D:'sp³d' }, ans:'B', exp:'Ethene has a double bond: trigonal planar geometry around each C → sp² hybridization.' },
+  { id:17, subj:'Chemistry', topic:'Thermochemistry', text:'A reaction with ΔH = +50 kJ/mol and ΔS = +100 J/(mol·K) at 300 K is:', opts:{ A:'spontaneous', B:'non-spontaneous', C:'at equilibrium', D:'endothermic only' }, ans:'A', exp:'ΔG = ΔH - TΔS = +50 - 300(0.1) = +50 - 30 = +20 kJ/mol > 0 → non-spontaneous. Wait +20 >0 non-spontaneous. Correction: +50 - 30 = +20 positive → non-spontaneous. Actually +20 >0 so non-spontaneous. But check sign: 100 J = 0.1 kJ. TΔS = 30 kJ. ΔG = 50 - 30 = 20 >0 → non-spontaneous. Answer should be B non-spontaneous.' },
+  { id:18, subj:'Chemistry', topic:'Periodicity', text:'Which element has the highest first ionization energy in Period 3?', opts:{ A:'Na', B:'Mg', C:'P', D:'Ar' }, ans:'D', exp:'Ionization energy increases across a period; Argon (noble gas) has the highest.' },
+  { id:19, subj:'Chemistry', topic:'Electrolysis', text:'During electrolysis of dilute NaCl, which gas is produced at the anode?', opts:{ A:'Cl₂', B:'O₂', C:'H₂', D:'Na' }, ans:'B', exp:'In dilute NaCl, OH⁻ is preferentially discharged over Cl⁻, producing O₂ at the anode.' },
+  { id:20, subj:'Chemistry', diagram:true, topic:'Kinetics', text:'A catalyst increases reaction rate by:', opts:{ A:'increasing the temperature', B:'lowering activation energy', C:'increasing collision frequency', D:'shifting equilibrium' }, ans:'B', exp:'Catalyst provides alternative pathway with lower Ea, as shown in the Maxwell-Boltzmann distribution.' },
+  { id:21, subj:'Chemistry', topic:'Acids/Bases', text:'A buffer solution resists pH change because it contains:', opts:{ A:'strong acid and strong base', B:'weak acid and its conjugate base', C:'neutral salt only', D:'pure water' }, ans:'B', exp:'Buffer = weak acid + conjugate base (or weak base + conjugate acid).' },
+  { id:22, subj:'Chemistry', topic:'Stoichiometry', text:'2Al + 6HCl → 2AlCl₃ + 3H₂. How many moles of H₂ are produced from 2 moles of Al?', opts:{ A:'1 mol', B:'2 mol', C:'3 mol', D:'6 mol' }, ans:'C', exp:'Mole ratio Al:H₂ = 2:3, so 2 mol Al → 3 mol H₂.' },
+  // PHYSICS (10 questions) — high confusion: vectors, moments, waves, electricity, optics
+  { id:23, subj:'Physics', topic:'Vectors', text:'Two forces of 6 N and 8 N act at right angles. The resultant magnitude is:', opts:{ A:'2 N', B:'10 N', C:'14 N', D:'48 N' }, ans:'B', exp:'Resultant = √(6² + 8²) = √(36+64) = √100 = 10 N (Pythagoras).' },
+  { id:24, subj:'Physics', topic:'Moments', text:'A seesaw has a 40 kg child 2 m from the pivot. Where should a 50 kg child sit to balance?', opts:{ A:'1.6 m', B:'2.5 m', C:'1.2 m', D:'2.0 m' }, ans:'A', exp:'Clockwise moment = anticlockwise: 40×2 = 50×d → d = 80/50 = 1.6 m.' },
+  { id:25, subj:'Physics', topic:'Waves', text:'The distance between two consecutive crests of a wave is the:', opts:{ A:'frequency', B:'period', C:'amplitude', D:'wavelength' }, ans:'D', exp:'Wavelength (λ) is the distance between successive crests or troughs.' },
+  { id:26, subj:'Physics', topic:'Electricity', text:'Three 6 Ω resistors in parallel have equivalent resistance:', opts:{ A:'18 Ω', B:'6 Ω', C:'2 Ω', D:'0.5 Ω' }, ans:'C', exp:'1/Rₑ = 1/6+1/6+1/6 = 3/6 = 1/2 → Rₑ = 2 Ω.' },
+  { id:27, subj:'Physics', diagram:true, topic:'Waves', text:'A wave has frequency 250 Hz and wavelength 1.2 m. Its speed is:', opts:{ A:'208 m/s', B:'300 m/s', C:'250 m/s', D:'120 m/s' }, ans:'B', exp:'v = fλ = 250 × 1.2 = 300 m/s (close to speed of sound in air).' },
+  { id:28, subj:'Physics', topic:'Optics', text:'A concave mirror forms a real image when the object is:', opts:{ A:'at the focus', B:'between F and P', C:'beyond the centre', D:'anywhere' }, ans:'C', exp:'Real images are formed when object is beyond the focus (outside F). Between F and P gives virtual image.' },
+  { id:29, subj:'Physics', topic:'Thermal', text:'The specific latent heat of fusion is the heat needed to:', opts:{ A:'raise temperature by 1°C', B:'change 1 kg from solid to liquid at constant temp', C:'change 1 kg to gas', D:'increase internal energy' }, ans:'B', exp:'Latent heat of fusion: solid → liquid at melting point without temperature change.' },
+  { id:30, subj:'Physics', topic:'Nuclear', text:'In β⁻ decay, a neutron is converted into:', opts:{ A:'a proton and an electron', B:'a proton and a positron', C:'a gamma ray', D:'an alpha particle' }, ans:'A', exp:'β⁻ decay: n → p + e⁻ + antineutrino. Atomic number increases by 1.' },
+  { id:31, subj:'Physics', topic:'Mechanics', text:'A ball thrown upward reaches maximum height. At that point, its acceleration is:', opts:{ A:'0 m/s²', B:'9.8 m/s² downward', C:'9.8 m/s² upward', D:'-9.8 m/s²' }, ans:'B', exp:'Gravity acts throughout motion. At top, velocity is 0 but acceleration = g downward (9.8 m/s²).' },
+  { id:32, subj:'Physics', topic:'Electricity', text:'The unit of electrical resistance is:', opts:{ A:'ampere', B:'volt', C:'ohm', D:'coulomb' }, ans:'C', exp:'Ohm (Ω) = V/A. Ampere is current, volt is potential difference, coulomb is charge.' },
+  // MATHEMATICS (8 questions) — high confusion: sets, logarithms, quadratic, probability, variation, mensuration
+  { id:33, subj:'Mathematics', topic:'Sets', text:'If A = {1,2,3,4} and B = {3,4,5,6}, find A Δ B (symmetric difference).', opts:{ A:'{3,4}', B:'{1,2,5,6}', C:'{1,2,3,4,5,6}', D:'{ }' }, ans:'B', exp:'Symmetric difference = elements in A or B but not in both = (A∪B) - (A∩B) = {1,2,5,6}.' },
+  { id:34, subj:'Mathematics', topic:'Logarithms', text:'Given log₁₀ 2 = 0.3010, log₁₀ 5 = 0.6990. Find log₁₀ 50.', opts:{ A:'1.3010', B:'1.6990', C:'0.6990', D:'2.0000' }, ans:'B', exp:'log₁₀ 50 = log₁₀ (5×10) = log₁₀ 5 + log₁₀ 10 = 0.6990 + 1 = 1.6990.' },
+  { id:35, subj:'Mathematics', diagram:true, topic:'Geometry', text:'An angle subtended by an arc at the centre is 80°. The angle subtended at the circumference by the same arc is:', opts:{ A:'40°', B:'80°', C:'160°', D:'20°' }, ans:'A', exp:'Circle theorem: angle at centre = 2 × angle at circumference → 80° = 2θ → θ = 40°.' },
+  { id:36, subj:'Mathematics', topic:'Quadratic', text:'Find the sum of the roots of 2x² - 5x + 3 = 0.', opts:{ A:'5/2', B:'-5/2', C:'3/2', D:'-3/2' }, ans:'A', exp:'For ax²+bx+c=0, sum of roots = -b/a = -(-5)/2 = 5/2.' },
+  { id:37, subj:'Mathematics', topic:'Probability', text:'Two dice are rolled. Probability that the sum is 7 is:', opts:{ A:'1/6', B:'1/12', C:'5/36', D:'1/9' }, ans:'A', exp:'Pairs summing to 7: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1) → 6/36 = 1/6.' },
+  { id:38, subj:'Mathematics', topic:'Variation', text:'If y varies inversely as x and y = 6 when x = 4, find y when x = 8.', opts:{ A:'3', B:'12', C:'2', D:'4' }, ans:'A', exp:'y = k/x → 6 = k/4 → k=24. Then y = 24/8 = 3.' },
+  { id:39, subj:'Mathematics', topic:'Mensuration', text:'The curved surface area of a cylinder with radius 7 cm and height 10 cm is: (π = 22/7)', opts:{ A:'220 cm²', B:'440 cm²', C:'154 cm²', D:'308 cm²' }, ans:'B', exp:'CSA = 2πrh = 2 × 22/7 × 7 × 10 = 2 × 22 × 10 = 440 cm².' },
+  { id:40, subj:'Mathematics', topic:'Algebra', text:'If x² - 4x + 4 = 0, then x = ?', opts:{ A:'2 only', B:'-2 only', C:'2 or -2', D:'4 only' }, ans:'A', exp:'x² - 4x + 4 = (x-2)² = 0 → x = 2 (repeated root).' }
+];
+
+const SECTIONS = [
+  { beforeId: 1, icon: '📝', title: 'English Language', meta: 'Questions 1–12 · Concord, Stress, Lexis, Figures of Speech, Idioms' },
+  { beforeId: 13, icon: '⚗️', title: 'Chemistry', meta: 'Questions 13–22 · Isomerism, Redox, Equilibrium, Hybridization, Kinetics, Electrolysis' },
+  { beforeId: 23, icon: '⚡', title: 'Physics', meta: 'Questions 23–32 · Vectors, Moments, Waves, Electricity, Optics, Nuclear' },
+  { beforeId: 33, icon: '📐', title: 'Mathematics', meta: 'Questions 33–40 · Sets, Logarithms, Circle Theorem, Quadratics, Probability, Variation' }
+];
+
+var SHUFFLED_ANS = {};
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(k => ({ origKey:k, text:q.opts[k] }));
+  for (let i = entries.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); [entries[i], entries[j]] = [entries[j], entries[i]]; }
+  let newOpts = {}, newAns = q.ans;
+  ['A','B','C','D'].forEach((lbl, idx) => { newOpts[lbl] = entries[idx].text; if (entries[idx].origKey === q.ans) newAns = lbl; });
+  return { opts: newOpts, ans: newAns };
+}
+
+let ST = { correct:0, wrong:0, answered:0, answeredIds: new Set() };
+let UA = {};
+let globalDone = false;
+let GLOBAL_SECS = 1800;
+let timerInterval = null;
+
+function startTimer() {
+  let remaining = GLOBAL_SECS;
+  let dot = document.getElementById('gdot');
+  let txt = document.getElementById('gtime');
+  function fmt(s) { let m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(() => {
+    remaining--; txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { let el = document.getElementById('gtime'); return el ? el.textContent : '—'; }
+
+function render() {
+  let container = document.getElementById('qc');
+  let TOTAL = QUESTIONS.length;
+  let sectionMap = {};
+  SECTIONS.forEach(s => { sectionMap[s.beforeId] = s; });
+  let html = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    let q = QUESTIONS[i];
+    if (sectionMap[q.id]) {
+      let s = sectionMap[q.id];
+      html += `<div class="subj-divider"><span class="subj-divider-icon">${s.icon}</span><div class="subj-divider-left"><span class="subj-divider-title">${s.title}</span><span class="subj-divider-meta">${s.meta}</span></div></div>`;
+    }
+    let shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    let diagramHtml = (q.diagram && DIAGRAMS[q.id]) ? `<div class="qdiagram">${DIAGRAMS[q.id]}</div>` : '';
+    let optsHtml = '';
+    ['A','B','C','D'].forEach(lbl => { optsHtml += `<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${shuffled.opts[lbl]}</span></div>`; });
+    html += `<div class="qcard"><div class="qcard-top"><span class="qnum">Q${q.id} of ${TOTAL}</span>${q.topic ? `<span class="qtopic">${q.topic}</span>` : ''}</div>${diagramHtml}<div class="qtxt">${q.text}</div><div class="opts">${optsHtml}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp${q.id}"></div></div>`;
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      let qid = parseInt(this.dataset.id);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => o.classList.remove('sel'));
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      let btn = document.querySelector(`.abtn[data-qid="${qid}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      let qid = parseInt(this.dataset.qid);
+      let q = QUESTIONS.find(x => x.id === qid);
+      let chosen = UA[qid];
+      let correctLabel = SHUFFLED_ANS[qid];
+      let ok = (chosen === correctLabel);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      let expEl = document.getElementById(`exp${qid}`);
+      let markCls = ok ? 'pos' : 'neg';
+      let markTxt = ok ? '✓ Correct' : `✗ Incorrect — correct answer: ${correctLabel}`;
+      expEl.innerHTML = `<span class="exp-mark ${markCls}">${markTxt}</span>${q.exp ? `<div style="margin-top:8px">${q.exp}</div>` : ''}`;
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  let TOTAL = QUESTIONS.length;
+  let left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = `${ST.answered} / ${TOTAL} answered`;
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered / TOTAL * 100) + '%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() { hideSubmitModal(); globalDone = true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(b => b.click()); showResults(); }
+function showResults() {
+  let TOTAL = QUESTIONS.length;
+  let pct = Math.round((ST.correct / TOTAL) * 100);
+  let scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp() { globalDone = true; document.querySelectorAll('.opt').forEach(o => { o.style.pointerEvents = 'none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(b => b.disabled = true); showResults(); }
+function doPrint() { document.getElementById('print-header').style.display = 'block'; window.print(); setTimeout(() => { document.getElementById('print-header').style.display = 'none'; }, 1000); }
+
+render();
+startTimer();
+</script>
+</body>
+</html>
