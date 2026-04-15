@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>UTME Sprint 4 — 2026 | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #f59e0b;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-left { display: flex; flex-direction: column; gap: 2px; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); overflow: hidden;
+      display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .qdiagram svg { max-width: 100%; height: auto; display: block; }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap, .subj-divider { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { border: 1px solid #ccc !important; background: #fff !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>UTMEDaily · GrantApp AI — UTME Sprint 4 (2026)</h1>
+  <p class="ph-meta">40 Questions · 30 Minutes · English · Chemistry · Physics · Mathematics</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">UTMEDaily · GrantApp AI</span>
+      <span class="hdr-title">UTME Sprint 4 — 2026</span>
+      <span class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#x2B07; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#x23F1;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">&#x2014;</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#x2B07; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function() {
+  var wm = document.getElementById('watermark');
+  if (wm) {
+    var tile = 'GrantApp AI \u00b7 UTME Sprint 4 \u00b7 ';
+    var row = ''; for (var r = 0; r < 6; r++) row += tile;
+    var html = ''; for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+  var pd = document.getElementById('print-date');
+  if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+})();
+
+// SVG diagrams for Chemistry
+var DIAGRAMS = {
+  14: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Atomic Radius Trend — Period 3</text><line x1="40" y1="120" x2="370" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="40" y1="20" x2="40" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><text x="30" y="70" text-anchor="middle" fill="var(--ter)" font-size="8" transform="rotate(-90,30,70)">Atomic Radius</text><text x="200" y="140" text-anchor="middle" fill="var(--ter)" font-size="8">Element (Period 3)</text><circle cx="80" cy="95" r="4" fill="#EF4444"/><text x="80" y="85" text-anchor="middle" fill="#EF4444" font-size="9">Na</text><circle cx="130" cy="100" r="4" fill="#EF4444"/><text x="130" y="90" text-anchor="middle" fill="#EF4444" font-size="9">Mg</text><circle cx="180" cy="105" r="4" fill="#EF4444"/><text x="180" y="95" text-anchor="middle" fill="#EF4444" font-size="9">Al</text><circle cx="230" cy="108" r="4" fill="#EF4444"/><text x="230" y="98" text-anchor="middle" fill="#EF4444" font-size="9">Si</text><circle cx="280" cy="110" r="4" fill="#EF4444"/><text x="280" y="100" text-anchor="middle" fill="#EF4444" font-size="9">P</text><circle cx="330" cy="112" r="4" fill="#EF4444"/><text x="330" y="102" text-anchor="middle" fill="#EF4444" font-size="9">S</text><circle cx="355" cy="114" r="4" fill="#22c55e"/><text x="355" y="104" text-anchor="middle" fill="#22c55e" font-size="9">Ar</text><text x="200" y="55" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">Atomic radius decreases left to right</text></svg>',
+  16: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">pH Scale — Acid/Base Strength</text><rect x="50" y="35" width="300" height="20" rx="10" fill="url(#phGrad)"/><defs><linearGradient id="phGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#EF4444"/><stop offset="30%" stop-color="#f59e0b"/><stop offset="50%" stop-color="#22c55e"/><stop offset="70%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs><text x="65" y="30" text-anchor="middle" fill="#EF4444" font-size="9">0</text><text x="115" y="30" text-anchor="middle" fill="#f59e0b" font-size="9">3</text><text x="165" y="30" text-anchor="middle" fill="#22c55e" font-size="9">7</text><text x="215" y="30" text-anchor="middle" fill="#3b82f6" font-size="9">9</text><text x="265" y="30" text-anchor="middle" fill="#8b5cf6" font-size="9">12</text><text x="330" y="30" text-anchor="middle" fill="#8b5cf6" font-size="9">14</text><text x="65" y="55" text-anchor="middle" fill="#EF4444" font-size="8">Strong Acid</text><text x="165" y="55" text-anchor="middle" fill="#22c55e" font-size="8">Neutral</text><text x="330" y="55" text-anchor="middle" fill="#8b5cf6" font-size="8">Strong Base</text><text x="200" y="90" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Lower pH = stronger acid</text></svg>',
+  18: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Oxygen Preparation — KClO₃ + MnO₂</text><rect x="40" y="40" width="130" height="55" rx="6" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="105" y="58" text-anchor="middle" fill="#22c55e" font-size="9">KClO₃ + MnO₂</text><text x="105" y="75" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">(catalyst)</text><line x1="170" y1="60" x2="200" y2="60" stroke="#f59e0b" stroke-width="2"/><text x="185" y="55" text-anchor="middle" fill="#f59e0b" font-size="12">→</text><rect x="200" y="40" width="110" height="55" rx="6" fill="rgba(239,68,68,0.1)" stroke="#EF4444" stroke-width="1.5"/><text x="255" y="58" text-anchor="middle" fill="#EF4444" font-size="9">KCl + O₂↑</text><text x="255" y="75" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">(oxygen gas)</text><path d="M310,50 L350,50" stroke="#3b82f6" stroke-width="1.5"/><circle cx="350" cy="50" r="8" fill="none" stroke="#3b82f6" stroke-width="1.5"/><text x="350" y="54" text-anchor="middle" fill="#3b82f6" font-size="7">O₂</text></svg>',
+  26: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Ionisation Energy — Group 1 Trend</text><line x1="40" y1="120" x2="370" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="40" y1="20" x2="40" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><text x="30" y="70" text-anchor="middle" fill="var(--ter)" font-size="8" transform="rotate(-90,30,70)">Ionisation Energy</text><text x="200" y="140" text-anchor="middle" fill="var(--ter)" font-size="8">Group 1 (Alkali Metals)</text><circle cx="100" cy="95" r="4" fill="#EF4444"/><text x="100" y="85" text-anchor="middle" fill="#EF4444" font-size="9">Li</text><circle cx="180" cy="102" r="4" fill="#EF4444"/><text x="180" y="92" text-anchor="middle" fill="#EF4444" font-size="9">Na</text><circle cx="260" cy="108" r="4" fill="#EF4444"/><text x="260" y="98" text-anchor="middle" fill="#EF4444" font-size="9">K</text><circle cx="340" cy="113" r="4" fill="#EF4444"/><text x="340" y="103" text-anchor="middle" fill="#EF4444" font-size="9">Rb</text><path d="M100,95 L180,102 L260,108 L340,113" fill="none" stroke="#22c55e" stroke-width="2"/><text x="200" y="55" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">Ionisation energy decreases down the group</text></svg>'
+};
+
+const QUESTIONS = [
+  // ENGLISH (12)
+  { id:1, subj:'English', topic:'Oral', text:'Which word contains the /ð/ sound (voiced dental fricative)?', opts:{ A:'think', B:'bath', C:'mother', D:'month' }, ans:'C', exp:'"Mother" has /ð/. "Think" and "bath" have /θ/, "month" has /θ/.' },
+  { id:2, subj:'English', topic:'Oral', text:'Which word has its primary stress on the SECOND syllable?', opts:{ A:'citizen', B:'patriot', C:'democracy', D:'election' }, ans:'D', exp:'e-LEC-tion (2nd syllable). Citizen (1st), patriot (1st).' },
+  { id:3, subj:'English', topic:'Civic', text:'The term "franchise" in civic education refers to:', opts:{ A:'a fast-food chain', B:'the right to vote', C:'a special privilege', D:'tax exemption' }, ans:'B', exp:'Franchise = suffrage = the right to vote.' },
+  { id:4, subj:'English', topic:'Gerund', text:'"The citizen avoided _____ taxes illegally."', opts:{ A:'to pay', B:'pay', C:'paying', D:'paid' }, ans:'C', exp:'"Avoid" is followed by gerund: avoiding paying.' },
+  { id:5, subj:'English', topic:'Patriotic', text:'"___ allegiance to the flag" is a phrase expressing patriotism.', opts:{ A:'Pledge', B:'Swear', C:'Promise', D:'Vow' }, ans:'A', exp:'"Pledge allegiance" is standard.' },
+  { id:6, subj:'English', topic:'Oral', text:'Which word contains the /dʒ/ sound?', opts:{ A:'ship', B:'church', C:'judge', D:'shoes' }, ans:'C', exp:'Judge = /dʒʌdʒ/. Church = /tʃ/.' },
+  { id:7, subj:'English', topic:'Gerund', text:'"He is used to _____ up early every morning."', opts:{ A:'wake', B:'waking', C:'woke', D:'woken' }, ans:'B', exp:'"Used to" + gerund: used to waking.' },
+  { id:8, subj:'English', topic:'Civic', text:'The term "electoral college" refers to:', opts:{ A:'a school for politicians', B:'body that formally elects the president', C:'voter registration centre', D:'political party headquarters' }, ans:'B', exp:'Electoral college: group of electors who formally vote for president.' },
+  { id:9, subj:'English', topic:'Oral', text:'The vowel sound in "trap" is:', opts:{ A:'/ɑː/', B:'/æ/', C:'/e/', D:'/ʌ/' }, ans:'B', exp:'Trap = /træp/ — short front vowel /æ/.' },
+  { id:10, subj:'English', topic:'Patriotic', text:'A citizen who voluntarily gives up their citizenship is said to:', opts:{ A:'expatriate', B:'denaturalise', C:'abdicate', D:'secede' }, ans:'A', exp:'Expatriate = renounce one\'s native country.' },
+  { id:11, subj:'English', topic:'Gerund', text:'"I recall _____ him at the town hall meeting."', opts:{ A:'to see', B:'see', C:'seeing', D:'saw' }, ans:'C', exp:'"Recall" + gerund: recall seeing.' },
+  { id:12, subj:'English', topic:'Oral', text:'Which pair are minimal pairs?', opts:{ A:'ship/sheep', B:'cat/cut', C:'seat/sit', D:'all of the above' }, ans:'D', exp:'All differ by one vowel phoneme.' },
+  // CHEMISTRY (10)
+  { id:13, subj:'Chemistry', topic:'Periodic', text:'Across a period, atomic radius decreases because:', opts:{ A:'nuclear charge increases', B:'shielding increases', C:'electrons are added to new shells', D:'mass decreases' }, ans:'A', exp:'Increased nuclear charge pulls electrons inward.' },
+  { id:14, subj:'Chemistry', diagram:true, topic:'Periodic', text:'Which element in Period 3 has the largest atomic radius?', opts:{ A:'Chlorine', B:'Sodium', C:'Argon', D:'Silicon' }, ans:'B', exp:'Atomic radius decreases left to right; Sodium is largest.' },
+  { id:15, subj:'Chemistry', topic:'Acid/Base', text:'A solution with pH = 2 has a hydrogen ion concentration of:', opts:{ A:'2 M', B:'0.02 M', C:'0.01 M', D:'10⁻² M' }, ans:'D', exp:'pH = -log[H⁺] → [H⁺] = 10⁻² M.' },
+  { id:16, subj:'Chemistry', diagram:true, topic:'Acid/Base', text:'Which pH value represents the strongest acid?', opts:{ A:'1', B:'5', C:'7', D:'13' }, ans:'A', exp:'Lower pH = stronger acid.' },
+  { id:17, subj:'Chemistry', topic:'Lab Prep', text:'Oxygen gas is commonly prepared in the lab by heating:', opts:{ A:'KClO₃ with MnO₂', B:'NaCl', C:'CaCO₃', D:'H₂O₂ alone' }, ans:'A', exp:'KClO₃ decomposes to KCl + O₂; MnO₂ is catalyst.' },
+  { id:18, subj:'Chemistry', diagram:true, topic:'Lab Prep', text:'In the preparation of oxygen, manganese(IV) oxide acts as:', opts:{ A:'reactant', B:'catalyst', C:'product', D:'oxidising agent' }, ans:'B', exp:'MnO₂ lowers activation energy and is not consumed.' },
+  { id:19, subj:'Chemistry', topic:'Periodic', text:'Ionisation energy generally increases across a period because:', opts:{ A:'atomic radius increases', B:'shielding increases', C:'nuclear charge increases', D:'electrons are added to outer shell' }, ans:'C', exp:'Higher nuclear charge holds electrons tighter.' },
+  { id:20, subj:'Chemistry', topic:'Acid/Base', text:'Which of the following is a strong base?', opts:{ A:'NH₃', B:'NaOH', C:'CH₃COOH', D:'H₂CO₃' }, ans:'B', exp:'NaOH dissociates completely.' },
+  { id:21, subj:'Chemistry', topic:'Lab Prep', text:'Hydrogen gas is prepared by reacting zinc with:', opts:{ A:'HNO₃', B:'H₂SO₄', C:'HCl', D:'both B and C' }, ans:'D', exp:'Zn + H₂SO₄ → ZnSO₄ + H₂; Zn + 2HCl → ZnCl₂ + H₂.' },
+  { id:22, subj:'Chemistry', topic:'Periodic', text:'Which group has the highest ionisation energy?', opts:{ A:'Group 1', B:'Group 2', C:'Group 17', D:'Group 18' }, ans:'D', exp:'Noble gases have complete octets, highest IE.' },
+  // PHYSICS (10)
+  { id:23, subj:'Physics', topic:'Mechanics', text:'A car accelerates uniformly from rest to 20 m/s in 5 seconds. Its average velocity is:', opts:{ A:'4 m/s', B:'10 m/s', C:'20 m/s', D:'100 m/s' }, ans:'B', exp:'v_avg = (0 + v)/2 = 10 m/s.' },
+  { id:24, subj:'Physics', topic:'Mechanics', text:'A stone dropped from a height takes 2 seconds to hit the ground. The height is (g = 10 m/s²):', opts:{ A:'10 m', B:'20 m', C:'5 m', D:'40 m' }, ans:'B', exp:'h = ½gt² = 20 m.' },
+  { id:25, subj:'Physics', topic:'Energy', text:'A 60 W bulb operates for 5 hours. The electrical energy consumed in kWh is:', opts:{ A:'0.3 kWh', B:'3 kWh', C:'30 kWh', D:'300 kWh' }, ans:'A', exp:'60W = 0.06 kW × 5 h = 0.3 kWh.' },
+  { id:26, subj:'Physics', diagram:true, topic:'Periodic', text:'Ionisation energy for Group 1 elements decreases down the group because:', opts:{ A:'atomic size increases', B:'nuclear charge decreases', C:'shielding decreases', D:'mass decreases' }, ans:'A', exp:'Larger atomic size means outer electron is farther from nucleus.' },
+  { id:27, subj:'Physics', topic:'Momentum', text:'A 2 kg mass moving at 3 m/s collides with a stationary 1 kg mass and they stick together. The common velocity is:', opts:{ A:'1 m/s', B:'2 m/s', C:'3 m/s', D:'6 m/s' }, ans:'B', exp:'Momentum conserved: (2×3) = (3)×V → V = 2 m/s.' },
+  { id:28, subj:'Physics', topic:'Electricity', text:'Two resistors of 2 Ω and 3 Ω in series. Equivalent resistance:', opts:{ A:'1.2 Ω', B:'5 Ω', C:'6 Ω', D:'0.83 Ω' }, ans:'B', exp:'R_series = R₁ + R₂ = 5 Ω.' },
+  { id:29, subj:'Physics', topic:'Waves', text:'A wave of frequency 50 Hz has period:', opts:{ A:'0.02 s', B:'50 s', C:'0.2 s', D:'5 s' }, ans:'A', exp:'T = 1/f = 1/50 = 0.02 s.' },
+  { id:30, subj:'Physics', topic:'Mechanics', text:'A net force of 20 N on a 5 kg mass produces acceleration:', opts:{ A:'100 m/s²', B:'4 m/s²', C:'0.25 m/s²', D:'25 m/s²' }, ans:'B', exp:'a = F/m = 4 m/s².' },
+  { id:31, subj:'Physics', topic:'Optics', text:'A convex lens of focal length 20 cm has power:', opts:{ A:'0.05 D', B:'5 D', C:'20 D', D:'0.2 D' }, ans:'B', exp:'P = 1/f(m) = 1/0.2 = 5 D.' },
+  { id:32, subj:'Physics', topic:'Energy', text:'A machine with input 200 J and output 150 J has efficiency:', opts:{ A:'25%', B:'75%', C:'50%', D:'133%' }, ans:'B', exp:'(150/200)×100 = 75%.' },
+  // MATHEMATICS (8)
+  { id:33, subj:'Mathematics', topic:'AP', text:'The 10th term of AP: 2, 5, 8, 11, ... is:', opts:{ A:'29', B:'30', C:'31', D:'32' }, ans:'A', exp:'T₁₀ = a + 9d = 2 + 27 = 29.' },
+  { id:34, subj:'Mathematics', topic:'GP', text:'GP: 2, 6, 18, 54,... common ratio:', opts:{ A:'2', B:'3', C:'4', D:'6' }, ans:'B', exp:'6/2 = 3, 18/6 = 3.' },
+  { id:35, subj:'Mathematics', topic:'Binomial', text:'In (1 + x)⁵, coefficient of x² is:', opts:{ A:'5', B:'10', C:'15', D:'20' }, ans:'B', exp:'Pascal row 5: 1,5,10,10,5,1 → coefficient = 10.' },
+  { id:36, subj:'Mathematics', topic:'Pattern', text:'Sum of first 5 odd numbers (1+3+5+7+9):', opts:{ A:'15', B:'20', C:'25', D:'30' }, ans:'C', exp:'Sum of first n odd numbers = n² = 25.' },
+  { id:37, subj:'Mathematics', topic:'GP', text:'Sum to infinity: 4 + 2 + 1 + 0.5 + ... =', opts:{ A:'4', B:'6', C:'8', D:'10' }, ans:'C', exp:'S∞ = a/(1-r) = 4/0.5 = 8.' },
+  { id:38, subj:'Mathematics', topic:'Binomial', text:'In (2x + y)⁴, the term x³y is:', opts:{ A:'32x³y', B:'16x³y', C:'8x³y', D:'4x³y' }, ans:'A', exp:'⁴C₃ = 4, (2x)³ = 8x³ → 4×8 = 32x³y.' },
+  { id:39, subj:'Mathematics', topic:'Probability', text:'Two dice rolled. Probability of double six:', opts:{ A:'1/6', B:'1/12', C:'1/36', D:'1/18' }, ans:'C', exp:'(1/6)×(1/6) = 1/36.' },
+  { id:40, subj:'Mathematics', topic:'GP', text:'3rd term of GP is 12, 6th term is 96. First term:', opts:{ A:'2', B:'3', C:'4', D:'6' }, ans:'B', exp:'ar²=12, ar⁵=96 → r³=8 → r=2 → a=3.' }
+];
+
+const SECTIONS = [
+  { beforeId: 1, icon: '🗣️', title: 'English Language', meta: 'Oral · Civic/Patriotic Register · Gerunds' },
+  { beforeId: 13, icon: '⚗️', title: 'Chemistry', meta: 'Periodic Trends · Acid/Base · Lab Preparations' },
+  { beforeId: 23, icon: '⚡', title: 'Physics', meta: 'Mechanics · Energy · Electricity · Waves · Optics' },
+  { beforeId: 33, icon: '📐', title: 'Mathematics', meta: 'AP · GP · Binomial · Probability · Patterns' }
+];
+
+// ROBUST SHUFFLE ALGORITHM - Fisher-Yates with random seed
+var SHUFFLED_ANS = {};
+
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+  return arr;
+}
+
+function buildShuffledOpts(q) {
+  var entries = [
+    { origKey: 'A', text: q.opts.A },
+    { origKey: 'B', text: q.opts.B },
+    { origKey: 'C', text: q.opts.C },
+    { origKey: 'D', text: q.opts.D }
+  ];
+  
+  // Shuffle the entries
+  entries = shuffleArray(entries);
+  
+  var newOpts = {};
+  var newAns = q.ans;
+  
+  entries.forEach(function(entry, idx) {
+    var newLabel = ['A','B','C','D'][idx];
+    newOpts[newLabel] = entry.text;
+    if (entry.origKey === q.ans) {
+      newAns = newLabel;
+    }
+  });
+  
+  return { opts: newOpts, ans: newAns };
+}
+
+let ST = { correct:0, wrong:0, answered:0, answeredIds: new Set() };
+let UA = {};
+let globalDone = false;
+let GLOBAL_SECS = 1800;
+let timerInterval = null;
+
+function startTimer() {
+  let remaining = GLOBAL_SECS;
+  let dot = document.getElementById('gdot');
+  let txt = document.getElementById('gtime');
+  function fmt(s) { let m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(() => {
+    remaining--; txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { let el = document.getElementById('gtime'); return el ? el.textContent : '—'; }
+
+function render() {
+  let container = document.getElementById('qc');
+  let TOTAL = QUESTIONS.length;
+  let sectionMap = {};
+  SECTIONS.forEach(s => { sectionMap[s.beforeId] = s; });
+  let html = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    let q = QUESTIONS[i];
+    if (sectionMap[q.id]) {
+      let s = sectionMap[q.id];
+      html += `<div class="subj-divider"><span class="subj-divider-icon">${s.icon}</span><div class="subj-divider-left"><span class="subj-divider-title">${s.title}</span><span class="subj-divider-meta">${s.meta}</span></div></div>`;
+    }
+    let shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    let diagramHtml = (q.diagram && DIAGRAMS[q.id]) ? `<div class="qdiagram">${DIAGRAMS[q.id]}</div>` : '';
+    let optsHtml = '';
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="A"><span class="opt-key">A.</span><span class="opt-txt">${shuffled.opts.A}</span></div>`;
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="B"><span class="opt-key">B.</span><span class="opt-txt">${shuffled.opts.B}</span></div>`;
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="C"><span class="opt-key">C.</span><span class="opt-txt">${shuffled.opts.C}</span></div>`;
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="D"><span class="opt-key">D.</span><span class="opt-txt">${shuffled.opts.D}</span></div>`;
+    html += `<div class="qcard"><div class="qcard-top"><span class="qnum">Q${q.id} of ${TOTAL}</span>${q.topic ? `<span class="qtopic">${q.topic}</span>` : ''}</div>${diagramHtml}<div class="qtxt">${q.text}</div><div class="opts">${optsHtml}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp${q.id}"></div></div>`;
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      let qid = parseInt(this.dataset.id);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => o.classList.remove('sel'));
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      let btn = document.querySelector(`.abtn[data-qid="${qid}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      let qid = parseInt(this.dataset.qid);
+      let q = QUESTIONS.find(x => x.id === qid);
+      let chosen = UA[qid];
+      let correctLabel = SHUFFLED_ANS[qid];
+      let ok = (chosen === correctLabel);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      let expEl = document.getElementById(`exp${qid}`);
+      let markCls = ok ? 'pos' : 'neg';
+      let markTxt = ok ? '✓ Correct' : `✗ Incorrect — correct answer: ${correctLabel}`;
+      expEl.innerHTML = `<span class="exp-mark ${markCls}">${markTxt}</span>${q.exp ? `<div style="margin-top:8px">${q.exp}</div>` : ''}`;
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  let TOTAL = QUESTIONS.length;
+  let left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = `${ST.answered} / ${TOTAL} answered`;
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered / TOTAL * 100) + '%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() { hideSubmitModal(); globalDone = true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(b => b.click()); showResults(); }
+function showResults() {
+  let TOTAL = QUESTIONS.length;
+  let pct = Math.round((ST.correct / TOTAL) * 100);
+  let scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp() { globalDone = true; document.querySelectorAll('.opt').forEach(o => { o.style.pointerEvents = 'none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(b => b.disabled = true); showResults(); }
+function doPrint() { document.getElementById('print-header').style.display = 'block'; window.print(); setTimeout(() => { document.getElementById('print-header').style.display = 'none'; }, 1000); }
+
+render();
+startTimer();
+</script>
+</body>
+</html>
