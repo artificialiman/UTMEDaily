@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>UTME Sprint 2 — 2026 | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #f59e0b;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-left { display: flex; flex-direction: column; gap: 2px; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); overflow: hidden;
+      display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .qdiagram svg { max-width: 100%; height: auto; display: block; }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap, .subj-divider { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { border: 1px solid #ccc !important; background: #fff !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>UTMEDaily · GrantApp AI — UTME Sprint 2 (2026)</h1>
+  <p class="ph-meta">40 Questions · 30 Minutes · English · Chemistry · Physics · Mathematics</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">UTMEDaily · GrantApp AI</span>
+      <span class="hdr-title">UTME Sprint 2 — 2026</span>
+      <span class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 40 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#x2B07; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>40</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">40</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#x23F1;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">&#x2014;</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#x2B07; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── WATERMARK ── */
+(function() {
+  var wm = document.getElementById('watermark');
+  if (!wm) return;
+  var tile = 'GrantApp AI \u00b7 UTME Sprint 2 \u00b7 ';
+  var row = ''; for (var r = 0; r < 8; r++) row += tile;
+  var html = ''; for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+  wm.innerHTML = html;
+  var pd = document.getElementById('print-date');
+  if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric'
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   SVG DIAGRAMS (unchanged from Sprint 1 – kept for consistency but not used in Sprint 2)
+   ══════════════════════════════════════════════════════════════ */
+var DIAGRAMS = {};
+
+/* ══════════════════════════════════════════════════════════════
+   QUESTIONS — UTME SPRINT 2 (fully replaced)
+   ══════════════════════════════════════════════════════════════ */
+const QUESTIONS = [
+  // ENGLISH 1–12
+  { id: 1, subj: 'English', topic: 'Comprehension', text: 'Choose the option closest in meaning to the underlined word: "The magistrate delivered a <u>laconic</u> reply to the lengthy petition."', opts: { A: 'brief and direct', B: 'emotionally charged', C: 'carefully elaborate', D: 'formally structured' }, ans: 'A', exp: 'Laconic means using very few words; brief and direct. It derives from the Laconians (Spartans), famous for terse speech. The other options describe qualities unrelated to brevity.' },
+  { id: 2, subj: 'English', topic: 'Lexis & Structure', text: '"If either the lecturer or his students _____ absent, the class is cancelled." Choose the correct verb.', opts: { A: 'is', B: 'are', C: 'was', D: 'have been' }, ans: 'B', exp: 'With "either … or", the verb agrees with the noun closest to it (proximity rule). "Students" is plural, so "are" is correct. "Is" would be correct if "students" and "lecturer" were swapped.' },
+  { id: 3, subj: 'English', topic: 'Oral English', text: 'Which of the following words has stress on the SECOND syllable?', opts: { A: '"photograph"', B: '"cinema"', C: '"machine"', D: '"beautiful"' }, ans: 'C', exp: '"Machine" is stressed on the second syllable: /məˈʃiːn/. "Photograph", "cinema", and "beautiful" all carry primary stress on the first syllable.' },
+  { id: 4, subj: 'English', topic: 'Lexis & Structure', text: '"The committee _____ divided on the issue, each member holding a firm position." Select the correct form.', opts: { A: 'is', B: 'was', C: 'has been', D: 'were' }, ans: 'D', exp: 'When members of a collective noun act individually (signalled here by "each member"), British usage requires a plural verb: "were". "Was" treats the committee as a single unit acting unanimously.' },
+  { id: 5, subj: 'English', topic: 'Comprehension', text: '"The professor\'s tone throughout the lecture was unmistakably <u>didactic</u>." This means she was:', opts: { A: 'moralistic and instructional', B: 'hostile toward the class', C: 'ambiguous in delivery', D: 'overly defensive in manner' }, ans: 'A', exp: 'Didactic (from Greek didaktikos) means intended to teach or moralise. It describes content or tone designed to instruct, often with an ethical dimension. The other options carry no teaching connotation.' },
+  { id: 6, subj: 'English', topic: 'Oral English', text: 'In which of the following words does the underlined section represent a NASAL consonant?', opts: { A: '"ba<u>th</u>"', B: '"kni<u>gh</u>t"', C: '"si<u>ng</u>"', D: '"le<u>dge</u>"' }, ans: 'C', exp: 'The "ng" in "sing" represents the velar nasal /ŋ/, one of three nasal consonants in English (/m/, /n/, /ŋ/). "th" in "bath" is the voiceless fricative /θ/; "gh" in "knight" is silent; "dge" in "ledge" is /dʒ/.' },
+  { id: 7, subj: 'English', topic: 'Lexis & Structure', text: '"Time is a thief that steals our youth." The figure of speech used here is:', opts: { A: 'simile', B: 'hyperbole', C: 'personification', D: 'metaphor' }, ans: 'D', exp: 'A metaphor directly equates two unlike things without "like" or "as". Time IS called a thief — a direct identification. A simile would say "Time is LIKE a thief". Personification gives human traits; this gives criminal traits to an abstraction, which is a metaphor.' },
+  { id: 8, subj: 'English', topic: 'Lexis & Structure', text: '"By the time the results are released, candidates _____ all hope of passing." Select the correct verb form.', opts: { A: 'would abandon', B: 'have abandoned', C: 'were abandoning', D: 'will have abandoned' }, ans: 'D', exp: '"By the time" + future reference requires the future perfect tense: "will have abandoned". This expresses an action that will be completed before a future reference point.' },
+  { id: 9, subj: 'English', topic: 'Comprehension', text: 'Choose the word most OPPOSITE in meaning to "ostentatious":', opts: { A: 'flamboyant', B: 'restrained', C: 'extravagant', D: 'theatrical' }, ans: 'B', exp: 'Ostentatious means deliberately showy or designed to impress. Its antonym is "restrained" — understated and avoiding display. Options A, C, and D are all synonyms, not antonyms.' },
+  { id: 10, subj: 'English', topic: 'Oral English', text: 'Which of the following words does NOT rhyme with "though"?', opts: { A: 'dough', B: 'rough', C: 'flow', D: 'glow' }, ans: 'B', exp: '"Rough" is pronounced /rʌf/ — the "ough" maps to the /ʌf/ sound. "Though", "dough", "flow", and "glow" all end in the /əʊ/ vowel sound. English spelling is deceptive here: same letters, different phonemes.' },
+  { id: 11, subj: 'English', topic: 'Lexis & Structure', text: '"He was penalised _____ missing the deadline and barred _____ future competitions." Select the correct prepositions.', opts: { A: 'for / in', B: 'because / of', C: 'for / from', D: 'owing to / of' }, ans: 'C', exp: '"Penalised for" indicates the reason/cause; "barred from" indicates exclusion. These are fixed collocations. "Penalised because" needs a full clause, not a gerund; "barred in" is not idiomatic.' },
+  { id: 12, subj: 'English', topic: 'Lexis & Structure', text: '"The news _____ arriving slowly from the war front, causing widespread panic." Choose the correct verb.', opts: { A: 'was', B: 'were', C: 'have been', D: 'are' }, ans: 'A', exp: '"News" is an uncountable noun that always takes a singular verb, despite ending in "s". Compare: "The news is good." Plural verbs (were, are) are a common concord trap here.' },
+
+  // CHEMISTRY 13–22
+  { id: 13, subj: 'Chemistry', topic: 'Mole Concept', text: '4.0 g of sodium hydroxide (NaOH) is dissolved in water. How many moles does this represent? (Na = 23, O = 16, H = 1)', opts: { A: '0.10 mol', B: '0.40 mol', C: '1.00 mol', D: '0.25 mol' }, ans: 'A', exp: 'Molar mass of NaOH = 23 + 16 + 1 = 40 g/mol. Moles = mass/M = 4.0/40 = 0.10 mol. A common error is dividing by 23 (sodium only) or using 4/16 (oxygen only).' },
+  { id: 14, subj: 'Chemistry', topic: 'Atomic Structure', text: 'Which set of quantum numbers (n, l, mₗ, mₛ) is INVALID for an electron?', opts: { A: '(3, 2, −2, +½)', B: '(4, 0, 0, −½)', C: '(2, 2, 0, +½)', D: '(3, 1, +1, −½)' }, ans: 'C', exp: 'The rule is l < n. For n = 2, l can only be 0 or 1. A value of l = 2 requires n ≥ 3. All other sets are valid: A has n=3, l=2 ✓; B has n=4, l=0 ✓; D has n=3, l=1 ✓.' },
+  { id: 15, subj: 'Chemistry', topic: 'Organic Chemistry', text: 'Which of the following is a PRIMARY alcohol?', opts: { A: '(CH₃)₃COH', B: 'CH₃CH(OH)CH₃', C: 'CH₃CH₂OH', D: '(CH₃)₂CHOH' }, ans: 'C', exp: 'A primary alcohol has −OH attached to a carbon bonded to only one other carbon. CH₃CH₂OH (ethanol) qualifies. A is tertiary (−OH on a carbon with three alkyl groups); B and D are both secondary.' },
+  { id: 16, subj: 'Chemistry', topic: 'Kinetics', text: 'In a second-order reaction, the concentration of reactant A is tripled. By what factor does the initial rate change?', opts: { A: '9 times', B: '3 times', C: '6 times', D: '27 times' }, ans: 'A', exp: 'For a second-order reaction: rate = k[A]². If [A] → 3[A], then rate → k(3[A])² = 9k[A]² — nine times the original rate. 3 times (option B) would be correct for a first-order reaction.' },
+  { id: 17, subj: 'Chemistry', topic: 'Periodic Table', text: 'Which Period 3 oxide dissolves in water to form a STRONGLY ACIDIC solution?', opts: { A: 'Na₂O', B: 'SO₃', C: 'MgO', D: 'Al₂O₃' }, ans: 'B', exp: 'SO₃ + H₂O → H₂SO₄ (sulphuric acid), a strong acid. Na₂O gives NaOH (strong base). MgO gives Mg(OH)₂ (weak base). Al₂O₃ is amphoteric and barely dissolves in water.' },
+  { id: 18, subj: 'Chemistry', topic: 'Electrochemistry', text: 'A current of 2 A is passed through aqueous CuSO₄ for 96,500 s. How many moles of copper are deposited? (F = 96,500 C mol⁻¹; Cu²⁺ + 2e⁻ → Cu)', opts: { A: '2.0 mol', B: '1.0 mol', C: '0.5 mol', D: '4.0 mol' }, ans: 'B', exp: 'Charge Q = It = 2 × 96,500 = 193,000 C. Moles of electrons = 193,000/96,500 = 2 mol. Since Cu requires 2 mol e⁻ per mol, moles of Cu = 2/2 = 1.0 mol. Picking 2.0 mol ignores the 2-electron requirement.' },
+  { id: 19, subj: 'Chemistry', topic: 'Equilibrium', text: 'For the reaction 2SO₂(g) + O₂(g) ⇌ 2SO₃(g), select the correct expression for Kc.', opts: { A: 'Kc = [SO₃] / ([SO₂][O₂])', B: 'Kc = [SO₂]²[O₂] / [SO₃]²', C: 'Kc = [SO₃]² / ([SO₂][O₂])', D: 'Kc = [SO₃]² / ([SO₂]²[O₂])' }, ans: 'D', exp: 'Kc = [products]^stoich / [reactants]^stoich = [SO₃]² / ([SO₂]²[O₂]). Option C omits the exponent on [SO₂]. Option B inverts products and reactants. Option A ignores all stoichiometric exponents.' },
+  { id: 20, subj: 'Chemistry', topic: 'Energetics', text: 'Given: (1) C + O₂ → CO₂, ΔH = −394 kJ/mol; and (2) CO + ½O₂ → CO₂, ΔH = −283 kJ/mol. Calculate ΔH for: C + ½O₂ → CO.', opts: { A: '−394 kJ/mol', B: '−111 kJ/mol', C: '+111 kJ/mol', D: '−677 kJ/mol' }, ans: 'B', exp: 'Target = (1) − (2): ΔH = −394 − (−283) = −394 + 283 = −111 kJ/mol. Option D wrongly adds both values. Option C has the correct magnitude but wrong sign — partial combustion of carbon is still exothermic.' },
+  { id: 21, subj: 'Chemistry', topic: 'Acids, Bases & Salts', text: 'Which of the following mixtures constitutes a BASIC buffer solution?', opts: { A: 'Equal volumes of HCl and NaCl', B: 'Excess NaOH added to HCl', C: 'Equal amounts of CH₃COOH and CH₃COONa', D: 'Equal amounts of NH₃ and NH₄Cl' }, ans: 'D', exp: 'A basic buffer contains a weak base and its conjugate acid salt. NH₃ (weak base) + NH₄Cl (its salt) fits this. Option C is an ACIDIC buffer (weak acid + its salt). Options A and B are not buffers at all.' },
+  { id: 22, subj: 'Chemistry', topic: 'Organic Chemistry', text: 'Propan-1-ol and methoxyethane share the molecular formula C₃H₈O but have different functional groups. They are examples of:', opts: { A: 'chain isomers', B: 'position isomers', C: 'functional group isomers', D: 'geometric isomers' }, ans: 'C', exp: 'Functional group isomers have the same molecular formula but different functional groups (here: −OH vs −O−). Position isomers share a functional group but differ in its location on the chain. Chain isomers differ in the carbon skeleton.' },
+
+  // PHYSICS 23–32
+  { id: 23, subj: 'Physics', topic: 'Projectile Motion', text: 'A stone is projected horizontally from a cliff 20 m high. How long does it take to reach the ground? (g = 10 m/s²)', opts: { A: '2.0 s', B: '4.0 s', C: '1.4 s', D: '0.5 s' }, ans: 'A', exp: 'Only gravity acts vertically. Using h = ½gt²: 20 = ½(10)t² → t² = 4 → t = 2.0 s. The horizontal velocity has no effect on vertical fall time. Option C (≈√2) is the error from using h=gt² without the ½.' },
+  { id: 24, subj: 'Physics', topic: 'Thermal Physics', text: 'A gas occupies 3.0 L at 27°C and constant pressure. What volume does it occupy at 127°C?', opts: { A: '6.0 L', B: '2.25 L', C: '4.0 L', D: '1.5 L' }, ans: 'C', exp: 'Charles\' Law: V₁/T₁ = V₂/T₂ (T in Kelvin). T₁ = 300 K, T₂ = 400 K. V₂ = 3.0 × 400/300 = 4.0 L. A common error is using °C directly: 3 × 127/27 ≈ 14 L, which is physically unreasonable.' },
+  { id: 25, subj: 'Physics', topic: 'Electricity', text: 'A resistor of 4 Ω carries a current of 3 A. The power dissipated is:', opts: { A: '4 W', B: '9 W', C: '36 W', D: '48 W' }, ans: 'C', exp: 'P = I²R = (3)² × 4 = 9 × 4 = 36 W. Option B is just I² without R; option D uses P = IV with V = IR = 12, but V×I = 12×3=36 also gives 36 — confirming C. Option D would require a 4-Ω resistor carrying 3.46 A.' },
+  { id: 26, subj: 'Physics', topic: 'Waves', text: 'Two coherent waves of equal amplitude A arrive at a point EXACTLY IN PHASE. The resultant amplitude is:', opts: { A: '2A', B: 'A', C: 'A/2', D: 'zero' }, ans: 'A', exp: 'Constructive interference occurs when phase difference = 0° (or multiples of 2π). The amplitudes add directly: A + A = 2A. Option D (zero) is destructive interference, which occurs when waves are 180° out of phase.' },
+  { id: 27, subj: 'Physics', topic: 'Optics', text: 'Light travels from glass (n = 1.5) into air (n = 1.0). The sine of the critical angle is:', opts: { A: '1.5', B: '0.89', C: '2/3', D: '1/√2' }, ans: 'C', exp: 'sin θ_c = n₂/n₁ = 1.0/1.5 = 2/3 ≈ 0.667. Option A (1.5) would give sin > 1, which is impossible. Option D (1/√2 ≈ 0.707) corresponds to 45°, the critical angle for a hypothetical medium. Option B ≈ sin 63° — no physical basis here.' },
+  { id: 28, subj: 'Physics', topic: 'Nuclear Physics', text: 'Identify particle X in the nuclear equation: ²³⁸₉₂U → ²³⁴₉₀Th + X', opts: { A: 'beta particle', B: 'alpha particle', C: 'gamma photon', D: 'neutron' }, ans: 'B', exp: 'Conservation: mass number 238 = 234 + 4; atomic number 92 = 90 + 2. X has A = 4, Z = 2 → ⁴₂He, the alpha particle. A beta emission changes Z by ±1 without changing A. A gamma photon has no mass or charge.' },
+  { id: 29, subj: 'Physics', topic: 'Mechanics', text: 'A 0.5 kg ball moving at 6 m/s is brought to rest in 0.1 s. The magnitude of the average braking force is:', opts: { A: '3 N', B: '0.3 N', C: '12 N', D: '30 N' }, ans: 'D', exp: 'Impulse = change in momentum: F × Δt = mΔv = 0.5 × 6 = 3 N·s. F = 3/0.1 = 30 N. Option A is the impulse itself (not the force). Option C forgets to divide by time.' },
+  { id: 30, subj: 'Physics', topic: 'Electromagnetism', text: 'Lenz\'s law states that the induced current in a conductor always:', opts: { A: 'amplifies the flux change that produced it', B: 'flows clockwise when viewed from above', C: 'is parallel to the applied magnetic field', D: 'opposes the change in magnetic flux inducing it' }, ans: 'D', exp: 'Lenz\'s law is a consequence of energy conservation: the induced current creates a magnetic field that opposes the change in flux causing it. Option A (amplification) would violate energy conservation and produce a perpetual-motion machine.' },
+  { id: 31, subj: 'Physics', topic: 'Mechanics', text: 'For a simple pendulum undergoing small oscillations, which quantity does NOT affect its period?', opts: { A: 'length of the string', B: 'mass of the bob', C: 'gravitational field strength', D: 'location on Earth\'s surface' }, ans: 'B', exp: 'T = 2π√(L/g). Period depends on string length L and local gravity g, but NOT on the mass of the bob. This is Galileo\'s isochronism. Options C and D both affect g, which does affect T.' },
+  { id: 32, subj: 'Physics', topic: 'Electricity', text: 'Two point charges of +2 μC each are placed 0.3 m apart in vacuum. The electrostatic force between them is: (k = 9 × 10⁹ N m² C⁻²)', opts: { A: '0.04 N', B: '0.40 N', C: '4.00 N', D: '40.0 N' }, ans: 'B', exp: 'F = kq₁q₂/r² = (9×10⁹)(2×10⁻⁶)²/(0.3)² = 9×10⁹ × 4×10⁻¹²/0.09 = 36×10⁻³/0.09 = 0.40 N. A common error is forgetting to square r or to convert μC to C, giving option C or D.' },
+
+  // MATHEMATICS 33–40
+  { id: 33, subj: 'Mathematics', topic: 'Surds', text: 'Simplify: (√3 + 1)(√3 − 1)', opts: { A: '4', B: '2', C: '√2', D: '3' }, ans: 'B', exp: 'Using the difference-of-squares identity: (a + b)(a − b) = a² − b². Here: (√3)² − 1² = 3 − 1 = 2. Option D (3) is the error of writing (√3)² = 3 and forgetting to subtract 1².' },
+  { id: 34, subj: 'Mathematics', topic: 'Probability', text: 'A bag contains 4 red, 3 blue, and 5 green balls. One ball is drawn at random. The probability it is NOT red is:', opts: { A: '1/3', B: '2/3', C: '5/12', D: '3/4' }, ans: 'B', exp: 'Total = 12 balls. P(red) = 4/12 = 1/3. P(not red) = 1 − 1/3 = 2/3. Option C (5/12) is the probability of drawing specifically green balls. Option A is P(red), the complement of the required event.' },
+  { id: 35, subj: 'Mathematics', topic: 'Trigonometry', text: 'Evaluate sin 60° × cos 30°.', opts: { A: '1', B: '√3/2', C: '1/2', D: '3/4' }, ans: 'D', exp: 'sin 60° = √3/2; cos 30° = √3/2. Product = (√3/2)² = 3/4. Option B is the value of each factor individually. A common error is adding instead of multiplying: sin 60° + cos 30° = √3 ≈ 1.73.' },
+  { id: 36, subj: 'Mathematics', topic: 'Sequences & Series', text: 'Find the 8th term of the arithmetic progression: 3, 7, 11, 15, …', opts: { A: '33', B: '35', C: '31', D: '29' }, ans: 'C', exp: 'Tₙ = a + (n−1)d. a = 3, d = 4. T₈ = 3 + 7 × 4 = 3 + 28 = 31. Option A (33) uses n = 8 without subtracting 1: 3 + 8×4 − 4 ≠ 33. Option B uses d = 4 but adds one extra term.' },
+  { id: 37, subj: 'Mathematics', topic: 'Coordinate Geometry', text: 'Calculate the gradient of the line that passes through the points (2, 5) and (6, 13).', opts: { A: '2', B: '4', C: '1', D: '3' }, ans: 'A', exp: 'm = (y₂ − y₁)/(x₂ − x₁) = (13 − 5)/(6 − 2) = 8/4 = 2. Option B (4) is the change in x alone; option D (3) is a common estimation error when the axis intercept is incorrectly used instead of the slope formula.' },
+  { id: 38, subj: 'Mathematics', topic: 'Mensuration', text: 'Find the volume of a cylinder with radius 7 cm and height 10 cm. (Take π = 22/7)', opts: { A: '440 cm³', B: '154 cm³', C: '1 540 cm³', D: '4 400 cm³' }, ans: 'C', exp: 'V = πr²h = (22/7) × 49 × 10 = 22 × 7 × 10 = 1 540 cm³. Option A omits r² and uses r only: π × 7 × 10 × 2 = 440. Option B is the area of the circular cross-section (πr²) without multiplying by height.' },
+  { id: 39, subj: 'Mathematics', topic: 'Algebra', text: 'Solve simultaneously: 2x + y = 7 and x − y = 2. Find the value of x.', opts: { A: '5', B: '2', C: '4', D: '3' }, ans: 'D', exp: 'Adding the two equations eliminates y: 3x = 9 → x = 3. Substituting: y = 7 − 2(3) = 1. Option A (5) is the value of x + y. Option B is the value of y. Verify: 2(3) + 1 = 7 ✓ and 3 − 1 = 2 ✓.' },
+  { id: 40, subj: 'Mathematics', topic: 'Sets', text: 'Given A = {1, 2, 3, 4} and B = {3, 4, 5, 6}, find A ∩ B.', opts: { A: '{3, 4}', B: '{1, 2, 5, 6}', C: '{1, 2, 3, 4, 5, 6}', D: '{ }' }, ans: 'A', exp: 'A ∩ B (intersection) contains only elements belonging to BOTH A and B. Only 3 and 4 appear in both sets. Option B is A △ B (symmetric difference). Option C is A ∪ B (union). Option D would be correct if the sets shared no elements.' }
+];
+
+const SECTIONS = [
+  { beforeId: 1, icon: '📝', title: 'English Language', meta: 'Questions 1–12 · Comprehension, Lexis & Structure, Oral English' },
+  { beforeId: 13, icon: '⚗️', title: 'Chemistry', meta: 'Questions 13–22 · Mole Concept, Atomic Structure, Organic, Kinetics, Equilibrium' },
+  { beforeId: 23, icon: '⚡', title: 'Physics', meta: 'Questions 23–32 · Mechanics, Thermal, Electricity, Waves, Nuclear, Optics' },
+  { beforeId: 33, icon: '📐', title: 'Mathematics', meta: 'Questions 33–40 · Surds, Probability, Trigonometry, AP, Coordinate Geometry, Mensuration' }
+];
+
+/* ── ANSWER SHUFFLE ── */
+var SHUFFLED_ANS = {};
+
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return { origKey:k, text:q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp;
+  }
+  var newOpts = {}; var newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) {
+    newOpts[lbl] = entries[idx].text;
+    if (entries[idx].origKey === q.ans) newAns = lbl;
+  });
+  return { opts: newOpts, ans: newAns };
+}
+
+/* ── STATE ── */
+var ST = { correct:0, wrong:0, answered:0, answeredIds: new Set() };
+var UA = {};
+var globalDone = false;
+var GLOBAL_SECS = 1800;
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) { var m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if      (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60)                    { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el ? el.textContent : '\u2014'; }
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var TOTAL = QUESTIONS.length;
+  var sectionMap = {};
+  SECTIONS.forEach(function(s){ sectionMap[s.beforeId] = s; });
+
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    if (sectionMap[q.id]) {
+      var s = sectionMap[q.id];
+      html += '<div class="subj-divider">'
+            + '<span class="subj-divider-icon">' + s.icon + '</span>'
+            + '<div class="subj-divider-left">'
+            +   '<span class="subj-divider-title">' + s.title + '</span>'
+            +   '<span class="subj-divider-meta">'  + s.meta  + '</span>'
+            + '</div></div>';
+    }
+    var shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    var optsHtml = '';
+    ['A','B','C','D'].forEach(function(lbl) {
+      optsHtml += '<div class="opt" data-id="' + q.id + '" data-a="' + lbl + '">'
+               +  '<span class="opt-key">' + lbl + '.</span>'
+               +  '<span class="opt-txt">' + shuffled.opts[lbl] + '</span>'
+               + '</div>';
+    });
+    html += '<div class="qcard" style="animation-delay:' + (i * 0.025) + 's">'
+          +   '<div class="qcard-top">'
+          +     '<span class="qnum">Q' + q.id + ' of ' + TOTAL + '</span>'
+          +     (q.topic ? '<span class="qtopic">' + q.topic + '</span>' : '')
+          +   '</div>'
+          +   '<div class="qtxt">' + q.text + '</div>'
+          +   '<div class="opts">' + optsHtml + '</div>'
+          +   '<button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button>'
+          +   '<div class="exp" id="exp' + q.id + '"></div>'
+          + '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid = parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="' + qid + '"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      var btn = document.querySelector('.abtn[data-qid="' + qid + '"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid = parseInt(this.dataset.qid);
+      var q = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen       = UA[qid];
+      var correctLabel = SHUFFLED_ANS[qid];
+      var ok = (chosen === correctLabel);
+      document.querySelectorAll('.opt[data-id="' + qid + '"]').forEach(function(o) {
+        o.classList.add('locked');
+        o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen)  o.classList.add('no');
+      });
+      var expEl   = document.getElementById('exp' + qid);
+      var markCls = ok ? 'pos' : 'neg';
+      var markTxt = ok ? '\u2713 Correct' : '\u2717 Incorrect \u2014 correct answer: ' + correctLabel;
+      expEl.innerHTML = '<span class="exp-mark ' + markCls + '">' + markTxt + '</span>'
+                      + (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : '');
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++;
+        ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  var TOTAL = QUESTIONS.length;
+  var left  = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent        = ST.correct;
+  document.getElementById('sc-wrong').textContent       = ST.wrong;
+  document.getElementById('sc-skip').textContent        = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent       = ST.answered + ' / ' + TOTAL + ' answered';
+  document.getElementById('m-ans').textContent          = ST.answered;
+  document.getElementById('m-left').textContent         = left;
+  document.getElementById('m-time').textContent         = getTimeDisplay();
+  document.getElementById('prog-fill').style.width      = (ST.answered / TOTAL * 100) + '%';
+}
+
+function showSubmitModal() {
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('submit-modal').classList.add('show');
+}
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() {
+  hideSubmitModal();
+  globalDone = true;
+  stopTimer();
+  document.querySelectorAll('.abtn:not([disabled])').forEach(function(b){ b.click(); });
+  showResults();
+}
+function showResults() {
+  var TOTAL = QUESTIONS.length;
+  var pct   = Math.round((ST.correct / TOTAL) * 100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className   = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function timeUp() {
+  globalDone = true;
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.style.pointerEvents = 'none'; o.classList.add('locked');
+  });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled = true; });
+  showResults();
+}
+
+function doPrint() {
+  document.getElementById('print-header').style.display = 'block';
+  window.print();
+  setTimeout(function(){ document.getElementById('print-header').style.display = 'none'; }, 1000);
+}
+
+render();
+startTimer();
+</script>
+</body>
+</html>
