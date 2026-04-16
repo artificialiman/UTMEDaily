@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>UTME Sprint 10 — The Capstone | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #f59e0b;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-left { display: flex; flex-direction: column; gap: 2px; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); overflow: hidden;
+      display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .qdiagram svg { max-width: 100%; height: auto; display: block; }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+      body::before, #watermark, .hdr, .gtimer, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip, .prog-wrap, .subj-divider { display: none !important; }
+      .exp { display: block !important; background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #333 !important; }
+      .qcard { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; margin-bottom: 20pt; page-break-inside: avoid; }
+      .opt { border: 1px solid #ccc !important; background: #fff !important; }
+      .opt.ok  { background: #e6f9f0 !important; border-color: #10b981 !important; }
+      .opt.no  { background: #fef2f2 !important; border-color: #ef4444 !important; }
+      .opt.sel { background: #f0fdf4 !important; border-color: #22c55e !important; }
+      .opt-txt { color: #000 !important; } .qtxt { color: #000 !important; }
+      .qtopic { background: #f0fdf4 !important; color: #14532d !important; border-color: #22c55e !important; }
+      .qdiagram { border: 1px solid #ccc !important; background: #fff !important; }
+      #print-header { display: block !important; text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2pt solid #000; }
+      #print-header h1 { font-size: 18pt; font-weight: 800; margin-bottom: 4pt; }
+      #print-header .ph-meta { font-size: 10pt; color: #555; margin-bottom: 4pt; }
+    }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none">
+  <h1>UTMEDaily · GrantApp AI — UTME Sprint 10 (The Capstone)</h1>
+  <p class="ph-meta">90 Questions · 30 Minutes · English(30) · Chemistry(20) · Physics(20) · Mathematics(20)</p>
+  <p class="ph-meta" id="print-date"></p>
+</div>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">UTMEDaily · GrantApp AI</span>
+      <span class="hdr-title">Sprint 10 — The Capstone</span>
+      <span class="hdr-meta">90 questions · 30 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">30:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">90</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">90</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 90 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+  <button class="submit-btn" onclick="doPrint()"
+    style="flex:0;padding:13px 16px;background:var(--card2);color:var(--ter);border:1px solid var(--sep);"
+    title="Download PDF">&#x2B07; PDF</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>90</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">90</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">30:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">&#x23F1;</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">&#x2014;</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    <button class="timeup-btn sec" onclick="doPrint()">&#x2B07; Download PDF</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+(function() {
+  var wm = document.getElementById('watermark');
+  if (wm) {
+    var tile = 'GrantApp AI · Sprint 10 · The Capstone · ';
+    var row = ''; for (var r = 0; r < 6; r++) row += tile;
+    var html = ''; for (var i = 0; i < 14; i++) html += '<span>' + row + '</span>';
+    wm.innerHTML = html;
+  }
+  var pd = document.getElementById('print-date');
+  if (pd) pd.textContent = 'Printed: ' + new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+})();
+
+// SVG DIAGRAMS for Chemistry and Physics
+var DIAGRAMS = {
+  chem_elec: '<svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Electrolysis of Brine (NaCl solution)</text><rect x="40" y="30" width="320" height="100" rx="8" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/><text x="200" y="90" text-anchor="middle" fill="rgba(232,237,245,0.35)" font-size="11">NaCl(aq)</text><rect x="60" y="25" width="12" height="110" rx="4" fill="#3b82f6" opacity="0.7"/><text x="66" y="148" text-anchor="middle" fill="#3b82f6" font-size="10">Cathode (−)</text><text x="66" y="159" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">2H⁺ + 2e⁻ → H₂↑</text><rect x="328" y="25" width="12" height="110" rx="4" fill="#f59e0b" opacity="0.7"/><text x="334" y="148" text-anchor="middle" fill="#f59e0b" font-size="10">Anode (+)</text><text x="334" y="159" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">2Cl⁻ − 2e⁻ → Cl₂↑</text></svg>',
+  chem_enthalpy: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Enthalpy Diagram — Exothermic</text><line x1="80" y1="30" x2="80" y2="110" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="80" y1="110" x2="320" y2="110" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><text x="80" y="25" text-anchor="middle" fill="var(--ter)" font-size="8">Enthalpy (H)</text><text x="320" y="115" text-anchor="middle" fill="var(--ter)" font-size="8">Reaction progress</text><circle cx="130" cy="80" r="5" fill="#EF4444"/><text x="130" y="95" text-anchor="middle" fill="#EF4444" font-size="9">Reactants</text><circle cx="270" cy="40" r="5" fill="#22c55e"/><text x="270" y="30" text-anchor="middle" fill="#22c55e" font-size="9">Products</text><line x1="130" y1="80" x2="270" y2="40" stroke="#f59e0b" stroke-width="2"/><text x="200" y="65" text-anchor="middle" fill="#f59e0b" font-size="10">ΔH = −ve</text></svg>',
+  photo_effect: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Photoelectric Effect — Einstein\'s Explanation</text><rect x="60" y="40" width="120" height="80" rx="4" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="120" y="65" text-anchor="middle" fill="#22c55e" font-size="10">Metal surface</text><text x="120" y="105" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">(photocathode)</text><path d="M30,50 L50,60" stroke="#f59e0b" stroke-width="2"/><path d="M30,65 L50,75" stroke="#f59e0b" stroke-width="2"/><path d="M30,80 L50,90" stroke="#f59e0b" stroke-width="2"/><text x="25" y="70" text-anchor="end" fill="#f59e0b" font-size="9">Light</text><circle cx="180" cy="70" r="5" fill="#EF4444"/><text x="185" y="75" fill="#EF4444" font-size="9">e⁻</text><path d="M185,70 L230,70" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3"/><text x="260" y="65" text-anchor="middle" fill="#3b82f6" font-size="9">KE = hf − φ</text></svg>',
+  transformer: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Transformer — Step-Up/Step-Down</text><rect x="80" y="40" width="240" height="70" rx="4" fill="rgba(34,197,94,0.05)" stroke="#22c55e" stroke-width="1.5"/><text x="200" y="55" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Laminated Iron Core</text><circle cx="140" cy="75" r="18" fill="none" stroke="#3b82f6" stroke-width="1.5"/><text x="140" y="80" text-anchor="middle" fill="#3b82f6" font-size="9">Nₚ</text><circle cx="260" cy="75" r="18" fill="none" stroke="#f59e0b" stroke-width="1.5"/><text x="260" y="80" text-anchor="middle" fill="#f59e0b" font-size="9">Nₛ</text><text x="200" y="125" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Vₚ/Vₛ = Nₚ/Nₛ = Iₛ/Iₚ</text></svg>',
+  ac_gen: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">AC Generator — Coil Rotating in B-field</text><circle cx="200" cy="80" r="40" fill="none" stroke="#3b82f6" stroke-width="1.5"/><text x="200" y="77" text-anchor="middle" fill="#3b82f6" font-size="10">Coil</text><text x="200" y="88" text-anchor="middle" fill="rgba(232,237,245,0.4)" font-size="8">N turns</text><line x1="100" y1="80" x2="300" y2="80" stroke="#EF4444" stroke-width="1.5"/><text x="320" y="85" fill="#EF4444" font-size="9">B-field</text><line x1="200" y1="40" x2="200" y2="10" stroke="#f59e0b" stroke-width="1.5"/><circle cx="200" cy="10" r="6" fill="none" stroke="#f59e0b" stroke-width="1.5"/><text x="200" y="5" text-anchor="middle" fill="#f59e0b" font-size="8">Slip rings</text></svg>',
+  inclined: '<svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Inclined Plane — Vector Resolution</text><polygon points="60,110 340,110 280,30" fill="rgba(34,197,94,0.05)" stroke="#22c55e" stroke-width="1.5"/><rect x="140" y="55" width="40" height="40" rx="3" fill="rgba(239,68,68,0.2)" stroke="#EF4444" stroke-width="1.5"/><text x="160" y="78" text-anchor="middle" fill="#EF4444" font-size="10">m</text><line x1="160" y1="95" x2="280" y2="95" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3"/><text x="220" y="110" text-anchor="middle" fill="#3b82f6" font-size="9">mg sinθ</text><line x1="160" y1="95" x2="160" y2="50" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/><text x="150" y="45" text-anchor="end" fill="#f59e0b" font-size="9">mg cosθ</text></svg>',
+  rhr: '<svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Right-Hand Rule — Force on Current-Carrying Wire</text><line x1="100" y1="65" x2="300" y2="65" stroke="#3b82f6" stroke-width="2"/><text x="200" y="60" text-anchor="middle" fill="#3b82f6" font-size="10">Current (I)</text><text x="200" y="80" text-anchor="middle" fill="#EF4444" font-size="10">× B-field (into page)</text><circle cx="200" cy="95" r="3" fill="#f59e0b"/><line x1="200" y1="95" x2="260" y2="110" stroke="#f59e0b" stroke-width="1.5"/><text x="265" y="115" fill="#f59e0b" font-size="9">Force (F)</text></svg>',
+  binding_curve: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="14" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="700">Binding Energy per Nucleon Curve</text><line x1="40" y1="120" x2="370" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="40" y1="20" x2="40" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><text x="30" y="70" text-anchor="middle" fill="var(--ter)" font-size="8" transform="rotate(-90,30,70)">B.E./nucleon (MeV)</text><text x="200" y="140" text-anchor="middle" fill="var(--ter)" font-size="8">Mass number (A)</text><path d="M60,110 Q120,95 160,70 Q180,60 200,58 Q220,60 240,65 Q280,80 340,100" fill="none" stroke="#22c55e" stroke-width="2.5"/><circle cx="200" cy="58" r="4" fill="#EF4444"/><text x="205" y="55" fill="#EF4444" font-size="9">Fe-56</text><text x="300" y="90" fill="rgba(232,237,245,0.5)" font-size="8">Nuclear fission</text><text x="120" y="85" fill="rgba(232,237,245,0.5)" font-size="8">Fusion</text></svg>'
+};
+
+// FULL QUESTIONS ARRAY — 90 questions as planned
+const QUESTIONS = [
+  // ENGLISH (1-30): Register, Synonyms/Antonyms in context, Comprehension
+  { id:1, subj:'English', topic:'Legal Register', text:'In the sentence "The court issued a writ of habeas corpus to compel the prisoner\'s release", the underlined term means:', opts:{ A:'a written court order to appear', B:'a demand to present a detained person before a judge', C:'an appeal against conviction', D:'a pardon from the executive' }, ans:'B', exp:'Habeas corpus (Latin: "you shall have the body") is a legal action requiring a person under arrest to be brought before a judge.' },
+  { id:2, subj:'English', topic:'Medical Register', text:'"The oncologist gave a grim prognosis after reviewing the biopsy results." The word "prognosis" means:', opts:{ A:'treatment plan', B:'likely course and outcome of the disease', C:'surgical procedure', D:'medication prescription' }, ans:'B', exp:'Prognosis is the medical forecast of the likely development and outcome of a disease.' },
+  { id:3, subj:'English', topic:'Political Register', text:'"The treaty was ratified by the senate after months of deliberation." "Ratified" means:', opts:{ A:'rejected', B:'formally approved', C:'amended', D:'proposed' }, ans:'B', exp:'Ratify means to give formal consent to a treaty, contract, or agreement, making it officially valid.' },
+  { id:4, subj:'English', topic:'Business Register', text:'"The company went into liquidation after failing to secure additional capital." Liquidation means:', opts:{ A:'expansion', B:'selling assets to pay debts and close operations', C:'merger with a competitor', D:'restructuring under new management' }, ans:'B', exp:'Liquidation is the process of winding up a company by converting assets to cash to pay creditors.' },
+  { id:5, subj:'English', topic:'Synonym', text:'"The professor\'s explanation was so abstruse that even the graduate students struggled." A synonym for "abstruse" is:', opts:{ A:'simple', B:'profound', C:'obscure', D:'shallow' }, ans:'C', exp:'Abstruse means difficult to understand; obscure or profound. "Obscure" is the closest synonym here.' },
+  { id:6, subj:'English', topic:'Antonym', text:'"Despite his gregarious nature at parties, he preferred solitude when working." An antonym for "gregarious" is:', opts:{ A:'sociable', B:'withdrawn', C:'talkative', D:'friendly' }, ans:'B', exp:'Gregarious means fond of company; sociable. Withdrawn or reserved is the opposite.' },
+  { id:7, subj:'English', topic:'Comprehension', text:'Read the passage: "Democracy is often touted as the best form of government, yet it requires an informed electorate to function properly. Voter apathy, misinformation, and low turnout undermine its ideals." The main idea is:', opts:{ A:'Democracy is always effective', B:'Democracy requires informed citizens to succeed', C:'Voters are always apathetic', D:'Misinformation is beneficial' }, ans:'B', exp:'The passage emphasizes that democracy needs an informed electorate to function.' },
+  { id:8, subj:'English', topic:'Legal Register', text:'"The plaintiff alleged that the defendant breached the contract." A "plaintiff" is:', opts:{ A:'the person being sued', B:'the person who initiates a lawsuit', C:'the judge', D:'the jury foreman' }, ans:'B', exp:'Plaintiff is the party who brings a civil lawsuit against another (the defendant).' },
+  { id:9, subj:'English', topic:'Synonym Context', text:'"The CEO\'s laconic reply suggested he was displeased with the proposal." "Laconic" means:', opts:{ A:'lengthy and detailed', B:'brief and terse', C:'angry and aggressive', D:'confused and vague' }, ans:'B', exp:'Laconic means using very few words; concise to the point of curtness.' },
+  { id:10, subj:'English', topic:'Antonym', text:'"The philanthropist was known for his magnanimous donations." An antonym for "magnanimous" is:', opts:{ A:'generous', B:'selfish', C:'benevolent', D:'altruistic' }, ans:'B', exp:'Magnanimous means very generous or forgiving. Selfish is the opposite.' },
+  { id:11, subj:'English', topic:'Comprehension', text:'Passage: "The industrial revolution transformed rural agrarian societies into urban industrial powerhouses. This shift brought unprecedented economic growth but also severe pollution and worker exploitation." The author\'s tone is:', opts:{ A:'celebratory', B:'critical', C:'balanced/neutral', D:'indifferent' }, ans:'C', exp:'The author presents both benefits (economic growth) and drawbacks (pollution, exploitation) in a balanced manner.' },
+  { id:12, subj:'English', topic:'Political Register', text:'"The ambassador was granted full plenipotentiary powers to negotiate the trade agreement." This means the ambassador:', opts:{ A:'has limited authority', B:'has full power to act independently', C:'must consult the home government constantly', D:'cannot sign any document' }, ans:'B', exp:'Plenipotentiary means having full authority to act independently on behalf of one\'s government.' },
+  { id:13, subj:'English', topic:'Synonym', text:'"The ubiquitous presence of smartphones has changed social interactions." "Ubiquitous" means:', opts:{ A:'rare', B:'everywhere', C:'expensive', D:'outdated' }, ans:'B', exp:'Ubiquitous means present, appearing, or found everywhere.' },
+  { id:14, subj:'English', topic:'Medical Register', text:'"The patient was asymptomatic for weeks before the fever appeared." Asymptomatic means:', opts:{ A:'showing severe symptoms', B:'showing no symptoms', C:'responding to treatment', D:'terminal' }, ans:'B', exp:'Asymptomatic means producing or showing no symptoms of a disease.' },
+  { id:15, subj:'English', topic:'Antonym Context', text:'"The candidate\'s mercurial temperament made him unpredictable in debates." An antonym for "mercurial" is:', opts:{ A:'volatile', B:'stable', C:'erratic', D:'fickle' }, ans:'B', exp:'Mercurial means subject to sudden changes of mood; volatile. Stable is the opposite.' },
+  { id:16, subj:'English', topic:'Business Register', text:'"The company offered its assets as collateral for the loan." Collateral means:', opts:{ A:'interest payment', B:'property pledged as security for a loan', C:'profit margin', D:'operating expense' }, ans:'B', exp:'Collateral is an asset that a borrower offers to a lender to secure a loan.' },
+  { id:17, subj:'English', topic:'Synonym', text:'"The orator\'s mellifluous voice captivated the audience." "Mellifluous" means:', opts:{ A:'harsh', B:'sweet and smooth sounding', C:'monotonous', D:'inaudible' }, ans:'B', exp:'Mellifluous means sweetly or smoothly flowing; pleasant to hear.' },
+  { id:18, subj:'English', topic:'Comprehension', text:'Passage: "Climate change poses an existential threat to coastal communities. Rising sea levels, increased storm intensity, and saltwater intrusion into aquifers are already visible consequences." The author primarily uses:', opts:{ A:'emotional appeal', B:'statistical evidence', C:'specific examples', D:'anecdotal evidence' }, ans:'C', exp:'The author lists specific consequences (rising sea levels, storm intensity, saltwater intrusion).' },
+  { id:19, subj:'English', topic:'Legal Register', text:'"The witness was held in contempt of court for refusing to answer." Contempt of court means:', opts:{ A:'admitting guilt', B:'disobedience or disrespect to a court', C:'filing an appeal', D:'requesting a mistrial' }, ans:'B', exp:'Contempt of court is behavior that defies or disrespects the authority or dignity of a court.' },
+  { id:20, subj:'English', topic:'Antonym', text:'"The soldier was cited for exemplary conduct during the mission." An antonym for "exemplary" is:', opts:{ A:'commendable', B:'deplorable', C:'outstanding', D:'admirable' }, ans:'B', exp:'Exemplary means serving as a desirable model; very good. Deplorable means deserving strong condemnation.' },
+  { id:21, subj:'English', topic:'Political Register', text:'"The president vetoed the bill, but congress overrode the veto with a two-thirds majority." To "override" means:', opts:{ A:'ignore', B:'reject the president\'s rejection', C:'amend', D:'delay' }, ans:'B', exp:'To override a veto means to pass a bill into law despite the president\'s veto, requiring a two-thirds majority.' },
+  { id:22, subj:'English', topic:'Synonym Context', text:'"The negotiations reached an impasse after three weeks of failed talks." "Impasse" means:', opts:{ A:'breakthrough', B:'deadlock', C:'agreement', D:'compromise' }, ans:'B', exp:'Impasse is a situation in which no progress is possible, especially because of disagreement; a deadlock.' },
+  { id:23, subj:'English', topic:'Medical Register', text:'"The patient suffered a febrile seizure due to high temperature." Febrile means:', opts:{ A:'cold-related', B:'fever-related', C:'head injury', D:'allergic' }, ans:'B', exp:'Febrile means relating to or characterized by fever.' },
+  { id:24, subj:'English', topic:'Antonym', text:'"The manager was known for his pragmatic approach to problem-solving." An antonym for "pragmatic" is:', opts:{ A:'practical', B:'realistic', C:'idealistic', D:'sensible' }, ans:'C', exp:'Pragmatic means dealing with things sensibly and realistically. Idealistic is the opposite — pursuing ideals rather than practical solutions.' },
+  { id:25, subj:'English', topic:'Comprehension', text:'Passage: "Artificial intelligence has surpassed human performance in specific domains like chess and Go. However, general intelligence—the ability to apply knowledge across diverse tasks—remains uniquely human." The passage suggests:', opts:{ A:'AI is superior to humans in all tasks', B:'AI excels at narrow tasks but lacks general intelligence', C:'humans are obsolete', D:'AI will soon achieve general intelligence' }, ans:'B', exp:'The passage contrasts narrow AI success with the uniquely human ability of general intelligence.' },
+  { id:26, subj:'English', topic:'Legal Register', text:'"The defendant filed an appeal after the guilty verdict." An appeal is:', opts:{ A:'a request for a new trial', B:'a request for a higher court to review the decision', C:'a confession', D:'a plea bargain' }, ans:'B', exp:'An appeal is a formal request to a higher court to review and change the decision of a lower court.' },
+  { id:27, subj:'English', topic:'Synonym', text:'"The artist\'s oeuvre includes paintings, sculptures, and installations." "Oeuvre" means:', opts:{ A:'single masterpiece', B:'the entire body of work', C:'studio', D:'gallery' }, ans:'B', exp:'Oeuvre refers to the complete works of an artist, composer, or writer.' },
+  { id:28, subj:'English', topic:'Business Register', text:'"The startup secured seed funding from angel investors." Seed funding refers to:', opts:{ A:'loan repayment', B:'initial capital for a new business', C:'stock dividends', D:'tax refund' }, ans:'B', exp:'Seed funding is the initial capital used to start a business, often from angel investors.' },
+  { id:29, subj:'English', topic:'Antonym Context', text:'"Her trenchant criticism exposed the flaws in the proposal." An antonym for "trenchant" is:', opts:{ A:'sharp', B:'incisive', C:'blunt', D:'penetrating' }, ans:'C', exp:'Trenchant means vigorous or incisive in expression; sharp. Blunt means uncompromisingly forthright but can also mean dull — here it serves as antonym.' },
+  { id:30, subj:'English', topic:'Comprehension', text:'Passage: "The invention of the printing press democratized knowledge, making books affordable and accessible. Before Gutenberg, manuscripts were hand-copied and owned only by the wealthy." The primary effect described is:', opts:{ A:'increased wealth for printers', B:'wider access to information', C:'decline of literacy', D:'rise of digital media' }, ans:'B', exp:'The passage emphasizes how printing made knowledge accessible to more people, democratizing information.' },
+
+  // CHEMISTRY (31-50): Electronic config, isotopes, qualitative analysis, dipole, equilibrium, enthalpy, electrolysis, organic, heavy water
+  { id:31, subj:'Chemistry', topic:'Electronic Config', text:'The electronic configuration of Chromium (Z=24) is:', opts:{ A:'[Ar] 4s² 3d⁴', B:'[Ar] 4s¹ 3d⁵', C:'[Ar] 4s² 3d⁶', D:'[Ar] 4s² 4p⁴' }, ans:'B', exp:'Cr has half-filled stability: [Ar] 4s¹ 3d⁵ (exception to Aufbau).' },
+  { id:32, subj:'Chemistry', topic:'Isotopes', text:'Chlorine has two isotopes: Cl-35 (75%) and Cl-37 (25%). The relative atomic mass is:', opts:{ A:'35.0', B:'35.5', C:'36.0', D:'37.0' }, ans:'B', exp:'(35×0.75)+(37×0.25)=26.25+9.25=35.5.' },
+  { id:33, subj:'Chemistry', topic:'Qualitative Analysis', text:'A salt gives a brick red flame test. The cation is likely:', opts:{ A:'Na⁺', B:'K⁺', C:'Ca²⁺', D:'Cu²⁺' }, ans:'C', exp:'Calcium gives brick red; sodium gives yellow; potassium gives lilac; copper gives green.' },
+  { id:34, subj:'Chemistry', topic:'Dipole Moment', text:'Which molecule has a net dipole moment?', opts:{ A:'CO₂', B:'CCl₄', C:'H₂O', D:'BF₃' }, ans:'C', exp:'Water is bent (104.5°) with polar bonds not canceling; CO₂, CCl₄, BF₃ are symmetric with zero dipole.' },
+  { id:35, subj:'Chemistry', topic:'Equilibrium', text:'For the reaction N₂(g)+3H₂(g)⇌2NH₃(g) ΔH=−92 kJ, increasing temperature will:', opts:{ A:'increase Kc', B:'decrease Kc', C:'have no effect', D:'double Kc' }, ans:'B', exp:'Exothermic reaction: heat is product. Higher T shifts left, decreasing Kc.' },
+  { id:36, subj:'Chemistry', topic:'Enthalpy', text:'Given: C(s)+O₂→CO₂ ΔH=−394 kJ; CO+½O₂→CO₂ ΔH=−283 kJ. ΔH for C+½O₂→CO is:', opts:{ A:'−111 kJ', B:'+111 kJ', C:'−677 kJ', D:'+677 kJ' }, ans:'A', exp:'Target = (1)−(2) = −394 − (−283) = −111 kJ/mol.' },
+  { id:37, subj:'Chemistry', diagram:true, topic:'Electrolysis', text:'During electrolysis of concentrated NaCl(aq), the product at the anode is:', opts:{ A:'H₂', B:'O₂', C:'Cl₂', D:'Na' }, ans:'C', exp:'High [Cl⁻] causes preferential discharge: 2Cl⁻ → Cl₂ + 2e⁻.' },
+  { id:38, subj:'Chemistry', topic:'Organic', text:'Bromine water is decolorized by which compound?', opts:{ A:'Hexane', B:'Benzene', C:'Ethene', D:'Ethanol' }, ans:'C', exp:'Alkenes (C=C) decolorize bromine water via addition reaction. Alkanes and benzene do not.' },
+  { id:39, subj:'Chemistry', topic:'Heavy Water', text:'Heavy water (D₂O) is used in nuclear reactors as a:', opts:{ A:'coolant only', B:'moderator', C:'fuel', D:'control rod' }, ans:'B', exp:'Heavy water slows down neutrons (moderator) without absorbing many, enabling natural uranium reactors.' },
+  { id:40, subj:'Chemistry', topic:'Electronic Config', text:'Which set of quantum numbers (n,l,mₗ,mₛ) is valid?', opts:{ A:'(3,3,0,+½)', B:'(2,2,−1,−½)', C:'(3,2,−2,+½)', D:'(4,0,1,+½)' }, ans:'C', exp:'n=3,l=2 (d-orbital), mₗ=−2 valid; l must be < n, so C is correct.' },
+  { id:41, subj:'Chemistry', topic:'Qualitative Analysis', text:'Adding AgNO₃ to a solution gives a white precipitate soluble in dilute NH₃. The anion is:', opts:{ A:'Cl⁻', B:'Br⁻', C:'I⁻', D:'SO₄²⁻' }, ans:'A', exp:'AgCl is white, soluble in dilute NH₃; AgBr is pale yellow, soluble in conc. NH₃; AgI is yellow, insoluble.' },
+  { id:42, subj:'Chemistry', topic:'Dipole Moment', text:'The molecule with the highest dipole moment among the following is:', opts:{ A:'NH₃', B:'NF₃', C:'H₂O', D:'CH₄' }, ans:'C', exp:'Water has strong dipole (1.85 D) due to bent shape and O-H polarity; NH₃ (1.47 D), NF₃ (0.24 D).' },
+  { id:43, subj:'Chemistry', topic:'Equilibrium', text:'A catalyst increases reaction rate by:', opts:{ A:'increasing ΔH', B:'lowering activation energy', C:'shifting equilibrium', D:'increasing temperature' }, ans:'B', exp:'Catalyst provides alternative pathway with lower Ea, increasing rate without affecting equilibrium.' },
+  { id:44, subj:'Chemistry', topic:'Enthalpy', text:'An endothermic reaction has ΔH:', opts:{ A:'positive', B:'negative', C:'zero', D:'undefined' }, ans:'A', exp:'Endothermic absorbs heat from surroundings, so ΔH > 0.' },
+  { id:45, subj:'Chemistry', diagram:true, topic:'Electrolysis', text:'In electrolysis of CuSO₄ using copper electrodes, the mass of the anode:', opts:{ A:'increases', B:'decreases', C:'remains constant', D:'first increases then decreases' }, ans:'B', exp:'Anode (Cu) oxidizes to Cu²⁺, so its mass decreases. Cathode gains mass.' },
+  { id:46, subj:'Chemistry', topic:'Organic', text:'The functional group in carboxylic acids is:', opts:{ A:'-OH', B:'-CHO', C:'-COOH', D:'-COO-' }, ans:'C', exp:'Carboxyl group -COOH characterizes carboxylic acids.' },
+  { id:47, subj:'Chemistry', topic:'Isotopes', text:'The number of neutrons in an atom of U-235 is:', opts:{ A:'92', B:'143', C:'235', D:'327' }, ans:'B', exp:'Neutrons = mass number − atomic number = 235 − 92 = 143.' },
+  { id:48, subj:'Chemistry', topic:'Boiling Points', text:'Which has the highest boiling point?', opts:{ A:'CH₄', B:'H₂O', C:'H₂S', D:'HCl' }, ans:'B', exp:'Water has strong hydrogen bonding, giving unusually high boiling point compared to other hydrides.' },
+  { id:49, subj:'Chemistry', topic:'Arrhenius', text:'According to Arrhenius, an acid is a substance that:', opts:{ A:'donates a proton', B:'accepts a proton', C:'donates OH⁻', D:'produces H⁺ in water' }, ans:'D', exp:'Arrhenius definition: acid produces H⁺ (or H₃O⁺) in aqueous solution.' },
+  { id:50, subj:'Chemistry', topic:'Heavy Water', text:'Heavy water differs from ordinary water in that it contains:', opts:{ A:'tritium instead of protium', B:'deuterium instead of protium', C:'oxygen-18', D:'dissolved salts' }, ans:'B', exp:'Heavy water (D₂O) contains deuterium (²H) instead of protium (¹H).' },
+
+  // PHYSICS (51-70): Modern physics, vectors, electromagnetism
+  { id:51, subj:'Physics', diagram:true, topic:'Modern', text:'In the photoelectric effect, increasing the frequency of incident light above threshold:', opts:{ A:'increases number of electrons', B:'increases maximum KE of electrons', C:'increases work function', D:'decreases stopping potential' }, ans:'B', exp:'KE_max = hf − φ. Increasing f increases KE_max linearly.' },
+  { id:52, subj:'Physics', topic:'Modern', text:'The de Broglie wavelength of an electron is given by:', opts:{ A:'λ = h/p', B:'λ = p/h', C:'λ = h/E', D:'λ = E/h' }, ans:'A', exp:'λ = h/p where p = momentum, h = Planck\'s constant.' },
+  { id:53, subj:'Physics', diagram:true, topic:'Vectors', text:'Two forces of 6 N and 8 N act at right angles. The resultant magnitude is:', opts:{ A:'2 N', B:'10 N', C:'14 N', D:'48 N' }, ans:'B', exp:'Resultant = √(6²+8²) = 10 N.' },
+  { id:54, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'The force on a charge q moving with velocity v in a magnetic field B is given by:', opts:{ A:'F = qvB', B:'F = qvB sinθ', C:'F = qE', D:'F = qv/B' }, ans:'B', exp:'Lorentz force: F = q(v × B) = qvB sinθ.' },
+  { id:55, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'A transformer with primary turns 500 and secondary turns 1000. If input voltage is 120 V AC, output voltage is:', opts:{ A:'60 V', B:'120 V', C:'240 V', D:'480 V' }, ans:'C', exp:'Vₛ/Vₚ = Nₛ/Nₚ → Vₛ = 120 × (1000/500) = 240 V (step-up).' },
+  { id:56, subj:'Physics', topic:'Modern', text:'The binding energy per nucleon is maximum for which element?', opts:{ A:'Hydrogen', B:'Uranium', C:'Iron-56', D:'Helium' }, ans:'C', exp:'Iron-56 has the highest binding energy per nucleon (~8.8 MeV), making it most stable.' },
+  { id:57, subj:'Physics', diagram:true, topic:'Vectors', text:'A force of 10 N is applied at 30° to the horizontal. The horizontal component is:', opts:{ A:'5 N', B:'8.66 N', C:'10 N', D:'0 N' }, ans:'B', exp:'F_x = F cosθ = 10 × cos30° = 10 × 0.866 = 8.66 N.' },
+  { id:58, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'The direction of induced current is given by:', opts:{ A:'Fleming\'s left-hand rule', B:'Fleming\'s right-hand rule', C:'Right-hand grip rule', D:'Lenz\'s law' }, ans:'D', exp:'Lenz\'s law states induced current opposes the change in flux that produced it.' },
+  { id:59, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'An AC generator produces a sinusoidal emf because:', opts:{ A:'magnetic field varies', B:'coil rotates at constant speed in uniform B-field', C:'commutator reverses current', D:'slip rings are used' }, ans:'B', exp:'Rotating coil in uniform B-field gives sinusoidal flux change → sinusoidal emf.' },
+  { id:60, subj:'Physics', topic:'Modern', text:'The half-life of a radioactive isotope is 10 years. After 30 years, what fraction remains?', opts:{ A:'1/2', B:'1/4', C:'1/8', D:'1/16' }, ans:'C', exp:'After 3 half-lives (30 years): (1/2)³ = 1/8 remains.' },
+  { id:61, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'Two parallel wires carrying current in the same direction will:', opts:{ A:'attract each other', B:'repel each other', C:'have no force', D:'rotate' }, ans:'A', exp:'Parallel currents attract; opposite currents repel.' },
+  { id:62, subj:'Physics', diagram:true, topic:'Modern', text:'The Compton effect demonstrates:', opts:{ A:'wave nature of light', B:'particle nature of light', C:'interference', D:'diffraction' }, ans:'B', exp:'Compton scattering (X-ray wavelength increase) supports photon particle nature.' },
+  { id:63, subj:'Physics', diagram:true, topic:'Vectors', text:'The dot product of two perpendicular vectors is:', opts:{ A:'maximum', B:'zero', C:'minimum', D:'equal to cross product' }, ans:'B', exp:'A·B = |A||B|cos90° = 0.' },
+  { id:64, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'Lenz\'s law is a consequence of:', opts:{ A:'Coulomb\'s law', B:'conservation of energy', C:'Ohm\'s law', D:'Gauss\'s law' }, ans:'B', exp:'Lenz\'s law ensures energy conservation — induced current opposes change.' },
+  { id:65, subj:'Physics', topic:'Modern', text:'The threshold frequency for photoelectric emission depends on:', opts:{ A:'light intensity', B:'metal work function', C:'light wavelength', D:'incident power' }, ans:'B', exp:'Threshold frequency f₀ = φ/h, determined solely by metal\'s work function.' },
+  { id:66, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'Eddy currents are induced in:', opts:{ A:'insulators only', B:'conductors in changing B-field', C:'magnets only', D:'vacuum' }, ans:'B', exp:'Eddy currents are circulating currents induced in conductors when exposed to changing magnetic fields.' },
+  { id:67, subj:'Physics', diagram:true, topic:'Vectors', text:'The cross product A × B gives a vector:', opts:{ A:'parallel to A', B:'parallel to B', C:'perpendicular to both A and B', D:'equal to A·B' }, ans:'C', exp:'Cross product yields vector perpendicular to the plane containing A and B (right-hand rule).' },
+  { id:68, subj:'Physics', topic:'Modern', text:'X-rays are produced when high-speed electrons strike a metal target due to:', opts:{ A:'photoelectric effect', B:'Compton scattering', C:'bremsstrahlung and characteristic X-rays', D:'pair production' }, ans:'C', exp:'X-rays are produced via bremsstrahlung (braking radiation) and characteristic X-ray emission.' },
+  { id:69, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'In a step-down transformer, compared to the primary:', opts:{ A:'Vₛ > Vₚ, Iₛ < Iₚ', B:'Vₛ < Vₚ, Iₛ > Iₚ', C:'Vₛ < Vₚ, Iₛ < Iₚ', D:'Vₛ = Vₚ, Iₛ = Iₚ' }, ans:'B', exp:'Step-down: fewer secondary turns → lower voltage, higher current (power conserved).' },
+  { id:70, subj:'Physics', topic:'Modern', text:'The mass defect in a nucleus is related to:', opts:{ A:'nuclear size', B:'binding energy (E = Δmc²)', C:'radioactive decay constant', D:'atomic number' }, ans:'B', exp:'Mass defect Δm corresponds to binding energy via E = Δm·c².' },
+
+  // MATHEMATICS (71-90): Permutation & Combination, Probability, Polynomials, Trig Identities, Calculus
+  { id:71, subj:'Mathematics', topic:'Permutation', text:'How many 4-digit numbers can be formed from digits 1,2,3,4,5 without repetition?', opts:{ A:'60', B:'120', C:'24', D:'625' }, ans:'B', exp:'5P4 = 5×4×3×2 = 120.' },
+  { id:72, subj:'Mathematics', topic:'Combination', text:'A committee of 3 is to be chosen from 7 people. How many ways?', opts:{ A:'21', B:'35', C:'210', D:'42' }, ans:'B', exp:'7C3 = 7!/(3!4!) = 35.' },
+  { id:73, subj:'Mathematics', topic:'Probability', text:'A bag has 4 red, 3 blue, 5 green balls. One ball drawn. P(not blue) = ?', opts:{ A:'3/12', B:'1/4', C:'3/4', D:'5/12' }, ans:'C', exp:'Total=12, P(blue)=3/12=1/4, so P(not blue)=3/4.' },
+  { id:74, subj:'Mathematics', topic:'Probability', text:'Two dice rolled. Probability of sum 7 is:', opts:{ A:'1/6', B:'1/12', C:'5/36', D:'1/9' }, ans:'A', exp:'6 outcomes sum to 7 out of 36 → 6/36 = 1/6.' },
+  { id:75, subj:'Mathematics', topic:'Polynomials', text:'If (x−2) is a factor of x³−3x²+ax−6, find a.', opts:{ A:'5', B:'6', C:'7', D:'8' }, ans:'A', exp:'P(2)=8−12+2a−6=0 → 2a−10=0 → a=5.' },
+  { id:76, subj:'Mathematics', topic:'Polynomials', text:'The sum of roots of 2x²−5x+3=0 is:', opts:{ A:'5/2', B:'-5/2', C:'3/2', D:'-3/2' }, ans:'A', exp:'Sum = -b/a = -(-5)/2 = 5/2.' },
+  { id:77, subj:'Mathematics', topic:'Trig Identities', text:'Simplify sin²θ + cos²θ:', opts:{ A:'0', B:'1', C:'sinθ', D:'cosθ' }, ans:'B', exp:'Pythagorean identity: sin²θ + cos²θ = 1.' },
+  { id:78, subj:'Mathematics', topic:'Trig Identities', text:'If tanθ = 3/4, then sinθ = ? (θ acute)', opts:{ A:'3/5', B:'4/5', C:'5/3', D:'3/4' }, ans:'A', exp:'Right triangle: opposite=3, adjacent=4, hypotenuse=5 → sinθ=3/5.' },
+  { id:79, subj:'Mathematics', topic:'Calculus', text:'Derivative of x³ is:', opts:{ A:'3x²', B:'x²', C:'3x³', D:'x⁴/4' }, ans:'A', exp:'d/dx (xⁿ) = nxⁿ⁻¹ → d/dx (x³) = 3x².' },
+  { id:80, subj:'Mathematics', topic:'Calculus', text:'The gradient of y = x² at x=2 is:', opts:{ A:'2', B:'4', C:'8', D:'0' }, ans:'B', exp:'dy/dx = 2x, at x=2 → 4.' },
+  { id:81, subj:'Mathematics', topic:'Permutation', text:'In how many ways can the letters of "MATHS" be arranged?', opts:{ A:'60', B:'120', C:'24', D:'5' }, ans:'B', exp:'5 distinct letters: 5! = 120.' },
+  { id:82, subj:'Mathematics', topic:'Probability', text:'A coin tossed 3 times. P(exactly 2 heads) = ?', opts:{ A:'1/8', B:'3/8', C:'1/2', D:'5/8' }, ans:'B', exp:'HHT,HTH,THH → 3/8.' },
+  { id:83, subj:'Mathematics', topic:'Polynomials', text:'The remainder when x³−2x²+3x−4 is divided by (x−1) is:', opts:{ A:'−2', B:'0', C:'2', D:'4' }, ans:'A', exp:'P(1)=1−2+3−4=−2.' },
+  { id:84, subj:'Mathematics', topic:'Trig Identities', text:'sin(90°−θ) equals:', opts:{ A:'sinθ', B:'cosθ', C:'−sinθ', D:'−cosθ' }, ans:'B', exp:'Cofunction identity: sin(90°−θ) = cosθ.' },
+  { id:85, subj:'Mathematics', topic:'Calculus', text:'The stationary point of y = x²−4x+3 is a:', opts:{ A:'maximum', B:'minimum', C:'point of inflection', D:'saddle point' }, ans:'B', exp:'dy/dx = 2x−4=0 → x=2. d²y/dx²=2>0 → minimum.' },
+  { id:86, subj:'Mathematics', topic:'Combination', text:'Number of ways to choose a president, vice-president, secretary from 10 people:', opts:{ A:'720', B:'120', C:'1000', D:'7200' }, ans:'A', exp:'10P3 = 10×9×8 = 720.' },
+  { id:87, subj:'Mathematics', topic:'Probability', text:'Probability of drawing a king from a standard deck:', opts:{ A:'1/13', B:'4/52', C:'1/13', D:'All of above' }, ans:'D', exp:'4 kings out of 52 = 1/13 = 4/52.' },
+  { id:88, subj:'Mathematics', topic:'Trig Identities', text:'cos2θ equals:', opts:{ A:'cos²θ−sin²θ', B:'2cos²θ−1', C:'1−2sin²θ', D:'All of above' }, ans:'D', exp:'All three are equivalent double-angle identities.' },
+  { id:89, subj:'Mathematics', topic:'Calculus', text:'∫ 2x dx =', opts:{ A:'x² + C', B:'2x² + C', C:'x²', D:'2x + C' }, ans:'A', exp:'∫ 2x dx = x² + C.' },
+  { id:90, subj:'Mathematics', topic:'Polynomials', text:'The product of roots of 3x²−6x+9=0 is:', opts:{ A:'2', B:'3', C:'6', D:'9' }, ans:'B', exp:'Product = c/a = 9/3 = 3.' }
+];
+
+const SECTIONS = [
+  { beforeId: 1, icon: '📝', title: 'English Language', meta: '30 Questions · Register · Synonyms/Antonyms in Context · Comprehension' },
+  { beforeId: 31, icon: '⚗️', title: 'Chemistry', meta: '20 Questions · Electronic Config · Isotopes · Qualitative Analysis · Dipole · Equilibrium · Enthalpy · Electrolysis · Organic · Heavy Water' },
+  { beforeId: 51, icon: '⚡', title: 'Physics', meta: '20 Questions · Modern Physics (Photoelectric, X-rays, Binding Energy) · Vectors · Electromagnetism (Transformers, Motors, Generators, Lenz\'s Law)' },
+  { beforeId: 71, icon: '📐', title: 'Mathematics', meta: '20 Questions · Permutation & Combination · Probability · Polynomials · Trig Identities · Calculus Basics' }
+];
+
+var SHUFFLED_ANS = {};
+function shuffleArray(arr) { for (var i = arr.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var temp = arr[i]; arr[i] = arr[j]; arr[j] = temp; } return arr; }
+function buildShuffledOpts(q) {
+  var entries = [{ origKey:'A', text:q.opts.A }, { origKey:'B', text:q.opts.B }, { origKey:'C', text:q.opts.C }, { origKey:'D', text:q.opts.D }];
+  entries = shuffleArray(entries);
+  var newOpts = {}, newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) { newOpts[lbl] = entries[idx].text; if (entries[idx].origKey === q.ans) newAns = lbl; });
+  return { opts: newOpts, ans: newAns };
+}
+
+let ST = { correct:0, wrong:0, answered:0, answeredIds: new Set() };
+let UA = {};
+let globalDone = false;
+let GLOBAL_SECS = 1800;
+let timerInterval = null;
+
+function startTimer() {
+  let remaining = GLOBAL_SECS;
+  let dot = document.getElementById('gdot');
+  let txt = document.getElementById('gtime');
+  function fmt(s) { let m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(() => {
+    remaining--; txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { let el = document.getElementById('gtime'); return el ? el.textContent : '—'; }
+
+function render() {
+  let container = document.getElementById('qc');
+  let TOTAL = QUESTIONS.length;
+  let sectionMap = {};
+  SECTIONS.forEach(s => { sectionMap[s.beforeId] = s; });
+  let html = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    let q = QUESTIONS[i];
+    if (sectionMap[q.id]) {
+      let s = sectionMap[q.id];
+      html += `<div class="subj-divider"><span class="subj-divider-icon">${s.icon}</span><div class="subj-divider-left"><span class="subj-divider-title">${s.title}</span><span class="subj-divider-meta">${s.meta}</span></div></div>`;
+    }
+    let shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    let diagramHtml = '';
+    if (q.diagram) {
+      if (q.id === 37 || q.id === 45) diagramHtml = `<div class="qdiagram">${DIAGRAMS.chem_elec}</div>`;
+      else if (q.id === 36) diagramHtml = `<div class="qdiagram">${DIAGRAMS.chem_enthalpy}</div>`;
+      else if (q.id === 51 || q.id === 65) diagramHtml = `<div class="qdiagram">${DIAGRAMS.photo_effect}</div>`;
+      else if (q.id === 55 || q.id === 69) diagramHtml = `<div class="qdiagram">${DIAGRAMS.transformer}</div>`;
+      else if (q.id === 59) diagramHtml = `<div class="qdiagram">${DIAGRAMS.ac_gen}</div>`;
+      else if (q.id === 53 || q.id === 57) diagramHtml = `<div class="qdiagram">${DIAGRAMS.inclined}</div>`;
+      else if (q.id === 54 || q.id === 61) diagramHtml = `<div class="qdiagram">${DIAGRAMS.rhr}</div>`;
+      else if (q.id === 56) diagramHtml = `<div class="qdiagram">${DIAGRAMS.binding_curve}</div>`;
+    }
+    let optsHtml = '';
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="A"><span class="opt-key">A.</span><span class="opt-txt">${shuffled.opts.A}</span></div>`;
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="B"><span class="opt-key">B.</span><span class="opt-txt">${shuffled.opts.B}</span></div>`;
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="C"><span class="opt-key">C.</span><span class="opt-txt">${shuffled.opts.C}</span></div>`;
+    optsHtml += `<div class="opt" data-id="${q.id}" data-a="D"><span class="opt-key">D.</span><span class="opt-txt">${shuffled.opts.D}</span></div>`;
+    html += `<div class="qcard"><div class="qcard-top"><span class="qnum">Q${q.id} of ${TOTAL}</span>${q.topic ? `<span class="qtopic">${q.topic}</span>` : ''}</div>${diagramHtml}<div class="qtxt">${q.text}</div><div class="opts">${optsHtml}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp${q.id}"></div></div>`;
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      let qid = parseInt(this.dataset.id);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => o.classList.remove('sel'));
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      let btn = document.querySelector(`.abtn[data-qid="${qid}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      let qid = parseInt(this.dataset.qid);
+      let q = QUESTIONS.find(x => x.id === qid);
+      let chosen = UA[qid];
+      let correctLabel = SHUFFLED_ANS[qid];
+      let ok = (chosen === correctLabel);
+      document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o => {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      let expEl = document.getElementById(`exp${qid}`);
+      let markCls = ok ? 'pos' : 'neg';
+      let markTxt = ok ? '✓ Correct' : `✗ Incorrect — correct answer: ${correctLabel}`;
+      expEl.innerHTML = `<span class="exp-mark ${markCls}">${markTxt}</span>${q.exp ? `<div style="margin-top:8px">${q.exp}</div>` : ''}`;
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+function updateStats() {
+  let TOTAL = QUESTIONS.length;
+  let left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = `${ST.answered} / ${TOTAL} answered`;
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered / TOTAL * 100) + '%';
+}
+
+function showSubmitModal() { document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() { hideSubmitModal(); globalDone = true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(b => b.click()); showResults(); }
+function showResults() {
+  let TOTAL = QUESTIONS.length;
+  let pct = Math.round((ST.correct / TOTAL) * 100);
+  let scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL - ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+function timeUp() { globalDone = true; document.querySelectorAll('.opt').forEach(o => { o.style.pointerEvents = 'none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(b => b.disabled = true); showResults(); }
+function doPrint() { document.getElementById('print-header').style.display = 'block'; window.print(); setTimeout(() => { document.getElementById('print-header').style.display = 'none'; }, 1000); }
+
+render();
+startTimer();
+</script>
+</body>
+</html>
