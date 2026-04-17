@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Cybersecurity — Paper 1 | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0A0E1A;
+      --card:   #111827;
+      --card2:  #161E2E;
+      --text:   #E8EDF5;
+      --sec:    rgba(232,237,245,0.75);
+      --ter:    rgba(232,237,245,0.45);
+      --accent: #22c55e;
+      --accent2:#16a34a;
+      --warn:   #22c55e;
+      --red:    #EF4444;
+      --green:  #10B981;
+      --sep:    rgba(255,255,255,0.08);
+      --hov:    rgba(255,255,255,0.05);
+      --r:      14px;
+      --mono:   'Space Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2.2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); transform-origin: center center;
+      opacity: 0.09; font-family: var(--mono); font-size: 0.95rem; font-weight: 700;
+      color: #f0eff4; letter-spacing: 0.1em; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
+    }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-left { display: flex; flex-direction: column; gap: 2px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .hdr-meta { font-size: 11px; color: var(--ter); margin-top: 1px; }
+    .hdr-greeting { font-size: 11px; color: var(--ter); background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: 0.05em; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); flex-shrink: 0; }
+    .gtimer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transition: background .3s; }
+    .gtimer-dot.warn { background: var(--warn); }
+    .gtimer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: 1px; color: var(--accent); transition: color .3s; }
+    .gtimer-txt.warn { color: var(--warn); }
+    .gtimer-txt.dang { color: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px 8px; position: relative; z-index: 1; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .sc-l { font-size: 10px; color: var(--ter); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 10px; position: relative; z-index: 1; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #qc { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); gap: 10px; }
+    .qnum { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ter); letter-spacing: 0.1em; text-transform: uppercase; }
+    .qtopic { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); color: var(--accent); letter-spacing: 0.3px; }
+    .qtxt { font-size: 15px; line-height: 1.72; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; transition: all 0.15s; }
+    .opt:hover:not(.locked) { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.05); }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok  { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no  { border-color: var(--red);   background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; width: 18px; padding-top: 1px; }
+    .opt.ok  .opt-key { color: var(--green); }
+    .opt.no  .opt-key { color: var(--red); }
+    .opt.sel .opt-key { color: var(--accent); }
+    .opt-txt { font-size: 14px; color: var(--sec); line-height: 1.55; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 10px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+    .abtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .abtn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.68; color: var(--sec); }
+    .exp.show { display: block; }
+    .exp-mark { display: inline-block; margin-bottom: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index: 200; backdrop-filter: blur(16px); display: flex; gap: 10px; align-items: center; }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-progress { font-family: var(--mono); font-size: 11px; color: var(--ter); white-space: nowrap; }
+    .timeup { position: fixed; inset: 0; z-index: 5000; background: rgba(10,14,26,0.96); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border: 1px solid var(--sep); border-radius: 20px; padding: 36px 32px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .timeup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .timeup-ttl { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .timeup-score { font-family: var(--mono); font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .timeup-score.pos { color: var(--green); } .timeup-score.neg { color: var(--red); }
+    .timeup-sub { font-size: 13px; color: var(--ter); margin-bottom: 20px; }
+    .timeup-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .tu-stat-v { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .tu-stat-v.c { color: var(--green); } .tu-stat-v.w { color: var(--red); } .tu-stat-v.s { color: var(--ter); }
+    .tu-stat-l { font-size: 10px; color: var(--ter); text-transform: uppercase; margin-top: 2px; }
+    .timeup-btn { width: 100%; padding: 13px; background: var(--accent); color: #000; font-family: var(--sans); font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+    .timeup-btn.sec { background: transparent; color: var(--ter); border: 1px solid var(--sep); font-weight: 400; font-size: 13px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--sep); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-family: var(--mono); font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .modal-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sep); font-size: 13px; color: var(--ter); }
+    .modal-row b { color: var(--text); font-family: var(--mono); }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .modal-btn.primary { background: var(--accent); color: #000; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.ghost { background: transparent; color: var(--ter); border: 1px solid var(--sep); }
+    @media (max-width: 480px) {
+      .score-strip { grid-template-columns: repeat(2,1fr); }
+      .hdr-title { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">GrantApp AI</span>
+      <span class="hdr-title">Cybersecurity · Paper 1</span>
+      <span class="hdr-meta">30 questions · 25 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">25:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v"   id="sc-total">30</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">30</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 30 answered</span>
+  <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>30</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">30</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">25:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const TOTAL = 30;
+const GLOBAL_SECS = 1500; // 25 minutes
+
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+/*
+  QUESTIONS
+  Pre-sequenced: foundational recall → logical/exception → math/model → administrative
+  Topic clusters: CIA Triad · Networking · Cryptography · Attack Taxonomy · Access Control · Malware · Web Security · Incident Response · Governance
+*/
+const QUESTIONS = [
+  // ── FOUNDATIONAL RECALL ──
+  {
+    id: 1,
+    text: "The CIA Triad in information security stands for:",
+    opts: { A:"Confidentiality, Integrity, Availability", B:"Control, Identification, Authentication", C:"Compliance, Investigation, Assessment", D:"Confidentiality, Investigation, Authorisation" },
+    ans: "A",
+    topic: "Foundations",
+    exp: "The CIA Triad is the foundational model of information security. Confidentiality ensures data is accessible only to authorised parties; Integrity ensures data is not tampered with; Availability ensures systems and data are accessible when needed."
+  },
+  {
+    id: 2,
+    text: "Which of the following best defines a vulnerability in cybersecurity?",
+    opts: { A:"A successful exploitation of a system weakness", B:"A weakness that can be exploited to cause harm", C:"An intentional backdoor placed by a developer", D:"Any software bug regardless of security impact" },
+    ans: "B",
+    topic: "Foundations",
+    exp: "A vulnerability is a weakness or flaw in a system that could be exploited by a threat actor. A threat is the potential, an exploit is the act, and a risk is the likelihood × impact. These four concepts form the basis of threat modelling."
+  },
+  {
+    id: 3,
+    text: "Authentication, authorisation, and accounting together form the security framework known as:",
+    opts: { A:"PKI", B:"CIA", C:"AAA", D:"MFA" },
+    ans: "C",
+    topic: "Access Control",
+    exp: "AAA (Authentication, Authorisation, Accounting) is a core security framework. Authentication verifies identity, authorisation determines permissions, and accounting logs what was done. RADIUS and TACACS+ are common AAA protocols."
+  },
+  {
+    id: 4,
+    text: "Which OSI layer is primarily targeted in a SYN flood attack?",
+    opts: { A:"Layer 7 — Application", B:"Layer 2 — Data Link", C:"Layer 4 — Transport", D:"Layer 3 — Network" },
+    ans: "C",
+    topic: "Networking",
+    exp: "A SYN flood exploits the TCP three-way handshake at Layer 4 (Transport). The attacker sends many SYN packets without completing the handshake, exhausting the target's connection state table."
+  },
+  {
+    id: 5,
+    text: "A firewall operating at Layer 7 of the OSI model is called:",
+    opts: { A:"Packet filtering firewall", B:"Stateful inspection firewall", C:"Application-layer gateway (proxy firewall)", D:"Circuit-level gateway" },
+    ans: "C",
+    topic: "Networking",
+    exp: "A Layer 7 (application-layer) firewall or proxy firewall inspects the actual content of traffic — HTTP headers, DNS queries, etc. Packet-filtering firewalls operate at Layer 3/4. Stateful firewalls track connection state but don't inspect payload content."
+  },
+  {
+    id: 6,
+    text: "Which of the following is a symmetric encryption algorithm?",
+    opts: { A:"RSA", B:"Diffie-Hellman", C:"ECC", D:"AES" },
+    ans: "D",
+    topic: "Cryptography",
+    exp: "AES (Advanced Encryption Standard) is a symmetric cipher — the same key is used for both encryption and decryption. RSA, Diffie-Hellman, and ECC are asymmetric (public-key) algorithms."
+  },
+  {
+    id: 7,
+    text: "A hash function is considered cryptographically secure if it satisfies which three properties?",
+    opts: { A:"Speed, reversibility, and uniqueness", B:"Pre-image resistance, second pre-image resistance, collision resistance", C:"Key length, entropy, and randomness", D:"Compression, confusion, and diffusion" },
+    ans: "B",
+    topic: "Cryptography",
+    exp: "The three requirements for a cryptographic hash: (1) Pre-image resistance — hard to reverse; (2) Second pre-image resistance — hard to find another input with the same hash; (3) Collision resistance — hard to find any two inputs with the same hash."
+  },
+  {
+    id: 8,
+    text: "Which type of malware replicates itself across a network without needing a host file?",
+    opts: { A:"Trojan horse", B:"Rootkit", C:"Virus", D:"Worm" },
+    ans: "D",
+    topic: "Malware",
+    exp: "A worm is self-replicating and spreads across networks autonomously without attaching to a host file. A virus requires a host file to propagate. A trojan disguises itself as legitimate software. A rootkit hides malicious activity in the OS."
+  },
+  {
+    id: 9,
+    text: "The attack technique where an adversary intercepts and potentially alters communications between two parties is called:",
+    opts: { A:"Replay attack", B:"Man-in-the-Middle (MitM) attack", C:"Denial of Service attack", D:"SQL injection attack" },
+    ans: "B",
+    topic: "Attack Taxonomy",
+    exp: "A Man-in-the-Middle attack positions the adversary between two communicating parties, allowing interception, reading, or modification of traffic in transit. ARP poisoning and SSL stripping are common MitM techniques."
+  },
+  {
+    id: 10,
+    text: "Which of the following best describes social engineering in cybersecurity?",
+    opts: { A:"Exploiting unpatched software vulnerabilities", B:"Brute-forcing authentication credentials", C:"Manipulating people into divulging information or taking unsafe actions", D:"Scanning networks to discover open ports" },
+    ans: "C",
+    topic: "Attack Taxonomy",
+    exp: "Social engineering exploits human psychology rather than technical flaws. Phishing, pretexting, baiting, and tailgating are all social engineering vectors. It is consistently the most effective initial access technique."
+  },
+  // ── LOGICAL / EXCEPTION ──
+  {
+    id: 11,
+    text: "HTTPS provides confidentiality in transit. Which of the following attacks does HTTPS alone NOT prevent?",
+    opts: { A:"Eavesdropping on network traffic", B:"Packet sniffing between client and server", C:"Phishing via a valid TLS certificate", D:"Decryption of data by a passive observer" },
+    ans: "C",
+    topic: "Web Security",
+    exp: "HTTPS encrypts the transport channel but does not validate the legitimacy of the site's purpose. Attackers can obtain valid TLS certificates for phishing domains, making them appear trusted. HTTPS prevents eavesdropping, not content deception."
+  },
+  {
+    id: 12,
+    text: "A penetration tester finds an open port 22 on a server. Which of the following represents the LEAST immediate concern?",
+    opts: { A:"Brute-force of weak SSH credentials", B:"Default or unchanged SSH host keys", C:"SSH version banner disclosure", D:"SSH running without public key authentication" },
+    ans: "C",
+    topic: "Attack Taxonomy",
+    exp: "Banner disclosure (version information) is an informational finding — it reveals the SSH version but does not directly enable access. Weak credentials, default keys, and password-only auth represent direct exploitation paths and are higher-severity findings."
+  },
+  {
+    id: 13,
+    text: "Which of the following is NOT a characteristic of an Advanced Persistent Threat (APT)?",
+    opts: { A:"Long dwell time inside the target network", B:"Nation-state or organised criminal backing", C:"Opportunistic, automated exploitation with no specific target", D:"Multi-stage attack kill chain" },
+    ans: "C",
+    topic: "Attack Taxonomy",
+    exp: "APTs are characterised by long-term, targeted, stealthy intrusions with specific objectives. Opportunistic automated attacks (like mass ransomware campaigns) are not APTs. The Lockheed Martin Cyber Kill Chain and MITRE ATT&CK framework both model APT behaviour."
+  },
+  {
+    id: 14,
+    text: "Encryption at rest protects data stored on disk. Which scenario would encryption at rest FAIL to protect against?",
+    opts: { A:"Physical theft of an unencrypted hard drive", B:"Ransomware encrypting files while the OS is running", C:"Shoulder surfing in a public location", D:"An attacker reading backup tapes without authorisation" },
+    ans: "B",
+    topic: "Cryptography",
+    exp: "Encryption at rest protects data when the system is off or the disk is removed. When the OS is running and the user is logged in, the encryption is already unlocked. Ransomware operates on the live, decrypted filesystem — encryption at rest does not stop it."
+  },
+  {
+    id: 15,
+    text: "Which of the following is NOT a valid defence against SQL injection?",
+    opts: { A:"Parameterised queries and prepared statements", B:"Input validation and allow-listing", C:"Using a Web Application Firewall (WAF)", D:"Encrypting the database connection with TLS" },
+    ans: "D",
+    topic: "Web Security",
+    exp: "TLS encrypts the connection channel but does nothing to prevent malicious SQL payloads from being processed by the database. SQL injection is mitigated by parameterised queries, input validation, stored procedures, and WAFs — not transport encryption."
+  },
+  // ── MODEL / ARCHITECTURE ──
+  {
+    id: 16,
+    text: "In the TCP three-way handshake, the correct sequence of flags is:",
+    opts: { A:"SYN → ACK → SYN-ACK", B:"SYN → SYN-ACK → ACK", C:"ACK → SYN → SYN-ACK", D:"SYN-ACK → SYN → ACK" },
+    ans: "B",
+    topic: "Networking",
+    exp: "TCP connection establishment: (1) Client sends SYN; (2) Server responds SYN-ACK; (3) Client completes with ACK. A SYN flood attack sends many SYNs and never sends the final ACK, leaving half-open connections."
+  },
+  {
+    id: 17,
+    text: "In asymmetric encryption, a sender encrypts a message for a recipient using:",
+    opts: { A:"The sender's private key", B:"The recipient's private key", C:"A shared symmetric session key", D:"The recipient's public key" },
+    ans: "D",
+    topic: "Cryptography",
+    exp: "In asymmetric encryption: the sender encrypts with the recipient's PUBLIC key; only the recipient's PRIVATE key can decrypt. For digital signatures, it is reversed — the sender signs with their own private key, and anyone can verify with the sender's public key."
+  },
+  {
+    id: 18,
+    text: "The Cyber Kill Chain framework, developed by Lockheed Martin, describes an intrusion in how many stages?",
+    opts: { A:"Five stages", B:"Nine stages", C:"Seven stages", D:"Ten stages" },
+    ans: "C",
+    topic: "Governance",
+    exp: "The Lockheed Martin Cyber Kill Chain has 7 stages: (1) Reconnaissance, (2) Weaponisation, (3) Delivery, (4) Exploitation, (5) Installation, (6) Command & Control, (7) Actions on Objectives. Defenders aim to break the chain at the earliest possible stage."
+  },
+  {
+    id: 19,
+    text: "In the MITRE ATT&CK framework, 'Tactics' represent:",
+    opts: { A:"Specific named malware families used in attacks", B:"The adversary's technical objective at each stage", C:"Defensive countermeasures mapped to attack steps", D:"Step-by-step procedures for a specific technique" },
+    ans: "B",
+    topic: "Governance",
+    exp: "In MITRE ATT&CK: Tactics are the 'why' (e.g., Initial Access, Persistence, Lateral Movement). Techniques are the 'how'. Sub-techniques are specific implementations. Procedures are real-world usage by specific threat actors."
+  },
+  {
+    id: 20,
+    text: "Which security model operates on the principle of 'never trust, always verify'?",
+    opts: { A:"Defense-in-Depth", B:"Zero Trust Architecture", C:"Least Privilege Model", D:"Bell-LaPadula Model" },
+    ans: "B",
+    topic: "Access Control",
+    exp: "Zero Trust Architecture (ZTA) assumes no implicit trust based on network location. Every access request is authenticated, authorised, and continuously validated regardless of whether it originates inside or outside the perimeter."
+  },
+  // ── MATH / QUANTITATIVE ──
+  {
+    id: 21,
+    text: "An AES-128 key has how many possible key combinations?",
+    opts: { A:"2¹²⁸ combinations", B:"128 × 10⁶ combinations", C:"10¹²⁸ combinations", D:"2⁶⁴ combinations" },
+    ans: "A",
+    topic: "Cryptography",
+    exp: "AES-128 uses a 128-bit key, giving 2¹²⁸ ≈ 3.4 × 10³⁸ possible keys. Brute-forcing this is computationally infeasible with classical computers. AES-256 (2²⁵⁶ keys) is considered quantum-resistant for the foreseeable future."
+  },
+  {
+    id: 22,
+    text: "A subnet mask of 255.255.255.192 (/26) divides a network into how many usable host addresses per subnet?",
+    opts: { A:"64 usable hosts", B:"30 usable hosts", C:"62 usable hosts", D:"126 usable hosts" },
+    ans: "C",
+    topic: "Networking",
+    exp: "/26 means 6 host bits. Total addresses = 2⁶ = 64. Subtract 1 network address and 1 broadcast address: 64 − 2 = 62 usable hosts per subnet. Subnetting knowledge is essential for firewall rule design and network segmentation."
+  },
+  {
+    id: 23,
+    text: "An organisation's Annual Loss Expectancy (ALE) is calculated as:",
+    opts: { A:"ALE = Asset Value × Exposure Factor", B:"ALE = Single Loss Expectancy ÷ Annualised Rate of Occurrence", C:"ALE = Single Loss Expectancy × Annualised Rate of Occurrence", D:"ALE = Threat Probability × Vulnerability Score" },
+    ans: "C",
+    topic: "Governance",
+    exp: "ALE = SLE × ARO. SLE (Single Loss Expectancy) = Asset Value × Exposure Factor. ARO is how often the loss event is expected per year. ALE drives risk-based security investment decisions — you shouldn't spend more to mitigate a risk than the ALE."
+  },
+  {
+    id: 24,
+    text: "An MD5 hash always produces an output of exactly:",
+    opts: { A:"256 bits (32 bytes)", B:"160 bits (20 bytes)", C:"128 bits (16 bytes)", D:"512 bits (64 bytes)" },
+    ans: "C",
+    topic: "Cryptography",
+    exp: "MD5 produces a 128-bit (16-byte) hash, typically displayed as a 32-character hexadecimal string. SHA-1 produces 160 bits. SHA-256 produces 256 bits. MD5 is cryptographically broken and should not be used for security purposes."
+  },
+  {
+    id: 25,
+    text: "A CVSS v3 base score of 9.8 indicates a vulnerability severity of:",
+    opts: { A:"High", B:"Medium", C:"Critical", D:"Low" },
+    ans: "C",
+    topic: "Governance",
+    exp: "CVSS v3 severity ratings: None (0.0), Low (0.1–3.9), Medium (4.0–6.9), High (7.0–8.9), Critical (9.0–10.0). A score of 9.8 is Critical. CVSS is maintained by FIRST and is the industry standard for vulnerability scoring."
+  },
+  // ── ADMINISTRATIVE / DATES & NAMES ──
+  {
+    id: 26,
+    text: "The OWASP Top 10 is a document that lists:",
+    opts: { A:"The ten most dangerous malware families of the year", B:"The ten most critical web application security risks", C:"A ranked list of ten cybersecurity frameworks", D:"The ten most exploited CVEs in a given year" },
+    ans: "B",
+    topic: "Web Security",
+    exp: "OWASP (Open Worldwide Application Security Project) publishes the Top 10, a consensus list of the most critical web application security risks. As of the 2021 edition, Broken Access Control ranks #1. It is the de facto standard for web app security awareness."
+  },
+  {
+    id: 27,
+    text: "The WannaCry ransomware attack, which affected over 200,000 systems globally, occurred in:",
+    opts: { A:"2019", B:"2015", C:"2017", D:"2021" },
+    ans: "C",
+    topic: "Governance",
+    exp: "WannaCry spread globally in May 2017, exploiting the EternalBlue vulnerability (MS17-010) in Windows SMB. EternalBlue was developed by the NSA and leaked by the Shadow Brokers. The NHS in the UK was among the most severely affected organisations."
+  },
+  {
+    id: 28,
+    text: "The principle that a user should be granted only the minimum access rights required to perform their job function is called:",
+    opts: { A:"Separation of duties", B:"Least privilege", C:"Need to know", D:"Defence in depth" },
+    ans: "B",
+    topic: "Access Control",
+    exp: "The principle of least privilege (PoLP) limits the attack surface by ensuring accounts have minimal permissions. Separation of duties distributes critical tasks across multiple people to prevent fraud. Both are foundational access control principles."
+  },
+  {
+    id: 29,
+    text: "Which Nigerian law specifically criminalises cybercrime and related offences?",
+    opts: { A:"The Data Protection Act 2023", B:"The Cybercrime (Prohibition, Prevention, etc.) Act 2015", C:"The Electronic Transactions Act 2011", D:"The NCC Consumer Code of Practice 2007" },
+    ans: "B",
+    topic: "Governance",
+    exp: "Nigeria's Cybercrime (Prohibition, Prevention, etc.) Act 2015 is the primary legislation governing cybercrimes including hacking, identity theft, phishing, and cyberterrorism. It also established ONSA's coordinating role. Penalties include fines and imprisonment."
+  },
+  {
+    id: 30,
+    text: "The POODLE attack (2014) exploited a vulnerability in which deprecated protocol?",
+    opts: { A:"TLS 1.0", B:"SSL 3.0", C:"WEP", D:"SSH 1.0" },
+    ans: "B",
+    topic: "Cryptography",
+    exp: "POODLE (Padding Oracle On Downgraded Legacy Encryption) was disclosed in October 2014 by Google researchers. It forced a downgrade to SSL 3.0 and exploited its CBC padding to decrypt secure cookies. SSL 3.0 should be disabled on all modern systems."
+  }
+];
+
+/* ── SHUFFLE OPTIONS ── */
+var SHUFFLED_ANS = {};
+
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k){ return { origKey: k, text: q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp;
+  }
+  var newOpts = {}; var newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) {
+    newOpts[lbl] = entries[idx].text;
+    if (entries[idx].origKey === q.ans) newAns = lbl;
+  });
+  return { opts: newOpts, ans: newAns };
+}
+
+/* ── STATE ── */
+var ST = { correct: 0, wrong: 0, answered: 0, answeredIds: new Set() };
+var UA = {};
+var globalDone = false;
+
+/* ── TIMER ── */
+var timerInterval = null;
+function startTimer() {
+  var remaining = GLOBAL_SECS;
+  var dot = document.getElementById('gdot');
+  var txt = document.getElementById('gtime');
+  function fmt(s) { var m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  txt.textContent = fmt(remaining);
+  timerInterval = setInterval(function() {
+    remaining--;
+    txt.textContent = fmt(remaining);
+    if (remaining <= 300 && remaining > 60) { txt.className='gtimer-txt warn'; dot.className='gtimer-dot warn'; }
+    else if (remaining <= 60) { txt.className='gtimer-txt dang'; dot.className='gtimer-dot dang'; }
+    if (remaining <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el=document.getElementById('gtime'); return el?el.textContent:'—'; }
+
+/* ── RENDER ── */
+function render() {
+  var container = document.getElementById('qc');
+  var html = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    var shuffled = buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id] = shuffled.ans;
+    var optsHtml = '';
+    ['A','B','C','D'].forEach(function(lbl) {
+      optsHtml += '<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'">' +
+        '<span class="opt-key">'+lbl+'.</span>' +
+        '<span class="opt-txt">'+shuffled.opts[lbl]+'</span>' +
+        '</div>';
+    });
+    html += '<div class="qcard" style="animation-delay:'+(i*0.03)+'s">' +
+      '<div class="qcard-top">' +
+        '<span class="qnum">Q'+q.id+' of '+TOTAL+'</span>' +
+        (q.topic?'<span class="qtopic">'+q.topic+'</span>':'') +
+      '</div>' +
+      '<div class="qtxt">'+q.text+'</div>' +
+      '<div class="opts">'+optsHtml+'</div>' +
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>' +
+      '<div class="exp" id="exp'+q.id+'"></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  attachListeners();
+}
+
+/* ── LISTENERS ── */
+function attachListeners() {
+  document.querySelectorAll('.opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (globalDone || this.classList.contains('locked')) return;
+      var qid = parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){ o.classList.remove('sel'); });
+      this.classList.add('sel');
+      UA[qid] = this.dataset.a;
+      var btn = document.querySelector('.abtn[data-qid="'+qid+'"]');
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (globalDone) return;
+      var qid = parseInt(this.dataset.qid);
+      var q = QUESTIONS.find(function(x){ return x.id === qid; });
+      var chosen = UA[qid];
+      var correctLabel = SHUFFLED_ANS[qid];
+      var ok = (chosen === correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o) {
+        o.classList.add('locked'); o.style.pointerEvents = 'none';
+        if (o.dataset.a === correctLabel) o.classList.add('ok');
+        else if (o.dataset.a === chosen) o.classList.add('no');
+      });
+      var expEl = document.getElementById('exp'+qid);
+      var markCls = ok?'pos':'neg';
+      var markTxt = ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel;
+      expEl.innerHTML = '<span class="exp-mark '+markCls+'">'+markTxt+'</span>' +
+        (q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');
+      this.disabled = true;
+      if (!ST.answeredIds.has(qid)) {
+        ST.answered++; ST.answeredIds.add(qid);
+        if (ok) ST.correct++; else ST.wrong++;
+        updateStats();
+      }
+    });
+  });
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var left = TOTAL - ST.answered;
+  document.getElementById('sc-corr').textContent = ST.correct;
+  document.getElementById('sc-wrong').textContent = ST.wrong;
+  document.getElementById('sc-skip').textContent = left;
+  document.getElementById('answered-count').textContent = ST.answered;
+  document.getElementById('sub-prog').textContent = ST.answered+' / '+TOTAL+' answered';
+  document.getElementById('m-ans').textContent = ST.answered;
+  document.getElementById('m-left').textContent = left;
+  document.getElementById('m-time').textContent = getTimeDisplay();
+  document.getElementById('prog-fill').style.width = (ST.answered/TOTAL*100)+'%';
+}
+
+/* ── SUBMIT ── */
+function showSubmitModal() { document.getElementById('m-time').textContent=getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() {
+  hideSubmitModal(); globalDone = true; stopTimer();
+  document.querySelectorAll('.abtn:not([disabled])').forEach(function(b){ b.click(); });
+  var pct = Math.round((ST.correct/TOTAL)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── TIME UP ── */
+function timeUp() {
+  globalDone = true;
+  document.querySelectorAll('.opt').forEach(function(o){ o.style.pointerEvents='none'; o.classList.add('locked'); });
+  document.querySelectorAll('.abtn').forEach(function(b){ b.disabled=true; });
+  var pct = Math.round((ST.correct/TOTAL)*100);
+  var scoreEl = document.getElementById('tu-score');
+  scoreEl.textContent = pct+'%';
+  scoreEl.className = 'timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent = ST.correct;
+  document.getElementById('tu-wr').textContent = ST.wrong;
+  document.getElementById('tu-sk').textContent = TOTAL-ST.answeredIds.size;
+  document.getElementById('tu').classList.add('show');
+}
+
+/* ── INIT ── */
+render();
+startTimer();
+</script>
+</body>
+</html>
