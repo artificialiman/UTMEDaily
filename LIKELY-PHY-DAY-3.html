@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>2026 Checklist — Physics | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0E1A; --card: #111827; --card2: #161E2E; --text: #E8EDF5;
+      --sec: rgba(232,237,245,0.75); --ter: rgba(232,237,245,0.45);
+      --accent: #22c55e; --accent2: #16a34a; --warn: #f59e0b; --red: #EF4444; --green: #10B981;
+      --sep: rgba(255,255,255,0.08); --r: 14px; --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); opacity: 0.09; font-family: var(--mono);
+      font-weight: 700; color: #f0eff4; white-space: nowrap;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); padding: 12px; text-align: center;
+    }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100; backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--accent); }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .prog-wrap { padding: 0 20px 10px; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); width: 0%; border-radius: 99px; transition: width 0.4s; }
+    #qc { padding: 8px 20px 20px; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; }
+    .qcard-top { display: flex; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); }
+    .qnum { font-family: var(--mono); font-size: 11px; color: var(--ter); }
+    .qtopic { font-size: 10px; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); color: var(--accent); }
+    .qtxt { font-size: 15px; line-height: 1.6; margin-bottom: 16px; white-space: pre-line; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no { border-color: var(--red); background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); width: 20px; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; background: var(--accent); color: #000; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; }
+    .abtn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; }
+    .exp.show { display: block; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); display: inline-block; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); display: inline-block; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); display: flex; gap: 10px; z-index: 200; backdrop-filter: blur(16px); }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 4000; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; }
+    .timeup { position: fixed; inset: 0; background: rgba(10,14,26,0.98); display: none; align-items: center; justify-content: center; z-index: 5000; }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border-radius: 20px; padding: 32px; text-align: center; max-width: 360px; }
+    @media print { body { background: white; color: black; } .hdr, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip { display: none; } .exp { display: block !important; } }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none; text-align:center; margin-bottom:20pt;"><h1>2026 UTME Checklist — Physics</h1><p>40 Questions · 30 Minutes · Mechanics · Waves · Optics · Electricity · Electromagnetism · Modern Physics</p></div>
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div><span class="hdr-brand">UTMEDaily · GrantApp AI</span><div class="hdr-title">2026 UTME Checklist — Physics</div><div class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</div></div>
+    <div class="gtimer"><span class="gtimer-txt" id="gtime">30:00</span></div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div id="qc"></div>
+<div class="submit-bar"><span class="submit-progress" id="sub-prog">0 / 40 answered</span><button class="submit-btn" onclick="showSubmitModal()">Submit & See Results</button><button class="submit-btn" onclick="doPrint()">PDF</button></div>
+<div class="modal-overlay" id="submit-modal"><div class="modal"><h3>Submit?</h3><div class="modal-row">Answered: <b id="m-ans">0</b></div><div class="modal-btns"><button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button><button class="modal-btn primary" onclick="submitQuiz()">Submit</button></div></div></div>
+<div class="timeup" id="tu"><div class="timeup-box"><div class="timeup-ttl">Time's Up!</div><div class="timeup-score" id="tu-score">0%</div><button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review</button></div></div>
+
+<script>
+(function(){ var wm=document.getElementById('watermark'); if(wm){ var tile='2026 Checklist · Physics · Mechanics · Waves · Optics · Electricity · Magnetism · Modern · '; var row=''; for(var r=0;r<8;r++) row+=tile; var html=''; for(var i=0;i<12;i++) html+='<span>'+row+'</span>'; wm.innerHTML=html; } })();
+
+// SVG Diagrams for key physics concepts
+var DIAGRAMS = {
+  transformer: '<svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"><text x="200" y="15" fill="#22c55e" font-size="12" text-anchor="middle">Transformer — Step Down (Q15)</text><rect x="80" y="35" width="240" height="60" rx="4" fill="rgba(34,197,94,0.05)" stroke="#22c55e" stroke-width="1.5"/><text x="200" y="50" text-anchor="middle" fill="var(--ter)" font-size="9">Laminated Iron Core</text><circle cx="140" cy="65" r="16" fill="none" stroke="#3b82f6" stroke-width="1.5"/><text x="140" y="70" text-anchor="middle" fill="#3b82f6" font-size="10">Nₚ=500</text><circle cx="260" cy="65" r="16" fill="none" stroke="#f59e0b" stroke-width="1.5"/><text x="260" y="70" text-anchor="middle" fill="#f59e0b" font-size="10">Nₛ=100</text><text x="200" y="100" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="9">Vₛ/Vₚ = Nₛ/Nₚ → 240V to 48V</text></svg>',
+  photoelectric: '<svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg"><text x="200" y="15" fill="#22c55e" font-size="12" text-anchor="middle">Photoelectric Effect — Threshold Frequency (Q16)</text><rect x="70" y="35" width="110" height="60" rx="4" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="125" y="55" text-anchor="middle" fill="#22c55e" font-size="10">Metal surface</text><path d="M30,50 L50,60" stroke="#f59e0b" stroke-width="2"/><path d="M30,65 L50,75" stroke="#f59e0b" stroke-width="2"/><path d="M30,80 L50,90" stroke="#f59e0b" stroke-width="2"/><text x="25" y="70" text-anchor="end" fill="#f59e0b" font-size="9">Light (f)</text><circle cx="180" cy="65" r="5" fill="#EF4444"/><text x="185" y="70" fill="#EF4444" font-size="9">e⁻</text><text x="200" y="115" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">If f < f₀ → no emission regardless of intensity</text></svg>',
+  lens: '<svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"><text x="200" y="15" fill="#22c55e" font-size="12" text-anchor="middle">Convex Lens — Object beyond 2F (Q31)</text><ellipse cx="200" cy="60" rx="25" ry="8" fill="rgba(34,197,94,0.2)" stroke="#22c55e" stroke-width="1.5"/><line x1="80" y1="60" x2="320" y2="60" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><text x="200" y="55" text-anchor="middle" fill="var(--ter)" font-size="8">Principal Axis</text><rect x="100" y="50" width="20" height="20" rx="2" fill="rgba(239,68,68,0.3)" stroke="#EF4444" stroke-width="1"/><text x="110" y="62" text-anchor="middle" fill="#EF4444" font-size="7">Object</text><rect x="250" y="70" width="15" height="10" rx="2" fill="rgba(59,130,246,0.3)" stroke="#3b82f6" stroke-width="1"/><text x="257" y="77" text-anchor="middle" fill="#3b82f6" font-size="6">Image</text><text x="200" y="105" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">Real, inverted, diminished (beyond 2F)</text></svg>'
+};
+
+// FULL PHYSICS QUESTIONS (40) as provided
+const QUESTIONS = [
+  { id:1, subj:'Physics', topic:'Work & Energy', text:'Work is done when:', opts:{ A:'A force is applied to an object without movement', B:'An object moves without any applied force', C:'A force causes displacement in the direction of the force', D:'Energy is lost due to friction only' }, ans:'C', exp:'W = F × d × cosθ. Work requires both a force AND displacement in the direction of the force. A force without movement (e.g. pushing a wall) does zero work.' },
+  { id:2, subj:'Physics', topic:'SI Units', text:'The SI unit of electric field strength is:', opts:{ A:'J/kg', B:'N/C', C:'mol/m³', D:'C/N' }, ans:'B', exp:'Electric field strength E = F/q, so its unit is N/C (newtons per coulomb), equivalent to V/m.' },
+  { id:3, subj:'Physics', topic:'SI Units', text:'Which of the following is the correct SI unit for specific heat capacity?', opts:{ A:'J/kg', B:'J·K', C:'J/kg·K', D:'kg/J·K' }, ans:'C', exp:'Specific heat capacity c = Q/(mΔT), units = J/(kg·K) = J kg⁻¹ K⁻¹.' },
+  { id:4, subj:'Physics', topic:'SI Units', text:'The unit mol/m³ is the SI unit of:', opts:{ A:'Molar mass', B:'Amount of substance', C:'Molar concentration', D:'Density' }, ans:'C', exp:'Molar concentration = moles of solute per unit volume = mol/m³ in SI base units.' },
+  { id:5, subj:'Physics', topic:'Forces', text:'A body of mass 4 kg accelerates at 5 m/s². The net force acting on it is:', opts:{ A:'0.8 N', B:'9 N', C:'20 N', D:'1.25 N' }, ans:'C', exp:'F = ma = 4 × 5 = 20 N. Newton\'s Second Law: net force equals mass multiplied by acceleration.' },
+  { id:6, subj:'Physics', topic:'Forces', text:'A block rests on a surface. The normal reaction force acting on the block is:', opts:{ A:'Equal to and in the same direction as its weight', B:'Equal in magnitude but opposite in direction to its weight', C:'Greater than its weight always', D:'The reaction of the block pushing down on the surface' }, ans:'B', exp:'For a block on a flat surface in equilibrium: Normal reaction N = mg (upward) balances weight W = mg (downward). They are equal in magnitude but opposite in direction.' },
+  { id:7, subj:'Physics', topic:'Work & Energy', text:'A force of 50 N moves an object 8 m along its line of action. The work done is:', opts:{ A:'6.25 J', B:'400 J', C:'58 J', D:'42 J' }, ans:'B', exp:'W = F × d = 50 × 8 = 400 J. This is a direct application of the work formula when force and displacement are parallel.' },
+  { id:8, subj:'Physics', topic:'Work & Energy', text:'A machine does 600 J of work in 30 seconds. Its power output is:', opts:{ A:'18 000 W', B:'630 W', C:'20 W', D:'0.05 W' }, ans:'C', exp:'Power P = Work/Time = 600/30 = 20 W. Power is the rate of doing work, measured in watts (W = J/s).' },
+  { id:9, subj:'Physics', topic:'Electromagnetism', text:'A conductor carrying current is placed in a magnetic field. The force experienced by the conductor is given by:', opts:{ A:'F = qE', B:'F = BIL sinθ', C:'F = mv²/r', D:'F = kq₁q₂/r²' }, ans:'B', exp:'The motor effect: F = BIL sinθ, where B = magnetic flux density, I = current, L = length of conductor, θ = angle between conductor and field.' },
+  { id:10, subj:'Physics', topic:'Modern Physics', text:'The energy of a photon is given by E = hf. If Planck\'s constant h = 6.63 × 10⁻³⁴ J·s and frequency f = 6 × 10¹⁴ Hz, the energy of the photon is approximately:', opts:{ A:'3.98 × 10⁻¹⁹ J', B:'3.98 × 10⁻²⁰ J', C:'9.05 × 10⁻²⁰ J', D:'1.10 × 10⁻⁴⁸ J' }, ans:'A', exp:'E = hf = 6.63×10⁻³⁴ × 6×10¹⁴ = 39.78×10⁻²⁰ = 3.98×10⁻¹⁹ J. This is in the visible light range.' },
+  { id:11, subj:'Physics', topic:'Forces', text:'A 10 kg object hangs from two strings making equal angles of 30° with the vertical. The tension in each string is: (g = 10 m/s²)', opts:{ A:'100 N', B:'57.7 N', C:'50 N', D:'86.6 N' }, ans:'B', exp:'2T cos30° = mg. T = mg/(2cos30°) = 100/(2 × 0.866) = 100/1.732 ≈ 57.7 N.' },
+  { id:12, subj:'Physics', topic:'Mechanics', text:'A car of mass 800 kg travelling at 20 m/s brakes to rest over 4 seconds. The braking force is:', opts:{ A:'4 000 N', B:'160 N', C:'3 200 N', D:'400 N' }, ans:'A', exp:'a = Δv/t = (0−20)/4 = −5 m/s². F = ma = 800 × 5 = 4 000 N (magnitude).' },
+  { id:13, subj:'Physics', topic:'Gravitational Field', text:'The gravitational potential energy of a 5 kg object at a height of 12 m above the ground is: (g = 10 m/s²)', opts:{ A:'600 J', B:'60 J', C:'17 J', D:'6000 J' }, ans:'A', exp:'GPE = mgh = 5 × 10 × 12 = 600 J.' },
+  { id:14, subj:'Physics', topic:'Electromagnetism', text:'Fleming\'s LEFT-hand rule is used to determine the direction of:', opts:{ A:'Induced EMF in a generator', B:'Force on a current-carrying conductor in a magnetic field', C:'Current direction in a transformer', D:'Magnetic field around a solenoid' }, ans:'B', exp:'Fleming\'s Left-hand rule (FBI rule) applies to the MOTOR effect: thumb = Force, index = B field, middle finger = current.' },
+  { id:15, subj:'Physics', diagram:true, topic:'Electromagnetism', text:'A transformer has 500 turns in its primary coil and 100 turns in its secondary coil. If the primary voltage is 240 V, the secondary voltage is:', opts:{ A:'1200 V', B:'48 V', C:'24 V', D:'2400 V' }, ans:'B', exp:'Vs/Vp = Ns/Np → Vs = 240 × (100/500) = 240 × 0.2 = 48 V. This is a step-down transformer.' },
+  { id:16, subj:'Physics', diagram:true, topic:'Modern Physics', text:'In the photoelectric effect, no electrons are emitted regardless of intensity if:', opts:{ A:'The light is polarised', B:'The frequency of light is below the threshold frequency', C:'The metal surface is positively charged', D:'The light source is too far away' }, ans:'B', exp:'Below threshold frequency f₀, photons lack sufficient energy to overcome the work function. Increasing intensity does not help — each photon still has insufficient energy.' },
+  { id:17, subj:'Physics', topic:'Waves', text:'Which of the following correctly distinguishes TRANSVERSE from LONGITUDINAL waves?', opts:{ A:'Transverse waves require a medium; longitudinal waves do not', B:'In transverse waves, displacement is perpendicular to wave direction; in longitudinal, it is parallel', C:'Longitudinal waves have higher frequency than transverse waves', D:'Transverse waves cannot be reflected or refracted' }, ans:'B', exp:'Transverse waves: displacement ⊥ propagation (light, water). Longitudinal: displacement ∥ propagation (sound).' },
+  { id:18, subj:'Physics', topic:'Heat', text:'Which process of heat transfer does NOT require a medium?', opts:{ A:'Conduction', B:'Convection', C:'Radiation', D:'All require a medium' }, ans:'C', exp:'Radiation transfers heat via electromagnetic waves (infrared) and can travel through a vacuum (e.g. heat from the sun).' },
+  { id:19, subj:'Physics', topic:'Electricity', text:'Ohm\'s Law states that, at constant temperature, the current through a conductor is:', opts:{ A:'Inversely proportional to the voltage across it', B:'Directly proportional to the voltage across it', C:'Independent of the voltage across it', D:'Equal to the resistance of the conductor' }, ans:'B', exp:'V = IR → I = V/R. At constant temperature and resistance, I ∝ V.' },
+  { id:20, subj:'Physics', topic:'Optics', text:'Total internal reflection occurs when:', opts:{ A:'Light travels from a less dense to a more dense medium at any angle', B:'Light strikes a mirror at 90°', C:'Light travels from a denser medium and hits the boundary at an angle greater than the critical angle', D:'The angle of incidence equals the angle of refraction' }, ans:'C', exp:'TIR requires: (1) light in denser medium, (2) angle of incidence > critical angle.' },
+  { id:21, subj:'Physics', topic:'Mechanics', text:'A ball is dropped from rest and falls freely for 3 seconds. The distance fallen is: (g = 10 m/s²)', opts:{ A:'30 m', B:'45 m', C:'90 m', D:'15 m' }, ans:'B', exp:'s = ut + ½gt² = 0 + ½(10)(3²) = 5 × 9 = 45 m.' },
+  { id:22, subj:'Physics', topic:'Electricity', text:'Three identical resistors each of 6 Ω are connected in series. The total resistance is:', opts:{ A:'2 Ω', B:'18 Ω', C:'6 Ω', D:'3 Ω' }, ans:'B', exp:'Series: Rₜ = R₁ + R₂ + R₃ = 6 + 6 + 6 = 18 Ω.' },
+  { id:23, subj:'Physics', topic:'Pressure', text:'A liquid column of height 0.5 m exerts a pressure of: (density = 1000 kg/m³, g = 10 m/s²)', opts:{ A:'5 000 Pa', B:'500 Pa', C:'50 Pa', D:'50 000 Pa' }, ans:'A', exp:'P = ρgh = 1000 × 10 × 0.5 = 5 000 Pa.' },
+  { id:24, subj:'Physics', topic:'Modern Physics', text:'In radioactive decay, a beta-minus (β⁻) particle is:', opts:{ A:'A helium nucleus emitted from the nucleus', B:'A high-energy photon released from the nucleus', C:'An electron emitted when a neutron decays into a proton', D:'A positron emitted from the nucleus' }, ans:'C', exp:'β⁻ decay: n → p + e⁻ + v̄ₑ. A neutron converts to a proton, emitting an electron (β⁻).' },
+  { id:25, subj:'Physics', topic:'Mechanics', text:'The momentum of a 0.5 kg ball moving at 12 m/s is:', opts:{ A:'24 kg·m/s', B:'6 kg·m/s', C:'0.042 kg·m/s', D:'12 kg·m/s' }, ans:'B', exp:'Momentum p = mv = 0.5 × 12 = 6 kg·m/s.' },
+  { id:26, subj:'Physics', topic:'Electromagnetism', text:'The phenomenon by which a changing magnetic flux induces an EMF in a conductor is called:', opts:{ A:'The motor effect', B:'Electromagnetic induction', C:'Electrolysis', D:'The Hall effect' }, ans:'B', exp:'Faraday\'s Law: EMF = −dΦ/dt. Changing magnetic flux induces EMF — principle of generators and transformers.' },
+  { id:27, subj:'Physics', topic:'Heat', text:'During a change of state (e.g. melting), temperature remains constant because:', opts:{ A:'No heat energy is being supplied', B:'Heat energy is used to break intermolecular bonds, not to raise temperature', C:'The substance loses heat to the surroundings', D:'Kinetic energy of molecules decreases during melting' }, ans:'B', exp:'The heat supplied (latent heat) overcomes intermolecular forces, not increasing kinetic energy — so temperature stays constant.' },
+  { id:28, subj:'Physics', topic:'Waves', text:'Which of the following is NOT a property of electromagnetic waves?', opts:{ A:'They travel at 3 × 10⁸ m/s in a vacuum', B:'They are transverse waves', C:'They require a medium for propagation', D:'They carry energy but no mass' }, ans:'C', exp:'EM waves do NOT require a medium — they propagate through a vacuum, unlike mechanical waves.' },
+  { id:29, subj:'Physics', topic:'Mechanics', text:'The principle of conservation of momentum states that:', opts:{ A:'Momentum is always zero in a closed system', B:'The total momentum of a closed system remains constant if no external force acts on it', C:'Momentum is conserved only in elastic collisions', D:'Force and momentum are always equal' }, ans:'B', exp:'Conservation of momentum: Σp(before) = Σp(after) for any collision in a closed system (no external forces).' },
+  { id:30, subj:'Physics', topic:'Electricity', text:'A charge of 30 C flows through a circuit in 5 seconds. The current is:', opts:{ A:'150 A', B:'25 A', C:'6 A', D:'0.17 A' }, ans:'C', exp:'I = Q/t = 30/5 = 6 A. Current is the rate of flow of charge.' },
+  { id:31, subj:'Physics', diagram:true, topic:'Optics', text:'A real, inverted, and diminished image is formed by a convex lens when the object is placed:', opts:{ A:'At the focal point F', B:'Between F and the optical centre', C:'Beyond 2F', D:'Between F and 2F' }, ans:'C', exp:'Object beyond 2F → image between F and 2F: real, inverted, diminished. This is how a camera lens works.' },
+  { id:32, subj:'Physics', topic:'Pressure', text:'Archimedes\' principle states that an object immersed in a fluid experiences an upthrust equal to:', opts:{ A:'The weight of the object', B:'The volume of the object multiplied by g', C:'The weight of fluid displaced by the object', D:'The pressure at the base of the object' }, ans:'C', exp:'Upthrust = weight of fluid displaced = ρ_fluid × V_submerged × g.' },
+  { id:33, subj:'Physics', topic:'Heat', text:'The specific latent heat of vaporisation is always GREATER than the specific latent heat of fusion for the same substance because:', opts:{ A:'More heat is needed to melt a solid than to boil a liquid', B:'Vaporisation requires complete separation of molecules against stronger intermolecular forces over a greater distance', C:'Fusion occurs at lower temperature', D:'The gas phase has lower energy than the liquid phase' }, ans:'B', exp:'Vaporisation fully separates molecules, requiring much more energy. For water: Lf = 334 kJ/kg, Lv = 2260 kJ/kg.' },
+  { id:34, subj:'Physics', topic:'Electromagnetism', text:'Which of the following statements about a solenoid is CORRECT?', opts:{ A:'A solenoid produces a non-uniform magnetic field inside its core', B:'The magnetic field inside a solenoid is approximately uniform and parallel to the axis', C:'Increasing the number of turns decreases the magnetic field strength', D:'A solenoid only works with alternating current' }, ans:'B', exp:'A solenoid produces a strong, approximately uniform magnetic field inside — field strength B = μ₀nI.' },
+  { id:35, subj:'Physics', topic:'Modern Physics', text:'Which series of the hydrogen emission spectrum falls in the VISIBLE light region?', opts:{ A:'Lyman series', B:'Paschen series', C:'Balmer series', D:'Brackett series' }, ans:'C', exp:'Balmer series (transitions to n=2) produces visible light (400–700 nm). Lyman = UV, Paschen/Brackett = infrared.' },
+  { id:36, subj:'Physics', topic:'Mechanics', text:'An object moves in a circle at constant speed. Which statement is TRUE?', opts:{ A:'The object has zero acceleration', B:'The velocity is constant', C:'The centripetal acceleration is directed toward the centre of the circle', D:'No force is needed to maintain circular motion' }, ans:'C', exp:'In circular motion, speed constant but velocity direction changes — centripetal acceleration a = v²/r, directed inward.' },
+  { id:37, subj:'Physics', topic:'Electricity', text:'The energy dissipated by a 4 Ω resistor carrying 3 A for 10 seconds is:', opts:{ A:'120 J', B:'360 J', C:'90 J', D:'1440 J' }, ans:'B', exp:'E = I²Rt = (3)² × 4 × 10 = 9 × 40 = 360 J.' },
+  { id:38, subj:'Physics', topic:'Waves', text:'Resonance occurs when:', opts:{ A:'A wave is completely absorbed by a medium', B:'The frequency of an applied force equals the natural frequency of the system', C:'Two waves of different frequencies overlap', D:'The amplitude of a wave decreases with distance' }, ans:'B', exp:'Resonance: maximum energy transfer when driving frequency = natural frequency.' },
+  { id:39, subj:'Physics', topic:'Mechanics', text:'The turning effect of a force about a pivot is called the MOMENT. If a force of 15 N acts at a perpendicular distance of 0.4 m from a pivot, the moment is:', opts:{ A:'37.5 N·m', B:'6 N·m', C:'0.027 N·m', D:'15.4 N·m' }, ans:'B', exp:'Moment = Force × perpendicular distance = 15 × 0.4 = 6 N·m.' },
+  { id:40, subj:'Physics', topic:'Modern Physics', text:'What is the mass number of an atom with 17 protons and 18 neutrons?', opts:{ A:'17', B:'18', C:'35', D:'1' }, ans:'C', exp:'Mass number A = protons + neutrons = 17 + 18 = 35. This is chlorine-35.' }
+];
+
+const SECTIONS = [{ beforeId: 1, icon: '⚡', title: 'Physics', meta: '40 Questions · Mechanics · Waves · Optics · Electricity · Electromagnetism · Modern Physics · Heat · Pressure · SI Units' }];
+
+var SHUFFLED_ANS = {};
+function shuffleArray(arr){ for(let i=arr.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function buildShuffledOpts(q){
+  let entries=[{origKey:'A',text:q.opts.A},{origKey:'B',text:q.opts.B},{origKey:'C',text:q.opts.C},{origKey:'D',text:q.opts.D}];
+  entries=shuffleArray(entries);
+  let newOpts={}, newAns=q.ans;
+  ['A','B','C','D'].forEach((lbl,idx)=>{ newOpts[lbl]=entries[idx].text; if(entries[idx].origKey===q.ans) newAns=lbl; });
+  return {opts:newOpts, ans:newAns};
+}
+
+let ST={correct:0,wrong:0,answered:0,answeredIds:new Set()}, UA={}, globalDone=false, GLOBAL_SECS=1800, timerInterval=null;
+function startTimer(){ let remaining=GLOBAL_SECS, txt=document.getElementById('gtime'); function fmt(s){ let m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; } txt.textContent=fmt(remaining); timerInterval=setInterval(()=>{ remaining--; txt.textContent=fmt(remaining); if(remaining<=0){ clearInterval(timerInterval); timeUp(); } },1000); }
+function stopTimer(){ if(timerInterval) clearInterval(timerInterval); }
+function render(){
+  let container=document.getElementById('qc'), TOTAL=QUESTIONS.length, sectionMap={}; SECTIONS.forEach(s=>sectionMap[s.beforeId]=s);
+  let html='';
+  for(let i=0;i<QUESTIONS.length;i++){
+    let q=QUESTIONS[i];
+    if(sectionMap[q.id]){ let s=sectionMap[q.id]; html+=`<div class="subj-divider"><span class="subj-divider-icon">${s.icon}</span><div><div class="subj-divider-title">${s.title}</div><div class="subj-divider-meta">${s.meta}</div></div></div>`; }
+    let shuffled=buildShuffledOpts(q); SHUFFLED_ANS[q.id]=shuffled.ans;
+    let diagramHtml='';
+    if(q.id===15) diagramHtml=`<div class="qdiagram">${DIAGRAMS.transformer}</div>`;
+    if(q.id===16) diagramHtml=`<div class="qdiagram">${DIAGRAMS.photoelectric}</div>`;
+    if(q.id===31) diagramHtml=`<div class="qdiagram">${DIAGRAMS.lens}</div>`;
+    let optsHtml=''; ['A','B','C','D'].forEach(lbl=>{ optsHtml+=`<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${shuffled.opts[lbl]}</span></div>`; });
+    html+=`<div class="qcard"><div class="qcard-top"><span class="qnum">Q${q.id} of ${TOTAL}</span>${q.topic?`<span class="qtopic">${q.topic}</span>`:''}</div>${diagramHtml}<div class="qtxt">${q.text}</div><div class="opts">${optsHtml}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp${q.id}"></div></div>`;
+  }
+  container.innerHTML=html; attachListeners();
+}
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click',function(){ if(globalDone||this.classList.contains('locked')) return; let qid=parseInt(this.dataset.id); document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o=>o.classList.remove('sel')); this.classList.add('sel'); UA[qid]=this.dataset.a; let btn=document.querySelector(`.abtn[data-qid="${qid}"]`); if(btn) btn.disabled=false; }); });
+  document.querySelectorAll('.abtn').forEach(btn=>{ btn.addEventListener('click',function(){ if(globalDone) return; let qid=parseInt(this.dataset.qid), q=QUESTIONS.find(x=>x.id===qid), chosen=UA[qid], correctLabel=SHUFFLED_ANS[qid], ok=(chosen===correctLabel); document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; if(o.dataset.a===correctLabel) o.classList.add('ok'); else if(o.dataset.a===chosen) o.classList.add('no'); }); let expEl=document.getElementById(`exp${qid}`), markCls=ok?'pos':'neg', markTxt=ok?'✓ Correct':`✗ Incorrect — correct answer: ${correctLabel}`; expEl.innerHTML=`<span class="exp-mark ${markCls}">${markTxt}</span>${q.exp?`<div>${q.exp}</div>`:''}`; expEl.classList.add('show'); this.disabled=true; if(!ST.answeredIds.has(qid)){ ST.answered++; ST.answeredIds.add(qid); if(ok) ST.correct++; else ST.wrong++; updateStats(); } }); });
+}
+function updateStats(){ let total=QUESTIONS.length, left=total-ST.answered; document.getElementById('sc-corr').textContent=ST.correct; document.getElementById('sc-wrong').textContent=ST.wrong; document.getElementById('sc-skip').textContent=left; document.getElementById('answered-count').textContent=ST.answered; document.getElementById('sub-prog').textContent=`${ST.answered}/${total} answered`; document.getElementById('m-ans').textContent=ST.answered; document.getElementById('m-left').textContent=left; document.getElementById('prog-fill').style.width=(ST.answered/total*100)+'%'; }
+function showSubmitModal(){ document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal(){ document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz(){ hideSubmitModal(); globalDone=true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(b=>b.click()); showResults(); }
+function showResults(){ let total=QUESTIONS.length, pct=Math.round((ST.correct/total)*100); document.getElementById('tu-score').textContent=pct+'%'; document.getElementById('tu').classList.add('show'); }
+function timeUp(){ globalDone=true; document.querySelectorAll('.opt').forEach(o=>{ o.style.pointerEvents='none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(b=>b.disabled=true); showResults(); }
+function doPrint(){ document.getElementById('print-header').style.display='block'; window.print(); setTimeout(()=>{ document.getElementById('print-header').style.display='none'; },1000); }
+render(); startTimer();
+</script>
+</body>
+</html>
