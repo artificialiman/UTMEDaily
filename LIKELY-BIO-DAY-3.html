@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>2026 Checklist — Biology | UTMEDaily · GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0E1A; --card: #111827; --card2: #161E2E; --text: #E8EDF5;
+      --sec: rgba(232,237,245,0.75); --ter: rgba(232,237,245,0.45);
+      --accent: #22c55e; --accent2: #16a34a; --warn: #f59e0b; --red: #EF4444; --green: #10B981;
+      --sep: rgba(255,255,255,0.08); --r: 14px; --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+    #watermark {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2rem; padding: 1rem;
+      transform: rotate(-20deg) scale(1.5); opacity: 0.09; font-family: var(--mono);
+      font-weight: 700; color: #f0eff4; white-space: nowrap;
+    }
+    .subj-divider {
+      margin: 4px 20px 12px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .subj-divider-icon { font-size: 1.3rem; }
+    .subj-divider-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+    .subj-divider-meta { font-size: 11px; color: var(--ter); }
+    .qdiagram {
+      margin: 0 0 16px 0; border-radius: 10px; border: 1px solid var(--sep);
+      background: rgba(255,255,255,0.025); padding: 12px; text-align: center;
+    }
+    .hdr {
+      background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--sep);
+      padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position: sticky; top: 0; z-index: 100; backdrop-filter: blur(24px);
+    }
+    .hdr-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .hdr-brand { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+    .hdr-title { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+    .gtimer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 20px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+    .gtimer-txt { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--accent); }
+    .score-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px 20px; }
+    .sc { background: var(--card); border-radius: 10px; padding: 10px; text-align: center; border: 1px solid var(--sep); }
+    .sc-v { font-family: var(--mono); font-size: 18px; font-weight: 700; }
+    .sc-v.c { color: var(--green); } .sc-v.w { color: var(--red); } .sc-v.s { color: var(--ter); }
+    .prog-wrap { padding: 0 20px 10px; }
+    .prog-track { height: 3px; background: var(--sep); border-radius: 99px; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); width: 0%; border-radius: 99px; transition: width 0.4s; }
+    #qc { padding: 8px 20px 20px; }
+    .qcard { background: var(--card); border: 1px solid var(--sep); border-radius: var(--r); padding: 20px; margin-bottom: 14px; }
+    .qcard-top { display: flex; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--sep); }
+    .qnum { font-family: var(--mono); font-size: 11px; color: var(--ter); }
+    .qtopic { font-size: 10px; padding: 3px 9px; border-radius: 99px; background: rgba(34,197,94,0.08); color: var(--accent); }
+    .qtxt { font-size: 15px; line-height: 1.6; margin-bottom: 16px; white-space: pre-line; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-radius: 10px; border: 1px solid var(--sep); background: var(--card2); cursor: pointer; }
+    .opt.sel { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); }
+    .opt.ok { border-color: var(--green); background: rgba(16,185,129,0.08); }
+    .opt.no { border-color: var(--red); background: rgba(239,68,68,0.08); }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); width: 20px; }
+    .abtn { margin-top: 12px; width: 100%; padding: 11px; background: var(--accent); color: #000; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; }
+    .abtn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .exp { display: none; margin-top: 12px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 10px; padding: 14px; font-size: 13px; }
+    .exp.show { display: block; }
+    .exp-mark.pos { background: rgba(16,185,129,0.15); color: var(--green); display: inline-block; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .exp-mark.neg { background: rgba(239,68,68,0.12); color: var(--red); display: inline-block; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,14,26,0.96); border-top: 1px solid var(--sep); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px); display: flex; gap: 10px; z-index: 200; backdrop-filter: blur(16px); }
+    .submit-btn { flex: 1; padding: 13px; background: var(--accent); color: #000; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 4000; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--card); border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; }
+    .timeup { position: fixed; inset: 0; background: rgba(10,14,26,0.98); display: none; align-items: center; justify-content: center; z-index: 5000; }
+    .timeup.show { display: flex; }
+    .timeup-box { background: var(--card); border-radius: 20px; padding: 32px; text-align: center; max-width: 360px; }
+    @media print { body { background: white; color: black; } .hdr, .submit-bar, .timeup, .modal-overlay, .abtn, .score-strip { display: none; } .exp { display: block !important; } }
+  </style>
+</head>
+<body>
+
+<div id="print-header" style="display:none; text-align:center; margin-bottom:20pt;"><h1>2026 UTME Checklist — Biology</h1><p>40 Questions · 30 Minutes · Human Skeleton · Ecology · Plant Tissues · Genetics · Cell Biology · Nutrition · Respiration · Reproduction · Evolution</p></div>
+<div id="watermark" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div><span class="hdr-brand">UTMEDaily · GrantApp AI</span><div class="hdr-title">2026 UTME Checklist — Biology</div><div class="hdr-meta">40 questions · 30 min · <span id="answered-count">0</span> answered</div></div>
+    <div class="gtimer"><span class="gtimer-txt" id="gtime">30:00</span></div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">40</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">40</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div id="qc"></div>
+<div class="submit-bar"><span class="submit-progress" id="sub-prog">0 / 40 answered</span><button class="submit-btn" onclick="showSubmitModal()">Submit & See Results</button><button class="submit-btn" onclick="doPrint()">PDF</button></div>
+<div class="modal-overlay" id="submit-modal"><div class="modal"><h3>Submit?</h3><div class="modal-row">Answered: <b id="m-ans">0</b></div><div class="modal-btns"><button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button><button class="modal-btn primary" onclick="submitQuiz()">Submit</button></div></div></div>
+<div class="timeup" id="tu"><div class="timeup-box"><div class="timeup-ttl">Time's Up!</div><div class="timeup-score" id="tu-score">0%</div><button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review</button></div></div>
+
+<script>
+(function(){ var wm=document.getElementById('watermark'); if(wm){ var tile='2026 Checklist · Biology · Human Skeleton · Ecology · Genetics · Plant Tissues · '; var row=''; for(var r=0;r<8;r++) row+=tile; var html=''; for(var i=0;i<12;i++) html+='<span>'+row+'</span>'; wm.innerHTML=html; } })();
+
+// SVG Diagrams for key biology concepts
+var DIAGRAMS = {
+  nephron: '<svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg"><text x="200" y="15" fill="#22c55e" font-size="12" text-anchor="middle">The Nephron — Functional Unit of Kidney (Q19)</text><circle cx="100" cy="50" r="20" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/><text x="100" y="54" text-anchor="middle" fill="#22c55e" font-size="9">Glomerulus</text><path d="M120,50 Q160,50 180,70" stroke="#3b82f6" fill="none" stroke-width="1.5"/><text x="150" y="65" fill="#3b82f6" font-size="8">Proximal tubule</text><path d="M180,70 Q220,90 250,80" stroke="#f59e0b" fill="none" stroke-width="1.5"/><text x="215" y="90" fill="#f59e0b" font-size="8">Loop of Henle</text><path d="M250,80 Q280,70 300,60" stroke="#EF4444" fill="none" stroke-width="1.5"/><text x="275" y="55" fill="#EF4444" font-size="8">Distal tubule</text><rect x="310" y="50" width="30" height="20" rx="3" fill="rgba(16,185,129,0.2)" stroke="#10B981" stroke-width="1"/><text x="325" y="63" text-anchor="middle" fill="#10B981" font-size="7">Collecting duct</text><text x="200" y="135" text-anchor="middle" fill="rgba(232,237,245,0.5)" font-size="8">Filtration → Reabsorption → Secretion → Excretion</text></svg>',
+  photosynthesis: '<svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg"><text x="200" y="15" fill="#22c55e" font-size="12" text-anchor="middle">Photosynthesis — Inputs & Outputs (Q20)</text><rect x="50" y="35" width="300" height="75" rx="8" fill="rgba(34,197,94,0.05)" stroke="#22c55e" stroke-width="1.5"/><text x="200" y="55" text-anchor="middle" fill="#22c55e" font-size="11">6CO₂ + 6H₂O  +  Light Energy  →  C₆H₁₂O₆ + 6O₂</text><text x="120" y="75" text-anchor="middle" fill="#3b82f6" font-size="9">Carbon dioxide</text><text x="280" y="75" text-anchor="middle" fill="#EF4444" font-size="9">Glucose (energy)</text><text x="120" y="95" text-anchor="middle" fill="#3b82f6" font-size="9">Water</text><text x="280" y="95" text-anchor="middle" fill="#EF4444" font-size="9">Oxygen (byproduct)</text></svg>',
+  heart: '<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"><text x="200" y="15" fill="#22c55e" font-size="12" text-anchor="middle">Heart Circulation — Pulmonary Vein (Q17)</text><path d="M200,35 L260,50 L280,100 L200,130 L120,100 L140,50 Z" fill="rgba(239,68,68,0.15)" stroke="#EF4444" stroke-width="1.5"/><text x="200" y="80" text-anchor="middle" fill="#EF4444" font-size="10">Heart</text><path d="M280,50 L340,45 L340,55 L280,60 Z" fill="#3b82f6" opacity="0.6"/><text x="310" y="55" text-anchor="middle" fill="#3b82f6" font-size="8">Pulmonary vein</text><text x="310" y="45" fill="var(--ter)" font-size="7">(oxygenated)</text><path d="M120,50 L60,45 L60,55 L120,60 Z" fill="#f59e0b" opacity="0.6"/><text x="90" y="55" text-anchor="middle" fill="#f59e0b" font-size="8">Pulmonary artery</text><text x="90" y="45" fill="var(--ter)" font-size="7">(deoxygenated)</text></svg>'
+};
+
+// FULL BIOLOGY QUESTIONS (40) as provided
+const QUESTIONS = [
+  { id:1, subj:'Biology', topic:'Human Skeletal', text:'Which is the longest bone in the human body?', opts:{ A:'Humerus', B:'Tibia', C:'Femur', D:'Fibula' }, ans:'C', exp:'The femur (thigh bone) is the longest and strongest bone in the human body, typically about 48–50 cm in adults.' },
+  { id:2, subj:'Biology', topic:'Ecology — Symbiosis', text:'In MUTUALISM, the relationship between two organisms involves:', opts:{ A:'One organism benefits while the other is harmed', B:'One organism benefits while the other is unaffected', C:'Both organisms benefit from the association', D:'Both organisms are harmed by the association' }, ans:'C', exp:'Mutualism: both organisms benefit. Examples: nitrogen-fixing bacteria (Rhizobium) in root nodules of legumes.' },
+  { id:3, subj:'Biology', topic:'Ecology — Symbiosis', text:'Tapeworms living in the human intestine is an example of:', opts:{ A:'Mutualism', B:'Commensalism', C:'Parasitism', D:'Predation' }, ans:'C', exp:'Parasitism: the parasite (tapeworm) benefits; the host (human) is harmed through nutrient loss and intestinal damage.' },
+  { id:4, subj:'Biology', topic:'Plant Transport', text:'Which of the following transports water and mineral salts from the roots to other parts of the plant?', opts:{ A:'Phloem', B:'Cambium', C:'Cortex', D:'Xylem' }, ans:'D', exp:'Xylem vessels transport water and dissolved mineral salts upward from roots to leaves — driven by transpiration pull.' },
+  { id:5, subj:'Biology', topic:'Plant Transport', text:'The movement of organic food substances (sucrose) from leaves to other parts of the plant through the phloem is called:', opts:{ A:'Transpiration', B:'Translocation', C:'Osmosis', D:'Diffusion' }, ans:'B', exp:'Translocation is the transport of organic solutes (sucrose, amino acids) through the phloem sieve tubes, from source to sink.' },
+  { id:6, subj:'Biology', topic:'Plant Tissue', text:'Which type of plant tissue provides mechanical support and is made up of dead cells with lignified walls?', opts:{ A:'Parenchyma', B:'Collenchyma', C:'Sclerenchyma', D:'Meristematic tissue' }, ans:'C', exp:'Sclerenchyma cells are dead at maturity, with thick lignified secondary walls that provide rigid mechanical support (e.g. fibres and sclereids).' },
+  { id:7, subj:'Biology', topic:'Human Skeletal', text:'The type of joint found at the KNEE is:', opts:{ A:'Ball-and-socket joint', B:'Hinge joint', C:'Gliding joint', D:'Pivot joint' }, ans:'B', exp:'The knee (and elbow) are hinge joints — they allow movement in ONE plane only (flexion and extension).' },
+  { id:8, subj:'Biology', topic:'Human Skeletal', text:'Which of the following correctly describes the function of the skeletal system?', opts:{ A:'Production of hormones and digestion of food', B:'Support, protection of organs, movement, mineral storage, and blood cell production', C:'Gas exchange and transport of nutrients only', D:'Regulation of body temperature and ionic balance' }, ans:'B', exp:'Functions: support, protection, movement, mineral storage (Ca, P), and haemopoiesis (blood cell production in bone marrow).' },
+  { id:9, subj:'Biology', topic:'Ecology — Parasitism', text:'The Plasmodium parasite that causes malaria is transmitted by:', opts:{ A:'Housefly (Musca domestica)', B:'Tsetse fly (Glossina)', C:'Female Anopheles mosquito', D:'Culex mosquito' }, ans:'C', exp:'Plasmodium is transmitted exclusively by the female Anopheles mosquito. Female needs blood for egg development.' },
+  { id:10, subj:'Biology', topic:'Plant Tissue', text:'Meristematic tissue in plants is responsible for:', opts:{ A:'Transport of water', B:'Storage of starch', C:'Continuous cell division and growth', D:'Mechanical support' }, ans:'C', exp:'Meristematic tissue consists of undifferentiated cells that divide by mitosis to produce new cells for growth.' },
+  { id:11, subj:'Biology', topic:'Genetics', text:'A man who is heterozygous for sickle cell trait (HbA HbS) marries a woman with the same genotype. What is the probability their child will have sickle cell anaemia (HbS HbS)?', opts:{ A:'0%', B:'25%', C:'50%', D:'75%' }, ans:'B', exp:'Cross: HbA HbS × HbA HbS → HbA HbA (25%): normal; HbA HbS (50%): carrier; HbS HbS (25%): sickle cell anaemia.' },
+  { id:12, subj:'Biology', topic:'Genetics', text:'The chromosome register: how many chromosomes does a normal human somatic (body) cell contain?', opts:{ A:'23', B:'46', C:'44', D:'48' }, ans:'B', exp:'Normal human somatic cells are diploid (2n = 46) — 23 pairs. Gametes (sperm/eggs) are haploid (n = 23).' },
+  { id:13, subj:'Biology', topic:'Genetics', text:'Which of the following describes SEX-LINKED inheritance?', opts:{ A:'Genes located on autosomes that influence sex characteristics', B:'Genes carried on the X or Y chromosome, causing traits that appear more often in one sex', C:'Inheritance patterns that skip generations', D:'Traits controlled by multiple alleles on different chromosomes' }, ans:'B', exp:'Sex-linked genes are on sex chromosomes (usually X). Haemophilia and colour blindness are X-linked recessive — more common in males.' },
+  { id:14, subj:'Biology', topic:'Cell Biology', text:'Which organelle is responsible for the production of ATP through aerobic respiration?', opts:{ A:'Nucleus', B:'Ribosome', C:'Mitochondrion', D:'Golgi apparatus' }, ans:'C', exp:'The mitochondrion is the site of aerobic respiration (Krebs cycle + oxidative phosphorylation), producing the majority of ATP.' },
+  { id:15, subj:'Biology', topic:'Nutrition', text:'Which nutrient is the PRIMARY source of energy in a balanced diet?', opts:{ A:'Proteins', B:'Fats', C:'Carbohydrates', D:'Vitamins' }, ans:'C', exp:'Carbohydrates are the body\'s preferred energy source, yielding 17 kJ/g (4 kcal/g). Glucose is the immediate fuel for cellular respiration.' },
+  { id:16, subj:'Biology', topic:'Respiration', text:'The overall equation for aerobic respiration is:', opts:{ A:'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂', B:'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP', C:'6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂', D:'C₆H₁₂O₆ + 6H₂O → 6CO₂ + 6O₂' }, ans:'B', exp:'Aerobic respiration: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ~38 ATP. Option A is anaerobic fermentation; Option C is photosynthesis.' },
+  { id:17, subj:'Biology', diagram:true, topic:'Circulatory', text:'Which blood vessel carries oxygenated blood FROM the lungs to the heart?', opts:{ A:'Pulmonary artery', B:'Aorta', C:'Pulmonary vein', D:'Vena cava' }, ans:'C', exp:'Pulmonary veins carry oxygenated blood from the lungs to the LEFT atrium. This is the only case where veins carry oxygenated blood.' },
+  { id:18, subj:'Biology', topic:'Ecology', text:'Which of the following is a PRIMARY consumer in a food chain? Grass → Grasshopper → Frog → Snake', opts:{ A:'The frog', B:'The grasshopper', C:'The snake', D:'The grass' }, ans:'B', exp:'Primary consumers eat producers directly. The grasshopper eats grass (the producer) and is the primary consumer.' },
+  { id:19, subj:'Biology', diagram:true, topic:'Excretion', text:'The functional unit of the kidney is:', opts:{ A:'The glomerulus', B:'The nephron', C:'The ureter', D:'The loop of Henle' }, ans:'B', exp:'The nephron is the structural and functional unit of the kidney. Each human kidney contains about 1 million nephrons.' },
+  { id:20, subj:'Biology', diagram:true, topic:'Photosynthesis', text:'Which of the following is NOT a raw material for photosynthesis?', opts:{ A:'Carbon dioxide', B:'Water', C:'Oxygen', D:'Light energy' }, ans:'C', exp:'Photosynthesis uses CO₂ + H₂O + light energy → glucose + O₂. Oxygen is a PRODUCT, not a raw material.' },
+  { id:21, subj:'Biology', topic:'Human Skeletal', text:'Ossification is the process by which:', opts:{ A:'Cartilage is replaced by bone through calcium deposition', B:'Bone is broken down by osteoclasts', C:'Muscles attach to bone via tendons', D:'Joints are lubricated by synovial fluid' }, ans:'A', exp:'Ossification: osteoblasts secrete collagen matrix which is then mineralised by calcium phosphate.' },
+  { id:22, subj:'Biology', topic:'Ecology — Nutrient Cycles', text:'Nitrogen-fixing bacteria convert atmospheric nitrogen (N₂) into:', opts:{ A:'Nitrates (NO₃⁻)', B:'Ammonia (NH₃)', C:'Nitrous oxide (N₂O)', D:'Nitrites (NO₂⁻)' }, ans:'B', exp:'Nitrogen fixation: N₂ + 8H⁺ + 8e⁻ → 2NH₃ + H₂. Rhizobium and Azotobacter fix N₂ to NH₃.' },
+  { id:23, subj:'Biology', topic:'Reproduction', text:'In humans, fertilisation normally occurs in the:', opts:{ A:'Uterus', B:'Ovary', C:'Fallopian tube (oviduct)', D:'Cervix' }, ans:'C', exp:'Fertilisation occurs in the ampulla of the fallopian tube (oviduct), where sperm meets the released ovum.' },
+  { id:24, subj:'Biology', topic:'Cell Biology', text:'Which process produces genetically identical daughter cells?', opts:{ A:'Meiosis I', B:'Meiosis II', C:'Mitosis', D:'Fertilisation' }, ans:'C', exp:'Mitosis: one cell divides into TWO genetically identical diploid daughter cells (2n → 2n). Used in growth, repair, and asexual reproduction.' },
+  { id:25, subj:'Biology', topic:'Nervous System', text:'The part of the brain responsible for balance and coordination of movement is the:', opts:{ A:'Cerebrum', B:'Medulla oblongata', C:'Cerebellum', D:'Hypothalamus' }, ans:'C', exp:'The cerebellum coordinates voluntary movement, balance, and fine motor control. Damage causes ataxia (uncoordinated movement).' },
+  { id:26, subj:'Biology', topic:'Plant Biology', text:'Guard cells control:', opts:{ A:'The transport of water in xylem vessels', B:'The opening and closing of stomata for gas exchange and transpiration', C:'The production of chlorophyll in leaves', D:'The storage of starch in roots' }, ans:'B', exp:'Guard cells are kidney-shaped cells flanking each stoma. When turgid, they open the stoma; when flaccid, they close.' },
+  { id:27, subj:'Biology', topic:'Genetics', text:'In a dihybrid cross between two heterozygous parents (AaBb × AaBb), the expected phenotypic ratio is:', opts:{ A:'1:2:1', B:'3:1', C:'9:3:3:1', D:'1:1:1:1' }, ans:'C', exp:'Mendel\'s dihybrid cross: AaBb × AaBb → 9 A_B_ : 3 A_bb : 3 aaB_ : 1 aabb = 9:3:3:1 phenotypic ratio.' },
+  { id:28, subj:'Biology', topic:'Digestion', text:'Bile is produced in the LIVER and stored in the GALL BLADDER. Its main function in digestion is to:', opts:{ A:'Chemically digest proteins into amino acids', B:'Emulsify fats into smaller droplets to increase surface area for lipase action', C:'Neutralise stomach acid in the duodenum only', D:'Absorb glucose into the bloodstream' }, ans:'B', exp:'Bile salts emulsify fats — breaking large fat globules into smaller droplets, vastly increasing surface area for pancreatic lipase to digest.' },
+  { id:29, subj:'Biology', topic:'Ecology', text:'Which of the following is a DENSITY-DEPENDENT factor affecting population size?', opts:{ A:'A hurricane destroying a habitat', B:'A volcanic eruption', C:'Competition for food as population increases', D:'A sudden change in temperature' }, ans:'C', exp:'Density-dependent factors have greater impact as population density increases: competition, predation, disease. Density-independent factors (floods, fire) affect populations regardless of density.' },
+  { id:30, subj:'Biology', topic:'Evolution', text:'Darwin\'s theory of natural selection is based on the concept that:', opts:{ A:'Organisms develop new organs in response to environmental needs', B:'Individuals with favourable variations survive and reproduce more successfully', C:'Traits acquired during lifetime are passed to offspring', D:'All members of a species are equally adapted to their environment' }, ans:'B', exp:'"Survival of the fittest": organisms with heritable traits better suited to their environment survive longer and reproduce more, passing on these traits.' },
+  { id:31, subj:'Biology', topic:'Endocrine', text:'Which hormone is responsible for regulating blood glucose levels by promoting uptake of glucose into cells?', opts:{ A:'Glucagon', B:'Adrenaline', C:'Insulin', D:'Thyroxine' }, ans:'C', exp:'Insulin (β-cells of pancreas) lowers blood glucose by promoting glucose uptake into cells and conversion to glycogen. Glucagon raises blood glucose.' },
+  { id:32, subj:'Biology', topic:'Pollution', text:'Eutrophication of water bodies is caused by:', opts:{ A:'Oil spillage reducing oxygen in water', B:'Excess nitrates and phosphates from fertilisers causing algal blooms and oxygen depletion', C:'Acid rain lowering the pH of lakes', D:'Thermal pollution from industrial effluents' }, ans:'B', exp:'Eutrophication: excess nutrients (N, P from farm runoff) → algal bloom → algae die → decomposers use O₂ → oxygen depletion → aquatic life dies.' },
+  { id:33, subj:'Biology', topic:'Cell Biology', text:'Osmosis is defined as the movement of water molecules:', opts:{ A:'From a region of low solute concentration to high solute concentration through a selectively permeable membrane', B:'From a region of high water potential to low water potential through a selectively permeable membrane', C:'Against a concentration gradient using energy', D:'From high solute to low solute concentration without a membrane' }, ans:'B', exp:'Osmosis: water moves from high water potential (dilute solution) to low water potential (concentrated solution) across a selectively permeable membrane.' },
+  { id:34, subj:'Biology', topic:'Plant Biology', text:'Which of the following is the correct site of PHOTOSYNTHESIS in plant cells?', opts:{ A:'Mitochondria', B:'Nucleus', C:'Chloroplast', D:'Vacuole' }, ans:'C', exp:'Photosynthesis occurs in chloroplasts: light reactions in thylakoid membranes, Calvin cycle in the stroma. Chlorophyll absorbs light energy.' },
+  { id:35, subj:'Biology', topic:'Human Skeletal', text:'The axial skeleton consists of:', opts:{ A:'The limbs, shoulder girdle, and pelvic girdle', B:'The skull, vertebral column, sternum, and ribs', C:'Only the skull and vertebral column', D:'The femur, humerus, and their associated girdles' }, ans:'B', exp:'The axial skeleton = central axis: skull + vertebral column (33 vertebrae) + thoracic cage (sternum + 12 pairs of ribs) = 80 bones.' },
+  { id:36, subj:'Biology', topic:'Ecology — Food Chain', text:'Why is energy lost at each trophic level in a food chain?', opts:{ A:'Organisms at each level absorb more energy than needed', B:'Energy is lost as heat through metabolic activities such as respiration', C:'Producers store more energy than consumers can access', D:'Energy is converted entirely to biomass at each level' }, ans:'B', exp:'Only ~10% of energy transfers between trophic levels. The rest is lost as heat (respiration), in excretion, undigested material, etc.' },
+  { id:37, subj:'Biology', topic:'Reproduction', text:'Which of the following is an ADVANTAGE of sexual reproduction over asexual reproduction?', opts:{ A:'It requires only one parent', B:'It produces genetically identical offspring', C:'It produces genetic variation, increasing adaptability to changing environments', D:'It is faster and more energy efficient' }, ans:'C', exp:'Sexual reproduction produces genetically variable offspring through meiosis and random fertilisation — raw material for natural selection and evolution.' },
+  { id:38, subj:'Biology', topic:'Immune System', text:'Active immunity differs from passive immunity in that active immunity:', opts:{ A:'Is acquired through injection of antibodies', B:'Involves the body producing its own antibodies in response to an antigen', C:'Is always present from birth', D:'Provides immediate but short-lived protection' }, ans:'B', exp:'Active immunity: body produces own antibodies after exposure to antigen — slower onset but long-lasting (memory cells). Passive immunity: pre-formed antibodies received — immediate but temporary.' },
+  { id:39, subj:'Biology', topic:'Cell Biology', text:'Which of the following is found in plant cells but NOT in animal cells?', opts:{ A:'Mitochondria', B:'Cell membrane', C:'Cell wall and chloroplasts', D:'Ribosomes' }, ans:'C', exp:'Plant cells uniquely have: cell wall (cellulose), chloroplasts (photosynthesis), large central vacuole. Animal cells have centrioles, no cell wall, no chloroplasts.' },
+  { id:40, subj:'Biology', topic:'Ecology — Symbiosis', text:'An orchid plant growing on a tree branch, using the tree only for physical support but not deriving nutrients from it, is an example of:', opts:{ A:'Parasitism', B:'Mutualism', C:'Commensalism', D:'Predation' }, ans:'C', exp:'Commensalism: one organism benefits (orchid gets light and position), the other (tree) is neither helped nor harmed.' }
+];
+
+const SECTIONS = [{ beforeId: 1, icon: '🧬', title: 'Biology', meta: '40 Questions · Human Skeletal System · Ecology (Symbiosis, Parasitism, Mutualism) · Plant Tissues (Xylem, Phloem, Sclerenchyma, Meristem) · Genetics · Cell Biology · Nutrition · Respiration · Circulatory · Excretion · Photosynthesis · Reproduction · Evolution · Endocrine · Pollution' }];
+
+var SHUFFLED_ANS = {};
+function shuffleArray(arr){ for(let i=arr.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function buildShuffledOpts(q){
+  let entries=[{origKey:'A',text:q.opts.A},{origKey:'B',text:q.opts.B},{origKey:'C',text:q.opts.C},{origKey:'D',text:q.opts.D}];
+  entries=shuffleArray(entries);
+  let newOpts={}, newAns=q.ans;
+  ['A','B','C','D'].forEach((lbl,idx)=>{ newOpts[lbl]=entries[idx].text; if(entries[idx].origKey===q.ans) newAns=lbl; });
+  return {opts:newOpts, ans:newAns};
+}
+
+let ST={correct:0,wrong:0,answered:0,answeredIds:new Set()}, UA={}, globalDone=false, GLOBAL_SECS=1800, timerInterval=null;
+function startTimer(){ let remaining=GLOBAL_SECS, txt=document.getElementById('gtime'); function fmt(s){ let m=Math.floor(s/60),ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; } txt.textContent=fmt(remaining); timerInterval=setInterval(()=>{ remaining--; txt.textContent=fmt(remaining); if(remaining<=0){ clearInterval(timerInterval); timeUp(); } },1000); }
+function stopTimer(){ if(timerInterval) clearInterval(timerInterval); }
+function render(){
+  let container=document.getElementById('qc'), TOTAL=QUESTIONS.length, sectionMap={}; SECTIONS.forEach(s=>sectionMap[s.beforeId]=s);
+  let html='';
+  for(let i=0;i<QUESTIONS.length;i++){
+    let q=QUESTIONS[i];
+    if(sectionMap[q.id]){ let s=sectionMap[q.id]; html+=`<div class="subj-divider"><span class="subj-divider-icon">${s.icon}</span><div><div class="subj-divider-title">${s.title}</div><div class="subj-divider-meta">${s.meta}</div></div></div>`; }
+    let shuffled=buildShuffledOpts(q); SHUFFLED_ANS[q.id]=shuffled.ans;
+    let diagramHtml='';
+    if(q.id===17) diagramHtml=`<div class="qdiagram">${DIAGRAMS.heart}</div>`;
+    if(q.id===19) diagramHtml=`<div class="qdiagram">${DIAGRAMS.nephron}</div>`;
+    if(q.id===20) diagramHtml=`<div class="qdiagram">${DIAGRAMS.photosynthesis}</div>`;
+    let optsHtml=''; ['A','B','C','D'].forEach(lbl=>{ optsHtml+=`<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${shuffled.opts[lbl]}</span></div>`; });
+    html+=`<div class="qcard"><div class="qcard-top"><span class="qnum">Q${q.id} of ${TOTAL}</span>${q.topic?`<span class="qtopic">${q.topic}</span>`:''}</div>${diagramHtml}<div class="qtxt">${q.text}</div><div class="opts">${optsHtml}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp${q.id}"></div></div>`;
+  }
+  container.innerHTML=html; attachListeners();
+}
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click',function(){ if(globalDone||this.classList.contains('locked')) return; let qid=parseInt(this.dataset.id); document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o=>o.classList.remove('sel')); this.classList.add('sel'); UA[qid]=this.dataset.a; let btn=document.querySelector(`.abtn[data-qid="${qid}"]`); if(btn) btn.disabled=false; }); });
+  document.querySelectorAll('.abtn').forEach(btn=>{ btn.addEventListener('click',function(){ if(globalDone) return; let qid=parseInt(this.dataset.qid), q=QUESTIONS.find(x=>x.id===qid), chosen=UA[qid], correctLabel=SHUFFLED_ANS[qid], ok=(chosen===correctLabel); document.querySelectorAll(`.opt[data-id="${qid}"]`).forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; if(o.dataset.a===correctLabel) o.classList.add('ok'); else if(o.dataset.a===chosen) o.classList.add('no'); }); let expEl=document.getElementById(`exp${qid}`), markCls=ok?'pos':'neg', markTxt=ok?'✓ Correct':`✗ Incorrect — correct answer: ${correctLabel}`; expEl.innerHTML=`<span class="exp-mark ${markCls}">${markTxt}</span>${q.exp?`<div>${q.exp}</div>`:''}`; expEl.classList.add('show'); this.disabled=true; if(!ST.answeredIds.has(qid)){ ST.answered++; ST.answeredIds.add(qid); if(ok) ST.correct++; else ST.wrong++; updateStats(); } }); });
+}
+function updateStats(){ let total=QUESTIONS.length, left=total-ST.answered; document.getElementById('sc-corr').textContent=ST.correct; document.getElementById('sc-wrong').textContent=ST.wrong; document.getElementById('sc-skip').textContent=left; document.getElementById('answered-count').textContent=ST.answered; document.getElementById('sub-prog').textContent=`${ST.answered}/${total} answered`; document.getElementById('m-ans').textContent=ST.answered; document.getElementById('m-left').textContent=left; document.getElementById('prog-fill').style.width=(ST.answered/total*100)+'%'; }
+function showSubmitModal(){ document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal(){ document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz(){ hideSubmitModal(); globalDone=true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(b=>b.click()); showResults(); }
+function showResults(){ let total=QUESTIONS.length, pct=Math.round((ST.correct/total)*100); document.getElementById('tu-score').textContent=pct+'%'; document.getElementById('tu').classList.add('show'); }
+function timeUp(){ globalDone=true; document.querySelectorAll('.opt').forEach(o=>{ o.style.pointerEvents='none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(b=>b.disabled=true); showResults(); }
+function doPrint(){ document.getElementById('print-header').style.display='block'; window.print(); setTimeout(()=>{ document.getElementById('print-header').style.display='none'; },1000); }
+render(); startTimer();
+</script>
+</body>
+</html>
