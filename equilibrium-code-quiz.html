@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Code Quiz — MEPC Equilibrium · HTML Foundations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A; --card:#111827; --card2:#161E2E;
+      --text:#E8EDF5; --sec:rgba(232,237,245,0.75); --ter:rgba(232,237,245,0.45);
+      --accent:#4A9E8A; --accent2:#2A6E5E;
+      --warn:#C8A84B; --red:#EF4444; --green:#10B981;
+      --sep:rgba(255,255,255,0.08); --r:14px;
+      --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(74,158,138,0.08);border:1px solid rgba(74,158,138,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)} .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--accent);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)} .gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)} .sc-v.w{color:var(--red)} .sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(74,158,138,0.08);border:1px solid rgba(74,158,138,0.18);color:var(--accent);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .code-ref{font-family:var(--mono);font-size:12px;background:rgba(74,158,138,0.06);border:1px solid rgba(74,158,138,0.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;color:rgba(200,221,216,0.75);line-height:1.9;white-space:pre-wrap;word-break:break-all}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(74,158,138,0.4);background:rgba(74,158,138,0.05)}
+    .opt.sel{border-color:rgba(74,158,138,0.5);background:rgba(74,158,138,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)} .opt.no .opt-key{color:var(--red)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--accent);color:#000;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}
+    .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)} .timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)} .tu-stat-v.w{color:var(--red)} .tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--accent);color:#000}
+    .modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)}.hdr-title{font-size:13px}}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">MEPC · Codebase Study</span>
+      <span class="hdr-title">HTML Foundations · Code Quiz</span>
+      <span class="hdr-meta">15 questions · 20 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">20:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">15</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">15</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 15 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>15</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">15</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">20:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+const TOTAL = 15;
+const GLOBAL_SECS = 1200;
+
+const QUESTIONS = [
+  {
+    id:1, topic:"&lt;head&gt;",
+    text:"What is the purpose of <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;!DOCTYPE html&gt;</code> and where must it appear?",
+    code:"<!DOCTYPE html>\n<html lang=\"en\">",
+    opts:{
+      A:"It links the external CSS file — it must appear before the &lt;head&gt;",
+      B:"It tells the browser to use HTML5 standards mode — it must be the very first line of the document",
+      C:"It declares the document language as HTML — it can go anywhere in the file",
+      D:"It is a comment that documents the file type — it has no functional effect"
+    },
+    ans:"B",
+    exp:"&lt;!DOCTYPE html&gt; is not a tag — it's a declaration that instructs the browser to render the page in HTML5 standards mode rather than 'quirks mode' (a legacy compatibility mode with inconsistent behaviour). It must be the absolute first line of the file, before even the &lt;html&gt; tag. Without it, some browsers misrender layouts unpredictably."
+  },
+  {
+    id:2, topic:"&lt;head&gt;",
+    text:"The opening tag is <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;html lang=\"en\"&gt;</code>. What does the <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>lang</code> attribute do?",
+    code:"<html lang=\"en\">",
+    opts:{
+      A:"It sets the page's default font to the English system font",
+      B:"It tells the browser to load an English translation of the page",
+      C:"It declares the human language of the document's content — used by screen readers, search engines, and spell checkers",
+      D:"It restricts the page so only English-speaking users can access it"
+    },
+    ans:"C",
+    exp:"The lang attribute on &lt;html&gt; declares the natural language of the content. Screen readers use it to select the correct pronunciation engine. Search engines use it for language-based indexing. Browsers use it to offer translation prompts. Spell checkers use it to choose the right dictionary. It has no visual effect — it's pure metadata about the document's content."
+  },
+  {
+    id:3, topic:"&lt;head&gt;",
+    text:"What separates the <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;head&gt;</code> from the <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;body&gt;</code> — fundamentally, what is each one for?",
+    code:"<head>\n  <meta charset=\"UTF-8\">\n  <title>Equilibrium — The Chemistry That Never Stops</title>\n  <style>...</style>\n</head>\n<body>\n  <!-- visible content -->\n</body>",
+    opts:{
+      A:"&lt;head&gt; holds the top navigation bar; &lt;body&gt; holds everything else",
+      B:"&lt;head&gt; contains metadata and instructions about the document — none of it renders visibly; &lt;body&gt; contains everything the user sees",
+      C:"&lt;head&gt; is where HTML goes; &lt;body&gt; is where CSS and JavaScript go",
+      D:"&lt;head&gt; and &lt;body&gt; are interchangeable — the browser treats them identically"
+    },
+    ans:"B",
+    exp:"The &lt;head&gt;/&lt;body&gt; split is HTML's most fundamental structural rule. &lt;head&gt; holds information about the document: character encoding, viewport settings, the page title, and stylesheet rules. None of it renders as visible content (except &lt;title&gt;, which shows in the browser tab). &lt;body&gt; contains everything that actually appears on screen. This separation — metadata vs content — is the core pattern HTML is built on."
+  },
+  {
+    id:4, topic:"&lt;head&gt;",
+    text:"What breaks if <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;meta charset=\"UTF-8\"&gt;</code> is missing?",
+    code:"<meta charset=\"UTF-8\">",
+    opts:{
+      A:"The page will fail to load entirely",
+      B:"All images on the page will be broken",
+      C:"Special characters — like the em-dash in the title, or scientific symbols — can appear as garbled sequences",
+      D:"JavaScript will throw a syntax error"
+    },
+    ans:"C",
+    exp:"The charset meta tag tells the browser how to decode the file's bytes into readable text. UTF-8 supports virtually every character in every language. Without it, characters outside basic ASCII — em-dashes, curly quotes, mathematical symbols like ΔG, or accented letters — can render as garbled nonsense (called mojibake). It must appear early in &lt;head&gt;, before any content the browser might try to parse."
+  },
+  {
+    id:5, topic:"&lt;head&gt;",
+    text:"The viewport meta has three values. What does <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>initial-scale=1.0</code> specifically control?",
+    code:"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\">",
+    opts:{
+      A:"It sets the minimum font size to 1.0rem across the page",
+      B:"It sets the starting zoom level to 100% — no zoom in or out when the page first loads",
+      C:"It permanently locks the user's zoom level so it can never change",
+      D:"It makes one CSS pixel equal exactly one physical screen pixel at all times"
+    },
+    ans:"B",
+    exp:"initial-scale=1.0 sets the zoom level the page starts at — 1.0 means 100%, no zoom applied. Without it, some mobile browsers apply their own default zoom. It does not prevent the user from zooming (that would require user-scalable=no, considered an accessibility violation). viewport-fit=cover separately extends the layout into the notch/safe-area of modern phones."
+  },
+  {
+    id:6, topic:"&lt;head&gt;",
+    text:"What does <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;meta name=\"apple-mobile-web-app-capable\" content=\"yes\"&gt;</code> do?",
+    code:"<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">",
+    opts:{
+      A:"It enables Apple Pay on the page",
+      B:"It makes the page available for download from the App Store",
+      C:"It tells iOS Safari the page can run as a standalone app when added to the home screen — hiding the browser chrome",
+      D:"It enables push notifications from the website on iPhones"
+    },
+    ans:"C",
+    exp:"When a user adds a website to their iPhone home screen, iOS normally still shows Safari's browser interface (address bar, toolbar). With apple-mobile-web-app-capable set to yes, the page opens fullscreen — no browser chrome — making it feel like a native app. This pairs with viewport-fit=cover in the same file, which extends content into the notch area for a true edge-to-edge look."
+  },
+  {
+    id:7, topic:"&lt;head&gt;",
+    text:"The &lt;title&gt; reads 'Equilibrium — The Chemistry That Never Stops'. Where does this text actually appear?",
+    code:"<title>Equilibrium — The Chemistry That Never Stops</title>",
+    opts:{
+      A:"As the large heading rendered at the top of the visible page",
+      B:"In the browser tab, bookmarks, and search engine result link text — not on the page itself",
+      C:"As a tooltip that appears when hovering anywhere on the page",
+      D:"Inside the nav element targeted by the .nav-mark class"
+    },
+    ans:"B",
+    exp:"The &lt;title&gt; tag names the document for the browser and the web — not for the user reading the page. It shows in: the browser tab label, saved bookmarks, browser history, and search engine result snippets (as the clickable blue link text). It is never rendered as visible page content — the hero's &lt;h1&gt; is a completely separate element that happens to have similar wording."
+  },
+  {
+    id:8, topic:"&lt;head&gt;",
+    text:"The file uses an embedded <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;style&gt;</code> block rather than a <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;link&gt;</code> to an external CSS file. What is the real tradeoff between these two approaches?",
+    code:"<!-- Embedded -->\n<style> body { background: #08090C; } </style>\n\n<!-- External -->\n<link rel=\"stylesheet\" href=\"quiz-styles.css\">",
+    opts:{
+      A:"They are identical in every way — the browser treats both exactly the same",
+      B:"&lt;style&gt; embeds CSS in the HTML (one request, not separately cacheable); &lt;link&gt; loads an external file (extra request, but cacheable and reusable across pages)",
+      C:"&lt;style&gt; only works in modern browsers; &lt;link&gt; works in all browsers",
+      D:"&lt;link&gt; is always faster because external files always load in parallel"
+    },
+    ans:"B",
+    exp:"Embedding CSS in &lt;style&gt; means all styles travel with the HTML — one network request, but the CSS cannot be cached independently or shared across pages. An external stylesheet via &lt;link&gt; is an extra HTTP request, but browsers cache it — repeat visitors load it from disk. This file uses embedded styles (common for standalone articles or demos). Your own quiz project uses external stylesheets via &lt;link&gt;, which is the right call for a multi-page codebase."
+  },
+
+  // ── HERO SECTION ──
+
+  {
+    id:9, topic:"Hero",
+    text:"<code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;div id=\"progress\"&gt;&lt;/div&gt;</code> is completely empty. Why write an element with no content?",
+    code:"<body>\n<div id=\"progress\"></div>\n<nav class=\"nav\">\n  ...\n</nav>",
+    opts:{
+      A:"It is a mistake — empty elements should always be deleted",
+      B:"It acts as a hook that CSS and JavaScript will animate — the progress bar's width is updated by JS as the user scrolls",
+      C:"It reserves vertical space so the nav doesn't overlap content below it",
+      D:"It is required by HTML5 as the first child of every &lt;body&gt; element"
+    },
+    ans:"B",
+    exp:"Empty divs are a legitimate pattern when an element's visual content comes entirely from CSS or JavaScript rather than HTML text. Here, #progress is a thin bar at the top of the page. The CSS gives it height and a gradient background; a JavaScript scroll listener updates its width from 0% to 100% as the user reads down. The HTML element needs no text — its job is purely to be a target for CSS and JS to act on."
+  },
+  {
+    id:10, topic:"Hero",
+    text:"The navigation uses a <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;nav&gt;</code> element. Why use &lt;nav&gt; instead of just &lt;div class=\"nav\"&gt;?",
+    code:"<nav class=\"nav\">\n  <div class=\"nav-mark\">MEPC · Flow Article</div>\n  <div class=\"nav-links\">\n    <a href=\"#act1\">The System</a>\n    <a href=\"#act2\">The Symbols</a>\n    <a href=\"#act3\">The World</a>\n  </div>\n</nav>",
+    opts:{
+      A:"&lt;nav&gt; loads faster than &lt;div&gt; because it is a simpler element",
+      B:"&lt;nav&gt; is a semantic element — it signals to browsers, screen readers, and search engines that this region contains navigation links",
+      C:"&lt;nav&gt; automatically arranges its children into a horizontal row without any CSS",
+      D:"&lt;nav&gt; is required whenever &lt;a&gt; tags are used — &lt;div&gt; cannot legally contain anchor tags"
+    },
+    ans:"B",
+    exp:"Semantic HTML means using elements whose names describe their purpose. &lt;nav&gt; signals 'this is a navigation landmark' to assistive technologies (screen readers can jump directly to it), search engines (navigation links are weighted differently from body links), and developers reading the code. A &lt;div&gt; is semantically neutral — just a container with no implied meaning. The CSS class .nav handles the visual styling either way; the element choice communicates meaning."
+  },
+  {
+    id:11, topic:"Hero",
+    text:"The nav links use <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>href=\"#act1\"</code>, <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>href=\"#act2\"</code>, <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>href=\"#act3\"</code>. What kind of link is this?",
+    code:"<a href=\"#act1\">The System</a>\n<a href=\"#act2\">The Symbols</a>\n<a href=\"#act3\">The World</a>\n\n<!-- Later in the document: -->\n<div id=\"act1\" class=\"container\">",
+    opts:{
+      A:"External links — they open act1.html, act2.html, act3.html in a new tab",
+      B:"Fragment links — they scroll the same page to the element whose id matches the value after the #",
+      C:"Relative links — they navigate to a subfolder called act1 within the same directory",
+      D:"JavaScript links — they call a function named act1() defined elsewhere"
+    },
+    ans:"B",
+    exp:"A # prefix creates a fragment identifier — an in-page anchor link. Clicking it scrolls the browser to the element with the matching id attribute on the same page. No new page loads, no server request is made. In this file, clicking 'The System' scrolls to &lt;div id='act1'&gt;. The smooth scroll animation comes from CSS scroll-behavior:smooth on &lt;html&gt; — a single rule that makes all fragment navigation feel polished."
+  },
+  {
+    id:12, topic:"Hero",
+    text:"The hero section contains two empty decorative divs: <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;div class=\"hero-glow\"&gt;&lt;/div&gt;</code> and <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;div class=\"hero-glow2\"&gt;&lt;/div&gt;</code>. What are they for?",
+    code:"<div class=\"hero\">\n  <div class=\"hero-glow\"></div>\n  <div class=\"hero-glow2\"></div>\n  <div class=\"hero-series\">Flow Article — Chemistry of Equilibrium</div>\n  <h1 class=\"hero-title\">...</h1>\n</div>",
+    opts:{
+      A:"They are required spacers — without them the hero content would collapse to zero height",
+      B:"They are empty hooks that CSS uses to render purely decorative glow effects — radial gradients — without adding any real content to the document",
+      C:"They contain hidden text readable by search engines but invisible to users",
+      D:"They are placeholder divs intended to be filled with images later"
+    },
+    ans:"B",
+    exp:"Like #progress, these are content-free elements whose entire purpose is to give CSS a target. The CSS attaches radial-gradient backgrounds to them, creating the soft teal and violet glow effects behind the hero text. Using two separate divs gives independent control over each glow's position, size, and colour. They carry no semantic meaning — they are purely presentational scaffolding. This is a common professional pattern for layered visual effects."
+  },
+  {
+    id:13, topic:"Hero",
+    text:"The hero title uses <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;h1&gt;</code>. Why &lt;h1&gt; and not a &lt;div&gt; or &lt;p&gt; — visuals aside?",
+    code:"<h1 class=\"hero-title\">The Tide<br>That <em>Never Stops</em></h1>",
+    opts:{
+      A:"Because &lt;h1&gt; is the only element that accepts &lt;br&gt; and &lt;em&gt; inside it",
+      B:"Because &lt;h1&gt; is a semantic heading — it signals the page's primary heading to browsers, search engines, and screen readers",
+      C:"Because &lt;h1&gt; automatically makes text large and bold without CSS",
+      D:"Because only one &lt;h1&gt; is allowed per file, and the rule is it must be the most visually prominent element"
+    },
+    ans:"B",
+    exp:"Heading elements (h1–h6) carry semantic weight — they define the document's outline. Search engines treat h1 content as highly relevant to the page's topic. Screen readers use headings as navigation landmarks (users can jump between headings with a keypress). The visual size is irrelevant — the CSS overrides it entirely. Any element can be made to look like a heading with CSS. But only &lt;h1&gt; communicates 'this is the primary heading of this document' to the machines reading it."
+  },
+  {
+    id:14, topic:"Hero",
+    text:"Inside the &lt;h1&gt;, there is a <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;br&gt;</code> and an <code style='font-family:monospace;font-size:0.9em;color:#6DBFAA'>&lt;em&gt;</code>. What does each one do — and what's the difference in their nature?",
+    code:"<h1 class=\"hero-title\">The Tide<br>That <em>Never Stops</em></h1>",
+    opts:{
+      A:"&lt;br&gt; adds a horizontal rule; &lt;em&gt; makes text bold — both are purely visual",
+      B:"&lt;br&gt; forces a line break (presentational only); &lt;em&gt; marks text as emphasised — semantic, with meaning beyond appearance",
+      C:"&lt;br&gt; creates a new paragraph; &lt;em&gt; highlights text in the accent colour",
+      D:"&lt;br&gt; and &lt;em&gt; are identical — both just add spacing around their content"
+    },
+    ans:"B",
+    exp:"&lt;br&gt; is a void element (no closing tag) that forces a line break — 'The Tide' and 'That Never Stops' appear on separate lines. It is purely presentational with no semantic meaning. &lt;em&gt; (emphasis) is semantic — it marks text as stressed or important. Screen readers may change intonation on &lt;em&gt; text. Browsers default to italic, but CSS can override that. The distinction is the broader lesson: HTML has elements that describe how something looks, and elements that describe what something means — and the latter matter to machines."
+  },
+  {
+    id:15, topic:"Hero",
+    text:"The hero-meta section is a parent div wrapping item divs, each wrapping a label and a value. What does this nesting teach about HTML structure as a whole?",
+    code:"<div class=\"hero-meta\">\n  <div class=\"hero-meta-item\">\n    <div class=\"hero-meta-label\">Acts</div>\n    <div class=\"hero-meta-val\">Three</div>\n  </div>\n  <div class=\"hero-meta-item\">\n    <div class=\"hero-meta-label\">Tone</div>\n    <div class=\"hero-meta-val\">Editorial + Exam</div>\n  </div>\n</div>",
+    opts:{
+      A:"It is poor practice — good HTML should always use a flat list of elements rather than nesting",
+      B:"HTML structure should mirror content structure — a group of items, each with a label and value, is naturally expressed as nested elements that reflect that real hierarchy",
+      C:"The nesting exists only so CSS selectors have more specificity to target",
+      D:"Nested divs load faster because the browser parses them in parallel"
+    },
+    ans:"B",
+    exp:"This is HTML's tree structure at work — the most important structural idea in the language. The nesting reflects the content's actual hierarchy: a metadata block, containing items, each containing a label and a value. When HTML nesting mirrors content structure, CSS and JS become dramatically easier to write — you can style all labels at once, target items cleanly, and read the document like an outline. This is also what makes the &lt;head&gt;/&lt;body&gt; split itself a synecdoche for all of HTML: there is always a layer that describes, and a layer that presents — and keeping them cleanly separate is what good markup is."
+  }
+];
+
+var SHUFFLED_ANS={};
+function buildShuffledOpts(q){
+  var entries=['A','B','C','D'].map(function(k){return{origKey:k,text:q.opts[k]};});
+  for(var i=entries.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=entries[i];entries[i]=entries[j];entries[j]=tmp;}
+  var newOpts={},newAns=q.ans;
+  ['A','B','C','D'].forEach(function(lbl,idx){newOpts[lbl]=entries[idx].text;if(entries[idx].origKey===q.ans)newAns=lbl;});
+  return{opts:newOpts,ans:newAns};
+}
+
+var ST={correct:0,wrong:0,answered:0,answeredIds:new Set()},UA={},globalDone=false;
+
+var timerInterval=null;
+function startTimer(){
+  var remaining=GLOBAL_SECS,dot=document.getElementById('gdot'),txt=document.getElementById('gtime');
+  function fmt(s){var m=Math.floor(s/60),ss=s%60;return(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  txt.textContent=fmt(remaining);
+  timerInterval=setInterval(function(){
+    remaining--;txt.textContent=fmt(remaining);
+    if(remaining<=300&&remaining>60){txt.className='gtimer-txt warn';dot.className='gtimer-dot warn';}
+    else if(remaining<=60){txt.className='gtimer-txt dang';dot.className='gtimer-dot dang';}
+    if(remaining<=0){clearInterval(timerInterval);timeUp();}
+  },1000);
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);}
+function getTimeDisplay(){var el=document.getElementById('gtime');return el?el.textContent:'—';}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function render(){
+  var container=document.getElementById('qc'),html='';
+  for(var i=0;i<QUESTIONS.length;i++){
+    var q=QUESTIONS[i],shuffled=buildShuffledOpts(q);
+    SHUFFLED_ANS[q.id]=shuffled.ans;
+    var optsHtml='';
+    ['A','B','C','D'].forEach(function(lbl){
+      optsHtml+='<div class="opt" data-id="'+q.id+'" data-a="'+lbl+'"><span class="opt-key">'+lbl+'.</span><span class="opt-txt">'+shuffled.opts[lbl]+'</span></div>';
+    });
+    var codeHtml=q.code?'<div class="code-ref">'+escHtml(q.code)+'</div>':'';
+    html+='<div class="qcard" style="animation-delay:'+(i*0.03)+'s">'+
+      '<div class="qcard-top"><span class="qnum">Q'+q.id+' of '+TOTAL+'</span><span class="qtopic">'+q.topic+'</span></div>'+
+      '<div class="qtxt">'+q.text+'</div>'+codeHtml+
+      '<div class="opts">'+optsHtml+'</div>'+
+      '<button class="abtn" data-qid="'+q.id+'" disabled>Check Answer</button>'+
+      '<div class="exp" id="exp'+q.id+'"></div></div>';
+  }
+  container.innerHTML=html;
+  attachListeners();
+}
+
+function attachListeners(){
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      if(globalDone||this.classList.contains('locked'))return;
+      var qid=parseInt(this.dataset.id);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){o.classList.remove('sel');});
+      this.classList.add('sel');UA[qid]=this.dataset.a;
+      var btn=document.querySelector('.abtn[data-qid="'+qid+'"]');if(btn)btn.disabled=false;
+    });
+  });
+  document.querySelectorAll('.abtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(globalDone)return;
+      var qid=parseInt(this.dataset.qid),q=QUESTIONS.find(function(x){return x.id===qid;});
+      var chosen=UA[qid],correctLabel=SHUFFLED_ANS[qid],ok=(chosen===correctLabel);
+      document.querySelectorAll('.opt[data-id="'+qid+'"]').forEach(function(o){
+        o.classList.add('locked');o.style.pointerEvents='none';
+        if(o.dataset.a===correctLabel)o.classList.add('ok');
+        else if(o.dataset.a===chosen)o.classList.add('no');
+      });
+      var expEl=document.getElementById('exp'+qid);
+      expEl.innerHTML='<span class="exp-mark '+(ok?'pos':'neg')+'">'+(ok?'✓ Correct':'✗ Incorrect — correct answer: '+correctLabel)+'</span>'+(q.exp?'<div style="margin-top:8px">'+q.exp+'</div>':'');
+      expEl.classList.add('show');this.disabled=true;
+      if(!ST.answeredIds.has(qid)){ST.answered++;ST.answeredIds.add(qid);if(ok)ST.correct++;else ST.wrong++;updateStats();}
+    });
+  });
+}
+
+function updateStats(){
+  var left=TOTAL-ST.answered;
+  document.getElementById('sc-corr').textContent=ST.correct;
+  document.getElementById('sc-wrong').textContent=ST.wrong;
+  document.getElementById('sc-skip').textContent=left;
+  document.getElementById('answered-count').textContent=ST.answered;
+  document.getElementById('sub-prog').textContent=ST.answered+' / '+TOTAL+' answered';
+  document.getElementById('m-ans').textContent=ST.answered;
+  document.getElementById('m-left').textContent=left;
+  document.getElementById('m-time').textContent=getTimeDisplay();
+  document.getElementById('prog-fill').style.width=(ST.answered/TOTAL*100)+'%';
+}
+
+function showSubmitModal(){document.getElementById('m-time').textContent=getTimeDisplay();document.getElementById('submit-modal').classList.add('show');}
+function hideSubmitModal(){document.getElementById('submit-modal').classList.remove('show');}
+function submitQuiz(){
+  hideSubmitModal();globalDone=true;stopTimer();
+  document.querySelectorAll('.abtn:not([disabled])').forEach(function(b){b.click();});
+  var pct=Math.round((ST.correct/TOTAL)*100),scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=TOTAL-ST.answered;
+  document.getElementById('tu').classList.add('show');
+}
+
+function timeUp(){
+  globalDone=true;
+  document.querySelectorAll('.opt').forEach(function(o){o.style.pointerEvents='none';o.classList.add('locked');});
+  document.querySelectorAll('.abtn').forEach(function(b){b.disabled=true;});
+  var pct=Math.round((ST.correct/TOTAL)*100),scoreEl=document.getElementById('tu-score');
+  scoreEl.textContent=pct+'%';scoreEl.className='timeup-score '+(pct>=50?'pos':'neg');
+  document.getElementById('tu-co').textContent=ST.correct;
+  document.getElementById('tu-wr').textContent=ST.wrong;
+  document.getElementById('tu-sk').textContent=TOTAL-ST.answeredIds.size;
+  document.getElementById('tu').classList.add('show');
+}
+
+render();
+startTimer();
+</script>
+</body>
+</html>
