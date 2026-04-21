@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Equilibrium — The Chemistry That Never Stops</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+:root{
+  --bg:#08090C;--bg2:#0D0F14;--bg3:#121519;--bg4:#181C22;
+  --accent:#4A9E8A;--accent-bright:#6DBFAA;--accent-dim:#2A6E5E;
+  --accent-glow:rgba(74,158,138,0.11);--accent-rule:rgba(74,158,138,0.2);
+  --wire:#C8DDD8;--wire2:rgba(200,221,216,0.65);--wire3:rgba(200,221,216,0.35);
+  --wire4:rgba(200,221,216,0.12);--rule:rgba(200,221,216,0.07);--rule2:rgba(200,221,216,0.03);
+  --gold:#C8A84B;--red:#C05050;--violet:#8B6DCC;--orange:#C8784A;
+  --display:'Cormorant Garamond',serif;--body:'Libre Baskerville',serif;--mono:'DM Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--bg);color:var(--wire);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;}
+#progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent-dim),var(--accent-bright));z-index:999;width:0%;transition:width .1s linear;}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,9,12,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);}
+.nav-mark{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;}
+.nav-links{display:flex;gap:24px;}
+.nav-links a{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--wire3);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:var(--accent)}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 10vw 80px;border-bottom:1px solid var(--accent-rule);position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--rule2) 1px,transparent 1px),linear-gradient(90deg,var(--rule2) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+.hero-glow{position:absolute;bottom:-120px;right:6vw;width:700px;height:500px;background:radial-gradient(ellipse,var(--accent-glow) 0%,transparent 65%);pointer-events:none;}
+.hero-glow2{position:absolute;top:-80px;left:4vw;width:400px;height:400px;background:radial-gradient(ellipse,rgba(139,109,204,0.06) 0%,transparent 65%);pointer-events:none;}
+.hero-series{font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:28px;position:relative;z-index:1;display:flex;align-items:center;gap:14px;}
+.hero-series::before{content:'';width:36px;height:1px;background:var(--accent);}
+.hero-title{font-family:var(--display);font-size:clamp(44px,8.5vw,108px);font-weight:300;line-height:0.95;color:var(--wire);margin-bottom:16px;position:relative;z-index:1;letter-spacing:-1px;}
+.hero-title em{font-style:italic;color:var(--accent-bright);}
+.hero-sub{font-family:var(--display);font-style:italic;font-weight:300;font-size:clamp(16px,2.2vw,22px);color:var(--wire2);margin-bottom:52px;position:relative;z-index:1;max-width:54ch;line-height:1.5;}
+.hero-meta{display:flex;gap:0;border:1px solid var(--accent-rule);width:fit-content;position:relative;z-index:1;}
+.hero-meta-item{padding:14px 22px;border-right:1px solid var(--accent-rule);}
+.hero-meta-item:last-child{border-right:none}
+.hero-meta-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
+.hero-meta-val{font-family:var(--display);font-size:17px;color:var(--wire2);font-style:italic;}
+.container{max-width:820px;margin:0 auto;padding:0 32px;}
+.act{padding:88px 0 0;}
+.act-marker{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:14px;}
+.act-marker::after{content:'';flex:1;height:1px;background:var(--accent-rule);}
+.act-title{font-family:var(--display);font-size:clamp(30px,5vw,56px);font-weight:600;line-height:1.05;color:var(--wire);margin-bottom:8px;}
+.act-title em{font-style:italic;color:var(--accent-bright);}
+.act-deck{font-family:var(--display);font-style:italic;font-weight:300;font-size:19px;color:var(--wire2);margin-bottom:40px;padding-bottom:36px;border-bottom:1px solid var(--rule);line-height:1.5;}
+.prose{padding:12px 0;}
+.prose p{font-size:16px;line-height:1.9;color:var(--wire2);margin-bottom:22px;}
+.prose p:last-child{margin-bottom:0}
+.prose strong{color:var(--wire);}
+.prose em{color:var(--accent-bright);font-style:italic;}
+.compress{margin:40px 0;padding:28px 32px;background:var(--bg2);border-left:3px solid var(--accent);position:relative;}
+.compress-label{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;}
+.compress-text{font-family:var(--display);font-size:clamp(19px,2.6vw,26px);font-style:italic;color:var(--wire);line-height:1.4;}
+.compress.gold{border-left-color:var(--gold);}
+.compress.gold .compress-label{color:var(--gold);}
+.compress.violet{border-left-color:var(--violet);}
+.compress.violet .compress-label{color:var(--violet);}
+.compress.orange{border-left-color:var(--orange);}
+.compress.orange .compress-label{color:var(--orange);}
+.compress.red{border-left-color:var(--red);}
+.compress.red .compress-label{color:var(--red);}
+.svg-panel{margin:40px 0;background:var(--bg2);border:1px solid var(--accent-rule);overflow:hidden;}
+.svg-panel-head{padding:11px 20px;background:var(--bg3);border-bottom:1px solid var(--accent-rule);font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;}
+.svg-panel-body{padding:28px 20px;overflow-x:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;}
+.svg-panel-body svg{max-width:100%;height:auto;}
+.tbl-wrap{margin:36px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+thead tr{background:var(--bg3);}
+th{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;padding:12px 16px;text-align:left;border-bottom:1px solid var(--accent-rule);}
+td{padding:11px 16px;border-bottom:1px solid var(--rule);color:var(--wire2);vertical-align:top;line-height:1.6;}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3);color:var(--wire);}
+td.mono{font-family:var(--mono);font-size:12px;color:var(--accent-bright);}
+td.note{font-size:12px;color:var(--wire3);}
+td.trap{font-size:12px;color:var(--red);}
+td.gold{font-size:13px;color:var(--gold);}
+td.violet{font-size:12px;color:var(--violet);}
+.arrow-list{margin:24px 0;list-style:none;}
+.arrow-list li{display:flex;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);color:var(--wire2);font-size:15px;line-height:1.7;}
+.arrow-list li:last-child{border-bottom:none}
+.arrow-list li::before{content:'→';color:var(--accent);font-family:var(--mono);flex-shrink:0;}
+.arrow-list li strong{color:var(--wire);}
+.arrow-list li em{color:var(--accent-bright);font-style:italic;}
+.arrow-list.gold li::before{color:var(--gold);}
+.arrow-list.violet li::before{color:var(--violet);}
+.arrow-list.orange li::before{color:var(--orange);}
+.arrow-list.red li::before{color:var(--red);}
+.comma-list{margin:20px 0;padding:20px 24px;background:var(--bg2);border:1px solid var(--rule);}
+.comma-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}
+.comma-text{font-size:15px;color:var(--wire2);line-height:1.8;}
+.comma-text strong{color:var(--wire);}
+.comma-text em{color:var(--accent-bright);font-style:italic;}
+.section-end{height:1px;background:var(--rule);margin:80px 0 0;}
+.footnote{margin:60px 0 0;padding:32px;border:1px solid var(--rule);background:var(--bg2);}
+.footnote-label{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:14px;}
+.footnote p{font-size:14px;color:var(--wire3);line-height:1.85;}
+.closing{padding:88px 0;text-align:center;}
+.closing-text{font-family:var(--display);font-size:clamp(18px,2.8vw,28px);font-style:italic;color:var(--wire2);margin-bottom:14px;line-height:1.4;}
+.closing-sub{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;}
+.eq-block{margin:28px 0;padding:20px 28px;background:var(--bg3);border:1px solid var(--accent-rule);font-family:var(--mono);font-size:13px;color:var(--accent-bright);line-height:2;}
+.eq-block .eq-label{font-size:9px;letter-spacing:2px;color:var(--wire3);text-transform:uppercase;margin-bottom:8px;}
+.eq-block .eq-note{font-size:11px;color:var(--wire3);margin-top:6px;font-family:var(--body);}
+@media(max-width:600px){
+  .nav-links{display:none;}
+  .hero{padding:100px 6vw 60px;}
+  .container{padding:0 18px;}
+  .hero-meta{flex-wrap:wrap;}
+  .hero-meta-item{border-right:none;border-bottom:1px solid var(--accent-rule);}
+  .hero-meta-item:last-child{border-bottom:none;}
+  .compress{padding:20px 20px;}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<nav class="nav">
+  <div class="nav-mark">MEPC · Flow Article</div>
+  <div class="nav-links">
+    <a href="#act1">The System</a>
+    <a href="#act2">The Symbols</a>
+    <a href="#act3">The World</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-series">Flow Article — Chemistry of Equilibrium</div>
+  <h1 class="hero-title">The Tide<br>That <em>Never Stops</em></h1>
+  <p class="hero-sub">Equilibrium is not a pause. It is the most active state in chemistry — two reactions running simultaneously, holding each other in check. From the beach to the bloodstream, from the lab bench to the atmosphere, the same system is always at work.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><div class="hero-meta-label">Acts</div><div class="hero-meta-val">Three</div></div>
+    <div class="hero-meta-item"><div class="hero-meta-label">Tone</div><div class="hero-meta-val">Editorial + Exam</div></div>
+    <div class="hero-meta-item"><div class="hero-meta-label">Series</div><div class="hero-meta-val">Flow Article</div></div>
+  </div>
+</div>
+
+<!-- ACT 1 — THE SYSTEM -->
+<div id="act1" class="container">
+  <div class="act">
+    <div class="act-marker">Act One</div>
+    <h2 class="act-title">The System — <em>Theory, Law, and Principle</em></h2>
+    <p class="act-deck">Everything wants to reach the most stable, lowest-energy state possible. Equilibrium is what happens when two competing forces find the exact point where neither can win anymore — and then keep fighting anyway, at a standstill.</p>
+
+    <div class="compress">
+      <div class="compress-label">The opening compression</div>
+      <div class="compress-text">Equilibrium is not stillness. It is a tie — both reactions running at equal rates, the tide coming in exactly as fast as it goes out, the sandcastle being built and destroyed simultaneously at the same point.</div>
+    </div>
+
+    <div class="prose">
+      <p>The theoretical foundation is the <strong>Second Law of Thermodynamics</strong>: the universe moves toward maximum disorder. But reactions are not just about disorder. They are also about energy — specifically, whether releasing heat makes the process more or less favourable. Gibbs Free Energy (ΔG) combines both tendencies into a single verdict: <em>will this happen, and how far will it go?</em></p>
+      <p>When ΔG = 0, neither forward nor reverse reaction is favoured. The system is at equilibrium. That condition gives rise to the equilibrium constant K — a precise number that tells you exactly where the balance point sits.</p>
+    </div>
+
+    <!-- ΔG Overview SVG -->
+    <div class="svg-panel">
+      <div class="svg-panel-head">Gibbs Free Energy — what drives every reaction to its equilibrium</div>
+      <div class="svg-panel-body">
+        <svg width="680" height="160" viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arr1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#6DBFAA"/>
+            </marker>
+          </defs>
+          <!-- ΔH box -->
+          <rect x="10" y="58" width="110" height="44" rx="3" fill="rgba(200,120,74,0.1)" stroke="#C8784A" stroke-width="1.2"/>
+          <text x="65" y="77" font-family="DM Mono,monospace" font-size="11" fill="#C8784A" text-anchor="middle">ΔH</text>
+          <text x="65" y="93" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">heat tendency</text>
+          <!-- TΔS box -->
+          <rect x="10" y="114" width="110" height="36" rx="3" fill="rgba(139,109,204,0.1)" stroke="#8B6DCC" stroke-width="1.2"/>
+          <text x="65" y="130" font-family="DM Mono,monospace" font-size="11" fill="#8B6DCC" text-anchor="middle">TΔS</text>
+          <text x="65" y="144" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">entropy × temp</text>
+          <!-- arrows to ΔG -->
+          <line x1="122" y1="80" x2="200" y2="95" stroke="#C8784A" stroke-width="1.3" marker-end="url(#arr1)"/>
+          <line x1="122" y1="132" x2="200" y2="105" stroke="#8B6DCC" stroke-width="1.3" marker-end="url(#arr1)"/>
+          <!-- ΔG box -->
+          <rect x="202" y="72" width="120" height="46" rx="4" fill="rgba(74,158,138,0.15)" stroke="#6DBFAA" stroke-width="1.8"/>
+          <text x="262" y="92" font-family="DM Mono,monospace" font-size="12" fill="#C8DDD8" text-anchor="middle" font-weight="500">ΔG = ΔH − TΔS</text>
+          <text x="262" y="109" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.5)" text-anchor="middle">the verdict</text>
+          <!-- ΔG to outcomes -->
+          <line x1="324" y1="88" x2="390" y2="48" stroke="#6DBFAA" stroke-width="1.3" marker-end="url(#arr1)"/>
+          <line x1="324" y1="95" x2="390" y2="95" stroke="#6DBFAA" stroke-width="1.3" marker-end="url(#arr1)"/>
+          <line x1="324" y1="102" x2="390" y2="140" stroke="#6DBFAA" stroke-width="1.3" marker-end="url(#arr1)"/>
+          <!-- outcome boxes -->
+          <rect x="392" y="28" width="130" height="36" rx="3" fill="rgba(74,158,138,0.1)" stroke="#4A9E8A" stroke-width="1.2"/>
+          <text x="457" y="44" font-family="DM Mono,monospace" font-size="10" fill="#6DBFAA" text-anchor="middle">ΔG &lt; 0</text>
+          <text x="457" y="58" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">Spontaneous → forward</text>
+          <rect x="392" y="77" width="130" height="36" rx="3" fill="rgba(200,168,75,0.08)" stroke="#C8A84B" stroke-width="1.2"/>
+          <text x="457" y="93" font-family="DM Mono,monospace" font-size="10" fill="#C8A84B" text-anchor="middle">ΔG = 0</text>
+          <text x="457" y="107" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">Equilibrium — tied</text>
+          <rect x="392" y="124" width="130" height="36" rx="3" fill="rgba(192,80,80,0.08)" stroke="#C05050" stroke-width="1.2"/>
+          <text x="457" y="140" font-family="DM Mono,monospace" font-size="10" fill="#C05050" text-anchor="middle">ΔG &gt; 0</text>
+          <text x="457" y="154" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">Non-spontaneous ← reverse</text>
+          <!-- K link -->
+          <line x1="524" y1="95" x2="580" y2="95" stroke="#C8A84B" stroke-width="1.3" marker-end="url(#arr1)"/>
+          <rect x="582" y="77" width="90" height="36" rx="3" fill="rgba(200,168,75,0.08)" stroke="#C8A84B" stroke-width="1.2"/>
+          <text x="627" y="93" font-family="DM Mono,monospace" font-size="10" fill="#C8A84B" text-anchor="middle">K = e^(−ΔG°/RT)</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>The equilibrium constant K is born from ΔG. Every time you write a K expression, you are encoding the exact energy balance of a reaction into a ratio of concentrations or pressures. The number K tells you everything about where the system wants to end up — but nothing about how fast it gets there. <em>Kinetics and equilibrium are separate conversations.</em></p>
+    </div>
+
+    <div class="compress gold">
+      <div class="compress-label">Hess's Law — the foundation</div>
+      <div class="compress-text">The total enthalpy change of a reaction is independent of the path taken. Only the start and end points matter. Whether you break the journey into two steps or twenty, the total ΔH is identical — which means you can calculate the heat of any reaction without measuring it directly.</div>
+    </div>
+
+    <div class="prose">
+      <p><strong>Le Chatelier's Principle</strong> is the practical arm of equilibrium theory. Disturb a system at equilibrium — change concentration, pressure, or temperature — and the system shifts to oppose the disturbance. It is not a law in the strict thermodynamic sense; it is a predictive principle derived from the fact that K is a fixed number at a given temperature. If you add a reactant, Q drops below K, so the system shifts forward to restore K. Simple as the tide adjusting to the moon.</p>
+    </div>
+
+    <ul class="arrow-list">
+      <li><strong>Increase concentration of reactant</strong> — Q &lt; K → shifts forward → more products form until Q = K again.</li>
+      <li><strong>Increase concentration of product</strong> — Q &gt; K → shifts backward → reactants reform until Q = K.</li>
+      <li><strong>Increase pressure (gases)</strong> — shifts toward the side with fewer moles of gas. Fewer molecules means less pressure — the system resists the change.</li>
+      <li><strong>Increase temperature</strong> — shifts in the endothermic direction. The system absorbs the extra heat to resist the increase. K itself changes — unlike concentration or pressure changes.</li>
+      <li><strong>Add a catalyst</strong> — equilibrium position does NOT change. K does NOT change. Only the rate at which equilibrium is reached increases. JAMB tests this every year.</li>
+    </ul>
+
+    <div class="compress violet">
+      <div class="compress-label">The critical distinction</div>
+      <div class="compress-text">Concentration and pressure changes shift the position of equilibrium but do not change K. Temperature changes actually change K. A catalyst changes neither K nor equilibrium position — only speed. These three facts are three of the most tested ideas in JAMB chemistry.</div>
+    </div>
+  </div>
+  <div class="section-end"></div>
+</div>
+
+<!-- ACT 2 — THE SYMBOLS -->
+<div id="act2" class="container">
+  <div class="act">
+    <div class="act-marker">Act Two</div>
+    <h2 class="act-title">The Symbols — <em>Every K Decoded</em></h2>
+    <p class="act-deck">The K family is not one constant — it is a type system. Each member applies to a specific situation: solutions, gases, water, acids, bases, sparingly soluble salts. The notation carries the meaning. Read the subscript; know the context.</p>
+
+    <div class="compress">
+      <div class="compress-label">The Act 2 compression</div>
+      <div class="compress-text">Every K expression is just products over reactants, raised to their stoichiometric powers, with solids and pure liquids excluded. That one rule, applied to different contexts, generates the entire K family.</div>
+    </div>
+
+    <!-- K Family SVG -->
+    <div class="svg-panel">
+      <div class="svg-panel-head">The K family — one rule, many contexts</div>
+      <div class="svg-panel-body">
+        <svg width="680" height="200" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="kArr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#4A9E8A"/>
+            </marker>
+          </defs>
+          <!-- central K -->
+          <rect x="290" y="78" width="100" height="44" rx="4" fill="rgba(74,158,138,0.18)" stroke="#6DBFAA" stroke-width="2"/>
+          <text x="340" y="105" font-family="DM Mono,monospace" font-size="22" fill="#C8DDD8" text-anchor="middle" font-weight="500">K</text>
+          <!-- Kc -->
+          <rect x="10" y="10" width="100" height="44" rx="3" fill="rgba(74,158,138,0.08)" stroke="#4A9E8A" stroke-width="1.2"/>
+          <text x="60" y="30" font-family="DM Mono,monospace" font-size="13" fill="#6DBFAA" text-anchor="middle">Kc</text>
+          <text x="60" y="46" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">concentrations</text>
+          <line x1="112" y1="32" x2="288" y2="92" stroke="#4A9E8A" stroke-width="1.2" marker-end="url(#kArr)"/>
+          <!-- Kp -->
+          <rect x="10" y="78" width="100" height="44" rx="3" fill="rgba(200,168,75,0.08)" stroke="#C8A84B" stroke-width="1.2"/>
+          <text x="60" y="98" font-family="DM Mono,monospace" font-size="13" fill="#C8A84B" text-anchor="middle">Kp</text>
+          <text x="60" y="114" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">partial pressures</text>
+          <line x1="112" y1="100" x2="288" y2="100" stroke="#C8A84B" stroke-width="1.2" marker-end="url(#kArr)"/>
+          <!-- Kw -->
+          <rect x="10" y="146" width="100" height="44" rx="3" fill="rgba(139,109,204,0.08)" stroke="#8B6DCC" stroke-width="1.2"/>
+          <text x="60" y="166" font-family="DM Mono,monospace" font-size="13" fill="#8B6DCC" text-anchor="middle">Kw</text>
+          <text x="60" y="182" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">water ionisation</text>
+          <line x1="112" y1="168" x2="288" y2="108" stroke="#8B6DCC" stroke-width="1.2" marker-end="url(#kArr)"/>
+          <!-- Ka -->
+          <rect x="570" y="10" width="100" height="44" rx="3" fill="rgba(192,80,80,0.08)" stroke="#C05050" stroke-width="1.2"/>
+          <text x="620" y="30" font-family="DM Mono,monospace" font-size="13" fill="#C05050" text-anchor="middle">Ka</text>
+          <text x="620" y="46" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">acid dissociation</text>
+          <line x1="392" y1="92" x2="568" y2="32" stroke="#C05050" stroke-width="1.2" marker-end="url(#kArr)"/>
+          <!-- Kb -->
+          <rect x="570" y="78" width="100" height="44" rx="3" fill="rgba(200,120,74,0.08)" stroke="#C8784A" stroke-width="1.2"/>
+          <text x="620" y="98" font-family="DM Mono,monospace" font-size="13" fill="#C8784A" text-anchor="middle">Kb</text>
+          <text x="620" y="114" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">base dissociation</text>
+          <line x1="392" y1="100" x2="568" y2="100" stroke="#C8784A" stroke-width="1.2" marker-end="url(#kArr)"/>
+          <!-- Ksp -->
+          <rect x="570" y="146" width="100" height="44" rx="3" fill="rgba(74,158,138,0.08)" stroke="#2A6E5E" stroke-width="1.2"/>
+          <text x="620" y="166" font-family="DM Mono,monospace" font-size="13" fill="#4A9E8A" text-anchor="middle">Ksp</text>
+          <text x="620" y="182" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">solubility product</text>
+          <line x1="392" y1="108" x2="568" y2="168" stroke="#2A6E5E" stroke-width="1.2" marker-end="url(#kArr)"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>The fundamental rule for writing any K expression: <strong>products over reactants, raised to stoichiometric powers, pure solids and pure liquids excluded.</strong> This one rule generates every K expression you will ever write. The subscript changes; the logic does not.</p>
+    </div>
+
+    <!-- Writing K expressions -->
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Symbol</th><th>Full name</th><th>Uses</th><th>Unit</th><th>JAMB trap</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Kc</strong></td>
+            <td>Concentration equilibrium constant</td>
+            <td class="mono">[products]^p / [reactants]^r</td>
+            <td class="note">mol/dm³ raised to Δn — or dimensionless by convention</td>
+            <td class="trap">Powers come from coefficients, not molecular formula subscripts. 2A ⇌ B → Kc = [B]/[A]²</td>
+          </tr>
+          <tr>
+            <td><strong>Kp</strong></td>
+            <td>Pressure equilibrium constant</td>
+            <td class="mono">P(products)^p / P(reactants)^r</td>
+            <td class="note">atm or Pa raised to Δn</td>
+            <td class="trap">Only gaseous species appear. Solids and liquids excluded same as Kc.</td>
+          </tr>
+          <tr>
+            <td><strong>Kw</strong></td>
+            <td>Ionic product of water</td>
+            <td class="mono">[H⁺][OH⁻] = 1×10⁻¹⁴ at 25°C</td>
+            <td class="note">mol²/dm⁶</td>
+            <td class="trap">Kw increases with temperature — water ionises more at higher T. Neutral pH is NOT always 7.</td>
+          </tr>
+          <tr>
+            <td><strong>Ka</strong></td>
+            <td>Acid dissociation constant</td>
+            <td class="mono">[H⁺][A⁻] / [HA]</td>
+            <td class="note">mol/dm³</td>
+            <td class="trap">Large Ka = strong acid. pKa = −log Ka, so large Ka = small pKa. Inverse relationship.</td>
+          </tr>
+          <tr>
+            <td><strong>Kb</strong></td>
+            <td>Base dissociation constant</td>
+            <td class="mono">[BH⁺][OH⁻] / [B]</td>
+            <td class="note">mol/dm³</td>
+            <td class="gold">Ka × Kb = Kw. If you know Ka of the acid, you know Kb of its conjugate base.</td>
+          </tr>
+          <tr>
+            <td><strong>Ksp</strong></td>
+            <td>Solubility product</td>
+            <td class="mono">[cation]^a × [anion]^b</td>
+            <td class="note">varies with formula</td>
+            <td class="trap">The solid itself is excluded. AB → Ksp = [A⁺][B⁻] = s². But A₂B → Ksp = [A⁺]²[B²⁻] = (2s)²(s) = 4s³.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- The solid/liquid exclusion -->
+    <div class="compress orange">
+      <div class="compress-label">The most tested trap in all of equilibrium</div>
+      <div class="compress-text">Pure solids and pure liquids never appear in K expressions. Their concentration is effectively constant — it doesn't change as the reaction proceeds. CaCO₃(s) ⇌ CaO(s) + CO₂(g): both solids vanish. Kc = [CO₂] alone. This appears in at least one JAMB question every year.</div>
+    </div>
+
+    <!-- Kc vs Kp conversion -->
+    <div class="eq-block">
+      <div class="eq-label">Kc ↔ Kp conversion</div>
+      Kp = Kc(RT)^Δn
+      <div class="eq-note">R = 8.314 J/mol·K · T in Kelvin · Δn = moles gaseous products − moles gaseous reactants. If Δn = 0, then Kp = Kc. This is JAMB's favourite shortcut question.</div>
+    </div>
+
+    <!-- Q — the reaction quotient -->
+    <div class="prose">
+      <p>Q is the reaction quotient — it uses the exact same formula as K, but with <strong>current</strong> concentrations, not equilibrium ones. The comparison of Q to K is how you predict which way a reaction will shift.</p>
+    </div>
+
+    <div class="svg-panel">
+      <div class="svg-panel-head">Q vs K — predicting the direction of shift</div>
+      <div class="svg-panel-body">
+        <svg width="600" height="100" viewBox="0 0 600 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="qArr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#6DBFAA"/>
+            </marker>
+            <marker id="qArrR" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#C05050"/>
+            </marker>
+            <marker id="qArrL" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+              <path d="M7,0 L0,3.5 L7,7 Z" fill="#C8784A"/>
+            </marker>
+          </defs>
+          <!-- Q < K -->
+          <rect x="10" y="20" width="140" height="60" rx="3" fill="rgba(74,158,138,0.08)" stroke="#4A9E8A" stroke-width="1.2"/>
+          <text x="80" y="46" font-family="DM Mono,monospace" font-size="13" fill="#6DBFAA" text-anchor="middle">Q &lt; K</text>
+          <text x="80" y="62" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">too few products</text>
+          <line x1="152" y1="50" x2="220" y2="50" stroke="#4A9E8A" stroke-width="2" marker-end="url(#qArr)"/>
+          <text x="186" y="42" font-family="DM Mono,monospace" font-size="9" fill="#6DBFAA" text-anchor="middle">→ forward</text>
+          <!-- K = equilibrium -->
+          <rect x="220" y="20" width="160" height="60" rx="4" fill="rgba(200,168,75,0.12)" stroke="#C8A84B" stroke-width="1.8"/>
+          <text x="300" y="46" font-family="DM Mono,monospace" font-size="13" fill="#C8A84B" text-anchor="middle">Q = K</text>
+          <text x="300" y="62" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">equilibrium · no net shift</text>
+          <!-- Q > K -->
+          <line x1="382" y1="50" x2="450" y2="50" stroke="#C05050" stroke-width="2" marker-end="url(#qArrR)"/>
+          <text x="416" y="42" font-family="DM Mono,monospace" font-size="9" fill="#C05050" text-anchor="middle">← backward</text>
+          <rect x="452" y="20" width="140" height="60" rx="3" fill="rgba(192,80,80,0.08)" stroke="#C05050" stroke-width="1.2"/>
+          <text x="522" y="46" font-family="DM Mono,monospace" font-size="13" fill="#C05050" text-anchor="middle">Q &gt; K</text>
+          <text x="522" y="62" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">too many products</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- pH, pOH, pKa -->
+    <div class="prose">
+      <p>The <strong>p-notation</strong> is simply the negative logarithm of any quantity. It exists to compress very small numbers — Ka values like 1.8 × 10⁻⁵ — into manageable form. Once you see pX = −log[X], the entire pH/pOH/pKa/pKb system becomes the same operation applied to different quantities.</p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Symbol</th><th>Definition</th><th>Relation</th><th>JAMB note</th></tr></thead>
+        <tbody>
+          <tr><td><strong>pH</strong></td><td class="mono">−log[H⁺]</td><td class="note">pH + pOH = 14 at 25°C</td><td class="note">pH &lt; 7 = acidic. pH &gt; 7 = basic. pH = 7 = neutral (at 25°C only).</td></tr>
+          <tr><td><strong>pOH</strong></td><td class="mono">−log[OH⁻]</td><td class="note">pOH = 14 − pH</td><td class="trap">Find [OH⁻] → get pOH → subtract from 14 to get pH. Three-step route JAMB tests.</td></tr>
+          <tr><td><strong>pKa</strong></td><td class="mono">−log Ka</td><td class="note">Large Ka → small pKa → stronger acid</td><td class="gold">Henderson-Hasselbalch: pH = pKa + log([A⁻]/[HA]). Tested in buffer questions.</td></tr>
+          <tr><td><strong>pKb</strong></td><td class="mono">−log Kb</td><td class="note">pKa + pKb = 14</td><td class="note">Weak base: find Kb → pKb → pOH → pH. Same three-step logic.</td></tr>
+          <tr><td><strong>pKw</strong></td><td class="mono">−log Kw = 14</td><td class="note">Kw = 10⁻¹⁴ → pKw = 14</td><td class="trap">pKw changes with temperature. At 37°C (body temp), neutral pH ≈ 6.8, not 7.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="compress gold">
+      <div class="compress-label">The Act 2 principle</div>
+      <div class="compress-text">Every K expression is the same fraction, dressed differently for different arenas. Learn the rule once — products over reactants, powers from coefficients, solids excluded — and you can write any K expression JAMB will ever ask for.</div>
+    </div>
+  </div>
+  <div class="section-end"></div>
+</div>
+
+<!-- ACT 3 — THE WORLD -->
+<div id="act3" class="container">
+  <div class="act">
+    <div class="act-marker">Act Three</div>
+    <h2 class="act-title">The World — <em>Equilibrium Everywhere</em></h2>
+    <p class="act-deck">Equilibrium is not a laboratory concept. It is the mechanism behind esterification, behind the body's pH regulation, behind how indicators change colour, behind why solids precipitate, behind how industrial ammonia is made. Every domain is just equilibrium wearing a different coat.</p>
+
+    <!-- SECTION: ORGANIC REACTIONS -->
+    <div class="act-marker" style="margin-top:32px;">Organic Chemistry</div>
+
+    <div class="prose">
+      <p>Organic reactions hide equilibrium behind single arrows. Most organic reactions have K so large that the reverse is negligible — so chemists write → and move on. The exceptions are exactly what JAMB tests.</p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Reaction type</th><th>Example 1</th><th>Example 2</th><th>Equilibrium note</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Esterification</strong></td>
+            <td class="mono">CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O<br><span style="color:rgba(200,221,216,0.4);font-size:11px">ethanoic acid + ethanol → ethyl ethanoate</span></td>
+            <td class="mono">HCOOH + CH₃OH ⇌ HCOOCH₃ + H₂O<br><span style="color:rgba(200,221,216,0.4);font-size:11px">methanoic acid + methanol → methyl methanoate</span></td>
+            <td class="gold">Genuinely reversible. Kc ≈ 4 at room temp. Yield improved by excess alcohol or removing water. Classic Le Chatelier application.</td>
+          </tr>
+          <tr>
+            <td><strong>Addition (alkenes)</strong></td>
+            <td class="mono">CH₂=CH₂ + H₂ → CH₃CH₃<br><span style="color:rgba(200,221,216,0.4);font-size:11px">ethene + hydrogen → ethane</span></td>
+            <td class="mono">CH₂=CH₂ + Br₂ → CH₂BrCH₂Br<br><span style="color:rgba(200,221,216,0.4);font-size:11px">ethene + bromine → 1,2-dibromoethane</span></td>
+            <td class="note">K >> 1. Written with → because reverse is negligible. The C=C opens; electrons reorganise. No equilibrium complications tested.</td>
+          </tr>
+          <tr>
+            <td><strong>Substitution (alkanes)</strong></td>
+            <td class="mono">CH₄ + Cl₂ → CH₃Cl + HCl<br><span style="color:rgba(200,221,216,0.4);font-size:11px">methane + chlorine → chloromethane + HCl</span></td>
+            <td class="mono">C₂H₆ + Br₂ → C₂H₅Br + HBr<br><span style="color:rgba(200,221,216,0.4);font-size:11px">ethane + bromine → bromoethane + HBr</span></td>
+            <td class="note">Free radical mechanism. UV light required. K >> 1. Not tested as equilibrium — tested for mechanism and conditions.</td>
+          </tr>
+          <tr>
+            <td><strong>Elimination</strong></td>
+            <td class="mono">CH₃CH₂OH → CH₂=CH₂ + H₂O<br><span style="color:rgba(200,221,216,0.4);font-size:11px">ethanol → ethene + water (conc. H₂SO₄, 170°C)</span></td>
+            <td class="mono">CH₃CH₂Br + KOH(alc) → CH₂=CH₂ + KBr + H₂O<br><span style="color:rgba(200,221,216,0.4);font-size:11px">bromoethane + alcoholic KOH → ethene</span></td>
+            <td class="note">High temperature favours elimination over substitution (entropy drives). Competes with substitution — Le Chatelier at the mechanistic level.</td>
+          </tr>
+          <tr>
+            <td><strong>Hydrolysis (esters)</strong></td>
+            <td class="mono">CH₃COOC₂H₅ + H₂O ⇌ CH₃COOH + C₂H₅OH<br><span style="color:rgba(200,221,216,0.4);font-size:11px">ethyl ethanoate + water → ethanoic acid + ethanol</span></td>
+            <td class="mono">CH₃COOC₂H₅ + NaOH → CH₃COONa + C₂H₅OH<br><span style="color:rgba(200,221,216,0.4);font-size:11px">ethyl ethanoate + NaOH → sodium ethanoate + ethanol</span></td>
+            <td class="trap">Acid hydrolysis is reversible (⇌). Base hydrolysis (saponification) is irreversible (→) — the carboxylate salt formed doesn't re-esterify. This difference is frequently tested.</td>
+          </tr>
+          <tr>
+            <td><strong>Condensation polymerisation</strong></td>
+            <td class="mono">nH₂N(CH₂)₆NH₂ + nHOOC(CH₂)₄COOH → Nylon-6,6 + nH₂O<br><span style="color:rgba(200,221,216,0.4);font-size:11px">diamine + diacid → polyamide</span></td>
+            <td class="mono">nHOCH₂CH₂OH + nC₈H₆O₄ → Terylene + nH₂O<br><span style="color:rgba(200,221,216,0.4);font-size:11px">diol + diacid → polyester</span></td>
+            <td class="note">Each condensation step is an esterification or amide bond formation — equilibrium driven to completion by removing H₂O. Industrial process uses high temp to shift equilibrium.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION: ACID-BASE DEFINITIONS -->
+    <div class="act-marker" style="margin-top:48px;">Acid-Base Definitions</div>
+
+    <div class="prose">
+      <p>Three definitions of acid-base behaviour exist. Each is broader than the last. JAMB tests all three — and tests which definition applies to which reaction.</p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Definition</th><th>Acid is...</th><th>Base is...</th><th>Example 1</th><th>Example 2</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Arrhenius</strong><br><span style="font-size:11px;color:var(--wire3)">Narrowest. Water only.</span></td>
+            <td>Produces H⁺ in water</td>
+            <td>Produces OH⁻ in water</td>
+            <td class="mono">HCl → H⁺ + Cl⁻<br><span style="color:rgba(200,221,216,0.4);font-size:10px">hydrochloric acid in water</span></td>
+            <td class="mono">NaOH → Na⁺ + OH⁻<br><span style="color:rgba(200,221,216,0.4);font-size:10px">sodium hydroxide in water</span></td>
+          </tr>
+          <tr>
+            <td><strong>Brønsted-Lowry</strong><br><span style="font-size:11px;color:var(--wire3)">Broader. Includes non-aqueous.</span></td>
+            <td>Proton donor (H⁺ donor)</td>
+            <td>Proton acceptor (H⁺ acceptor)</td>
+            <td class="mono">CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺<br><span style="color:rgba(200,221,216,0.4);font-size:10px">ethanoic acid donates H⁺ to water</span></td>
+            <td class="mono">NH₃ + H₂O ⇌ NH₄⁺ + OH⁻<br><span style="color:rgba(200,221,216,0.4);font-size:10px">ammonia accepts H⁺ from water — base</span></td>
+          </tr>
+          <tr>
+            <td><strong>Lewis</strong><br><span style="font-size:11px;color:var(--wire3)">Broadest. No proton needed.</span></td>
+            <td>Electron pair acceptor</td>
+            <td>Electron pair donor</td>
+            <td class="mono">BF₃ + NH₃ → F₃B←NH₃<br><span style="color:rgba(200,221,216,0.4);font-size:10px">BF₃ accepts lone pair from NH₃</span></td>
+            <td class="mono">Fe³⁺ + 6H₂O → [Fe(H₂O)₆]³⁺<br><span style="color:rgba(200,221,216,0.4);font-size:10px">Fe³⁺ accepts lone pairs from water ligands</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="comma-list">
+      <div class="comma-label">Conjugate acid-base pairs — Brønsted-Lowry in action</div>
+      <div class="comma-text">
+        Every Brønsted-Lowry equilibrium produces a conjugate pair. In <strong>CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺</strong>: CH₃COOH and CH₃COO⁻ are a conjugate pair; H₂O and H₃O⁺ are a conjugate pair.
+        In <strong>NH₃ + H₂O ⇌ NH₄⁺ + OH⁻</strong>: NH₃ and NH₄⁺ are a conjugate pair; H₂O and OH⁻ are a conjugate pair.
+        The rule: <em>conjugate base = acid minus one H⁺. Conjugate acid = base plus one H⁺.</em> Water appears in both — it is amphoteric by the Brønsted-Lowry definition.
+      </div>
+    </div>
+
+    <!-- SECTION: INORGANIC / INDUSTRIAL -->
+    <div class="act-marker" style="margin-top:48px;">Industrial &amp; Inorganic Processes</div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Process / Reaction</th><th>Equation</th><th>Equilibrium applied</th><th>JAMB link</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Haber Process</strong></td>
+            <td class="mono">N₂ + 3H₂ ⇌ 2NH₃</td>
+            <td>High pressure (200 atm) favours forward — 4 mol gas → 2 mol gas. 450°C is a compromise: lower temp gives better yield but too slow. Iron catalyst speeds equilibrium without shifting it.</td>
+            <td class="gold">Most tested industrial equilibrium. Know: conditions, reasons for each, why yield is only ~15% at 450°C, what Le Chatelier predicts vs what industry actually does.</td>
+          </tr>
+          <tr>
+            <td><strong>Contact Process (SO₃)</strong></td>
+            <td class="mono">2SO₂ + O₂ ⇌ 2SO₃</td>
+            <td>Exothermic forward. High pressure and low temperature favour SO₃. V₂O₅ catalyst. 450°C compromise again — same industrial logic as Haber.</td>
+            <td class="note">Second most tested industrial equilibrium. SO₃ + H₂O → H₂SO₄. Acid rain: unabsorbed SO₂ escapes → SO₂ + H₂O → H₂SO₃.</td>
+          </tr>
+          <tr>
+            <td><strong>Dissociation of water</strong></td>
+            <td class="mono">H₂O ⇌ H⁺ + OH⁻</td>
+            <td>Kw = [H⁺][OH⁻] = 10⁻¹⁴. Temperature increase → more dissociation → Kw increases → neutral pH drops below 7. Endothermic forward.</td>
+            <td class="trap">Neutral solution always has [H⁺] = [OH⁻], but this equals 10⁻⁷ only at 25°C. At 37°C, neutral pH ≈ 6.8. "Neutral" ≠ "pH 7" in general.</td>
+          </tr>
+          <tr>
+            <td><strong>Dissolution of a salt (Ksp)</strong></td>
+            <td class="mono">AgCl(s) ⇌ Ag⁺(aq) + Cl⁻(aq)</td>
+            <td>Ksp = [Ag⁺][Cl⁻]. If ion product exceeds Ksp → precipitation. Add NaCl → [Cl⁻] increases → Q > Ksp → AgCl precipitates. Common ion effect.</td>
+            <td class="note">Common ion effect is Le Chatelier applied to Ksp. Adding a common ion reduces solubility. Tested in qualitative analysis and precipitation questions.</td>
+          </tr>
+          <tr>
+            <td><strong>Carbonate decomposition</strong></td>
+            <td class="mono">CaCO₃(s) ⇌ CaO(s) + CO₂(g)</td>
+            <td>Kc = [CO₂] only — both solids excluded. Increase pressure → Q > Kc → shifts back → less decomposition. Increase temperature → shifts forward (endothermic).</td>
+            <td class="trap">Canonical example of solid exclusion from K expression. Appears in nearly every JAMB past paper.</td>
+          </tr>
+          <tr>
+            <td><strong>Chromate/Dichromate equilibrium</strong></td>
+            <td class="mono">2CrO₄²⁻ + 2H⁺ ⇌ Cr₂O₇²⁻ + H₂O</td>
+            <td>Yellow (chromate) in base → add acid → orange (dichromate). Add base → shifts back to yellow. Visible colour change demonstrates Le Chatelier directly.</td>
+            <td class="note">A favourite JAMB demonstration question. The colour change is the equilibrium shift — no calculation needed, just direction of shift with pH change.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION: LAB & TITRATION -->
+    <div class="act-marker" style="margin-top:48px;">Titration, Indicators &amp; Buffers</div>
+
+    <div class="prose">
+      <p>The titration flask is an equilibrium arena. Every indicator is a weak acid equilibrium. Every buffer solution is Le Chatelier holding the line. These are not separate topics — they are the same system, applied to the lab bench.</p>
+    </div>
+
+    <div class="svg-panel">
+      <div class="svg-panel-head">Indicator colour change — Le Chatelier in a bottle</div>
+      <div class="svg-panel-body">
+        <svg width="620" height="120" viewBox="0 0 620 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="indArr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#6DBFAA"/>
+            </marker>
+            <marker id="indArrL" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <path d="M7,0 L0,3.5 L7,7 Z" fill="#C8A84B"/>
+            </marker>
+          </defs>
+          <!-- HIn box -->
+          <rect x="10" y="38" width="140" height="44" rx="3" fill="rgba(192,80,80,0.1)" stroke="#C05050" stroke-width="1.2"/>
+          <text x="80" y="57" font-family="DM Mono,monospace" font-size="11" fill="#C05050" text-anchor="middle">HIn (acid form)</text>
+          <text x="80" y="73" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">Colour A</text>
+          <!-- equilibrium arrow -->
+          <line x1="152" y1="55" x2="238" y2="55" stroke="#6DBFAA" stroke-width="1.5" marker-end="url(#indArr)"/>
+          <line x1="238" y1="65" x2="152" y2="65" stroke="#C8A84B" stroke-width="1.5" marker-end="url(#indArrL)"/>
+          <text x="195" y="46" font-family="DM Mono,monospace" font-size="8" fill="#6DBFAA" text-anchor="middle">add base</text>
+          <text x="195" y="82" font-family="DM Mono,monospace" font-size="8" fill="#C8A84B" text-anchor="middle">add acid</text>
+          <!-- In- box -->
+          <rect x="240" y="38" width="140" height="44" rx="3" fill="rgba(74,158,138,0.1)" stroke="#4A9E8A" stroke-width="1.2"/>
+          <text x="310" y="57" font-family="DM Mono,monospace" font-size="11" fill="#6DBFAA" text-anchor="middle">In⁻ + H⁺</text>
+          <text x="310" y="73" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.4)" text-anchor="middle">Colour B</text>
+          <!-- Ka expression -->
+          <rect x="430" y="28" width="180" height="64" rx="3" fill="rgba(200,168,75,0.06)" stroke="#C8A84B" stroke-width="1"/>
+          <text x="440" y="48" font-family="DM Mono,monospace" font-size="9" fill="#C8A84B">Ka = [H⁺][In⁻] / [HIn]</text>
+          <text x="440" y="64" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.35)">Colour changes near pH = pKa</text>
+          <text x="440" y="80" font-family="DM Mono,monospace" font-size="9" fill="rgba(200,221,216,0.35)">Match indicator pKa to endpoint</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Titration type</th><th>Example 1</th><th>Example 2</th><th>Indicator &amp; endpoint</th><th>Equilibrium behind it</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Strong acid / Strong base</strong></td>
+            <td class="mono">HCl + NaOH → NaCl + H₂O</td>
+            <td class="mono">H₂SO₄ + 2KOH → K₂SO₄ + 2H₂O</td>
+            <td class="note">Any indicator works. Sharp endpoint. Phenolphthalein or methyl orange both valid. Salt formed is neutral (pH 7).</td>
+            <td class="note">K = 10¹⁴ — reaction goes to completion. Q drops to 0; system shifts fully forward. No equilibrium position to manage.</td>
+          </tr>
+          <tr>
+            <td><strong>Weak acid / Strong base</strong></td>
+            <td class="mono">CH₃COOH + NaOH → CH₃COONa + H₂O</td>
+            <td class="mono">HCOOH + NaOH → HCOONa + H₂O</td>
+            <td class="trap">Phenolphthalein only. Endpoint pH > 7 (basic salt hydrolysis). Methyl orange changes too early — wrong indicator = wrong endpoint.</td>
+            <td class="gold">Salt formed (CH₃COO⁻) hydrolyses: CH₃COO⁻ + H₂O ⇌ CH₃COOH + OH⁻. This is Kb of the conjugate base operating. Endpoint pH = 8–9.</td>
+          </tr>
+          <tr>
+            <td><strong>Strong acid / Weak base</strong></td>
+            <td class="mono">HCl + NH₃ → NH₄Cl</td>
+            <td class="mono">HNO₃ + NH₃ → NH₄NO₃</td>
+            <td class="trap">Methyl orange only. Endpoint pH < 7 (acidic salt hydrolysis). Phenolphthalein changes too late.</td>
+            <td class="note">NH₄⁺ hydrolyses: NH₄⁺ + H₂O ⇌ NH₃ + H₃O⁺. Ka of NH₄⁺ is active. Endpoint pH ≈ 5.</td>
+          </tr>
+          <tr>
+            <td><strong>Buffer action</strong></td>
+            <td class="mono">CH₃COOH/CH₃COONa — resists pH drop when acid added</td>
+            <td class="mono">NH₃/NH₄Cl — resists pH rise when base added</td>
+            <td class="gold">Henderson-Hasselbalch: pH = pKa + log([A⁻]/[HA]). Half-equivalence point: [HA] = [A⁻] → pH = pKa exactly. JAMB tests this identity.</td>
+            <td class="note">Buffer IS the equilibrium. Add H⁺ → CH₃COO⁻ absorbs it (shifts left). Add OH⁻ → CH₃COOH releases H⁺ (shifts right). K unchanged throughout.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION: REAL LIFE -->
+    <div class="act-marker" style="margin-top:48px;">Real Life Processes</div>
+
+    <ul class="arrow-list gold">
+      <li><strong>Blood pH regulation (CO₂/HCO₃⁻ buffer)</strong> — CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻. Lungs control CO₂; kidneys control HCO₃⁻. Together they hold blood pH at 7.35–7.45. Deviate by 0.1 units — medical emergency. This is Le Chatelier keeping you alive.</li>
+      <li><strong>Haemoglobin / oxygen binding</strong> — Hb + O₂ ⇌ HbO₂. In lungs (high O₂): shifts forward. In tissues (low O₂, high CO₂): shifts backward, releasing O₂. Equilibrium carries every molecule of oxygen in your body.</li>
+      <li><strong>Tooth enamel dissolution</strong> — Ca₅(PO₄)₃OH(s) ⇌ 5Ca²⁺ + 3PO₄³⁻ + OH⁻. Ksp governs this. Acid in the mouth lowers [OH⁻] → Q < Ksp → enamel dissolves. Fluoride increases Ksp of the fluoride analogue — teeth resist acid. Chemistry in your mouth, every meal.</li>
+      <li><strong>Ocean acidification</strong> — CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻. Rising atmospheric CO₂ → more dissolves in ocean → equilibrium shifts forward → [H⁺] rises → pH drops. The same carbonic acid equilibrium that runs your blood is dissolving coral reefs.</li>
+      <li><strong>Soap and hard water (Ksp)</strong> — Ca²⁺ + 2RCOO⁻ ⇌ Ca(RCOO)₂(s). Calcium ions in hard water precipitate soap scum. Ksp exceeded → precipitate forms. Softeners replace Ca²⁺ with Na⁺ (more soluble soap). Equilibrium solubility in the shower.</li>
+      <li><strong>Fermentation (alcohol)</strong> — C₆H₁₂O₆ ⇌ 2C₂H₅OH + 2CO₂. Yeast enzymes catalyse — faster equilibrium, not different equilibrium. CO₂ removal (open vessel) prevents reverse. Product removal shifts forward. Industrial fermenters exploit Le Chatelier.</li>
+    </ul>
+
+    <div class="footnote">
+      <div class="footnote-label">Why this maps directly to JAMB questions</div>
+      <p>Every cluster in this article corresponds to a category of JAMB question. Writing K expressions → tests solid/liquid exclusion and stoichiometric powers. Kc/Kp conversion → tests Δn and the special case Δn = 0. Le Chatelier → tests conditions for industrial processes (Haber, Contact). Q vs K → predicts shift direction. pH/pOH → three-step calculation questions. Ksp → solubility and common ion effect. Indicator choice → identifies titration type from endpoint pH. Buffer → Henderson-Hasselbalch at half-equivalence point. The thread connecting every question is always the same: products over reactants, the system resisting disturbance, and K as the fixed target the system always moves toward.</p>
+    </div>
+
+    <div class="compress">
+      <div class="compress-label">The closing compression</div>
+      <div class="compress-text">Equilibrium is chemistry's way of never fully committing. The tide always comes in and always goes out. Every reaction that matters — in industry, in the lab, in the body, in the ocean — is just a system finding the exact point where both directions are equally tired. Understand that one idea, and the symbols, laws, and principles all fall into place behind it.</div>
+    </div>
+  </div>
+  <div class="section-end"></div>
+</div>
+
+<div class="container">
+  <div class="closing">
+    <p class="closing-text">From the beach where the tide holds steady to the blood vessel where pH never wavers — it was always the same question: where does the system want to rest?</p>
+    <p class="closing-sub">MEPC · Flow Article · Equilibrium</p>
+  </div>
+</div>
+
+<script>
+window.addEventListener('scroll',function(){
+  var p=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  document.getElementById('progress').style.width=p+'%';
+});
+</script>
+</body>
+</html>
