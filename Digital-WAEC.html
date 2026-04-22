@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>WAEC Digital Tech | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #0C0F1A;
+      --surface:  #131824;
+      --surface2: #1A2030;
+      --border:   rgba(255,255,255,0.07);
+      --border2:  rgba(255,255,255,0.12);
+      --text:     #EEF0F6;
+      --sec:      rgba(238,240,246,0.65);
+      --ter:      rgba(238,240,246,0.38);
+      --accent:   #4F8EF7;
+      --accent2:  #2563EB;
+      --gold:     #F0B429;
+      --green:    #22C55E;
+      --green2:   #16A34A;
+      --red:      #EF4444;
+      --amber:    #F59E0B;
+      --r:        12px;
+      --serif:    'Instrument Serif', Georgia, serif;
+      --mono:     'DM Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.6;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 90px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.35;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+    #watermark {
+      position:fixed; inset:0; z-index:9999; pointer-events:none; overflow:hidden;
+      display:flex; flex-direction:column; gap:2.4rem; padding:1rem;
+      transform:rotate(-18deg) scale(1.6); transform-origin:center center;
+      opacity:0.055; font-family:var(--mono); font-size:0.85rem; font-weight:500;
+      color:#dde4f7; letter-spacing:0.12em; white-space:nowrap; user-select:none; -webkit-user-select:none;
+    }
+    .hdr {
+      background:rgba(12,15,26,0.94); border-bottom:1px solid var(--border2);
+      padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position:sticky; top:0; z-index:100;
+      backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
+    }
+    .hdr-inner { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .hdr-left { display:flex; flex-direction:column; gap:3px; }
+    .hdr-brand { font-family:var(--mono); font-size:10px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
+    .hdr-title { font-family:var(--serif); font-size:18px; font-style:italic; color:var(--text); letter-spacing:-0.2px; }
+    .hdr-meta  { font-size:11px; color:var(--ter); font-family:var(--mono); }
+    .timer-pill {
+      display:flex; align-items:center; gap:8px; padding:8px 14px;
+      border-radius:20px; background:rgba(79,142,247,0.08); border:1px solid rgba(79,142,247,0.2);
+      flex-shrink:0; cursor:default;
+    }
+    .timer-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; transition:background .3s; }
+    .timer-dot.warn { background:var(--amber); }
+    .timer-dot.dang { background:var(--red); animation:blink 1s infinite; }
+    .timer-val { font-family:var(--mono); font-size:15px; font-weight:500; color:var(--accent); letter-spacing:1.5px; transition:color .3s; }
+    .timer-val.warn { color:var(--amber); }
+    .timer-val.dang { color:var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+    .score-strip {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+      padding:14px 20px 10px; position:relative; z-index:1;
+    }
+    .sc { background:var(--surface); border-radius:10px; padding:10px 8px; text-align:center; border:1px solid var(--border); }
+    .sc-v { font-family:var(--mono); font-size:17px; font-weight:500; color:var(--text); }
+    .sc-v.g { color:var(--green); } .sc-v.r { color:var(--red); } .sc-v.d { color:var(--ter); }
+    .sc-v.b { color:var(--accent); }
+    .sc-l { font-size:10px; color:var(--ter); margin-top:2px; text-transform:uppercase; letter-spacing:0.5px; font-family:var(--mono); }
+    .prog-wrap { padding:0 20px 12px; position:relative; z-index:1; }
+    .prog-track { height:2px; background:var(--border); border-radius:99px; overflow:hidden; }
+    .prog-fill { height:100%; background:linear-gradient(90deg, var(--accent2), var(--accent)); border-radius:99px; transition:width .4s ease; width:0%; }
+    .tabs {
+      display:flex; gap:0; padding:0 20px 14px; position:relative; z-index:1; border-bottom:1px solid var(--border);
+      margin-bottom:4px;
+    }
+    .tab {
+      flex:1; padding:10px 8px; text-align:center; font-family:var(--mono); font-size:11px; font-weight:500;
+      letter-spacing:0.06em; text-transform:uppercase; color:var(--ter); background:transparent;
+      border:1px solid var(--border); cursor:pointer; transition:all .2s;
+    }
+    .tab:first-child { border-radius:8px 0 0 8px; }
+    .tab:last-child  { border-radius:0 8px 8px 0; border-left:none; }
+    .tab.active {
+      background:rgba(79,142,247,0.1); border-color:rgba(79,142,247,0.35); color:var(--accent);
+    }
+    .panel { display:none; }
+    .panel.active { display:block; }
+    .sect-hdr {
+      margin:4px 20px 14px; padding:14px 18px;
+      border-radius:var(--r); background:rgba(79,142,247,0.05);
+      border:1px solid rgba(79,142,247,0.15);
+      position:relative; z-index:1;
+    }
+    .sect-hdr-title { font-family:var(--serif); font-size:16px; font-style:italic; color:var(--text); margin-bottom:3px; }
+    .sect-hdr-meta  { font-size:11px; color:var(--ter); font-family:var(--mono); }
+    #obj-qc, #thy-qc { padding:4px 20px 20px; position:relative; z-index:1; }
+    .qcard {
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+      padding:20px; margin-bottom:14px; animation:fadeUp .3s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .qcard-top {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border); gap:10px;
+    }
+    .qnum  { font-family:var(--mono); font-size:10px; font-weight:500; color:var(--ter); letter-spacing:0.12em; text-transform:uppercase; }
+    .qtopic {
+      font-size:10px; font-weight:500; padding:3px 9px; border-radius:99px;
+      background:rgba(79,142,247,0.08); border:1px solid rgba(79,142,247,0.18); color:var(--accent); letter-spacing:0.3px;
+    }
+    .qtxt { font-size:15px; line-height:1.75; color:var(--text); margin-bottom:16px; }
+    .opts { display:flex; flex-direction:column; gap:8px; }
+    .opt {
+      display:flex; align-items:flex-start; gap:12px; padding:12px 15px;
+      border-radius:9px; border:1px solid var(--border); background:var(--surface2);
+      cursor:pointer; transition:all .15s;
+    }
+    .opt:hover:not(.locked) { border-color:rgba(79,142,247,0.4); background:rgba(79,142,247,0.05); }
+    .opt.sel  { border-color:rgba(79,142,247,0.45); background:rgba(79,142,247,0.08); }
+    .opt.ok   { border-color:var(--green);  background:rgba(34,197,94,0.07); }
+    .opt.no   { border-color:var(--red);    background:rgba(239,68,68,0.07); }
+    .opt.locked { cursor:default; }
+    .opt-key { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--accent); flex-shrink:0; width:18px; padding-top:1px; }
+    .opt.ok  .opt-key { color:var(--green); }
+    .opt.no  .opt-key { color:var(--red); }
+    .opt-txt { font-size:14px; color:var(--sec); line-height:1.55; }
+    .theory-body { display:flex; flex-direction:column; gap:10px; }
+    .theory-marks-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      font-family:var(--mono); font-size:10px; color:var(--gold);
+      background:rgba(240,180,41,0.08); border:1px solid rgba(240,180,41,0.2);
+      padding:3px 10px; border-radius:99px; width:fit-content;
+    }
+    .prose-area {
+      width:100%; min-height:140px; padding:14px 16px;
+      background:var(--surface2); border:1px solid var(--border2);
+      border-radius:9px; color:var(--text); font-family:var(--sans);
+      font-size:14px; line-height:1.75; resize:vertical;
+      transition:border-color .2s; outline:none;
+    }
+    .prose-area:focus { border-color:rgba(79,142,247,0.5); }
+    .prose-area:disabled { opacity:0.5; cursor:not-allowed; resize:none; }
+    .word-count { font-family:var(--mono); font-size:10px; color:var(--ter); text-align:right; }
+    .word-count.active { color:var(--sec); }
+    .thy-selection-info {
+      margin:0 20px 10px; padding:10px 16px; border-radius:9px;
+      background:rgba(240,180,41,0.06); border:1px solid rgba(240,180,41,0.18);
+      font-family:var(--mono); font-size:11px; color:var(--gold);
+      position:relative; z-index:1;
+    }
+    .abtn {
+      margin-top:10px; width:100%; padding:11px; border-radius:9px;
+      background:var(--accent); color:#fff; font-family:var(--sans); font-size:13px;
+      font-weight:600; border:none; cursor:pointer; transition:opacity .2s, transform .15s;
+      letter-spacing:0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity:0.88; transform:translateY(-1px); }
+    .abtn:disabled { opacity:0.25; cursor:not-allowed; transform:none; }
+    .exp {
+      display:none; margin-top:12px; background:rgba(34,197,94,0.05);
+      border:1px solid rgba(34,197,94,0.15); border-radius:9px;
+      padding:14px; font-size:13px; line-height:1.72; color:var(--sec);
+    }
+    .exp.show { display:block; }
+    .exp.wrong-exp { background:rgba(239,68,68,0.05); border-color:rgba(239,68,68,0.15); }
+    .exp.partial-exp { background:rgba(240,180,41,0.05); border-color:rgba(240,180,41,0.15); }
+    .exp-mark {
+      display:inline-flex; align-items:center; gap:6px; margin-bottom:10px;
+      font-family:var(--mono); font-size:11px; font-weight:500;
+      padding:4px 10px; border-radius:6px;
+    }
+    .exp-mark.pos     { background:rgba(34,197,94,0.12);  color:var(--green); }
+    .exp-mark.partial { background:rgba(240,180,41,0.12); color:var(--gold); }
+    .exp-mark.neg     { background:rgba(239,68,68,0.1);   color:var(--red); }
+    .kw-feedback { margin-top:10px; }
+    .kw-feedback-title { font-family:var(--mono); font-size:10px; color:var(--ter); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+    .kw-list { display:flex; flex-wrap:wrap; gap:6px; }
+    .kw-tag {
+      font-family:var(--mono); font-size:11px; padding:3px 9px; border-radius:5px;
+    }
+    .kw-tag.hit  { background:rgba(34,197,94,0.1);  color:var(--green); border:1px solid rgba(34,197,94,0.2); }
+    .kw-tag.miss { background:rgba(239,68,68,0.08); color:var(--red);   border:1px solid rgba(239,68,68,0.15); text-decoration:line-through; opacity:0.7; }
+    .submit-bar {
+      position:fixed; bottom:0; left:0; right:0;
+      background:rgba(12,15,26,0.97); border-top:1px solid var(--border2);
+      padding:12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index:200;
+      backdrop-filter:blur(20px); display:flex; gap:10px; align-items:center;
+    }
+    .submit-btn {
+      flex:1; padding:13px; background:var(--accent); color:#fff;
+      font-family:var(--sans); font-size:14px; font-weight:600;
+      border:none; border-radius:9px; cursor:pointer; transition:opacity .2s;
+    }
+    .submit-btn:hover { opacity:0.88; }
+    .submit-progress { font-family:var(--mono); font-size:10px; color:var(--ter); white-space:nowrap; line-height:1.4; }
+    .modal-overlay {
+      position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.75);
+      backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:1rem;
+    }
+    .modal-overlay.show { display:flex; }
+    .modal {
+      background:var(--surface); border:1px solid var(--border2); border-radius:16px;
+      width:100%; max-width:400px; padding:24px;
+      box-shadow:0 32px 64px rgba(0,0,0,0.6); animation:modalIn .2s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(.96) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .modal h3 { font-family:var(--serif); font-size:1.2rem; font-style:italic; margin-bottom:16px; color:var(--text); }
+    .modal-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--ter);
+    }
+    .modal-row b { color:var(--text); font-family:var(--mono); font-weight:500; }
+    .modal-btns { display:flex; gap:8px; margin-top:20px; }
+    .modal-btn { flex:1; padding:11px; border-radius:9px; font-family:var(--sans); font-size:13px; font-weight:600; border:none; cursor:pointer; transition:opacity .2s; }
+    .modal-btn.primary { background:var(--accent); color:#fff; }
+    .modal-btn.primary:hover { opacity:.88; }
+    .modal-btn.ghost { background:transparent; color:var(--ter); border:1px solid var(--border); }
+    .results-screen {
+      position:fixed; inset:0; z-index:5000; background:var(--bg);
+      display:none; flex-direction:column; overflow-y:auto;
+      padding:24px 20px calc(env(safe-area-inset-bottom) + 40px);
+      animation:fadeUp .35s ease;
+    }
+    .results-screen.show { display:flex; }
+    .results-brand { font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; }
+    .results-title { font-family:var(--serif); font-size:2rem; font-style:italic; color:var(--text); margin-bottom:4px; line-height:1.2; }
+    .results-sub { font-size:13px; color:var(--ter); margin-bottom:28px; font-family:var(--mono); }
+    .grade-circle-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:28px; }
+    .grade-circle {
+      width:120px; height:120px; border-radius:50%;
+      border:2px solid var(--border2);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      margin-bottom:12px; position:relative;
+    }
+    .grade-score { font-family:var(--mono); font-size:2rem; font-weight:500; line-height:1; }
+    .grade-label { font-family:var(--mono); font-size:10px; color:var(--ter); margin-top:3px; letter-spacing:0.08em; }
+    .grade-badge {
+      font-family:var(--mono); font-size:11px; font-weight:500; padding:4px 14px;
+      border-radius:99px; letter-spacing:0.08em;
+    }
+    .grade-desc { font-size:13px; color:var(--ter); margin-top:6px; }
+    .results-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px; }
+    .res-cell { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+    .res-cell-val { font-family:var(--mono); font-size:1.4rem; font-weight:500; }
+    .res-cell-lbl { font-size:11px; color:var(--ter); margin-top:3px; font-family:var(--mono); }
+    .grade-table { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:24px; }
+    .grade-table-title { padding:12px 16px; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ter); border-bottom:1px solid var(--border); }
+    .grade-row { display:flex; justify-content:space-between; padding:9px 16px; border-bottom:1px solid var(--border); font-family:var(--mono); font-size:12px; }
+    .grade-row:last-child { border-bottom:none; }
+    .grade-row.current { background:rgba(79,142,247,0.06); }
+    .grade-row .gr-grade { color:var(--text); }
+    .grade-row .gr-range { color:var(--ter); }
+    .grade-row .gr-remark { color:var(--sec); }
+    .results-btn {
+      width:100%; padding:14px; background:var(--accent); color:#fff;
+      font-family:var(--sans); font-size:14px; font-weight:600;
+      border:none; border-radius:9px; cursor:pointer; transition:opacity .2s; margin-bottom:10px;
+    }
+    .results-btn:hover { opacity:.88; }
+    .results-btn.ghost {
+      background:transparent; color:var(--ter); border:1px solid var(--border); font-weight:400; font-size:13px;
+    }
+    @media print {
+      body { background:#fff !important; color:#000 !important; font-size:12pt; }
+      body::before, #watermark, .hdr, .tabs, .score-strip, .prog-wrap,
+      .thy-selection-info, .submit-bar, .results-screen, .modal-overlay,
+      .abtn, .prose-area { display:none !important; }
+      .panel { display:block !important; }
+      .exp { display:block !important; }
+      .qcard { break-inside:avoid; border:1px solid #ddd !important; background:#fff !important; margin-bottom:16pt; }
+      .opt { border:1px solid #ccc !important; background:#fff !important; }
+      .opt.ok  { background:#e6f9f0 !important; border-color:#22c55e !important; }
+      .opt.no  { background:#fef2f2 !important; border-color:#ef4444 !important; }
+      .opt-txt, .qtxt { color:#000 !important; }
+      #print-header { display:block !important; text-align:center; margin-bottom:20pt; padding-bottom:10pt; border-bottom:2pt solid #000; }
+      #print-header h1 { font-size:16pt; font-weight:800; }
+      #print-header p  { font-size:10pt; color:#555; margin-top:3pt; }
+    }
+    @media (max-width:420px) {
+      .score-strip { grid-template-columns:repeat(2,1fr); }
+      .results-grid { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="print-header" style="display:none"><h1>GrantApp AI · WAEC Digital Technology</h1><p>Section A: 50 Objectives (50 marks) · Section B: Theory — answer 5 of 10 (50 marks) · Total: 100 marks scaled to 100</p><p id="print-date"></p></div>
+<div id="watermark" aria-hidden="true"></div>
+<header class="hdr"><div class="hdr-inner"><div class="hdr-left"><span class="hdr-brand">GrantApp AI · WAEC</span><span class="hdr-title">Digital Technology — Paper 1</span><span class="hdr-meta" id="hdr-meta">Section A · <span id="answered-count">0</span> answered</span></div><div class="timer-pill" id="timer-pill"><div class="timer-dot" id="timer-dot"></div><span class="timer-val" id="timer-val">1:30:00</span></div></div></header>
+<div class="score-strip"><div class="sc"><div class="sc-v b" id="sc-total">100</div><div class="sc-l">Total</div></div><div class="sc"><div class="sc-v g" id="sc-marks">0</div><div class="sc-l">Marks</div></div><div class="sc"><div class="sc-v" id="sc-obj">0/50</div><div class="sc-l">OBJ</div></div><div class="sc"><div class="sc-v d" id="sc-thy">0/5</div><div class="sc-l">Theory</div></div></div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div class="tabs"><button class="tab active" id="tab-obj" onclick="switchTab('obj')">Section A — Objectives (50)</button><button class="tab" id="tab-thy" onclick="switchTab('thy')">Section B — Theory</button></div>
+<div class="panel active" id="panel-obj"><div class="sect-hdr"><div class="sect-hdr-title">Section A — Objective Questions</div><div class="sect-hdr-meta">50 questions · 1 mark each · Answer all</div></div><div id="obj-qc"></div></div>
+<div class="panel" id="panel-thy"><div class="thy-selection-info" id="thy-info">Answer <strong>5</strong> questions only. <span id="thy-answered-display">0 of 5 answered.</span></div><div class="sect-hdr"><div class="sect-hdr-title">Section B — Theory Questions</div><div class="sect-hdr-meta">10 questions · Answer any 5 · 10 marks each</div></div><div id="thy-qc"></div></div>
+<div class="submit-bar"><div class="submit-progress" id="sub-prog">OBJ: 0/50 · Theory: 0/5</div><button class="submit-btn" onclick="showSubmitModal()">Submit Exam</button><button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--surface2);color:var(--ter);border:1px solid var(--border);" title="Print / PDF">⬇</button></div>
+<div class="modal-overlay" id="submit-modal"><div class="modal"><h3>Submit examination?</h3><div class="modal-row"><span>OBJ answered</span><b id="m-obj">0 / 50</b></div><div class="modal-row"><span>Theory answered</span><b id="m-thy">0 / 5</b></div><div class="modal-row"><span>Marks so far</span><b id="m-marks">0 / 100</b></div><div class="modal-row"><span>Time remaining</span><b id="m-time">1:30:00</b></div><div class="modal-btns"><button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button><button class="modal-btn primary" onclick="submitExam()">Submit Now</button></div></div></div>
+<div class="results-screen" id="results-screen"><div class="results-brand">GrantApp AI · WAEC</div><div class="results-title">Digital Technology — Paper 1</div><div class="results-sub" id="res-sub">Completed</div><div class="grade-circle-wrap"><div class="grade-circle" id="res-circle"><span class="grade-score" id="res-score">—</span><span class="grade-label">/ 100</span></div><span class="grade-badge" id="res-badge">—</span><span class="grade-desc" id="res-desc">—</span></div><div class="results-grid"><div class="res-cell"><div class="res-cell-val" id="res-obj-marks">—</div><div class="res-cell-lbl">OBJ Marks (/ 50)</div></div><div class="res-cell"><div class="res-cell-val" id="res-thy-marks">—</div><div class="res-cell-lbl">Theory Marks (/ 50)</div></div><div class="res-cell"><div class="res-cell-val" id="res-raw">—</div><div class="res-cell-lbl">Raw Score (/ 100)</div></div><div class="res-cell"><div class="res-cell-val" id="res-pct">—</div><div class="res-cell-lbl">Scaled (/ 100)</div></div></div><div class="grade-table"><div class="grade-table-title">WAEC Grade Scale</div><div class="grade-row" id="gr-A1"><span class="gr-grade">A1</span><span class="gr-range">75–100</span><span class="gr-remark">Excellent</span></div><div class="grade-row" id="gr-B2"><span class="gr-grade">B2</span><span class="gr-range">70–74</span><span class="gr-remark">Very Good</span></div><div class="grade-row" id="gr-B3"><span class="gr-grade">B3</span><span class="gr-range">65–69</span><span class="gr-remark">Good</span></div><div class="grade-row" id="gr-C4"><span class="gr-grade">C4</span><span class="gr-range">60–64</span><span class="gr-remark">Credit</span></div><div class="grade-row" id="gr-C5"><span class="gr-grade">C5</span><span class="gr-range">55–59</span><span class="gr-remark">Credit</span></div><div class="grade-row" id="gr-C6"><span class="gr-grade">C6</span><span class="gr-range">50–54</span><span class="gr-remark">Credit</span></div><div class="grade-row" id="gr-D7"><span class="gr-grade">D7</span><span class="gr-range">45–49</span><span class="gr-remark">Pass</span></div><div class="grade-row" id="gr-E8"><span class="gr-grade">E8</span><span class="gr-range">40–44</span><span class="gr-remark">Pass</span></div><div class="grade-row" id="gr-F9"><span class="gr-grade">F9</span><span class="gr-range">0–39</span><span class="gr-remark">Fail</span></div></div><button class="results-btn" onclick="reviewAnswers()">Review Answers</button><button class="results-btn ghost" onclick="doPrint()">⬇ Download PDF</button></div>
+
+<script>
+'use strict';
+(function(){ let wm=document.getElementById('watermark'); if(wm){ let tile='GrantApp AI · WAEC Digital Technology · '; let row=''; for(let r=0;r<8;r++) row+=tile; let html=''; for(let i=0;i<16;i++) html+='<span>'+row+'</span>'; wm.innerHTML=html; }
+let pd=document.getElementById('print-date'); if(pd) pd.textContent='Date: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+})();
+
+// 50 Objective Questions covering Digital Technology syllabus
+const OBJ_Q = [
+  { id:'o1', topic:'Hardware', text:'Which component is considered the "brain" of the computer?', opts:{ A:'RAM', B:'CPU', C:'Hard Drive', D:'Motherboard' }, ans:'B', exp:'The CPU (Central Processing Unit) executes instructions and processes data.' },
+  { id:'o2', topic:'Software', text:'Which of the following is an example of system software?', opts:{ A:'Microsoft Word', B:'Google Chrome', C:'Windows 11', D:'Photoshop' }, ans:'C', exp:'Windows 11 is an operating system, a type of system software.' },
+  { id:'o3', topic:'Memory', text:'ROM stands for:', opts:{ A:'Read Only Memory', B:'Random Output Memory', C:'Read Operate Memory', D:'Random Only Memory' }, ans:'A', exp:'ROM is non-volatile memory used to store firmware.' },
+  { id:'o4', topic:'Networking', text:'What does IP stand for?', opts:{ A:'Internet Provider', B:'Internal Protocol', C:'Internet Protocol', D:'International Program' }, ans:'C', exp:'IP (Internet Protocol) is the principal communications protocol.' },
+  { id:'o5', topic:'Security', text:'A program designed to damage or disrupt a computer system is called:', opts:{ A:'Firewall', B:'Antivirus', C:'Malware', D:'Encryption' }, ans:'C', exp:'Malware is malicious software including viruses, worms, and trojans.' },
+  { id:'o6', topic:'Internet', text:'WWW stands for:', opts:{ A:'World Wide Web', B:'Web World Wide', C:'Wide World Web', D:'World Web Wide' }, ans:'A', exp:'The World Wide Web is an information system on the internet.' },
+  { id:'o7', topic:'Database', text:'In a database, a record is also known as a:', opts:{ A:'Field', B:'Row', C:'Column', D:'Table' }, ans:'B', exp:'A record corresponds to a row in a database table.' },
+  { id:'o8', topic:'Multimedia', text:'Which file extension represents an image?', opts:{ A:'.mp3', B:'.txt', C:'.png', D:'.doc' }, ans:'C', exp:'.png is a raster image format.' },
+  { id:'o9', topic:'Algorithms', text:'The first step in problem-solving using a computer is:', opts:{ A:'Coding', B:'Testing', C:'Defining the problem', D:'Debugging' }, ans:'C', exp:'Problem definition is the initial and crucial step.' },
+  { id:'o10', topic:'OS', text:'Which key combination is used to copy selected text in Windows?', opts:{ A:'Ctrl+X', B:'Ctrl+V', C:'Ctrl+C', D:'Ctrl+Z' }, ans:'C', exp:'Ctrl+C is the shortcut for copy.' },
+  { id:'o11', topic:'Networking', text:'Bluetooth is an example of:', opts:{ A:'LAN', B:'WAN', C:'PAN', D:'MAN' }, ans:'C', exp:'Personal Area Network for short-range device communication.' },
+  { id:'o12', topic:'Storage', text:'Which storage device has the fastest access speed?', opts:{ A:'HDD', B:'DVD', C:'SSD', D:'USB Flash Drive' }, ans:'C', exp:'SSDs use flash memory with no moving parts for high speed.' },
+  { id:'o13', topic:'Internet', text:'The "cloud" in cloud computing refers to:', opts:{ A:'Weather server', B:'Remote servers over the internet', C:'Local hard disk', D:'Network cables' }, ans:'B', exp:'Cloud computing delivers services over the internet.' },
+  { id:'o14', topic:'Software', text:'Which of these is a web browser?', opts:{ A:'Excel', B:'PowerPoint', C:'Firefox', D:'Access' }, ans:'C', exp:'Firefox is a free and open-source web browser.' },
+  { id:'o15', topic:'Security', text:'The practice of tricking users into revealing passwords is called:', opts:{ A:'Hacking', B:'Phishing', C:'Spamming', D:'Spoofing' }, ans:'B', exp:'Phishing uses deceptive emails or websites to steal credentials.' },
+  { id:'o16', topic:'Hardware', text:'Which output device produces a physical copy?', opts:{ A:'Monitor', B:'Projector', C:'Printer', D:'Speaker' }, ans:'C', exp:'A printer creates hard copies on paper.' },
+  { id:'o17', topic:'Data', text:'A group of 8 bits is called a:', opts:{ A:'Nibble', B:'Byte', C:'Word', D:'Kilobyte' }, ans:'B', exp:'1 byte = 8 bits, the basic unit of storage.' },
+  { id:'o18', topic:'Networking', text:'Which device connects multiple computers within a LAN?', opts:{ A:'Router', B:'Modem', C:'Switch', D:'Gateway' }, ans:'C', exp:'A switch forwards data between devices on the same network.' },
+  { id:'o19', topic:'Ethics', text:'Unauthorized access to computer systems is a crime under:', opts:{ A:'Copyright Act', B:'Cybercrime Act', C:'Data Protection Act', D:'Patent Act' }, ans:'B', exp:'Cybercrime laws specifically address unauthorized access.' },
+  { id:'o20', topic:'Multimedia', text:'Which software is used for video editing?', opts:{ A:'Photoshop', B:'Audacity', C:'Premiere Pro', D:'Excel' }, ans:'C', exp:'Adobe Premiere Pro is professional video editing software.' },
+  { id:'o21', topic:'Hardware', text:'Which port is used to connect a keyboard or mouse?', opts:{ A:'HDMI', B:'USB', C:'VGA', D:'Ethernet' }, ans:'B', exp:'USB (Universal Serial Bus) is common for peripherals.' },
+  { id:'o22', topic:'Internet', text:'The speed of a network is measured in:', opts:{ A:'Hertz', B:'Bytes', C:'Bits per second', D:'Joules' }, ans:'C', exp:'Data rate is measured in bits per second (bps).' },
+  { id:'o23', topic:'Software', text:'An example of a spreadsheet application is:', opts:{ A:'Word', B:'Excel', C:'PowerPoint', D:'Outlook' }, ans:'B', exp:'Microsoft Excel is used for spreadsheets and data analysis.' },
+  { id:'o24', topic:'OS', text:'Which of the following is NOT an operating system?', opts:{ A:'Linux', B:'macOS', C:'Windows', D:'Photoshop' }, ans:'D', exp:'Photoshop is application software, not an OS.' },
+  { id:'o25', topic:'Programming', text:'HTML is used to create:', opts:{ A:'Databases', B:'Spreadsheets', C:'Web pages', D:'Presentations' }, ans:'C', exp:'HTML (HyperText Markup Language) structures web content.' },
+  { id:'o26', topic:'Data', text:'Which number system is used by computers?', opts:{ A:'Decimal', B:'Binary', C:'Octal', D:'Hexadecimal' }, ans:'B', exp:'Computers use binary (base-2) with digits 0 and 1.' },
+  { id:'o27', topic:'Storage', text:'Which of these has the largest storage capacity?', opts:{ A:'1 KB', B:'1 MB', C:'1 GB', D:'1 TB' }, ans:'D', exp:'1 TB (Terabyte) = 1024 GB, largest among options.' },
+  { id:'o28', topic:'Security', text:'A firewall is used to:', opts:{ A:'Speed up computer', B:'Block unauthorized access', C:'Install software', D:'Backup data' }, ans:'B', exp:'Firewalls monitor and control incoming/outgoing network traffic.' },
+  { id:'o29', topic:'Internet', text:'The protocol used for secure web browsing is:', opts:{ A:'HTTP', B:'FTP', C:'HTTPS', D:'SMTP' }, ans:'C', exp:'HTTPS adds encryption layer to HTTP for security.' },
+  { id:'o30', topic:'Hardware', text:'Which component stores the BIOS?', opts:{ A:'RAM', B:'CPU', C:'ROM', D:'Cache' }, ans:'C', exp:'BIOS is stored on a ROM chip on the motherboard.' },
+  { id:'o31', topic:'Networking', text:'Wi-Fi is a technology for:', opts:{ A:'Wired networking', B:'Wireless networking', C:'Satellite TV', D:'Radio broadcast' }, ans:'B', exp:'Wi-Fi enables wireless local area networking.' },
+  { id:'o32', topic:'Database', text:'SQL is a language used for:', opts:{ A:'Graphics design', B:'Database management', C:'Web design', D:'Video editing' }, ans:'B', exp:'Structured Query Language manages relational databases.' },
+  { id:'o33', topic:'Ethics', text:'Software piracy refers to:', opts:{ A:'Free software', B:'Illegal copying of software', C:'Open source', D:'Software updates' }, ans:'B', exp:'Piracy is the unauthorized use or distribution of copyrighted software.' },
+  { id:'o34', topic:'OS', text:'A graphical user interface uses:', opts:{ A:'Command line only', B:'Icons and windows', C:'Text menus only', D:'Punched cards' }, ans:'B', exp:'GUI provides visual elements like icons, windows, and pointers.' },
+  { id:'o35', topic:'Hardware', text:'Which device captures images for input?', opts:{ A:'Printer', B:'Scanner', C:'Monitor', D:'Speaker' }, ans:'B', exp:'A scanner digitizes physical images/documents for input.' },
+  { id:'o36', topic:'Internet', text:'Email stands for:', opts:{ A:'Electronic Mail', B:'Electric Mail', C:'Emergency Mail', D:'Efficient Mail' }, ans:'A', exp:'Email is electronic mail sent over the internet.' },
+  { id:'o37', topic:'Security', text:'A strong password should contain:', opts:{ A:'Only letters', B:'Only numbers', C:'Mixed characters', D:'Only symbols' }, ans:'C', exp:'Strong passwords mix uppercase, lowercase, numbers, and symbols.' },
+  { id:'o38', topic:'Software', text:'Which software is used for presentations?', opts:{ A:'Word', B:'Excel', C:'PowerPoint', D:'Access' }, ans:'C', exp:'PowerPoint creates slide-based presentations.' },
+  { id:'o39', topic:'Data', text:'ASCII is a standard for:', opts:{ A:'Video compression', B:'Character encoding', C:'Audio format', D:'Image format' }, ans:'B', exp:'ASCII encodes text characters as numbers.' },
+  { id:'o40', topic:'Networking', text:'A URL is a:', opts:{ A:'Uniform Resource Locator', B:'Universal Response Link', C:'Unique Resource Locator', D:'Unified Retrieval Language' }, ans:'A', exp:'URL specifies the address of a web resource.' },
+  { id:'o41', topic:'Hardware', text:'Which is an input device?', opts:{ A:'Monitor', B:'Keyboard', C:'Printer', D:'Speaker' }, ans:'B', exp:'Keyboard sends data into the computer (input).' },
+  { id:'o42', topic:'Internet', text:'A blog is a:', opts:{ A:'Type of virus', B:'Online journal', C:'Search engine', D:'Email client' }, ans:'B', exp:'Blog (weblog) is regularly updated website or web page.' },
+  { id:'o43', topic:'Storage', text:'Which is volatile memory?', opts:{ A:'ROM', B:'Hard Disk', C:'RAM', D:'SSD' }, ans:'C', exp:'RAM loses data when power is off.' },
+  { id:'o44', topic:'Programming', text:'Which language is commonly used for web development?', opts:{ A:'Python', B:'JavaScript', C:'C++', D:'Java' }, ans:'B', exp:'JavaScript is essential for client-side web interactivity.' },
+  { id:'o45', topic:'OS', text:'The process of starting a computer is called:', opts:{ A:'Booting', B:'Loading', C:'Burning', D:'Flashing' }, ans:'A', exp:'Booting loads the OS into main memory.' },
+  { id:'o46', topic:'Security', text:'A computer virus can spread via:', opts:{ A:'Email attachments', B:'USB drives', C:'Downloads', D:'All of the above' }, ans:'D', exp:'Viruses can spread through many vectors.' },
+  { id:'o47', topic:'Hardware', text:'The resolution of a monitor refers to:', opts:{ A:'Number of colors', B:'Number of pixels', C:'Screen size', D:'Refresh rate' }, ans:'B', exp:'Resolution is pixel count (e.g., 1920×1080).' },
+  { id:'o48', topic:'Networking', text:'A MAC address is:', opts:{ A:'Apple computer ID', B:'Physical network address', C:'IP address', D:'Email address' }, ans:'B', exp:'MAC address is a unique hardware identifier for network interfaces.' },
+  { id:'o49', topic:'Data', text:'A terabyte is approximately:', opts:{ A:'1 billion bytes', B:'1 trillion bytes', C:'1 million bytes', D:'1 thousand bytes' }, ans:'B', exp:'1 TB ≈ 1 trillion bytes (1024^4 bytes).' },
+  { id:'o50', topic:'Ethics', text:'Digital citizenship includes:', opts:{ A:'Responsible technology use', B:'Hacking', C:'Piracy', D:'Spamming' }, ans:'A', exp:'Digital citizenship promotes safe, ethical, and responsible tech use.' }
+];
+
+// Theory questions (10)
+const THY_Q = [
+  { id:'t1', topic:'Computer Networks', marks:10, text:'(a) Define a computer network. (b) State three benefits of networking computers. (c) Differentiate between LAN and WAN.', markScheme:'Network: interconnection of two or more computers to share resources.\nBenefits: resource sharing, communication, centralised data.\nLAN: small area, high speed. WAN: large area, slower.', keywords:['network','interconnection','LAN','WAN','resources','communication','local area','wide area','benefits','share'], minKeywords:6 },
+  { id:'t2', topic:'Data Processing', marks:10, text:'Explain the data processing cycle: (i) Input (ii) Processing (iii) Output (iv) Storage. Give examples.', markScheme:'Input: capturing raw data. Processing: performing operations. Output: presenting information. Storage: saving data.', keywords:['input','processing','output','storage','raw data','capturing','operations','information','saving','cycle'], minKeywords:6 },
+  { id:'t3', topic:'Cybersecurity', marks:10, text:'(a) Define cybersecurity. (b) Describe three cyber threats. (c) State two measures against phishing.', markScheme:'Cybersecurity: protection of internet systems. Threats: malware, phishing, ransomware. Measures: education, email filters, MFA.', keywords:['cybersecurity','threats','malware','phishing','ransomware','protection','education','filters','authentication','attack'], minKeywords:6 },
+  { id:'t4', topic:'Algorithms', marks:10, text:'(a) What is an algorithm? (b) List three characteristics of a good algorithm. (c) Write an algorithm to find the largest of three numbers.', markScheme:'Algorithm: step-by-step procedure. Characteristics: unambiguous, finite, well-defined. Steps: read numbers, compare, output largest.', keywords:['algorithm','step-by-step','unambiguous','finite','compare','largest','procedure','inputs','output','efficient'], minKeywords:6 },
+  { id:'t5', topic:'Internet', marks:10, text:'Explain: URL, ISP, IP Address, DNS. Give examples.', markScheme:'URL: web address. ISP: Internet Service Provider. IP: numeric label. DNS: translates domain names to IPs.', keywords:['URL','ISP','IP','DNS','example','address','provider','domain','translate','internet'], minKeywords:6 },
+  { id:'t6', topic:'OS', marks:10, text:'Describe four functions of an operating system with examples.', markScheme:'Process management, memory management, file management, security, device management, user interface.', keywords:['process','memory','file','security','device','interface','management','allocate','driver','user'], minKeywords:6 },
+  { id:'t7', topic:'Spreadsheets', marks:10, text:'(a) What is a cell reference? (b) Distinguish relative vs absolute referencing. (c) Formula for average of A1:A10.', markScheme:'Cell reference: address. Relative changes when copied; absolute fixed with $. =AVERAGE(A1:A10)', keywords:['cell reference','relative','absolute','$','copy','average','formula','spreadsheet','A1','range'], minKeywords:5 },
+  { id:'t8', topic:'HTML', marks:10, text:'(a) Define HTML and CSS. (b) Write HTML for heading and paragraph. (c) Explain <a> tag.', markScheme:'HTML: structure. CSS: style. <h1>heading</h1><p>text</p>. <a> for hyperlinks.', keywords:['HTML','CSS','structure','style','h1','paragraph','<a>','hyperlink','href','markup'], minKeywords:6 },
+  { id:'t9', topic:'Digital Divide', marks:10, text:'Explain "digital divide". Discuss two consequences on education and propose one solution.', markScheme:'Digital divide: gap in ICT access. Consequences: unequal learning, skill gaps. Solutions: community access, affordable devices.', keywords:['digital divide','gap','access','education','learning','skills','solution','affordable','community','ICT'], minKeywords:6 },
+  { id:'t10', topic:'AI', marks:10, text:'(a) Define Artificial Intelligence. (b) Two real-world AI applications. (c) One ethical concern.', markScheme:'AI: simulation of human intelligence. Apps: Siri, self-driving cars, diagnosis. Concerns: bias, privacy, jobs.', keywords:['artificial intelligence','simulation','machine learning','virtual assistant','bias','privacy','ethics','diagnosis','autonomous','jobs'], minKeywords:6 }
+];
+
+let ST = { objAnswered:0, objCorrect:0, objMarks:0, thyAnswered:0, thyMarks:0, objDone:new Set(), thyDone:new Set() };
+let UA_OBJ = {}, UA_THY = {}, SHUFFLED = {};
+let globalDone = false, TOTAL_SECS = 5400, timerInterval=null;
+
+function startTimer(){ let rem=TOTAL_SECS, dot=document.getElementById('timer-dot'), val=document.getElementById('timer-val'); function fmt(s){ let h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60; return (h>0?(h<10?'0':'')+h+':':'')+(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; } val.textContent=fmt(rem); timerInterval=setInterval(function(){ rem--; val.textContent=fmt(rem); if(rem<=600 && rem>180){ val.className='timer-val warn'; dot.className='timer-dot warn'; }else if(rem<=180){ val.className='timer-val dang'; dot.className='timer-dot dang'; } if(rem<=0){ clearInterval(timerInterval); timeUp(); } },1000); }
+function stopTimer(){ if(timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay(){ let el=document.getElementById('timer-val'); return el?el.textContent:'—'; }
+function buildShuffled(q){ let entries=['A','B','C','D'].map(k=>({key:k,text:q.opts[k]})); for(let i=entries.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [entries[i],entries[j]]=[entries[j],entries[i]]; } let opts={}, ans=q.ans; ['A','B','C','D'].forEach((lbl,idx)=>{ opts[lbl]=entries[idx].text; if(entries[idx].key===q.ans) ans=lbl; }); return {opts,ans}; }
+function switchTab(which){ document.getElementById('panel-obj').classList.toggle('active',which==='obj'); document.getElementById('panel-thy').classList.toggle('active',which==='thy'); document.getElementById('tab-obj').classList.toggle('active',which==='obj'); document.getElementById('tab-thy').classList.toggle('active',which==='thy'); let meta=document.getElementById('hdr-meta'); if(which==='obj') meta.innerHTML='Section A · <span id="answered-count">'+ST.objAnswered+'</span> answered'; else meta.innerHTML='Section B · <span id="answered-count">'+ST.thyAnswered+'</span> answered'; }
+function updateStats(){ let totalMarks=ST.objMarks+ST.thyMarks; document.getElementById('sc-marks').textContent=totalMarks; document.getElementById('sc-obj').textContent=ST.objAnswered+'/50'; document.getElementById('sc-thy').textContent=ST.thyAnswered+'/5'; document.getElementById('answered-count').textContent=ST.objAnswered+ST.thyAnswered; let totalQ=55, done=ST.objAnswered+ST.thyAnswered; document.getElementById('prog-fill').style.width=(done/totalQ*100)+'%'; document.getElementById('sub-prog').textContent='OBJ: '+ST.objAnswered+'/50 · Theory: '+ST.thyAnswered+'/5'; document.getElementById('thy-answered-display').textContent=ST.thyAnswered+' of 5 answered.'; document.getElementById('m-obj').textContent=ST.objAnswered+' / 50'; document.getElementById('m-thy').textContent=ST.thyAnswered+' / 5'; document.getElementById('m-marks').textContent=totalMarks+' / 100'; document.getElementById('m-time').textContent=getTimeDisplay(); }
+function renderObj(){ let container=document.getElementById('obj-qc'); let html=''; OBJ_Q.forEach((q,i)=>{ let sh=buildShuffled(q); SHUFFLED[q.id]=sh; let opts=''; ['A','B','C','D'].forEach(lbl=>{ opts+=`<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${sh.opts[lbl]}</span></div>`; }); html+=`<div class="qcard"><div class="qcard-top"><span class="qnum">Q${i+1}</span><span class="qtopic">${q.topic}</span></div><div class="qtxt">${q.text}</div><div class="opts">${opts}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp-${q.id}"></div></div>`; }); container.innerHTML=html; document.querySelectorAll('#obj-qc .opt').forEach(opt=>{ opt.addEventListener('click',function(){ if(globalDone||this.classList.contains('locked')) return; let qid=this.dataset.id; document.querySelectorAll(`#obj-qc .opt[data-id="${qid}"]`).forEach(o=>o.classList.remove('sel')); this.classList.add('sel'); UA_OBJ[qid]=this.dataset.a; let btn=document.querySelector(`#obj-qc .abtn[data-qid="${qid}"]`); if(btn) btn.disabled=false; }); }); document.querySelectorAll('#obj-qc .abtn').forEach(btn=>{ btn.addEventListener('click',function(){ if(globalDone) return; let qid=this.dataset.qid; let q=OBJ_Q.find(x=>x.id===qid); let chosen=UA_OBJ[qid]; let correctLbl=SHUFFLED[qid].ans; let ok=(chosen===correctLbl); document.querySelectorAll(`#obj-qc .opt[data-id="${qid}"]`).forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; if(o.dataset.a===correctLbl) o.classList.add('ok'); else if(o.dataset.a===chosen) o.classList.add('no'); }); let expEl=document.getElementById('exp-'+qid); let markCls=ok?'pos':'neg'; let markTxt=ok?'✓ Correct — 1 mark':'✗ Incorrect — correct: '+correctLbl; expEl.innerHTML=`<span class="exp-mark ${markCls}">${markTxt}</span><div style="margin-top:8px">${q.exp}</div>`; expEl.className='exp show'+(ok?'':' wrong-exp'); this.disabled=true; if(!ST.objDone.has(qid)){ ST.objDone.add(qid); ST.objAnswered++; if(ok){ ST.objCorrect++; ST.objMarks++; } updateStats(); } }); }); }
+function renderThy(){ let container=document.getElementById('thy-qc'); let html=''; THY_Q.forEach((q,i)=>{ html+=`<div class="qcard" id="thycard-${q.id}"><div class="qcard-top"><span class="qnum">Q${i+1}</span><span class="qtopic">${q.topic}</span></div><div class="theory-body"><span class="theory-marks-badge">⬡ ${q.marks} marks</span><div class="qtxt">${q.text.replace(/\n/g,'<br>')}</div><textarea class="prose-area" id="prose-${q.id}" placeholder="Write your answer here…" oninput="onProseInput('${q.id}')" rows="6"></textarea><div class="word-count" id="wc-${q.id}">0 words</div></div><button class="abtn" data-qid="${q.id}" id="thybtn-${q.id}" disabled onclick="checkTheory('${q.id}')">Check & Mark</button><div class="exp" id="thy-exp-${q.id}"></div></div>`; }); container.innerHTML=html; }
+window.onProseInput=function(qid){ let ta=document.getElementById('prose-'+qid); let wc=document.getElementById('wc-'+qid); let btn=document.getElementById('thybtn-'+qid); if(!ta||!wc) return; let words=ta.value.trim().split(/\s+/).filter(w=>w.length>0); let count=ta.value.trim()===''?0:words.length; wc.textContent=count+' word'+(count!==1?'s':''); wc.className=count>0?'word-count active':'word-count'; if(btn) btn.disabled=count<5; };
+window.checkTheory=function(qid){ if(globalDone) return; let q=THY_Q.find(x=>x.id===qid); if(!ST.thyDone.has(qid) && ST.thyAnswered>=5){ let ta2=document.getElementById('prose-'+qid); if(ta2){ ta2.disabled=true; ta2.placeholder='You have already answered 5 questions.'; } document.getElementById('thybtn-'+qid).disabled=true; return; } let ta=document.getElementById('prose-'+qid); let answer=ta?ta.value.toLowerCase():''; let hits=[], misses=[]; q.keywords.forEach(kw=>{ if(answer.indexOf(kw.toLowerCase())!==-1) hits.push(kw); else misses.push(kw); }); let hitCount=hits.length, totalKw=q.keywords.length, marks; if(hitCount>=q.minKeywords){ let extra=hitCount-q.minKeywords, extraMax=totalKw-q.minKeywords, bonus=extraMax>0?(extra/extraMax)*2:0; marks=Math.min(10,Math.round(8+bonus)); }else if(hitCount===0){ marks=0; }else{ marks=Math.round((hitCount/q.minKeywords)*7); } if(ta) ta.disabled=true; document.getElementById('thybtn-'+qid).disabled=true; let expEl=document.getElementById('thy-exp-'+qid); let markCls=marks>=8?'pos':marks>=5?'partial':'neg'; let expCls=marks>=8?'':marks>=5?' partial-exp':' wrong-exp'; let kwListHtml='<div class="kw-list">'; hits.forEach(kw=>kwListHtml+=`<span class="kw-tag hit">✓ ${kw}</span>`); misses.forEach(kw=>kwListHtml+=`<span class="kw-tag miss">${kw}</span>`); kwListHtml+='</div>'; expEl.innerHTML=`<span class="exp-mark ${markCls}">${marks} / 10 marks</span><div style="margin-top:8px;font-size:13px;color:var(--ter);margin-bottom:10px">${hitCount} of ${totalKw} marking keywords found</div><div class="kw-feedback"><div class="kw-feedback-title">Keyword Breakdown</div>${kwListHtml}</div><div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--ter);line-height:1.7"><strong style="color:var(--sec);font-family:var(--mono);font-size:10px;letter-spacing:.08em">MARK SCHEME</strong><br><br>${q.markScheme.replace(/\n/g,'<br>')}</div>`; expEl.className='exp show'+expCls; if(!ST.thyDone.has(qid)){ ST.thyDone.add(qid); ST.thyAnswered++; ST.thyMarks+=marks; UA_THY[qid]={marks}; updateStats(); } };
+const GRADE_SCALE=[{id:'A1',min:75,max:100,label:'A1',remark:'Excellent'},{id:'B2',min:70,max:74,label:'B2',remark:'Very Good'},{id:'B3',min:65,max:69,label:'B3',remark:'Good'},{id:'C4',min:60,max:64,label:'C4',remark:'Credit'},{id:'C5',min:55,max:59,label:'C5',remark:'Credit'},{id:'C6',min:50,max:54,label:'C6',remark:'Credit'},{id:'D7',min:45,max:49,label:'D7',remark:'Pass'},{id:'E8',min:40,max:44,label:'E8',remark:'Pass'},{id:'F9',min:0,max:39,label:'F9',remark:'Fail'}];
+function getGrade(pct){ for(let g of GRADE_SCALE) if(pct>=g.min && pct<=g.max) return g; return GRADE_SCALE[GRADE_SCALE.length-1]; }
+window.showSubmitModal=function(){ document.getElementById('m-time').textContent=getTimeDisplay(); document.getElementById('m-obj').textContent=ST.objAnswered+' / 50'; document.getElementById('m-thy').textContent=ST.thyAnswered+' / 5'; document.getElementById('m-marks').textContent=(ST.objMarks+ST.thyMarks)+' / 100'; document.getElementById('submit-modal').classList.add('show'); };
+window.hideSubmitModal=function(){ document.getElementById('submit-modal').classList.remove('show'); };
+window.submitExam=function(){ hideSubmitModal(); globalDone=true; stopTimer(); document.querySelectorAll('#obj-qc .opt').forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; }); document.querySelectorAll('#obj-qc .abtn:not([disabled])').forEach(b=>b.click()); document.querySelectorAll('.prose-area').forEach(ta=>ta.disabled=true); document.querySelectorAll('#thy-qc .abtn:not([disabled])').forEach(b=>b.disabled=true); showResults(); };
+function showResults(){ let raw=ST.objMarks+ST.thyMarks, pct=Math.round((raw/100)*100), grade=getGrade(pct); document.getElementById('res-sub').textContent='Completed · '+new Date().toLocaleDateString('en-GB'); document.getElementById('res-score').textContent=pct; document.getElementById('res-score').style.color=grade.color; document.getElementById('res-badge').textContent=grade.label+' — '+grade.remark; document.getElementById('res-badge').style.background=grade.color+'15'; document.getElementById('res-badge').style.border='1px solid '+grade.color; document.getElementById('res-desc').textContent=grade.remark; document.getElementById('res-obj-marks').textContent=ST.objMarks; document.getElementById('res-thy-marks').textContent=ST.thyMarks; document.getElementById('res-raw').textContent=raw+'/100'; document.getElementById('res-pct').textContent=pct+'%'; GRADE_SCALE.forEach(g=>{ let row=document.getElementById('gr-'+g.id); if(row) row.classList.toggle('current',g.id===grade.id); }); document.getElementById('results-screen').classList.add('show'); }
+window.reviewAnswers=function(){ document.getElementById('results-screen').classList.remove('show'); switchTab('obj'); };
+function timeUp(){ globalDone=true; document.querySelectorAll('.opt').forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; }); document.querySelectorAll('.abtn').forEach(b=>b.disabled=true); document.querySelectorAll('.prose-area').forEach(ta=>ta.disabled=true); showResults(); }
+window.doPrint=function(){ document.getElementById('print-header').style.display='block'; window.print(); setTimeout(()=>{ document.getElementById('print-header').style.display='none'; },1200); };
+renderObj(); renderThy(); startTimer(); updateStats();
+</script>
+</body>
+</html>
