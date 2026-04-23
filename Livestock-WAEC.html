@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>WAEC Animal Husbandry | GrantApp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #0C0F1A;
+      --surface:  #131824;
+      --surface2: #1A2030;
+      --border:   rgba(255,255,255,0.07);
+      --border2:  rgba(255,255,255,0.12);
+      --text:     #EEF0F6;
+      --sec:      rgba(238,240,246,0.65);
+      --ter:      rgba(238,240,246,0.38);
+      --accent:   #4F8EF7;
+      --accent2:  #2563EB;
+      --gold:     #F0B429;
+      --green:    #22C55E;
+      --green2:   #16A34A;
+      --red:      #EF4444;
+      --amber:    #F59E0B;
+      --r:        12px;
+      --serif:    'Instrument Serif', Georgia, serif;
+      --mono:     'DM Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans); font-size: 16px; color: var(--text);
+      background: var(--bg); line-height: 1.6;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 90px);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.35;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+    #watermark {
+      position:fixed; inset:0; z-index:9999; pointer-events:none; overflow:hidden;
+      display:flex; flex-direction:column; gap:2.4rem; padding:1rem;
+      transform:rotate(-18deg) scale(1.6); transform-origin:center center;
+      opacity:0.055; font-family:var(--mono); font-size:0.85rem; font-weight:500;
+      color:#dde4f7; letter-spacing:0.12em; white-space:nowrap; user-select:none; -webkit-user-select:none;
+    }
+    .hdr {
+      background:rgba(12,15,26,0.94); border-bottom:1px solid var(--border2);
+      padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;
+      position:sticky; top:0; z-index:100;
+      backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
+    }
+    .hdr-inner { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .hdr-left { display:flex; flex-direction:column; gap:3px; }
+    .hdr-brand { font-family:var(--mono); font-size:10px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
+    .hdr-title { font-family:var(--serif); font-size:18px; font-style:italic; color:var(--text); letter-spacing:-0.2px; }
+    .hdr-meta  { font-size:11px; color:var(--ter); font-family:var(--mono); }
+    .timer-pill {
+      display:flex; align-items:center; gap:8px; padding:8px 14px;
+      border-radius:20px; background:rgba(79,142,247,0.08); border:1px solid rgba(79,142,247,0.2);
+      flex-shrink:0; cursor:default;
+    }
+    .timer-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; transition:background .3s; }
+    .timer-dot.warn { background:var(--amber); }
+    .timer-dot.dang { background:var(--red); animation:blink 1s infinite; }
+    .timer-val { font-family:var(--mono); font-size:15px; font-weight:500; color:var(--accent); letter-spacing:1.5px; transition:color .3s; }
+    .timer-val.warn { color:var(--amber); }
+    .timer-val.dang { color:var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+    .score-strip {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+      padding:14px 20px 10px; position:relative; z-index:1;
+    }
+    .sc { background:var(--surface); border-radius:10px; padding:10px 8px; text-align:center; border:1px solid var(--border); }
+    .sc-v { font-family:var(--mono); font-size:17px; font-weight:500; color:var(--text); }
+    .sc-v.g { color:var(--green); } .sc-v.r { color:var(--red); } .sc-v.d { color:var(--ter); }
+    .sc-v.b { color:var(--accent); }
+    .sc-l { font-size:10px; color:var(--ter); margin-top:2px; text-transform:uppercase; letter-spacing:0.5px; font-family:var(--mono); }
+    .prog-wrap { padding:0 20px 12px; position:relative; z-index:1; }
+    .prog-track { height:2px; background:var(--border); border-radius:99px; overflow:hidden; }
+    .prog-fill { height:100%; background:linear-gradient(90deg, var(--accent2), var(--accent)); border-radius:99px; transition:width .4s ease; width:0%; }
+    .tabs {
+      display:flex; gap:0; padding:0 20px 14px; position:relative; z-index:1; border-bottom:1px solid var(--border);
+      margin-bottom:4px;
+    }
+    .tab {
+      flex:1; padding:10px 8px; text-align:center; font-family:var(--mono); font-size:11px; font-weight:500;
+      letter-spacing:0.06em; text-transform:uppercase; color:var(--ter); background:transparent;
+      border:1px solid var(--border); cursor:pointer; transition:all .2s;
+    }
+    .tab:first-child { border-radius:8px 0 0 8px; }
+    .tab:last-child  { border-radius:0 8px 8px 0; border-left:none; }
+    .tab.active {
+      background:rgba(79,142,247,0.1); border-color:rgba(79,142,247,0.35); color:var(--accent);
+    }
+    .panel { display:none; }
+    .panel.active { display:block; }
+    .sect-hdr {
+      margin:4px 20px 14px; padding:14px 18px;
+      border-radius:var(--r); background:rgba(79,142,247,0.05);
+      border:1px solid rgba(79,142,247,0.15);
+      position:relative; z-index:1;
+    }
+    .sect-hdr-title { font-family:var(--serif); font-size:16px; font-style:italic; color:var(--text); margin-bottom:3px; }
+    .sect-hdr-meta  { font-size:11px; color:var(--ter); font-family:var(--mono); }
+    #obj-qc, #thy-qc { padding:4px 20px 20px; position:relative; z-index:1; }
+    .qcard {
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+      padding:20px; margin-bottom:14px; animation:fadeUp .3s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .qcard-top {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border); gap:10px;
+    }
+    .qnum  { font-family:var(--mono); font-size:10px; font-weight:500; color:var(--ter); letter-spacing:0.12em; text-transform:uppercase; }
+    .qtopic {
+      font-size:10px; font-weight:500; padding:3px 9px; border-radius:99px;
+      background:rgba(79,142,247,0.08); border:1px solid rgba(79,142,247,0.18); color:var(--accent); letter-spacing:0.3px;
+    }
+    .qtxt { font-size:15px; line-height:1.75; color:var(--text); margin-bottom:16px; }
+    .opts { display:flex; flex-direction:column; gap:8px; }
+    .opt {
+      display:flex; align-items:flex-start; gap:12px; padding:12px 15px;
+      border-radius:9px; border:1px solid var(--border); background:var(--surface2);
+      cursor:pointer; transition:all .15s;
+    }
+    .opt:hover:not(.locked) { border-color:rgba(79,142,247,0.4); background:rgba(79,142,247,0.05); }
+    .opt.sel  { border-color:rgba(79,142,247,0.45); background:rgba(79,142,247,0.08); }
+    .opt.ok   { border-color:var(--green);  background:rgba(34,197,94,0.07); }
+    .opt.no   { border-color:var(--red);    background:rgba(239,68,68,0.07); }
+    .opt.locked { cursor:default; }
+    .opt-key { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--accent); flex-shrink:0; width:18px; padding-top:1px; }
+    .opt.ok  .opt-key { color:var(--green); }
+    .opt.no  .opt-key { color:var(--red); }
+    .opt-txt { font-size:14px; color:var(--sec); line-height:1.55; }
+    .theory-body { display:flex; flex-direction:column; gap:10px; }
+    .theory-marks-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      font-family:var(--mono); font-size:10px; color:var(--gold);
+      background:rgba(240,180,41,0.08); border:1px solid rgba(240,180,41,0.2);
+      padding:3px 10px; border-radius:99px; width:fit-content;
+    }
+    .prose-area {
+      width:100%; min-height:140px; padding:14px 16px;
+      background:var(--surface2); border:1px solid var(--border2);
+      border-radius:9px; color:var(--text); font-family:var(--sans);
+      font-size:14px; line-height:1.75; resize:vertical;
+      transition:border-color .2s; outline:none;
+    }
+    .prose-area:focus { border-color:rgba(79,142,247,0.5); }
+    .prose-area:disabled { opacity:0.5; cursor:not-allowed; resize:none; }
+    .word-count { font-family:var(--mono); font-size:10px; color:var(--ter); text-align:right; }
+    .word-count.active { color:var(--sec); }
+    .thy-selection-info {
+      margin:0 20px 10px; padding:10px 16px; border-radius:9px;
+      background:rgba(240,180,41,0.06); border:1px solid rgba(240,180,41,0.18);
+      font-family:var(--mono); font-size:11px; color:var(--gold);
+      position:relative; z-index:1;
+    }
+    .abtn {
+      margin-top:10px; width:100%; padding:11px; border-radius:9px;
+      background:var(--accent); color:#fff; font-family:var(--sans); font-size:13px;
+      font-weight:600; border:none; cursor:pointer; transition:opacity .2s, transform .15s;
+      letter-spacing:0.02em;
+    }
+    .abtn:hover:not(:disabled) { opacity:0.88; transform:translateY(-1px); }
+    .abtn:disabled { opacity:0.25; cursor:not-allowed; transform:none; }
+    .exp {
+      display:none; margin-top:12px; background:rgba(34,197,94,0.05);
+      border:1px solid rgba(34,197,94,0.15); border-radius:9px;
+      padding:14px; font-size:13px; line-height:1.72; color:var(--sec);
+    }
+    .exp.show { display:block; }
+    .exp.wrong-exp { background:rgba(239,68,68,0.05); border-color:rgba(239,68,68,0.15); }
+    .exp.partial-exp { background:rgba(240,180,41,0.05); border-color:rgba(240,180,41,0.15); }
+    .exp-mark {
+      display:inline-flex; align-items:center; gap:6px; margin-bottom:10px;
+      font-family:var(--mono); font-size:11px; font-weight:500;
+      padding:4px 10px; border-radius:6px;
+    }
+    .exp-mark.pos     { background:rgba(34,197,94,0.12);  color:var(--green); }
+    .exp-mark.partial { background:rgba(240,180,41,0.12); color:var(--gold); }
+    .exp-mark.neg     { background:rgba(239,68,68,0.1);   color:var(--red); }
+    .kw-feedback { margin-top:10px; }
+    .kw-feedback-title { font-family:var(--mono); font-size:10px; color:var(--ter); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+    .kw-list { display:flex; flex-wrap:wrap; gap:6px; }
+    .kw-tag {
+      font-family:var(--mono); font-size:11px; padding:3px 9px; border-radius:5px;
+    }
+    .kw-tag.hit  { background:rgba(34,197,94,0.1);  color:var(--green); border:1px solid rgba(34,197,94,0.2); }
+    .kw-tag.miss { background:rgba(239,68,68,0.08); color:var(--red);   border:1px solid rgba(239,68,68,0.15); text-decoration:line-through; opacity:0.7; }
+    .submit-bar {
+      position:fixed; bottom:0; left:0; right:0;
+      background:rgba(12,15,26,0.97); border-top:1px solid var(--border2);
+      padding:12px 20px calc(env(safe-area-inset-bottom) + 12px); z-index:200;
+      backdrop-filter:blur(20px); display:flex; gap:10px; align-items:center;
+    }
+    .submit-btn {
+      flex:1; padding:13px; background:var(--accent); color:#fff;
+      font-family:var(--sans); font-size:14px; font-weight:600;
+      border:none; border-radius:9px; cursor:pointer; transition:opacity .2s;
+    }
+    .submit-btn:hover { opacity:0.88; }
+    .submit-progress { font-family:var(--mono); font-size:10px; color:var(--ter); white-space:nowrap; line-height:1.4; }
+    .modal-overlay {
+      position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.75);
+      backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:1rem;
+    }
+    .modal-overlay.show { display:flex; }
+    .modal {
+      background:var(--surface); border:1px solid var(--border2); border-radius:16px;
+      width:100%; max-width:400px; padding:24px;
+      box-shadow:0 32px 64px rgba(0,0,0,0.6); animation:modalIn .2s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(.96) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .modal h3 { font-family:var(--serif); font-size:1.2rem; font-style:italic; margin-bottom:16px; color:var(--text); }
+    .modal-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--ter);
+    }
+    .modal-row b { color:var(--text); font-family:var(--mono); font-weight:500; }
+    .modal-btns { display:flex; gap:8px; margin-top:20px; }
+    .modal-btn { flex:1; padding:11px; border-radius:9px; font-family:var(--sans); font-size:13px; font-weight:600; border:none; cursor:pointer; transition:opacity .2s; }
+    .modal-btn.primary { background:var(--accent); color:#fff; }
+    .modal-btn.primary:hover { opacity:.88; }
+    .modal-btn.ghost { background:transparent; color:var(--ter); border:1px solid var(--border); }
+    .results-screen {
+      position:fixed; inset:0; z-index:5000; background:var(--bg);
+      display:none; flex-direction:column; overflow-y:auto;
+      padding:24px 20px calc(env(safe-area-inset-bottom) + 40px);
+      animation:fadeUp .35s ease;
+    }
+    .results-screen.show { display:flex; }
+    .results-brand { font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; }
+    .results-title { font-family:var(--serif); font-size:2rem; font-style:italic; color:var(--text); margin-bottom:4px; line-height:1.2; }
+    .results-sub { font-size:13px; color:var(--ter); margin-bottom:28px; font-family:var(--mono); }
+    .grade-circle-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:28px; }
+    .grade-circle {
+      width:120px; height:120px; border-radius:50%;
+      border:2px solid var(--border2);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      margin-bottom:12px; position:relative;
+    }
+    .grade-score { font-family:var(--mono); font-size:2rem; font-weight:500; line-height:1; }
+    .grade-label { font-family:var(--mono); font-size:10px; color:var(--ter); margin-top:3px; letter-spacing:0.08em; }
+    .grade-badge {
+      font-family:var(--mono); font-size:11px; font-weight:500; padding:4px 14px;
+      border-radius:99px; letter-spacing:0.08em;
+    }
+    .grade-desc { font-size:13px; color:var(--ter); margin-top:6px; }
+    .results-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px; }
+    .res-cell { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+    .res-cell-val { font-family:var(--mono); font-size:1.4rem; font-weight:500; }
+    .res-cell-lbl { font-size:11px; color:var(--ter); margin-top:3px; font-family:var(--mono); }
+    .grade-table { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:24px; }
+    .grade-table-title { padding:12px 16px; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ter); border-bottom:1px solid var(--border); }
+    .grade-row { display:flex; justify-content:space-between; padding:9px 16px; border-bottom:1px solid var(--border); font-family:var(--mono); font-size:12px; }
+    .grade-row:last-child { border-bottom:none; }
+    .grade-row.current { background:rgba(79,142,247,0.06); }
+    .grade-row .gr-grade { color:var(--text); }
+    .grade-row .gr-range { color:var(--ter); }
+    .grade-row .gr-remark { color:var(--sec); }
+    .results-btn {
+      width:100%; padding:14px; background:var(--accent); color:#fff;
+      font-family:var(--sans); font-size:14px; font-weight:600;
+      border:none; border-radius:9px; cursor:pointer; transition:opacity .2s; margin-bottom:10px;
+    }
+    .results-btn:hover { opacity:.88; }
+    .results-btn.ghost {
+      background:transparent; color:var(--ter); border:1px solid var(--border); font-weight:400; font-size:13px;
+    }
+    @media print {
+      body { background:#fff !important; color:#000 !important; font-size:12pt; }
+      body::before, #watermark, .hdr, .tabs, .score-strip, .prog-wrap,
+      .thy-selection-info, .submit-bar, .results-screen, .modal-overlay,
+      .abtn, .prose-area { display:none !important; }
+      .panel { display:block !important; }
+      .exp { display:block !important; }
+      .qcard { break-inside:avoid; border:1px solid #ddd !important; background:#fff !important; margin-bottom:16pt; }
+      .opt { border:1px solid #ccc !important; background:#fff !important; }
+      .opt.ok  { background:#e6f9f0 !important; border-color:#22c55e !important; }
+      .opt.no  { background:#fef2f2 !important; border-color:#ef4444 !important; }
+      .opt-txt, .qtxt { color:#000 !important; }
+      #print-header { display:block !important; text-align:center; margin-bottom:20pt; padding-bottom:10pt; border-bottom:2pt solid #000; }
+      #print-header h1 { font-size:16pt; font-weight:800; }
+      #print-header p  { font-size:10pt; color:#555; margin-top:3pt; }
+    }
+    @media (max-width:420px) {
+      .score-strip { grid-template-columns:repeat(2,1fr); }
+      .results-grid { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="print-header" style="display:none"><h1>GrantApp AI · WAEC Animal Husbandry</h1><p>Section A: 50 Objectives (50 marks) · Section B: Theory — answer 5 of 10 (50 marks) · Total: 100 marks</p><p id="print-date"></p></div>
+<div id="watermark" aria-hidden="true"></div>
+<header class="hdr"><div class="hdr-inner"><div class="hdr-left"><span class="hdr-brand">GrantApp AI · WAEC</span><span class="hdr-title">Animal Husbandry — Paper 1</span><span class="hdr-meta" id="hdr-meta">Section A · <span id="answered-count">0</span> answered</span></div><div class="timer-pill" id="timer-pill"><div class="timer-dot" id="timer-dot"></div><span class="timer-val" id="timer-val">1:30:00</span></div></div></header>
+<div class="score-strip"><div class="sc"><div class="sc-v b" id="sc-total">100</div><div class="sc-l">Total</div></div><div class="sc"><div class="sc-v g" id="sc-marks">0</div><div class="sc-l">Marks</div></div><div class="sc"><div class="sc-v" id="sc-obj">0/50</div><div class="sc-l">OBJ</div></div><div class="sc"><div class="sc-v d" id="sc-thy">0/5</div><div class="sc-l">Theory</div></div></div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div class="tabs"><button class="tab active" id="tab-obj" onclick="switchTab('obj')">Section A — Objectives (50)</button><button class="tab" id="tab-thy" onclick="switchTab('thy')">Section B — Theory</button></div>
+<div class="panel active" id="panel-obj"><div class="sect-hdr"><div class="sect-hdr-title">Section A — Objective Questions</div><div class="sect-hdr-meta">50 questions · 1 mark each · Answer all</div></div><div id="obj-qc"></div></div>
+<div class="panel" id="panel-thy"><div class="thy-selection-info" id="thy-info">Answer <strong>5</strong> questions only. <span id="thy-answered-display">0 of 5 answered.</span></div><div class="sect-hdr"><div class="sect-hdr-title">Section B — Theory Questions</div><div class="sect-hdr-meta">10 questions · Answer any 5 · 10 marks each</div></div><div id="thy-qc"></div></div>
+<div class="submit-bar"><div class="submit-progress" id="sub-prog">OBJ: 0/50 · Theory: 0/5</div><button class="submit-btn" onclick="showSubmitModal()">Submit Exam</button><button class="submit-btn" onclick="doPrint()" style="flex:0;padding:13px 16px;background:var(--surface2);color:var(--ter);border:1px solid var(--border);" title="Print / PDF">⬇</button></div>
+<div class="modal-overlay" id="submit-modal"><div class="modal"><h3>Submit examination?</h3><div class="modal-row"><span>OBJ answered</span><b id="m-obj">0 / 50</b></div><div class="modal-row"><span>Theory answered</span><b id="m-thy">0 / 5</b></div><div class="modal-row"><span>Marks so far</span><b id="m-marks">0 / 100</b></div><div class="modal-row"><span>Time remaining</span><b id="m-time">1:30:00</b></div><div class="modal-btns"><button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button><button class="modal-btn primary" onclick="submitExam()">Submit Now</button></div></div></div>
+<div class="results-screen" id="results-screen"><div class="results-brand">GrantApp AI · WAEC</div><div class="results-title">Animal Husbandry — Paper 1</div><div class="results-sub" id="res-sub">Completed</div><div class="grade-circle-wrap"><div class="grade-circle" id="res-circle"><span class="grade-score" id="res-score">—</span><span class="grade-label">/ 100</span></div><span class="grade-badge" id="res-badge">—</span><span class="grade-desc" id="res-desc">—</span></div><div class="results-grid"><div class="res-cell"><div class="res-cell-val" id="res-obj-marks">—</div><div class="res-cell-lbl">OBJ Marks (/ 50)</div></div><div class="res-cell"><div class="res-cell-val" id="res-thy-marks">—</div><div class="res-cell-lbl">Theory Marks (/ 50)</div></div><div class="res-cell"><div class="res-cell-val" id="res-raw">—</div><div class="res-cell-lbl">Raw Score (/ 100)</div></div><div class="res-cell"><div class="res-cell-val" id="res-pct">—</div><div class="res-cell-lbl">Scaled (/ 100)</div></div></div><div class="grade-table"><div class="grade-table-title">WAEC Grade Scale</div><div class="grade-row" id="gr-A1"><span class="gr-grade">A1</span><span class="gr-range">75–100</span><span class="gr-remark">Excellent</span></div><div class="grade-row" id="gr-B2"><span class="gr-grade">B2</span><span class="gr-range">70–74</span><span class="gr-remark">Very Good</span></div><div class="grade-row" id="gr-B3"><span class="gr-grade">B3</span><span class="gr-range">65–69</span><span class="gr-remark">Good</span></div><div class="grade-row" id="gr-C4"><span class="gr-grade">C4</span><span class="gr-range">60–64</span><span class="gr-remark">Credit</span></div><div class="grade-row" id="gr-C5"><span class="gr-grade">C5</span><span class="gr-range">55–59</span><span class="gr-remark">Credit</span></div><div class="grade-row" id="gr-C6"><span class="gr-grade">C6</span><span class="gr-range">50–54</span><span class="gr-remark">Credit</span></div><div class="grade-row" id="gr-D7"><span class="gr-grade">D7</span><span class="gr-range">45–49</span><span class="gr-remark">Pass</span></div><div class="grade-row" id="gr-E8"><span class="gr-grade">E8</span><span class="gr-range">40–44</span><span class="gr-remark">Pass</span></div><div class="grade-row" id="gr-F9"><span class="gr-grade">F9</span><span class="gr-range">0–39</span><span class="gr-remark">Fail</span></div></div><button class="results-btn" onclick="reviewAnswers()">Review Answers</button><button class="results-btn ghost" onclick="doPrint()">⬇ Download PDF</button></div>
+
+<script>
+'use strict';
+(function(){ let wm=document.getElementById('watermark'); if(wm){ let tile='GrantApp AI · WAEC Animal Husbandry · '; let row=''; for(let r=0;r<8;r++) row+=tile; let html=''; for(let i=0;i<16;i++) html+='<span>'+row+'</span>'; wm.innerHTML=html; } let pd=document.getElementById('print-date'); if(pd) pd.textContent='Date: '+new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); })();
+
+// 50 Objective Questions based on WAEC Animal Husbandry Syllabus [citation:1][citation:5]
+const OBJ_Q = [
+  { id:'o1', topic:'Classification', text:'Which of the following farm animals is a ruminant?', opts:{ A:'Pig', B:'Rabbit', C:'Goat', D:'Fowl' }, ans:'C', exp:'Ruminants have four-chambered stomachs. Goats are ruminants; pigs and rabbits are monogastric; fowl have a crop and gizzard.' },
+  { id:'o2', topic:'Importance', text:'Which of the following is a source of animal protein from livestock?', opts:{ A:'Milk', B:'Cotton', C:'Maize', D:'Yam' }, ans:'A', exp:'Milk from cattle, goats, and sheep is a rich source of animal protein.' },
+  { id:'o3', topic:'Reproduction', text:'The gestation period of a sow is approximately:', opts:{ A:'150 days', B:'114 days', C:'280 days', D:'30 days' }, ans:'B', exp:'Sows have a gestation period of about 114 days (3 months, 3 weeks, 3 days).' },
+  { id:'o4', topic:'Nutrition', text:'Which of the following is a green forage crop?', opts:{ A:'Maize', B:'Groundnut cake', C:'Elephant grass', D:'Bone meal' }, ans:'C', exp:'Elephant grass (Pennisetum purpureum) is a green forage grass fed to ruminants.' },
+  { id:'o5', topic:'Animal Health', text:'Trypanosomiasis is transmitted by the bite of:', opts:{ A:'Tsetse fly', B:'Mosquito', C:'Tick', D:'Housefly' }, ans:'A', exp:'Trypanosomiasis is caused by Trypanosoma, transmitted by tsetse flies.' },
+  { id:'o6', topic:'Nutrition', text:'Ptyalin is an enzyme that digests:', opts:{ A:'Protein', B:'Cellulose', C:'Starch', D:'Fat' }, ans:'C', exp:'Ptyalin (salivary amylase) begins starch digestion.' },
+  { id:'o7', topic:'Reproduction', text:'The act of giving birth in farm animals is known as:', opts:{ A:'Gestation', B:'Parturition', C:'Copulation', D:'Lactation' }, ans:'B', exp:'Parturition refers to the process of giving birth.' },
+  { id:'o8', topic:'Management', text:'The first milk produced by a mother after giving birth is called:', opts:{ A:'Butter', B:'Colostrum', C:'Cream', D:'Yoghurt' }, ans:'B', exp:'Colostrum is rich in antibodies essential for newborn immunity.' },
+  { id:'o9', topic:'Pasture', text:'Which of the following is a leguminous forage crop?', opts:{ A:'Guinea grass', B:'Centrosema', C:'Elephant grass', D:'Bahama grass' }, ans:'B', exp:'Centrosema is a leguminous forage that fixes nitrogen, enriching the soil.' },
+  { id:'o10', topic:'Nutrition', text:'Rennin coagulates milk in which of the following animals?', opts:{ A:'Adult cattle', B:'Young ruminants', C:'Piglets', D:'Poultry' }, ans:'B', exp:'Rennin is present in young ruminants to coagulate milk for better digestion.' },
+  { id:'o11', topic:'Reproduction', text:'The female rabbit is called:', opts:{ A:'Doe', B:'Ewe', C:'Sow', D:'Nanny' }, ans:'A', exp:'A female rabbit is a doe; male is a buck.' },
+  { id:'o12', topic:'Health', text:'Anthrax disease is caused by:', opts:{ A:'Virus', B:'Bacterium', C:'Fungus', D:'Protozoan' }, ans:'B', exp:'Anthrax is caused by Bacillus anthracis, a bacterium.' },
+  { id:'o13', topic:'Improvement', text:'Cross-breeding involves mating animals of:', opts:{ A:'Same breed', B:'Different breeds', C:'Same family', D:'Different species' }, ans:'B', exp:'Cross-breeding combines traits from two different breeds.' },
+  { id:'o14', topic:'Management', text:'The removal of horns from cattle is known as:', opts:{ A:'Dehorning', B:'Castration', C:'Debeaking', D:'Notching' }, ans:'A', exp:'Dehorning prevents injury and minimizes feed bunk space requirements.' },
+  { id:'o15', topic:'Parasites', text:'Liver fluke belongs to which group of parasites?', opts:{ A:'Nematode', B:'Cestode', C:'Trematode', D:'Protozoa' }, ans:'C', exp:'Liver fluke (Fasciola hepatica) is a trematode (flatworm).' },
+  { id:'o16', topic:'Nutrition', text:'Which nutrient is essential for bone formation in poultry?', opts:{ A:'Vitamin A', B:'Calcium', C:'Protein', D:'Carbohydrate' }, ans:'B', exp:'Calcium is required for eggshell formation and skeletal development.' },
+  { id:'o17', topic:'Reproduction', text:'The heat period in farm animals is known as:', opts:{ A:'Oestrus', B:'Ovulation', C:'Gestation', D:'Parturition' }, ans:'A', exp:'Oestrus is the period when the female is receptive to mating.' },
+  { id:'o18', topic:'Poultry', text:'The process of removing the beak of a bird to prevent cannibalism is called:', opts:{ A:'Dehorning', B:'Debeaking', C:'Culling', D:'Docking' }, ans:'B', exp:'Debeaking prevents pecking injuries and feather pulling.' },
+  { id:'o19', topic:'Systems', text:'The organ responsible for digestion in fowl where grit is stored is:', opts:{ A:'Crop', B:'Proventriculus', C:'Gizzard', D:'Caecum' }, ans:'C', exp:'The gizzard grinds feed with the help of ingested grit.' },
+  { id:'o20', topic:'Importance', text:'The payment of bride price in some African cultures involves the use of:', opts:{ A:'Cattle', B:'Pigs', C:'Rabbits', D:'Snails' }, ans:'A', exp:'Cattle are often used as bride price (dowry) in many African cultures.' },
+  { id:'o21', topic:'Pasture', text:'The practice of grazing a paddock intensely and then resting it is called:', opts:{ A:'Rotational grazing', B:'Continuous grazing', C:'Strip grazing', D:'Zero grazing' }, ans:'A', exp:'Rotational grazing improves pasture utilization and prevents overgrazing.' },
+  { id:'o22', topic:'Health', txt:'A general symptom of disease in farm animals includes:', opts:{ A:'Increased appetite', B:'Weight gain', C:'High body temperature', D:'Smooth coat' }, ans:'C', exp:'Fever/high body temperature is a common indicator of illness.' },
+  { id:'o23', topic:'Reproduction', text:'The male goat is called:', opts:{ A:'Ram', B:'Buck', C:'Boar', D:'Bull' }, ans:'B', exp:'A male goat is a buck; a castrated male is a wether.' },
+  { id:'o24', topic:'Management', text:'The device used for restraining sheep during dipping is:', opts:{ A:'Crutch', B:'Racing crate', C:'Head bail', D:'Castration rack' }, ans:'B', exp:'A dipping crate/racing crate restrains sheep during acaricide application.' },
+  { id:'o25', topic:'Nutrition', text:'Concentrates are feeds that are:', opts:{ A:'High in fibre', B:'Low in digestible nutrients', C:'High in digestible nutrients', D:'Bulkly' }, ans:'C', exp:'Concentrates are energy-rich with low fibre (e.g., grains).' },
+  { id:'o26', topic:'Improvement', text:'Artificial insemination involves collecting semen from:', opts:{ A:'Female', B:'Male', C:'Offspring', D:'Both sexes' }, ans:'B', exp:'Semen is collected from superior males for artificial insemination.' },
+  { id:'o27', topic:'Parasites', text:'An example of an ectoparasite in cattle is:', opts:{ A:'Roundworm', B:'Tapeworm', C:'Tick', D:'Liver fluke' }, ans:'C', exp:'Ticks are external parasites feeding on blood.' },
+  { id:'o28', topic:'Poultry', text:'The average incubation period of a chicken egg is:', opts:{ A:'14 days', B:'21 days', C:'28 days', D:'35 days' }, ans:'B', exp:'Chicken eggs hatch after about 21 days of incubation.' },
+  { id:'o29', topic:'Systems', text:'The function of the rumen is:', opts:{ A:'Absorption of water', B:'Digestion of cellulose', C:'Secretion of bile', D:'Neutralization of acid' }, ans:'B', exp:'Rumen microbes digest fibrous cellulose components of forage.' },
+  { id:'o30', topic:'Management', text:'The term 'steaming up' refers to:', opts:{ A:'Feeding pregnant animals', B:'Grain drying', C:'Washing equipment', D:'Heating water' }, ans:'A', exp:'Steaming up is increased feeding in late pregnancy to prepare for lactation.' },
+  { id:'o31', topic:'Health', text:'Mastitis is a disease of the:', opts:{ A:'Udder', B:'Lungs', C:'Liver', D:'Skin' }, ans:'A', exp:'Mastitis is inflammation of the mammary gland/udder.' },
+  { id:'o32', topic:'Improvement', text:'Selection in animal breeding involves:', opts:{ A:'Random mating', B:'Choosing best animals for reproduction', C:'Inbreeding', D:'Crossing species' }, ans:'B', exp:'Selection retains animals with desirable traits for breeding.' },
+  { id:'o33', topic:'Nutrition', text:'Pigs are primarily what type of feeders?', opts:{ A:'Roughage feeders', B:'Concentrate feeders', C:'Mixed feeders', D:'Frugivores' }, ans:'B', exp:'Pigs thrive on concentrate-based diets with high energy.' },
+  { id:'o34', topic:'Pasture', text:'The term 'stocking rate' refers to:', opts:{ A:'Number of animals per area', B:'Weight of animals', C:'Age of animals', D:'Feed consumption' }, ans:'A', exp:'Stocking rate is the number of livestock per unit area.' },
+  { id:'o35', topic:'Reproduction', text:'The act of mating in farm animals is called:', opts:{ A:'Ovulation', B:'Copulation', C:'Fertilization', D:'Implantation' }, ans:'B', exp:'Copulation refers to the actual mating act.' },
+  { id:'o36', topic:'Health', text:'A vehicle for transmitting disease is a:', opts:{ A:'Vector', B:'Pathogen', C:'Host', D:'Reservoir' }, ans:'A', exp:'A vector (e.g., tick, mosquito) transmits pathogens.' },
+  { id:'o37', topic:'Management', text:'The removal of the tail of a sheep is called:', opts:{ A:'Docking', B:'Cropping', C:'Culling', D:'Clipping' }, ans:'A', exp:'Docking prevents fecal matter accumulation and blowfly strike.' },
+  { id:'o38', topic:'Systems', text:'In ruminants, the largest compartment of the stomach is the:', opts:{ A:'Rumen', B:'Reticulum', C:'Omasum', D:'Abomasum' }, ans:'A', exp:'The rumen is the largest, holding up to 50 gallons in cattle.' },
+  { id:'o39', topic:'Poultry', text:'The fatty organ in poultry that produces eggs is the:', opts:{ A:'Ovary', B:'Oviduct', C:'Infundibulum', D:'Vent' }, ans:'A', exp:'The ovary produces the yolk/egg.' },
+  { id:'o40', topic:'Importance', text:'Which animal is commonly used for animal traction in West Africa?', opts:{ A:'Sheep', B:'Goat', C:'Ox', D:'Pig' }, ans:'C', exp:'Oxen (castrated male cattle) are used for plowing and carting.' },
+  { id:'o41', topic:'Health', text:'The coccidiosis parasite affects the:', opts:{ A:'Lungs', B:'Intestine', C:'Liver', D:'Brain' }, ans:'B', exp:'Coccidia infect the intestinal lining, causing diarrhoea.' },
+  { id:'o42', topic:'Nutrition', text:'Oyster shell is fed to poultry as a source of:', opts:{ A:'Protein', B:'Energy', C:'Calcium', D:'Vitamins' }, ans:'C', exp:'Oyster shell provides calcium for eggshell formation.' },
+  { id:'o43', topic:'Management', text:'Fostering in animal husbandry refers to:', opts:{ A:'Weaning early', B:'Letting another mother nurse offspring', C:'Feeding supplements', D:'Isolating sick animals' }, ans:'B', exp:'Fostering places offspring with a surrogate mother.' },
+  { id:'o44', topic:'Improvement', text:'Inbreeding can lead to:', opts:{ A:'Hybrid vigour', B:'Inbreeding depression', C:'Increased variation', D:'Cross-sterility' }, ans:'B', exp:'Inbreeding reduces fitness and productivity.' },
+  { id:'o45', topic:'Pasture', text:'The process of renewing a pasture by planting seeds is:', opts:{ A:'Reseeding', B:'Rotating', C:'Resting', D:'Rolling' }, ans:'A', exp:'Reseeding/overseeding introduces new seeds to improve pasture.' },
+  { id:'o46', topic:'Reproduction', text:'A parturition difficulty is referred to as:', opts:{ A:'Dystocia', B:'Prolapse', C:'Retention', D:'Abortion' }, ans:'A', exp:'Dystocia means difficult birth.' },
+  { id:'o47', topic:'Health', text:'A viral disease of poultry characterized by greenish diarrhoea is:', opts:{ A:'Newcastle', B:'Fowl pox', C:'Coccidiosis', D:'Pullorum' }, ans:'A', exp:'Newcastle disease causes greenish diarrhoea and nervous signs.' },
+  { id:'o48', topic:'Nutrition', text:'Roughages are characterized by:', opts:{ A:'Low fibre content', B:'High fibre content', C:'High energy', D:'Low water content' }, ans:'B', exp:'Roughages contain >18% crude fibre (e.g., hay, straw).' },
+  { id:'o49', topic:'Systems', text:'The function of the crop in poultry is:', opts:{ A:'Grinding feed', B:'Storage of feed', C:'Digestion of protein', D:'Absorption of water' }, ans:'B', exp:'The crop temporarily stores food before digestion.' },
+  { id:'o50', topic:'General', text:'The branch of agriculture dealing with farm animals is:', opts:{ A:'Agronomy', B:'Animal Husbandry', C:'Horticulture', D:'Silviculture' }, ans:'B', exp:'Animal Husbandry (Livestock Production) focuses on farm animal care.' }
+];
+
+// Theory Questions (10) based on WAEC past questions [citation:2][citation:4][citation:7]
+const THY_Q = [
+  { id:'t1', topic:'Goat Management', marks:10, text:'(a) State seven characteristics of West African goats. (b) Discuss the management of goats under: (i) breeding, (ii) care of kids, (iii) identification, (iv) castration.', markScheme:'Characteristics: small size, hardy, hardy, early maturity, produce 1-2 kids, prolific twins. Breeding: mate at 8-12 months, flushing, identify heat. Care of kids: clean navel, provide colostrum, creep feed. Identification: ear notching/tagging, records. Castration: before 4 months using burdizzo/elastrator.', keywords:['west african','goat','characteristics','breeding','care of kids','identification','castration','colostrum','creep feed','ear notching','burdizzo','elastrator'], minKeywords:6 },
+  { id:'t2', topic:'Pasture', marks:10, text:'(a) Define the following terms: (i) fodder, (ii) paddocking, (iii) reseeding, (iv) stocking rate, (v) natural pasture. (b) State five factors affecting pasture establishment in West Africa.', markScheme:'Fodder: preserved feed. Paddocking: dividing pasture into sections. Reseeding: planting seeds. Stocking rate: animals per area. Natural pasture: indigenous grasses. Factors: rainfall, soil fertility, weeds, pests, land preparation.', keywords:['fodder','paddocking','reseeding','stocking rate','natural pasture','factors','rainfall','soil','weeds','establishment'], minKeywords:6 },
+  { id:'t3', topic:'Rabbit Production', marks:10, text:'(a) State the scientific name of domestic rabbit. (b) Mention two organs each from: (i) head, (ii) thorax, (iii) abdomen of a rabbit. (c) State six practical ways of checking malnutrition in livestock.', markScheme:'Scientific name: Oryctolagus cuniculus. Head: eyes, ears. Thorax: heart, lungs. Abdomen: liver, kidneys. Malnutrition: provide balanced rations, deworm, separate weak animals, supplements, good water, adjust stocking.', keywords:['oryctolagus','rabbit','head','thorax','abdomen','organs','malnutrition','balanced ration','deworm','supplements'], minKeywords:6 },
+  { id:'t4', topic:'Reproduction', marks:10, text:'(a) Explain flushing, dystocia, and parturition. (b) Complete the table: Farm animal (Sheep, Pig, Rabbit) -> Name of mature female -> Gestation period (days).', markScheme:'Flushing: increased feeding before mating. Dystocia: difficult birth. Parturition: giving birth. Table: Sheep - Ewe - 150 days; Pig - Sow - 114 days; Rabbit - Doe - 31 days.', keywords:['flushing','dystocia','parturition','ewe','sow','doe','gestation','150','114','31','days'], minKeywords:7 },
+  { id:'t5', topic:'Artificial Insemination', marks:10, text:'(a) Define artificial insemination (AI). (b) State four advantages of artificial insemination in livestock production. (c) Name two equipment used for AI.', markScheme:'AI: introduction of semen into female reproductive tract without natural mating. Advantages: genetic improvement, disease control, low cost, superior sires. Equipment: AI gun, liquid nitrogen tank, straw cutter, sheath.', keywords:['artificial insemination','semen','advantages','genetic improvement','disease control','cost','AI gun','liquid nitrogen','straw','breeding'], minKeywords:6 },
+  { id:'t6', topic:'Digestion', marks:10, text:'(a) State five functions of the rumen. (b) Mention one major function each of ptyalin, rennin, and pepsin during feed digestion.', markScheme:'Rumen functions: cellulose digestion, microbial protein synthesis, B vitamin production, fermentation, gas expulsion. Ptyalin: starch digestion. Rennin: milk coagulation. Pepsin: protein digestion.', keywords:['rumen','functions','cellulose','microbial','fermentation','ptyalin','rennin','pepsin','starch','protein','coagulation'], minKeywords:6 },
+  { id:'t7', topic:'Poultry', marks:10, text:'(a) Define culling. (b) Distinguish between battery cage and deep litter systems. (c) List four disadvantages of deep litter system.', markScheme:'Culling: removing unproductive animals. Battery cage: individual cages, easy management. Deep litter: birds on floor with bedding. Disadvantages: disease spread, cannibalism, dirty eggs, high litter cost.', keywords:['culling','battery cage','deep litter','disadvantages','disease','cannibalism','eggs','litter','management','unproductive'], minKeywords:6 },
+  { id:'t8', topic:'Animal Health', marks:10, text:'(a) Define malnutrition in farm animals. (b) Distinguish between maintenance ration and production ration. (c) Name three disease-causing organisms in livestock.', markScheme:'Malnutrition: deficiency/imbalance of nutrients. Maintenance ration: keeps animal alive without production. Production ration: supports growth/milk/egg/meat. Organisms: bacteria, viruses, fungi, protozoa.', keywords:['malnutrition','maintenance ration','production ration','bacteria','viruses','fungi','protozoa','nutrients','balanced','deficiency'], minKeywords:6 },
+  { id:'t9', topic:'Animal Improvement', marks:10, text:'(a) Define animal improvement. (b) Explain cross-breeding and out-breeding. (c) State five aims of animal improvement.', markScheme:'Animal improvement: genetic enhancement of livestock. Cross-breeding: different breeds. Out-breeding: unrelated animals. Aims: increased productivity, disease resistance, adaptability, improved reproduction, better product quality.', keywords:['improvement','cross-breeding','out-breeding','aims','productivity','disease resistance','adaptability','reproduction','quality','genetic'], minKeywords:6 },
+  { id:'t10', topic:'Parasites', marks:10, text:'(a) Mention four parasites of farm animals. (b) State five precautions during sheep dipping.', markScheme:'Parasites: tick, lice, roundworm, liver fluke. Precautions: protective clothing, restrain animals, avoid windy days, calculate dip volume, prevent drinking dip, proper disposal, time dipping interval.', keywords:['parasites','tick','lice','roundworm','liver fluke','dipping','precautions','chemical','safety','restrain'], minKeywords:6 }
+];
+
+let ST = { objAnswered:0, objCorrect:0, objMarks:0, thyAnswered:0, thyMarks:0, objDone:new Set(), thyDone:new Set() };
+let UA_OBJ = {}, UA_THY = {}, SHUFFLED = {};
+let globalDone = false, TOTAL_SECS = 5400, timerInterval=null;
+
+function startTimer(){ let rem=TOTAL_SECS, dot=document.getElementById('timer-dot'), val=document.getElementById('timer-val'); function fmt(s){ let h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60; return (h>0?(h<10?'0':'')+h+':':'')+(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; } val.textContent=fmt(rem); timerInterval=setInterval(function(){ rem--; val.textContent=fmt(rem); if(rem<=600 && rem>180){ val.className='timer-val warn'; dot.className='timer-dot warn'; }else if(rem<=180){ val.className='timer-val dang'; dot.className='timer-dot dang'; } if(rem<=0){ clearInterval(timerInterval); timeUp(); } },1000); }
+function stopTimer(){ if(timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay(){ let el=document.getElementById('timer-val'); return el?el.textContent:'—'; }
+function buildShuffled(q){ let entries=['A','B','C','D'].map(k=>({key:k,text:q.opts[k]})); for(let i=entries.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [entries[i],entries[j]]=[entries[j],entries[i]]; } let opts={}, ans=q.ans; ['A','B','C','D'].forEach((lbl,idx)=>{ opts[lbl]=entries[idx].text; if(entries[idx].key===q.ans) ans=lbl; }); return {opts,ans}; }
+function switchTab(which){ document.getElementById('panel-obj').classList.toggle('active',which==='obj'); document.getElementById('panel-thy').classList.toggle('active',which==='thy'); document.getElementById('tab-obj').classList.toggle('active',which==='obj'); document.getElementById('tab-thy').classList.toggle('active',which==='thy'); let meta=document.getElementById('hdr-meta'); if(which==='obj') meta.innerHTML='Section A · <span id="answered-count">'+ST.objAnswered+'</span> answered'; else meta.innerHTML='Section B · <span id="answered-count">'+ST.thyAnswered+'</span> answered'; }
+function updateStats(){ let totalMarks=ST.objMarks+ST.thyMarks; document.getElementById('sc-marks').textContent=totalMarks; document.getElementById('sc-obj').textContent=ST.objAnswered+'/50'; document.getElementById('sc-thy').textContent=ST.thyAnswered+'/5'; document.getElementById('answered-count').textContent=ST.objAnswered+ST.thyAnswered; let totalQ=55, done=ST.objAnswered+ST.thyAnswered; document.getElementById('prog-fill').style.width=(done/totalQ*100)+'%'; document.getElementById('sub-prog').textContent='OBJ: '+ST.objAnswered+'/50 · Theory: '+ST.thyAnswered+'/5'; document.getElementById('thy-answered-display').textContent=ST.thyAnswered+' of 5 answered.'; document.getElementById('m-obj').textContent=ST.objAnswered+' / 50'; document.getElementById('m-thy').textContent=ST.thyAnswered+' / 5'; document.getElementById('m-marks').textContent=totalMarks+' / 100'; document.getElementById('m-time').textContent=getTimeDisplay(); }
+function renderObj(){ let container=document.getElementById('obj-qc'); let html=''; OBJ_Q.forEach((q,i)=>{ let sh=buildShuffled(q); SHUFFLED[q.id]=sh; let opts=''; ['A','B','C','D'].forEach(lbl=>{ opts+=`<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${sh.opts[lbl]}</span></div>`; }); html+=`<div class="qcard"><div class="qcard-top"><span class="qnum">Q${i+1}</span><span class="qtopic">${q.topic}</span></div><div class="qtxt">${q.text}</div><div class="opts">${opts}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp-${q.id}"></div></div>`; }); container.innerHTML=html; document.querySelectorAll('#obj-qc .opt').forEach(opt=>{ opt.addEventListener('click',function(){ if(globalDone||this.classList.contains('locked')) return; let qid=this.dataset.id; document.querySelectorAll(`#obj-qc .opt[data-id="${qid}"]`).forEach(o=>o.classList.remove('sel')); this.classList.add('sel'); UA_OBJ[qid]=this.dataset.a; let btn=document.querySelector(`#obj-qc .abtn[data-qid="${qid}"]`); if(btn) btn.disabled=false; }); }); document.querySelectorAll('#obj-qc .abtn').forEach(btn=>{ btn.addEventListener('click',function(){ if(globalDone) return; let qid=this.dataset.qid; let q=OBJ_Q.find(x=>x.id===qid); let chosen=UA_OBJ[qid]; let correctLbl=SHUFFLED[qid].ans; let ok=(chosen===correctLbl); document.querySelectorAll(`#obj-qc .opt[data-id="${qid}"]`).forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; if(o.dataset.a===correctLbl) o.classList.add('ok'); else if(o.dataset.a===chosen) o.classList.add('no'); }); let expEl=document.getElementById('exp-'+qid); let markCls=ok?'pos':'neg'; let markTxt=ok?'✓ Correct — 1 mark':'✗ Incorrect — correct: '+correctLbl; expEl.innerHTML=`<span class="exp-mark ${markCls}">${markTxt}</span><div style="margin-top:8px">${q.exp}</div>`; expEl.className='exp show'+(ok?'':' wrong-exp'); this.disabled=true; if(!ST.objDone.has(qid)){ ST.objDone.add(qid); ST.objAnswered++; if(ok){ ST.objCorrect++; ST.objMarks++; } updateStats(); } }); }); }
+function renderThy(){ let container=document.getElementById('thy-qc'); let html=''; THY_Q.forEach((q,i)=>{ html+=`<div class="qcard" id="thycard-${q.id}"><div class="qcard-top"><span class="qnum">Q${i+1}</span><span class="qtopic">${q.topic}</span></div><div class="theory-body"><span class="theory-marks-badge">⬡ ${q.marks} marks</span><div class="qtxt">${q.text.replace(/\n/g,'<br>')}</div><textarea class="prose-area" id="prose-${q.id}" placeholder="Write your answer here…" oninput="onProseInput('${q.id}')" rows="6"></textarea><div class="word-count" id="wc-${q.id}">0 words</div></div><button class="abtn" data-qid="${q.id}" id="thybtn-${q.id}" disabled onclick="checkTheory('${q.id}')">Check & Mark</button><div class="exp" id="thy-exp-${q.id}"></div></div>`; }); container.innerHTML=html; }
+window.onProseInput=function(qid){ let ta=document.getElementById('prose-'+qid); let wc=document.getElementById('wc-'+qid); let btn=document.getElementById('thybtn-'+qid); if(!ta||!wc) return; let words=ta.value.trim().split(/\s+/).filter(w=>w.length>0); let count=ta.value.trim()===''?0:words.length; wc.textContent=count+' word'+(count!==1?'s':''); wc.className=count>0?'word-count active':'word-count'; if(btn) btn.disabled=count<5; };
+window.checkTheory=function(qid){ if(globalDone) return; let q=THY_Q.find(x=>x.id===qid); if(!ST.thyDone.has(qid) && ST.thyAnswered>=5){ let ta2=document.getElementById('prose-'+qid); if(ta2){ ta2.disabled=true; ta2.placeholder='You have already answered 5 questions.'; } document.getElementById('thybtn-'+qid).disabled=true; return; } let ta=document.getElementById('prose-'+qid); let answer=ta?ta.value.toLowerCase():''; let hits=[], misses=[]; q.keywords.forEach(kw=>{ if(answer.indexOf(kw.toLowerCase())!==-1) hits.push(kw); else misses.push(kw); }); let hitCount=hits.length, totalKw=q.keywords.length, marks; if(hitCount>=q.minKeywords){ let extra=hitCount-q.minKeywords, extraMax=totalKw-q.minKeywords, bonus=extraMax>0?(extra/extraMax)*2:0; marks=Math.min(10,Math.round(8+bonus)); }else if(hitCount===0){ marks=0; }else{ marks=Math.round((hitCount/q.minKeywords)*7); } if(ta) ta.disabled=true; document.getElementById('thybtn-'+qid).disabled=true; let expEl=document.getElementById('thy-exp-'+qid); let markCls=marks>=8?'pos':marks>=5?'partial':'neg'; let expCls=marks>=8?'':marks>=5?' partial-exp':' wrong-exp'; let kwListHtml='<div class="kw-list">'; hits.forEach(kw=>kwListHtml+=`<span class="kw-tag hit">✓ ${kw}</span>`); misses.forEach(kw=>kwListHtml+=`<span class="kw-tag miss">${kw}</span>`); kwListHtml+='</div>'; expEl.innerHTML=`<span class="exp-mark ${markCls}">${marks} / 10 marks</span><div style="margin-top:8px;font-size:13px;color:var(--ter);margin-bottom:10px">${hitCount} of ${totalKw} marking keywords found</div><div class="kw-feedback"><div class="kw-feedback-title">Keyword Breakdown</div>${kwListHtml}</div><div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--ter);line-height:1.7"><strong style="color:var(--sec);font-family:var(--mono);font-size:10px;letter-spacing:.08em">MARK SCHEME</strong><br><br>${q.markScheme.replace(/\n/g,'<br>')}</div>`; expEl.className='exp show'+expCls; if(!ST.thyDone.has(qid)){ ST.thyDone.add(qid); ST.thyAnswered++; ST.thyMarks+=marks; UA_THY[qid]={marks}; updateStats(); } };
+const GRADE_SCALE=[{id:'A1',min:75,max:100,label:'A1',remark:'Excellent'},{id:'B2',min:70,max:74,label:'B2',remark:'Very Good'},{id:'B3',min:65,max:69,label:'B3',remark:'Good'},{id:'C4',min:60,max:64,label:'C4',remark:'Credit'},{id:'C5',min:55,max:59,label:'C5',remark:'Credit'},{id:'C6',min:50,max:54,label:'C6',remark:'Credit'},{id:'D7',min:45,max:49,label:'D7',remark:'Pass'},{id:'E8',min:40,max:44,label:'E8',remark:'Pass'},{id:'F9',min:0,max:39,label:'F9',remark:'Fail'}];
+function getGrade(pct){ for(let g of GRADE_SCALE) if(pct>=g.min && pct<=g.max) return g; return GRADE_SCALE[GRADE_SCALE.length-1]; }
+window.showSubmitModal=function(){ document.getElementById('m-time').textContent=getTimeDisplay(); document.getElementById('m-obj').textContent=ST.objAnswered+' / 50'; document.getElementById('m-thy').textContent=ST.thyAnswered+' / 5'; document.getElementById('m-marks').textContent=(ST.objMarks+ST.thyMarks)+' / 100'; document.getElementById('submit-modal').classList.add('show'); };
+window.hideSubmitModal=function(){ document.getElementById('submit-modal').classList.remove('show'); };
+window.submitExam=function(){ hideSubmitModal(); globalDone=true; stopTimer(); document.querySelectorAll('#obj-qc .opt').forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; }); document.querySelectorAll('#obj-qc .abtn:not([disabled])').forEach(b=>b.click()); document.querySelectorAll('.prose-area').forEach(ta=>ta.disabled=true); document.querySelectorAll('#thy-qc .abtn:not([disabled])').forEach(b=>b.disabled=true); showResults(); };
+function showResults(){ let raw=ST.objMarks+ST.thyMarks, pct=Math.round((raw/100)*100), grade=getGrade(pct); document.getElementById('res-sub').textContent='Completed · '+new Date().toLocaleDateString('en-GB'); document.getElementById('res-score').textContent=pct; document.getElementById('res-score').style.color=grade.color; document.getElementById('res-badge').textContent=grade.label+' — '+grade.remark; document.getElementById('res-badge').style.background=grade.color+'15'; document.getElementById('res-badge').style.border='1px solid '+grade.color; document.getElementById('res-desc').textContent=grade.remark; document.getElementById('res-obj-marks').textContent=ST.objMarks; document.getElementById('res-thy-marks').textContent=ST.thyMarks; document.getElementById('res-raw').textContent=raw+'/100'; document.getElementById('res-pct').textContent=pct+'%'; GRADE_SCALE.forEach(g=>{ let row=document.getElementById('gr-'+g.id); if(row) row.classList.toggle('current',g.id===grade.id); }); document.getElementById('results-screen').classList.add('show'); }
+window.reviewAnswers=function(){ document.getElementById('results-screen').classList.remove('show'); switchTab('obj'); };
+function timeUp(){ globalDone=true; document.querySelectorAll('.opt').forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; }); document.querySelectorAll('.abtn').forEach(b=>b.disabled=true); document.querySelectorAll('.prose-area').forEach(ta=>ta.disabled=true); showResults(); }
+window.doPrint=function(){ document.getElementById('print-header').style.display='block'; window.print(); setTimeout(()=>{ document.getElementById('print-header').style.display='none'; },1200); };
+renderObj(); renderThy(); startTimer(); updateStats();
+</script>
+</body>
+</html>
