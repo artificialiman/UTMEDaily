@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Code Quiz — MEPC Equilibrium · HTML Refactor & Hierarchy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0E1A; --card:#111827; --card2:#161E2E;
+      --text:#E8EDF5; --sec:rgba(232,237,245,0.75); --ter:rgba(232,237,245,0.45);
+      --accent:#4A9E8A; --accent2:#2A6E5E;
+      --warn:#C8A84B; --red:#EF4444; --green:#10B981;
+      --sep:rgba(255,255,255,0.08); --r:14px;
+      --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:var(--sans);font-size:16px;color:var(--text);background:var(--bg);line-height:1.5;padding-bottom:calc(env(safe-area-inset-bottom) + 80px);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+    .hdr{background:rgba(10,14,26,0.92);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 14px) 20px 14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .hdr-left{display:flex;flex-direction:column;gap:2px}
+    .hdr-brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent)}
+    .hdr-title{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+    .hdr-meta{font-size:11px;color:var(--ter);margin-top:1px}
+    .gtimer{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;background:rgba(74,158,138,0.08);border:1px solid rgba(74,158,138,0.2);flex-shrink:0}
+    .gtimer-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;transition:background .3s}
+    .gtimer-dot.warn{background:var(--warn)} .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+    .gtimer-txt{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--accent);transition:color .3s}
+    .gtimer-txt.warn{color:var(--warn)} .gtimer-txt.dang{color:var(--red)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .score-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 8px;position:relative;z-index:1}
+    .sc{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--sep)}
+    .sc-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .sc-v.c{color:var(--green)} .sc-v.w{color:var(--red)} .sc-v.s{color:var(--ter)}
+    .sc-l{font-size:10px;color:var(--ter);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+    .prog-wrap{padding:0 20px 10px;position:relative;z-index:1}
+    .prog-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width 0.4s ease;width:0%}
+    #qc{padding:8px 20px 20px;position:relative;z-index:1}
+    .qcard{background:var(--card);border:1px solid var(--sep);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--sep);gap:10px}
+    .qnum{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ter);letter-spacing:0.1em;text-transform:uppercase}
+    .qtopic{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:rgba(74,158,138,0.08);border:1px solid rgba(74,158,138,0.18);color:var(--accent);letter-spacing:0.3px}
+    .qtxt{font-size:15px;line-height:1.72;color:var(--text);font-weight:400;margin-bottom:16px}
+    .code-ref{font-family:var(--mono);font-size:12px;background:rgba(74,158,138,0.06);border:1px solid rgba(74,158,138,0.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;color:rgba(200,221,216,0.75);line-height:1.9;white-space:pre-wrap;word-break:break-all}
+    .opts{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--sep);background:var(--card2);cursor:pointer;transition:all 0.15s}
+    .opt:hover:not(.locked){border-color:rgba(74,158,138,0.4);background:rgba(74,158,138,0.05)}
+    .opt.sel{border-color:rgba(74,158,138,0.5);background:rgba(74,158,138,0.08)}
+    .opt.ok{border-color:var(--green);background:rgba(16,185,129,0.08)}
+    .opt.no{border-color:var(--red);background:rgba(239,68,68,0.08)}
+    .opt.locked{cursor:default}
+    .opt-key{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;width:18px;padding-top:1px}
+    .opt.ok .opt-key{color:var(--green)} .opt.no .opt-key{color:var(--red)}
+    .opt-txt{font-size:14px;color:var(--sec);line-height:1.55}
+    .abtn{margin-top:12px;width:100%;padding:11px;border-radius:10px;background:var(--accent);color:#000;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s}
+    .abtn:hover:not(:disabled){opacity:0.88;transform:translateY(-1px)}
+    .abtn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
+    .exp{display:none;margin-top:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.18);border-radius:10px;padding:14px;font-size:13px;line-height:1.68;color:var(--sec)}
+    .exp.show{display:block}
+    .exp-mark{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}
+    .exp-mark.pos{background:rgba(16,185,129,0.15);color:var(--green)}
+    .exp-mark.neg{background:rgba(239,68,68,0.12);color:var(--red)}
+    .submit-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.96);border-top:1px solid var(--sep);padding:12px 20px calc(env(safe-area-inset-bottom) + 12px);z-index:200;backdrop-filter:blur(16px);display:flex;gap:10px;align-items:center}
+    .submit-btn{flex:1;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:opacity 0.2s}
+    .submit-btn:hover{opacity:0.88}
+    .submit-progress{font-family:var(--mono);font-size:11px;color:var(--ter);white-space:nowrap}
+    .timeup{position:fixed;inset:0;z-index:5000;background:rgba(10,14,26,0.96);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .timeup.show{display:flex}
+    .timeup-box{background:var(--card);border:1px solid var(--sep);border-radius:20px;padding:36px 32px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+    .timeup-icon{font-size:2.5rem;margin-bottom:12px}
+    .timeup-ttl{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .timeup-score{font-family:var(--mono);font-size:2rem;font-weight:700;margin-bottom:6px}
+    .timeup-score.pos{color:var(--green)} .timeup-score.neg{color:var(--red)}
+    .timeup-sub{font-size:13px;color:var(--ter);margin-bottom:20px}
+    .timeup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+    .tu-stat-v{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text)}
+    .tu-stat-v.c{color:var(--green)} .tu-stat-v.w{color:var(--red)} .tu-stat-v.s{color:var(--ter)}
+    .tu-stat-l{font-size:10px;color:var(--ter);text-transform:uppercase;margin-top:2px}
+    .timeup-btn{width:100%;padding:13px;background:var(--accent);color:#000;font-family:var(--sans);font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:8px}
+    .modal-overlay{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--card);border:1px solid var(--sep);border-radius:16px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);animation:modalIn 0.2s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sep);font-size:13px;color:var(--ter)}
+    .modal-row b{color:var(--text);font-family:var(--mono)}
+    .modal-btns{display:flex;gap:8px;margin-top:20px}
+    .modal-btn{flex:1;padding:11px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:opacity 0.2s}
+    .modal-btn.primary{background:var(--accent);color:#000}
+    .modal-btn.primary:hover{opacity:0.88}
+    .modal-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--sep)}
+    @media(max-width:480px){.score-strip{grid-template-columns:repeat(2,1fr)}.hdr-title{font-size:13px}}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <span class="hdr-brand">MEPC · Codebase Study</span>
+      <span class="hdr-title">Refactor + Hierarchy · Foundations</span>
+      <span class="hdr-meta">25 questions · 20 min · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="gtimer" id="gtimer">
+        <div class="gtimer-dot" id="gdot"></div>
+        <span class="gtimer-txt" id="gtime">20:00</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v" id="sc-total">25</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v c" id="sc-corr">0</div><div class="sc-l">Correct</div></div>
+  <div class="sc"><div class="sc-v w" id="sc-wrong">0</div><div class="sc-l">Wrong</div></div>
+  <div class="sc"><div class="sc-v s" id="sc-skip">25</div><div class="sc-l">Left</div></div>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="qc"></div>
+
+<div class="submit-bar">
+  <span class="submit-progress" id="sub-prog">0 / 25 answered</span>
+  <button class="submit-btn" onclick="showSubmitModal()">Submit &amp; See Results</button>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>Submit Quiz?</h3>
+    <div class="modal-row"><span>Total Questions</span><b>25</b></div>
+    <div class="modal-row"><span>Answered</span><b id="m-ans">0</b></div>
+    <div class="modal-row"><span>Unanswered</span><b id="m-left">25</b></div>
+    <div class="modal-row"><span>Time Remaining</span><b id="m-time">20:00</b></div>
+    <div class="modal-btns">
+      <button class="modal-btn ghost" onclick="hideSubmitModal()">Keep Going</button>
+      <button class="modal-btn primary" onclick="submitQuiz()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="timeup" id="tu">
+  <div class="timeup-box">
+    <div class="timeup-icon">⏱</div>
+    <div class="timeup-ttl">Time's Up!</div>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub">Your answers are locked in. Review below.</div>
+    <div class="timeup-stats">
+      <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+      <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+      <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+    </div>
+    <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+const TOTAL = 25;
+const GLOBAL_SECS = 1200;
+
+const QUESTIONS = [
+  { id:1, topic:"Refactor 101", text:"You're given an existing webpage with the text 'Equilibrium — Chemistry that never stops'. You want to change it to your brand 'Nova Forge'. What is the beginner-safe method?", code:"<title>Equilibrium — The Chemistry That Never Stops</title>\n<h1>The Tide That Never Stops</h1>", opts:{ A:"Rename all CSS classes containing 'equilibrium' to 'novaforge'", B:"Delete the whole <head> section and start over", C:"Locate the visible text nodes (between <title>, <h1>, <p>) and replace the words — leave attributes, class names, and JavaScript alone", D:"Change the file extension from .html to .txt" }, ans:"C", exp:"The golden rule for beginners: change only the white pieces — the visible text that users read. Don't touch class names, ids, or script variables. Search for the words inside tags (like 'Equilibrium') and replace them. That's how you rebrand safely." },
+  { id:2, topic:"CSS Refactor", text:"The codebase uses a teal accent color defined as --accent. You need to change it to a deep orange (#E76F51). What is the minimal, correct refactor?", code:":root { --accent:#4A9E8A; --accent2:#2A6E5E; }\nbutton { background: var(--accent); }", opts:{ A:"Find every button and change background inline", B:"Only change the hex value inside :root for --accent — the variable name stays the same", C:"Rename --accent to --orange everywhere", D:"Delete the :root block and rewrite all styles" }, ans:"B", exp:"CSS variables (custom properties) are a power tool: change the definition once, and everything using var(--accent) updates automatically. Keep the variable name — only change the value. That's light refactoring with zero breakage." },
+  { id:3, topic:"Safe Edits", text:"What does the mental model 'only touch the white parts' mean for a junior developer?", code:"<div class=\"hero-title\" id=\"mainHeading\">Welcome to Equilibrium</div>\n<script>updateTitle('Equilibrium');</script>", opts:{ A:"Change the class name 'hero-title' to your preferred name", B:"Change the id 'mainHeading' to something shorter", C:"Change the visible text 'Welcome to Equilibrium' but keep 'hero-title', 'mainHeading', and 'updateTitle()' untouched", D:"Delete the <script> block entirely" }, ans:"C", exp:"White parts = text between tags. Colored/symbolic parts = class names, ids, function names, JavaScript variables. A beginner can rewrite any visible sentence, but touching the colored parts breaks functionality. This is the #1 survival skill for editing existing codebases." },
+  { id:4, topic:"Brackets & Syntax", text:"Which type of bracket defines an HTML element? (example: <div>)", code:"<div>Content</div>", opts:{ A:"Curly braces { }", B:"Square brackets [ ]", C:"Angle brackets < >", D:"Parentheses ( )" }, ans:"C", exp:"Angle brackets < > are the DNA of HTML. They surround tag names: <p> for paragraph, <img> for image. Without angle brackets, the browser doesn't know where elements start or end. Curly braces are for CSS/JS, parentheses for functions, square brackets for arrays." },
+  { id:5, topic:"Brackets & Syntax", text:"What is the difference between parentheses ( ) and curly braces { } when you see them in a codebase?", code:"if (score > 5) { updateDisplay(); }", opts:{ A:"Parentheses are for comments, curly braces for text", B:"Parentheses ( ) group conditions and function calls; curly braces { } define code blocks (what happens when condition is true)", C:"They are interchangeable", D:"Curly braces are only used in HTML attributes" }, ans:"B", exp:"This is a huge lightbulb moment: parentheses control logic flow (if, while, function calls). Curly braces wrap a block of actions. Changing one to the other would crash everything. As a beginner, never rename or remove them — they're 'colored syntax'." },
+  { id:6, topic:"Tag Hierarchy", text:"Which order of top-level tags is correct inside <html>?", code:"<html>\n  ___ \n  ___ \n</html>", opts:{ A:"<body> then <head>", B:"<head> then <body> — always head first, then body", C:"<div> then <section>", D:"<footer> then <main>" }, ans:"B", exp:"Every HTML document has strict hierarchy: <html> contains exactly one <head> and one <body>, in that order. Head holds metadata (title, meta tags, CSS links). Body holds visible content. Reversing them confuses browsers — but they'll try to fix it. Good markup respects the order." },
+  { id:7, topic:"Hierarchy", text:"What is the direct parent of the <p> tag in this structure?", code:"<body>\n  <div class=\"card\">\n    <p>Text here</p>\n  </div>\n</body>", opts:{ A:"<body>", B:"<div class=\"card\">", C:"<html>", D:"The text node itself" }, ans:"B", exp:"Parent = the element that directly wraps another. Here <div class='card'> contains <p>. Body is an ancestor (grandparent). Understanding parent/child relationships helps you write CSS selectors and manipulate the DOM without fear." },
+  { id:8, topic:"Deep Nesting", text:"How many <div> elements can you nest inside each other?", code:"<div><div><div><div><div>Deep</div></div></div></div></div>", opts:{ A:"Maximum 3 levels", B:"Maximum 5 levels", C:"No strict limit — any depth is allowed as long as closing tags match in reverse order (LIFO)", D:"Only one <div> per HTML file" }, ans:"C", exp:"There's no technical limit, but too many nested divs (div soup) makes code unreadable and CSS overly specific. The rule: every opening <div> needs a matching closing </div>, and inner tags must close before outer tags. This LIFO (last in, first out) rule applies to all HTML elements." },
+  { id:9, topic:"Div's Place", text:"What is the main purpose of a <div> in HTML hierarchy?", code:"<div class=\"section-wrapper\">\n  <h2>Heading</h2>\n  <p>Content</p>\n</div>", opts:{ A:"It adds semantic meaning like 'this is an article'", B:"It is a generic container with no inherent meaning — used for grouping elements for styling or layout", C:"It forces a line break before and after", D:"It must always contain an image" }, ans:"B", exp:"<div> = division. It's a neutral box. Unlike <nav> or <article>, a div conveys zero meaning — that's its superpower. Use it when you need a hook for CSS or JavaScript but don't want to change the document's semantics." },
+  { id:10, topic:"IDs & Classes", text:"What happens if you accidentally use the same id value on two different elements?", code:"<div id=\"main\">First</div>\n<div id=\"main\">Second</div>", opts:{ A:"The browser automatically renames the second one", B:"Nothing — ids can be duplicated freely", C:"It's invalid HTML. JavaScript will only select the first element with that id, causing bugs", D:"The page fails to load" }, ans:"C", exp:"id attributes must be unique within a document. Duplicate ids break JavaScript (getElementById returns only the first match) and violate HTML standards. Use class names when you need to style multiple elements — classes are built for repetition." },
+  { id:11, topic:"Fragment Links", text:"What do href=\"#section2\" links do?", code:"<a href=\"#faq\">Go to FAQ</a>\n...\n<div id=\"faq\">Frequently Asked Questions</div>", opts:{ A:"Load a new page called section2.html", B:"Scroll the same page to the element with id=\"faq\" — no page reload", C:"Send a request to the server", D:"Open a popup window" }, ans:"B", exp:"The # creates a fragment identifier (in-page anchor). Clicking the link jumps to the element with a matching id attribute on the same page. It's perfect for navigation menus, table of contents, or FAQ sections — and doesn't require JavaScript." },
+  { id:12, topic:"Empty Divs", text:"Why would a developer write <div class=\"hero-glow\"></div> (an empty div)?", code:"<div class=\"hero-glow\"></div>\n.hero-glow { background: radial-gradient(teal, transparent); height: 200px; }", opts:{ A:"It's a mistake — delete empty elements", B:"The div is purely decorative: CSS adds a gradient background. No content needed", C:"It's a placeholder for future text", D:"It increases SEO ranking" }, ans:"B", exp:"Empty divs are not bugs — they're visual scaffolding. CSS can give them backgrounds, glows, or shapes without any text. This pattern keeps HTML clean while enabling complex visual effects. If you see an empty div, check the CSS: it's probably doing something invisible but important." },
+  { id:13, topic:"Semantic HTML", text:"Why use <nav> instead of <div class=\"nav\">?", code:"<nav>\n  <a href=\"/\">Home</a>\n  <a href=\"/about\">About</a>\n</nav>", opts:{ A:"<nav> loads faster", B:"<nav> is semantic — it tells screen readers and search engines 'this is a navigation landmark'", C:"<nav> automatically styles links", D:"<div> cannot contain links" }, ans:"B", exp:"Semantic elements (<nav>, <header>, <main>, <article>) describe their purpose. Screen readers can jump to nav regions. Search engines understand site structure. A <div> with a class .nav looks the same visually but carries zero meaning for assistive tech. Semantics matter for accessibility and SEO." },
+  { id:14, topic:"Heading Hierarchy", text:"Why is <h1> important beyond just making text big?", code:"<h1>Document Title</h1>\n<h2>Chapter One</h2>", opts:{ A:"<h1> is the only element search engines read", B:"It defines the primary heading of the page — outlines the document structure for screen readers and search engine bots", C:"It automatically generates a table of contents", D:"You can only use one heading per page" }, ans:"B", exp:"Headings (h1–h6) create an outline of your content. Screen reader users navigate by headings. Search engines give more weight to h1 content. The visual size is irrelevant (CSS changes that). Using correct heading hierarchy is a core accessibility practice." },
+  { id:15, topic:"Character Encoding", text:"What breaks if <meta charset=\"UTF-8\"> is missing?", code:"<meta charset=\"UTF-8\">", opts:{ A:"All JavaScript stops working", B:"Special characters (emoji, curly quotes, © symbols) may display as garbled mojibake", C:"Images won't load", D:"The page becomes offline-only" }, ans:"B", exp:"The charset meta tells the browser how to interpret bytes as characters. UTF-8 supports almost every symbol. Without it, accented letters, emoji, or smart quotes turn into weird gibberish (mojibake). Always include it early in <head>." },
+  { id:16, topic:"Viewport Meta", text:"What does initial-scale=1.0 in viewport meta control?", code:"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">", opts:{ A:"Locks the user's zoom", B:"Sets the starting zoom level to 100% — no zoom on page load", C:"Changes the font size", D:"Makes the page fullscreen" }, ans:"B", exp:"initial-scale=1.0 means the page loads at 1:1 zoom (100%). Without it, some mobile browsers zoom out or in unpredictably. It doesn't prevent user zooming (that's user-scalable, which is bad for accessibility)." },
+  { id:17, topic:"Title Tag", text:"Where does the <title> content actually appear?", code:"<title>My Awesome Page</title>", opts:{ A:"At the top of the visible page inside a banner", B:"In the browser tab, bookmarks, and search engine results — never inside the page body", C:"As a tooltip when you hover the logo", D:"Inside the footer" }, ans:"B", exp:"<title> is metadata, not visible content. It shows in browser tabs, history, bookmarks, and search engine snippets. The big heading on the page is <h1>, which is completely separate. Each serves a different role." },
+  { id:18, topic:"External vs Embedded CSS", text:"What's the tradeoff between <style> (embedded) and <link> (external stylesheet)?", code:"<style> body { background: black; } </style>\n<link rel=\"stylesheet\" href=\"styles.css\">", opts:{ A:"They are identical", B:"<style> embeds CSS in HTML (single request, not cacheable separately). <link> adds an extra request but the CSS can be cached and reused across pages", C:"<link> only works in modern browsers", D:"<style> is faster for large sites" }, ans:"B", exp:"Embedded CSS travels with the HTML — one request, but every page loads it fresh. External CSS via <link> adds a request but the browser caches it — repeat visits load from disk. For multi-page projects, external is better. For a single standalone demo, embedded is fine." },
+  { id:19, topic:"Inline vs Block", text:"By default, does a <div> force a new line before and after? (block behavior)", code:"<div>First</div><div>Second</div>", opts:{ A:"No, they sit side by side", B:"Yes, a <div> is block-level — each starts on a new line and takes full width", C:"It depends on the screen size", D:"Only if you add CSS" }, ans:"B", exp:"<div> is a block element by default: it occupies the full width available and creates a line break before and after. <span> is inline (stays in line). This fundamental display difference affects layout dramatically. Check browser devtools to see it in action." },
+  { id:20, topic:"Whitespace & Beginners", text:"If you only feel comfortable editing 'the white parts', which change is safe?", code:"<button class=\"quiz-submit\" onclick=\"finalizeQuiz()\">Submit Answers</button>", opts:{ A:"Change 'quiz-submit' to 'my-button'", B:"Change 'finalizeQuiz()' to 'sendData()'", C:"Change the inner text 'Submit Answers' to 'Send Responses'", D:"Change <button> to <div>" }, ans:"C", exp:"The text between opening and closing tags (Submit Answers) is purely content. You can change it to anything. Class names, on-click attributes, and tag names are 'colored parts' — changing them breaks styling or functionality. White parts = visible text. This intuition will save you countless bugs." },
+  { id:21, topic:"Refactoring Colors", text:"You have :root { --primary: #4A9E8A; }. What is the minimal change to turn the whole site pink?", code:":root { --primary: #4A9E8A; }\n.btn { background: var(--primary); }", opts:{ A:"Change the variable name to --pink everywhere", B:"Change the hex value to #FFB6C1 but keep --primary variable name", C:"Find every .btn and change background individually", D:"Delete the CSS file and rewrite" }, ans:"B", exp:"Variables are magic. Change the value once in :root, and every component using var(--primary) updates. Leave the variable name untouched; that's the contract. This is how you refresh a brand in 10 seconds." },
+  { id:22, topic:"Closing Tags Rule", text:"What is the 'LIFO' rule (last in, first out) in HTML?", code:"<div><p><span>Text</span></p></div>", opts:{ A:"The first tag opened must close first", B:"The last tag opened must close first — closing order mirrors opening order", C:"Tags can close in any order", D:"All tags close at the end of the file" }, ans:"B", exp:"LIFO: if you open <div> then <p> then <span>, you must close </span> first, then </p>, then </div>. Crossing order (like <div><p></div></p>) is invalid and breaks layout. This nesting discipline is fundamental to HTML." },
+  { id:23, topic:"DOM Tree Parents", text:"In the snippet, what ancestor elements does <li> have?", code:"<ul class=\"menu\">\n  <li>Item</li>\n</ul>", opts:{ A:"Only <ul>", B:"<ul> and <body> and <html>", C:"No ancestors", D:"Only <html>" }, ans:"B", exp:"Ancestors = all elements that wrap an element, including parents, grandparents, etc. Here <li> is inside <ul>, which is inside <body>, which is inside <html>. Understanding ancestor relationships helps with CSS selectors (like .menu li) and event delegation." },
+  { id:24, topic:"ID vs Class", text:"You want to style a unique hero section that appears once. Should you use id or class?", code:"<div ???=\"hero\">\n  <h1>Welcome</h1>\n</div>", opts:{ A:"Always use class — id is obsolete", B:"Use id if the element is truly unique on the page (id=\"hero\") and you need a JavaScript hook; but for styling, both work", C:"Use id=\"hero\" only for JavaScript, never CSS", D:"Id cannot be styled" }, ans:"B", exp:"Both id and class work for CSS. But id must be unique. For a one-of-a-kind element (main banner, header), id is fine. But if you might reuse the style later, prefer class. Many developers use classes for everything to avoid uniqueness headaches." },
+  { id:25, topic:"Beginner Mindset", text:"What is the #1 habit when modifying an existing HTML/CSS/JS codebase as a beginner?", code:"/* from an existing project */", opts:{ A:"Rewrite everything from scratch", B:"Make small changes, test after each change, and change only what you understand — prioritize visible text edits first", C:"Delete all comments", D:"Rename all variables to shorter names" }, ans:"B", exp:"The expert beginner: small changes + continuous testing. Change one sentence, refresh the page. Change a color, refresh. Never bulk-rename; never delete code you don't understand. The white parts (visible text) are always safe. Build confidence step by step — that's how you learn without breaking things." }
+];
+
+var SHUFFLED_ANS = {};
+function buildShuffledOpts(q) {
+  var entries = ['A','B','C','D'].map(function(k) { return { origKey: k, text: q.opts[k] }; });
+  for (var i = entries.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp; }
+  var newOpts = {}, newAns = q.ans;
+  ['A','B','C','D'].forEach(function(lbl, idx) { newOpts[lbl] = entries[idx].text; if (entries[idx].origKey === q.ans) newAns = lbl; });
+  return { opts: newOpts, ans: newAns };
+}
+
+var ST = { correct: 0, wrong: 0, answered: 0, answeredIds: new Set() }, UA = {}, globalDone = false;
+var timerInterval = null;
+function startTimer() { var remaining = GLOBAL_SECS, dot = document.getElementById('gdot'), txt = document.getElementById('gtime'); function fmt(s) { var m = Math.floor(s / 60), ss = s % 60; return (m < 10 ? '0' : '') + m + ':' + (ss < 10 ? '0' : '') + ss; } txt.textContent = fmt(remaining); timerInterval = setInterval(function () { remaining--; txt.textContent = fmt(remaining); if (remaining <= 300 && remaining > 60) { txt.className = 'gtimer-txt warn'; dot.className = 'gtimer-dot warn'; } else if (remaining <= 60) { txt.className = 'gtimer-txt dang'; dot.className = 'gtimer-dot dang'; } if (remaining <= 0) { clearInterval(timerInterval); timeUp(); } }, 1000); }
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function getTimeDisplay() { var el = document.getElementById('gtime'); return el ? el.textContent : '—'; }
+function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function render() { var container = document.getElementById('qc'), html = ''; for (var i = 0; i < QUESTIONS.length; i++) { var q = QUESTIONS[i], shuffled = buildShuffledOpts(q); SHUFFLED_ANS[q.id] = shuffled.ans; var optsHtml = ''; ['A', 'B', 'C', 'D'].forEach(function (lbl) { optsHtml += '<div class="opt" data-id="' + q.id + '" data-a="' + lbl + '"><span class="opt-key">' + lbl + '.</span><span class="opt-txt">' + shuffled.opts[lbl] + '</span></div>'; }); var codeHtml = q.code ? '<div class="code-ref">' + escHtml(q.code) + '</div>' : ''; html += '<div class="qcard" style="animation-delay:' + (i * 0.03) + 's"><div class="qcard-top"><span class="qnum">Q' + q.id + ' of ' + TOTAL + '</span><span class="qtopic">' + q.topic + '</span></div><div class="qtxt">' + q.text + '</div>' + codeHtml + '<div class="opts">' + optsHtml + '</div><button class="abtn" data-qid="' + q.id + '" disabled>Check Answer</button><div class="exp" id="exp' + q.id + '"></div></div>'; } container.innerHTML = html; attachListeners(); }
+function attachListeners() { document.querySelectorAll('.opt').forEach(function (opt) { opt.addEventListener('click', function () { if (globalDone || this.classList.contains('locked')) return; var qid = parseInt(this.dataset.id); document.querySelectorAll('.opt[data-id="' + qid + '"]').forEach(function (o) { o.classList.remove('sel'); }); this.classList.add('sel'); UA[qid] = this.dataset.a; var btn = document.querySelector('.abtn[data-qid="' + qid + '"]'); if (btn) btn.disabled = false; }); }); document.querySelectorAll('.abtn').forEach(function (btn) { btn.addEventListener('click', function () { if (globalDone) return; var qid = parseInt(this.dataset.qid), q = QUESTIONS.find(function (x) { return x.id === qid; }); var chosen = UA[qid], correctLabel = SHUFFLED_ANS[qid], ok = (chosen === correctLabel); document.querySelectorAll('.opt[data-id="' + qid + '"]').forEach(function (o) { o.classList.add('locked'); o.style.pointerEvents = 'none'; if (o.dataset.a === correctLabel) o.classList.add('ok'); else if (o.dataset.a === chosen) o.classList.add('no'); }); var expEl = document.getElementById('exp' + qid); expEl.innerHTML = '<span class="exp-mark ' + (ok ? 'pos' : 'neg') + '">' + (ok ? '✓ Correct' : '✗ Incorrect — correct answer: ' + correctLabel) + '</span>' + (q.exp ? '<div style="margin-top:8px">' + q.exp + '</div>' : ''); expEl.classList.add('show'); this.disabled = true; if (!ST.answeredIds.has(qid)) { ST.answered++; ST.answeredIds.add(qid); if (ok) ST.correct++; else ST.wrong++; updateStats(); } }); }); }
+function updateStats() { var left = TOTAL - ST.answered; document.getElementById('sc-corr').textContent = ST.correct; document.getElementById('sc-wrong').textContent = ST.wrong; document.getElementById('sc-skip').textContent = left; document.getElementById('answered-count').textContent = ST.answered; document.getElementById('sub-prog').textContent = ST.answered + ' / ' + TOTAL + ' answered'; document.getElementById('m-ans').textContent = ST.answered; document.getElementById('m-left').textContent = left; document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('prog-fill').style.width = (ST.answered / TOTAL * 100) + '%'; }
+function showSubmitModal() { document.getElementById('m-time').textContent = getTimeDisplay(); document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal() { document.getElementById('submit-modal').classList.remove('show'); }
+function submitQuiz() { hideSubmitModal(); globalDone = true; stopTimer(); document.querySelectorAll('.abtn:not([disabled])').forEach(function (b) { b.click(); }); var pct = Math.round((ST.correct / TOTAL) * 100), scoreEl = document.getElementById('tu-score'); scoreEl.textContent = pct + '%'; scoreEl.className = 'timeup-score ' + (pct >= 50 ? 'pos' : 'neg'); document.getElementById('tu-co').textContent = ST.correct; document.getElementById('tu-wr').textContent = ST.wrong; document.getElementById('tu-sk').textContent = TOTAL - ST.answered; document.getElementById('tu').classList.add('show'); }
+function timeUp() { globalDone = true; document.querySelectorAll('.opt').forEach(function (o) { o.style.pointerEvents = 'none'; o.classList.add('locked'); }); document.querySelectorAll('.abtn').forEach(function (b) { b.disabled = true; }); var pct = Math.round((ST.correct / TOTAL) * 100); document.getElementById('tu-score').textContent = pct + '%'; document.getElementById('tu-co').textContent = ST.correct; document.getElementById('tu-wr').textContent = ST.wrong; document.getElementById('tu-sk').textContent = TOTAL - ST.answeredIds.size; document.getElementById('tu').classList.add('show'); }
+render();
+startTimer();
+</script>
+</body>
+</html>
