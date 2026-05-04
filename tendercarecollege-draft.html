@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TenderCare Secondary School Fee Management System</title>
+    <style>
+        :root {
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #0f3b5e;
+            --primary-light: #1a5a8a;
+            --green: #10b981;
+            --green-bg: #d1fae5;
+            --red: #ef4444;
+            --red-bg: #fee2e2;
+            --orange: #f59e0b;
+            --orange-bg: #fef3c7;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --radius: 10px;
+            --transition: 0.2s ease;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 2px 12px rgba(15, 59, 94, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+        .header .sub {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+        .academic-year {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+        }
+        .status-bar {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 6px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            color: var(--muted);
+            flex-wrap: wrap;
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.ok {
+            background: #10b981;
+        }
+        .status-dot.warn {
+            background: #f59e0b;
+        }
+        .status-dot.err {
+            background: #ef4444;
+        }
+        .tab-nav {
+            display: flex;
+            gap: 2px;
+            background: #fff;
+            padding: 4px 20px 0 20px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 98px;
+            z-index: 99;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tab-btn {
+            padding: 9px 18px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--muted);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: var(--font);
+        }
+        .tab-btn:hover {
+            color: var(--text);
+            background: #f8fafc;
+        }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 700;
+        }
+        .tab-badge {
+            display: inline-block;
+            background: var(--orange-bg);
+            color: #b45309;
+            font-size: 0.68rem;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+        .toast-container {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-width: 380px;
+        }
+        .toast {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .toast.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .toast.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .toast.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
+            margin-bottom: 18px;
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .stat-box {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 14px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        .stat-box .num {
+            font-size: 1.7rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .stat-box .label {
+            font-size: 0.73rem;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .stat-box.green .num {
+            color: #059669;
+        }
+        .stat-box.red .num {
+            color: #dc2626;
+        }
+        .stat-box.orange .num {
+            color: #d97706;
+        }
+        .stat-box.primary .num {
+            color: var(--primary);
+        }
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            max-height: 55vh;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            min-width: 1400px;
+        }
+        table.wide {
+            min-width: 1600px;
+        }
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        thead th {
+            background: #f1f5f9;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--muted);
+            padding: 9px 7px;
+            border-bottom: 2px solid #cbd5e1;
+            white-space: nowrap;
+        }
+        tbody td {
+            padding: 7px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+        .badge.fully-paid {
+            background: var(--green-bg);
+            color: #065f46;
+        }
+        .badge.outstanding {
+            background: var(--red-bg);
+            color: #991b1b;
+        }
+        .badge.partial {
+            background: var(--orange-bg);
+            color: #92400e;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        .btn-outline {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            background: #f8fafc;
+        }
+        .btn-danger {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1.5px solid #fecaca;
+        }
+        .btn-danger:hover {
+            background: #fee2e2;
+        }
+        .btn-sm {
+            padding: 4px 9px;
+            font-size: 0.7rem;
+            border-radius: 5px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            align-items: center;
+        }
+        .search-box {
+            padding: 7px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.82rem;
+            width: 220px;
+            font-family: var(--font);
+            transition: var(--transition);
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 59, 94, 0.08);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 10px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .form-group label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 7px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-family: var(--font);
+            transition: var(--transition);
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 59, 94, 0.06);
+        }
+        .instructions {
+            max-width: 750px;
+        }
+        .instructions ol {
+            padding-left: 18px;
+        }
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .instructions .step-title {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .instructions code {
+            background: #f1f5f9;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .color-dots {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        .color-dots span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            font-size: 0.82rem;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot.green {
+            background: #10b981;
+        }
+        .dot.red {
+            background: #ef4444;
+        }
+        .dot.orange {
+            background: #f59e0b;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 14px 0;
+            font-size: 0.82rem;
+            color: #92400e;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .warning-box strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 22px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        .modal h3 {
+            margin-bottom: 14px;
+            color: var(--primary);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.72rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 14px;
+            }
+            .header h1 {
+                font-size: 0.95rem;
+            }
+            .tab-btn {
+                padding: 7px 12px;
+                font-size: 0.75rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            table {
+                font-size: 0.68rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🏫 TENDERCARE SECONDARY SCHOOL</h1>
+            <div class="sub">Fee Payment Management System · Bursary Department</div>
+        </div>
+        <div class="academic-year">📅 Academic Year: <strong>2025/2026</strong></div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+        <span class="status-dot ok" id="statusDot"></span>
+        <span id="statusText">Initializing…</span>
+        <span style="margin-left:auto;font-weight:600;" id="statusRecordCount"></span>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="register">📋 Payment Register</button>
+        <button class="tab-btn" data-tab="defaulters">⚠️ Defaulters List <span class="tab-badge" id="defaultersBadge">0</span></button>
+        <button class="tab-btn" data-tab="summary">📊 Class Summary</button>
+        <button class="tab-btn" data-tab="backup">💾 Backup & Restore</button>
+        <button class="tab-btn" data-tab="instructions">📖 Instructions</button>
+    </div>
+
+    <div class="main-content" id="mainContent">
+
+        <!-- PAYMENT REGISTER -->
+        <div class="tab-panel active" id="panel-register">
+            <div class="stats-grid" id="registerStats">
+                <div class="stat-box primary"><div class="num" id="statTotalStudents">0</div><div class="label">Total Students</div></div>
+                <div class="stat-box green"><div class="num" id="statFullyPaid">0</div><div class="label">Fully Paid</div></div>
+                <div class="stat-box red"><div class="num" id="statOutstanding">0</div><div class="label">Outstanding</div></div>
+                <div class="stat-box orange"><div class="num" id="statPartial">0</div><div class="label">Partial Payment</div></div>
+                <div class="stat-box primary"><div class="num" id="statTotalCollected">₦0</div><div class="label">Total Collected</div></div>
+                <div class="stat-box"><div class="num" id="statTotalExpected">₦0</div><div class="label">Total Expected</div></div>
+            </div>
+            <div class="toolbar">
+                <input type="text" class="search-box" id="searchRegister" placeholder="🔍 Search by name or class…">
+                <button class="btn btn-primary" onclick="openAddStudentModal()">➕ Add Student</button>
+                <button class="btn btn-outline" onclick="openRecordPaymentModal()">💳 Record Payment</button>
+                <button class="btn btn-outline" onclick="exportToCSV('register')">📥 Export CSV</button>
+            </div>
+            <div class="table-container">
+                <table class="wide" id="registerTable">
+                    <thead>
+                        <tr>
+                            <th>S/N</th><th>Full Name</th><th>Class</th><th>Parent/Guardian</th>
+                            <th>Phone</th><th>Tuition (₦)</th><th>PTA Levy (₦)</th><th>Exam Fee (₦)</th>
+                            <th>Dev. Fund (₦)</th><th>Other (₦)</th><th>Total (₦)</th>
+                            <th>Paid (₦)</th><th>Balance (₦)</th><th>Expected (₦)</th><th>Status</th>
+                            <th>Date</th><th>Receipt No</th><th>Method</th><th>Recorded By</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registerBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DEFAULTERS LIST -->
+        <div class="tab-panel" id="panel-defaulters">
+            <div class="card">
+                <h2>⚠️ Defaulters & Outstanding Payments</h2>
+                <p style="color:var(--muted);font-size:0.82rem;margin-bottom:12px;">Students with Outstanding or Partial payment status appear here automatically.</p>
+                <button class="btn btn-outline btn-sm" onclick="exportToCSV('defaulters')">📥 Export CSV</button>
+            </div>
+            <div class="table-container">
+                <table id="defaultersTable">
+                    <thead><tr><th>S/N</th><th>Student Name</th><th>Class</th><th>Phone</th><th>Balance (₦)</th><th>Status</th></tr></thead>
+                    <tbody id="defaultersBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CLASS SUMMARY -->
+        <div class="tab-panel" id="panel-summary">
+            <div class="card">
+                <h2>📊 School Fee Summary Report</h2>
+                <button class="btn btn-outline btn-sm" onclick="exportToCSV('summary')">📥 Export CSV</button>
+            </div>
+            <div class="table-container">
+                <table id="summaryTable">
+                    <thead><tr><th>Class</th><th>Total Students</th><th>Fully Paid</th><th>Outstanding</th><th>Partial</th><th>Total Expected (₦)</th><th>Total Collected (₦)</th><th>Collection Rate</th></tr></thead>
+                    <tbody id="summaryBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- BACKUP & RESTORE -->
+        <div class="tab-panel" id="panel-backup">
+            <div class="card">
+                <h2>💾 Backup & Restore — Data Safeguards</h2>
+                <p style="color:var(--muted);font-size:0.82rem;margin-bottom:16px;">
+                    Data is stored in <strong>IndexedDB</strong> and automatically backed up as <strong>CSV</strong> after every change.
+                </p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
+                    <div class="card" style="margin:0;">
+                        <h3 style="font-size:0.9rem;">📤 Export Full Backup</h3>
+                        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Download a complete CSV backup of all records.</p>
+                        <button class="btn btn-primary" onclick="downloadFullBackup()">📥 Download Backup (CSV)</button>
+                    </div>
+                    <div class="card" style="margin:0;">
+                        <h3 style="font-size:0.9rem;">📥 Restore from Backup</h3>
+                        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Restore data from a previously downloaded CSV file. <strong>⚠️ Replaces all current data.</strong></p>
+                        <input type="file" id="restoreFileInput" accept=".csv" style="margin-bottom:6px;font-size:0.8rem;">
+                        <button class="btn btn-danger" onclick="restoreFromBackup()">🔄 Restore from File</button>
+                    </div>
+                    <div class="card" style="margin:0;">
+                        <h3 style="font-size:0.9rem;">📊 Storage Info</h3>
+                        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Current database status.</p>
+                        <div id="storageInfo" style="font-size:0.8rem;line-height:1.6;"></div>
+                        <button class="btn btn-outline btn-sm" onclick="refreshStorageInfo()" style="margin-top:6px;">🔄 Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTRUCTIONS -->
+        <div class="tab-panel instructions" id="panel-instructions">
+            <div class="card">
+                <h2>📋 How to Use This Payment Management System</h2>
+                <ol>
+                    <li><span class="step-title">Add Students:</span> Click <em>Add Student</em>. Enter the student's full name, class, parent name, phone, and fee breakdown. The <strong>Total Fee</strong> is calculated automatically.</li>
+                    <li><span class="step-title">Record Payments:</span> Use the <em>Record Payment</em> button. Select the student, enter the amount paid, date, receipt number, method, and your name. Balance and Status update instantly.</li>
+                    <li><span class="step-title">Track Defaulters:</span> The <strong>Defaulters List</strong> tab automatically shows students who haven't paid in full.</li>
+                    <li><span class="step-title">Class Summary:</span> The <strong>Summary</strong> tab shows per-class aggregates — totals, collections, and rates.</li>
+                    <li><span class="step-title">Backup Regularly:</span> CSV backups are <strong>automatically saved after every change</strong>. Use the <strong>Backup & Restore</strong> tab to manually export or restore data.</li>
+                </ol>
+                <div class="color-dots">
+                    <span><span class="dot green"></span> Fully Paid</span>
+                    <span><span class="dot red"></span> Outstanding (No payment)</span>
+                    <span><span class="dot orange"></span> Partial Payment (Defaulter)</span>
+                </div>
+                <div class="warning-box">
+                    <span>⚠️</span>
+                    <div>
+                        <strong>Data Safety:</strong> Data is stored in IndexedDB with CSV backups saved automatically on every change. Keep backup files in a secure folder. Term is fixed to <strong>2025/2026 Academic Year</strong> and Fee Category to <strong>Day</strong> by default.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal-overlay" id="addStudentModal">
+        <div class="modal">
+            <h3>➕ Add New Student</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Full Name *</label><input type="text" id="addFullName" placeholder="e.g. Adebayo OluwaTobi"></div>
+                <div class="form-group"><label>Class *</label><input type="text" id="addClass" placeholder="e.g. SS 2A" list="classList"><datalist id="classList"></datalist></div>
+                <div class="form-group"><label>Parent/Guardian</label><input type="text" id="addParent" placeholder="e.g. Mr. Adebayo"></div>
+                <div class="form-group"><label>Phone Number</label><input type="text" id="addPhone" placeholder="e.g. 08012345678"></div>
+                <div class="form-group"><label>Tuition (₦)</label><input type="number" id="addTuition" value="0" min="0"></div>
+                <div class="form-group"><label>PTA Levy (₦)</label><input type="number" id="addPTA" value="0" min="0"></div>
+                <div class="form-group"><label>Exam Fee (₦)</label><input type="number" id="addExam" value="0" min="0"></div>
+                <div class="form-group"><label>Dev. Fund (₦)</label><input type="number" id="addDevFund" value="0" min="0"></div>
+                <div class="form-group"><label>Other Fee (₦)</label><input type="number" id="addOther" value="0" min="0"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('addStudentModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addStudent()">Save Student</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Payment Modal -->
+    <div class="modal-overlay" id="recordPaymentModal">
+        <div class="modal">
+            <h3>💳 Record Payment</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Select Student *</label><select id="paymentStudentSelect"></select></div>
+                <div class="form-group"><label>Amount Paid (₦) *</label><input type="number" id="paymentAmount" min="1" value="0"></div>
+                <div class="form-group"><label>Date of Payment</label><input type="date" id="paymentDate"></div>
+                <div class="form-group"><label>Receipt Number</label><input type="text" id="paymentReceipt" placeholder="e.g. RCP-001"></div>
+                <div class="form-group"><label>Payment Method</label><select id="paymentMethod"><option>Cash</option><option>Bank Transfer</option><option>POS</option><option>Cheque</option></select></div>
+                <div class="form-group"><label>Recorded By</label><input type="text" id="paymentRecordedBy" placeholder="Staff name"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('recordPaymentModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="recordPayment()">Save Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2025 TenderCare Secondary School · Bursary Department · Auto-save CSV on every change
+    </div>
+
+    <script>
+        (function() {
+            // ─────────────────────── CONSTANTS ───────────────────────
+            const ACADEMIC_TERM = '2025/2026';
+            const FEE_CATEGORY = 'Day';
+
+            // ─────────────────────── DATABASE (IndexedDB) ───────────────────────
+            const DB_NAME = 'TenderCareFeeDB';
+            const DB_VERSION = 3;
+            const STORE_NAME = 'students';
+            let db = null;
+            let dbReady = false;
+            let writeLock = false;
+            const TAB_ID = 'tab_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    request.onupgradeneeded = function(e) {
+                        const dbRef = e.target.result;
+                        if (!dbRef.objectStoreNames.contains(STORE_NAME)) {
+                            const store = dbRef.createObjectStore(STORE_NAME, { keyPath: 'name' });
+                            store.createIndex('class', 'class', { unique: false });
+                        }
+                    };
+                    request.onsuccess = function(e) {
+                        db = e.target.result;
+                        dbReady = true;
+                        setupTabCoordination();
+                        resolve(db);
+                    };
+                    request.onerror = function(e) {
+                        reject(new Error('Failed to open database: ' + e.target.error.message));
+                    };
+                    request.onblocked = function() {
+                        reject(new Error('Database blocked — close other tabs of this app and refresh.'));
+                    };
+                });
+            }
+
+            function setupTabCoordination() {
+                try {
+                    const channel = new BroadcastChannel('tendercare_tabs');
+                    channel.onmessage = function(e) {
+                        if (e.data.type === 'write_lock_claim' && e.data.tabId !== TAB_ID) {
+                            toast('Another tab is open. Editing may conflict.', 'warning', 3500);
+                            updateStatusBar('warn', 'Multi-tab warning');
+                        }
+                        if (e.data.type === 'data_changed' && e.data.tabId !== TAB_ID) {
+                            toast('Data changed in another tab. Refreshing…', 'info', 1500);
+                            setTimeout(() => refreshAll(), 300);
+                        }
+                    };
+                    channel.postMessage({ type: 'write_lock_claim', tabId: TAB_ID });
+                } catch (e) { /* unavailable */ }
+            }
+
+            function notifyOtherTabs() {
+                try {
+                    const channel = new BroadcastChannel('tendercare_tabs');
+                    channel.postMessage({ type: 'data_changed', tabId: TAB_ID });
+                } catch (e) { /* unavailable */ }
+            }
+
+            function getStore(mode = 'readonly') {
+                if (!dbReady || !db) throw new Error('Database not ready');
+                const tx = db.transaction(STORE_NAME, mode);
+                return tx.objectStore(STORE_NAME);
+            }
+
+            function getAllStudents() {
+                return new Promise((resolve, reject) => {
+                    if (!dbReady) return reject(new Error('Database not ready'));
+                    const store = getStore('readonly');
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(new Error('Read failed'));
+                });
+            }
+
+            function putStudent(student) {
+                return new Promise((resolve, reject) => {
+                    if (!dbReady) return reject(new Error('Database not ready'));
+                    if (writeLock) return reject(new Error('Write in progress'));
+                    writeLock = true;
+                    const store = getStore('readwrite');
+                    const request = store.put(student);
+                    request.onsuccess = () => { writeLock = false;
+                        resolve(request.result); };
+                    request.onerror = () => { writeLock = false;
+                        reject(new Error('Write failed')); };
+                });
+            }
+
+            function deleteStudentFromDB(name) {
+                return new Promise((resolve, reject) => {
+                    if (!dbReady) return reject(new Error('Database not ready'));
+                    if (writeLock) return reject(new Error('Write in progress'));
+                    writeLock = true;
+                    const store = getStore('readwrite');
+                    const request = store.delete(name);
+                    request.onsuccess = () => { writeLock = false;
+                        resolve(); };
+                    request.onerror = () => { writeLock = false;
+                        reject(new Error('Delete failed')); };
+                });
+            }
+
+            function clearAllStudents() {
+                return new Promise((resolve, reject) => {
+                    if (!dbReady) return reject(new Error('Database not ready'));
+                    if (writeLock) return reject(new Error('Write in progress'));
+                    writeLock = true;
+                    const store = getStore('readwrite');
+                    const request = store.clear();
+                    request.onsuccess = () => { writeLock = false;
+                        resolve(); };
+                    request.onerror = () => { writeLock = false;
+                        reject(new Error('Clear failed')); };
+                });
+            }
+
+            function getStorageEstimate() {
+                if (navigator.storage && navigator.storage.estimate) return navigator.storage.estimate();
+                return Promise.resolve({ usage: null, quota: null });
+            }
+
+            async function loadAllStudents() {
+                try {
+                    const data = await getAllStudents();
+                    if (!Array.isArray(data)) throw new Error('Data corruption: not an array');
+                    return data.filter(s => s.name && s.class);
+                } catch (e) {
+                    console.error('Load error:', e);
+                    toast('Failed to load data: ' + e.message, 'error', 5000);
+                    return [];
+                }
+            }
+
+            // ─────────────────────── CSV AUTO-BACKUP ───────────────────────
+            let lastBackupCSV = null;
+
+            function studentsToCSV(students) {
+                const header = 'Name,Class,Parent,Phone,Tuition,PTA Levy,Exam Fee,Dev Fund,Other,Amount Paid,Payment Date,Receipt No,Payment Method,Recorded By';
+                const rows = students.map(s => [
+                    escCSV(s.name), escCSV(s.class), escCSV(s.parent || ''), escCSV(s.phone || ''),
+                    s.tuition || 0, s.pta || 0, s.exam || 0, s.devFund || 0, s.other || 0,
+                    s.amountPaid || 0, escCSV(s.paymentDate || ''), escCSV(s.receiptNo || ''),
+                    escCSV(s.paymentMethod || ''), escCSV(s.recordedBy || '')
+                ].join(','));
+                return [header, ...rows].join('\n');
+            }
+
+            function csvToStudents(csvText) {
+                const lines = csvText.split('\n').filter(l => l.trim());
+                if (lines.length < 2) return [];
+                const header = lines[0].split(',');
+                const students = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const vals = parseCSVLine(lines[i]);
+                    if (vals.length < 14) continue;
+                    const s = {
+                        name: vals[0]?.trim() || '',
+                        class: vals[1]?.trim() || '',
+                        parent: vals[2]?.trim() || '',
+                        phone: vals[3]?.trim() || '',
+                        tuition: Number(vals[4]) || 0,
+                        pta: Number(vals[5]) || 0,
+                        exam: Number(vals[6]) || 0,
+                        devFund: Number(vals[7]) || 0,
+                        other: Number(vals[8]) || 0,
+                        amountPaid: Number(vals[9]) || 0,
+                        paymentDate: vals[10]?.trim() || '',
+                        receiptNo: vals[11]?.trim() || '',
+                        paymentMethod: vals[12]?.trim() || '',
+                        recordedBy: vals[13]?.trim() || ''
+                    };
+                    if (s.name && s.class) students.push(s);
+                }
+                return students;
+            }
+
+            function parseCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                for (const char of line) {
+                    if (char === '"') { inQuotes = !inQuotes; continue; }
+                    if (char === ',' && !inQuotes) { result.push(current);
+                        current = ''; continue; }
+                    current += char;
+                }
+                result.push(current);
+                return result;
+            }
+
+            function escCSV(val) {
+                const str = String(val || '');
+                if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                    return '"' + str.replace(/"/g, '""') + '"';
+                }
+                return str;
+            }
+
+            async function autoBackup() {
+                try {
+                    const data = await loadAllStudents();
+                    const csv = studentsToCSV(data);
+                    if (csv === lastBackupCSV) return;
+                    lastBackupCSV = csv;
+                    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `tendercare_backup_${new Date().toISOString().replace(/[:.]/g, '-').slice(0,19)}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    console.log('Auto-backup CSV saved.');
+                } catch (e) {
+                    console.error('Auto-backup failed:', e);
+                }
+            }
+
+            async function saveWithBackup(operation) {
+                try {
+                    await operation();
+                    await autoBackup();
+                    notifyOtherTabs();
+                    await refreshAll();
+                    updateStatusBar('ok', 'Saved & backed up');
+                    return true;
+                } catch (e) {
+                    console.error('Save error:', e);
+                    toast('Save failed: ' + e.message, 'error', 5000);
+                    updateStatusBar('err', 'Save failed');
+                    return false;
+                }
+            }
+
+            // ─────────────────────── TOASTS & STATUS ───────────────────────
+            function toast(message, type = 'info', duration = 3000) {
+                const container = document.getElementById('toastContainer');
+                const el = document.createElement('div');
+                el.className = 'toast ' + type;
+                el.textContent = message;
+                container.appendChild(el);
+                setTimeout(() => el.remove(), duration);
+            }
+
+            function updateStatusBar(state, text) {
+                const dot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+                dot.className = 'status-dot ' + (state === 'ok' ? 'ok' : state === 'warn' ? 'warn' : 'err');
+                statusText.textContent = text;
+            }
+
+            async function refreshStorageInfo() {
+                const info = document.getElementById('storageInfo');
+                if (!info) return;
+                const data = await loadAllStudents();
+                const est = await getStorageEstimate();
+                info.innerHTML = `
+                    <strong>Students:</strong> ${data.length}<br>
+                    <strong>DB Version:</strong> ${DB_VERSION}<br>
+                    <strong>Storage Used:</strong> ${est.usage ? (est.usage / 1024).toFixed(1) + ' KB' : 'Unknown'}<br>
+                    <strong>Storage Quota:</strong> ${est.quota ? (est.quota / 1024 / 1024).toFixed(1) + ' MB' : 'Unknown'}<br>
+                    <strong>Term:</strong> ${ACADEMIC_TERM} · <strong>Category:</strong> ${FEE_CATEGORY}
+                `;
+            }
+
+            // ─────────────────────── COMPUTED HELPERS ───────────────────────
+            function getTotalFee(s) {
+                return (Number(s.tuition) || 0) + (Number(s.pta) || 0) + (Number(s.exam) || 0) + (Number(s.devFund) ||
+                    0) + (Number(s.other) || 0);
+            }
+
+            function getBalance(s) {
+                return getTotalFee(s) - (Number(s.amountPaid) || 0);
+            }
+
+            function getStatus(s) {
+                const paid = Number(s.amountPaid) || 0;
+                const total = getTotalFee(s);
+                if (paid <= 0) return 'Outstanding';
+                if (paid >= total) return 'Fully Paid';
+                return 'Partial';
+            }
+
+            // ─────────────────────── CACHE & RENDER ───────────────────────
+            let studentsCache = [];
+
+            async function refreshCache() {
+                studentsCache = await loadAllStudents();
+            }
+
+            async function refreshAll() {
+                await refreshCache();
+                renderAll();
+            }
+
+            function renderAll() {
+                renderRegister();
+                renderDefaulters();
+                renderSummary();
+                updateStats();
+                updateDefaultersBadge();
+                document.getElementById('statusRecordCount').textContent = studentsCache.length + ' records';
+            }
+
+            function renderRegister(filter = '') {
+                const tbody = document.getElementById('registerBody');
+                const term = filter.toLowerCase();
+                const filtered = studentsCache.filter(s => {
+                    if (!term) return true;
+                    return (s.name.toLowerCase().includes(term) || s.class.toLowerCase().includes(term) || (s
+                        .parent || '').toLowerCase().includes(term));
+                });
+                tbody.innerHTML = filtered.map((s, i) => {
+                    const total = getTotalFee(s);
+                    const balance = getBalance(s);
+                    const status = getStatus(s);
+                    const badgeClass = status === 'Fully Paid' ? 'fully-paid' : status === 'Outstanding' ?
+                        'outstanding' : 'partial';
+                    return `
+                    <tr>
+                        <td>${i + 1}</td><td><strong>${esc(s.name)}</strong></td><td>${esc(s.class)}</td>
+                        <td>${esc(s.parent || '')}</td><td>${esc(s.phone || '')}</td>
+                        <td>₦${nf(s.tuition)}</td><td>₦${nf(s.pta)}</td><td>₦${nf(s.exam)}</td>
+                        <td>₦${nf(s.devFund)}</td><td>₦${nf(s.other)}</td><td><strong>₦${nf(total)}</strong></td>
+                        <td>₦${nf(s.amountPaid)}</td><td>₦${nf(balance)}</td><td>₦${nf(total)}</td>
+                        <td><span class="badge ${badgeClass}">${status}</span></td>
+                        <td>${esc(s.paymentDate || '')}</td><td>${esc(s.receiptNo || '')}</td>
+                        <td>${esc(s.paymentMethod || '')}</td><td>${esc(s.recordedBy || '')}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteStudent('${esc(s.name)}')" title="Delete">🗑️</button></td>
+                    </tr>`;
+                }).join('');
+                if (filtered.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="20" style="text-align:center;padding:30px;color:var(--muted);">No students found. Click <strong>Add Student</strong> to begin.</td></tr>';
+                }
+            }
+
+            function renderDefaulters() {
+                const tbody = document.getElementById('defaultersBody');
+                const defaulters = studentsCache.filter(s => getStatus(s) !== 'Fully Paid');
+                tbody.innerHTML = defaulters.map((s, i) => `
+                    <tr>
+                        <td>${i + 1}</td><td><strong>${esc(s.name)}</strong></td><td>${esc(s.class)}</td>
+                        <td>${esc(s.phone || '')}</td><td>₦${nf(getBalance(s))}</td>
+                        <td><span class="badge ${getStatus(s) === 'Outstanding' ? 'outstanding' : 'partial'}">${getStatus(s)}</span></td>
+                    </tr>
+                `).join('');
+                if (defaulters.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted);">🎉 All students are fully paid! No defaulters.</td></tr>';
+                }
+                document.getElementById('defaultersBadge').textContent = defaulters.length;
+            }
+
+            function renderSummary() {
+                const tbody = document.getElementById('summaryBody');
+                const classes = [...new Set(studentsCache.map(s => s.class))].sort();
+                let tS = 0,
+                    tF = 0,
+                    tO = 0,
+                    tP = 0,
+                    tE = 0,
+                    tC = 0;
+                const rows = classes.map(cls => {
+                    const inClass = studentsCache.filter(s => s.class === cls);
+                    const cnt = inClass.length;
+                    const fully = inClass.filter(s => getStatus(s) === 'Fully Paid').length;
+                    const out = inClass.filter(s => getStatus(s) === 'Outstanding').length;
+                    const part = inClass.filter(s => getStatus(s) === 'Partial').length;
+                    const exp = inClass.reduce((a, s) => a + getTotalFee(s), 0);
+                    const coll = inClass.reduce((a, s) => a + (Number(s.amountPaid) || 0), 0);
+                    tS += cnt;
+                    tF += fully;
+                    tO += out;
+                    tP += part;
+                    tE += exp;
+                    tC += coll;
+                    const rate = exp > 0 ? ((coll / exp) * 100).toFixed(1) + '%' : '0%';
+                    return `<tr><td><strong>${esc(cls)}</strong></td><td>${cnt}</td><td>${fully}</td><td>${out}</td><td>${part}</td><td>₦${nf(exp)}</td><td>₦${nf(coll)}</td><td>${rate}</td></tr>`;
+                });
+                const gRate = tE > 0 ? ((tC / tE) * 100).toFixed(1) + '%' : '0%';
+                rows.push(
+                    `<tr style="font-weight:700;background:#f1f5f9;"><td>GRAND TOTAL</td><td>${tS}</td><td>${tF}</td><td>${tO}</td><td>${tP}</td><td>₦${nf(tE)}</td><td>₦${nf(tC)}</td><td>${gRate}</td></tr>`
+                    );
+                tbody.innerHTML = rows.join('');
+            }
+
+            function updateStats() {
+                const total = studentsCache.length;
+                const fully = studentsCache.filter(s => getStatus(s) === 'Fully Paid').length;
+                const out = studentsCache.filter(s => getStatus(s) === 'Outstanding').length;
+                const part = studentsCache.filter(s => getStatus(s) === 'Partial').length;
+                const coll = studentsCache.reduce((a, s) => a + (Number(s.amountPaid) || 0), 0);
+                const exp = studentsCache.reduce((a, s) => a + getTotalFee(s), 0);
+                document.getElementById('statTotalStudents').textContent = total;
+                document.getElementById('statFullyPaid').textContent = fully;
+                document.getElementById('statOutstanding').textContent = out;
+                document.getElementById('statPartial').textContent = part;
+                document.getElementById('statTotalCollected').textContent = '₦' + nf(coll);
+                document.getElementById('statTotalExpected').textContent = '₦' + nf(exp);
+            }
+
+            function updateDefaultersBadge() {
+                document.getElementById('defaultersBadge').textContent = studentsCache.filter(s => getStatus(s) !==
+                    'Fully Paid').length;
+            }
+
+            function populateClassDatalist() {
+                const dl = document.getElementById('classList');
+                const classes = [...new Set(studentsCache.map(s => s.class))].sort();
+                dl.innerHTML = classes.map(c => `<option value="${esc(c)}">`).join('');
+            }
+
+            function populatePaymentSelect() {
+                const sel = document.getElementById('paymentStudentSelect');
+                sel.innerHTML = '<option value="">-- Select Student --</option>' +
+                    studentsCache.map(s =>
+                            `<option value="${esc(s.name)}">${esc(s.name)} (${esc(s.class)}) - Balance: ₦${nf(getBalance(s))}</option>`
+                            )
+                    .join('');
+            }
+
+            // ─────────────────────── ACTIONS ───────────────────────
+            window.addStudent = async function() {
+                const name = document.getElementById('addFullName').value.trim();
+                const cls = document.getElementById('addClass').value.trim();
+                if (!name || !cls) return toast('Please fill Full Name and Class.', 'error');
+                const existing = studentsCache.find(s => s.name === name && s.class === cls);
+                if (existing) return toast('A student with this name and class already exists.', 'error');
+                const student = {
+                    name,
+                    class: cls,
+                    parent: document.getElementById('addParent').value.trim(),
+                    phone: document.getElementById('addPhone').value.trim(),
+                    tuition: Number(document.getElementById('addTuition').value) || 0,
+                    pta: Number(document.getElementById('addPTA').value) || 0,
+                    exam: Number(document.getElementById('addExam').value) || 0,
+                    devFund: Number(document.getElementById('addDevFund').value) || 0,
+                    other: Number(document.getElementById('addOther').value) || 0,
+                    amountPaid: 0,
+                    paymentDate: '',
+                    receiptNo: '',
+                    paymentMethod: '',
+                    recordedBy: ''
+                };
+                const ok = await saveWithBackup(async () => { await putStudent(student); });
+                if (ok) {
+                    closeModal('addStudentModal');
+                    toast('Student added. CSV backup saved.', 'success');
+                }
+            };
+
+            window.recordPayment = async function() {
+                const name = document.getElementById('paymentStudentSelect').value;
+                const amount = Number(document.getElementById('paymentAmount').value) || 0;
+                if (!name) return toast('Please select a student.', 'error');
+                if (amount <= 0) return toast('Please enter a valid amount.', 'error');
+                const student = studentsCache.find(s => s.name === name);
+                if (!student) return toast('Student not found.', 'error');
+                student.amountPaid = (Number(student.amountPaid) || 0) + amount;
+                student.paymentDate = document.getElementById('paymentDate').value;
+                student.receiptNo = document.getElementById('paymentReceipt').value.trim();
+                student.paymentMethod = document.getElementById('paymentMethod').value;
+                student.recordedBy = document.getElementById('paymentRecordedBy').value.trim();
+                const ok = await saveWithBackup(async () => { await putStudent(student); });
+                if (ok) {
+                    closeModal('recordPaymentModal');
+                    toast('Payment recorded. CSV backup saved.', 'success');
+                }
+            };
+
+            window.deleteStudent = async function(name) {
+                if (!confirm(`Delete "${name}" permanently? A backup will be saved first.`)) return;
+                await autoBackup();
+                const ok = await saveWithBackup(async () => { await deleteStudentFromDB(name); });
+                if (ok) toast('Student deleted. Backup saved.', 'success');
+            };
+
+            // ─────────────────────── BACKUP & RESTORE ───────────────────────
+            window.downloadFullBackup = async function() {
+                const data = await loadAllStudents();
+                const csv = studentsToCSV(data);
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tendercare_full_backup_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                lastBackupCSV = csv;
+                toast('Full CSV backup downloaded.', 'success');
+            };
+
+            window.restoreFromBackup = function() {
+                const input = document.getElementById('restoreFileInput');
+                if (!input.files || !input.files[0]) return toast('Please select a CSV backup file.', 'error');
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const students = csvToStudents(e.target.result);
+                        if (students.length === 0) return toast('No valid records found in file.', 'error');
+                        if (!confirm(`Restore ${students.length} students from this backup? This REPLACES all current data.`))
+                            return;
+                        await autoBackup();
+                        await clearAllStudents();
+                        for (const s of students) { await putStudent(s); }
+                        await refreshAll();
+                        updateStatusBar('ok', `Restored ${students.length} records`);
+                        toast('Data restored. Previous data backed up as safety measure.', 'success');
+                    } catch (err) {
+                        toast('Restore failed: ' + err.message, 'error', 5000);
+                    }
+                };
+                reader.readAsText(file);
+            };
+
+            window.refreshStorageInfo = refreshStorageInfo;
+
+            // ─────────────────────── MODALS ───────────────────────
+            window.openAddStudentModal = function() {
+                ['addFullName', 'addClass', 'addParent', 'addPhone', 'addTuition', 'addPTA', 'addExam', 'addDevFund',
+                    'addOther'
+                ].forEach(f => {
+                    const el = document.getElementById(f);
+                    if (el && el.type === 'number') el.value = '0';
+                    else if (el) el.value = '';
+                });
+                document.getElementById('addStudentModal').classList.add('show');
+            };
+            window.openRecordPaymentModal = function() {
+                populatePaymentSelect();
+                document.getElementById('paymentAmount').value = '';
+                document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('paymentReceipt').value = 'RCP-' + (studentsCache.length + 1).toString().padStart(
+                    3, '0');
+                document.getElementById('paymentMethod').value = 'Cash';
+                document.getElementById('paymentRecordedBy').value = '';
+                document.getElementById('recordPaymentModal').classList.add('show');
+            };
+            window.closeModal = function(id) {
+                document.getElementById(id).classList.remove('show');
+            };
+
+            // ─────────────────────── TABS ───────────────────────
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+                    if (this.dataset.tab === 'defaulters') renderDefaulters();
+                    if (this.dataset.tab === 'summary') renderSummary();
+                    if (this.dataset.tab === 'backup') refreshStorageInfo();
+                });
+            });
+
+            // ─────────────────────── SEARCH ───────────────────────
+            document.getElementById('searchRegister').addEventListener('input', function() {
+                renderRegister(this.value);
+            });
+
+            // ─────────────────────── EXPORT CSV ───────────────────────
+            window.exportToCSV = function(type) {
+                let rows = [];
+                if (type === 'register') {
+                    rows.push(
+                        'S/N,Full Name,Class,Parent,Phone,Tuition,PTA Levy,Exam Fee,Dev Fund,Other,Total,Paid,Balance,Expected,Status,Date,Receipt,Method,Recorded By'
+                        );
+                    studentsCache.forEach((s, i) => {
+                        rows.push([i + 1, escCSV(s.name), escCSV(s.class), escCSV(s.parent || ''), escCSV(s
+                            .phone || ''), s.tuition, s.pta, s.exam, s.devFund, s.other, getTotalFee(s),
+                            s.amountPaid, getBalance(s), getTotalFee(s), getStatus(s), escCSV(s
+                                .paymentDate || ''), escCSV(s.receiptNo || ''), escCSV(s.paymentMethod ||
+                                ''), escCSV(s.recordedBy || '')
+                        ].join(','));
+                    });
+                } else if (type === 'defaulters') {
+                    rows.push('S/N,Student Name,Class,Phone,Balance,Status');
+                    studentsCache.filter(s => getStatus(s) !== 'Fully Paid').forEach((s, i) => {
+                        rows.push([i + 1, escCSV(s.name), escCSV(s.class), escCSV(s.phone || ''),
+                            getBalance(s), getStatus(s)
+                        ].join(','));
+                    });
+                } else if (type === 'summary') {
+                    rows.push(
+                        'Class,Total Students,Fully Paid,Outstanding,Partial,Total Expected,Total Collected,Collection Rate'
+                        );
+                    const classes = [...new Set(studentsCache.map(s => s.class))].sort();
+                    classes.forEach(cls => {
+                        const inClass = studentsCache.filter(s => s.class === cls);
+                        const exp = inClass.reduce((a, s) => a + getTotalFee(s), 0);
+                        const coll = inClass.reduce((a, s) => a + (Number(s.amountPaid) || 0), 0);
+                        rows.push([escCSV(cls), inClass.length, inClass.filter(s => getStatus(s) ===
+                            'Fully Paid').length, inClass.filter(s => getStatus(s) ===
+                            'Outstanding').length, inClass.filter(s => getStatus(s) === 'Partial')
+                            .length, exp, coll, exp > 0 ? ((coll / exp) * 100).toFixed(1) + '%' :
+                            '0%'
+                        ].join(','));
+                    });
+                }
+                const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tendercare_${type}_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            // ─────────────────────── UTILS ───────────────────────
+            function esc(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g,
+                    '&gt;').replace(/"/g, '&quot;'); }
+
+            function nf(num) { return Number(num || 0).toLocaleString('en-NG'); }
+
+            // ─────────────────────── MODAL OVERLAY CLICK ───────────────────────
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) this.classList.remove('show');
+                });
+            });
+
+            // ─────────────────────── INIT ───────────────────────
+            async function init() {
+                try {
+                    updateStatusBar('warn', 'Opening database…');
+                    await openDB();
+                    await refreshCache();
+                    renderAll();
+                    updateStats();
+                    updateDefaultersBadge();
+                    populateClassDatalist();
+                    populatePaymentSelect();
+                    document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('statusRecordCount').textContent = studentsCache.length +
+                        ' records';
+                    updateStatusBar('ok', 'Ready — auto-save CSV on every change');
+                    toast('System ready. CSV backup auto-saves on every change.', 'info', 2500);
+                } catch (e) {
+                    console.error('Init failed:', e);
+                    updateStatusBar('err', 'Failed: ' + e.message);
+                    toast('FATAL: Could not open database.', 'error', 10000);
+                }
+            }
+            init();
+        })();
+    </script>
+</body>
+</html>
