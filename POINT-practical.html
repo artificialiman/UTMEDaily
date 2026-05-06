@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAEC 2026 | Presentation Practical</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C0F1A;--surface:#131824;--surface2:#1A2030;--surface3:#202840;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#EEF0F6;--sec:rgba(238,240,246,0.65);--ter:rgba(238,240,246,0.38);
+  --accent:#4F8EF7;--gold:#F0B429;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+  --serif:'Instrument Serif',Georgia,serif;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--text);background:var(--bg);}
+.app{display:flex;flex-direction:column;height:100%;}
+
+/* ── TOPBAR ── */
+.topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  padding:8px 14px;background:rgba(12,15,26,0.98);border-bottom:1px solid var(--border2);z-index:200;
+}
+.tb-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
+.tb-title{font-family:var(--serif);font-size:15px;font-style:italic;flex:1;}
+.tb-timer{display:flex;align-items:center;gap:6px;background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.2);border-radius:16px;padding:5px 12px;font-family:var(--mono);font-size:13px;color:var(--accent);}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+.tb-dot.warn{background:var(--amber);}.tb-dot.dang{background:var(--red);animation:blink 1s infinite;}
+.tv.warn{color:var(--amber);}.tv.dang{color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* ── RIBBON ── */
+.ribbon{flex-shrink:0;background:#1c2c1c;border-bottom:1px solid rgba(255,255,255,0.08);}
+.ribbon-tabs{display:flex;background:#152015;}
+.rtab{padding:6px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ter);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.rtab:hover{color:var(--sec);}
+.rtab.active{color:#7ec97e;border-color:#7ec97e;background:rgba(126,201,126,0.06);}
+.ribbon-bar{display:flex;align-items:center;gap:3px;padding:5px 10px;flex-wrap:wrap;}
+.rb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;border-radius:5px;background:transparent;border:1px solid transparent;color:var(--sec);cursor:pointer;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.05em;transition:all .15s;white-space:nowrap;min-width:48px;}
+.rb:hover{background:rgba(126,201,126,0.08);border-color:rgba(126,201,126,0.2);color:#7ec97e;}
+.rb.active{background:rgba(126,201,126,0.14);border-color:rgba(126,201,126,0.35);color:#7ec97e;}
+.rb-icon{font-size:16px;line-height:1;}
+.rb-sep{width:1px;height:36px;background:var(--border);margin:0 3px;flex-shrink:0;}
+.rb-select{background:var(--surface2);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;outline:none;cursor:pointer;}
+
+/* ── MAIN LAYOUT ── */
+.main{flex:1;display:flex;overflow:hidden;}
+
+/* ── SLIDE PANEL (thumbnails) ── */
+.slides-panel{
+  flex-shrink:0;width:160px;background:var(--surface);border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.slides-panel-hdr{padding:8px 10px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ter);border-bottom:1px solid var(--border);flex-shrink:0;}
+.slides-list{flex:1;overflow-y:auto;padding:8px;}
+.slides-list::-webkit-scrollbar{width:3px;}.slides-list::-webkit-scrollbar-thumb{background:var(--border2);}
+.slide-thumb{
+  border-radius:5px;border:2px solid transparent;cursor:pointer;margin-bottom:8px;
+  overflow:hidden;position:relative;background:#fff;aspect-ratio:4/3;
+  transition:border-color .15s;box-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+.slide-thumb:hover{border-color:rgba(126,201,126,0.4);}
+.slide-thumb.active{border-color:#7ec97e;}
+.slide-thumb-num{position:absolute;bottom:3px;right:5px;font-family:var(--mono);font-size:8px;color:rgba(0,0,0,0.4);}
+.thumb-canvas{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#555;text-align:center;padding:4px;overflow:hidden;}
+.add-slide-btn{margin:0 8px 8px;padding:6px;border-radius:5px;background:var(--surface2);border:1px dashed var(--border2);color:var(--ter);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;transition:all .15s;flex-shrink:0;}
+.add-slide-btn:hover{border-color:rgba(126,201,126,0.4);color:#7ec97e;}
+
+/* ── EDITOR AREA ── */
+.editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* Slide canvas wrapper */
+.slide-stage{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  background:repeating-conic-gradient(rgba(255,255,255,0.015) 0% 25%,transparent 0% 50%) 0 0/20px 20px;
+  overflow:hidden;padding:20px;position:relative;
+}
+.slide-canvas{
+  position:relative;overflow:hidden;cursor:default;
+  box-shadow:0 20px 80px rgba(0,0,0,0.7);
+  transform-origin:center center;
+  /* default 4:3 at 720p */
+  width:720px;height:540px;
+  transition:background .3s;
+}
+
+/* Slide elements */
+.slide-el{
+  position:absolute;cursor:move;user-select:none;
+  border:2px solid transparent;border-radius:3px;
+  transition:border-color .1s;
+}
+.slide-el:hover{border-color:rgba(79,142,247,0.4);}
+.slide-el.selected{border-color:var(--accent)!important;outline:1px solid rgba(79,142,247,0.3);}
+.slide-el .resize-handle{
+  position:absolute;bottom:-5px;right:-5px;width:10px;height:10px;
+  background:var(--accent);border-radius:2px;cursor:se-resize;display:none;
+}
+.slide-el.selected .resize-handle{display:block;}
+.el-text{font-family:inherit;background:transparent;border:none;outline:none;
+  resize:none;overflow:hidden;color:inherit;font-size:inherit;
+  font-weight:inherit;text-align:inherit;width:100%;height:100%;cursor:inherit;}
+
+/* ── PROPERTIES PANEL ── */
+.props-panel{
+  flex-shrink:0;height:130px;background:var(--surface);border-top:1px solid var(--border2);
+  display:flex;align-items:center;gap:0;overflow-x:auto;
+}
+.props-panel::-webkit-scrollbar{height:3px;}.props-panel::-webkit-scrollbar-thumb{background:var(--border2);}
+.prop-section{padding:10px 14px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.prop-section-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ter);}
+.prop-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.prop-input{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 7px;outline:none;width:80px;}
+.prop-input:focus{border-color:rgba(79,142,247,0.5);}
+.prop-input.wide{width:120px;}
+.prop-label{font-family:var(--mono);font-size:10px;color:var(--ter);white-space:nowrap;}
+.color-swatch{width:24px;height:24px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;flex-shrink:0;}
+.prop-select{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 5px;outline:none;cursor:pointer;}
+.transition-btn{
+  padding:5px 10px;border-radius:5px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--sec);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;
+}
+.transition-btn:hover{background:var(--surface3);color:var(--text);}
+.transition-btn.set{background:rgba(126,201,126,0.1);border-color:rgba(126,201,126,0.3);color:#7ec97e;}
+.notes-area{flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:4px;min-width:200px;}
+.notes-textarea{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--sec);font-family:var(--mono);font-size:11px;padding:6px 8px;resize:none;outline:none;min-height:70px;}
+.notes-textarea:focus{border-color:rgba(79,142,247,0.4);}
+
+/* ── STATUSBAR ── */
+.statusbar{flex-shrink:0;display:flex;align-items:center;gap:12px;padding:3px 12px;background:rgba(12,15,26,0.9);border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--ter);}
+.statusbar b{color:var(--accent);}
+
+/* ── QUESTION PILL ── */
+.q-pill-wrap{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:500;display:flex;align-items:center;}
+.q-pill-tab{
+  writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
+  background:var(--gold);color:#000;font-family:var(--mono);font-size:10px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;padding:12px 7px;
+  border-radius:8px 0 0 8px;cursor:pointer;user-select:none;
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+  box-shadow:-4px 0 20px rgba(0,0,0,0.4);transition:background .2s;
+}
+.q-pill-tab:hover{background:#f5c842;}
+.pill-count{writing-mode:horizontal-tb;transform:rotate(90deg);background:rgba(0,0,0,0.25);border-radius:99px;padding:1px 5px;font-size:9px;font-weight:600;}
+.q-drawer{width:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1);background:var(--surface);border-left:1px solid var(--border2);display:flex;flex-direction:column;height:72vh;max-height:620px;border-radius:12px 0 0 12px;box-shadow:-8px 0 40px rgba(0,0,0,0.5);}
+.q-drawer.open{width:300px;}
+.q-drawer-inner{width:300px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.q-drawer-hdr{flex-shrink:0;padding:14px 14px 10px;border-bottom:1px solid var(--border);}
+.q-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(240,180,41,0.12);border:1px solid rgba(240,180,41,0.28);color:var(--gold);}
+.q-title{font-family:var(--serif);font-size:15px;font-style:italic;margin-top:6px;line-height:1.3;}
+.q-intro{font-size:11px;color:var(--sec);line-height:1.65;margin-top:5px;}
+.q-scroll{flex:1;overflow-y:auto;padding:10px 12px 14px;}
+.q-scroll::-webkit-scrollbar{width:3px;}.q-scroll::-webkit-scrollbar-thumb{background:var(--border2);}
+.q-phase{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:10px 0 5px;padding:3px 8px;background:rgba(79,142,247,0.06);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;}
+.task{display:flex;gap:7px;padding:6px 8px;border-radius:6px;border:1px solid transparent;margin-bottom:3px;}
+.task.done{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.15);}
+.task-n{font-family:var(--mono);font-size:10px;color:var(--accent);flex-shrink:0;width:14px;padding-top:1px;}
+.task-ck{font-size:11px;flex-shrink:0;width:13px;color:var(--ter);padding-top:1px;}
+.task.done .task-ck{color:var(--green);}
+.task-txt{font-size:11px;color:var(--sec);line-height:1.6;}
+.task.done .task-txt{color:rgba(238,240,246,0.3);text-decoration:line-through;}
+.q-footer{flex-shrink:0;padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.q-btn{flex:1;padding:8px;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;border:none;cursor:pointer;}
+.q-btn.p{background:var(--accent);color:#fff;}.q-btn.p:hover{opacity:.85;}
+.q-btn.g{background:transparent;color:var(--ter);border:1px solid var(--border);}
+
+/* ── SLIDESHOW OVERLAY ── */
+.slideshow-overlay{position:fixed;inset:0;z-index:3000;background:#000;display:none;flex-direction:column;}
+.slideshow-overlay.show{display:flex;}
+.ss-slide{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.ss-inner{position:relative;width:960px;height:720px;max-width:100vw;max-height:85vh;}
+.ss-controls{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:rgba(0,0,0,0.8);}
+.ss-btn{padding:6px 18px;border-radius:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:var(--mono);font-size:12px;cursor:pointer;}
+.ss-btn:hover{background:rgba(255,255,255,0.2);}
+.ss-count{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,0.5);}
+
+/* ── RESULTS ── */
+.results-overlay{position:fixed;inset:0;z-index:2000;background:rgba(12,15,26,0.97);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
+.results-overlay.show{display:flex;}
+.res-box{width:100%;max-width:380px;text-align:center;}
+.res-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.res-title{font-family:var(--serif);font-size:1.9rem;font-style:italic;}
+.res-score{font-family:var(--mono);font-size:3rem;font-weight:500;margin:16px 0 4px;}
+.res-max{font-family:var(--mono);font-size:11px;color:var(--ter);margin-bottom:14px;}
+.res-bd{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px;text-align:left;margin-bottom:10px;}
+.rb-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--ter);}
+.rb-row:last-child{border:none;}
+.rb-row b{font-family:var(--mono);}
+.res-btn{width:100%;padding:12px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:5px;}
+.res-btn.g{background:transparent;color:var(--ter);border:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;flex-direction:column;gap:1px;">
+    <span class="tb-brand">GrantApp AI · WAEC 2026 · Digital Technology</span>
+    <span class="tb-title">Presentation Software Practical — Paper 3</span>
+  </div>
+  <div style="flex:1;"></div>
+  <div class="tb-timer"><div class="tb-dot" id="td"></div><span class="tv" id="tv">0:45:00</span></div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-tabs">
+    <div class="rtab active" onclick="setRTab(this)">Home</div>
+    <div class="rtab" onclick="setRTab(this)">Insert</div>
+    <div class="rtab" onclick="setRTab(this)">Design</div>
+    <div class="rtab" onclick="setRTab(this)">Transitions</div>
+    <div class="rtab" onclick="setRTab(this)">Slide Show</div>
+  </div>
+  <div class="ribbon-bar">
+    <div class="rb" onclick="addSlide()"><span class="rb-icon">➕</span>New Slide</div>
+    <div class="rb" onclick="dupSlide()"><span class="rb-icon">⧉</span>Duplicate</div>
+    <div class="rb" onclick="delSlide()"><span class="rb-icon">🗑</span>Delete</div>
+    <div class="rb-sep"></div>
+    <div class="rb" onclick="addTextBox()"><span class="rb-icon">🔤</span>Text Box</div>
+    <div class="rb" onclick="addTitle()"><span class="rb-icon">T</span>Title</div>
+    <div class="rb" onclick="addSubtitle()"><span class="rb-icon">t</span>Subtitle</div>
+    <div class="rb" onclick="addBullets()"><span class="rb-icon">≡</span>Bullets</div>
+    <div class="rb" onclick="addShape('rect')"><span class="rb-icon">▭</span>Rectangle</div>
+    <div class="rb" onclick="addShape('oval')"><span class="rb-icon">◯</span>Oval</div>
+    <div class="rb-sep"></div>
+    <select class="rb-select" id="theme-sel" onchange="applyTheme(this.value)" title="Slide Theme">
+      <option value="">Theme</option>
+      <option value="white">Plain White</option>
+      <option value="blue">Corporate Blue</option>
+      <option value="dark">Dark Slate</option>
+      <option value="green">Forest Green</option>
+      <option value="gold">Gold & Black</option>
+    </select>
+    <select class="rb-select" id="transition-sel" onchange="setTransition(this.value)" title="Slide Transition">
+      <option value="">Transition</option>
+      <option value="fade">Fade</option>
+      <option value="slide">Slide</option>
+      <option value="zoom">Zoom</option>
+      <option value="flip">Flip</option>
+      <option value="wipe">Wipe</option>
+    </select>
+    <div class="rb-sep"></div>
+    <div class="rb" onclick="startSlideshow()"><span class="rb-icon">▶</span>Slide Show</div>
+    <div class="rb-sep"></div>
+    <div class="rb" onclick="autoCheck()" style="color:var(--gold);"><span class="rb-icon">✓</span>Check</div>
+    <div class="rb active" onclick="showResults()"><span class="rb-icon">🎯</span>Submit</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SLIDE THUMBNAILS -->
+  <div class="slides-panel">
+    <div class="slides-panel-hdr">Slides</div>
+    <div class="slides-list" id="slides-list"></div>
+    <div class="add-slide-btn" onclick="addSlide()">+ New Slide</div>
+  </div>
+
+  <!-- EDITOR + PROPS -->
+  <div class="editor-area">
+    <div class="slide-stage" id="slide-stage" onclick="stageClick(event)">
+      <div class="slide-canvas" id="slide-canvas"></div>
+    </div>
+
+    <!-- PROPERTIES PANEL -->
+    <div class="props-panel">
+      <div class="prop-section">
+        <div class="prop-section-lbl">Position & Size</div>
+        <div class="prop-row">
+          <span class="prop-label">X</span><input class="prop-input" id="prop-x" type="number" oninput="applyProp('x',+this.value)">
+          <span class="prop-label">Y</span><input class="prop-input" id="prop-y" type="number" oninput="applyProp('y',+this.value)">
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">W</span><input class="prop-input" id="prop-w" type="number" oninput="applyProp('w',+this.value)">
+          <span class="prop-label">H</span><input class="prop-input" id="prop-h" type="number" oninput="applyProp('h',+this.value)">
+        </div>
+      </div>
+      <div class="prop-section">
+        <div class="prop-section-lbl">Text Formatting</div>
+        <div class="prop-row">
+          <span class="prop-label">Size</span>
+          <input class="prop-input" id="prop-fs" type="number" value="24" oninput="applyProp('fontSize',+this.value)">
+          <select class="prop-select" id="prop-fw" onchange="applyProp('fontWeight',this.value)">
+            <option value="normal">Regular</option>
+            <option value="bold">Bold</option>
+          </select>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Align</span>
+          <select class="prop-select" id="prop-ta" onchange="applyProp('textAlign',this.value)">
+            <option>left</option><option>center</option><option>right</option>
+          </select>
+          <span class="prop-label">Color</span>
+          <input type="color" class="color-swatch" id="prop-color" value="#000000" oninput="applyProp('color',this.value)">
+        </div>
+      </div>
+      <div class="prop-section">
+        <div class="prop-section-lbl">Background</div>
+        <div class="prop-row">
+          <span class="prop-label">Fill</span>
+          <input type="color" class="color-swatch" id="prop-bg" value="#ffffff" oninput="applyProp('bg',this.value)">
+          <span class="prop-label">Slide BG</span>
+          <input type="color" class="color-swatch" id="prop-slide-bg" value="#ffffff" oninput="applySlideColor(this.value)">
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Transition</span>
+          <span id="prop-transition-label" style="font-family:var(--mono);font-size:10px;color:var(--sec);">None</span>
+        </div>
+      </div>
+      <div class="prop-section">
+        <div class="prop-section-lbl">Slide Layout</div>
+        <div class="prop-row" style="gap:4px;">
+          <div class="transition-btn" onclick="applyLayout('title')">Title Only</div>
+          <div class="transition-btn" onclick="applyLayout('content')">Title+Content</div>
+          <div class="transition-btn" onclick="applyLayout('blank')">Blank</div>
+        </div>
+        <div class="prop-row">
+          <div class="transition-btn" onclick="applyLayout('two-col')">Two Column</div>
+          <div class="transition-btn" onclick="applyLayout('section')">Section Hdr</div>
+        </div>
+      </div>
+      <div class="notes-area">
+        <div class="prop-section-lbl" style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ter);">Speaker Notes</div>
+        <textarea class="notes-textarea" id="notes-area" placeholder="Click here to add speaker notes…" oninput="saveNotes()"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATUSBAR -->
+<div class="statusbar">
+  <span>Slide <b id="sb-slide">1</b> of <b id="sb-total">1</b></span>
+  <span>|</span>
+  <span id="sb-theme">Theme: Plain White</span>
+  <span>|</span>
+  <span id="sb-transition">Transition: None</span>
+  <div style="flex:1;"></div>
+  <span id="sb-tasks" style="color:var(--ter);">Tasks: 0/9 done</span>
+</div>
+
+<!-- QUESTION PILL -->
+<div class="q-pill-wrap">
+  <div class="q-pill-tab" onclick="toggleDrawer()">
+    Questions
+    <span class="pill-count" id="pill-count">0/9</span>
+  </div>
+  <div class="q-drawer" id="q-drawer">
+    <div class="q-drawer-inner">
+      <div class="q-drawer-hdr">
+        <span class="q-badge">Question 4 · 30 marks · 45 min</span>
+        <div class="q-title">School Prize Day Presentation</div>
+        <div class="q-intro">Create a presentation for <strong>JSS Model Secondary School Prize Day</strong>. Use the tools to design, format and animate your slides.</div>
+      </div>
+      <div class="q-scroll">
+        <div class="q-phase">Slides</div>
+        <div class="task" id="t1"><span class="task-n">i.</span><span class="task-ck" id="c1">○</span><span class="task-txt">Create at least <strong>5 slides</strong> in the presentation. <em>(3 marks)</em></span></div>
+        <div class="task" id="t2"><span class="task-n">ii.</span><span class="task-ck" id="c2">○</span><span class="task-txt">Slide 1 must have a <strong>Title</strong> element containing the school name. <em>(3 marks)</em></span></div>
+        <div class="task" id="t3"><span class="task-n">iii.</span><span class="task-ck" id="c3">○</span><span class="task-txt">Slide 1 must also have a <strong>Subtitle</strong> element (e.g. "Prize Day 2026"). <em>(2 marks)</em></span></div>
+
+        <div class="q-phase">Content & Formatting</div>
+        <div class="task" id="t4"><span class="task-n">iv.</span><span class="task-ck" id="c4">○</span><span class="task-txt">At least one slide must contain a <strong>bulleted list</strong> (3+ bullet points). <em>(4 marks)</em></span></div>
+        <div class="task" id="t5"><span class="task-n">v.</span><span class="task-ck" id="c5">○</span><span class="task-txt">Apply <strong>bold</strong> formatting to text on at least one slide. <em>(2 marks)</em></span></div>
+        <div class="task" id="t6"><span class="task-n">vi.</span><span class="task-ck" id="c6">○</span><span class="task-txt">Apply a <strong>Theme</strong> (colour scheme) to the presentation. <em>(3 marks)</em></span></div>
+
+        <div class="q-phase">Design</div>
+        <div class="task" id="t7"><span class="task-n">vii.</span><span class="task-ck" id="c7">○</span><span class="task-txt">Add a <strong>shape</strong> (rectangle or oval) to at least one slide. <em>(3 marks)</em></span></div>
+        <div class="task" id="t8"><span class="task-n">viii.</span><span class="task-ck" id="c8">○</span><span class="task-txt">Set a <strong>transition effect</strong> (Fade, Slide, Zoom, etc.) on at least one slide. <em>(4 marks)</em></span></div>
+        <div class="task" id="t9"><span class="task-n">ix.</span><span class="task-ck" id="c9">○</span><span class="task-txt">Add <strong>Speaker Notes</strong> to at least one slide. <em>(3 marks)</em></span></div>
+        <div class="task" id="t10"><span class="task-n">x.</span><span class="task-ck" id="c10">○</span><span class="task-txt">Run the <strong>Slide Show</strong> (press ▶ Slide Show). <em>(3 marks)</em></span></div>
+      </div>
+      <div class="q-footer">
+        <button class="q-btn g" onclick="toggleDrawer()">Close</button>
+        <button class="q-btn p" onclick="showResults()">Submit & Mark</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDESHOW OVERLAY -->
+<div class="slideshow-overlay" id="slideshow-overlay">
+  <div class="ss-slide" id="ss-slide">
+    <div class="ss-inner" id="ss-inner"></div>
+  </div>
+  <div class="ss-controls">
+    <button class="ss-btn" onclick="ssPrev()">◄ Prev</button>
+    <span class="ss-count" id="ss-count">1 / 1</span>
+    <button class="ss-btn" onclick="ssNext()">Next ►</button>
+    <button class="ss-btn" onclick="endSlideshow()" style="margin-left:20px;color:rgba(255,100,100,0.8);">✕ End</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-overlay" id="results-screen">
+  <div class="res-box">
+    <div class="res-brand">GrantApp AI · WAEC 2026</div>
+    <div class="res-title">Marking Complete</div>
+    <div class="res-score" id="res-score">—</div>
+    <div class="res-max">out of 30 marks</div>
+    <div class="res-bd" id="res-bd"></div>
+    <button class="res-btn" onclick="document.getElementById('results-screen').classList.remove('show')">Review Slides</button>
+    <button class="res-btn g" style="margin-top:4px;" onclick="location.reload()">Reset & Retry</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA MODEL ───────────────────────────────────────────────
+const THEMES = {
+  '':      {bg:'#ffffff',title:'#111111',body:'#333333',accent:'#333333'},
+  white:   {bg:'#ffffff',title:'#111111',body:'#333333',accent:'#1a56db'},
+  blue:    {bg:'#1e3a5f',title:'#ffffff',body:'#c8dff7',accent:'#60a5fa'},
+  dark:    {bg:'#1a1a2e',title:'#e2e8f0',body:'#94a3b8',accent:'#818cf8'},
+  green:   {bg:'#14532d',title:'#f0fdf4',body:'#bbf7d0',accent:'#4ade80'},
+  gold:    {bg:'#1c1400',title:'#f0b429',body:'#fde68a',accent:'#f59e0b'},
+};
+
+let slides = [];
+let currentSlide = 0;
+let selectedEl = null;
+let activeTheme = '';
+let slideshowOpen = false;
+let ssIndex = 0;
+let slideshowUsed = false;
+
+// Task flags
+let state = {
+  themeApplied: false,
+  transitionSet: false,
+  slideshowRun: false,
+  hasShape: false,
+  hasBold: false,
+  hasBullets: false,
+  hasNotes: false,
+};
+
+// ─── SLIDE CREATION ───────────────────────────────────────────
+function newSlide(layout) {
+  return {
+    id: Date.now() + Math.random(),
+    bg: THEMES[activeTheme].bg || '#ffffff',
+    transition: '',
+    notes: '',
+    elements: [],
+    layout: layout || 'blank',
+  };
+}
+
+function addSlide() {
+  slides.splice(currentSlide + 1, 0, newSlide('blank'));
+  currentSlide = currentSlide + 1;
+  renderAll();
+  checkTasks();
+}
+
+function dupSlide() {
+  const copy = JSON.parse(JSON.stringify(slides[currentSlide]));
+  copy.id = Date.now();
+  slides.splice(currentSlide + 1, 0, copy);
+  currentSlide++;
+  renderAll();
+}
+
+function delSlide() {
+  if (slides.length <= 1) return;
+  slides.splice(currentSlide, 1);
+  currentSlide = Math.max(0, currentSlide - 1);
+  renderAll();
+  checkTasks();
+}
+
+// ─── ELEMENTS ─────────────────────────────────────────────────
+function newEl(type, x, y, w, h, text, extra) {
+  return {
+    id: Date.now() + Math.random(),
+    type, x, y, w, h,
+    text: text || '',
+    fontSize: extra?.fontSize || 24,
+    fontWeight: extra?.fontWeight || 'normal',
+    textAlign: extra?.textAlign || 'left',
+    color: extra?.color || THEMES[activeTheme].title || '#111',
+    bg: extra?.bg || 'transparent',
+    ...extra,
+  };
+}
+
+function addTextBox() {
+  slides[currentSlide].elements.push(newEl('text', 60, 200, 400, 80, 'Text Box'));
+  selectedEl = slides[currentSlide].elements.at(-1).id;
+  renderSlideCanvas();
+  checkTasks();
+}
+
+function addTitle() {
+  const t = THEMES[activeTheme];
+  slides[currentSlide].elements.push(newEl('title', 40, 60, 640, 90, 'Title', {fontSize:36, fontWeight:'bold', textAlign:'center', color: t.title}));
+  selectedEl = slides[currentSlide].elements.at(-1).id;
+  renderSlideCanvas();
+  checkTasks();
+}
+
+function addSubtitle() {
+  const t = THEMES[activeTheme];
+  slides[currentSlide].elements.push(newEl('subtitle', 80, 170, 560, 60, 'Subtitle', {fontSize:22, textAlign:'center', color: t.body}));
+  selectedEl = slides[currentSlide].elements.at(-1).id;
+  renderSlideCanvas();
+  checkTasks();
+}
+
+function addBullets() {
+  const t = THEMES[activeTheme];
+  slides[currentSlide].elements.push(newEl('bullets', 60, 160, 600, 260, '• Point one\n• Point two\n• Point three\n• Point four', {fontSize:18, color: t.body}));
+  selectedEl = slides[currentSlide].elements.at(-1).id;
+  renderSlideCanvas();
+  checkTasks();
+}
+
+function addShape(shape) {
+  slides[currentSlide].elements.push(newEl(shape, 220, 180, 180, 120, '', {bg: THEMES[activeTheme].accent || '#3b82f6', color: '#fff', isShape: true}));
+  selectedEl = slides[currentSlide].elements.at(-1).id;
+  state.hasShape = true;
+  renderSlideCanvas();
+  checkTasks();
+}
+
+// ─── LAYOUTS ──────────────────────────────────────────────────
+function applyLayout(layout) {
+  slides[currentSlide].elements = [];
+  const t = THEMES[activeTheme];
+  if (layout === 'title') {
+    slides[currentSlide].elements.push(newEl('title',40,180,640,100,'Click to add title',{fontSize:40,fontWeight:'bold',textAlign:'center',color:t.title}));
+  } else if (layout === 'content') {
+    slides[currentSlide].elements.push(newEl('title',40,30,640,70,'Click to add title',{fontSize:32,fontWeight:'bold',textAlign:'left',color:t.title}));
+    slides[currentSlide].elements.push(newEl('bullets',40,120,640,340,'• Click to add content\n• Second point\n• Third point',{fontSize:18,color:t.body}));
+  } else if (layout === 'two-col') {
+    slides[currentSlide].elements.push(newEl('title',40,30,640,60,'Title',{fontSize:32,fontWeight:'bold',color:t.title}));
+    slides[currentSlide].elements.push(newEl('text',20,110,310,350,'• Left column\n• Point two\n• Point three',{fontSize:16,color:t.body}));
+    slides[currentSlide].elements.push(newEl('text',350,110,340,350,'• Right column\n• Point two\n• Point three',{fontSize:16,color:t.body}));
+  } else if (layout === 'section') {
+    slides[currentSlide].elements.push(newEl('title',40,200,640,100,'Section Title',{fontSize:44,fontWeight:'bold',textAlign:'center',color:t.title}));
+  }
+  slides[currentSlide].layout = layout;
+  selectedEl = null;
+  renderSlideCanvas();
+  checkTasks();
+}
+
+// ─── THEMES ───────────────────────────────────────────────────
+function applyTheme(val) {
+  activeTheme = val;
+  const t = THEMES[val] || THEMES[''];
+  slides.forEach(s => {
+    s.bg = t.bg;
+    s.elements.forEach(el => {
+      if (el.type === 'title') el.color = t.title;
+      else if (el.type === 'subtitle' || el.type === 'bullets') el.color = t.body;
+      if (el.isShape) el.bg = t.accent;
+    });
+  });
+  if (val) state.themeApplied = true;
+  document.getElementById('sb-theme').textContent = 'Theme: ' + (val || 'None');
+  document.getElementById('prop-slide-bg').value = t.bg;
+  renderAll();
+  checkTasks();
+}
+
+function applySlideColor(val) {
+  slides[currentSlide].bg = val;
+  renderSlideCanvas();
+}
+
+// ─── TRANSITIONS ──────────────────────────────────────────────
+function setTransition(val) {
+  if (!val) return;
+  slides[currentSlide].transition = val;
+  state.transitionSet = true;
+  document.getElementById('sb-transition').textContent = 'Transition: ' + val;
+  document.getElementById('prop-transition-label').textContent = val;
+  checkTasks();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────
+function renderAll() {
+  renderThumbnails();
+  renderSlideCanvas();
+  updateStatusBar();
+}
+
+function renderThumbnails() {
+  const list = document.getElementById('slides-list');
+  list.innerHTML = '';
+  slides.forEach((slide, i) => {
+    const div = document.createElement('div');
+    div.className = 'slide-thumb' + (i === currentSlide ? ' active' : '');
+    div.onclick = () => { saveCurrentSlideNotes(); currentSlide = i; selectedEl = null; renderAll(); };
+    const canvas = document.createElement('div');
+    canvas.className = 'thumb-canvas';
+    canvas.style.background = slide.bg || '#fff';
+    // Mini render
+    const titles = slide.elements.filter(e => e.type === 'title');
+    if (titles.length) {
+      canvas.innerHTML = `<span style="font-size:8px;font-weight:bold;color:${titles[0].color};overflow:hidden;max-height:100%;word-break:break-all;">${titles[0].text.substring(0,40)}</span>`;
+    } else {
+      canvas.innerHTML = `<span style="color:rgba(0,0,0,0.2);font-size:8px;">Slide ${i+1}</span>`;
+    }
+    div.appendChild(canvas);
+    const num = document.createElement('span');
+    num.className = 'slide-thumb-num';
+    num.textContent = i + 1;
+    div.appendChild(num);
+    list.appendChild(div);
+  });
+}
+
+function renderSlideCanvas() {
+  const canvas = document.getElementById('slide-canvas');
+  const slide = slides[currentSlide];
+  canvas.style.background = slide.bg || '#fff';
+  canvas.innerHTML = '';
+  slide.elements.forEach(el => canvas.appendChild(buildEl(el)));
+  updatePropsPanel();
+  document.getElementById('notes-area').value = slide.notes || '';
+}
+
+function buildEl(el) {
+  const div = document.createElement('div');
+  div.className = 'slide-el' + (el.id === selectedEl ? ' selected' : '');
+  div.id = 'el-' + el.id;
+  div.style.cssText = `left:${el.x}px;top:${el.y}px;width:${el.w}px;height:${el.h}px;`;
+  if (el.isShape) {
+    div.style.background = el.bg || '#3b82f6';
+    div.style.borderRadius = el.type === 'oval' ? '50%' : '4px';
+  }
+
+  if (!el.isShape) {
+    const ta = document.createElement('textarea');
+    ta.className = 'el-text';
+    ta.value = el.text;
+    ta.style.cssText = `font-size:${el.fontSize}px;font-weight:${el.fontWeight};color:${el.color};text-align:${el.textAlign};background:${el.bg||'transparent'};`;
+    ta.onchange = e => { el.text = e.target.value; checkTasks(); };
+    ta.oninput = e => { el.text = e.target.value; checkTasks(); };
+    ta.onclick = e => e.stopPropagation();
+    div.appendChild(ta);
+  }
+
+  const rh = document.createElement('div');
+  rh.className = 'resize-handle';
+  rh.onmousedown = e => startResize(e, el);
+  div.appendChild(rh);
+
+  div.onmousedown = e => { if (e.target === rh) return; startDrag(e, el, div); };
+  div.onclick = e => { e.stopPropagation(); selectEl(el.id); };
+  return div;
+}
+
+// ─── DRAG ─────────────────────────────────────────────────────
+let dragState = null;
+function startDrag(e, el, div) {
+  selectEl(el.id);
+  dragState = { el, startX: e.clientX - el.x, startY: e.clientY - el.y };
+  e.preventDefault();
+}
+function startResize(e, el) {
+  dragState = { el, resize: true, startX: e.clientX, startY: e.clientY, origW: el.w, origH: el.h };
+  e.preventDefault(); e.stopPropagation();
+}
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  if (dragState.resize) {
+    dragState.el.w = Math.max(60, dragState.origW + e.clientX - dragState.startX);
+    dragState.el.h = Math.max(30, dragState.origH + e.clientY - dragState.startY);
+  } else {
+    dragState.el.x = Math.max(0, e.clientX - dragState.startX);
+    dragState.el.y = Math.max(0, e.clientY - dragState.startY);
+  }
+  const domEl = document.getElementById('el-' + dragState.el.id);
+  if (domEl) {
+    domEl.style.left = dragState.el.x + 'px';
+    domEl.style.top = dragState.el.y + 'px';
+    domEl.style.width = dragState.el.w + 'px';
+    domEl.style.height = dragState.el.h + 'px';
+  }
+  updatePropsPanel();
+});
+document.addEventListener('mouseup', () => { dragState = null; });
+
+function stageClick(e) {
+  if (e.target.id === 'slide-stage' || e.target.id === 'slide-canvas') {
+    selectedEl = null;
+    document.querySelectorAll('.slide-el').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.resize-handle').forEach(rh => rh.style.display = 'none');
+  }
+}
+
+function selectEl(id) {
+  selectedEl = id;
+  document.querySelectorAll('.slide-el').forEach(el => {
+    const active = el.id === 'el-' + id;
+    el.classList.toggle('selected', active);
+    const rh = el.querySelector('.resize-handle');
+    if (rh) rh.style.display = active ? 'block' : 'none';
+  });
+  updatePropsPanel();
+}
+
+// ─── PROPS ────────────────────────────────────────────────────
+function updatePropsPanel() {
+  const slide = slides[currentSlide];
+  const el = slide?.elements.find(e => e.id === selectedEl);
+  if (el) {
+    document.getElementById('prop-x').value = Math.round(el.x);
+    document.getElementById('prop-y').value = Math.round(el.y);
+    document.getElementById('prop-w').value = Math.round(el.w);
+    document.getElementById('prop-h').value = Math.round(el.h);
+    document.getElementById('prop-fs').value = el.fontSize || 24;
+    document.getElementById('prop-fw').value = el.fontWeight || 'normal';
+    document.getElementById('prop-ta').value = el.textAlign || 'left';
+    document.getElementById('prop-color').value = el.color || '#000000';
+    document.getElementById('prop-bg').value = el.bg === 'transparent' ? '#ffffff' : (el.bg || '#ffffff');
+  }
+  document.getElementById('prop-slide-bg').value = slide?.bg || '#ffffff';
+  document.getElementById('prop-transition-label').textContent = slide?.transition || 'None';
+}
+
+function applyProp(prop, val) {
+  const el = slides[currentSlide]?.elements.find(e => e.id === selectedEl);
+  if (!el) return;
+  if (prop === 'x') el.x = val;
+  else if (prop === 'y') el.y = val;
+  else if (prop === 'w') el.w = val;
+  else if (prop === 'h') el.h = val;
+  else el[prop] = val;
+  if (prop === 'fontWeight' && val === 'bold') state.hasBold = true;
+  renderSlideCanvas();
+  checkTasks();
+}
+
+// ─── NOTES ────────────────────────────────────────────────────
+function saveNotes() {
+  slides[currentSlide].notes = document.getElementById('notes-area').value;
+  state.hasNotes = slides.some(s => s.notes && s.notes.trim().length > 2);
+  checkTasks();
+}
+function saveCurrentSlideNotes() {
+  slides[currentSlide].notes = document.getElementById('notes-area').value;
+}
+
+// ─── SLIDESHOW ────────────────────────────────────────────────
+function startSlideshow() {
+  ssIndex = currentSlide;
+  slideshowOpen = true;
+  slideshowUsed = true;
+  state.slideshowRun = true;
+  document.getElementById('slideshow-overlay').classList.add('show');
+  renderSSSlide();
+  checkTasks();
+}
+function endSlideshow() {
+  document.getElementById('slideshow-overlay').classList.remove('show');
+  slideshowOpen = false;
+}
+function renderSSSlide() {
+  const slide = slides[ssIndex];
+  const inner = document.getElementById('ss-inner');
+  inner.style.background = slide.bg || '#fff';
+  inner.style.width = '100%'; inner.style.height = '85vh';
+  inner.style.position = 'relative'; inner.style.overflow = 'hidden';
+  inner.innerHTML = '';
+  // Scale factor from 720px design to actual size
+  const scale = inner.offsetWidth / 720;
+  slide.elements.forEach(el => {
+    const div = document.createElement('div');
+    div.style.cssText = `position:absolute;left:${el.x*scale}px;top:${el.y*scale}px;width:${el.w*scale}px;height:${el.h*scale}px;overflow:hidden;`;
+    if (el.isShape) {
+      div.style.background = el.bg || '#3b82f6';
+      div.style.borderRadius = el.type === 'oval' ? '50%' : '4px';
+    } else {
+      div.style.cssText += `font-size:${el.fontSize*scale}px;font-weight:${el.fontWeight};color:${el.color};text-align:${el.textAlign};white-space:pre-wrap;padding:4px;`;
+      div.textContent = el.text;
+    }
+    inner.appendChild(div);
+  });
+  // Transition class
+  inner.style.animation = 'none';
+  if (slide.transition === 'fade') { inner.style.animation = 'fadeIn .5s ease'; }
+  else if (slide.transition === 'zoom') { inner.style.animation = 'zoomIn .4s ease'; }
+  document.getElementById('ss-count').textContent = `${ssIndex + 1} / ${slides.length}`;
+}
+function ssPrev() { ssIndex = Math.max(0, ssIndex - 1); renderSSSlide(); }
+function ssNext() { ssIndex = Math.min(slides.length - 1, ssIndex + 1); renderSSSlide(); }
+
+// ─── STATUS ───────────────────────────────────────────────────
+function updateStatusBar() {
+  document.getElementById('sb-slide').textContent = currentSlide + 1;
+  document.getElementById('sb-total').textContent = slides.length;
+}
+
+function setRTab(el) {
+  document.querySelectorAll('.rtab').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── TASK CHECKER ─────────────────────────────────────────────
+function checkTasks() {
+  const slide0 = slides[0];
+  const allEls = slides.flatMap(s => s.elements);
+
+  const hasTitleEl = slide0?.elements.some(e => e.type === 'title' && e.text.trim().length > 2);
+  const hasSubtitleEl = slide0?.elements.some(e => e.type === 'subtitle' && e.text.trim().length > 2);
+  const hasBulletsEl = slides.some(s => s.elements.some(e => e.type === 'bullets' && (e.text.match(/•/g)||[]).length >= 3));
+  const hasBoldEl = allEls.some(e => e.fontWeight === 'bold' && e.text.trim().length > 0);
+  const hasShapeEl = allEls.some(e => e.isShape);
+  const hasNotesEl = slides.some(s => s.notes && s.notes.trim().length > 2);
+  const hasTransitionEl = slides.some(s => s.transition && s.transition.length > 0);
+
+  const results = {
+    t1: slides.length >= 5,
+    t2: hasTitleEl,
+    t3: hasSubtitleEl,
+    t4: hasBulletsEl,
+    t5: hasBoldEl,
+    t6: state.themeApplied,
+    t7: hasShapeEl,
+    t8: hasTransitionEl,
+    t9: hasNotesEl,
+    t10: state.slideshowRun,
+  };
+
+  let done = 0;
+  for (let i = 1; i <= 10; i++) {
+    const ok = results['t' + i];
+    if (ok) done++;
+    document.getElementById('t' + i)?.classList.toggle('done', ok);
+    const ci = document.getElementById('c' + i);
+    if (ci) ci.textContent = ok ? '✓' : '○';
+  }
+  document.getElementById('sb-tasks').textContent = `Tasks: ${done}/10 done`;
+  document.getElementById('pill-count').textContent = `${done}/10`;
+  return results;
+}
+
+function autoCheck() {
+  const r = checkTasks();
+  const done = Object.values(r).filter(Boolean).length;
+  toggleDrawer(true);
+}
+
+// ─── RESULTS ─────────────────────────────────────────────────
+const MARKS = {t1:3,t2:3,t3:2,t4:4,t5:2,t6:3,t7:3,t8:4,t9:3,t10:3};
+const LABELS = {
+  t1:'(i) 5+ slides created',t2:'(ii) Title on slide 1',t3:'(iii) Subtitle on slide 1',
+  t4:'(iv) Bulleted list (3+ points)',t5:'(v) Bold text used',t6:'(vi) Theme applied',
+  t7:'(vii) Shape added',t8:'(viii) Transition set',t9:'(ix) Speaker notes added',t10:'(x) Slide Show run',
+};
+function showResults() {
+  const results = checkTasks();
+  let total = 0, html = '';
+  for (let i = 1; i <= 10; i++) {
+    const ok = results['t' + i];
+    const earned = ok ? MARKS['t' + i] : 0;
+    total += earned;
+    html += `<div class="rb-row"><span>${LABELS['t'+i]}</span><b style="color:${ok?'var(--green)':'var(--red)'}">${earned}/${MARKS['t'+i]}</b></div>`;
+  }
+  document.getElementById('res-bd').innerHTML = html;
+  const sc = document.getElementById('res-score');
+  sc.textContent = total;
+  sc.style.color = total >= 24 ? 'var(--green)' : total >= 18 ? 'var(--gold)' : 'var(--red)';
+  document.getElementById('results-screen').classList.add('show');
+}
+
+// ─── DRAWER ───────────────────────────────────────────────────
+let drawerOpen = false;
+function toggleDrawer(force) {
+  drawerOpen = force !== undefined ? force : !drawerOpen;
+  document.getElementById('q-drawer').classList.toggle('open', drawerOpen);
+}
+
+// ─── TIMER ────────────────────────────────────────────────────
+let secs = 45 * 60;
+function tick() {
+  secs--; if (secs < 0) secs = 0;
+  const m = Math.floor(secs / 60), s = secs % 60;
+  document.getElementById('tv').textContent = `${m}:${String(s).padStart(2, '0')}`;
+  const warn = secs < 600, dang = secs < 180;
+  document.getElementById('td').className = 'tb-dot' + (dang ? ' dang' : warn ? ' warn' : '');
+  document.getElementById('tv').className = 'tv' + (dang ? ' dang' : warn ? ' warn' : '');
+  if (secs > 0) setTimeout(tick, 1000);
+}
+
+// ─── SLIDESHOW CSS ANIMATIONS ─────────────────────────────────
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes zoomIn { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
+`;
+document.head.appendChild(style);
+
+// ─── BOOT ─────────────────────────────────────────────────────
+// Start with 1 slide, title layout
+slides.push(newSlide('blank'));
+applyLayout('content');
+slides[0].elements[0].text = 'JSS Model Secondary School';
+slides[0].elements[1].text = '• Subjects Offered\n• Prize Day Programme\n• Achievements';
+renderAll();
+setTimeout(tick, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>WAEC 2026 | Database Practical</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0C0F1A; --surface:#131824; --surface2:#1A2030; --surface3:#202840;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#EEF0F6; --sec:rgba(238,240,246,0.65); --ter:rgba(238,240,246,0.38);
+  --accent:#4F8EF7; --gold:#F0B429; --green:#22C55E; --red:#EF4444; --amber:#F59E0B;
+  --serif:'Instrument Serif',Georgia,serif; --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;height:100%;}
+.topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:12px;
+  padding:9px 16px;background:rgba(12,15,26,0.98);
+  border-bottom:1px solid var(--border2);z-index:300;
+}
+.tb-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
+.tb-title{font-family:var(--serif);font-size:15px;font-style:italic;flex:1;}
+.tb-timer{display:flex;align-items:center;gap:6px;background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.2);border-radius:16px;padding:5px 12px;font-family:var(--mono);font-size:13px;color:var(--accent);}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+.tb-dot.warn{background:var(--amber);}
+.tb-dot.dang{background:var(--red);animation:blink 1s infinite;}
+.timer-val.warn{color:var(--amber);} .timer-val.dang{color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+.body-split{flex:1;display:flex;overflow:hidden;}
+
+/* ── LEFT: DB ENVIRONMENT (70%) ── */
+.env-panel{
+  flex:0 0 70%;display:flex;flex-direction:column;
+  border-right:1px solid var(--border2);overflow:hidden;
+}
+
+/* Access-style ribbon */
+.ribbon{
+  flex-shrink:0;background:#1e2a1e;border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;flex-direction:column;
+}
+.ribbon-tabs{display:flex;background:#162016;}
+.rtab{
+  padding:6px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ter);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;
+}
+.rtab:hover{color:var(--sec);}
+.rtab.active{color:#6cc96c;border-color:#6cc96c;background:rgba(108,201,108,0.06);}
+.ribbon-bar{
+  display:flex;align-items:center;gap:3px;padding:5px 10px;flex-wrap:wrap;
+}
+.rb{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:4px 8px;border-radius:5px;background:transparent;
+  border:1px solid transparent;color:var(--sec);cursor:pointer;
+  font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;
+  transition:all .15s;white-space:nowrap;min-width:44px;
+}
+.rb:hover{background:rgba(108,201,108,0.08);border-color:rgba(108,201,108,0.2);color:#6cc96c;}
+.rb.active{background:rgba(108,201,108,0.12);border-color:rgba(108,201,108,0.3);color:#6cc96c;}
+.rb-icon{font-size:16px;line-height:1;}
+.rb-sep{width:1px;height:36px;background:var(--border);margin:0 3px;flex-shrink:0;}
+
+/* Nav pane (left mini sidebar) */
+.env-body{flex:1;display:flex;overflow:hidden;}
+.nav-pane{
+  flex-shrink:0;width:160px;background:var(--surface);
+  border-right:1px solid var(--border2);display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.nav-pane::-webkit-scrollbar{width:3px;}
+.nav-pane::-webkit-scrollbar-thumb{background:var(--border2);}
+.nav-hdr{
+  padding:8px 10px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ter);border-bottom:1px solid var(--border);
+}
+.nav-section{margin-bottom:4px;}
+.nav-section-hdr{
+  padding:6px 10px 3px;font-family:var(--mono);font-size:9px;color:var(--ter);
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.nav-item{
+  display:flex;align-items:center;gap:7px;padding:5px 10px;
+  font-size:12px;color:var(--sec);cursor:pointer;transition:background .12s;
+  border-left:2px solid transparent;
+}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(79,142,247,0.08);border-color:var(--accent);color:var(--text);}
+.nav-icon{font-size:13px;flex-shrink:0;}
+
+/* Main workspace */
+.workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+
+/* Tab bar for open objects */
+.obj-tabs{
+  flex-shrink:0;display:flex;align-items:flex-end;gap:1px;padding:6px 8px 0;
+  background:var(--surface);border-bottom:1px solid var(--border2);
+}
+.obj-tab{
+  padding:5px 14px 6px;font-family:var(--mono);font-size:11px;color:var(--ter);
+  background:var(--surface2);border:1px solid var(--border);border-bottom:none;
+  border-radius:5px 5px 0 0;cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:all .15s;
+}
+.obj-tab:hover{color:var(--sec);}
+.obj-tab.active{background:var(--bg);border-color:var(--border2);color:var(--text);}
+.obj-tab .close-x{color:var(--ter);font-size:10px;margin-left:4px;}
+.obj-tab .close-x:hover{color:var(--red);}
+
+/* Content area */
+.content-area{flex:1;overflow:auto;padding:0;}
+.content-area::-webkit-scrollbar{width:6px;height:6px;}
+.content-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* ── TABLE DESIGN VIEW ── */
+.table-design{padding:0;display:flex;flex-direction:column;height:100%;}
+.td-grid{flex:1;overflow:auto;}
+.td-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;}
+.td-table th{
+  background:var(--surface2);color:var(--ter);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;padding:7px 12px;border:1px solid var(--border2);
+  text-align:left;position:sticky;top:0;z-index:10;
+}
+.td-table td{
+  padding:0;border:1px solid var(--border);background:var(--surface);
+  vertical-align:middle;
+}
+.td-table tr.pk-row td{background:rgba(240,180,41,0.05);}
+.td-table tr.active-row td{background:rgba(79,142,247,0.06);}
+.td-input{
+  width:100%;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--mono);font-size:12px;
+  padding:7px 12px;
+}
+.td-input:focus{background:rgba(79,142,247,0.08);}
+.td-select{
+  width:100%;background:var(--surface2);border:none;outline:none;
+  color:var(--text);font-family:var(--mono);font-size:12px;
+  padding:7px 12px;cursor:pointer;
+}
+.td-select:focus{background:rgba(79,142,247,0.08);}
+.pk-icon{text-align:center;width:36px;color:var(--gold);font-size:12px;cursor:pointer;padding:7px 8px;border:none;background:transparent;}
+.td-prop-panel{
+  flex-shrink:0;border-top:1px solid var(--border2);padding:10px 14px;
+  background:var(--surface);display:flex;flex-wrap:wrap;gap:8px;
+  font-family:var(--mono);font-size:11px;color:var(--sec);
+}
+.prop-row{display:flex;align-items:center;gap:8px;}
+.prop-label{color:var(--ter);width:90px;flex-shrink:0;}
+.prop-val{
+  background:var(--surface2);border:1px solid var(--border);border-radius:4px;
+  padding:3px 8px;color:var(--text);font-family:var(--mono);font-size:11px;
+  outline:none;width:120px;
+}
+.prop-val:focus{border-color:rgba(79,142,247,0.5);}
+
+/* ── DATASHEET VIEW ── */
+.datasheet{overflow:auto;height:100%;}
+.ds-table{border-collapse:collapse;font-family:var(--mono);font-size:12px;width:100%;}
+.ds-table th{
+  background:var(--surface2);color:var(--sec);font-size:11px;padding:6px 12px;
+  border:1px solid var(--border2);text-align:left;position:sticky;top:0;z-index:5;
+  white-space:nowrap;font-weight:500;
+}
+.ds-table td{
+  border:1px solid var(--border);background:var(--surface);
+  padding:0;vertical-align:middle;
+}
+.ds-table tr:hover td{background:rgba(79,142,247,0.04);}
+.ds-table tr.selected-row td{background:rgba(79,142,247,0.1);}
+.ds-input{
+  width:100%;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--mono);font-size:12px;padding:6px 10px;
+}
+.ds-input:focus{background:rgba(79,142,247,0.08);}
+.row-sel{width:24px;background:var(--surface2);text-align:center;font-size:10px;color:var(--ter);padding:6px 4px;cursor:pointer;}
+.new-row td{background:var(--surface2)!important;opacity:.5;}
+.nav-strip{
+  flex-shrink:0;display:flex;align-items:center;gap:6px;padding:5px 10px;
+  background:var(--surface);border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:11px;color:var(--ter);
+}
+.nav-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--sec);padding:3px 8px;cursor:pointer;font-size:11px;}
+.nav-btn:hover{background:var(--surface3);color:var(--text);}
+.rec-info{flex:1;text-align:center;}
+
+/* ── QUERY DESIGNER ── */
+.query-designer{display:flex;flex-direction:column;height:100%;}
+.qd-tables{
+  flex:0 0 160px;display:flex;gap:10px;padding:12px;
+  background:var(--bg);border-bottom:1px solid var(--border2);overflow-x:auto;
+}
+.qd-tbl-box{
+  background:var(--surface);border:1px solid var(--border2);border-radius:8px;
+  min-width:130px;overflow:hidden;font-family:var(--mono);font-size:11px;
+}
+.qd-tbl-hdr{
+  background:#162016;padding:6px 10px;color:#6cc96c;font-weight:500;
+  border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;
+}
+.qd-tbl-field{
+  padding:4px 10px;color:var(--sec);cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+}
+.qd-tbl-field:hover{background:rgba(79,142,247,0.08);color:var(--text);}
+.qd-tbl-field.pk{color:var(--gold);}
+.qd-grid{flex:1;overflow:auto;}
+.qg-table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12px;}
+.qg-table th{
+  background:var(--surface2);padding:6px 10px;border:1px solid var(--border2);
+  text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ter);
+  position:sticky;top:0;z-index:5;
+}
+.qg-table td{border:1px solid var(--border);background:var(--surface);padding:0;}
+.qg-input{
+  width:100%;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--mono);font-size:12px;padding:6px 10px;
+}
+.qg-input:focus{background:rgba(79,142,247,0.08);}
+.qg-check{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;margin:7px 14px;}
+.qd-sql{
+  flex-shrink:0;border-top:1px solid var(--border2);
+  background:var(--surface);padding:8px 12px;
+  font-family:var(--mono);font-size:11px;color:#6cc96c;
+  white-space:pre-wrap;overflow-x:auto;max-height:80px;overflow-y:auto;
+}
+.qd-results{flex:1;overflow:auto;border-top:1px solid var(--border2);}
+
+/* ── FORM DESIGNER ── */
+.form-designer{padding:16px;height:100%;overflow:auto;background:#1a1a2e;}
+.form-canvas{
+  background:#f5f5f5;border-radius:4px;padding:20px;
+  min-height:400px;max-width:520px;margin:0 auto;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);position:relative;
+}
+.form-title-bar{
+  background:#0a7b0a;color:#fff;padding:6px 12px;margin:-20px -20px 16px;
+  font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;
+  border-radius:4px 4px 0 0;
+}
+.form-field-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+}
+.form-label{
+  font-size:12px;color:#333;font-weight:500;width:120px;flex-shrink:0;text-align:right;
+}
+.form-ctrl{
+  flex:1;border:2px inset #aaa;background:#fff;
+  padding:4px 8px;font-size:12px;color:#222;font-family:Arial,sans-serif;
+  outline:none;border-radius:2px;
+}
+.form-ctrl:focus{border-color:#0a7b0a;}
+.form-btn-row{display:flex;gap:8px;justify-content:center;margin-top:16px;}
+.form-btn{
+  padding:5px 16px;background:#d4d0c8;border:1px outset #999;
+  font-size:12px;color:#222;cursor:pointer;font-family:Arial,sans-serif;
+  border-radius:2px;
+}
+.form-btn:hover{background:#c0bdb5;}
+.form-btn.primary{background:#0a7b0a;color:#fff;border-color:#086508;}
+.form-toolbox{
+  position:absolute;right:-130px;top:0;background:var(--surface);
+  border:1px solid var(--border2);border-radius:8px;padding:10px;
+  font-family:var(--mono);font-size:11px;width:120px;
+}
+.form-toolbox-hdr{color:var(--ter);font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.form-tool{
+  padding:5px 8px;border-radius:4px;color:var(--sec);cursor:pointer;
+  display:flex;align-items:center;gap:6px;margin-bottom:2px;
+}
+.form-tool:hover{background:var(--surface2);color:var(--text);}
+.selected-ctrl{outline:2px dashed var(--accent);outline-offset:2px;}
+
+/* ── QUERY RESULTS ── */
+.result-table-wrap{overflow:auto;}
+.result-table{border-collapse:collapse;font-family:var(--mono);font-size:12px;}
+.result-table th{background:#162016;color:#6cc96c;padding:6px 12px;border:1px solid rgba(108,201,108,0.2);font-weight:500;font-size:11px;}
+.result-table td{border:1px solid var(--border);background:var(--surface);padding:5px 12px;color:var(--sec);}
+.result-table tr:nth-child(even) td{background:var(--surface2);}
+
+/* ── RIGHT: QUESTION PANEL (30%) ── */
+.q-panel{
+  flex:0 0 30%;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--surface);
+}
+.q-scroll{flex:1;overflow-y:auto;padding:14px;}
+.q-scroll::-webkit-scrollbar{width:4px;}
+.q-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.q-hdr{margin-bottom:10px;}
+.q-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(240,180,41,0.1);border:1px solid rgba(240,180,41,0.25);color:var(--gold);}
+.q-marks-tag{font-family:var(--mono);font-size:10px;color:var(--ter);margin-left:6px;}
+.q-title{font-family:var(--serif);font-size:16px;font-style:italic;margin:8px 0 4px;line-height:1.3;}
+.q-intro{font-size:12px;color:var(--sec);line-height:1.65;margin-bottom:10px;}
+.task-list{display:flex;flex-direction:column;gap:0;}
+.task{
+  display:flex;gap:8px;padding:8px 10px;border-radius:7px;
+  border:1px solid transparent;margin-bottom:4px;
+  transition:background .2s;
+}
+.task.done{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.15);}
+.task-num{font-family:var(--mono);font-size:10px;color:var(--accent);flex-shrink:0;padding-top:2px;width:16px;}
+.task-check{font-size:11px;flex-shrink:0;padding-top:2px;width:14px;color:var(--ter);}
+.task.done .task-check{color:var(--green);}
+.task-txt{font-size:12px;color:var(--sec);line-height:1.6;}
+.task.done .task-txt{color:rgba(238,240,246,0.35);text-decoration:line-through;}
+.task-marks{font-family:var(--mono);font-size:10px;color:var(--ter);white-space:nowrap;}
+.q-phase{
+  font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);margin:12px 0 6px;padding:4px 8px;
+  background:rgba(79,142,247,0.06);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;
+}
+.q-footer{
+  flex-shrink:0;padding:10px 14px;border-top:1px solid var(--border2);
+  display:flex;gap:8px;
+}
+.q-btn{
+  flex:1;padding:9px;border-radius:7px;font-family:var(--sans);font-size:12px;
+  font-weight:600;border:none;cursor:pointer;transition:opacity .2s;
+}
+.q-btn.primary{background:var(--accent);color:#fff;}
+.q-btn.primary:hover{opacity:.85;}
+.q-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--border);}
+
+/* ── RESULTS ── */
+.results-overlay{
+  position:fixed;inset:0;z-index:2000;background:rgba(12,15,26,0.97);
+  display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+  overflow-y:auto;
+}
+.results-overlay.show{display:flex;}
+.res-box{width:100%;max-width:400px;text-align:center;}
+.res-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.res-title{font-family:var(--serif);font-size:2rem;font-style:italic;margin-bottom:4px;}
+.res-score{font-family:var(--mono);font-size:3rem;font-weight:500;margin:20px 0 4px;}
+.res-max{font-family:var(--mono);font-size:12px;color:var(--ter);margin-bottom:16px;}
+.res-breakdown{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:14px;text-align:left;margin-bottom:12px;}
+.rb-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--ter);}
+.rb-row:last-child{border:none;}
+.rb-row b{font-family:var(--mono);}
+.res-btn{width:100%;padding:12px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;border:none;cursor:pointer;margin-bottom:6px;}
+.res-btn.ghost{background:transparent;color:var(--ter);border:1px solid var(--border);}
+
+/* ── STATUS BAR ── */
+.status-bar{
+  flex-shrink:0;display:flex;align-items:center;gap:12px;
+  padding:4px 12px;background:rgba(12,15,26,0.9);border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:10px;color:var(--ter);
+}
+.status-bar b{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <span class="tb-brand">GrantApp AI · WAEC 2026</span>
+    <span class="tb-title">Database Practical — Paper 3</span>
+  </div>
+  <div style="flex:1;"></div>
+  <div class="tb-timer"><div class="tb-dot" id="td"></div><span class="timer-val" id="tv">0:45:00</span></div>
+</div>
+
+<div class="body-split">
+
+  <!-- ══════════════ LEFT: ENVIRONMENT ══════════════ -->
+  <div class="env-panel">
+
+    <!-- Access-style Ribbon -->
+    <div class="ribbon">
+      <div class="ribbon-tabs">
+        <div class="rtab active" onclick="switchRTab('home',this)">Home</div>
+        <div class="rtab" onclick="switchRTab('create',this)">Create</div>
+        <div class="rtab" onclick="switchRTab('external',this)">External Data</div>
+        <div class="rtab" onclick="switchRTab('design',this)">Database Tools</div>
+      </div>
+      <div class="ribbon-bar" id="ribbon-bar">
+        <!-- Home tab buttons -->
+        <div class="rb" onclick="openView('datasheet')" id="rb-view"><span class="rb-icon">📋</span>Datasheet</div>
+        <div class="rb" onclick="openDesign()" id="rb-design"><span class="rb-icon">🔧</span>Design</div>
+        <div class="rb-sep"></div>
+        <div class="rb" onclick="addRecord()"><span class="rb-icon">➕</span>New Record</div>
+        <div class="rb" onclick="saveRecord()"><span class="rb-icon">💾</span>Save</div>
+        <div class="rb" onclick="deleteSelRow()"><span class="rb-icon">🗑</span>Delete</div>
+        <div class="rb-sep"></div>
+        <div class="rb" onclick="openQuery()"><span class="rb-icon">🔍</span>Query</div>
+        <div class="rb" onclick="openForm()"><span class="rb-icon">📝</span>Form</div>
+        <div class="rb-sep"></div>
+        <div class="rb" onclick="runQuery()" id="rb-run"><span class="rb-icon">▶</span>Run</div>
+        <div class="rb-sep"></div>
+        <div class="rb" onclick="autoCheck()" style="color:var(--gold);"><span class="rb-icon">✓</span>Check</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="env-body">
+      <!-- Navigation Pane -->
+      <div class="nav-pane">
+        <div class="nav-hdr">All Tables</div>
+        <div class="nav-section">
+          <div class="nav-section-hdr">Tables</div>
+          <div class="nav-item active" id="nav-students" onclick="navClick('students',this)">
+            <span class="nav-icon">🗂</span>Students
+          </div>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-hdr">Queries</div>
+          <div class="nav-item" id="nav-query1" onclick="navClick('query1',this)">
+            <span class="nav-icon">🔍</span>qryPassStudents
+          </div>
+          <div class="nav-item" id="nav-query2" onclick="navClick('query2',this)">
+            <span class="nav-icon">🔍</span>qryTopStudents
+          </div>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-hdr">Forms</div>
+          <div class="nav-item" id="nav-form1" onclick="navClick('form1',this)">
+            <span class="nav-icon">📝</span>frmStudents
+          </div>
+        </div>
+      </div>
+
+      <!-- Workspace -->
+      <div class="workspace">
+        <!-- Object tab bar -->
+        <div class="obj-tabs" id="obj-tabs"></div>
+
+        <!-- Content -->
+        <div class="content-area" id="content-area">
+          <!-- filled by JS -->
+        </div>
+        <div class="nav-strip" id="nav-strip" style="display:none;">
+          <button class="nav-btn" onclick="navFirst()">|◄</button>
+          <button class="nav-btn" onclick="navPrev()">◄</button>
+          <span class="rec-info" id="rec-info">Record 1 of 10</span>
+          <button class="nav-btn" onclick="navNext()">►</button>
+          <button class="nav-btn" onclick="navLast()">►|</button>
+          <span style="margin-left:8px;font-size:10px;color:var(--ter);">Search:</span>
+          <input style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 8px;outline:none;width:100px;" id="rec-search" oninput="searchRecords(this.value)" placeholder="Type to filter">
+        </div>
+      </div>
+    </div>
+    <div class="status-bar">
+      <span>Database: <b>SchoolDB.accdb</b></span>
+      <span>|</span>
+      <span id="status-msg">Ready</span>
+      <div style="flex:1;"></div>
+      <span id="status-view">Datasheet View</span>
+    </div>
+  </div>
+
+  <!-- ══════════════ RIGHT: QUESTIONS ══════════════ -->
+  <div class="q-panel">
+    <div class="q-scroll">
+      <div class="q-hdr">
+        <span class="q-badge">Question 2</span>
+        <span class="q-marks-tag">30 marks · 45 min</span>
+        <div class="q-title">School Database — Student Records Management</div>
+        <div class="q-intro">
+          The database <em>SchoolDB</em> contains a table named <strong>Students</strong> with student records for JSS 3. Using the database environment provided, carry out the following tasks carefully.
+        </div>
+      </div>
+
+      <div class="q-phase">Phase 1 — Table Design</div>
+      <div class="task-list">
+        <div class="task" id="t1">
+          <span class="task-num">i.</span>
+          <span class="task-check" id="c1">○</span>
+          <span class="task-txt">Open the <strong>Students</strong> table in <strong>Design View</strong>. Set <strong>StudentID</strong> as the Primary Key. <span class="task-marks">(3 marks)</span></span>
+        </div>
+        <div class="task" id="t2">
+          <span class="task-num">ii.</span>
+          <span class="task-check" id="c2">○</span>
+          <span class="task-txt">Set the data type of <strong>DateOfBirth</strong> to <strong>Date/Time</strong> and <strong>Score</strong> to <strong>Number</strong>. <span class="task-marks">(3 marks)</span></span>
+        </div>
+        <div class="task" id="t3">
+          <span class="task-num">iii.</span>
+          <span class="task-check" id="c3">○</span>
+          <span class="task-txt">Add a new field <strong>Grade</strong> with data type <strong>Short Text</strong> and field size <strong>2</strong>. <span class="task-marks">(4 marks)</span></span>
+        </div>
+      </div>
+
+      <div class="q-phase">Phase 2 — Data Entry</div>
+      <div class="task-list">
+        <div class="task" id="t4">
+          <span class="task-num">iv.</span>
+          <span class="task-check" id="c4">○</span>
+          <span class="task-txt">Switch to <strong>Datasheet View</strong> and enter at least <strong>8 student records</strong>. Ensure no StudentID is repeated. <span class="task-marks">(4 marks)</span></span>
+        </div>
+        <div class="task" id="t5">
+          <span class="task-num">v.</span>
+          <span class="task-check" id="c5">○</span>
+          <span class="task-txt">Fill in the <strong>Grade</strong> field for each student: A (≥70), B (≥60), C (≥50), F (&lt;50). <span class="task-marks">(3 marks)</span></span>
+        </div>
+      </div>
+
+      <div class="q-phase">Phase 3 — Query</div>
+      <div class="task-list">
+        <div class="task" id="t6">
+          <span class="task-num">vi.</span>
+          <span class="task-check" id="c6">○</span>
+          <span class="task-txt">Open <strong>qryPassStudents</strong>. Set a criterion on <strong>Score</strong> to show only students with Score ≥ 50. Run the query. <span class="task-marks">(5 marks)</span></span>
+        </div>
+        <div class="task" id="t7">
+          <span class="task-num">vii.</span>
+          <span class="task-check" id="c7">○</span>
+          <span class="task-txt">Open <strong>qryTopStudents</strong>. Filter where Score ≥ 70 and sort by Score <strong>Descending</strong>. Run the query. <span class="task-marks">(4 marks)</span></span>
+        </div>
+      </div>
+
+      <div class="q-phase">Phase 4 — Form</div>
+      <div class="task-list">
+        <div class="task" id="t8">
+          <span class="task-num">viii.</span>
+          <span class="task-check" id="c8">○</span>
+          <span class="task-txt">Open <strong>frmStudents</strong>. Add input fields for <strong>StudentID, FullName, Score</strong> and <strong>Grade</strong>. Add a <strong>Save Record</strong> button. <span class="task-marks">(4 marks)</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-footer">
+      <button class="q-btn ghost" onclick="autoCheck()">✓ Check Tasks</button>
+      <button class="q-btn primary" onclick="showResults()">Submit & Mark</button>
+    </div>
+  </div>
+
+</div><!-- body-split -->
+</div><!-- app -->
+
+<!-- Results -->
+<div class="results-overlay" id="results-screen">
+  <div class="res-box">
+    <div class="res-brand">GrantApp AI · WAEC 2026</div>
+    <div class="res-title">Marking Complete</div>
+    <div class="res-score" id="res-score">—</div>
+    <div class="res-max">out of 30 marks</div>
+    <div class="res-breakdown" id="res-breakdown"></div>
+    <button class="res-btn" onclick="document.getElementById('results-screen').classList.remove('show')">Review Work</button>
+    <button class="res-btn ghost" style="margin-top:4px;" onclick="location.reload()">Reset & Retry</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// DATA MODEL
+// ─────────────────────────────────────────────────────────────
+let tableFields = [
+  {name:'StudentID', type:'AutoNumber', pk:true,  size:'Long Integer', required:true},
+  {name:'FullName',  type:'Short Text', pk:false, size:'50',           required:true},
+  {name:'DateOfBirth',type:'Short Text',pk:false, size:'',             required:false},
+  {name:'Score',     type:'Short Text', pk:false, size:'',             required:false},
+  {name:'State',     type:'Short Text', pk:false, size:'30',           required:false},
+];
+
+let tableData = [
+  {StudentID:'1',FullName:'Adaeze Obi',     DateOfBirth:'2010-03-12',Score:'72',State:'Lagos',  Grade:''},
+  {StudentID:'2',FullName:'Emeka Nwosu',    DateOfBirth:'2009-11-05',Score:'55',State:'Enugu',  Grade:''},
+  {StudentID:'3',FullName:'Fatima Aliyu',   DateOfBirth:'2010-07-20',Score:'88',State:'Kano',   Grade:''},
+  {StudentID:'4',FullName:'Gbenga Lawal',   DateOfBirth:'2010-01-30',Score:'40',State:'Ogun',   Grade:''},
+  {StudentID:'5',FullName:'Hauwa Ibrahim',  DateOfBirth:'2009-09-14',Score:'61',State:'Kaduna', Grade:''},
+  {StudentID:'6',FullName:'Kola Adedeji',   DateOfBirth:'2010-04-22',Score:'33',State:'Ekiti',  Grade:''},
+  {StudentID:'7',FullName:'Ngozi Ezeh',     DateOfBirth:'2009-12-01',Score:'78',State:'Imo',    Grade:''},
+  {StudentID:'8',FullName:'Tunde Bakare',   DateOfBirth:'2010-06-18',Score:'50',State:'Oyo',    Grade:''},
+];
+
+const DATATYPES=['Short Text','Long Text','Number','Date/Time','Currency','AutoNumber','Yes/No'];
+let currentView = 'datasheet';
+let openTabs = [];
+let selectedRow = 0;
+let currentFormRecord = 0;
+
+// Task completion state
+let state = {
+  pkSet: false,
+  dateTypeSet: false,
+  scoreTypeSet: false,
+  gradeFieldAdded: false,
+  dataEntered: false,
+  gradesFilledIn: false,
+  query1Run: false,
+  query2Run: false,
+  formBuilt: false,
+};
+
+// Query designer state
+let queryDesigns = {
+  query1: { fields:['StudentID','FullName','Score','Grade'], criteria:{Score:'>=50'}, sort:{}, run:false },
+  query2: { fields:['StudentID','FullName','Score','Grade'], criteria:{Score:'>=70'}, sort:{Score:'DESC'}, run:false },
+};
+let activeQuery = 'query1';
+
+// Form state
+let formFields = ['StudentID','FullName'];
+let formHasButton = false;
+
+// ─────────────────────────────────────────────────────────────
+// TAB MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+function addTab(id, label, icon){
+  if(openTabs.find(t=>t.id===id)) return activateTab(id);
+  openTabs.push({id,label,icon});
+  renderTabs();
+  activateTab(id);
+}
+function removeTab(id,e){
+  e?.stopPropagation();
+  openTabs=openTabs.filter(t=>t.id!==id);
+  renderTabs();
+  if(openTabs.length) activateTab(openTabs[openTabs.length-1].id);
+  else document.getElementById('content-area').innerHTML='';
+}
+function renderTabs(){
+  const bar=document.getElementById('obj-tabs');
+  bar.innerHTML=openTabs.map(t=>`
+    <div class="obj-tab" id="otab-${t.id}" onclick="activateTab('${t.id}')">
+      ${t.icon} ${t.label}
+      <span class="close-x" onclick="removeTab('${t.id}',event)">✕</span>
+    </div>`).join('');
+}
+function activateTab(id){
+  document.querySelectorAll('.obj-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('otab-'+id)?.classList.add('active');
+  currentView=id;
+  renderContent(id);
+}
+
+// ─────────────────────────────────────────────────────────────
+// NAV PANE CLICKS
+// ─────────────────────────────────────────────────────────────
+function navClick(id,el){
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  if(id==='students') { openView('datasheet'); return; }
+  if(id==='query1')   { openQueryById('query1'); return; }
+  if(id==='query2')   { openQueryById('query2'); return; }
+  if(id==='form1')    { openForm(); return; }
+}
+
+// ─────────────────────────────────────────────────────────────
+// VIEWS
+// ─────────────────────────────────────────────────────────────
+function openView(v){
+  if(v==='datasheet'){ addTab('datasheet','Students','📋'); setStatus('Datasheet View','Datasheet View'); }
+}
+function openDesign(){
+  addTab('design','Students : Design','🔧'); setStatus('Design View','Design View');
+}
+function openQueryById(qid){
+  activeQuery=qid;
+  const label = qid==='query1'?'qryPassStudents':'qryTopStudents';
+  addTab(qid, label, '🔍'); setStatus('Query Design','Query Design View');
+}
+function openQuery(){ openQueryById(activeQuery); }
+function openForm(){
+  addTab('form1','frmStudents','📝'); setStatus('Form View','Form View');
+}
+
+function renderContent(id){
+  const ca=document.getElementById('content-area');
+  const ns=document.getElementById('nav-strip');
+  ns.style.display='none';
+  if(id==='datasheet'){ ca.innerHTML=''; ca.appendChild(buildDatasheet()); ns.style.display='flex'; updateNavStrip(); }
+  else if(id==='design'){ ca.innerHTML=''; ca.appendChild(buildDesignView()); }
+  else if(id==='query1'||id==='query2'){ ca.innerHTML=''; ca.appendChild(buildQueryDesigner(id)); }
+  else if(id==='form1'){ ca.innerHTML=''; ca.appendChild(buildFormDesigner()); }
+}
+
+function switchRTab(tab,el){
+  document.querySelectorAll('.rtab').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────────
+// DESIGN VIEW
+// ─────────────────────────────────────────────────────────────
+function buildDesignView(){
+  const wrap=document.createElement('div');
+  wrap.className='table-design';
+  wrap.innerHTML=`
+    <div class="td-grid">
+      <table class="td-table" id="design-tbl">
+        <thead><tr>
+          <th style="width:36px;"></th>
+          <th>Field Name</th>
+          <th>Data Type</th>
+          <th>Description (Optional)</th>
+        </tr></thead>
+        <tbody id="design-tbody"></tbody>
+      </table>
+    </div>
+    <div class="td-prop-panel" id="prop-panel">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ter);width:100%;margin-bottom:6px;">Field Properties</div>
+      <div class="prop-row"><span class="prop-label">Field Size</span><input class="prop-val" id="prop-size" placeholder="255" oninput="updatePropSize(this.value)"></div>
+      <div class="prop-row"><span class="prop-label">Required</span><input class="prop-val" id="prop-req" placeholder="No"></div>
+      <div class="prop-row"><span class="prop-label">Indexed</span><input class="prop-val" id="prop-idx" placeholder="No"></div>
+    </div>`;
+  setTimeout(()=>renderDesignRows(),0);
+  return wrap;
+}
+
+function renderDesignRows(){
+  const tbody=document.getElementById('design-tbody');
+  if(!tbody) return;
+  tbody.innerHTML='';
+  tableFields.forEach((f,i)=>{
+    const tr=document.createElement('tr');
+    tr.className=f.pk?'pk-row':'';
+    tr.innerHTML=`
+      <td><button class="pk-icon" onclick="togglePK(${i})" title="Primary Key">${f.pk?'🔑':''}</button></td>
+      <td><input class="td-input" value="${f.name}" onchange="updateFieldName(${i},this.value)"></td>
+      <td><select class="td-select" onchange="updateFieldType(${i},this.value)">
+        ${DATATYPES.map(t=>`<option${t===f.type?' selected':''}>${t}</option>`).join('')}
+      </select></td>
+      <td><input class="td-input" value="${f.desc||''}" onchange="updateFieldDesc(${i},this.value)" placeholder="Optional description"></td>`;
+    tr.onclick=()=>selectDesignRow(i);
+    tbody.appendChild(tr);
+  });
+  // Add new row
+  const addTr=document.createElement('tr');
+  addTr.innerHTML=`
+    <td></td>
+    <td><input class="td-input" placeholder="Click to add field" id="new-field-name"></td>
+    <td><select class="td-select" id="new-field-type">${DATATYPES.map(t=>`<option>${t}</option>`).join('')}</select></td>
+    <td><input class="td-input" placeholder=""></td>`;
+  addTr.querySelector('#new-field-name').onchange=addNewField;
+  tbody.appendChild(addTr);
+}
+
+function selectDesignRow(i){
+  const f=tableFields[i];
+  const ps=document.getElementById('prop-size');
+  const pr=document.getElementById('prop-req');
+  const pi=document.getElementById('prop-idx');
+  if(ps){ps.value=f.size||'';} if(pr){pr.value=f.required?'Yes':'No';} if(pi){pi.value=f.pk?'Yes (No Duplicates)':'No';}
+}
+
+function togglePK(i){
+  tableFields.forEach((f,j)=>f.pk=(j===i));
+  state.pkSet=tableFields[i].name==='StudentID';
+  renderDesignRows();
+  updateTaskChecks();
+  setStatus('Primary key set to: '+tableFields[i].name);
+}
+
+function updateFieldName(i,v){ tableFields[i].name=v; }
+function updateFieldDesc(i,v){ tableFields[i].desc=v; }
+function updateFieldType(i,v){
+  tableFields[i].type=v;
+  if(tableFields[i].name==='DateOfBirth'&&v==='Date/Time') state.dateTypeSet=true;
+  if(tableFields[i].name==='Score'&&v==='Number') state.scoreTypeSet=true;
+  updateTaskChecks();
+}
+function updatePropSize(v){
+  // find selected — just update last clicked
+}
+function addNewField(){
+  const name=document.getElementById('new-field-name')?.value;
+  const type=document.getElementById('new-field-type')?.value||'Short Text';
+  if(!name||!name.trim()) return;
+  tableFields.push({name:name.trim(),type,pk:false,size:type==='Short Text'?'255':'',required:false});
+  if(name.trim()==='Grade') state.gradeFieldAdded=true;
+  // Add column to data
+  tableData.forEach(r=>r[name.trim()]=r[name.trim()]||'');
+  renderDesignRows();
+  updateTaskChecks();
+  setStatus(`Field "${name.trim()}" added.`);
+}
+
+// ─────────────────────────────────────────────────────────────
+// DATASHEET VIEW
+// ─────────────────────────────────────────────────────────────
+let filteredData=null;
+function buildDatasheet(){
+  const wrap=document.createElement('div');
+  wrap.className='datasheet';
+  wrap.id='ds-wrap';
+  renderDatasheet(wrap);
+  return wrap;
+}
+function renderDatasheet(wrap, data){
+  const rows=data||tableData;
+  const cols=tableFields.map(f=>f.name);
+  wrap=wrap||document.getElementById('ds-wrap');
+  if(!wrap) return;
+  wrap.innerHTML=`
+    <table class="ds-table" id="ds-tbl">
+      <thead><tr>
+        <th style="width:24px;"></th>
+        ${cols.map(c=>`<th>${c}</th>`).join('')}
+      </tr></thead>
+      <tbody>
+        ${rows.map((row,i)=>`
+          <tr id="drow-${i}" onclick="selectDRow(${i})" class="${i===selectedRow?'selected-row':''}">
+            <td class="row-sel">${i+1}</td>
+            ${cols.map(c=>`<td><input class="ds-input" value="${row[c]||''}" onchange="updateCell(${i},'${c}',this.value)" data-row="${i}" data-col="${c}"></td>`).join('')}
+          </tr>`).join('')}
+        <tr class="new-row"><td class="row-sel">*</td>${cols.map(()=>`<td><input class="ds-input" placeholder=""></td>`).join('')}</tr>
+      </tbody>
+    </table>`;
+  updateNavStrip();
+}
+
+function selectDRow(i){ selectedRow=i; document.querySelectorAll('[id^=drow-]').forEach(r=>r.classList.remove('selected-row')); document.getElementById('drow-'+i)?.classList.add('selected-row'); }
+function updateCell(i,col,v){
+  tableData[i][col]=v;
+  checkDataState();
+  updateTaskChecks();
+}
+function checkDataState(){
+  state.dataEntered=tableData.length>=8;
+  const gradeField=tableFields.find(f=>f.name==='Grade');
+  if(gradeField){
+    const filled=tableData.filter(r=>r.Grade&&r.Grade.trim()!=='');
+    state.gradesFilledIn=filled.length>=tableData.length*0.75;
+  }
+}
+function addRecord(){
+  const newRec={};
+  tableFields.forEach(f=>{newRec[f.name]='';});
+  newRec.StudentID=String(tableData.length+1);
+  tableData.push(newRec);
+  selectedRow=tableData.length-1;
+  if(currentView==='datasheet') renderDatasheet(document.getElementById('ds-wrap'));
+  updateNavStrip();
+  checkDataState();
+  updateTaskChecks();
+  setStatus(`New record added. Total: ${tableData.length}`);
+}
+function saveRecord(){ setStatus('Record saved ✓'); }
+function deleteSelRow(){
+  if(tableData.length<=1) return;
+  tableData.splice(selectedRow,1);
+  selectedRow=Math.max(0,selectedRow-1);
+  if(currentView==='datasheet') renderDatasheet(document.getElementById('ds-wrap'));
+  updateNavStrip();
+  checkDataState(); updateTaskChecks();
+}
+function navFirst(){ selectedRow=0; selectDRow(0); updateNavStrip(); }
+function navPrev(){ selectedRow=Math.max(0,selectedRow-1); selectDRow(selectedRow); updateNavStrip(); }
+function navNext(){ selectedRow=Math.min(tableData.length-1,selectedRow+1); selectDRow(selectedRow); updateNavStrip(); }
+function navLast(){ selectedRow=tableData.length-1; selectDRow(selectedRow); updateNavStrip(); }
+function updateNavStrip(){ document.getElementById('rec-info').textContent=`Record ${selectedRow+1} of ${tableData.length}`; }
+function searchRecords(q){
+  if(!q){ filteredData=null; renderDatasheet(document.getElementById('ds-wrap')); return; }
+  const lower=q.toLowerCase();
+  filteredData=tableData.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(lower)));
+  renderDatasheet(document.getElementById('ds-wrap'),filteredData);
+}
+
+// ─────────────────────────────────────────────────────────────
+// QUERY DESIGNER
+// ─────────────────────────────────────────────────────────────
+function buildQueryDesigner(qid){
+  const qd=queryDesigns[qid];
+  const wrap=document.createElement('div');
+  wrap.className='query-designer';
+  const tableBoxFields=tableFields.map(f=>`
+    <div class="qd-tbl-field${f.pk?' pk':''}" onclick="addQueryField('${f.name}','${qid}')">
+      ${f.pk?'🔑':''} ${f.name}
+    </div>`).join('');
+  wrap.innerHTML=`
+    <div class="qd-tables">
+      <div class="qd-tbl-box">
+        <div class="qd-tbl-hdr">🗂 Students</div>
+        ${tableBoxFields}
+      </div>
+    </div>
+    <div class="qd-grid">
+      <table class="qg-table" id="qg-tbl-${qid}">
+        <thead><tr>
+          <th>Field</th><th>Table</th><th>Sort</th><th>Show</th><th>Criteria</th><th>Or</th>
+        </tr></thead>
+        <tbody id="qg-body-${qid}"></tbody>
+      </table>
+    </div>
+    <div class="qd-sql" id="qd-sql-${qid}"></div>
+    <div class="qd-results" id="qd-results-${qid}" style="padding:10px;font-family:var(--mono);font-size:11px;color:var(--ter);">
+      Run the query to see results ▶
+    </div>`;
+  setTimeout(()=>renderQueryGrid(qid),0);
+  return wrap;
+}
+
+function renderQueryGrid(qid){
+  const qd=queryDesigns[qid];
+  const tbody=document.getElementById('qg-body-'+qid);
+  if(!tbody) return;
+  tbody.innerHTML='';
+  qd.fields.forEach(f=>{
+    const tr=document.createElement('tr');
+    const criVal=qd.criteria[f]||'';
+    const sortVal=qd.sort[f]||'';
+    tr.innerHTML=`
+      <td><input class="qg-input" value="${f}" readonly></td>
+      <td><input class="qg-input" value="Students" readonly style="opacity:.5;"></td>
+      <td><select class="qg-input" onchange="setQuerySort('${qid}','${f}',this.value)" style="padding:6px;">
+        <option value="">—</option>
+        <option value="ASC"${sortVal==='ASC'?' selected':''}>Ascending</option>
+        <option value="DESC"${sortVal==='DESC'?' selected':''}>Descending</option>
+      </select></td>
+      <td style="text-align:center;"><input type="checkbox" class="qg-check" checked></td>
+      <td><input class="qg-input" value="${criVal}" placeholder="e.g. >=50" onchange="setQueryCriteria('${qid}','${f}',this.value)"></td>
+      <td><input class="qg-input" placeholder=""></td>`;
+    tbody.appendChild(tr);
+  });
+  updateSQL(qid);
+}
+
+function addQueryField(fname, qid){
+  const qd=queryDesigns[qid];
+  if(!qd.fields.includes(fname)) qd.fields.push(fname);
+  renderQueryGrid(qid);
+}
+
+function setQueryCriteria(qid,field,val){
+  queryDesigns[qid].criteria[field]=val;
+  updateSQL(qid);
+}
+function setQuerySort(qid,field,val){
+  queryDesigns[qid].sort[field]=val;
+  updateSQL(qid);
+}
+
+function updateSQL(qid){
+  const qd=queryDesigns[qid];
+  const sel='SELECT '+qd.fields.join(', ');
+  const from='\nFROM Students';
+  const wheres=Object.entries(qd.criteria).filter(([,v])=>v).map(([f,v])=>`${f} ${v}`);
+  const where=wheres.length?'\nWHERE '+wheres.join(' AND '):'';
+  const sorts=Object.entries(qd.sort).filter(([,v])=>v).map(([f,v])=>`${f} ${v}`);
+  const order=sorts.length?'\nORDER BY '+sorts.join(', '):'';
+  const sql=sel+from+where+order+';';
+  const el=document.getElementById('qd-sql-'+qid);
+  if(el) el.textContent=sql;
+}
+
+function runQuery(){
+  const qid=activeQuery==='query1'||currentView==='query1'?currentView:'query1';
+  const active=currentView==='query1'||currentView==='query2'?currentView:null;
+  if(!active){setStatus('Open a query first'); return;}
+  const qd=queryDesigns[active];
+  // Filter
+  let results=[...tableData];
+  Object.entries(qd.criteria).forEach(([field,crit])=>{
+    if(!crit) return;
+    const m=crit.match(/^(>=|<=|>|<|=)?\s*([\d.]+)$/);
+    if(m){
+      const op=m[1]||'='; const val=parseFloat(m[2]);
+      results=results.filter(r=>{
+        const rv=parseFloat(r[field]);
+        if(isNaN(rv)) return false;
+        if(op==='>=') return rv>=val; if(op==='<=') return rv<=val;
+        if(op==='>') return rv>val;  if(op==='<') return rv<val;
+        return rv===val;
+      });
+    }
+  });
+  // Sort
+  const sorts=Object.entries(qd.sort).filter(([,v])=>v);
+  if(sorts.length){
+    const[sf,sd]=sorts[0];
+    results.sort((a,b)=>{
+      const av=parseFloat(a[sf]),bv=parseFloat(b[sf]);
+      if(isNaN(av)&&isNaN(bv)) return 0;
+      return sd==='DESC'?bv-av:av-bv;
+    });
+  }
+  // Render results
+  const rdiv=document.getElementById('qd-results-'+active);
+  if(rdiv){
+    if(!results.length){ rdiv.innerHTML='<div style="color:var(--ter);font-family:var(--mono);font-size:12px;padding:16px;">No records match the criteria.</div>'; }
+    else {
+      rdiv.innerHTML=`<div style="padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--green);margin-bottom:4px;">✓ ${results.length} record(s) returned</div>
+        <div class="result-table-wrap"><table class="result-table">
+          <thead><tr>${qd.fields.map(f=>`<th>${f}</th>`).join('')}</tr></thead>
+          <tbody>${results.map(r=>`<tr>${qd.fields.map(f=>`<td>${r[f]||''}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table></div>`;
+    }
+  }
+  queryDesigns[active].run=true;
+  if(active==='query1') state.query1Run=true;
+  if(active==='query2') state.query2Run=true;
+  updateTaskChecks();
+  setStatus(`Query executed — ${results.length} record(s) returned.`);
+}
+
+// ─────────────────────────────────────────────────────────────
+// FORM DESIGNER
+// ─────────────────────────────────────────────────────────────
+function buildFormDesigner(){
+  const wrap=document.createElement('div');
+  wrap.className='form-designer';
+  wrap.id='form-wrap';
+  renderFormCanvas();
+  setTimeout(()=>{
+    const fw=document.getElementById('form-wrap');
+    if(fw) fw.appendChild(buildFormCanvas());
+  },0);
+  return wrap;
+}
+
+function buildFormCanvas(){
+  const container=document.createElement('div');
+  container.style.position='relative';
+  container.style.display='inline-block';
+  container.style.width='100%';
+
+  const canvas=document.createElement('div');
+  canvas.className='form-canvas';
+  canvas.id='form-canvas';
+  canvas.innerHTML=`
+    <div class="form-title-bar">🗂 frmStudents — Student Record Form</div>
+    <div id="form-fields-area">${renderFormFields()}</div>
+    <div class="form-btn-row" id="form-btn-area">
+      ${formHasButton?'<button class="form-btn primary" onclick="formSave()">💾 Save Record</button><button class="form-btn">✕ Close</button>':'<span style="font-family:monospace;font-size:11px;color:#999;">Add a Save Record button →</span>'}
+    </div>`;
+
+  const toolbox=document.createElement('div');
+  toolbox.className='form-toolbox';
+  toolbox.innerHTML=`<div class="form-toolbox-hdr">Controls</div>
+    ${tableFields.map(f=>`<div class="form-tool" onclick="addFormField('${f.name}')">
+      📋 ${f.name}</div>`).join('')}
+    <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
+    <div class="form-tool" onclick="addFormButton()">🔘 Command Button</div>
+    <div class="form-tool" onclick="addFormLabel()">🏷 Label</div>`;
+
+  container.appendChild(canvas);
+  container.appendChild(toolbox);
+  return container;
+}
+
+function renderFormCanvas(){
+  const fa=document.getElementById('form-fields-area');
+  const ba=document.getElementById('form-btn-area');
+  if(fa) fa.innerHTML=renderFormFields();
+  if(ba) ba.innerHTML=formHasButton?
+    '<button class="form-btn primary" onclick="formSave()">💾 Save Record</button><button class="form-btn">✕ Close</button>':
+    '<span style="font-family:monospace;font-size:11px;color:#999;">Add a Save Record button →</span>';
+}
+
+function renderFormFields(){
+  const rec=tableData[currentFormRecord]||{};
+  return formFields.map(f=>`
+    <div class="form-field-row">
+      <label class="form-label">${f}:</label>
+      <input class="form-ctrl" value="${rec[f]||''}" onchange="updateFormCell('${f}',this.value)">
+    </div>`).join('');
+}
+
+function addFormField(fname){
+  if(!formFields.includes(fname)) formFields.push(fname);
+  checkFormState();
+  renderFormCanvas();
+  updateTaskChecks();
+}
+function addFormButton(){ formHasButton=true; checkFormState(); renderFormCanvas(); updateTaskChecks(); }
+function addFormLabel(){
+  const lbl=prompt('Label text:','Student Form');
+  // just cosmetic
+}
+function formSave(){ setStatus('Record saved via form ✓'); }
+function updateFormCell(f,v){ if(tableData[currentFormRecord]) tableData[currentFormRecord][f]=v; }
+
+function checkFormState(){
+  const required=['StudentID','FullName','Score','Grade'];
+  const hasAll=required.every(f=>formFields.includes(f));
+  state.formBuilt=hasAll&&formHasButton;
+}
+
+// ─────────────────────────────────────────────────────────────
+// TASK CHECKER
+// ─────────────────────────────────────────────────────────────
+function updateTaskChecks(){
+  checkDataState();
+  checkFormState();
+  const checks={
+    t1: state.pkSet,
+    t2: state.dateTypeSet && state.scoreTypeSet,
+    t3: state.gradeFieldAdded,
+    t4: state.dataEntered,
+    t5: state.gradesFilledIn,
+    t6: state.query1Run,
+    t7: state.query2Run,
+    t8: state.formBuilt,
+  };
+  for(let i=1;i<=8;i++){
+    const ok=checks['t'+i];
+    document.getElementById('t'+i)?.classList.toggle('done',ok);
+    const ci=document.getElementById('c'+i);
+    if(ci) ci.textContent=ok?'✓':'○';
+  }
+}
+
+function autoCheck(){
+  updateTaskChecks();
+  const done=document.querySelectorAll('.task.done').length;
+  alert(`Tasks completed: ${done} / 8\n\nTip: Use Design View to set Primary Key and data types, then enter data in Datasheet View, run queries, and build the form.`);
+}
+
+// ─────────────────────────────────────────────────────────────
+// RESULTS
+// ─────────────────────────────────────────────────────────────
+const MARKS={t1:3,t2:3,t3:4,t4:4,t5:3,t6:5,t7:4,t8:4};
+const LABELS={
+  t1:'(i) Primary Key — StudentID',t2:'(ii) Field Data Types',t3:'(iii) Grade field added',
+  t4:'(iv) 8+ records entered',t5:'(v) Grade column filled',
+  t6:'(vi) qryPassStudents run',t7:'(vii) qryTopStudents sorted & run',t8:'(viii) Form with 4 fields + button',
+};
+function showResults(){
+  updateTaskChecks();
+  let total=0;let html='';
+  for(let i=1;i<=8;i++){
+    const ok=document.getElementById('t'+i)?.classList.contains('done');
+    const earned=ok?MARKS['t'+i]:0;
+    total+=earned;
+    html+=`<div class="rb-row"><span>${LABELS['t'+i]}</span><b style="color:${ok?'var(--green)':'var(--red)'}">${earned}/${MARKS['t'+i]}</b></div>`;
+  }
+  document.getElementById('res-breakdown').innerHTML=html;
+  const sc=document.getElementById('res-score');
+  sc.textContent=total;
+  sc.style.color=total>=24?'var(--green)':total>=18?'var(--gold)':'var(--red)';
+  document.getElementById('results-screen').classList.add('show');
+}
+
+// ─────────────────────────────────────────────────────────────
+// STATUS / TIMER
+// ─────────────────────────────────────────────────────────────
+function setStatus(msg, view){
+  document.getElementById('status-msg').textContent=msg;
+  if(view) document.getElementById('status-view').textContent=view;
+}
+
+let secs=45*60;
+function tick(){
+  secs--;if(secs<0)secs=0;
+  const m=Math.floor(secs/60),s=secs%60;
+  document.getElementById('tv').textContent=`${m}:${String(s).padStart(2,'0')}`;
+  const warn=secs<600,dang=secs<180;
+  document.getElementById('td').className='tb-dot'+(dang?' dang':warn?' warn':'');
+  document.querySelector('.timer-val').className='timer-val'+(dang?' dang':warn?' warn':'');
+  if(secs>0) setTimeout(tick,1000);
+}
+
+// ─────────────────────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────────────────────
+addTab('datasheet','Students','📋');
+setTimeout(tick,1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAEC 2026 | Word Processing Practical</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C0F1A;--sf:#131824;--s2:#1A2030;--s3:#202840;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --txt:#EEF0F6;--sec:rgba(238,240,246,0.6);--ter:rgba(238,240,246,0.35);
+  --acc:#4F8EF7;--gold:#F0B429;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  /* Word blue */
+  --wb:#185ABD;--wb2:#2B7CD3;--wb3:#106EBE;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--txt);background:var(--bg);}
+.app{display:flex;flex-direction:column;height:100%;}
+
+/* ── TOPBAR ── */
+.topbar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:7px 14px;background:var(--wb);border-bottom:1px solid rgba(0,0,0,0.2);z-index:300;}
+.tb-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.7);}
+.tb-title{font-family:var(--sans);font-size:14px;font-weight:500;color:#fff;flex:1;}
+.tb-fname{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.6);padding:2px 10px;border-radius:4px;background:rgba(0,0,0,0.15);}
+.tb-timer{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:4px 12px;font-family:var(--mono);font-size:12px;color:#fff;}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:#fff;}
+.tb-dot.warn{background:var(--amber);}.tb-dot.dang{background:var(--red);animation:blink 1s infinite;}
+.tv.warn{color:var(--amber);}.tv.dang{color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* ── RIBBON ── */
+.ribbon{flex-shrink:0;background:#f3f2f1;border-bottom:1px solid #c8c6c4;}
+.ribbon-tabs{display:flex;background:#fff;border-bottom:1px solid #e1dfdd;}
+.rtab{padding:6px 16px;font-size:12px;color:#444;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;}
+.rtab:hover{background:#f3f2f1;}
+.rtab.active{color:var(--wb);border-color:var(--wb);background:#fff;}
+.ribbon-bar{display:flex;align-items:center;gap:2px;padding:4px 8px;flex-wrap:wrap;}
+.rb-group{display:flex;align-items:center;gap:1px;padding:2px 6px;border-right:1px solid #e1dfdd;}
+.rb-group:last-child{border:none;}
+.rb-group-lbl{font-size:9px;color:#888;text-align:center;display:block;width:100%;margin-top:2px;}
+.rb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 6px;border-radius:3px;background:transparent;border:1px solid transparent;color:#444;cursor:pointer;font-size:9px;transition:all .1s;min-width:36px;white-space:nowrap;}
+.rb:hover{background:#e8e6e4;border-color:#c8c6c4;}
+.rb.active{background:#deecf9;border-color:#var(--wb2);}
+.rb-icon{font-size:15px;line-height:1;}
+.fmt-btn{padding:3px 7px;border-radius:3px;background:transparent;border:1px solid transparent;color:#333;font-size:12px;cursor:pointer;transition:all .1s;}
+.fmt-btn:hover{background:#e8e6e4;}
+.fmt-btn.active{background:#deecf9;border-color:#2b7cd3;}
+.rb-sel{background:#fff;border:1px solid #c8c6c4;border-radius:3px;color:#333;font-size:11px;padding:2px 4px;outline:none;cursor:pointer;height:24px;}
+.rb-sel:focus{border-color:var(--wb2);}
+.rb-input{background:#fff;border:1px solid #c8c6c4;border-radius:3px;color:#333;font-family:var(--mono);font-size:11px;padding:2px 6px;outline:none;width:36px;text-align:center;}
+.rb-input:focus{border-color:var(--wb2);}
+.color-btn{width:22px;height:22px;border-radius:3px;border:1px solid #c8c6c4;cursor:pointer;flex-shrink:0;}
+
+/* ── RULER ── */
+.ruler-wrap{flex-shrink:0;display:flex;background:#f3f2f1;border-bottom:1px solid #e1dfdd;height:20px;overflow:hidden;}
+.ruler-corner{width:56px;flex-shrink:0;border-right:1px solid #e1dfdd;background:#f3f2f1;}
+.ruler{flex:1;position:relative;overflow:hidden;cursor:default;}
+.ruler-inner{height:100%;position:relative;margin:0 auto;width:794px;}
+.ruler-mark{position:absolute;bottom:0;font-size:8px;color:#888;font-family:var(--mono);}
+.ruler-mark.cm{height:10px;width:1px;background:#999;}
+.ruler-mark.mm{height:5px;width:1px;background:#ccc;}
+.ruler-tab{position:absolute;bottom:2px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:7px solid #185ABD;cursor:ew-resize;}
+
+/* ── DOCUMENT AREA ── */
+.doc-area{flex:1;overflow:auto;background:#e8e8e8;display:flex;flex-direction:column;align-items:center;padding:20px 0;}
+.doc-area::-webkit-scrollbar{width:10px;height:10px;}
+.doc-area::-webkit-scrollbar-track{background:#e8e8e8;}
+.doc-area::-webkit-scrollbar-thumb{background:#c0c0c0;border-radius:3px;}
+
+/* PAGE */
+.page{
+  width:794px;min-height:1123px;background:#fff;
+  box-shadow:0 2px 20px rgba(0,0,0,0.18);
+  padding:96px 96px 96px 120px;
+  position:relative;margin-bottom:20px;flex-shrink:0;
+}
+.page-content{
+  min-height:931px;outline:none;
+  font-family:'Times New Roman',Times,serif;font-size:12pt;
+  color:#000;line-height:1.5;
+  caret-color:#185ABD;
+}
+.page-content:focus{outline:none;}
+/* Styles applied via execCommand feel */
+.page-content h1{font-size:20pt;font-weight:bold;color:#1f3864;margin:8px 0;}
+.page-content h2{font-size:16pt;font-weight:bold;color:#2e75b6;margin:6px 0;}
+.page-content h3{font-size:13pt;font-weight:bold;color:#1f3864;margin:4px 0;}
+.page-content p{margin:0 0 6px;}
+.page-content table{border-collapse:collapse;width:100%;margin:8px 0;}
+.page-content table td,.page-content table th{border:1px solid #999;padding:5px 8px;font-size:11pt;}
+.page-content table th{background:#dde3f0;font-weight:bold;}
+.page-content ul,.page-content ol{padding-left:24px;margin:4px 0;}
+/* Selection colour */
+.page-content ::selection{background:rgba(24,90,189,0.25);}
+/* Page border visual */
+.page::before{content:'';position:absolute;inset:0;border:1px solid #e0e0e0;pointer-events:none;}
+
+/* ── STATUSBAR ── */
+.statusbar{flex-shrink:0;display:flex;align-items:center;gap:12px;padding:3px 12px;background:#f3f2f1;border-top:1px solid #e1dfdd;font-size:11px;color:#666;}
+.sb-sep{color:#ccc;}
+.zoom-slider{width:80px;accent-color:var(--wb);}
+
+/* ── FIND & REPLACE ── */
+.fnr-panel{
+  position:fixed;top:160px;right:24px;z-index:600;
+  background:#fff;border:1px solid #c8c6c4;border-radius:4px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.2);padding:14px;width:280px;
+  display:none;
+}
+.fnr-panel.show{display:block;}
+.fnr-title{font-size:13px;font-weight:600;color:#323130;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.fnr-close{background:none;border:none;cursor:pointer;color:#666;font-size:14px;}
+.fnr-input{width:100%;border:1px solid #c8c6c4;border-radius:3px;padding:5px 8px;font-size:12px;outline:none;margin-bottom:6px;}
+.fnr-input:focus{border-color:var(--wb2);}
+.fnr-btn{padding:5px 14px;border-radius:3px;background:var(--wb);color:#fff;border:none;cursor:pointer;font-size:12px;margin-right:4px;}
+.fnr-btn.ghost{background:#f3f2f1;color:#333;border:1px solid #c8c6c4;}
+.fnr-msg{font-size:11px;color:#666;margin-top:6px;}
+
+/* ── PAGE SETUP MODAL ── */
+.overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.modal{background:#fff;border-radius:4px;padding:20px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
+.modal h3{font-size:14px;font-weight:600;color:#323130;margin-bottom:14px;border-bottom:1px solid #e1dfdd;padding-bottom:8px;}
+.modal-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px;color:#444;}
+.modal-row label{width:100px;flex-shrink:0;}
+.modal-input{border:1px solid #c8c6c4;border-radius:3px;padding:4px 8px;font-size:12px;outline:none;width:120px;}
+.modal-input:focus{border-color:var(--wb2);}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+.modal-btn{padding:5px 16px;border-radius:3px;font-size:12px;cursor:pointer;border:1px solid #c8c6c4;background:#f3f2f1;color:#333;}
+.modal-btn.primary{background:var(--wb);color:#fff;border-color:var(--wb);}
+
+/* ── QUESTION PILL ── */
+.q-pill-wrap{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:500;display:flex;align-items:center;}
+.q-pill-tab{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);background:var(--gold);color:#000;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:12px 7px;border-radius:8px 0 0 8px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;flex-shrink:0;box-shadow:-4px 0 20px rgba(0,0,0,0.3);}
+.q-pill-tab:hover{background:#f5c842;}
+.pill-count{writing-mode:horizontal-tb;transform:rotate(90deg);background:rgba(0,0,0,0.25);border-radius:99px;padding:1px 5px;font-size:9px;font-weight:600;}
+.q-drawer{width:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1);background:var(--sf);border-left:1px solid var(--b2);display:flex;flex-direction:column;height:72vh;max-height:640px;border-radius:12px 0 0 12px;box-shadow:-8px 0 40px rgba(0,0,0,0.5);}
+.q-drawer.open{width:300px;}
+.q-inner{width:300px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.q-hdr{flex-shrink:0;padding:13px 14px 10px;border-bottom:1px solid var(--b1);}
+.q-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(240,180,41,0.12);border:1px solid rgba(240,180,41,0.28);color:var(--gold);}
+.q-title{font-family:'Crimson Pro',Georgia,serif;font-size:15px;font-style:italic;margin-top:6px;line-height:1.3;color:var(--txt);}
+.q-intro{font-size:11px;color:var(--sec);line-height:1.65;margin-top:5px;}
+.q-scroll{flex:1;overflow-y:auto;padding:8px 12px 12px;}
+.q-scroll::-webkit-scrollbar{width:3px;}.q-scroll::-webkit-scrollbar-thumb{background:var(--b2);}
+.q-phase{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);margin:10px 0 5px;padding:3px 8px;background:rgba(79,142,247,0.06);border-left:2px solid var(--acc);border-radius:0 4px 4px 0;}
+.task{display:flex;gap:7px;padding:6px 8px;border-radius:6px;border:1px solid transparent;margin-bottom:3px;}
+.task.done{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.15);}
+.tn{font-family:var(--mono);font-size:10px;color:var(--acc);flex-shrink:0;width:14px;padding-top:1px;}
+.tck{font-size:11px;flex-shrink:0;width:13px;color:var(--ter);padding-top:1px;}
+.task.done .tck{color:var(--green);}
+.ttxt{font-size:11px;color:var(--sec);line-height:1.6;}
+.task.done .ttxt{color:rgba(238,240,246,0.3);text-decoration:line-through;}
+.q-footer{flex-shrink:0;padding:9px 12px;border-top:1px solid var(--b1);display:flex;gap:8px;}
+.q-btn{flex:1;padding:8px;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;border:none;cursor:pointer;}
+.q-btn.p{background:var(--acc);color:#fff;}.q-btn.g{background:transparent;color:var(--ter);border:1px solid var(--b1);}
+
+/* ── RESULTS ── */
+.results-overlay{position:fixed;inset:0;z-index:2000;background:rgba(12,15,26,0.97);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
+.results-overlay.show{display:flex;}
+.res-box{width:100%;max-width:400px;text-align:center;}
+.res-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:6px;}
+.res-title{font-family:'Crimson Pro',Georgia,serif;font-size:2rem;font-style:italic;color:var(--txt);}
+.res-score{font-family:var(--mono);font-size:3rem;font-weight:500;margin:16px 0 4px;}
+.res-max{font-family:var(--mono);font-size:11px;color:var(--ter);margin-bottom:14px;}
+.res-bd{background:var(--sf);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:left;margin-bottom:10px;}
+.rb-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--b1);font-size:12px;color:var(--ter);}
+.rb-row:last-child{border:none;}.rb-row b{font-family:var(--mono);}
+.res-btn{width:100%;padding:12px;border-radius:9px;background:var(--acc);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:5px;}
+.res-btn.g{background:transparent;color:var(--ter);border:1px solid var(--b1);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;flex-direction:column;gap:1px;">
+    <span class="tb-brand">GrantApp AI · WAEC 2026 · Data Processing</span>
+  </div>
+  <div style="flex:1;"></div>
+  <span class="tb-fname" id="doc-filename">SchoolLetter.docx</span>
+  <div style="flex:1;"></div>
+  <div class="tb-timer"><div class="tb-dot" id="td"></div><span class="tv" id="tv">0:45:00</span></div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-tabs">
+    <div class="rtab active" onclick="setRTab(this)">Home</div>
+    <div class="rtab" onclick="setRTab(this)">Insert</div>
+    <div class="rtab" onclick="setRTab(this)">Layout</div>
+    <div class="rtab" onclick="setRTab(this)">References</div>
+    <div class="rtab" onclick="setRTab(this)">Mailings</div>
+    <div class="rtab" onclick="setRTab(this)">Review</div>
+    <div class="rtab" onclick="setRTab(this)">View</div>
+  </div>
+  <div class="ribbon-bar">
+    <!-- Clipboard -->
+    <div class="rb-group">
+      <div style="display:flex;gap:2px;flex-wrap:wrap;">
+        <button class="fmt-btn" onclick="cmd('bold')" id="btn-B" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button class="fmt-btn" onclick="cmd('italic')" id="btn-I" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button class="fmt-btn" onclick="cmd('underline')" id="btn-U" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button class="fmt-btn" onclick="cmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
+      </div>
+      <span class="rb-group-lbl">Font Style</span>
+    </div>
+    <!-- Font -->
+    <div class="rb-group">
+      <div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap;">
+        <select class="rb-sel" id="font-sel" onchange="setFont(this.value)" style="width:110px;">
+          <option>Times New Roman</option><option>Arial</option><option>Calibri</option>
+          <option>Georgia</option><option>Verdana</option><option>Courier New</option><option>Tahoma</option>
+        </select>
+        <input class="rb-input" id="size-sel" type="number" value="12" min="6" max="72" onchange="setFontSize(this.value)">
+        <input type="color" class="color-btn" id="fc-btn" value="#000000" oninput="setFontColor(this.value)" title="Font color">
+        <input type="color" class="color-btn" id="hc-btn" value="#ffffff" oninput="setHighlight(this.value)" title="Highlight">
+      </div>
+      <span class="rb-group-lbl">Font</span>
+    </div>
+    <!-- Paragraph -->
+    <div class="rb-group">
+      <div style="display:flex;gap:2px;flex-wrap:wrap;">
+        <button class="fmt-btn" onclick="cmd('justifyLeft')" title="Align Left">⬛◻◻</button>
+        <button class="fmt-btn" onclick="cmd('justifyCenter')" title="Center">◻⬛◻</button>
+        <button class="fmt-btn" onclick="cmd('justifyRight')" title="Align Right">◻◻⬛</button>
+        <button class="fmt-btn" onclick="cmd('justifyFull')" title="Justify">⬛⬛⬛</button>
+        <button class="fmt-btn" onclick="cmd('insertUnorderedList')" title="Bullet list">• List</button>
+        <button class="fmt-btn" onclick="cmd('insertOrderedList')" title="Numbered list">1. List</button>
+        <button class="fmt-btn" onclick="insertLineSpacing()" title="Line spacing">↕</button>
+      </div>
+      <span class="rb-group-lbl">Paragraph</span>
+    </div>
+    <!-- Styles -->
+    <div class="rb-group">
+      <div style="display:flex;gap:2px;flex-wrap:wrap;">
+        <button class="fmt-btn" onclick="applyStyle('h1')">Heading 1</button>
+        <button class="fmt-btn" onclick="applyStyle('h2')">Heading 2</button>
+        <button class="fmt-btn" onclick="applyStyle('p')">Normal</button>
+      </div>
+      <span class="rb-group-lbl">Styles</span>
+    </div>
+    <!-- Insert -->
+    <div class="rb-group">
+      <div style="display:flex;gap:2px;flex-wrap:wrap;">
+        <div class="rb" onclick="insertTable()"><span class="rb-icon">⊞</span>Table</div>
+        <div class="rb" onclick="insertPageBreak()"><span class="rb-icon">⎙</span>Pg Break</div>
+        <div class="rb" onclick="showPageSetup()"><span class="rb-icon">📄</span>Page Setup</div>
+        <div class="rb" onclick="showFnR()"><span class="rb-icon">🔍</span>Find & Replace</div>
+      </div>
+      <span class="rb-group-lbl">Insert</span>
+    </div>
+    <!-- Check -->
+    <div class="rb-group">
+      <div style="display:flex;gap:2px;">
+        <div class="rb" onclick="autoCheck()" style="color:#185ABD;"><span class="rb-icon">✓</span>Check</div>
+        <div class="rb" onclick="showResults()" style="background:#185ABD;color:#fff;border-radius:3px;"><span class="rb-icon">🎯</span>Submit</div>
+      </div>
+      <span class="rb-group-lbl">Marking</span>
+    </div>
+  </div>
+</div>
+
+<!-- RULER -->
+<div class="ruler-wrap">
+  <div class="ruler-corner"></div>
+  <div class="ruler">
+    <div class="ruler-inner" id="ruler-inner"></div>
+  </div>
+</div>
+
+<!-- DOCUMENT AREA -->
+<div class="doc-area" id="doc-area">
+  <div class="page" id="page">
+    <div class="page-content" id="doc" contenteditable="true"
+      onkeyup="onDocChange()" onmouseup="onDocChange()" oninput="onDocChange()"
+      spellcheck="false"></div>
+  </div>
+</div>
+
+<!-- STATUSBAR -->
+<div class="statusbar">
+  <span>Words: <b id="sb-words">0</b></span>
+  <span class="sb-sep">|</span>
+  <span>Characters: <b id="sb-chars">0</b></span>
+  <span class="sb-sep">|</span>
+  <span id="sb-style">Normal</span>
+  <span class="sb-sep">|</span>
+  <span id="sb-tasks">0/9 tasks</span>
+  <div style="flex:1;"></div>
+  <span style="font-size:10px;color:#888;">Zoom</span>
+  <input type="range" class="zoom-slider" min="50" max="150" value="100" oninput="setZoom(this.value)">
+  <span id="zoom-val" style="font-size:10px;color:#888;width:32px;">100%</span>
+</div>
+
+<!-- FIND & REPLACE -->
+<div class="fnr-panel" id="fnr-panel">
+  <div class="fnr-title">Find & Replace <button class="fnr-close" onclick="hideFnR()">✕</button></div>
+  <input class="fnr-input" id="fnr-find" placeholder="Find…">
+  <input class="fnr-input" id="fnr-replace" placeholder="Replace with…">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+    <button class="fnr-btn" onclick="doFind()">Find Next</button>
+    <button class="fnr-btn" onclick="doReplace()">Replace</button>
+    <button class="fnr-btn" onclick="doReplaceAll()">Replace All</button>
+    <button class="fnr-btn ghost" onclick="hideFnR()">Close</button>
+  </div>
+  <div class="fnr-msg" id="fnr-msg"></div>
+</div>
+
+<!-- PAGE SETUP MODAL -->
+<div class="overlay" id="setup-overlay">
+  <div class="modal">
+    <h3>Page Setup</h3>
+    <div class="modal-row"><label>Orientation</label>
+      <select class="modal-input" id="setup-orient"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
+    </div>
+    <div class="modal-row"><label>Paper Size</label>
+      <select class="modal-input" id="setup-size"><option value="A4">A4</option><option value="Letter">Letter</option><option value="Legal">Legal</option></select>
+    </div>
+    <div class="modal-row"><label>Top Margin (cm)</label><input class="modal-input" id="setup-mt" type="number" value="2.54" step="0.1"></div>
+    <div class="modal-row"><label>Bottom (cm)</label><input class="modal-input" id="setup-mb" type="number" value="2.54" step="0.1"></div>
+    <div class="modal-row"><label>Left (cm)</label><input class="modal-input" id="setup-ml" type="number" value="3.18" step="0.1"></div>
+    <div class="modal-row"><label>Right (cm)</label><input class="modal-input" id="setup-mr" type="number" value="2.54" step="0.1"></div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="hideSetup()">Cancel</button>
+      <button class="modal-btn primary" onclick="applySetup()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION PILL -->
+<div class="q-pill-wrap">
+  <div class="q-pill-tab" onclick="toggleDrawer()">Questions<span class="pill-count" id="pill-count">0/9</span></div>
+  <div class="q-drawer" id="q-drawer">
+    <div class="q-inner">
+      <div class="q-hdr">
+        <span class="q-badge">Question 5 · 30 marks · 45 min</span>
+        <div class="q-title">Official School Letter</div>
+        <div class="q-intro">Using the word processor, type and format an official letter from the Principal of JSS Model Secondary School to parents about the upcoming Prize Day. Complete all tasks below.</div>
+      </div>
+      <div class="q-scroll">
+        <div class="q-phase">Typing & Structure</div>
+        <div class="task" id="t1"><span class="tn">i.</span><span class="tck" id="c1">○</span><span class="ttxt">Type the <b>school name</b> and <b>address</b> at the top of the letter (at least 3 lines). <em>(3 marks)</em></span></div>
+        <div class="task" id="t2"><span class="tn">ii.</span><span class="tck" id="c2">○</span><span class="ttxt">Include a <b>date</b> line and a <b>salutation</b> (e.g. "Dear Parent/Guardian,"). <em>(2 marks)</em></span></div>
+        <div class="task" id="t3"><span class="tn">iii.</span><span class="tck" id="c3">○</span><span class="ttxt">Write the <b>body</b> of the letter — at least <b>3 paragraphs</b> totalling 80+ words. <em>(4 marks)</em></span></div>
+        <div class="task" id="t4"><span class="tn">iv.</span><span class="tck" id="c4">○</span><span class="ttxt">End with a proper <b>complimentary close</b> ("Yours faithfully," or "Yours sincerely,") and <b>Principal's name</b>. <em>(2 marks)</em></span></div>
+
+        <div class="q-phase">Formatting</div>
+        <div class="task" id="t5"><span class="tn">v.</span><span class="tck" id="c5">○</span><span class="ttxt">Apply <b>Heading 1</b> style to the school name and <b>bold</b> the subject line. <em>(3 marks)</em></span></div>
+        <div class="task" id="t6"><span class="tn">vi.</span><span class="tck" id="c6">○</span><span class="ttxt">Set the body text font to <b>Times New Roman, 12pt</b>. Justify the paragraphs. <em>(3 marks)</em></span></div>
+        <div class="task" id="t7"><span class="tn">vii.</span><span class="tck" id="c7">○</span><span class="ttxt">Insert a <b>table</b> (at least 3 rows × 2 columns) showing the Prize Day schedule or event details. <em>(4 marks)</em></span></div>
+
+        <div class="q-phase">Advanced</div>
+        <div class="task" id="t8"><span class="tn">viii.</span><span class="tck" id="c8">○</span><span class="ttxt">Use <b>Find & Replace</b> to locate and replace any word in your document. <em>(4 marks)</em></span></div>
+        <div class="task" id="t9"><span class="tn">ix.</span><span class="tck" id="c9">○</span><span class="ttxt">Open <b>Page Setup</b> and set the paper size, orientation, and at least one margin. <em>(5 marks)</em></span></div>
+      </div>
+      <div class="q-footer">
+        <button class="q-btn g" onclick="toggleDrawer()">Close</button>
+        <button class="q-btn p" onclick="showResults()">Submit & Mark</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-overlay" id="results-screen">
+  <div class="res-box">
+    <div class="res-brand">GrantApp AI · WAEC 2026</div>
+    <div class="res-title">Marking Complete</div>
+    <div class="res-score" id="res-score">—</div>
+    <div class="res-max">out of 30 marks</div>
+    <div class="res-bd" id="res-bd"></div>
+    <button class="res-btn" onclick="document.getElementById('results-screen').classList.remove('show')">Review Document</button>
+    <button class="res-btn g" style="margin-top:4px;" onclick="location.reload()">Reset & Retry</button>
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────
+let state = {
+  fnrUsed: false,
+  pageSetupDone: false,
+  tableInserted: false,
+  headingUsed: false,
+};
+let drawerOpen = false;
+
+// ─── RULER ───────────────────────────────────────────────────
+function buildRuler() {
+  const inner = document.getElementById('ruler-inner');
+  inner.innerHTML = '';
+  for (let mm = 0; mm <= 210; mm++) {
+    const span = document.createElement('span');
+    span.className = 'ruler-mark ' + (mm % 10 === 0 ? 'cm' : 'mm');
+    span.style.left = (mm / 210 * 100) + '%';
+    if (mm % 10 === 0) span.textContent = mm / 10;
+    inner.appendChild(span);
+  }
+  // Indent tabs
+  const leftTab = document.createElement('div');
+  leftTab.className = 'ruler-tab';
+  leftTab.style.left = '16%';
+  inner.appendChild(leftTab);
+}
+
+// ─── DOCUMENT COMMANDS ───────────────────────────────────────
+function cmd(command, val) {
+  document.getElementById('doc').focus();
+  document.execCommand(command, false, val || null);
+  onDocChange();
+}
+
+function setFont(f) { cmd('fontName', f); }
+function setFontSize(s) { cmd('fontSize', 3); /* execCommand size is limited; use CSS */ applyCustomFontSize(s); }
+function setFontColor(c) { cmd('foreColor', c); }
+function setHighlight(c) { cmd('hiliteColor', c); }
+
+function applyCustomFontSize(s) {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const span = document.createElement('span');
+  span.style.fontSize = s + 'pt';
+  try { sel.getRangeAt(0).surroundContents(span); } catch(e) {}
+  onDocChange();
+}
+
+function applyStyle(tag) {
+  document.getElementById('doc').focus();
+  document.execCommand('formatBlock', false, tag);
+  if (tag === 'h1' || tag === 'h2') state.headingUsed = true;
+  onDocChange();
+}
+
+function insertTable() {
+  const rows = parseInt(prompt('Number of rows (e.g. 3):', '3')) || 3;
+  const cols = parseInt(prompt('Number of columns (e.g. 2):', '2')) || 2;
+  let html = '<table>';
+  html += '<tr>' + Array(cols).fill(0).map((_,i) => `<th>Column ${i+1}</th>`).join('') + '</tr>';
+  for (let r = 1; r < rows; r++) {
+    html += '<tr>' + Array(cols).fill(0).map(() => '<td>&nbsp;</td>').join('') + '</tr>';
+  }
+  html += '</table><p><br></p>';
+  cmd('insertHTML', html);
+  state.tableInserted = true;
+  onDocChange();
+}
+
+function insertPageBreak() {
+  cmd('insertHTML', '<div style="page-break-after:always;border-top:1px dashed #ccc;margin:12px 0;"></div><p><br></p>');
+}
+
+function insertLineSpacing() {
+  const val = prompt('Line spacing (e.g. 1.5, 2):', '1.5');
+  if (val) {
+    document.querySelectorAll('#doc p, #doc div').forEach(el => el.style.lineHeight = val);
+  }
+}
+
+// ─── FIND & REPLACE ──────────────────────────────────────────
+function showFnR() { document.getElementById('fnr-panel').classList.add('show'); }
+function hideFnR() { document.getElementById('fnr-panel').classList.remove('show'); }
+
+function doFind() {
+  const term = document.getElementById('fnr-find').value;
+  if (!term) return;
+  const text = document.getElementById('doc').innerHTML;
+  if (text.toLowerCase().includes(term.toLowerCase())) {
+    document.getElementById('fnr-msg').textContent = `"${term}" found in document.`;
+    state.fnrUsed = true;
+    checkTasks();
+  } else {
+    document.getElementById('fnr-msg').textContent = `"${term}" not found.`;
+  }
+}
+
+function doReplace() {
+  const find = document.getElementById('fnr-find').value;
+  const rep = document.getElementById('fnr-replace').value;
+  if (!find) return;
+  const doc = document.getElementById('doc');
+  const html = doc.innerHTML;
+  const re = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+  if (re.test(html)) {
+    doc.innerHTML = html.replace(re, `<mark style="background:#fff2cc;">${rep}</mark>`);
+    document.getElementById('fnr-msg').textContent = `Replaced 1 instance.`;
+    state.fnrUsed = true;
+    checkTasks();
+  } else {
+    document.getElementById('fnr-msg').textContent = `"${find}" not found.`;
+  }
+}
+
+function doReplaceAll() {
+  const find = document.getElementById('fnr-find').value;
+  const rep = document.getElementById('fnr-replace').value;
+  if (!find) return;
+  const doc = document.getElementById('doc');
+  const re = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+  const count = (doc.innerHTML.match(re) || []).length;
+  doc.innerHTML = doc.innerHTML.replace(re, `<mark style="background:#fff2cc;">${rep}</mark>`);
+  document.getElementById('fnr-msg').textContent = `Replaced ${count} instance(s).`;
+  state.fnrUsed = true;
+  checkTasks();
+}
+
+// ─── PAGE SETUP ───────────────────────────────────────────────
+function showPageSetup() { document.getElementById('setup-overlay').classList.add('show'); }
+function hideSetup() { document.getElementById('setup-overlay').classList.remove('show'); }
+
+function applySetup() {
+  const orient = document.getElementById('setup-orient').value;
+  const mt = parseFloat(document.getElementById('setup-mt').value) || 2.54;
+  const mb = parseFloat(document.getElementById('setup-mb').value) || 2.54;
+  const ml = parseFloat(document.getElementById('setup-ml').value) || 3.18;
+  const mr = parseFloat(document.getElementById('setup-mr').value) || 2.54;
+  const page = document.getElementById('page');
+  if (orient === 'landscape') {
+    page.style.width = '1123px'; page.style.minHeight = '794px';
+  } else {
+    page.style.width = '794px'; page.style.minHeight = '1123px';
+  }
+  const pxPerCm = 37.8;
+  page.style.paddingTop = (mt * pxPerCm) + 'px';
+  page.style.paddingBottom = (mb * pxPerCm) + 'px';
+  page.style.paddingLeft = (ml * pxPerCm) + 'px';
+  page.style.paddingRight = (mr * pxPerCm) + 'px';
+  state.pageSetupDone = true;
+  hideSetup();
+  checkTasks();
+}
+
+// ─── ZOOM ─────────────────────────────────────────────────────
+function setZoom(v) {
+  document.getElementById('page').style.transform = `scale(${v/100})`;
+  document.getElementById('page').style.transformOrigin = 'top center';
+  document.getElementById('zoom-val').textContent = v + '%';
+}
+
+// ─── STATUS ───────────────────────────────────────────────────
+function onDocChange() {
+  const doc = document.getElementById('doc');
+  const text = doc.innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById('sb-words').textContent = words;
+  document.getElementById('sb-chars').textContent = text.length;
+  // Detect current block
+  try {
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      let node = sel.getRangeAt(0).startContainer;
+      while (node && node !== doc) {
+        if (node.tagName) {
+          const tag = node.tagName.toLowerCase();
+          if (['h1','h2','h3','p','div'].includes(tag)) {
+            document.getElementById('sb-style').textContent = {h1:'Heading 1',h2:'Heading 2',h3:'Heading 3',p:'Normal',div:'Normal'}[tag] || 'Normal';
+            break;
+          }
+        }
+        node = node.parentNode;
+      }
+    }
+  } catch(e){}
+  checkTasks();
+}
+
+// ─── TASK CHECKER ─────────────────────────────────────────────
+const KEYWORDS_SALUTATION = ['dear','parent','guardian','sir','madam'];
+const KEYWORDS_CLOSE = ['yours faithfully','yours sincerely','faithfully','sincerely'];
+
+function checkTasks() {
+  const doc = document.getElementById('doc');
+  const html = doc.innerHTML.toLowerCase();
+  const text = (doc.innerText || '').toLowerCase();
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+
+  // Count paragraphs / block elements
+  const paras = doc.querySelectorAll('p,div,h1,h2,h3,h4,li');
+  const nonEmptyParas = Array.from(paras).filter(p => p.innerText.trim().length > 3);
+
+  // T1: School name/address — 3+ non-empty lines in first 10 lines
+  const topLines = nonEmptyParas.slice(0,8);
+  const results = {};
+  results.t1 = topLines.length >= 3;
+
+  // T2: Date line + salutation
+  const hasDate = /\b(january|february|march|april|may|june|july|august|september|october|november|december|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\d{1,2}(st|nd|rd|th))/i.test(text);
+  const hasSalutation = KEYWORDS_SALUTATION.some(k => text.includes(k));
+  results.t2 = hasDate && hasSalutation;
+
+  // T3: 80+ words, 3+ paragraphs
+  results.t3 = words >= 80 && nonEmptyParas.length >= 5;
+
+  // T4: Complimentary close
+  results.t4 = KEYWORDS_CLOSE.some(k => text.includes(k));
+
+  // T5: Heading 1 used (h1 tag in html)
+  results.t5 = html.includes('<h1') && html.includes('<b>') || html.includes('<strong>') || state.headingUsed;
+
+  // T6: Times New Roman somewhere + justified text
+  const hasTNR = html.includes('times new roman') || html.includes("'times new roman'") || doc.querySelector('[face*="Times"]') !== null;
+  const hasJustify = html.includes('text-align: justify') || html.includes('text-align:justify');
+  results.t6 = (hasTNR || words > 20) && hasJustify; // lenient on font detection
+
+  // T7: Table
+  results.t7 = state.tableInserted || doc.querySelector('table') !== null;
+
+  // T8: Find & Replace used
+  results.t8 = state.fnrUsed;
+
+  // T9: Page setup used
+  results.t9 = state.pageSetupDone;
+
+  let done = 0;
+  for (let i = 1; i <= 9; i++) {
+    const ok = !!results['t'+i];
+    if (ok) done++;
+    document.getElementById('t'+i)?.classList.toggle('done', ok);
+    const ci = document.getElementById('c'+i);
+    if (ci) ci.textContent = ok ? '✓' : '○';
+  }
+  document.getElementById('sb-tasks').textContent = `${done}/9 tasks`;
+  document.getElementById('pill-count').textContent = `${done}/9`;
+  return results;
+}
+
+function autoCheck() {
+  checkTasks();
+  toggleDrawer(true);
+}
+
+// ─── RESULTS ─────────────────────────────────────────────────
+const MARKS = {t1:3,t2:2,t3:4,t4:2,t5:3,t6:3,t7:4,t8:4,t9:5};
+const LABELS = {
+  t1:'(i) School name & address (3+ lines)',t2:'(ii) Date line & salutation',
+  t3:'(iii) Body — 3+ paragraphs, 80+ words',t4:'(iv) Complimentary close & name',
+  t5:'(v) Heading 1 style & bold subject',t6:'(vi) TNR 12pt, justified paragraphs',
+  t7:'(vii) Table (3×2 min)',t8:'(viii) Find & Replace used',t9:'(ix) Page Setup configured',
+};
+
+function showResults() {
+  const results = checkTasks();
+  let total = 0, html = '';
+  for (let i = 1; i <= 9; i++) {
+    const ok = !!results['t'+i];
+    const earned = ok ? MARKS['t'+i] : 0;
+    total += earned;
+    html += `<div class="rb-row"><span>${LABELS['t'+i]}</span><b style="color:${ok?'var(--green)':'var(--red)'}">${earned}/${MARKS['t'+i]}</b></div>`;
+  }
+  document.getElementById('res-bd').innerHTML = html;
+  const sc = document.getElementById('res-score');
+  sc.textContent = total;
+  sc.style.color = total >= 24 ? 'var(--green)' : total >= 18 ? 'var(--gold)' : 'var(--red)';
+  document.getElementById('results-screen').classList.add('show');
+}
+
+// ─── DRAWER / RIBBON ─────────────────────────────────────────
+function toggleDrawer(force) {
+  drawerOpen = force !== undefined ? force : !drawerOpen;
+  document.getElementById('q-drawer').classList.toggle('open', drawerOpen);
+}
+function setRTab(el) {
+  document.querySelectorAll('.rtab').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── KEYBOARD SHORTCUTS ───────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'h') { e.preventDefault(); showFnR(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); showFnR(); }
+});
+
+// ─── TIMER ───────────────────────────────────────────────────
+let secs = 45 * 60;
+function tick() {
+  secs--; if (secs < 0) secs = 0;
+  const m = Math.floor(secs / 60), s = secs % 60;
+  document.getElementById('tv').textContent = `${m}:${String(s).padStart(2, '0')}`;
+  const warn = secs < 600, dang = secs < 180;
+  document.getElementById('td').className = 'tb-dot' + (dang ? ' dang' : warn ? ' warn' : '');
+  document.getElementById('tv').className = 'tv' + (dang ? ' dang' : warn ? ' warn' : '');
+  if (secs > 0) setTimeout(tick, 1000);
+}
+
+// ─── BOOT ────────────────────────────────────────────────────
+buildRuler();
+document.getElementById('doc').focus();
+setTimeout(tick, 1000);
+</script>
+</body>
+</html>

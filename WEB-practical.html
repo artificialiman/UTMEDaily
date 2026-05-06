@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAEC 2026 | Web Practical</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C0F1A;--surface:#131824;--surface2:#1A2030;--surface3:#202840;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#EEF0F6;--sec:rgba(238,240,246,0.65);--ter:rgba(238,240,246,0.38);
+  --accent:#4F8EF7;--gold:#F0B429;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+  --serif:'Instrument Serif',Georgia,serif;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--text);background:var(--bg);}
+
+/* ── APP SHELL ── */
+.app{display:flex;flex-direction:column;height:100%;}
+
+/* ── TOPBAR ── */
+.topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  padding:8px 14px;background:rgba(12,15,26,0.98);border-bottom:1px solid var(--border2);z-index:200;
+}
+.tb-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
+.tb-title{font-family:var(--serif);font-size:15px;font-style:italic;flex:1;}
+.tb-timer{display:flex;align-items:center;gap:6px;background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.2);border-radius:16px;padding:5px 12px;font-family:var(--mono);font-size:13px;color:var(--accent);}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+.tb-dot.warn{background:var(--amber);} .tb-dot.dang{background:var(--red);animation:blink 1s infinite;}
+.tv.warn{color:var(--amber);} .tv.dang{color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* ── EDITOR RIBBON ── */
+.ribbon{
+  flex-shrink:0;display:flex;align-items:center;gap:2px;flex-wrap:wrap;
+  padding:5px 10px;background:var(--surface);border-bottom:1px solid var(--border2);
+}
+.rb{padding:4px 10px;border-radius:5px;background:transparent;border:1px solid transparent;color:var(--sec);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.rb:hover{background:var(--surface3);border-color:var(--border2);color:var(--text);}
+.rb.active{background:rgba(79,142,247,0.12);border-color:rgba(79,142,247,0.3);color:var(--accent);}
+.rb-sep{width:1px;height:20px;background:var(--border2);margin:0 3px;}
+.rb-tag{padding:3px 8px;border-radius:4px;background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.2);color:var(--accent);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;}
+.rb-tag:hover{background:rgba(79,142,247,0.18);}
+
+/* ── MAIN BODY ── */
+.main{flex:1;display:flex;overflow:hidden;position:relative;}
+
+/* ── CODE EDITOR PANEL ── */
+.editor-panel{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+.editor-tabs{display:flex;align-items:flex-end;padding:6px 10px 0;background:var(--surface);border-bottom:1px solid var(--border2);gap:1px;}
+.etab{padding:5px 14px 6px;font-family:var(--mono);font-size:11px;color:var(--ter);background:var(--surface2);border:1px solid var(--border);border-bottom:none;border-radius:5px 5px 0 0;cursor:pointer;transition:all .15s;}
+.etab.active{background:var(--bg);border-color:var(--border2);color:var(--text);}
+.editor-wrap{flex:1;position:relative;overflow:hidden;}
+.line-numbers{
+  position:absolute;left:0;top:0;bottom:0;width:44px;background:var(--surface);
+  border-right:1px solid var(--border);padding:12px 0;overflow:hidden;
+  font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--ter);text-align:right;
+  pointer-events:none;z-index:2;
+}
+.ln{padding-right:10px;display:block;}
+textarea.code-area{
+  position:absolute;inset:0;left:44px;
+  background:transparent;border:none;outline:none;resize:none;
+  font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--text);
+  padding:12px 14px;tab-size:2;caret-color:var(--accent);
+  white-space:pre;overflow-wrap:normal;overflow-x:auto;
+  spellcheck:false;
+}
+/* Syntax highlight overlay */
+.highlight-overlay{
+  position:absolute;inset:0;left:44px;pointer-events:none;
+  font-family:var(--mono);font-size:13px;line-height:1.6;
+  padding:12px 14px;white-space:pre;overflow:hidden;z-index:1;
+  color:transparent;
+}
+
+/* ── PREVIEW PANEL ── */
+.preview-panel{
+  width:45%;flex-shrink:0;display:flex;flex-direction:column;
+  border-left:1px solid var(--border2);
+}
+.preview-bar{
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+  padding:7px 12px;background:var(--surface);border-bottom:1px solid var(--border2);
+}
+.preview-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ter);}
+.preview-url{
+  flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+  padding:4px 10px;font-family:var(--mono);font-size:11px;color:var(--sec);
+}
+.preview-btn{padding:4px 10px;border-radius:5px;background:var(--accent);color:#fff;font-family:var(--mono);font-size:11px;border:none;cursor:pointer;}
+.preview-iframe{flex:1;border:none;background:#fff;}
+
+/* ── QUESTION PILL ── */
+.q-pill-wrap{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  z-index:500;display:flex;align-items:center;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+.q-pill-tab{
+  writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
+  background:var(--gold);color:#000;font-family:var(--mono);font-size:10px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;padding:12px 7px;
+  border-radius:8px 0 0 8px;cursor:pointer;user-select:none;
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+  box-shadow:-4px 0 20px rgba(0,0,0,0.4);transition:background .2s;
+}
+.q-pill-tab:hover{background:#f5c842;}
+.q-pill-tab .pill-count{
+  writing-mode:horizontal-tb;transform:rotate(90deg);
+  background:rgba(0,0,0,0.25);border-radius:99px;padding:1px 5px;
+  font-size:9px;font-weight:600;
+}
+.q-drawer{
+  width:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1);
+  background:var(--surface);border-left:1px solid var(--border2);
+  display:flex;flex-direction:column;height:70vh;max-height:600px;
+  border-radius:12px 0 0 12px;box-shadow:-8px 0 40px rgba(0,0,0,0.5);
+}
+.q-drawer.open{width:320px;}
+.q-drawer-inner{width:320px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.q-drawer-hdr{
+  flex-shrink:0;padding:14px 16px 10px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+}
+.q-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(240,180,41,0.12);border:1px solid rgba(240,180,41,0.28);color:var(--gold);}
+.q-title{font-family:var(--serif);font-size:15px;font-style:italic;margin-top:6px;line-height:1.3;}
+.q-intro{font-size:12px;color:var(--sec);line-height:1.65;margin-top:6px;}
+.q-scroll{flex:1;overflow-y:auto;padding:10px 14px 14px;}
+.q-scroll::-webkit-scrollbar{width:3px;} .q-scroll::-webkit-scrollbar-thumb{background:var(--border2);}
+.q-phase{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:10px 0 5px;padding:3px 8px;background:rgba(79,142,247,0.06);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;}
+.task{display:flex;gap:7px;padding:7px 8px;border-radius:6px;border:1px solid transparent;margin-bottom:3px;}
+.task.done{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.15);}
+.task-n{font-family:var(--mono);font-size:10px;color:var(--accent);flex-shrink:0;width:14px;padding-top:1px;}
+.task-ck{font-size:11px;flex-shrink:0;padding-top:1px;width:13px;color:var(--ter);}
+.task.done .task-ck{color:var(--green);}
+.task-txt{font-size:11px;color:var(--sec);line-height:1.6;}
+.task.done .task-txt{color:rgba(238,240,246,0.3);text-decoration:line-through;}
+.q-footer{flex-shrink:0;padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.q-btn{flex:1;padding:8px;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;border:none;cursor:pointer;}
+.q-btn.p{background:var(--accent);color:#fff;}
+.q-btn.p:hover{opacity:.85;}
+.q-btn.g{background:transparent;color:var(--ter);border:1px solid var(--border);}
+
+/* ── STATUS BAR ── */
+.statusbar{
+  flex-shrink:0;display:flex;align-items:center;gap:12px;
+  padding:3px 12px;background:rgba(12,15,26,0.9);border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:10px;color:var(--ter);
+}
+.sb-item b{color:var(--accent);}
+
+/* ── RESULTS ── */
+.results-overlay{position:fixed;inset:0;z-index:2000;background:rgba(12,15,26,0.97);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
+.results-overlay.show{display:flex;}
+.res-box{width:100%;max-width:380px;text-align:center;}
+.res-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.res-title{font-family:var(--serif);font-size:1.9rem;font-style:italic;}
+.res-score{font-family:var(--mono);font-size:3rem;font-weight:500;margin:18px 0 4px;}
+.res-max{font-family:var(--mono);font-size:11px;color:var(--ter);margin-bottom:14px;}
+.res-bd{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px;text-align:left;margin-bottom:10px;}
+.rb-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--ter);}
+.rb-row:last-child{border:none;}
+.rb-row b{font-family:var(--mono);}
+.res-btn{width:100%;padding:12px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:5px;}
+.res-btn.g{background:transparent;color:var(--ter);border:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;flex-direction:column;gap:1px;">
+    <span class="tb-brand">GrantApp AI · WAEC 2026 · Digital Technology</span>
+    <span class="tb-title">Web Page Creation Practical — Paper 3</span>
+  </div>
+  <div style="flex:1;"></div>
+  <div class="tb-timer"><div class="tb-dot" id="td"></div><span class="tv" id="tv">0:45:00</span></div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <span style="font-family:var(--mono);font-size:10px;color:var(--ter);margin-right:4px;">INSERT:</span>
+  <span class="rb-tag" onclick="ins('&lt;h1&gt;&lt;/h1&gt;')" title="Heading 1">h1</span>
+  <span class="rb-tag" onclick="ins('&lt;h2&gt;&lt;/h2&gt;')" title="Heading 2">h2</span>
+  <span class="rb-tag" onclick="ins('&lt;p&gt;&lt;/p&gt;')" title="Paragraph">p</span>
+  <span class="rb-tag" onclick="ins('&lt;a href=&quot;&quot;&gt;&lt;/a&gt;')" title="Hyperlink">a</span>
+  <span class="rb-tag" onclick="ins('&lt;img src=&quot;&quot; alt=&quot;&quot;&gt;')" title="Image">img</span>
+  <span class="rb-tag" onclick="ins('&lt;ul&gt;\n  &lt;li&gt;&lt;/li&gt;\n&lt;/ul&gt;')" title="Unordered list">ul</span>
+  <span class="rb-tag" onclick="ins('&lt;ol&gt;\n  &lt;li&gt;&lt;/li&gt;\n&lt;/ol&gt;')" title="Ordered list">ol</span>
+  <span class="rb-tag" onclick="ins('&lt;table&gt;\n  &lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;\n  &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;/table&gt;')" title="Table">table</span>
+  <span class="rb-tag" onclick="ins('&lt;br&gt;')" title="Line break">br</span>
+  <span class="rb-tag" onclick="ins('&lt;hr&gt;')" title="Horizontal rule">hr</span>
+  <div class="rb-sep"></div>
+  <span style="font-family:var(--mono);font-size:10px;color:var(--ter);margin-right:2px;">FORMAT:</span>
+  <span class="rb-tag" onclick="wrap('&lt;b&gt;','&lt;/b&gt;')"><b>b</b></span>
+  <span class="rb-tag" onclick="wrap('&lt;i&gt;','&lt;/i&gt;')"><i>i</i></span>
+  <span class="rb-tag" onclick="wrap('&lt;u&gt;','&lt;/u&gt;')"><u>u</u></span>
+  <span class="rb-tag" onclick="wrap('&lt;strong&gt;','&lt;/strong&gt;')">strong</span>
+  <span class="rb-tag" onclick="wrap('&lt;em&gt;','&lt;/em&gt;')">em</span>
+  <span class="rb-tag" onclick="ins('&lt;font color=&quot;red&quot;&gt;&lt;/font&gt;')">font</span>
+  <div class="rb-sep"></div>
+  <button class="rb" onclick="runPreview()">▶ Run</button>
+  <button class="rb" onclick="clearEditor()">✕ Clear</button>
+  <button class="rb" onclick="autoCheck()" style="color:var(--gold);">✓ Check</button>
+  <div style="flex:1;"></div>
+  <button class="rb active" onclick="showResults()">Submit & Mark</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- EDITOR PANEL -->
+  <div class="editor-panel">
+    <div class="editor-tabs">
+      <div class="etab active" id="etab-html" onclick="switchFile('html',this)">📄 index.html</div>
+      <div class="etab" id="etab-css" onclick="switchFile('css',this)">🎨 style.css</div>
+    </div>
+    <div class="editor-wrap">
+      <div class="line-numbers" id="line-nums"></div>
+      <textarea class="code-area" id="code-area" spellcheck="false"
+        oninput="onCodeInput()" onkeydown="handleTab(event)" onscroll="syncScroll(this)"
+        autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    </div>
+  </div>
+
+  <!-- PREVIEW PANEL -->
+  <div class="preview-panel">
+    <div class="preview-bar">
+      <span class="preview-label">Preview</span>
+      <div class="preview-url">file:///index.html</div>
+      <button class="preview-btn" onclick="runPreview()">↻ Refresh</button>
+    </div>
+    <iframe class="preview-iframe" id="preview" sandbox="allow-scripts"></iframe>
+  </div>
+
+</div><!-- main -->
+
+<!-- STATUS BAR -->
+<div class="statusbar">
+  <span class="sb-item">Ln <b id="sb-ln">1</b></span>
+  <span class="sb-item">Col <b id="sb-col">1</b></span>
+  <span class="sb-item sb-sep">|</span>
+  <span class="sb-item" id="sb-tags">Tags: 0</span>
+  <div style="flex:1;"></div>
+  <span class="sb-item" id="sb-check" style="color:var(--ter);">Tasks: 0/8 complete</span>
+</div>
+
+<!-- QUESTION PILL -->
+<div class="q-pill-wrap" id="q-pill-wrap">
+  <div class="q-pill-tab" onclick="toggleDrawer()" id="pill-tab">
+    Questions
+    <span class="pill-count" id="pill-count">0/8</span>
+  </div>
+  <div class="q-drawer" id="q-drawer">
+    <div class="q-drawer-inner">
+      <div class="q-drawer-hdr">
+        <div>
+          <span class="q-badge">Question 3 · 30 marks · 45 min</span>
+          <div class="q-title">Create a School Website Page</div>
+          <div class="q-intro">Using HTML and CSS, create a web page for <strong>JSS Model Secondary School</strong>. Complete all tasks in the editor. The preview updates in real time.</div>
+        </div>
+      </div>
+      <div class="q-scroll">
+        <div class="q-phase">Structure</div>
+        <div class="task" id="t1"><span class="task-n">i.</span><span class="task-ck" id="c1">○</span><span class="task-txt">Add the correct HTML boilerplate: <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, <code>&lt;body&gt;</code> tags. <em>(3 marks)</em></span></div>
+        <div class="task" id="t2"><span class="task-n">ii.</span><span class="task-ck" id="c2">○</span><span class="task-txt">Set a <code>&lt;title&gt;</code> inside <code>&lt;head&gt;</code> — e.g. <em>"JSS Model Secondary School"</em>. <em>(2 marks)</em></span></div>
+        <div class="task" id="t3"><span class="task-n">iii.</span><span class="task-ck" id="c3">○</span><span class="task-txt">Create a heading using <code>&lt;h1&gt;</code> for the school name and an <code>&lt;h2&gt;</code> for a sub-heading. <em>(3 marks)</em></span></div>
+
+        <div class="q-phase">Content</div>
+        <div class="task" id="t4"><span class="task-n">iv.</span><span class="task-ck" id="c4">○</span><span class="task-txt">Add at least one paragraph <code>&lt;p&gt;</code> describing the school. <em>(2 marks)</em></span></div>
+        <div class="task" id="t5"><span class="task-n">v.</span><span class="task-ck" id="c5">○</span><span class="task-txt">Create an <strong>unordered list</strong> <code>&lt;ul&gt;</code> of at least 3 subjects offered. <em>(3 marks)</em></span></div>
+        <div class="task" id="t6"><span class="task-n">vi.</span><span class="task-ck" id="c6">○</span><span class="task-txt">Add a <strong>table</strong> with at least 3 rows and 2 columns (e.g. Class &amp; Teacher). Include <code>&lt;th&gt;</code> headers. <em>(5 marks)</em></span></div>
+        <div class="task" id="t7"><span class="task-n">vii.</span><span class="task-ck" id="c7">○</span><span class="task-txt">Add a <strong>hyperlink</strong> <code>&lt;a href&gt;</code> to the school's email or website. <em>(3 marks)</em></span></div>
+
+        <div class="q-phase">Styling</div>
+        <div class="task" id="t8"><span class="task-n">viii.</span><span class="task-ck" id="c8">○</span><span class="task-txt">In <strong>style.css</strong>, style the <code>body</code> (background color, font-family) and the <code>h1</code> (color, text-align). <em>(4 marks)</em></span></div>
+
+        <div class="q-phase">Bonus</div>
+        <div class="task" id="t9"><span class="task-n">ix.</span><span class="task-ck" id="c9">○</span><span class="task-txt">Link the CSS file to your HTML using <code>&lt;link rel="stylesheet"&gt;</code> inside <code>&lt;head&gt;</code>. <em>(3 marks)</em></span></div>
+        <div class="task" id="t10"><span class="task-n">x.</span><span class="task-ck" id="c10">○</span><span class="task-txt">Add <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> to emphasise at least one word, and use <code>&lt;hr&gt;</code> to separate sections. <em>(2 marks)</em></span></div>
+      </div>
+      <div class="q-footer">
+        <button class="q-btn g" onclick="toggleDrawer()">Close</button>
+        <button class="q-btn p" onclick="showResults()">Submit & Mark</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-overlay" id="results-screen">
+  <div class="res-box">
+    <div class="res-brand">GrantApp AI · WAEC 2026</div>
+    <div class="res-title">Marking Complete</div>
+    <div class="res-score" id="res-score">—</div>
+    <div class="res-max">out of 30 marks</div>
+    <div class="res-bd" id="res-bd"></div>
+    <button class="res-btn" onclick="document.getElementById('results-screen').classList.remove('show')">Review Code</button>
+    <button class="res-btn g" style="margin-top:4px;" onclick="location.reload()">Reset & Retry</button>
+  </div>
+</div>
+
+<script>
+// ─── FILE STATE ───────────────────────────────────────────────
+const files = {
+  html: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title></title>\n</head>\n<body>\n\n</body>\n</html>`,
+  css: `/* Write your CSS here */\n\nbody {\n\n}\n\nh1 {\n\n}\n`
+};
+let activeFile = 'html';
+let drawerOpen = false;
+
+// ─── EDITOR ───────────────────────────────────────────────────
+const ta = document.getElementById('code-area');
+
+function loadFile(f) {
+  ta.value = files[f];
+  updateLineNums();
+  updateStatusBar();
+  if (f === 'html') runPreview();
+}
+
+function switchFile(f, el) {
+  files[activeFile] = ta.value;
+  activeFile = f;
+  document.querySelectorAll('.etab').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  loadFile(f);
+}
+
+function onCodeInput() {
+  files[activeFile] = ta.value;
+  updateLineNums();
+  updateStatusBar();
+  debouncePreview();
+  checkTasks();
+}
+
+function handleTab(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = ta.selectionStart, end = ta.selectionEnd;
+    ta.value = ta.value.substring(0, s) + '  ' + ta.value.substring(end);
+    ta.selectionStart = ta.selectionEnd = s + 2;
+    onCodeInput();
+  }
+}
+
+function syncScroll(el) {
+  document.getElementById('line-nums').scrollTop = el.scrollTop;
+}
+
+function updateLineNums() {
+  const lines = ta.value.split('\n').length;
+  const ln = document.getElementById('line-nums');
+  ln.innerHTML = Array.from({length: lines}, (_, i) =>
+    `<span class="ln">${i + 1}</span>`).join('');
+}
+
+function updateStatusBar() {
+  const val = ta.value;
+  const before = val.substring(0, ta.selectionStart);
+  const lines = before.split('\n');
+  document.getElementById('sb-ln').textContent = lines.length;
+  document.getElementById('sb-col').textContent = lines[lines.length-1].length + 1;
+  const tags = (val.match(/<[a-z][^>]*>/gi)||[]).length;
+  document.getElementById('sb-tags').textContent = `Tags: ${tags}`;
+}
+
+ta.addEventListener('click', updateStatusBar);
+ta.addEventListener('keyup', updateStatusBar);
+
+// ─── INSERT HELPERS ───────────────────────────────────────────
+function ins(snippet) {
+  const s = ta.selectionStart;
+  const decoded = snippet.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+  ta.value = ta.value.substring(0, s) + decoded + ta.value.substring(ta.selectionEnd);
+  ta.selectionStart = ta.selectionEnd = s + decoded.length;
+  ta.focus();
+  onCodeInput();
+}
+
+function wrap(open, close) {
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  const sel = ta.value.substring(s, e) || 'text';
+  const o = open.replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+  const c = close.replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+  ta.value = ta.value.substring(0, s) + o + sel + c + ta.value.substring(e);
+  ta.selectionStart = s + o.length;
+  ta.selectionEnd = s + o.length + sel.length;
+  ta.focus();
+  onCodeInput();
+}
+
+function clearEditor() {
+  if (confirm('Clear this file?')) { files[activeFile] = ''; ta.value = ''; onCodeInput(); }
+}
+
+// ─── PREVIEW ─────────────────────────────────────────────────
+let previewTimer;
+function debouncePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(runPreview, 800); }
+
+function runPreview() {
+  files[activeFile] = ta.value;
+  // Inject CSS into HTML for preview
+  let html = files.html;
+  if (files.css.trim()) {
+    const styleTag = `<style>${files.css}</style>`;
+    if (html.includes('</head>')) {
+      html = html.replace('</head>', styleTag + '</head>');
+    } else {
+      html = styleTag + html;
+    }
+  }
+  const iframe = document.getElementById('preview');
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+  checkTasks();
+}
+
+// ─── TASK CHECKER ─────────────────────────────────────────────
+const MARKS = {t1:3,t2:2,t3:3,t4:2,t5:3,t6:5,t7:3,t8:4,t9:3,t10:2};
+const LABELS = {
+  t1:'(i) HTML boilerplate',t2:'(ii) <title> set',t3:'(iii) h1 and h2 headings',
+  t4:'(iv) <p> paragraph',t5:'(v) <ul> list (3+ items)',t6:'(vi) Table with headers',
+  t7:'(vii) Hyperlink <a href>',t8:'(viii) CSS — body & h1 styled',
+  t9:'(ix) CSS linked via <link>',t10:'(x) <b>/<strong> and <hr>',
+};
+
+function checkTasks() {
+  const h = files.html.toLowerCase();
+  const c = files.css.toLowerCase();
+  const results = {
+    t1: h.includes('<!doctype html') && h.includes('<html') && h.includes('<head') && h.includes('<body'),
+    t2: h.includes('<title') && /<title>[^<]+<\/title>/i.test(files.html),
+    t3: h.includes('<h1') && h.includes('<h2'),
+    t4: h.includes('<p'),
+    t5: h.includes('<ul') && (h.match(/<li/g)||[]).length >= 3,
+    t6: h.includes('<table') && h.includes('<th') && (h.match(/<tr/g)||[]).length >= 3,
+    t7: /<a\s+[^>]*href\s*=\s*["'][^"']+["']/i.test(files.html),
+    t8: c.includes('body') && (c.includes('background') || c.includes('font-family')) && c.includes('h1') && (c.includes('color') || c.includes('text-align')),
+    t9: /<link[^>]+stylesheet/i.test(files.html),
+    t10: (h.includes('<b>') || h.includes('<strong')) && h.includes('<hr'),
+  };
+  let done = 0;
+  for (let i = 1; i <= 10; i++) {
+    const ok = results['t'+i];
+    if (ok) done++;
+    document.getElementById('t'+i)?.classList.toggle('done', ok);
+    const ci = document.getElementById('c'+i);
+    if (ci) ci.textContent = ok ? '✓' : '○';
+  }
+  document.getElementById('sb-check').textContent = `Tasks: ${done}/10 complete`;
+  document.getElementById('pill-count').textContent = `${done}/10`;
+  return results;
+}
+
+function autoCheck() {
+  const r = checkTasks();
+  const done = Object.values(r).filter(Boolean).length;
+  toggleDrawer(true);
+  setTimeout(() => alert(`${done}/10 tasks complete.\n\nTip: Switch to style.css to write your CSS, then switch back to index.html and link it with <link rel="stylesheet" href="style.css">`), 100);
+}
+
+// ─── RESULTS ─────────────────────────────────────────────────
+function showResults() {
+  const results = checkTasks();
+  let total = 0, html = '';
+  for (let i = 1; i <= 10; i++) {
+    const ok = results['t'+i];
+    const earned = ok ? MARKS['t'+i] : 0;
+    total += earned;
+    html += `<div class="rb-row"><span>${LABELS['t'+i]}</span><b style="color:${ok?'var(--green)':'var(--red)'}">${earned}/${MARKS['t'+i]}</b></div>`;
+  }
+  document.getElementById('res-bd').innerHTML = html;
+  const sc = document.getElementById('res-score');
+  sc.textContent = total;
+  sc.style.color = total >= 24 ? 'var(--green)' : total >= 18 ? 'var(--gold)' : 'var(--red)';
+  document.getElementById('results-screen').classList.add('show');
+}
+
+// ─── DRAWER ───────────────────────────────────────────────────
+function toggleDrawer(forceOpen) {
+  drawerOpen = forceOpen !== undefined ? forceOpen : !drawerOpen;
+  document.getElementById('q-drawer').classList.toggle('open', drawerOpen);
+  document.getElementById('pill-tab').style.borderRadius = drawerOpen ? '8px 0 0 8px' : '8px 0 0 8px';
+}
+
+// ─── TIMER ────────────────────────────────────────────────────
+let secs = 45 * 60;
+function tick() {
+  secs--; if (secs < 0) secs = 0;
+  const m = Math.floor(secs/60), s = secs % 60;
+  document.getElementById('tv').textContent = `${m}:${String(s).padStart(2,'0')}`;
+  const warn = secs < 600, dang = secs < 180;
+  document.getElementById('td').className = 'tb-dot' + (dang?' dang':warn?' warn':'');
+  document.getElementById('tv').className = 'tv' + (dang?' dang':warn?' warn':'');
+  if (secs > 0) setTimeout(tick, 1000);
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────
+loadFile('html');
+runPreview();
+setTimeout(tick, 1000);
+</script>
+</body>
+</html>

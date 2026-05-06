@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAEC 2026 | Spreadsheet Practical</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C0F1A;--surface:#131824;--surface2:#1A2030;--s3:#202840;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --text:#EEF0F6;--sec:rgba(238,240,246,0.6);--ter:rgba(238,240,246,0.35);
+  --accent:#4F8EF7;--gold:#F0B429;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --ch:24px;--cw:110px;--rh:26px;--rhw:42px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;}
+.app{display:flex;flex-direction:column;height:100%;}
+
+/* ── TOPBAR ── */
+.topbar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:7px 14px;background:rgba(12,15,26,0.98);border-bottom:1px solid var(--b2);z-index:300;}
+.tb-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
+.tb-title{font-family:'Georgia',serif;font-size:15px;font-style:italic;flex:1;}
+.tb-timer{display:flex;align-items:center;gap:6px;background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.2);border-radius:16px;padding:5px 12px;font-family:var(--mono);font-size:13px;color:var(--accent);}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+.tb-dot.warn{background:var(--amber);}.tb-dot.dang{background:var(--red);animation:blink 1s infinite;}
+.tv.warn{color:var(--amber);}.tv.dang{color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* ── RIBBON ── */
+.ribbon{flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--b2);}
+.ribbon-tabs{display:flex;background:var(--surface2);}
+.rtab{padding:5px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ter);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.rtab.active{color:var(--accent);border-color:var(--accent);background:rgba(79,142,247,0.05);}
+.ribbon-bar{display:flex;align-items:center;gap:2px;padding:4px 8px;flex-wrap:wrap;}
+.rb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 7px;border-radius:4px;background:transparent;border:1px solid transparent;color:var(--sec);cursor:pointer;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.05em;transition:all .12s;white-space:nowrap;min-width:40px;}
+.rb:hover{background:var(--s3);border-color:var(--b2);color:var(--text);}
+.rb.active{background:rgba(79,142,247,0.1);border-color:rgba(79,142,247,0.3);color:var(--accent);}
+.rb-icon{font-size:14px;line-height:1;}
+.rb-sep{width:1px;height:32px;background:var(--b1);margin:0 2px;flex-shrink:0;}
+.rb-sel{background:var(--s3);border:1px solid var(--b2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:2px 5px;outline:none;cursor:pointer;}
+.fmt-btn{padding:3px 8px;border-radius:4px;background:var(--s3);border:1px solid var(--b1);color:var(--sec);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .12s;}
+.fmt-btn:hover{border-color:var(--b2);color:var(--text);}
+.fmt-btn.active{background:rgba(79,142,247,0.12);border-color:rgba(79,142,247,0.3);color:var(--accent);}
+
+/* ── NAME BOX + FORMULA BAR ── */
+.fbar-wrap{flex-shrink:0;display:flex;align-items:stretch;background:var(--surface2);border-bottom:1px solid var(--b2);height:28px;}
+.namebox{width:80px;flex-shrink:0;border-right:1px solid var(--b2);display:flex;align-items:center;padding:0 8px;font-family:var(--mono);font-size:12px;color:var(--accent);background:var(--surface);cursor:default;}
+.fbar-fx{padding:0 8px;display:flex;align-items:center;font-family:var(--mono);font-size:11px;color:var(--ter);border-right:1px solid var(--b1);flex-shrink:0;}
+.fbar-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--text);padding:0 10px;}
+
+/* ── SPREADSHEET ── */
+.ss-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+.ss-scroll{flex:1;overflow:auto;position:relative;}
+.ss-scroll::-webkit-scrollbar{width:10px;height:10px;}
+.ss-scroll::-webkit-scrollbar-track{background:var(--surface);}
+.ss-scroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+.ss-scroll::-webkit-scrollbar-corner{background:var(--surface);}
+
+/* Grid rendered via canvas-like approach with divs */
+.ss-grid{position:relative;display:inline-flex;flex-direction:column;}
+.grid-row{display:flex;flex-shrink:0;}
+
+/* Header cells */
+.hdr-corner{
+  position:sticky;top:0;left:0;z-index:30;
+  width:var(--rhw);min-width:var(--rhw);height:var(--ch);
+  background:var(--surface2);border-right:1px solid var(--b2);border-bottom:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+}
+.col-hdr{
+  position:sticky;top:0;z-index:20;
+  height:var(--ch);background:var(--surface2);
+  border-right:1px solid var(--b1);border-bottom:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;color:var(--ter);
+  cursor:col-resize;user-select:none;flex-shrink:0;position:relative;
+  transition:background .1s;
+}
+.col-hdr:hover,.col-hdr.hlt{background:rgba(79,142,247,0.08);color:var(--accent);}
+.col-hdr.sel{background:rgba(79,142,247,0.15);color:var(--accent);}
+.col-resize-handle{position:absolute;right:0;top:0;bottom:0;width:4px;cursor:col-resize;z-index:5;}
+.row-hdr{
+  position:sticky;left:0;z-index:10;
+  width:var(--rhw);min-width:var(--rhw);height:var(--rh);
+  background:var(--surface2);border-right:1px solid var(--b2);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;color:var(--ter);cursor:row-resize;user-select:none;flex-shrink:0;
+  transition:background .1s;
+}
+.row-hdr:hover,.row-hdr.hlt{background:rgba(79,142,247,0.08);color:var(--accent);}
+
+/* Cells */
+.cell{
+  height:var(--rh);border-right:1px solid var(--b1);border-bottom:1px solid var(--b1);
+  font-family:var(--mono);font-size:12px;color:var(--text);
+  display:flex;align-items:center;padding:0 5px;
+  cursor:cell;user-select:none;position:relative;overflow:hidden;flex-shrink:0;
+  background:var(--surface);transition:background .08s;white-space:nowrap;
+}
+.cell:hover{background:rgba(255,255,255,0.02);}
+.cell.sel{background:rgba(79,142,247,0.1)!important;outline:2px solid var(--accent);outline-offset:-2px;z-index:5;}
+.cell.in-range{background:rgba(79,142,247,0.05)!important;}
+.cell.frozen-col{border-right:2px solid var(--b2)!important;}
+.cell.frozen-row{border-bottom:2px solid var(--b2)!important;}
+/* Formatting classes */
+.cell.bold{font-weight:600;}
+.cell.italic{font-style:italic;}
+.cell.underline{text-decoration:underline;}
+.cell.align-c{justify-content:center;}
+.cell.align-r{justify-content:flex-end;}
+.cell.wrap{white-space:normal;align-items:flex-start;padding-top:3px;}
+/* Bg colours */
+.cell.bg-yellow{background:#2a2400!important;}
+.cell.bg-green{background:#001a0a!important;}
+.cell.bg-blue{background:#001428!important;}
+.cell.bg-red{background:#1a0000!important;}
+.cell.bg-grey{background:var(--surface2)!important;}
+/* Text colours */
+.cell.tc-green{color:var(--green)!important;}
+.cell.tc-red{color:var(--red)!important;}
+.cell.tc-gold{color:var(--gold)!important;}
+.cell.tc-accent{color:var(--accent)!important;}
+/* Frozen border indicators */
+.freeze-col-line{position:absolute;top:0;bottom:0;width:2px;background:rgba(79,142,247,0.4);pointer-events:none;z-index:25;}
+.freeze-row-line{position:absolute;left:0;right:0;height:2px;background:rgba(79,142,247,0.4);pointer-events:none;z-index:25;}
+
+/* Active cell editor */
+.cell-editor{
+  position:absolute;inset:0;z-index:100;padding:0 5px;
+  background:var(--surface);border:2px solid var(--accent);
+  font-family:var(--mono);font-size:12px;color:var(--text);outline:none;
+}
+
+/* ── BOTTOM BAR ── */
+.btmbar{flex-shrink:0;display:flex;align-items:center;gap:12px;padding:3px 10px;background:var(--surface);border-top:1px solid var(--b2);font-family:var(--mono);font-size:10px;color:var(--ter);}
+.btm-stat{display:flex;align-items:center;gap:5px;} .btm-stat b{color:var(--accent);}
+.sheet-tabs{display:flex;gap:1px;}
+.sheet-tab{padding:3px 12px;border-radius:4px 4px 0 0;background:var(--surface2);border:1px solid var(--b1);border-bottom:none;font-family:var(--mono);font-size:10px;color:var(--sec);cursor:pointer;}
+.sheet-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btm-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.submit-btn{padding:4px 14px;border-radius:6px;background:var(--accent);color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;border:none;cursor:pointer;}
+.submit-btn:hover{opacity:.85;}
+.zoom-lbl{font-family:var(--mono);font-size:10px;color:var(--ter);}
+
+/* ── QUESTION PILL ── */
+.q-pill-wrap{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:500;display:flex;align-items:center;}
+.q-pill-tab{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);background:var(--gold);color:#000;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:12px 7px;border-radius:8px 0 0 8px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;flex-shrink:0;box-shadow:-4px 0 20px rgba(0,0,0,0.4);}
+.q-pill-tab:hover{background:#f5c842;}
+.pill-count{writing-mode:horizontal-tb;transform:rotate(90deg);background:rgba(0,0,0,0.25);border-radius:99px;padding:1px 5px;font-size:9px;font-weight:600;}
+.q-drawer{width:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1);background:var(--surface);border-left:1px solid var(--b2);display:flex;flex-direction:column;height:72vh;max-height:640px;border-radius:12px 0 0 12px;box-shadow:-8px 0 40px rgba(0,0,0,0.5);}
+.q-drawer.open{width:300px;}
+.q-inner{width:300px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.q-hdr{flex-shrink:0;padding:13px 14px 10px;border-bottom:1px solid var(--b1);}
+.q-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(240,180,41,0.12);border:1px solid rgba(240,180,41,0.28);color:var(--gold);}
+.q-title{font-family:'Georgia',serif;font-size:15px;font-style:italic;margin-top:6px;line-height:1.3;}
+.q-intro{font-size:11px;color:var(--sec);line-height:1.65;margin-top:5px;}
+.q-scroll{flex:1;overflow-y:auto;padding:8px 12px 12px;}
+.q-scroll::-webkit-scrollbar{width:3px;}.q-scroll::-webkit-scrollbar-thumb{background:var(--b2);}
+.q-phase{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:10px 0 5px;padding:3px 8px;background:rgba(79,142,247,0.06);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;}
+.task{display:flex;gap:7px;padding:6px 8px;border-radius:6px;border:1px solid transparent;margin-bottom:3px;}
+.task.done{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.15);}
+.tn{font-family:var(--mono);font-size:10px;color:var(--accent);flex-shrink:0;width:14px;padding-top:1px;}
+.tck{font-size:11px;flex-shrink:0;width:13px;color:var(--ter);padding-top:1px;}
+.task.done .tck{color:var(--green);}
+.ttxt{font-size:11px;color:var(--sec);line-height:1.6;}
+.task.done .ttxt{color:rgba(238,240,246,0.3);text-decoration:line-through;}
+.q-footer{flex-shrink:0;padding:9px 12px;border-top:1px solid var(--b1);display:flex;gap:8px;}
+.q-btn{flex:1;padding:8px;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;border:none;cursor:pointer;}
+.q-btn.p{background:var(--accent);color:#fff;}.q-btn.g{background:transparent;color:var(--ter);border:1px solid var(--b1);}
+
+/* ── CHART MODAL ── */
+.overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--b2);border-radius:14px;padding:22px;width:100%;max-width:500px;animation:mIn .2s ease;}
+@keyframes mIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-family:'Georgia',serif;font-size:17px;font-style:italic;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.modal-close{margin-left:auto;background:none;border:none;color:var(--ter);cursor:pointer;font-size:16px;}
+canvas{border-radius:6px;max-width:100%;}
+
+/* ── RESULTS ── */
+.results-overlay{position:fixed;inset:0;z-index:2000;background:rgba(12,15,26,0.97);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
+.results-overlay.show{display:flex;}
+.res-box{width:100%;max-width:400px;text-align:center;}
+.res-brand{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.res-title{font-family:'Georgia',serif;font-size:2rem;font-style:italic;}
+.res-score{font-family:var(--mono);font-size:3rem;font-weight:500;margin:16px 0 4px;}
+.res-max{font-family:var(--mono);font-size:11px;color:var(--ter);margin-bottom:14px;}
+.res-bd{background:var(--surface);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:left;margin-bottom:10px;}
+.rb-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--b1);font-size:12px;color:var(--ter);}
+.rb-row:last-child{border:none;}.rb-row b{font-family:var(--mono);}
+.res-btn{width:100%;padding:12px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:5px;}
+.res-btn.g{background:transparent;color:var(--ter);border:1px solid var(--b1);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;flex-direction:column;gap:1px;">
+    <span class="tb-brand">GrantApp AI · WAEC 2026 · Digital Technology</span>
+    <span class="tb-title">Spreadsheet Practical — Paper 3</span>
+  </div>
+  <div style="flex:1;"></div>
+  <div class="tb-timer"><div class="tb-dot" id="td"></div><span class="tv" id="tv">0:45:00</span></div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-tabs">
+    <div class="rtab active" onclick="setRTab(this)">Home</div>
+    <div class="rtab" onclick="setRTab(this)">Insert</div>
+    <div class="rtab" onclick="setRTab(this)">Formulas</div>
+    <div class="rtab" onclick="setRTab(this)">Data</div>
+    <div class="rtab" onclick="setRTab(this)">View</div>
+  </div>
+  <div class="ribbon-bar">
+    <!-- Format -->
+    <button class="fmt-btn" id="btn-B" onclick="toggleFmt('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button class="fmt-btn" id="btn-I" onclick="toggleFmt('italic')" title="Italic"><i>I</i></button>
+    <button class="fmt-btn" id="btn-U" onclick="toggleFmt('underline')" title="Underline"><u>U</u></button>
+    <div class="rb-sep"></div>
+    <button class="fmt-btn" onclick="setAlign('l')" title="Align Left">&#8676;</button>
+    <button class="fmt-btn" onclick="setAlign('c')" title="Center">&#8674;</button>
+    <button class="fmt-btn" onclick="setAlign('r')" title="Align Right">&#8677;</button>
+    <div class="rb-sep"></div>
+    <select class="rb-sel" onchange="applyBg(this.value);this.value=''" title="Fill colour">
+      <option value="">Fill ▾</option>
+      <option value="bg-yellow">Yellow</option>
+      <option value="bg-green">Green</option>
+      <option value="bg-blue">Blue</option>
+      <option value="bg-red">Red</option>
+      <option value="bg-grey">Grey</option>
+    </select>
+    <select class="rb-sel" onchange="applyTc(this.value);this.value=''" title="Text colour">
+      <option value="">Color ▾</option>
+      <option value="tc-green">Green</option>
+      <option value="tc-red">Red</option>
+      <option value="tc-gold">Gold</option>
+      <option value="tc-accent">Blue</option>
+    </select>
+    <div class="rb-sep"></div>
+    <!-- Insert -->
+    <div class="rb" onclick="mergeSelected()"><span class="rb-icon">⊞</span>Merge</div>
+    <div class="rb" onclick="freezePanes()"><span class="rb-icon">🧊</span>Freeze</div>
+    <div class="rb" onclick="insertChart()"><span class="rb-icon">📊</span>Chart</div>
+    <div class="rb-sep"></div>
+    <!-- Formulas -->
+    <div class="rb" onclick="insertFn('SUM')"><span class="rb-icon">Σ</span>SUM</div>
+    <div class="rb" onclick="insertFn('AVERAGE')"><span class="rb-icon">x̄</span>AVG</div>
+    <div class="rb" onclick="insertFn('MAX')"><span class="rb-icon">↑</span>MAX</div>
+    <div class="rb" onclick="insertFn('MIN')"><span class="rb-icon">↓</span>MIN</div>
+    <div class="rb" onclick="insertFn('IF')"><span class="rb-icon">?</span>IF</div>
+    <div class="rb" onclick="insertFn('COUNT')"><span class="rb-icon">#</span>COUNT</div>
+    <div class="rb-sep"></div>
+    <div class="rb" onclick="autoCheck()" style="color:var(--gold);"><span class="rb-icon">✓</span>Check</div>
+  </div>
+</div>
+
+<!-- FORMULA BAR -->
+<div class="fbar-wrap">
+  <div class="namebox" id="namebox">A1</div>
+  <div class="fbar-fx">fx</div>
+  <input class="fbar-input" id="fbar" placeholder="Enter value or formula — e.g. =SUM(B3:F3)" onkeydown="fbarKey(event)" oninput="fbarType()">
+</div>
+
+<!-- SPREADSHEET -->
+<div class="ss-wrap">
+  <div class="ss-scroll" id="ss-scroll">
+    <div class="ss-grid" id="ss-grid"></div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="btmbar">
+  <div class="sheet-tabs"><div class="sheet-tab active">Sheet1</div><div class="sheet-tab" style="opacity:.4;">+</div></div>
+  <span style="margin-left:8px;">|</span>
+  <div class="btm-stat">SUM: <b id="bs-sum">—</b></div>
+  <div class="btm-stat">AVG: <b id="bs-avg">—</b></div>
+  <div class="btm-stat">COUNT: <b id="bs-cnt">—</b></div>
+  <div class="btm-right">
+    <span class="zoom-lbl" id="task-status">0/8 tasks</span>
+    <button class="submit-btn" onclick="showResults()">Submit & Mark</button>
+  </div>
+</div>
+
+<!-- QUESTION PILL -->
+<div class="q-pill-wrap">
+  <div class="q-pill-tab" onclick="toggleDrawer()">Questions<span class="pill-count" id="pill-count">0/8</span></div>
+  <div class="q-drawer" id="q-drawer">
+    <div class="q-inner">
+      <div class="q-hdr">
+        <span class="q-badge">Question 1 · 30 marks · 45 min</span>
+        <div class="q-title">JSS 3 Final Examination Results</div>
+        <div class="q-intro">The table shows scores for 8 students across 5 subjects. Complete all tasks using formulas and formatting. The spreadsheet auto-checks your work.</div>
+      </div>
+      <div class="q-scroll">
+        <div class="q-phase">Formatting</div>
+        <div class="task" id="t1"><span class="tn">i.</span><span class="tck" id="c1">○</span><span class="ttxt">Type <b>JSS 3 FINAL EXAMINATION RESULTS</b> in cell A1. Make it <b>bold</b>. <em>(3 marks)</em></span></div>
+        <div class="task" id="t2"><span class="tn">ii.</span><span class="tck" id="c2">○</span><span class="ttxt">Make the column header row (row 2) <b>bold</b> and apply a background colour. <em>(3 marks)</em></span></div>
+
+        <div class="q-phase">Formulas</div>
+        <div class="task" id="t3"><span class="tn">iii.</span><span class="tck" id="c3">○</span><span class="ttxt">In column G, use <code>=SUM(B:F)</code> to calculate each student's <b>Total</b>. <em>(4 marks)</em></span></div>
+        <div class="task" id="t4"><span class="tn">iv.</span><span class="tck" id="c4">○</span><span class="ttxt">In column H, use <code>=AVERAGE(B:F)</code> for each student's <b>Average</b>. <em>(4 marks)</em></span></div>
+        <div class="task" id="t5"><span class="tn">v.</span><span class="tck" id="c5">○</span><span class="ttxt">In column I, use a nested <code>=IF</code> to assign <b>Grades</b>: A(≥70), B(≥60), C(≥50), D(≥40), F(&lt;40). <em>(5 marks)</em></span></div>
+
+        <div class="q-phase">Summary Row</div>
+        <div class="task" id="t6"><span class="tn">vi.</span><span class="tck" id="c6">○</span><span class="ttxt">In row 12, use <code>=AVERAGE</code> for each subject's <b>Class Average</b>; row 13 <code>=MAX</code>, row 14 <code>=MIN</code>. <em>(5 marks)</em></span></div>
+
+        <div class="q-phase">Analysis</div>
+        <div class="task" id="t7"><span class="tn">vii.</span><span class="tck" id="c7">○</span><span class="ttxt">Use <code>=COUNTIF</code> or <code>=COUNT</code> anywhere to count students who passed (Score ≥ 50). <em>(3 marks)</em></span></div>
+        <div class="task" id="t8"><span class="tn">viii.</span><span class="tck" id="c8">○</span><span class="ttxt">Insert a <b>Bar Chart</b> showing each student's total score. <em>(3 marks)</em></span></div>
+      </div>
+      <div class="q-footer">
+        <button class="q-btn g" onclick="toggleDrawer()">Close</button>
+        <button class="q-btn p" onclick="showResults()">Submit & Mark</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHART MODAL -->
+<div class="overlay" id="chart-overlay">
+  <div class="modal">
+    <h3>📊 Student Totals — Bar Chart <button class="modal-close" onclick="closeChart()">✕</button></h3>
+    <canvas id="chart-canvas" width="450" height="250"></canvas>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-top:8px;text-align:center;" id="chart-msg"></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-overlay" id="results-screen">
+  <div class="res-box">
+    <div class="res-brand">GrantApp AI · WAEC 2026</div>
+    <div class="res-title">Marking Complete</div>
+    <div class="res-score" id="res-score">—</div>
+    <div class="res-max">out of 30 marks</div>
+    <div class="res-bd" id="res-bd"></div>
+    <button class="res-btn" onclick="document.getElementById('results-screen').classList.remove('show')">Review Spreadsheet</button>
+    <button class="res-btn g" style="margin-top:4px;" onclick="location.reload()">Reset & Retry</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const ROWS = 20, COLS = 12;
+const COL_LABELS = 'ABCDEFGHIJKL'.split('');
+const STUDENTS = ['Adaeze Obi','Emeka Nwosu','Fatima Aliyu','Gbenga Lawal','Hauwa Ibrahim','Kola Adedeji','Ngozi Ezeh','Tunde Bakare'];
+const SCORES = [[72,68,75,60,55],[55,49,62,70,66],[88,92,85,79,83],[40,38,45,42,35],[61,74,58,66,70],[33,28,40,35,30],[78,82,69,74,77],[50,55,48,52,60]];
+const SUBJECTS = ['English','Maths','Basic Sci','Soc. Studies','Civic Edu'];
+
+// ═══════════════════════════════════════════════════════════════
+// GRID STATE
+// ═══════════════════════════════════════════════════════════════
+// cell id → {value, fmt:{bold,italic,underline,align,bg,tc,merged}}
+let G = {};
+let colWidths = {}; // col index → px width
+let selCell = 'A1';
+let editing = null;
+let frozen = {row:0, col:0}; // freeze rows/cols
+let chartDrawn = false;
+let drawerOpen = false;
+
+function cid(r,c){ return COL_LETTERS(c)+r; }
+function COL_LETTERS(c){ return COL_LABELS[c-1]||''; }
+function parseRef(id){ return {col:COL_LABELS.indexOf(id[0])+1, row:parseInt(id.slice(1))}; }
+
+function initGrid(){
+  for(let r=1;r<=ROWS;r++) for(let c=1;c<=COLS;c++){
+    G[cid(r,c)]={value:'',fmt:{bold:false,italic:false,underline:false,align:'',bg:'',tc:'',merged:false}};
+  }
+  // Seed
+  seed();
+  // Default col widths
+  for(let c=1;c<=COLS;c++) colWidths[c] = c===1?140:c<=9?90:110;
+  colWidths[10]=140; // J — student names
+}
+
+function seed(){
+  // Row 2 headers
+  setV('A2','S/N'); setV('B2','English'); setV('C2','Maths'); setV('D2','Basic Sci');
+  setV('E2','Soc.Studies'); setV('F2','Civic Edu'); setV('G2','Total'); setV('H2','Average'); setV('I2','Grade'); setV('J2','Student Name');
+  for(let c=1;c<=10;c++) G[cid(2,c)].fmt.bold=true;
+  // Student data rows 3–10
+  STUDENTS.forEach((name,i)=>{
+    const r=3+i;
+    setV(cid(r,1),String(i+1));
+    SCORES[i].forEach((s,j)=>setV(cid(r,2+j),String(s)));
+    setV(cid(r,10),name);
+    G[cid(r,10)].fmt.align='l';
+  });
+  // Row labels
+  setV('A12','Class Avg'); G['A12'].fmt.bold=true;
+  setV('A13','Highest');   G['A13'].fmt.bold=true;
+  setV('A14','Lowest');    G['A14'].fmt.bold=true;
+}
+
+function setV(id,val){
+  if(!G[id]) return;
+  G[id].value=val;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORMULA ENGINE
+// ═══════════════════════════════════════════════════════════════
+function numVal(id){
+  const cell=G[id]; if(!cell) return NaN;
+  const v=cell.value;
+  if(v===''||v===null||v===undefined) return NaN;
+  if(typeof v==='string'&&v.startsWith('=')){
+    const r=evalFormula(v.slice(1),id);
+    return typeof r==='number'?r:parseFloat(r);
+  }
+  return parseFloat(v);
+}
+
+function strVal(id){
+  const cell=G[id]; if(!cell) return '';
+  const v=cell.value;
+  if(typeof v==='string'&&v.startsWith('=')){
+    const r=evalFormula(v.slice(1),id);
+    return String(r);
+  }
+  return String(v);
+}
+
+function rangeVals(ref){
+  const[a,b]=ref.toUpperCase().split(':');
+  const{col:c1,row:r1}=parseRef(a);
+  const{col:c2,row:r2}=parseRef(b);
+  const vals=[];
+  for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++){
+    const v=numVal(cid(r,c)); if(!isNaN(v)) vals.push(v);
+  }
+  return vals;
+}
+
+function evalFormula(expr,selfId=''){
+  expr=expr.trim();
+  const UE=expr.toUpperCase();
+  try{
+    // SUM
+    let m=UE.match(/^SUM\(([A-Z]\d+:[A-Z]\d+)\)$/);
+    if(m){ return rangeVals(m[1]).reduce((a,b)=>a+b,0); }
+    // AVERAGE
+    m=UE.match(/^AVERAGE\(([A-Z]\d+:[A-Z]\d+)\)$/);
+    if(m){ const v=rangeVals(m[1]); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; }
+    // MAX
+    m=UE.match(/^MAX\(([A-Z]\d+:[A-Z]\d+)\)$/);
+    if(m){ const v=rangeVals(m[1]); return v.length?Math.max(...v):''; }
+    // MIN
+    m=UE.match(/^MIN\(([A-Z]\d+:[A-Z]\d+)\)$/);
+    if(m){ const v=rangeVals(m[1]); return v.length?Math.min(...v):''; }
+    // COUNT
+    m=UE.match(/^COUNT\(([A-Z]\d+:[A-Z]\d+)\)$/);
+    if(m){ return rangeVals(m[1]).length; }
+    // COUNTIF — =COUNTIF(range,criteria)
+    m=UE.match(/^COUNTIF\(([A-Z]\d+:[A-Z]\d+),(.+)\)$/);
+    if(m){
+      const vals=rangeVals(m[1]); const crit=m[2].trim().replace(/"/g,'');
+      const cm=crit.match(/^(>=|<=|>|<|<>|=)?([\d.]+)$/);
+      if(!cm) return 0;
+      const op=cm[1]||'=',v=parseFloat(cm[2]);
+      return vals.filter(x=>{ switch(op){ case'>=':return x>=v;case'<=':return x<=v;case'>':return x>v;case'<':return x<v;case'<>':return x!==v;default:return x===v;} }).length;
+    }
+    // ROUND
+    m=UE.match(/^ROUND\(([A-Z]\d+:[A-Z]\d+|[A-Z]\d+),(\d+)\)$/);
+    if(m){
+      const inner=m[1].includes(':')?rangeVals(m[1])[0]:numVal(m[1]);
+      return parseFloat(inner.toFixed(parseInt(m[2])));
+    }
+    // IF — handle deeply nested
+    m=expr.match(/^IF\((.+)\)$/si);
+    if(m) return evalIF(m[1]);
+    // Single cell ref
+    m=UE.match(/^([A-Z]\d+)$/);
+    if(m) return numVal(m[1]);
+    // Arithmetic with cell refs
+    const safe=expr.replace(/([A-Za-z]\d+)/g,ref=>{ const v=numVal(ref.toUpperCase()); return isNaN(v)?0:v; });
+    // eslint-disable-next-line no-new-func
+    const r=Function('"use strict";return('+safe+')')();
+    return isNaN(r)?'#ERR':r;
+  }catch(e){ return '#ERR'; }
+}
+
+function evalIF(inner){
+  // Tokenise respecting parenthesis depth
+  let depth=0,parts=[],cur='';
+  for(const ch of inner){
+    if(ch==='(') depth++;
+    if(ch===')') depth--;
+    if(ch===','&&depth===0){ parts.push(cur.trim()); cur=''; }
+    else cur+=ch;
+  }
+  parts.push(cur.trim());
+  if(parts.length<3) return '#ERR';
+  const cond=evalCond(parts[0]);
+  const branch=cond?parts[1]:parts[2];
+  // Recurse if nested IF
+  if(branch.toUpperCase().startsWith('IF(')) return evalIF(branch.slice(3,-1));
+  // String literal
+  if(branch.startsWith('"')&&branch.endsWith('"')) return branch.slice(1,-1);
+  // Cell ref
+  const cr=branch.toUpperCase().match(/^([A-Z]\d+)$/);
+  if(cr) return numVal(cr[1]);
+  // Number
+  const n=parseFloat(branch);
+  return isNaN(n)?branch:n;
+}
+
+function evalCond(cond){
+  cond=cond.trim();
+  const m=cond.match(/^(.+?)\s*(>=|<=|<>|>|<|=)\s*(.+)$/);
+  if(!m) return false;
+  const lv=resolveVal(m[1].trim()), op=m[2], rv=resolveVal(m[3].trim());
+  switch(op){ case'>=':return lv>=rv;case'<=':return lv<=rv;case'>':return lv>rv;case'<':return lv<rv;case'<>':return lv!==rv;case'=':return lv===rv; }
+  return false;
+}
+
+function resolveVal(s){
+  s=s.trim();
+  if(s.startsWith('"')&&s.endsWith('"')) return s.slice(1,-1);
+  const m=s.toUpperCase().match(/^([A-Z]\d+)$/);
+  if(m) return numVal(m[1]);
+  const n=parseFloat(s);
+  return isNaN(n)?s:n;
+}
+
+function computeDisplay(id){
+  const cell=G[id]; if(!cell) return '';
+  const v=cell.value;
+  if(typeof v!=='string'||!v.startsWith('=')) return v;
+  const r=evalFormula(v.slice(1),id);
+  if(typeof r==='number'&&!isNaN(r)){
+    // Average column H → 1dp
+    const col=id.charCodeAt(0)-64;
+    if(col===8&&id.slice(1)>='3'&&parseInt(id.slice(1))<=10) return r.toFixed(1);
+    return Number.isInteger(r)?String(r):parseFloat(r.toFixed(4)).toString();
+  }
+  return String(r);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function buildGrid(){
+  const grid=document.getElementById('ss-grid');
+  grid.innerHTML='';
+
+  // Header row
+  const hdrRow=div('grid-row');
+  hdrRow.appendChild(makeCorner());
+  for(let c=1;c<=COLS;c++) hdrRow.appendChild(makeColHdr(c));
+  grid.appendChild(hdrRow);
+
+  // Data rows
+  for(let r=1;r<=ROWS;r++){
+    const row=div('grid-row');
+    row.appendChild(makeRowHdr(r));
+    for(let c=1;c<=COLS;c++) row.appendChild(makeCell(r,c));
+    grid.appendChild(row);
+  }
+  renderAllCells();
+}
+
+function div(cls){ const d=document.createElement('div'); if(cls) d.className=cls; return d; }
+
+function makeCorner(){
+  const d=div('hdr-corner');
+  d.style.setProperty('--rhw','42px');
+  d.style.width='42px';d.style.minWidth='42px';
+  return d;
+}
+
+function makeColHdr(c){
+  const d=div('col-hdr');
+  d.id='ch-'+c;
+  const w=colWidths[c]||110;
+  d.style.width=w+'px';d.style.minWidth=w+'px';
+  d.textContent=COL_LABELS[c-1];
+  // Resize handle
+  const rh=div('col-resize-handle');
+  rh.onmousedown=e=>startColResize(e,c);
+  d.appendChild(rh);
+  return d;
+}
+
+function makeRowHdr(r){
+  const d=div('row-hdr');
+  d.id='rh-'+r;
+  d.style.height='26px';
+  d.textContent=r;
+  return d;
+}
+
+function makeCell(r,c){
+  const id=cid(r,c);
+  const d=div('cell');
+  d.id='c-'+id;
+  d.style.width=(colWidths[c]||110)+'px';
+  d.style.minWidth=(colWidths[c]||110)+'px';
+  d.onclick=e=>selectCell(id,e);
+  d.ondblclick=()=>startEdit(id);
+  return d;
+}
+
+function renderAllCells(){
+  for(let r=1;r<=ROWS;r++) for(let c=1;c<=COLS;c++) renderCell(r,c);
+  updateFreezeLines();
+}
+
+function renderCell(r,c){
+  const id=cid(r,c);
+  const el=document.getElementById('c-'+id);
+  if(!el||editing===id) return;
+  const cell=G[id];
+  const disp=computeDisplay(id);
+  el.textContent=disp;
+
+  // Classes
+  el.className='cell';
+  if(id===selCell) el.classList.add('sel');
+  if(cell.fmt.bold) el.classList.add('bold');
+  if(cell.fmt.italic) el.classList.add('italic');
+  if(cell.fmt.underline) el.classList.add('underline');
+  if(cell.fmt.align) el.classList.add('align-'+cell.fmt.align);
+  if(cell.fmt.bg) el.classList.add(cell.fmt.bg);
+  if(cell.fmt.tc) el.classList.add(cell.fmt.tc);
+  if(cell.fmt.merged) el.style.fontWeight='600';
+
+  // Frozen visual hint
+  if(frozen.col>0&&c===frozen.col) el.classList.add('frozen-col');
+  if(frozen.row>0&&r===frozen.row) el.classList.add('frozen-row');
+
+  // Grade coloring auto-hint
+  const col=c, row=r;
+  if(col===9&&row>=3&&row<=10){
+    const g=disp;
+    if(g==='A') el.classList.add('tc-accent');
+    else if(g==='B') el.classList.add('tc-green');
+    else if(g==='C') el.classList.add('tc-gold');
+    else if(g==='D') el.classList.add('tc-gold');
+    else if(g==='F') el.classList.add('tc-red');
+  }
+
+  el.style.width=(colWidths[c]||110)+'px';
+  el.style.minWidth=(colWidths[c]||110)+'px';
+}
+
+function rerender(){
+  renderAllCells();
+  updateFbar();
+  updateStats();
+  checkTasks();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FREEZE PANES
+// ═══════════════════════════════════════════════════════════════
+function updateFreezeLines(){
+  document.querySelectorAll('.freeze-col-line,.freeze-row-line').forEach(e=>e.remove());
+}
+
+function freezePanes(){
+  const{row,col}=parseRef(selCell);
+  frozen={row:row-1, col:col-1};
+  // Visual sticky for frozen — simplified: just mark border cells
+  for(let r=1;r<=ROWS;r++) renderCell(r,frozen.col);
+  for(let c=1;c<=COLS;c++) renderCell(frozen.row,c);
+  setStatus('Frozen at row '+(frozen.row)+', col '+(frozen.col));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SELECTION
+// ═══════════════════════════════════════════════════════════════
+function selectCell(id,e){
+  if(editing&&editing!==id) commitEdit();
+  const old=selCell; selCell=id;
+  const oel=document.getElementById('c-'+old); if(oel) oel.classList.remove('sel');
+  const nel=document.getElementById('c-'+id);  if(nel) nel.classList.add('sel');
+  // Highlight headers
+  document.querySelectorAll('.col-hdr,.row-hdr').forEach(el=>el.classList.remove('hlt'));
+  const{col,row}=parseRef(id);
+  document.getElementById('ch-'+col)?.classList.add('hlt');
+  document.getElementById('rh-'+row)?.classList.add('hlt');
+  updateFbar(); updateStats(); updateFmtButtons();
+  scrollIntoView(id);
+}
+
+function scrollIntoView(id){
+  const el=document.getElementById('c-'+id);
+  if(el) el.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+
+function updateFbar(){
+  document.getElementById('namebox').textContent=selCell;
+  if(!editing){
+    const v=G[selCell]?.value||'';
+    document.getElementById('fbar').value=v;
+  }
+}
+
+function updateStats(){
+  const v=numVal(selCell);
+  if(!isNaN(v)){
+    document.getElementById('bs-sum').textContent=v;
+    document.getElementById('bs-avg').textContent=v;
+    document.getElementById('bs-cnt').textContent=1;
+  } else {
+    document.getElementById('bs-sum').textContent='—';
+    document.getElementById('bs-avg').textContent='—';
+    document.getElementById('bs-cnt').textContent=0;
+  }
+}
+
+function updateFmtButtons(){
+  const f=G[selCell]?.fmt||{};
+  document.getElementById('btn-B')?.classList.toggle('active',!!f.bold);
+  document.getElementById('btn-I')?.classList.toggle('active',!!f.italic);
+  document.getElementById('btn-U')?.classList.toggle('active',!!f.underline);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EDITING
+// ═══════════════════════════════════════════════════════════════
+function startEdit(id){
+  if(editing===id) return;
+  if(editing) commitEdit();
+  editing=id;
+  const el=document.getElementById('c-'+id);
+  if(!el) return;
+  const inp=document.createElement('input');
+  inp.className='cell-editor';
+  inp.value=G[id].value||'';
+  inp.onkeydown=editorKey;
+  inp.oninput=()=>{ document.getElementById('fbar').value=inp.value; };
+  el.innerHTML=''; el.appendChild(inp);
+  inp.focus(); inp.select();
+}
+
+function commitEdit(){
+  if(!editing) return;
+  const el=document.getElementById('c-'+editing);
+  const inp=el?.querySelector('.cell-editor');
+  if(inp){ G[editing].value=inp.value.trim(); }
+  editing=null;
+  rerender();
+}
+
+function editorKey(e){
+  if(e.key==='Enter'){e.preventDefault();commitEdit();move(1,0);}
+  if(e.key==='Tab'){e.preventDefault();commitEdit();move(0,1);}
+  if(e.key==='Escape'){editing=null;rerender();}
+}
+
+function fbarKey(e){
+  if(e.key==='Enter'){
+    G[selCell].value=e.target.value.trim();
+    e.target.blur();
+    rerender();
+  }
+}
+function fbarType(){
+  // live sync
+  if(editing){
+    const inp=document.getElementById('c-'+editing)?.querySelector('.cell-editor');
+    if(inp) inp.value=document.getElementById('fbar').value;
+  }
+}
+
+function move(dr,dc){
+  const{col,row}=parseRef(selCell);
+  const nr=Math.max(1,Math.min(ROWS,row+dr));
+  const nc=Math.max(1,Math.min(COLS,col+dc));
+  selectCell(cid(nr,nc));
+}
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(editing) return;
+  const arrows={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+  if(arrows[e.key]){e.preventDefault();move(...arrows[e.key]);return;}
+  if(e.key==='Enter'||e.key==='F2'){e.preventDefault();startEdit(selCell);return;}
+  if(e.key==='Delete'||e.key==='Backspace'){G[selCell].value='';rerender();return;}
+  if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();toggleFmt('bold');return;}
+  if((e.ctrlKey||e.metaKey)&&e.key==='i'){e.preventDefault();toggleFmt('italic');return;}
+  if((e.ctrlKey||e.metaKey)&&e.key==='u'){e.preventDefault();toggleFmt('underline');return;}
+  if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){
+    startEdit(selCell);
+    setTimeout(()=>{
+      const inp=document.getElementById('c-'+selCell)?.querySelector('.cell-editor');
+      if(inp){inp.value=e.key;document.getElementById('fbar').value=e.key;}
+    },0);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FORMATTING
+// ═══════════════════════════════════════════════════════════════
+function toggleFmt(prop){ G[selCell].fmt[prop]=!G[selCell].fmt[prop]; rerender(); }
+function setAlign(a){ G[selCell].fmt.align=a; rerender(); }
+function applyBg(cls){ G[selCell].fmt.bg=cls; rerender(); }
+function applyTc(cls){ G[selCell].fmt.tc=cls; rerender(); }
+function mergeSelected(){ G[selCell].fmt.merged=!G[selCell].fmt.merged; rerender(); }
+
+// ═══════════════════════════════════════════════════════════════
+// COLUMN RESIZE
+// ═══════════════════════════════════════════════════════════════
+let resizeState=null;
+function startColResize(e,col){
+  e.preventDefault();
+  resizeState={col,startX:e.clientX,startW:colWidths[col]||110};
+}
+document.addEventListener('mousemove',e=>{
+  if(!resizeState) return;
+  const newW=Math.max(40,resizeState.startW+(e.clientX-resizeState.startX));
+  colWidths[resizeState.col]=newW;
+  // Update all cells in column
+  document.getElementById('ch-'+resizeState.col).style.width=newW+'px';
+  document.getElementById('ch-'+resizeState.col).style.minWidth=newW+'px';
+  for(let r=1;r<=ROWS;r++){
+    const el=document.getElementById('c-'+cid(r,resizeState.col));
+    if(el){el.style.width=newW+'px';el.style.minWidth=newW+'px';}
+  }
+});
+document.addEventListener('mouseup',()=>{ resizeState=null; });
+
+// ═══════════════════════════════════════════════════════════════
+// INSERT FORMULA HELPER
+// ═══════════════════════════════════════════════════════════════
+const FN_TEMPLATES={
+  SUM:'=SUM(B3:F3)',AVERAGE:'=AVERAGE(B3:F3)',MAX:'=MAX(B3:B10)',
+  MIN:'=MIN(B3:B10)',IF:'=IF(H3>=70,"A",IF(H3>=60,"B",IF(H3>=50,"C",IF(H3>=40,"D","F"))))',
+  COUNT:'=COUNTIF(H3:H10,">=50")'
+};
+function insertFn(fn){
+  startEdit(selCell);
+  setTimeout(()=>{
+    const inp=document.getElementById('c-'+selCell)?.querySelector('.cell-editor');
+    const tmpl=FN_TEMPLATES[fn]||'='+fn+'()';
+    if(inp){inp.value=tmpl;document.getElementById('fbar').value=tmpl;inp.focus();}
+  },30);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHART
+// ═══════════════════════════════════════════════════════════════
+function insertChart(){
+  const canvas=document.getElementById('chart-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#1A2030'; ctx.fillRect(0,0,W,H);
+  const pad={l:44,r:16,t:20,b:36};
+  const bw=W-pad.l-pad.r, bh=H-pad.t-pad.b;
+  const labels=[],vals=[];
+  for(let r=3;r<=10;r++){
+    labels.push(STUDENTS[r-3].split(' ')[0]);
+    const v=numVal(cid(r,7));
+    vals.push(isNaN(v)?0:v);
+  }
+  const maxV=Math.max(...vals,100);
+  const colors=['#4F8EF7','#22C55E','#F0B429','#EF4444','#A78BFA','#F59E0B','#06B6D4','#EC4899'];
+  // Grid lines
+  for(let i=0;i<=4;i++){
+    const y=pad.t+bh*(1-i/4);
+    ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle='rgba(238,240,246,0.3)'; ctx.font='9px DM Mono,monospace'; ctx.textAlign='right';
+    ctx.fillText(Math.round(maxV*i/4),pad.l-4,y+3);
+  }
+  // Bars
+  const barW=(bw/8)*0.55, gap=(bw/8)*0.45;
+  vals.forEach((v,i)=>{
+    const x=pad.l+i*(bw/8)+gap/2;
+    const bHeight=bh*(v/maxV);
+    const y=pad.t+bh-bHeight;
+    const g=ctx.createLinearGradient(x,y,x,y+bHeight);
+    g.addColorStop(0,colors[i]); g.addColorStop(1,colors[i]+'44');
+    ctx.fillStyle=g;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x,y,barW,bHeight,3);
+    else ctx.rect(x,y,barW,bHeight);
+    ctx.fill();
+    ctx.fillStyle=colors[i]; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(v||'?',x+barW/2,y-4);
+    ctx.fillStyle='rgba(238,240,246,0.45)'; ctx.font='8px DM Mono,monospace';
+    ctx.fillText(labels[i],x+barW/2,H-6);
+  });
+  chartDrawn=true;
+  document.getElementById('chart-msg').textContent='✓ Chart inserted — Task viii complete!';
+  document.getElementById('chart-overlay').classList.add('show');
+  checkTasks();
+}
+function closeChart(){ document.getElementById('chart-overlay').classList.remove('show'); }
+
+// ═══════════════════════════════════════════════════════════════
+// TASK CHECKER — more precise
+// ═══════════════════════════════════════════════════════════════
+function checkTasks(){
+  const results={};
+
+  // T1: A1 has heading text & bold
+  const a1=G['A1'];
+  results.t1 = a1&&a1.fmt.bold&&a1.value.length>4;
+
+  // T2: Row 2 has bold on at least 4 of A2:I2, plus any bg
+  let r2bold=0;
+  for(let c=1;c<=9;c++) if(G[cid(2,c)]?.fmt.bold) r2bold++;
+  const r2bg=Array.from({length:9},(_,i)=>G[cid(2,i+1)]?.fmt.bg).some(v=>v);
+  results.t2 = r2bold>=4&&r2bg;
+
+  // T3: G3:G10 — all have =SUM formulas
+  let sumOk=0;
+  for(let r=3;r<=10;r++){
+    const v=(G[cid(r,7)]?.value||'').toUpperCase();
+    if(v.startsWith('=')&&v.includes('SUM')) sumOk++;
+  }
+  results.t3 = sumOk>=6;
+
+  // T4: H3:H10 — AVERAGE formulas
+  let avgOk=0;
+  for(let r=3;r<=10;r++){
+    const v=(G[cid(r,8)]?.value||'').toUpperCase();
+    if(v.startsWith('=')&&v.includes('AVERAGE')) avgOk++;
+  }
+  results.t4 = avgOk>=6;
+
+  // T5: I3:I10 — IF formulas that produce A/B/C/D/F
+  let ifOk=0,gradeOk=0;
+  for(let r=3;r<=10;r++){
+    const v=(G[cid(r,9)]?.value||'').toUpperCase();
+    if(v.startsWith('=')&&v.includes('IF')) ifOk++;
+    const disp=computeDisplay(cid(r,9));
+    if(['A','B','C','D','F'].includes(disp)) gradeOk++;
+  }
+  results.t5 = ifOk>=6&&gradeOk>=4;
+
+  // T6: B12:F12 AVERAGE, B13:F13 MAX, B14:F14 MIN
+  let avgRow=0,maxRow=0,minRow=0;
+  for(let c=2;c<=6;c++){
+    if((G[cid(12,c)]?.value||'').toUpperCase().includes('AVERAGE')) avgRow++;
+    if((G[cid(13,c)]?.value||'').toUpperCase().includes('MAX')) maxRow++;
+    if((G[cid(14,c)]?.value||'').toUpperCase().includes('MIN')) minRow++;
+  }
+  results.t6 = avgRow>=3&&maxRow>=3&&minRow>=3;
+
+  // T7: Any cell has COUNT or COUNTIF
+  let hasCount=false;
+  for(const id in G){ if((G[id].value||'').toUpperCase().includes('COUNT')){ hasCount=true; break; } }
+  results.t7 = hasCount;
+
+  // T8: Chart drawn
+  results.t8 = chartDrawn;
+
+  let done=0;
+  for(let i=1;i<=8;i++){
+    const ok=!!results['t'+i];
+    if(ok) done++;
+    document.getElementById('t'+i)?.classList.toggle('done',ok);
+    const ci=document.getElementById('c'+i);
+    if(ci) ci.textContent=ok?'✓':'○';
+  }
+  document.getElementById('task-status').textContent=`${done}/8 tasks`;
+  document.getElementById('pill-count').textContent=`${done}/8`;
+  return results;
+}
+
+function autoCheck(){
+  const r=checkTasks();
+  const done=Object.values(r).filter(Boolean).length;
+  toggleDrawer(true);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════════
+const MARKS={t1:3,t2:3,t3:4,t4:4,t5:5,t6:5,t7:3,t8:3};
+const LABELS={
+  t1:'(i) Heading in A1, bold',t2:'(ii) Header row bold + fill',
+  t3:'(iii) SUM formulas (Total col)',t4:'(iv) AVERAGE formulas',
+  t5:'(v) Nested IF grades (A–F)',t6:'(vi) Class Avg / MAX / MIN rows',
+  t7:'(vii) COUNT / COUNTIF used',t8:'(viii) Bar chart inserted',
+};
+function showResults(){
+  const results=checkTasks();
+  let total=0,html='';
+  for(let i=1;i<=8;i++){
+    const ok=!!results['t'+i];
+    const earned=ok?MARKS['t'+i]:0;
+    total+=earned;
+    html+=`<div class="rb-row"><span>${LABELS['t'+i]}</span><b style="color:${ok?'var(--green)':'var(--red)'}">${earned}/${MARKS['t'+i]}</b></div>`;
+  }
+  document.getElementById('res-bd').innerHTML=html;
+  const sc=document.getElementById('res-score');
+  sc.textContent=total;
+  sc.style.color=total>=24?'var(--green)':total>=18?'var(--gold)':'var(--red)';
+  document.getElementById('results-screen').classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRAWER / RIBBON
+// ═══════════════════════════════════════════════════════════════
+function toggleDrawer(force){
+  drawerOpen=force!==undefined?force:!drawerOpen;
+  document.getElementById('q-drawer').classList.toggle('open',drawerOpen);
+}
+function setRTab(el){
+  document.querySelectorAll('.rtab').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+}
+function setStatus(msg){ /* could display in status bar */ }
+
+// ═══════════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════════
+let secs=45*60;
+function tick(){
+  secs--;if(secs<0)secs=0;
+  const m=Math.floor(secs/60),s=secs%60;
+  document.getElementById('tv').textContent=`${m}:${String(s).padStart(2,'0')}`;
+  const warn=secs<600,dang=secs<180;
+  document.getElementById('td').className='tb-dot'+(dang?' dang':warn?' warn':'');
+  document.getElementById('tv').className='tv'+(dang?' dang':warn?' warn':'');
+  if(secs>0) setTimeout(tick,1000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════
+initGrid();
+buildGrid();
+selectCell('A1');
+checkTasks();
+setTimeout(tick,1000);
+</script>
+</body>
+</html>
