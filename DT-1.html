@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>grantappai • Digital Systems Mock Exam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      background: #fefefe;
+      font-family: 'DM Sans', sans-serif;
+      color: #1e293b;
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 90px);
+    }
+    /* watermark diagonal */
+    .watermark {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-22deg) scale(1.4);
+      opacity: 0.045;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1e293b;
+      white-space: nowrap;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+    .watermark span {
+      display: block;
+      margin: 1rem 0;
+    }
+    /* light mode cards */
+    :root {
+      --bg: #fefefe;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --border: #e2e8f0;
+      --border2: #cbd5e1;
+      --text: #0f172a;
+      --sec: #334155;
+      --ter: #64748b;
+      --accent: #2563eb;
+      --accent2: #1d4ed8;
+      --gold: #eab308;
+      --green: #10b981;
+      --green2: #059669;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --r: 16px;
+      --serif: 'Instrument Serif', serif;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(37,99,235,0.02), transparent 70%);
+      pointer-events: none;
+    }
+    .hdr {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: calc(env(safe-area-inset-top) + 12px) 20px 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .hdr-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hdr-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hdr-brand {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .hdr-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-style: italic;
+      color: var(--text);
+    }
+    .hdr-meta {
+      font-size: 11px;
+      color: var(--ter);
+      font-family: var(--mono);
+    }
+    .timer-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 40px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+    }
+    .timer-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+    .timer-dot.warn { background: var(--amber); }
+    .timer-dot.dang { background: var(--red); animation: blink 1s infinite; }
+    .timer-val {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: #0f172a;
+    }
+    .score-strip {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 10px;
+      padding: 14px 20px 10px;
+    }
+    .sc {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 12px 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .sc-v {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .sc-v.g { color: var(--green); }
+    .sc-v.r { color: var(--red); }
+    .sc-v.b { color: var(--accent); }
+    .sc-l {
+      font-size: 9px;
+      color: var(--ter);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .prog-wrap { padding: 0 20px 16px; }
+    .prog-track {
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      width: 0%;
+      border-radius: 99px;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 8px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      color: var(--ter);
+      background: transparent;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab:first-child { border-radius: 12px 0 0 12px; }
+    .tab:last-child { border-radius: 0 12px 12px 0; border-left: none; }
+    .tab.active {
+      background: rgba(37,99,235,0.06);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .panel { display: none; animation: fade 0.2s ease; }
+    .panel.active { display: block; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    .sect-hdr {
+      margin: 12px 20px 16px;
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+    }
+    .sect-hdr-title {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-style: italic;
+      color: var(--text);
+    }
+    .sect-hdr-meta {
+      font-size: 11px;
+      color: var(--ter);
+      font-family: var(--mono);
+    }
+    .qcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .qcard-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .qnum {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ter);
+    }
+    .qtopic {
+      font-size: 10px;
+      padding: 4px 10px;
+      background: #eef2ff;
+      border-radius: 30px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .qtxt {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 18px;
+      font-weight: 500;
+    }
+    .opts { display: flex; flex-direction: column; gap: 10px; }
+    .opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .opt.sel { border-color: var(--accent); background: #eff6ff; }
+    .opt.ok { border-color: var(--green); background: #ecfdf5; }
+    .opt.no { border-color: var(--red); background: #fef2f2; }
+    .opt.locked { cursor: default; }
+    .opt-key {
+      font-family: var(--mono);
+      font-weight: 600;
+      color: var(--accent);
+      width: 24px;
+    }
+    .opt-txt { font-size: 14px; color: var(--sec); }
+    .abtn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 40px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .abtn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .exp {
+      display: none;
+      margin-top: 16px;
+      background: #fef9e3;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 13px;
+      color: #334155;
+    }
+    .exp.show { display: block; }
+    .exp.wrong-exp { background: #fee2e2; }
+    .exp.partial-exp { background: #fffbeb; }
+    .kw-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .kw-tag {
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .kw-tag.hit { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .kw-tag.miss { background: #fee2e2; color: #b91c1c; text-decoration: line-through; opacity: 0.7; }
+    .theory-marks-badge {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-family: var(--mono);
+      margin-bottom: 12px;
+    }
+    .prose-area {
+      width: 100%;
+      min-height: 140px;
+      padding: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      font-family: var(--sans);
+      font-size: 14px;
+      resize: vertical;
+    }
+    .word-count {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ter);
+      text-align: right;
+      margin-top: 5px;
+    }
+    .submit-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      display: flex;
+      gap: 12px;
+      z-index: 200;
+    }
+    .submit-btn {
+      flex: 1;
+      padding: 12px;
+      background: var(--accent);
+      color: white;
+      border-radius: 40px;
+      font-weight: 600;
+      border: none;
+    }
+    .results-screen {
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 400;
+      display: none;
+      overflow-y: auto;
+      padding: 28px 20px;
+    }
+    .results-screen.show { display: flex; flex-direction: column; }
+    .grade-circle { width: 110px; height: 110px; border-radius: 50%; border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-direction: column; margin: 0 auto 12px; }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 500;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: 28px; padding: 24px; width: 90%; max-width: 380px; }
+    @media print { body { background: white; } .watermark, .submit-bar, .modal-overlay { display: none; } }
+  </style>
+</head>
+<body>
+<div class="watermark" aria-hidden="true"><span>grantappai</span><span>grantappai</span><span>grantappai</span><span>grantappai</span><span>grantappai</span></div>
+<header class="hdr"><div class="hdr-inner"><div class="hdr-left"><span class="hdr-brand">grantappai • academia</span><span class="hdr-title">Digital Systems — Vector 1</span><span class="hdr-meta" id="hdr-meta">Fundamentals · <span id="answered-count">0</span> answered</span></div><div class="timer-pill"><div class="timer-dot" id="timer-dot"></div><span class="timer-val" id="timer-val">1:30:00</span></div></div></header>
+<div class="score-strip"><div class="sc"><div class="sc-v b" id="sc-total">100</div><div class="sc-l">Total</div></div><div class="sc"><div class="sc-v g" id="sc-marks">0</div><div class="sc-l">Marks</div></div><div class="sc"><div class="sc-v" id="sc-obj">0/50</div><div class="sc-l">OBJ</div></div><div class="sc"><div class="sc-v d" id="sc-thy">0/5</div><div class="sc-l">Theory/Prac</div></div></div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+<div class="tabs"><button class="tab active" onclick="switchTab('obj')">📘 Section A — 50 MCQs</button><button class="tab" onclick="switchTab('thy')">✍️ Section B — Theory + Practical</button></div>
+<div class="panel active" id="panel-obj"><div class="sect-hdr"><div class="sect-hdr-title">Objective Questions (50 marks)</div><div class="sect-hdr-meta">1 mark each · answer all</div></div><div id="obj-qc"></div></div>
+<div class="panel" id="panel-thy"><div class="thy-selection-info" style="margin:8px 20px 0;background:#f1f5f9;padding:10px;border-radius:14px;"><span>Answer <strong>5 questions</strong> (3 Theory + 2 Practical) · 10 marks each</span><br><span id="thy-answered-display">0 of 5 answered.</span></div><div id="thy-qc"></div></div>
+<div class="submit-bar"><div class="submit-progress" id="sub-prog">OBJ: 0/50 · Section B: 0/5</div><button class="submit-btn" onclick="showSubmitModal()">Submit Exam</button><button class="submit-btn" onclick="doPrint()" style="flex:0;padding:12px 18px;background:#f1f5f9;color:#334155;">🖨️</button></div>
+<div class="modal-overlay" id="submit-modal"><div class="modal"><h3>Submit assessment?</h3><div class="modal-row" style="display:flex;justify-content:space-between;margin:12px 0"><span>OBJ answered</span><b id="m-obj">0/50</b></div><div class="modal-row"><span>Theory/Practical</span><b id="m-thy">0/5</b></div><div class="modal-row"><span>Current marks</span><b id="m-marks">0/100</b></div><div class="modal-btns" style="display:flex;gap:12px;margin-top:20px"><button class="modal-btn ghost" onclick="hideSubmitModal()">Keep going</button><button class="modal-btn primary" onclick="submitExam()">Submit now</button></div></div></div>
+<div class="results-screen" id="results-screen"><div class="results-brand">grantappai · WAEC-style</div><div class="results-title">Fundamentals of Digital Systems</div><div class="grade-circle-wrap"><div class="grade-circle"><span class="grade-score" id="res-score">—</span><span class="grade-label">/100</span></div><span class="grade-badge" id="res-badge">—</span></div><div class="results-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0"><div><div id="res-obj-marks">—</div><div class="sc-l">Obj marks</div></div><div><div id="res-thy-marks">—</div><div class="sc-l">Section B marks</div></div></div><button class="results-btn" onclick="reviewAnswers()">Review answers</button><button class="results-btn" onclick="doPrint()">Download PDF</button></div>
+<script>
+// ---- 50 MCQ from Vector 1 (full dataset) ----
+const OBJ_Q = [
+  {id:'o1',topic:'Digital concepts',text:'The term "digital" in Digital Technologies primarily refers to data represented as...',opts:{A:'Continuous electrical waves',B:'Discrete binary values',C:'Analog signals',D:'Mechanical gears and levers'},ans:'B',exp:'Digital uses discrete binary states (0/1).'},
+  {id:'o2',topic:'Digital vs Analog',text:'A key characteristic that distinguishes a digital computer from an analog computer is that the digital computer...',opts:{A:'Processes continuous data',B:'Is always faster',C:'Processes data using binary',D:'Cannot be used for calculations'},ans:'C',exp:'Digital computers use discrete binary representation.'},
+  {id:'o3',topic:'Stored-program',text:'A machine is said to be a "stored-program" computer if it...',opts:{A:'Has a hard disk drive',B:'Stores data and instructions in the same memory',C:'Uses only solid-state storage',D:'Requires a human to change programs manually'},ans:'B',exp:'Von Neumann concept: single memory for instructions and data.'},
+  {id:'o4',topic:'Von Neumann',text:'The von Neumann architecture fundamentally introduced which concept?',opts:{A:'Separate memory for data and programs',B:'Stored-program using a single shared memory',C:'The use of transistors instead of vacuum tubes',D:'Parallel processing'},ans:'B',exp:'Stored program unified memory.'},
+  {id:'o5',topic:'Generations',text:'First-generation computers were characterized by...',opts:{A:'Integrated Circuits',B:'Transistors',C:'Vacuum tubes and massive size',D:'Microprocessors'},ans:'C',exp:'1940s–50s: vacuum tubes, ENIAC era.'},
+  {id:'o6',topic:'Generations',text:'Which generation of computers introduced the use of microprocessors, enabling the development of personal computers?',opts:{A:'Second Generation',B:'Third Generation',C:'Fourth Generation',D:'Fifth Generation'},ans:'C',exp:'Fourth generation (1970s–80s) microprocessors.'},
+  {id:'o7',topic:'Generations',text:'Fifth-generation computers are primarily associated with...',opts:{A:'Thermionic valves',B:'Very Large Scale Integration',C:'Artificial Intelligence and parallel processing',D:'Magnetic drum memory'},ans:'C',exp:'AI and intelligent systems.'},
+  {id:'o8',topic:'Pioneers',text:'Which computing pioneer is credited with the conceptual design of the Analytical Engine?',opts:{A:'Blaise Pascal',B:'John von Neumann',C:'Charles Babbage',D:'Alan Turing'},ans:'C',exp:'Babbage designed Analytical Engine.'},
+  {id:'o9',topic:'Pioneers',text:'Lady Ada Lovelace is historically recognized as the first...',opts:{A:'Computer engineer',B:'Programmer, for  Babbage\'s machine',C:'Inventor of the transistor',D:'GUI designer'},ans:'B',exp:'Ada Lovelace, first programmer.'},
+  {id:'o10',topic:'Generations',text:'The transition from vacuum tubes to transistors marked a significant advancement because transistors were...',opts:{A:'Larger and consumed more power',B:'Smaller, faster, more reliable, and generated less heat',C:'Wireless components',D:'Only used in analog computers'},ans:'B',exp:'Transistors revolutionized reliability and size.'},
+  {id:'o11',topic:'Classification',text:'A powerful computer capable of quadrillions of calculations per second, used for weather forecasting, is a...',opts:{A:'Personal Computer',B:'Mainframe',C:'Supercomputer',D:'Minicomputer'},ans:'C',exp:'Supercomputers achieve extreme performance.'},
+  {id:'o12',topic:'Classification',text:'Which type handles hundreds of concurrent users, used by banks?',opts:{A:'Embedded',B:'Supercomputer',C:'Workstation',D:'Mainframe'},ans:'D',exp:'Mainframes for high-volume transactions.'},
+  {id:'o13',topic:'Embedded',text:'A small specialized computer inside a microwave or engine is called?',opts:{A:'Microcomputer',B:'Embedded system',C:'Server farm',D:'Hybrid'},ans:'B',exp:'Embedded systems are task-specific.'},
+  {id:'o14',topic:'Workstation',text:'High-end desktop for CAD/video editing is a?',opts:{A:'Tablet',B:'Thin client',C:'Workstation',D:'Netbook'},ans:'C',exp:'Workstations offer high performance.'},
+  {id:'o15',topic:'Classification',text:'A smartphone is best classified as a?',opts:{A:'Mainframe',B:'Hybrid',C:'Microcomputer',D:'Analog'},ans:'C',exp:'Smartphones are powerful microcomputers.'},
+  {id:'o16',topic:'Classification',text:'Which classification is based on type of data processed?',opts:{A:'Digital, Analog, Hybrid',B:'Super/Mainframe/Micro',C:'General/Special purpose',D:'Desktop/Laptop'},ans:'A',exp:'Analog, digital, hybrid categories.'},
+  {id:'o17',topic:'Hybrid',text:'A hybrid computer combines features of...',opts:{A:'Super and mainframe',B:'Digital and analog',C:'Laptop and smartphone',D:'Hardware and software'},ans:'B',exp:'Hybrid merges analog & digital.'},
+  {id:'o18',topic:'Special purpose',text:'Example of a special-purpose computer is?',opts:{A:'Gaming laptop',B:'School PC',C:'Automatic Teller Machine (ATM)',D:'Office desktop'},ans:'C',exp:'ATM has dedicated function.'},
+  {id:'o19',topic:'General purpose',text:'General-purpose computers are designed to...',opts:{A:'Execute a single fixed program',B:'Run a variety of applications',C:'Only math',D:'Operate without OS'},ans:'B',exp:'Versatility via software.'},
+  {id:'o20',topic:'Motherboard',text:'The main circuit board connecting all core components is the?',opts:{A:'Backplane',B:'Daughterboard',C:'Motherboard',D:'Power board'},ans:'C',exp:'Motherboard, central backbone.'},
+  {id:'o21',topic:'CPU units',text:'CPU consists of which three main functional units?',opts:{A:'RAM, ROM, Cache',B:'ALU, Control Unit, Registers',C:'Input, Output, Storage',D:'Motherboard, Bus, Clock'},ans:'B',exp:'ALU, CU, registers are core.'},
+  {id:'o22',topic:'ALU',text:'Component responsible for arithmetic and logical comparisons?',opts:{A:'Control Unit',B:'MAR',C:'ALU',D:'Clock'},ans:'C',exp:'Arithmetic Logic Unit.'},
+  {id:'o23',topic:'Control Unit',text:'The Control Unit functions as the?',opts:{A:'Long-term storage',B:'Traffic controller fetching/decoding',C:'High-speed cache',D:'Power regulator'},ans:'B',exp:'CU orchestrates instruction execution.'},
+  {id:'o24',topic:'Clock speed',text:'CPU clock speed measured in GHz indicates?',opts:{A:'Storage capacity',B:'Instruction cycles/, second',C:'Internet speed',D:'Monitor resolution'},ans:'B',exp:'Cycles per second (GHz).'},
+  {id:'o25',topic:'Multi-core',text:'Multiple processing cores on a single chip is called?',opts:{A:'Multi-Core Processor',B:'Chipset',C:'Distributed',D:'Cluster'},ans:'A',exp:'Multi-core improves parallelism.'},
+  {id:'o26',topic:'RAM',text:'Temporary volatile memory that holds active data is?',opts:{A:'ROM',B:'Flash',C:'RAM',D:'HDD'},ans:'C',exp:'Random Access Memory volatile.'},
+  {id:'o27',topic:'Volatile',text:'Why is RAM volatile?',opts:{A:'Catches fire',B:'Permanent without power',C:'Contents lost when power off',D:'Read-only'},ans:'C',exp:'Volatility means data loss on power loss.'},
+  {id:'o28',topic:'ROM',text:'Read Only Memory is primarily used to?',opts:{A:'Store user files',B:'Hold temporary app data',C:'Store BIOS/UEFI firmware',D:'Cache web pages'},ans:'C',exp:'ROM stores boot firmware.'},
+  {id:'o29',topic:'BIOS',text:'Firmware that initializes hardware during boot is?',opts:{A:'CMOS',B:'BIOS/UEFI',C:'Driver',D:'Boot sector'},ans:'B',exp:'Basic Input Output System.'},
+  {id:'o30',topic:'Cache',text:'Small high-speed memory near CPU storing frequent data is?',opts:{A:'Virtual memory',B:'Flash',C:'Cache memory',D:'Register'},ans:'C',exp:'Cache reduces latency.'},
+  {id:'o31',topic:'Computer bus',text:'A bus in computer architecture is?',opts:{A:'Network topology',B:'Shared pathway for transfer',C:'Power cable',D:'Software protocol'},ans:'B',exp:'Bus = communication highway.'},
+  {id:'o32',topic:'Bus types',text:'Three types of buses typically found are?',opts:{A:'Serial, Parallel, USB',B:'Data, Address, Control',C:'System, Expansion, Power',D:'Northbridge, Southbridge, PCIe'},ans:'B',exp:'Data, address, control buses.'},
+  {id:'o33',topic:'Address bus',text:'The address bus is responsible for?',opts:{A:'Carrying data',B:'Control signals',C:'Specifying memory location',D:'Providing power'},ans:'C',exp:'Address bus selects memory address.'},
+  {id:'o34',topic:'Input device',text:'Which input device converts physical documents to digital?',opts:{A:'Printer',B:'Plotter',C:'Scanner',D:'Projector'},ans:'C',exp:'Scanner digitizes images/docs.'},
+  {id:'o35',topic:'OMR',text:'Optical Mark Reader is designed to?',opts:{A:'Read barcodes',B:'Detect pencil marks on forms',C:'Scan text',D:'Read magnetic strip'},ans:'B',exp:'OMR reads marked bubbles.'},
+  {id:'o36',topic:'Biometrics',text:'A biometric sensor used for authentication is a type of?',opts:{A:'Output device',B:'Storage',C:'Networking',D:'Input device'},ans:'D',exp:'Biometric sensors capture input.'},
+  {id:'o37',topic:'Touchscreen',text:'A touchscreen functions as both input and output because?',opts:{A:'Separate layers',B:'Displays and receives touch',C:'Uses stylus',D:'Switches functions'},ans:'B',exp:'Visual output + tactile input.'},
+  {id:'o38',topic:'Laser printer',text:'Which printer uses toner powder fused by heat?',opts:{A:'Inkjet',B:'Thermal',C:'Laser',D:'Dot matrix'},ans:'C',exp:'Laser printers use toner.'},
+  {id:'o39',topic:'Plotter',text:'A plotter is best suited for producing?',opts:{A:'Archival documents',B:'Large-format vector graphics',C:'Photo prints',D:'Carbon copies'},ans:'B',exp:'Plotters for CAD/drawings.'},
+  {id:'o40',topic:'Hardcopy',text:'Key difference between hardcopy and softcopy?',opts:{A:'Hardcopy temporary',B:'Hardcopy tangible physical form; softcopy digital',C:'Hardcopy from scanners',D:'No difference'},ans:'B',exp:'Hardcopy physical, softcopy electronic.'},
+  {id:'o41',topic:'Actuator',text:'An actuator in digital system converts?',opts:{A:'Senses environment',B:'Electrical signal into physical action',C:'Stores data',D:'Routes packets'},ans:'B',exp:'Actuator moves/controls mechanism.'},
+  {id:'o42',topic:'Data vs info',text:'Raw unorganized facts are referred to as?',opts:{A:'Information',B:'Knowledge',C:'Data',D:'Wisdom'},ans:'C',exp:'Data = raw unprocessed.'},
+  {id:'o43',topic:'Information',text:'When data is processed and structured to be meaningful it becomes?',opts:{A:'Metadata',B:'Information',C:'Big Data',D:'Raw data'},ans:'B',exp:'Information = processed meaningful data.'},
+  {id:'o44',topic:'Processing cycle',text:'Correct sequence of data processing cycle?',opts:{A:'Input → Process → Output → Storage',B:'Process → Input → Storage → Output',C:'Output → Storage → Input → Process',D:'Storage → Output → Input → Process'},ans:'A',exp:'Input, process, output, storage.'},
+  {id:'o45',topic:'Storage stage',text:'Storage stage in data processing cycle is necessary because?',opts:{A:'Data processed once',B:'Processed info may be needed later',C:'Input devices need storage',D:'All data must be printed'},ans:'B',exp:'Storage for future retrieval.'},
+  {id:'o46',topic:'Logical processing',text:'Which is a logical form of data processing?',opts:{A:'Adding column',B:'Sorting list',C:'Comparing values',D:'Calculating average'},ans:'C',exp:'Logical: comparison operations.'},
+  {id:'o47',topic:'Data to info',text:'Test scores entered are the ______, grade report is ______',opts:{A:'Output, Input',B:'Information, Data',C:'Data, Information',D:'Storage, Process'},ans:'C',exp:'Raw data → processed information.'},
+  {id:'o48',topic:'Timeliness',text:'Timeliness of good information means?',opts:{A:'Accurate',B:'Complete',C:'Available when needed',D:'Clear'},ans:'C',exp:'Timely = right time for decision.'},
+  {id:'o49',topic:'Binary units',text:'How many bytes in a gigabyte (binary)?',opts:{A:'1,000,000,000',B:'1,073,741,824 (2^30)',C:'1,048,576',D:'1,024'},ans:'B',exp:'1 GiB = 2^30 bytes.'},
+  {id:'o50',topic:'ASCII',text:'Standard using 7/8 bits for English characters?',opts:{A:'Unicode',B:'ASCII',C:'EBCDIC',D:'Baudot'},ans:'B',exp:'ASCII encoding.'}
+];
+
+// Theory + Practical (5 questions: 3 theory + 2 practical)
+const THY_Q = [
+  { id:'t1', topic:'Computer Generations & Architecture', marks:10, text:`(a) (i) Define "computer generation". (ii) List five generations chronologically.\n(b) Compare First and Fourth Gen: components, size, speed, example.\n(c) Explain Von Neumann architecture, Control Unit & stored program concept.\n(d) Classify a school server vs desktop PCs.`, markScheme:'Definition of generation; vacuum tubes→transistors→IC→microprocessor→AI; von Neumann: unified memory; CU manages fetch-decode-execute; server=mainframe-class., desktops=microcomputers.', keywords:['generation','vacuum tubes','transistors','integrated circuits','microprocessor','von Neumann','stored program','control unit','server','mainframe'], minKeywords:6 },
+  { id:'t2', topic:'CPU & Performance', marks:10, text:`(a) Draw labelled block diagram of CPU components (ALU, CU, Registers). (ii) Functions of ALU and CU.\n(b) Fetch-Decode-Execute cycle — explain and state which component manages it.\n(c) Graphic designer's PC lags (4GB RAM, HDD, i3). Recommend two upgrades and justify.`, markScheme:'ALU arithmetic/logic, CU control; fetch-decode-execute cycle by CU; upgrade RAM for multitasking, SSD for faster load times.', keywords:['ALU','control unit','fetch decode execute','RAM','SSD','graphic design','performance','register','cycle','processor'], minKeywords:6 },
+  { id:'t3', topic:'Data, Information & Digital Ecosystem', marks:10, text:`(a) Using supermarket checkout example differentiate data vs information.\n(b) Outline four stages of data processing cycle using school registration.\n(c) Four characteristics of good information.\n(d) Advantage & trade-off of Unicode vs ASCII.`, markScheme:'Data: raw barcode; info: total receipt. Input, process, output, storage. Accuracy, timeliness, completeness, relevance. Unicode supports many languages but uses more storage.', keywords:['data','information','barcode','receipt','input','process','output','storage','unicode','accuracy'], minKeywords:6 },
+  { id:'p1', topic:'Practical: Hardware Identification', marks:10, text:`(a) Identify: long-term magnetic storage, volatile working memory, PSU, CPU, boot firmware. (b) PCIe x16 location; why powerful GPU needs direct PSU connection; NVMe SSD connection type. (c) Functions of HDMI, USB-C, RJ-45.`, markScheme:'HDD, RAM, PSU, CPU, ROM; PCIe slot near CPU; high power draw; M.2 slot; HDMI video/audio; USB-C data/power/video; Ethernet wired network.', keywords:['HDD','RAM','PSU','CPU','ROM','PCIe','NVMe','M.2','HDMI','USB-C','RJ-45','ethernet'], minKeywords:7 },
+  { id:'p2', topic:'Practical: Data Processing & Revenue Logic', marks:10, text:`Scenario: Agricultural cooperative – Maize 150kg @₦500, Cassava 80kg @₦700, Yams 45kg @₦1200.\n(i) Calculate revenue per product.\n(ii) Total daily revenue.\n(iii) Check "Total Revenue > ₦200,000": arithmetic or logical?\n(iv) Monthly highest revenue: sequence of operations? \n(v) Dashboard characteristics and suitable output device for group meeting.`, markScheme:'Maize: 75,000; Cassava: 56,000; Yams: 54,000; total=185,000; logical comparison; arithmetic+logical sequence; timely, accurate; projector for group display.', keywords:['75000','56000','54000','185000','logical','arithmetic','comparison','dashboard','projector','timeliness','accurate'], minKeywords:6 }
+];
+
+// existing UI state and functions adaptation
+let ST = { objAnswered:0, objCorrect:0, objMarks:0, thyAnswered:0, thyMarks:0, objDone:new Set(), thyDone:new Set() };
+let UA_OBJ = {}, UA_THY = {}, SHUFFLED = {};
+let globalDone = false, TOTAL_SECS = 5400, timerInterval=null;
+
+function startTimer(){ let rem=TOTAL_SECS, dot=document.getElementById('timer-dot'), val=document.getElementById('timer-val'); function fmt(s){ let h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60; return (h>0?h+':':'')+(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; } val.textContent=fmt(rem); timerInterval=setInterval(()=>{ rem--; val.textContent=fmt(rem); if(rem<=600 && rem>180){ dot.className='timer-dot warn'; val.classList.add('warn'); }else if(rem<=180){ dot.className='timer-dot dang'; val.classList.add('dang'); } if(rem<=0){ clearInterval(timerInterval); timeUp(); } },1000); }
+function stopTimer(){ if(timerInterval) clearInterval(timerInterval); }
+function switchTab(which){ document.getElementById('panel-obj').classList.toggle('active',which==='obj'); document.getElementById('panel-thy').classList.toggle('active',which==='thy'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); if(which==='obj') document.querySelector('.tab:first-child').classList.add('active'); else document.querySelector('.tab:last-child').classList.add('active'); let meta=document.getElementById('hdr-meta'); meta.innerHTML=(which==='obj'?'Section A · <span id="answered-count">'+ST.objAnswered+'</span> answered':'Section B · <span id="answered-count">'+ST.thyAnswered+'</span> answered'); }
+function updateStats(){ let totalMarks=ST.objMarks+ST.thyMarks; document.getElementById('sc-marks').textContent=totalMarks; document.getElementById('sc-obj').textContent=ST.objAnswered+'/50'; document.getElementById('sc-thy').textContent=ST.thyAnswered+'/5'; let totalQ=55; let done=ST.objAnswered+ST.thyAnswered; document.getElementById('prog-fill').style.width=(done/totalQ*100)+'%'; document.getElementById('sub-prog').textContent=`OBJ: ${ST.objAnswered}/50 · Section B: ${ST.thyAnswered}/5`; document.getElementById('thy-answered-display').textContent=`${ST.thyAnswered} of 5 answered.`; document.getElementById('m-obj').innerHTML=`${ST.objAnswered} / 50`; document.getElementById('m-thy').innerHTML=`${ST.thyAnswered} / 5`; document.getElementById('m-marks').innerHTML=`${totalMarks} / 100`; }
+function buildShuffled(q){ let entries=['A','B','C','D'].map(k=>({key:k,text:q.opts[k]})); for(let i=entries.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [entries[i],entries[j]]=[entries[j],entries[i]]; } let opts={}, ans=q.ans; entries.forEach((e,idx)=>{ let lbl=String.fromCharCode(65+idx); opts[lbl]=e.text; if(e.key===q.ans) ans=lbl; }); return {opts,ans}; }
+function renderObj(){ let c=document.getElementById('obj-qc'); let html=''; OBJ_Q.forEach((q,i)=>{ let sh=buildShuffled(q); SHUFFLED[q.id]=sh; let opts=''; ['A','B','C','D'].forEach(lbl=>{ opts+=`<div class="opt" data-id="${q.id}" data-a="${lbl}"><span class="opt-key">${lbl}.</span><span class="opt-txt">${sh.opts[lbl]}</span></div>`; }); html+=`<div class="qcard"><div class="qcard-top"><span class="qnum">Q${i+1}</span><span class="qtopic">${q.topic}</span></div><div class="qtxt">${q.text}</div><div class="opts">${opts}</div><button class="abtn" data-qid="${q.id}" disabled>Check Answer</button><div class="exp" id="exp-${q.id}"></div></div>`; }); c.innerHTML=html; document.querySelectorAll('#obj-qc .opt').forEach(opt=>{ opt.addEventListener('click',function(){ if(globalDone||this.classList.contains('locked')) return; let qid=this.dataset.id; document.querySelectorAll(`#obj-qc .opt[data-id="${qid}"]`).forEach(o=>o.classList.remove('sel')); this.classList.add('sel'); UA_OBJ[qid]=this.dataset.a; let btn=document.querySelector(`#obj-qc .abtn[data-qid="${qid}"]`); if(btn) btn.disabled=false; }); }); document.querySelectorAll('#obj-qc .abtn').forEach(btn=>{ btn.addEventListener('click',function(){ if(globalDone) return; let qid=this.dataset.qid; let q=OBJ_Q.find(x=>x.id===qid); let chosen=UA_OBJ[qid]; let correctLbl=SHUFFLED[qid].ans; let ok=(chosen===correctLbl); document.querySelectorAll(`#obj-qc .opt[data-id="${qid}"]`).forEach(o=>{ o.classList.add('locked'); o.style.pointerEvents='none'; if(o.dataset.a===correctLbl) o.classList.add('ok'); else if(o.dataset.a===chosen) o.classList.add('no'); }); let expEl=document.getElementById('exp-'+qid); let markTxt=ok?'✓ Correct +1 mark':'✗ Incorrect (answer: '+correctLbl+')'; expEl.innerHTML=`<span style="color:${ok?'#10b981':'#ef4444'}">${markTxt}</span><div style="margin-top:6px">${q.exp}</div>`; expEl.className='exp show'+(ok?'':' wrong-exp'); this.disabled=true; if(!ST.objDone.has(qid)){ ST.objDone.add(qid); ST.objAnswered++; if(ok){ ST.objCorrect++; ST.objMarks++; } updateStats(); } }); }); }
+function renderThy(){ let container=document.getElementById('thy-qc'); let html=''; THY_Q.forEach((q,i)=>{ html+=`<div class="qcard"><div class="qcard-top"><span class="qnum">Q${i+1}</span><span class="qtopic">${q.topic}</span></div><div class="theory-marks-badge">📝 ${q.marks} marks</div><div class="qtxt">${q.text.replace(/\n/g,'<br>')}</div><textarea class="prose-area" id="prose-${q.id}" placeholder="Write your answer here…" rows="7"></textarea><div class="word-count" id="wc-${q.id}">0 words</div><button class="abtn" data-qid="${q.id}" id="btn-${q.id}" disabled>Check & Mark</button><div class="exp" id="exp-${q.id}"></div></div>`; }); container.innerHTML=html; THY_Q.forEach(q=>{ let ta=document.getElementById(`prose-${q.id}`); let wc=document.getElementById(`wc-${q.id}`); let btn=document.getElementById(`btn-${q.id}`); ta.addEventListener('input',()=>{ let words=ta.value.trim().split(/\s+/).filter(w=>w.length); wc.innerText=words.length+' words'; btn.disabled=words.length<8; }); btn.onclick=()=>{ if(globalDone||ST.thyDone.has(q.id)&&ST.thyAnswered>=5) return; let answer=ta.value.toLowerCase(); let hits=0; q.keywords.forEach(kw=>{ if(answer.includes(kw.toLowerCase())) hits++; }); let marks=Math.min(10,Math.round((hits/q.minKeywords)*10)); ta.disabled=true; btn.disabled=true; let expDiv=document.getElementById(`exp-${q.id}`); let colorClass=marks>=7?'pos':marks>=4?'partial':'neg'; expDiv.innerHTML=`<span class="exp-mark" style="font-weight:bold">${marks} / 10 marks</span><div>Keywords matched: ${hits}/${q.minKeywords} essential terms.</div><div class="kw-list">${q.keywords.map(kw=>`<span class="kw-tag ${answer.includes(kw.toLowerCase())?'hit':'miss'}">${kw}</span>`).join('')}</div><div style="margin-top:12px;border-top:1px solid #e2e8f0;padding-top:8px"><strong>📘 Mark scheme:</strong><br>${q.markScheme}</div>`; expDiv.classList.add('show'); if(!ST.thyDone.has(q.id)){ ST.thyDone.add(q.id); ST.thyAnswered++; ST.thyMarks+=marks; updateStats(); } }; }); }
+function showSubmitModal(){ document.getElementById('submit-modal').classList.add('show'); }
+function hideSubmitModal(){ document.getElementById('submit-modal').classList.remove('show'); }
+function submitExam(){ hideSubmitModal(); globalDone=true; stopTimer(); document.querySelectorAll('#obj-qc .abtn:not([disabled])').forEach(b=>b.click()); document.querySelectorAll('.prose-area').forEach(ta=>ta.disabled=true); document.querySelectorAll('#thy-qc .abtn').forEach(b=>b.disabled=true); showResults(); }
+function showResults(){ let raw=ST.objMarks+ST.thyMarks; let pct=raw; document.getElementById('res-score').innerText=pct; document.getElementById('res-obj-marks').innerText=ST.objMarks; document.getElementById('res-thy-marks').innerText=ST.thyMarks; let grade=pct>=75?'A1':pct>=70?'B2':pct>=65?'B3':pct>=60?'C4':pct>=55?'C5':pct>=50?'C6':pct>=45?'D7':pct>=40?'E8':'F9'; document.getElementById('res-badge').innerText=grade; document.getElementById('results-screen').classList.add('show'); }
+function reviewAnswers(){ document.getElementById('results-screen').classList.remove('show'); switchTab('obj'); }
+function timeUp(){ globalDone=true; showResults(); }
+function doPrint(){ window.print(); }
+renderObj(); renderThy(); startTimer(); updateStats();
+window.switchTab=switchTab; window.showSubmitModal=showSubmitModal; window.hideSubmitModal=hideSubmitModal; window.submitExam=submitExam; window.reviewAnswers=reviewAnswers; window.doPrint=doPrint;
+</script>
+</body>
+</html>
