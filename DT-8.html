@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>grantappai • Data, Info Mgmt & Big Data | Vector 8</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #fefefe;
+      font-family: 'DM Sans', sans-serif;
+      color: #0f172a;
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 90px);
+    }
+    .watermark {
+      position: fixed; inset: 0; pointer-events: none; z-index: 1000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transform: rotate(-22deg) scale(1.3); opacity: 0.04; font-family: 'DM Mono', monospace;
+      font-size: 1.2rem; font-weight: 700; color: #0f172a; white-space: nowrap; letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+    .watermark span { display: block; margin: 1rem 0; }
+    :root {
+      --bg: #fefefe; --surface: #ffffff; --surface2: #f8fafc; --border: #e2e8f0;
+      --border2: #cbd5e1; --text: #0f172a; --sec: #334155; --ter: #64748b;
+      --accent: #2563eb; --accent2: #1d4ed8; --green: #10b981; --red: #ef4444;
+    }
+    .hdr {
+      background: rgba(255,255,255,0.94); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); padding: calc(env(safe-area-inset-top) + 12px) 20px 12px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .hdr-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hdr-brand { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+    .hdr-title { font-family: 'Instrument Serif', serif; font-size: 20px; font-style: italic; }
+    .hdr-meta { font-size: 11px; color: var(--ter); font-family: 'DM Mono', monospace; }
+    .timer-pill {
+      display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 40px;
+      background: #f1f5f9; border: 1px solid var(--border);
+    }
+    .timer-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
+    .timer-dot.warn { background: #f59e0b; }
+    .timer-dot.dang { background: #ef4444; animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+    .timer-val { font-family: 'DM Mono', monospace; font-weight: 500; }
+    .score-strip {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; padding: 14px 20px 10px;
+    }
+    .sc {
+      background: #ffffff; border-radius: 14px; padding: 12px 8px; text-align: center;
+      border: 1px solid var(--border);
+    }
+    .sc-v { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 600; }
+    .sc-v.g { color: var(--green); }
+    .sc-v.b { color: var(--accent); }
+    .sc-l { font-size: 9px; color: var(--ter); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { padding: 0 20px 16px; }
+    .prog-track { height: 4px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, #1d4ed8, #2563eb); width: 0%; border-radius: 99px; }
+    .tabs {
+      display: flex; gap: 0; padding: 0 20px 16px; border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1; padding: 10px 8px; text-align: center; font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500; text-transform: uppercase; color: var(--ter);
+      background: transparent; border: 1px solid var(--border); cursor: pointer;
+    }
+    .tab:first-child { border-radius: 12px 0 0 12px; }
+    .tab:last-child { border-radius: 0 12px 12px 0; border-left: none; }
+    .tab.active { background: rgba(37,99,235,0.06); border-color: var(--accent); color: var(--accent); }
+    .panel { display: none; animation: fade 0.2s ease; }
+    .panel.active { display: block; }
+    .sect-hdr {
+      margin: 12px 20px 16px; padding: 14px 18px; background: #f8fafc;
+      border-radius: 16px; border: 1px solid var(--border);
+    }
+    .sect-hdr-title { font-family: 'Instrument Serif', serif; font-size: 18px; font-style: italic; }
+    .qcard {
+      background: #ffffff; border: 1px solid var(--border); border-radius: 20px;
+      padding: 22px; margin-bottom: 18px;
+    }
+    .qcard-top {
+      display: flex; justify-content: space-between; margin-bottom: 14px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+    .qnum { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ter); }
+    .qtopic { font-size: 10px; padding: 4px 10px; background: #eef2ff; border-radius: 30px; color: var(--accent); font-weight: 500; }
+    .qtxt { font-size: 15px; line-height: 1.65; font-weight: 500; margin-bottom: 18px; }
+    .opts { display: flex; flex-direction: column; gap: 10px; }
+    .opt {
+      display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px;
+      border-radius: 14px; border: 1px solid var(--border); background: var(--surface2);
+      cursor: pointer;
+    }
+    .opt.sel { border-color: var(--accent); background: #eff6ff; }
+    .opt.ok { border-color: var(--green); background: #ecfdf5; }
+    .opt.no { border-color: var(--red); background: #fef2f2; }
+    .opt.locked { cursor: default; }
+    .opt-key { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--accent); width: 24px; }
+    .abtn {
+      margin-top: 16px; width: 100%; padding: 12px; border-radius: 40px;
+      background: var(--accent); color: white; font-weight: 600; border: none; cursor: pointer;
+      font-size: 13px;
+    }
+    .abtn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .exp {
+      display: none; margin-top: 16px; background: #fef9e3; border-radius: 16px;
+      padding: 16px; font-size: 13px; color: #334155;
+    }
+    .exp.show { display: block; }
+    .kw-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .kw-tag {
+      padding: 4px 10px; border-radius: 30px; font-family: 'DM Mono', monospace; font-size: 11px;
+    }
+    .kw-tag.hit { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .kw-tag.miss { background: #fee2e2; color: #b91c1c; text-decoration: line-through; opacity: 0.7; }
+    .theory-marks-badge {
+      display: inline-block; background: #f1f5f9; padding: 4px 12px; border-radius: 30px;
+      font-size: 11px; font-family: 'DM Mono', monospace; margin-bottom: 12px;
+    }
+    .prose-area {
+      width: 100%; min-height: 140px; padding: 14px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 16px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; resize: vertical;
+    }
+    .word-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ter); text-align: right; margin-top: 5px; }
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border); padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      display: flex; gap: 12px; z-index: 200;
+    }
+    .submit-btn {
+      flex: 1; padding: 12px; background: var(--accent); color: white;
+      border-radius: 40px; font-weight: 600; border: none; cursor: pointer;
+    }
+    .submit-btn.secondary { flex: 0; background: #f1f5f9; color: #334155; }
+    .results-screen {
+      position: fixed; inset: 0; background: white; z-index: 400;
+      display: none; overflow-y: auto; padding: 28px 20px;
+    }
+    .results-screen.show { display: flex; flex-direction: column; }
+    .grade-circle {
+      width: 110px; height: 110px; border-radius: 50%; border: 2px solid #cbd5e1;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      margin: 0 auto 12px;
+    }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 500;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: 28px; padding: 24px; width: 90%; max-width: 380px; }
+    @media print {
+      body { background: white; }
+      .watermark, .submit-bar, .modal-overlay { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="watermark"><span>grantappai</span><span>grantappai</span><span>grantappai</span><span>grantappai</span></div>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <span class="hdr-brand">grantappai • academia</span>
+      <span class="hdr-title">Data, Information Mgmt & Big Data — Vector 8</span>
+      <span class="hdr-meta" id="hdrMeta">Section A · <span id="answeredCount">0</span> answered</span>
+    </div>
+    <div class="timer-pill"><div class="timer-dot" id="timerDot"></div><span class="timer-val" id="timerVal">1:30:00</span></div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v b" id="totalLabel">100</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v g" id="marksSoFar">0</div><div class="sc-l">Marks</div></div>
+  <div class="sc"><div class="sc-v" id="objCounter">0/50</div><div class="sc-l">OBJ</div></div>
+  <div class="sc"><div class="sc-v" id="thyCounter">0/5</div><div class="sc-l">Theory/Prac</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="progFill"></div></div></div>
+
+<div class="tabs">
+  <button class="tab active" id="tabObjBtn">📊 Section A — 50 MCQs</button>
+  <button class="tab" id="tabThyBtn">🧠 Section B — Theory + Practical</button>
+</div>
+
+<div class="panel active" id="panelObj">
+  <div class="sect-hdr"><div class="sect-hdr-title">Objective Questions (50 marks)</div><div class="sect-hdr-meta">1 mark each · answer all</div></div>
+  <div id="objContainer"></div>
+</div>
+
+<div class="panel" id="panelThy">
+  <div style="margin:8px 20px 0; background:#f1f5f9; padding:10px 14px; border-radius:14px;">
+    Answer <strong>5 questions</strong> (3 Theory + 2 Practical) · 10 marks each<br>
+    <span id="thyAnsweredDisplay">0 of 5 answered.</span>
+  </div>
+  <div id="thyContainer"></div>
+</div>
+
+<div class="submit-bar">
+  <div class="submit-progress" id="subProgress">OBJ: 0/50 · Section B: 0/5</div>
+  <button class="submit-btn" id="submitExamBtn">Submit Exam</button>
+  <button class="submit-btn secondary" id="printBtn">🖨️</button>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Submit assessment?</h3>
+    <div style="display:flex; justify-content:space-between; margin:12px 0"><span>OBJ answered</span><b id="modalObj">0/50</b></div>
+    <div style="display:flex; justify-content:space-between; margin:8px 0"><span>Theory/Practical</span><b id="modalThy">0/5</b></div>
+    <div style="display:flex; justify-content:space-between; margin:8px 0"><span>Current marks</span><b id="modalMarks">0/100</b></div>
+    <div style="display:flex; gap:12px; margin-top:20px">
+      <button id="modalCancelBtn" style="flex:1; padding:10px; border-radius:40px; background:transparent; border:1px solid #cbd5e1;">Keep going</button>
+      <button id="modalConfirmBtn" style="flex:1; padding:10px; border-radius:40px; background:#2563eb; color:white; border:none;">Submit now</button>
+    </div>
+  </div>
+</div>
+
+<div class="results-screen" id="resultsScreen">
+  <div class="results-brand">grantappai · Vector 8</div>
+  <div class="results-title">Data, Information Management & Big Data</div>
+  <div class="grade-circle-wrap"><div class="grade-circle"><span class="grade-score" id="finalScore">—</span><span class="grade-label">/100</span></div><span id="finalGrade">—</span></div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0">
+    <div><div id="finalObjMarks">—</div><div class="sc-l">Obj marks</div></div>
+    <div><div id="finalThyMarks">—</div><div class="sc-l">Section B marks</div></div>
+  </div>
+  <button id="reviewBtn" style="width:100%; padding:12px; background:#2563eb; color:white; border-radius:40px; border:none; margin-bottom:10px;">Review answers</button>
+  <button id="pdfBtn" style="width:100%; padding:12px; background:#f1f5f9; color:#334155; border-radius:40px; border:1px solid #e2e8f0;">Download PDF</button>
+</div>
+
+<script>
+// --------------------------------------------------------------
+// VECTOR 8 MCQ DATA (50) – Answer key based on provided list
+const MCQ_RAW = [
+  {text:"A collection of raw, unprocessed facts, figures, and symbols without context is called...", opts:["Information","Knowledge","Data","Wisdom"], ansIdx:2, topic:"Data hierarchy", exp:"Data = raw facts."},
+  {text:"Data that has been processed, organized, and given meaning and context becomes...", opts:["Raw data","Information","Metadata","A database"], ansIdx:1, topic:"Data hierarchy", exp:"Information = processed data."},
+  {text:"The DIKW pyramid represents the hierarchy from bottom to top as...", opts:["Knowledge, Wisdom, Information, Data","Information, Data, Knowledge, Wisdom","Data, Information, Knowledge, Wisdom","Wisdom, Knowledge, Information, Data"], ansIdx:2, topic:"DIKW", exp:"DIKW: Data → Information → Knowledge → Wisdom."},
+  {text:"Knowledge can be described as...", opts:["Raw, unprocessed numbers","Information combined with experience, context, interpretation, and reflection","A collection of databases","The final stage of computer processing"], ansIdx:1, topic:"Knowledge", exp:"Knowledge = information + experience."},
+  {text:"Which characteristic of good information ensures it is free from errors and correctly reflects the real-world entity?", opts:["Timeliness","Relevance","Accuracy","Completeness"], ansIdx:2, topic:"Info quality", exp:"Accuracy = error-free."},
+  {text:"Information must be available when needed for decision-making. This characteristic is called...", opts:["Accuracy","Completeness","Timeliness","Conciseness"], ansIdx:2, topic:"Info quality", exp:"Timeliness = available when needed."},
+  {text:"A manager receives a 500-page report but only needs a single summary statistic. The report lacks which quality?", opts:["Accuracy","Timeliness","Conciseness","Relevance"], ansIdx:2, topic:"Info quality", exp:"Conciseness = no extraneous detail."},
+  {text:"'Data about data' – information that describes the structure, context, and meaning of other data – is called...", opts:["Big Data","Metadata","Master Data","Transactional Data"], ansIdx:1, topic:"Metadata", exp:"Metadata = data about data."},
+  {text:"Which of the following is a source of primary data?", opts:["A textbook citing a research study","A newspaper article summarizing census results","Responses collected directly from a survey questionnaire","A blog post analyzing government statistics"], ansIdx:2, topic:"Primary data", exp:"Primary = collected firsthand."},
+  {text:"Secondary data is defined as data that...", opts:["Is less important than primary data","Has already been collected and published by someone else for a different purpose","Is stored on a secondary storage device","Cannot be used in academic research"], ansIdx:1, topic:"Secondary data", exp:"Secondary = existing data."},
+  {text:"The correct sequence of the Data Processing Cycle is...", opts:["Process → Input → Output → Storage","Input → Process → Output → Storage","Output → Storage → Input → Process","Storage → Input → Process → Output"], ansIdx:1, topic:"Processing cycle", exp:"Input → Process → Output → Storage."},
+  {text:"During the 'Processing' stage, activities include...", opts:["Printing a grade report","Entering test scores","Calculating averages, sorting names","Saving results to drive"], ansIdx:2, topic:"Processing", exp:"Processing = transforming data."},
+  {text:"A file-based system stores data in...", opts:["A single relational database","Separate, unrelated files, often with duplicated data","Cloud-based AI storage","Unstructured data lake"], ansIdx:1, topic:"File system", exp:"File-based = separate files."},
+  {text:"A major problem with traditional file-based systems is data redundancy, which leads to...", opts:["Improved consistency","Wasted storage and potential inconsistency","Faster retrieval","Better security"], ansIdx:1, topic:"Redundancy", exp:"Redundancy wastes space, causes inconsistency."},
+  {text:"Data inconsistency occurs when...", opts:["All files backed up regularly","Same data stored in multiple files but updated in only one place","Data is encrypted","A DBMS is used"], ansIdx:1, topic:"Inconsistency", exp:"Inconsistent updates cause mismatch."},
+  {text:"A key limitation of file-based systems compared to DBMS is...", opts:["Better integrity enforcement","Superior concurrency support","Lack of program-data independence","Built-in query languages"], ansIdx:2, topic:"File vs DBMS", exp:"Program-data dependence = rigid."},
+  {text:"The logical organization of data in a traditional file system typically involves...", opts:["Tables with relationships","Fields, Records, Files","Objects and classes","Key-value pairs"], ansIdx:1, topic:"Data organisation", exp:"Fields → Records → Files."},
+  {text:"A field in a traditional data record is equivalent to a ______ in a modern database.", opts:["Table","Row","Column","Primary Key"], ansIdx:2, topic:"Terminology", exp:"Field = column."},
+  {text:"A master file holds...", opts:["Temporary transaction data","Relatively permanent data about entities","Redundant copies","Archived data"], ansIdx:1, topic:"Master file", exp:"Master = standing data."},
+  {text:"A transaction file contains...", opts:["Main permanent records","Day-to-day business events, used to update master files","Database schema","Backups"], ansIdx:1, topic:"Transaction file", exp:"Transaction = activity data."},
+  {text:"A DBMS acts as an intermediary between...", opts:["CPU and RAM","User/application and physical database","Keyboard and monitor","Internet and firewall"], ansIdx:1, topic:"DBMS role", exp:"DBMS abstracts data storage."},
+  {text:"Which is an example of relational DBMS?", opts:["Excel","MongoDB","MySQL","Redis"], ansIdx:2, topic:"RDBMS", exp:"MySQL = relational."},
+  {text:"In a relational database, data is organized into...", opts:["Hierarchical trees","JSON documents","Tables (rows/columns)","Graph networks"], ansIdx:2, topic:"Relational model", exp:"Tables = relations."},
+  {text:"A field that uniquely identifies each record is the...", opts:["Foreign Key","Secondary Key","Primary Key","Composite Attribute"], ansIdx:2, topic:"Primary key", exp:"PK = unique identifier."},
+  {text:"A foreign key establishes a link to the...", opts:["OS kernel","Primary key of another table","Secondary storage","Network router"], ansIdx:1, topic:"Foreign key", exp:"FK references PK of another table."},
+  {text:"Referential integrity ensures that...", opts:["Every PK is numeric","A FK value matches an existing PK or is NULL","All data is encrypted","Database file cannot be deleted"], ansIdx:1, topic:"Referential integrity", exp:"RI ensures valid references."},
+  {text:"The process of organizing data to minimize redundancy and dependency is...", opts:["Defragmentation","Compilation","Normalization","Indexing"], ansIdx:2, topic:"Normalization", exp:"Normalization = reduce redundancy."},
+  {text:"An index in a database is used to...", opts:["Delete records automatically","Speed up retrieval at cost of storage and writes","Encrypt the database","Normalize tables"], ansIdx:1, topic:"Index", exp:"Index = faster SELECTs."},
+  {text:"SQL is the standard language for...", opts:["Designing GUIs","Creating websites","Manipulating relational databases","Writing OS scripts"], ansIdx:2, topic:"SQL", exp:"SQL = structured query language."},
+  {text:"The SQL command used to retrieve data is...", opts:["INSERT","DELETE","SELECT","UPDATE"], ansIdx:2, topic:"SQL SELECT", exp:"SELECT = query."},
+  {text:"The WHERE clause in SQL is used to...", opts:["Specify tables to join","Order results","Filter records based on condition","Define primary key"], ansIdx:2, topic:"SQL WHERE", exp:"WHERE filters rows."},
+  {text:"A data type specifies...", opts:["Disk location","Type of data and valid operations","Relationship to another table","Max users"], ansIdx:1, topic:"Data type", exp:"Data type = allowed values."},
+  {text:"Most appropriate data type for product price?", opts:["VARCHAR","INTEGER","DECIMAL","BOOLEAN"], ansIdx:2, topic:"Data type", exp:"DECIMAL for currency."},
+  {text:"A form in a database provides...", opts:["Printable summary","User-friendly layout for viewing/entering data","Encryption","CLI for SQL"], ansIdx:1, topic:"Form", exp:"Forms = data entry."},
+  {text:"A database report is primarily used for...", opts:["Entering data","Presenting summarized formatted output","Loading backups","Defining relationships"], ansIdx:1, topic:"Report", exp:"Reports = formatted output."},
+  {text:"Big Data refers to datasets that are...", opts:["Any database data","Extremely large, complex, fast-growing, hard to process traditionally","Data fitting on single hard drive","Only text-based books"], ansIdx:1, topic:"Big Data", exp:"Big Data = scale beyond traditional."},
+  {text:"The original Three Vs of Big Data are...", opts:["Volume, Velocity, Variety","Volume, Velocity, Veracity","Value, Veracity, Variety","Visibility, Velocity, Validity"], ansIdx:0, topic:"3 Vs", exp:"Volume, Velocity, Variety."},
+  {text:"In Big Data, 'Volume' refers to...", opts:["Speed of generation","Different formats","Sheer scale and quantity of data","Accuracy"], ansIdx:2, topic:"Volume", exp:"Volume = size."},
+  {text:"'Velocity' in Big Data describes...", opts:["Storage capacity","Different data types","High speed of data generation and analysis","Inconsistencies"], ansIdx:2, topic:"Velocity", exp:"Velocity = speed."},
+  {text:"The 'Variety' characteristic means data comes in...", opts:["Only structured tables","Multiple formats: structured, semi-structured, unstructured","Only social media feeds","Exclusively numeric"], ansIdx:1, topic:"Variety", exp:"Variety = diverse formats."},
+  {text:"A social media post containing text, image, geolocation is an example of...", opts:["Structured data","Semi-structured data","Unstructured data","Mix of unstructured and semi-structured"], ansIdx:3, topic:"Data variety", exp:"Mixed formats = multi-structured."},
+  {text:"Sensor data arriving at millisecond intervals primarily challenges Big Data's...", opts:["Volume","Velocity","Variety","Veracity"], ansIdx:1, topic:"Velocity", exp:"High speed = velocity challenge."},
+  {text:"'Veracity' refers to...", opts:["Total quantity","Speed","Uncertainty, inconsistencies, quality","Different formats"], ansIdx:2, topic:"Veracity", exp:"Veracity = data trustworthiness."},
+  {text:"'Value' as a V emphasizes that...", opts:["Data must be expensive","Big Data must generate meaningful insights or business value","All collected data holds value","Value unrelated"], ansIdx:1, topic:"Value", exp:"Value = actionable insight."},
+  {text:"A data lake holds...", opts:["Only structured relational data","Vast raw data in native format (structured, semi-structured, unstructured)","Only compressed backups","Thoroughly cleaned data"], ansIdx:1, topic:"Data lake", exp:"Data lake = raw format."},
+  {text:"A data warehouse is designed for...", opts:["Real-time OLTP","Storing current operational data only","Query and analysis, integrating historical data for BI","Replacing operational DB"], ansIdx:2, topic:"Data warehouse", exp:"DW = analytical queries."},
+  {text:"The process of discovering patterns in large datasets to predict outcomes is...", opts:["Data Entry","Data Warehousing","Data Mining","Data Backup"], ansIdx:2, topic:"Data mining", exp:"Data mining = pattern discovery."},
+  {text:"ETL stands for...", opts:["Enter, Transfer, Load","Extract, Transform, Load","Evaluate, Test, Launch","Edit, Tag, Link"], ansIdx:1, topic:"ETL", exp:"Extract, Transform, Load."},
+  {text:"NoSQL database like MongoDB is designed for...", opts:["Strict relational ACID","Large volumes of unstructured/semi-structured data with flexible schemas","Small datasets on one machine","Only numerical data"], ansIdx:1, topic:"NoSQL", exp:"NoSQL = schema-flexible."},
+  {text:"Hadoop is used for...", opts:["Mobile apps","Distributed storage and processing of large datasets across clusters","Managing SQL databases","UI design"], ansIdx:1, topic:"Hadoop", exp:"Hadoop = distributed processing."}
+];
+// Ensure we have exactly 50
+for(let i=MCQ_RAW.length; i<50; i++) MCQ_RAW.push({text:"Placeholder", opts:["A","B","C","D"], ansIdx:0, topic:"", exp:""}); // safety, but we have 50.
+
+// Section B: 5 questions (3 theory + 2 practical from prompt)
+const THY_Q = [
+  { id:"t1", title:"Data Hierarchy, Information Quality, and Processing", text:`(a)(i) Using DIKW pyramid, differentiate Data, Information, Knowledge with examples from school exam system. (ii) Explain metadata; two examples for a digital photo.\n(b) Inventory report: "Stock Level -50" and two weeks late. (i) Two info quality characteristics violated. (ii) Two business consequences.\n(c) Data Processing Cycle stages (Input, Process, Output, Storage) using ATM withdrawal example.`, keywords:["DIKW","data","information","knowledge","metadata","accuracy","timeliness","consequences","input","process","output","storage","ATM"], minKw:9, marks:10 },
+  { id:"t2", title:"Database Systems – File-Based vs DBMS", text:`(a)(i) Three problems with file-based systems. (ii) How DBMS overcomes each.\n(b)(i) Define Primary Key and Foreign Key. (ii) University tables STUDENT(StudentID, Name, Major) and ENROLLMENT(EnrollmentID, StudentID, CourseCode). Identify PK and FK, relationship.\n(c) Normalization up to 3NF; two benefits; example violating 1NF and fix.`, keywords:["redundancy","inconsistency","program-data dependence","primary key","foreign key","normalization","1NF","2NF","3NF","benefits","repeating group"], minKw:9, marks:10 },
+  { id:"t3", title:"Big Data, Analytics, and Ethics", text:`(a)(i) Define Big Data; explain 3 Vs with real-world example. (ii) Significance of Veracity and Value.\n(b) Compare Data Warehouse vs Data Lake: structure (schema-on-write vs on-read), users, data type, use case.\n(c)(i) Two data privacy concerns with Big Data. (ii) Algorithmic bias and societal impact. (iii) Name a regulation (GDPR/NDPR) and one right.`, keywords:["volume","velocity","variety","veracity","value","data warehouse","data lake","schema-on-write","schema-on-read","privacy","algorithmic bias","GDPR","right to erasure"], minKw:9, marks:10 },
+  { id:"p1", title:"Practical: Database Design & SQL", text:`Scenario: library spreadsheet with repeating book columns.\n(a) Normalization: Identify NF violation, anomalies; decompose to 3NF (Members, Books, Loans).\n(b) SQL queries: (i) members with last name 'Adeyemi', (ii) books by 'Chimamanda Ngozi Adichie', (iii) currently on loan with title, member name, loan date sorted newest.\n(c) Integrity: MemberID 505 not exists – constraint that prevents error, two benefits.`, keywords:["1NF","repeating group","normalization","primary key","foreign key","SELECT","JOIN","WHERE","referential integrity","constraint","benefits"], minKw:8, marks:10 },
+  { id:"p2", title:"Practical: Data Quality & Ethical Handling", text:`Dataset with rows 1003-1006.\n(a) Identify quality issues for rows 1003,1004,1005,1006.\n(b) (i) Negative quantity: check business rules; correct total? (ii) Inconsistent date formats effect and standard format. (iii) Formula to validate Total = Qty*Price; row failing.\n(c) Marketing data extraction: (i) two privacy principles. (ii) Exclude OptOutMarketing customers. (iii) SQL query for name, phone excluding opt-outs.`, keywords:["negative quantity","missing data","invalid date","data cleaning","date format","validation","privacy","opt-out","GDPR","SQL WHERE"], minKw:8, marks:10 }
+];
+
+// --- State Management ---
+let state = {
+  objDone: new Array(50).fill(false),
+  objSelected: new Array(50).fill(null),
+  objMarks: 0,
+  objCount: 0,
+  thyDone: new Array(5).fill(false),
+  thyMarks: 0,
+  thyCount: 0,
+  globalDone: false
+};
+let shuffledOrders = [];
+let timerSeconds = 5400;
+let timerInterval = null;
+
+function buildShuffled(q) {
+  let entries = q.opts.map((text, idx) => ({ origIdx: idx, text }));
+  for (let i = entries.length-1; i>0; i--) {
+    let j = Math.floor(Math.random() * (i+1));
+    [entries[i], entries[j]] = [entries[j], entries[i]];
+  }
+  let newOpts = entries.map(e => e.text);
+  let newAns = entries.findIndex(e => e.origIdx === q.ansIdx);
+  return { opts: newOpts, ans: newAns };
+}
+
+function renderMCQ() {
+  let container = document.getElementById("objContainer");
+  let html = "";
+  MCQ_RAW.forEach((q, idx) => {
+    let sh = buildShuffled(q);
+    shuffledOrders[idx] = sh;
+    let optHtml = "";
+    let letters = ["A","B","C","D"];
+    sh.opts.forEach((opt, optIdx) => {
+      optHtml += `<div class="opt" data-qidx="${idx}" data-val="${optIdx}">
+                    <span class="opt-key">${letters[optIdx]}.</span>
+                    <span class="opt-txt">${opt}</span>
+                  </div>`;
+    });
+    html += `<div class="qcard">
+              <div class="qcard-top"><span class="qnum">Q${idx+1}</span><span class="qtopic">${q.topic}</span></div>
+              <div class="qtxt">${q.text}</div>
+              <div class="opts">${optHtml}</div>
+              <button class="abtn" data-idx="${idx}" disabled>Check Answer</button>
+              <div class="exp" id="expMcq${idx}"></div>
+            </div>`;
+  });
+  container.innerHTML = html;
+  // attach option listeners
+  document.querySelectorAll("#objContainer .opt").forEach(opt => {
+    opt.addEventListener("click", (e) => {
+      if (state.globalDone) return;
+      let qidx = parseInt(opt.dataset.qidx);
+      if (state.objDone[qidx]) return;
+      document.querySelectorAll(`#objContainer .opt[data-qidx="${qidx}"]`).forEach(o => o.classList.remove("sel"));
+      opt.classList.add("sel");
+      state.objSelected[qidx] = parseInt(opt.dataset.val);
+      let btn = document.querySelector(`#objContainer .abtn[data-idx="${qidx}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+  document.querySelectorAll("#objContainer .abtn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      if (state.globalDone) return;
+      let qidx = parseInt(btn.dataset.idx);
+      if (state.objDone[qidx]) return;
+      let chosen = state.objSelected[qidx];
+      let correct = shuffledOrders[qidx].ans;
+      let isOk = (chosen === correct);
+      // lock and mark
+      document.querySelectorAll(`#objContainer .opt[data-qidx="${qidx}"]`).forEach(opt => {
+        opt.classList.add("locked");
+        opt.style.pointerEvents = "none";
+        let val = parseInt(opt.dataset.val);
+        if (val === correct) opt.classList.add("ok");
+        if (val === chosen && chosen !== correct) opt.classList.add("no");
+      });
+      let expDiv = document.getElementById(`expMcq${qidx}`);
+      expDiv.innerHTML = `<span style="color:${isOk?'#10b981':'#ef4444'}">${isOk?'✓ Correct +1 mark':'✗ Incorrect (correct: '+String.fromCharCode(65+correct)+')'}</span><div style="margin-top:6px">${MCQ_RAW[qidx].exp}</div>`;
+      expDiv.classList.add("show");
+      btn.disabled = true;
+      if (!state.objDone[qidx]) {
+        state.objDone[qidx] = true;
+        state.objCount++;
+        if (isOk) state.objMarks++;
+        updateUI();
+      }
+    });
+  });
+}
+
+function renderTheory() {
+  let container = document.getElementById("thyContainer");
+  let html = "";
+  THY_Q.forEach((q, idx) => {
+    html += `<div class="qcard">
+              <div class="qcard-top"><span class="qnum">Q${idx+1}</span><span class="qtopic">${q.title}</span></div>
+              <div class="theory-marks-badge">📝 ${q.marks} marks</div>
+              <div class="qtxt">${q.text.replace(/\n/g,'<br>')}</div>
+              <textarea class="prose-area" id="proseThy${idx}" rows="7" placeholder="Write your answer here…"></textarea>
+              <div class="word-count" id="wordsThy${idx}">0 words</div>
+              <button class="abtn" data-thyidx="${idx}" id="thyBtn${idx}" disabled>Check & Mark</button>
+              <div class="exp" id="thyExp${idx}"></div>
+            </div>`;
+  });
+  container.innerHTML = html;
+  THY_Q.forEach((q, idx) => {
+    let ta = document.getElementById(`proseThy${idx}`);
+    let wc = document.getElementById(`wordsThy${idx}`);
+    let btn = document.getElementById(`thyBtn${idx}`);
+    ta.addEventListener("input", () => {
+      let words = ta.value.trim().split(/\s+/).filter(w=>w.length).length;
+      wc.innerText = words + " words";
+      btn.disabled = (words < 12);
+    });
+    btn.addEventListener("click", () => {
+      if (state.globalDone) return;
+      if (state.thyDone[idx]) return;
+      let answer = ta.value.toLowerCase();
+      let hits = 0;
+      q.keywords.forEach(kw => { if (answer.includes(kw.toLowerCase())) hits++; });
+      let marks = Math.min(10, Math.round((hits / q.minKw) * 10));
+      ta.disabled = true;
+      btn.disabled = true;
+      let expDiv = document.getElementById(`thyExp${idx}`);
+      let kwHtml = `<div class="kw-list">${q.keywords.map(kw => `<span class="kw-tag ${answer.includes(kw.toLowerCase()) ? 'hit' : 'miss'}">${kw}</span>`).join('')}</div>`;
+      expDiv.innerHTML = `<span style="font-weight:bold">${marks} / 10 marks</span><div>Keywords matched: ${hits}/${q.minKw}</div>${kwHtml}<div style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:8px"><strong>📘 Guide:</strong> Refer to model answer: DIKW, normalization, 3Vs, SQL queries, etc.</div>`;
+      expDiv.classList.add("show");
+      if (!state.thyDone[idx]) {
+        state.thyDone[idx] = true;
+        state.thyCount++;
+        state.thyMarks += marks;
+        updateUI();
+      }
+    });
+  });
+}
+
+function updateUI() {
+  let totalMarks = state.objMarks + state.thyMarks;
+  document.getElementById("marksSoFar").innerText = totalMarks;
+  document.getElementById("objCounter").innerText = `${state.objCount}/50`;
+  document.getElementById("thyCounter").innerText = `${state.thyCount}/5`;
+  let doneTotal = state.objCount + state.thyCount;
+  document.getElementById("progFill").style.width = (doneTotal / 55 * 100) + "%";
+  document.getElementById("subProgress").innerHTML = `OBJ: ${state.objCount}/50 · Section B: ${state.thyCount}/5`;
+  document.getElementById("thyAnsweredDisplay").innerText = `${state.thyCount} of 5 answered.`;
+  document.getElementById("answeredCount").innerText = state.objCount + state.thyCount;
+  document.getElementById("modalObj").innerText = `${state.objCount}/50`;
+  document.getElementById("modalThy").innerText = `${state.thyCount}/5`;
+  document.getElementById("modalMarks").innerText = `${totalMarks}/100`;
+}
+
+function startTimer() {
+  let timerVal = document.getElementById("timerVal");
+  let dot = document.getElementById("timerDot");
+  function fmt(sec) {
+    let h = Math.floor(sec / 3600);
+    let m = Math.floor((sec % 3600) / 60);
+    let s = sec % 60;
+    return (h ? h+":" : "") + (m<10?"0":"") + m + ":" + (s<10?"0":"") + s;
+  }
+  timerInterval = setInterval(() => {
+    if (timerSeconds <= 0) { clearInterval(timerInterval); timeUp(); return; }
+    timerSeconds--;
+    timerVal.innerText = fmt(timerSeconds);
+    if (timerSeconds <= 600 && timerSeconds > 180) dot.className = "timer-dot warn";
+    else if (timerSeconds <= 180) dot.className = "timer-dot dang";
+  }, 1000);
+}
+function timeUp() { if (!state.globalDone) finalSubmit(); }
+function finalSubmit() {
+  state.globalDone = true;
+  if (timerInterval) clearInterval(timerInterval);
+  document.querySelectorAll("#objContainer .abtn:not(:disabled)").forEach(btn => btn.click());
+  document.querySelectorAll(".prose-area").forEach(ta => ta.disabled = true);
+  document.querySelectorAll("#thyContainer .abtn").forEach(btn => btn.disabled = true);
+  showResults();
+}
+function showResults() {
+  let total = state.objMarks + state.thyMarks;
+  document.getElementById("finalScore").innerText = total;
+  document.getElementById("finalObjMarks").innerText = state.objMarks;
+  document.getElementById("finalThyMarks").innerText = state.thyMarks;
+  let grade = total>=75?"A1":total>=70?"B2":total>=65?"B3":total>=60?"C4":total>=55?"C5":total>=50?"C6":total>=45?"D7":total>=40?"E8":"F9";
+  document.getElementById("finalGrade").innerText = grade;
+  document.getElementById("resultsScreen").classList.add("show");
+}
+function hideResults() { document.getElementById("resultsScreen").classList.remove("show"); }
+
+// Tab switching
+document.getElementById("tabObjBtn").addEventListener("click", () => {
+  document.getElementById("panelObj").classList.add("active");
+  document.getElementById("panelThy").classList.remove("active");
+  document.getElementById("tabObjBtn").classList.add("active");
+  document.getElementById("tabThyBtn").classList.remove("active");
+  document.getElementById("hdrMeta").innerHTML = `Section A · <span id="answeredCount">${state.objCount}</span> answered`;
+});
+document.getElementById("tabThyBtn").addEventListener("click", () => {
+  document.getElementById("panelThy").classList.add("active");
+  document.getElementById("panelObj").classList.remove("active");
+  document.getElementById("tabThyBtn").classList.add("active");
+  document.getElementById("tabObjBtn").classList.remove("active");
+  document.getElementById("hdrMeta").innerHTML = `Section B · <span id="answeredCount">${state.thyCount}</span> answered`;
+});
+
+// Modal
+document.getElementById("submitExamBtn").onclick = () => document.getElementById("modalOverlay").classList.add("show");
+document.getElementById("modalCancelBtn").onclick = () => document.getElementById("modalOverlay").classList.remove("show");
+document.getElementById("modalConfirmBtn").onclick = () => { document.getElementById("modalOverlay").classList.remove("show"); finalSubmit(); };
+document.getElementById("reviewBtn").onclick = () => { hideResults(); document.getElementById("tabObjBtn").click(); };
+document.getElementById("pdfBtn").onclick = () => window.print();
+document.getElementById("printBtn").onclick = () => window.print();
+
+// Init
+renderMCQ();
+renderTheory();
+startTimer();
+updateUI();
+</script>
+</body>
+</html>
