@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>grantappai • Software & OS | Vector 2 Exam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background: #fefefe;
+      font-family: 'DM Sans', sans-serif;
+      color: #0f172a;
+      line-height: 1.5;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 90px);
+    }
+    /* Watermark */
+    .wm {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-22deg) scale(1.3);
+      opacity: 0.04;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+    .wm span {
+      display: block;
+      margin: 1rem 0;
+    }
+    /* Header */
+    .hdr {
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid #e2e8f0;
+      padding: calc(env(safe-area-inset-top) + 12px) 20px 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .hdr-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hdr-brand {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #2563eb;
+    }
+    .hdr-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 20px;
+      font-style: italic;
+      color: #0f172a;
+    }
+    .hdr-meta {
+      font-size: 11px;
+      color: #64748b;
+      font-family: 'DM Mono', monospace;
+    }
+    .timer-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 40px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+    }
+    .timer-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+    .timer-dot.warn { background: #f59e0b; }
+    .timer-dot.dang { background: #ef4444; animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+    .timer-val {
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      color: #0f172a;
+    }
+    /* Score strip */
+    .score-strip {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 10px;
+      padding: 14px 20px 10px;
+    }
+    .sc {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 12px 8px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+    }
+    .sc-v {
+      font-family: 'DM Mono', monospace;
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .sc-v.g { color: #10b981; }
+    .sc-v.b { color: #2563eb; }
+    .sc-l {
+      font-size: 9px;
+      color: #64748b;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    .prog-wrap {
+      padding: 0 20px 16px;
+    }
+    .prog-track {
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1d4ed8, #2563eb);
+      width: 0%;
+      border-radius: 99px;
+    }
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 20px 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 8px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      color: #64748b;
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+    }
+    .tab:first-child { border-radius: 12px 0 0 12px; }
+    .tab:last-child { border-radius: 0 12px 12px 0; border-left: none; }
+    .tab.active {
+      background: rgba(37,99,235,0.06);
+      border-color: #2563eb;
+      color: #2563eb;
+    }
+    .panel {
+      display: none;
+    }
+    .panel.active {
+      display: block;
+    }
+    .sect-hdr {
+      margin: 12px 20px 16px;
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .sect-hdr-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 18px;
+      font-style: italic;
+    }
+    /* Cards */
+    .qcard {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+    .qcard-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .qnum {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .qtopic {
+      font-size: 10px;
+      padding: 4px 10px;
+      background: #eef2ff;
+      border-radius: 30px;
+      color: #2563eb;
+      font-weight: 500;
+    }
+    .qtxt {
+      font-size: 15px;
+      line-height: 1.65;
+      font-weight: 500;
+      margin-bottom: 18px;
+    }
+    .opts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      cursor: pointer;
+    }
+    .opt.sel {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .opt.ok {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+    .opt.no {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .opt.locked {
+      cursor: default;
+    }
+    .opt-key {
+      font-family: 'DM Mono', monospace;
+      font-weight: 600;
+      color: #2563eb;
+      width: 24px;
+    }
+    .abtn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 40px;
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .abtn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .exp {
+      display: none;
+      margin-top: 16px;
+      background: #fef9e3;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 13px;
+      color: #334155;
+    }
+    .exp.show {
+      display: block;
+    }
+    .theory-marks-badge {
+      display: inline-block;
+      background: #f1f5f9;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 12px;
+    }
+    .prose-area {
+      width: 100%;
+      min-height: 140px;
+      padding: 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      resize: vertical;
+    }
+    .word-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: #64748b;
+      text-align: right;
+      margin-top: 5px;
+    }
+    .kw-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .kw-tag {
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+    .kw-tag.hit {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .kw-tag.miss {
+      background: #fee2e2;
+      color: #b91c1c;
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+    .submit-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid #e2e8f0;
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 12px);
+      display: flex;
+      gap: 12px;
+      z-index: 200;
+    }
+    .submit-btn {
+      flex: 1;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      border-radius: 40px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .submit-btn.secondary {
+      flex: 0;
+      background: #f1f5f9;
+      color: #334155;
+    }
+    .results-screen {
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 400;
+      display: none;
+      overflow-y: auto;
+      padding: 28px 20px;
+    }
+    .results-screen.show {
+      display: flex;
+      flex-direction: column;
+    }
+    .grade-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin: 0 auto 12px;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      border-radius: 28px;
+      padding: 24px;
+      width: 90%;
+      max-width: 380px;
+    }
+    @media print {
+      body { background: white; }
+      .wm, .submit-bar, .modal-overlay { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="wm"><span>grantappai</span><span>grantappai</span><span>grantappai</span><span>grantappai</span></div>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <span class="hdr-brand">grantappai • academia</span>
+      <span class="hdr-title">Software & Operating Systems — Vector 2</span>
+      <span class="hdr-meta" id="hdr-meta">Section A · <span id="answered-count">0</span> answered</span>
+    </div>
+    <div class="timer-pill">
+      <div class="timer-dot" id="timer-dot"></div>
+      <span class="timer-val" id="timer-val">1:30:00</span>
+    </div>
+  </div>
+</header>
+
+<div class="score-strip">
+  <div class="sc"><div class="sc-v b" id="sc-total">100</div><div class="sc-l">Total</div></div>
+  <div class="sc"><div class="sc-v g" id="sc-marks">0</div><div class="sc-l">Marks</div></div>
+  <div class="sc"><div class="sc-v" id="sc-obj">0/50</div><div class="sc-l">OBJ</div></div>
+  <div class="sc"><div class="sc-v" id="sc-thy">0/5</div><div class="sc-l">Theory/Prac</div></div>
+</div>
+<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div></div>
+
+<div class="tabs">
+  <button class="tab active" id="tabObjBtn">📘 Section A — 50 MCQs</button>
+  <button class="tab" id="tabThyBtn">💡 Section B — Theory + Practical</button>
+</div>
+
+<div class="panel active" id="panelObj">
+  <div class="sect-hdr"><div class="sect-hdr-title">Objective Questions (50 marks)</div><div class="sect-hdr-meta">1 mark each · answer all</div></div>
+  <div id="objContainer"></div>
+</div>
+
+<div class="panel" id="panelThy">
+  <div style="margin:8px 20px 0; background:#f1f5f9; padding:10px 14px; border-radius:14px;">
+    Answer <strong>5 questions</strong> (3 Theory + 2 Practical) · 10 marks each<br>
+    <span id="thyAnsweredDisplay">0 of 5 answered.</span>
+  </div>
+  <div id="thyContainer"></div>
+</div>
+
+<div class="submit-bar">
+  <div class="submit-progress" id="subProgress">OBJ: 0/50 · Section B: 0/5</div>
+  <button class="submit-btn" id="submitExamBtn">Submit Exam</button>
+  <button class="submit-btn secondary" id="printBtn">🖨️</button>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Submit assessment?</h3>
+    <div style="display:flex; justify-content:space-between; margin:12px 0"><span>OBJ answered</span><b id="modalObj">0/50</b></div>
+    <div style="display:flex; justify-content:space-between; margin:8px 0"><span>Theory/Practical</span><b id="modalThy">0/5</b></div>
+    <div style="display:flex; justify-content:space-between; margin:8px 0"><span>Current marks</span><b id="modalMarks">0/100</b></div>
+    <div style="display:flex; gap:12px; margin-top:20px">
+      <button id="modalCancelBtn" style="flex:1; padding:10px; border-radius:40px; background:transparent; border:1px solid #cbd5e1;">Keep going</button>
+      <button id="modalConfirmBtn" style="flex:1; padding:10px; border-radius:40px; background:#2563eb; color:white; border:none;">Submit now</button>
+    </div>
+  </div>
+</div>
+
+<div class="results-screen" id="resultsScreen">
+  <div class="results-brand">grantappai · Software & OS</div>
+  <div class="results-title">Vector 2 Assessment</div>
+  <div class="grade-circle-wrap"><div class="grade-circle"><span class="grade-score" id="finalScore">—</span><span class="grade-label">/100</span></div><span id="finalGrade">—</span></div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0">
+    <div><div id="finalObjMarks">—</div><div class="sc-l">Obj marks</div></div>
+    <div><div id="finalThyMarks">—</div><div class="sc-l">Section B marks</div></div>
+  </div>
+  <button id="reviewBtn" style="width:100%; padding:12px; background:#2563eb; color:white; border-radius:40px; border:none; margin-bottom:10px;">Review answers</button>
+  <button id="pdfBtn" style="width:100%; padding:12px; background:#f1f5f9; color:#334155; border-radius:40px; border:1px solid #e2e8f0;">Download PDF</button>
+</div>
+
+<script>
+// --------------------------------------------------------------
+// 50 MCQ Questions (full Vector 2 dataset)
+const MCQ_DATA = [
+  {text:"A set of instructions that directs a computer hardware to perform specific tasks is called...", opts:["Firmware","Software","Middleware","Malware"], ans:1, topic:"Software concepts", exp:"Software comprises instructions for hardware."},
+  {text:"Software is broadly classified into two main categories:", opts:["Application Software and Utility Software","System Software and Application Software","Operating Systems and Device Drivers","Open-source and Proprietary Software"], ans:1, topic:"Classification", exp:"System vs Application software."},
+  {text:"Which of the following is an example of system software?", opts:["Microsoft Word","Adobe Photoshop","Linux Kernel","Google Chrome"], ans:2, topic:"System software", exp:"Linux Kernel is core system software."},
+  {text:"The primary purpose of an operating system is to...", opts:["Create documents","Manage hardware and platform apps","Browse internet","Edit photos"], ans:1, topic:"OS purpose", exp:"OS manages resources and runs applications."},
+  {text:"A program that performs maintenance like disk defragmentation is called?", opts:["Application suite","Utility program","Programming language","Firmware"], ans:1, topic:"Utility", exp:"Utilities perform system maintenance tasks."},
+  {text:"Firmware is special software that is...", opts:["Stored on hard drive","Permanently stored on non-volatile memory","Downloaded on demand","Only used in smartphones"], ans:1, topic:"Firmware", exp:"Firmware resides in ROM/flash."},
+  {text:"A device driver functions as a...", opts:["Translator between OS and hardware device","User interface","Power management tool","Security layer"], ans:0, topic:"Device driver", exp:"Driver translates OS calls to hardware commands."},
+  {text:"A software suite is best described as...", opts:["Single program with multiple features","related programs sold as bundle","All system software on a PC","Cloud version of desktop app"], ans:1, topic:"Software suite", exp:"Suite = bundled related apps."},
+  {text:"Which is a valid example of an office productivity suite?", opts:["Adobe Creative Cloud","Microsoft 365","VLC Media Player","Oracle Database"], ans:1, topic:"Office suite", exp:"Microsoft 365 is office suite."},
+  {text:"Middleware is software that...", opts:["Connects different software","Is neither too complex nor simple","Acts as middle layer between CPU and RAM","Manages middle portion of hard disk"], ans:0, topic:"Middleware", exp:"Middleware enables distributed communication."},
+  {text:"Which is NOT typically performed by an OS?", opts:["Memory management","File management","Word processing","Process scheduling"], ans:2, topic:"OS functions", exp:"Word processing is application, not OS."},
+  {text:"A multi-user operating system allows...", opts:["Multiple applications to run","Multiple users to access concurrently","Single user multiple desktops","Multiple processors"], ans:1, topic:"Multi-user OS", exp:"Multi-user = concurrent user access."},
+  {text:"Ability to execute multiple tasks apparently at the same time by rapidly switching is called?", opts:["Multiprocessing","Multitasking","Multiplexing","Multithreading"], ans:1, topic:"Multitasking", exp:"Multitasking = rapid task switching."},
+  {text:"A Real-Time OS is designed for...", opts:["Complex calculations","Applications requiring deterministic timing","Office productivity","Maximum GUI"], ans:1, topic:"RTOS", exp:"RTOS strict timing constraints."},
+  {text:"Which OS type would control anti-lock braking system?", opts:["Batch","Distributed","Real-Time","Mobile"], ans:2, topic:"RTOS example", exp:"RTOS for automotive safety."},
+  {text:"Single-user, single-tasking OS allows...", opts:["One user one app at a time","Multiple users one app","One user multiple apps","Multiple users share processor"], ans:0, topic:"Single-user single-tasking", exp:"Classic example: early DOS."},
+  {text:"MS-DOS is a classic example of a ______ OS.", opts:["GUI","CL Interface","Real-Time","Network"], ans:1, topic:"CLI example", exp:"MS-DOS uses CLI."},
+  {text:"A 64-bit OS compared to 32-bit can support...", opts:["Faster internet","Larger amount of RAM","More USB ports","Better audio"], ans:1, topic:"64-bit", exp:"64-bit addresses >4GB RAM."},
+  {text:"Which of these is a mobile OS?", opts:["Ubuntu Desktop","Windows Server","iPadOS","macOS"], ans:2, topic:"Mobile OS", exp:"iPadOS is mobile/tablet OS."},
+  {text:"The OS core component that remains resident in memory is the...", opts:["Shell","Kernel","Bootloader","Registry"], ans:1, topic:"Kernel", exp:"Kernel manages critical resources."},
+  {text:"A Graphical User Interface relies heavily on...", opts:["Text-based commands","Windows, Icons, Menus, Pointers","Punched cards","Voice only"], ans:1, topic:"GUI", exp:"WIMP paradigm."},
+  {text:"Advantage of CLI over GUI for administrator?", opts:["Easier for beginners","Uses less memory and scriptable","High-res graphics","Requires mouse"], ans:1, topic:"CLI advantage", exp:"CLI light and automatable."},
+  {text:"Menu-driven interface is most suitable for...", opts:["Programming algorithms","ATMs and information kiosks","High-end graphic design","Real-time control"], ans:1, topic:"Menu-driven", exp:"Limited options, guided interaction."},
+  {text:"Touch-based interface using swipe/pinch is a type of...", opts:["CLI","Menu-driven","GUI optimized for touch","Form-based"], ans:2, topic:"Touch interface", exp:"Touch GUI."},
+  {text:"An OS 'shell' refers to...", opts:["HDD casing","Outer layer for user interface","Memory core","Motherboard firmware"], ans:1, topic:"Shell", exp:"Shell = user interface layer."},
+  {text:"Software for creating/editing text documents is a...", opts:["Spreadsheet","Word processor","Desktop publisher","Presentation"], ans:1, topic:"Word processor", exp:"Word processor (MS Word)."},
+  {text:"Optimized for numerical analysis, charting, financial modeling?", opts:["DBMS","Word Processor","Spreadsheet","Graphics Editor"], ans:2, topic:"Spreadsheet", exp:"Spreadsheet = Excel."},
+  {text:"A Database Management System is designed to...", opts:["Create slideshows","Store/retrieve structured data","Edit photos","3D modeling"], ans:1, topic:"DBMS", exp:"DBMS for data management."},
+  {text:"Desktop Publishing software like InDesign used for...", opts:["Complex page layout for print/digital","Simple text docs","Large datasets","Web animations"], ans:0, topic:"DTP", exp:"DTP for sophisticated layouts."},
+  {text:"Which is NOT a web browser?", opts:["Firefox","Safari","Edge","Microsoft Excel"], ans:3, topic:"Web browsers", exp:"Excel is spreadsheet, not browser."},
+  {text:"Civil engineer uses which software to design bridge?", opts:["Word Processing","Multimedia","Computer-Aided Design (CAD)","Accounting"], ans:2, topic:"CAD", exp:"CAD for engineering designs."},
+  {text:"Project management software helps with...", opts:["Code writing","Planning, scheduling, tracking","Logo design","CRM"], ans:1, topic:"Project management", exp:"PM tools like MS Project."},
+  {text:"Classic example of integrated package (word processing + spreadsheet)?", opts:["Adobe Premiere","Microsoft Works","AutoCAD","Final Cut"], ans:1, topic:"Integrated package", exp:"Microsoft Works (historical) all-in-one."},
+  {text:"Enterprise Resource Planning software used to...", opts:["Design packaging","Integrate core processes","Edit videos","Run single cash register"], ans:1, topic:"ERP", exp:"ERP unifies business functions."},
+  {text:"Software free to use but source code not available?", opts:["Freeware","Open-source","Shareware","Gala-ware"], ans:0, topic:"Freeware", exp:"Freeware = zero cost, closed source."},
+  {text:"Proprietary software is characterized by...", opts:["Always free","Source code restricted","Freely modifiable","No copyright"], ans:1, topic:"Proprietary", exp:"Closed-source, owned by publisher."},
+  {text:"Open-source software grants users freedom to...", opts:["Run for 30 days","View, modify, distribute source code","Use on one computer","Resell under different name"], ans:1, topic:"Open-source", exp:"Open-source grants four freedoms."},
+  {text:"Example of open-source OS?", opts:["macOS","Windows","Linux (Ubuntu)","iOS"], ans:2, topic:"Linux", exp:"Linux is open-source."},
+  {text:"Shareware distribution model: users can...", opts:["See full source","Try limited time before paying","Use fully free","Pay yearly subscription"], ans:1, topic:"Shareware", exp:"Shareware = try before you buy."},
+  {text:"A site license permits an organization to...", opts:["Use on single computer","Install on multiple computers at site","Modify and resell","Share freely externally"], ans:1, topic:"Site license", exp:"Site license for many devices at one location."},
+  {text:"End-User License Agreement is a...", opts:["Tech spec document","Legal contract for usage rights","User manual","Hardware warranty"], ans:1, topic:"EULA", exp:"EULA legal agreement between licensor and user."},
+  {text:"A concurrent use license allows...", opts:["Unlimited installs","Specific number of simultaneous users","Only one user ever","Weekend use only"], ans:1, topic:"Concurrent license", exp:"Concurrent = max active sessions."},
+  {text:"A file's extension (.docx, .pdf) tells the OS...", opts:["Where file stored","Which app associated","File size","Creation date"], ans:1, topic:"File extension", exp:"Extension maps to default program."},
+  {text:"Hierarchical file system organizes files in...", opts:["Flat list","Directories forming tree structure","Chronological order","Random clusters"], ans:1, topic:"Hierarchical file system", exp:"Tree-like folder hierarchy."},
+  {text:"Defragmentation in HDD does...", opts:["Reorganizes data contiguously","Deletes viruses","Undoes deletion","Formats disk"], ans:0, topic:"Defragmentation", exp:"Speeds up HDD access."},
+  {text:"Disk formatting refers to...", opts:["Scanning for malware","Preparing storage with file system","Backing up files","Compressing files"], ans:1, topic:"Disk formatting", exp:"Formatting creates file system structures."},
+  {text:"In path C:\\Users\\... , the 'C:' refers to?", opts:["Folder name","File extension","Root / volume label","File type"], ans:2, topic:"Root directory", exp:"Drive letter / root."},
+  {text:"Disk cleanup utility is designed to...", opts:["Remove malware","Delete temporary files","Create partitions","Encrypt files"], ans:1, topic:"Disk cleanup", exp:"Cleans temp & recycle bin."},
+  {text:"Main function of a backup utility is to...", opts:["Increase CPU speed","Create copies for restoration","Remove duplicates","Install updates"], ans:1, topic:"Backup utility", exp:"Data protection."},
+  {text:"In Windows, an executable file typically has extension...", opts:[".txt",".exe",".dll",".zip"], ans:1, topic:"Executable extension", exp:".exe = executable program."}
+];
+
+// Section B: 5 questions (3 theory + 2 practical)
+const THEORY_DATA = [
+  { id:"t1", title:"Operating Systems – Functions & Types", text:`(a) (i) Define OS and role as resource manager. (ii) List four core functions. (b) Compare CLI vs GUI (ease, memory, scripting, use). (c) (i) RTOS definition. (ii) Hard vs soft real-time with examples. (d) School server: two advantages, one disadvantage of open-source Linux.`, keywords:["resource manager","memory management","process","file","CLI","GUI","RTOS","hard real-time","soft real-time","Linux","open-source","deterministic"], minKw:8, marks:10 },
+  { id:"t2", title:"Software Licensing & Malware", text:`(a) Distinguish proprietary vs open-source; freeware vs shareware. (b) Business installs single license on 5 PCs: (i) practice name, (ii) three consequences, (iii) legitimate option. (c) (i) Malware definition, list four types. (ii) Describe two types with harm. (iii) Anti-malware role and update importance.`, keywords:["proprietary","open-source","freeware","shareware","piracy","consequences","volume license","malware","virus","worm","ransomware","definition updates"], minKw:8, marks:10 },
+  { id:"t3", title:"Application Software & Selection", text:`(a) For each task name category and example: thesis, survey analysis, magazine layout, library catalog. (b) Standalone vs suite; two suite advantages. (c) (i) Freeware vs open-source for sensitive data, more trustworthy? (ii) Two security features OS should have.`, keywords:["word processor","spreadsheet","desktop publishing","DBMS","software suite","open-source","audit","encryption","authentication","firewall"], minKw:7, marks:10 },
+  { id:"p1", title:"Practical: File Management & Paths", text:`Given tree: D:\\SchoolWork\\Maths\\Assignments\\Calculus.docx, D:\\SchoolWork\\DigitalTech\\Notes\\Vectors.pdf, D:\\Personal\\Photos\\Profile.jpg\n(a) Full paths for three files. (b) Create folder, move file, copy folder, rename. (c) Default apps for .docx,.pdf,.pptx,.jpg; fix wrong association.`, keywords:["full path","D:","new folder","cut","paste","copy","rename","file association","open with","default program"], minKw:7, marks:10 },
+  { id:"p2", title:"Practical: OS Configuration & Utilities", text:`Scenario: laptop slow, pop-ups, long boot, HDD, 8GB RAM.\n(a) Two malware types causing symptoms; two reasons for OS updates.\n(b) Utility table: Anti-Malware, Disk Cleanup, Disk Defragmenter, Task Manager Startup – purpose and benefit.\n(c) (i) Virtual Memory vs RAM limitation. (ii) Disk partition and tool to investigate.`, keywords:["adware","spyware","OS updates","security","antimalware","disk cleanup","defragment","startup","virtual memory","slow","partition","disk management"], minKw:8, marks:10 }
+];
+
+// ----- App State -----
+let state = {
+  objDone: new Array(50).fill(false),
+  objSelected: new Array(50).fill(null),
+  objMarks: 0,
+  objCount: 0,
+  thyDone: new Array(5).fill(false),
+  thyMarks: 0,
+  thyCount: 0,
+  globalDone: false
+};
+let shuffledOrders = [];
+let timerSeconds = 5400;
+let timerInterval = null;
+
+// Helper: shuffle options for MCQs
+function buildShuffled(q) {
+  let entries = q.opts.map((text, idx) => ({ origIdx: idx, text }));
+  for (let i = entries.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [entries[i], entries[j]] = [entries[j], entries[i]];
+  }
+  let newOpts = entries.map(e => e.text);
+  let newAns = entries.findIndex(e => e.origIdx === q.ans);
+  return { opts: newOpts, ans: newAns };
+}
+
+// Render 50 MCQs
+function renderMCQ() {
+  let container = document.getElementById("objContainer");
+  let html = "";
+  MCQ_DATA.forEach((q, idx) => {
+    let shuffled = buildShuffled(q);
+    shuffledOrders[idx] = shuffled;
+    let optHtml = "";
+    let letters = ["A", "B", "C", "D"];
+    shuffled.opts.forEach((opt, optIdx) => {
+      optHtml += `<div class="opt" data-qidx="${idx}" data-val="${optIdx}">
+                    <span class="opt-key">${letters[optIdx]}.</span>
+                    <span class="opt-txt">${opt}</span>
+                  </div>`;
+    });
+    html += `<div class="qcard" id="mcqCard${idx}">
+              <div class="qcard-top"><span class="qnum">Q${idx+1}</span><span class="qtopic">${q.topic}</span></div>
+              <div class="qtxt">${q.text}</div>
+              <div class="opts">${optHtml}</div>
+              <button class="abtn" data-idx="${idx}" disabled>Check Answer</button>
+              <div class="exp" id="expMcq${idx}"></div>
+            </div>`;
+  });
+  container.innerHTML = html;
+  // attach option click handlers
+  document.querySelectorAll("#objContainer .opt").forEach(opt => {
+    opt.addEventListener("click", (e) => {
+      if (state.globalDone) return;
+      let qidx = parseInt(opt.dataset.qidx);
+      let val = parseInt(opt.dataset.val);
+      if (state.objDone[qidx]) return;
+      // remove sel from siblings
+      document.querySelectorAll(`#objContainer .opt[data-qidx="${qidx}"]`).forEach(o => o.classList.remove("sel"));
+      opt.classList.add("sel");
+      state.objSelected[qidx] = val;
+      let btn = document.querySelector(`#objContainer .abtn[data-idx="${qidx}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+  // attach check button handlers
+  document.querySelectorAll("#objContainer .abtn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      if (state.globalDone) return;
+      let qidx = parseInt(btn.dataset.idx);
+      if (state.objDone[qidx]) return;
+      let chosen = state.objSelected[qidx];
+      let correct = shuffledOrders[qidx].ans;
+      let isOk = (chosen === correct);
+      // lock options
+      document.querySelectorAll(`#objContainer .opt[data-qidx="${qidx}"]`).forEach(opt => {
+        opt.classList.add("locked");
+        opt.style.pointerEvents = "none";
+        let optVal = parseInt(opt.dataset.val);
+        if (optVal === correct) opt.classList.add("ok");
+        if (optVal === chosen && chosen !== correct) opt.classList.add("no");
+      });
+      let expDiv = document.getElementById(`expMcq${qidx}`);
+      expDiv.innerHTML = `<span style="color:${isOk ? '#10b981' : '#ef4444'}">${isOk ? '✓ Correct +1 mark' : '✗ Incorrect (correct: ' + String.fromCharCode(65+correct) + ')'}</span><div style="margin-top:6px">${MCQ_DATA[qidx].exp}</div>`;
+      expDiv.classList.add("show");
+      btn.disabled = true;
+      if (!state.objDone[qidx]) {
+        state.objDone[qidx] = true;
+        state.objCount++;
+        if (isOk) state.objMarks++;
+        updateUI();
+      }
+    });
+  });
+}
+
+function renderTheory() {
+  let container = document.getElementById("thyContainer");
+  let html = "";
+  THEORY_DATA.forEach((q, idx) => {
+    html += `<div class="qcard" id="thyCard${idx}">
+              <div class="qcard-top"><span class="qnum">Q${idx+1}</span><span class="qtopic">${q.title}</span></div>
+              <div class="theory-marks-badge">📝 ${q.marks} marks</div>
+              <div class="qtxt">${q.text.replace(/\n/g,'<br>')}</div>
+              <textarea class="prose-area" id="prose${idx}" rows="7" placeholder="Write your answer here…"></textarea>
+              <div class="word-count" id="words${idx}">0 words</div>
+              <button class="abtn" data-thyidx="${idx}" id="thyBtn${idx}" disabled>Check & Mark</button>
+              <div class="exp" id="thyExp${idx}"></div>
+            </div>`;
+  });
+  container.innerHTML = html;
+  // attach input listeners
+  THEORY_DATA.forEach((q, idx) => {
+    let ta = document.getElementById(`prose${idx}`);
+    let wc = document.getElementById(`words${idx}`);
+    let btn = document.getElementById(`thyBtn${idx}`);
+    ta.addEventListener("input", () => {
+      let words = ta.value.trim().split(/\s+/).filter(w=>w.length).length;
+      wc.innerText = words + " words";
+      btn.disabled = (words < 12);
+    });
+    btn.addEventListener("click", () => {
+      if (state.globalDone) return;
+      if (state.thyDone[idx]) return;
+      let answer = ta.value.toLowerCase();
+      let hits = 0;
+      q.keywords.forEach(kw => { if (answer.includes(kw.toLowerCase())) hits++; });
+      let marks = Math.min(10, Math.round((hits / q.minKw) * 10));
+      ta.disabled = true;
+      btn.disabled = true;
+      let expDiv = document.getElementById(`thyExp${idx}`);
+      let kwHtml = `<div class="kw-list">${q.keywords.map(kw => `<span class="kw-tag ${answer.includes(kw.toLowerCase()) ? 'hit' : 'miss'}">${kw}</span>`).join('')}</div>`;
+      expDiv.innerHTML = `<span style="font-weight:bold">${marks} / 10 marks</span><div>Keywords matched: ${hits}/${q.minKw}</div>${kwHtml}<div style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:8px"><strong>📘 Mark scheme guide:</strong><br>Refer to model answer: resource management, comparisons, real-time definitions, etc.</div>`;
+      expDiv.classList.add("show");
+      if (!state.thyDone[idx]) {
+        state.thyDone[idx] = true;
+        state.thyCount++;
+        state.thyMarks += marks;
+        updateUI();
+      }
+    });
+  });
+}
+
+function updateUI() {
+  let totalMarks = state.objMarks + state.thyMarks;
+  document.getElementById("sc-marks").innerText = totalMarks;
+  document.getElementById("sc-obj").innerText = `${state.objCount}/50`;
+  document.getElementById("sc-thy").innerText = `${state.thyCount}/5`;
+  let doneTotal = state.objCount + state.thyCount;
+  document.getElementById("prog-fill").style.width = (doneTotal / 55 * 100) + "%";
+  document.getElementById("subProgress").innerHTML = `OBJ: ${state.objCount}/50 · Section B: ${state.thyCount}/5`;
+  document.getElementById("thyAnsweredDisplay").innerText = `${state.thyCount} of 5 answered.`;
+  document.getElementById("answered-count").innerText = state.objCount + state.thyCount;
+  document.getElementById("modalObj").innerText = `${state.objCount}/50`;
+  document.getElementById("modalThy").innerText = `${state.thyCount}/5`;
+  document.getElementById("modalMarks").innerText = `${totalMarks}/100`;
+}
+
+function startTimer() {
+  let timerVal = document.getElementById("timer-val");
+  let dot = document.getElementById("timer-dot");
+  function format(sec) {
+    let h = Math.floor(sec / 3600);
+    let m = Math.floor((sec % 3600) / 60);
+    let s = sec % 60;
+    return (h ? h+":" : "") + (m<10?"0":"") + m + ":" + (s<10?"0":"") + s;
+  }
+  timerInterval = setInterval(() => {
+    if (timerSeconds <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+      return;
+    }
+    timerSeconds--;
+    timerVal.innerText = format(timerSeconds);
+    if (timerSeconds <= 600 && timerSeconds > 180) {
+      dot.className = "timer-dot warn";
+    } else if (timerSeconds <= 180) {
+      dot.className = "timer-dot dang";
+    }
+  }, 1000);
+}
+
+function timeUp() {
+  if (!state.globalDone) {
+    state.globalDone = true;
+    alert("Time's up! Submitting automatically.");
+    finalSubmit();
+  }
+}
+
+function finalSubmit() {
+  state.globalDone = true;
+  if (timerInterval) clearInterval(timerInterval);
+  // auto-check any unanswered MCQs (optional)
+  document.querySelectorAll("#objContainer .abtn:not(:disabled)").forEach(btn => btn.click());
+  document.querySelectorAll(".prose-area").forEach(ta => ta.disabled = true);
+  document.querySelectorAll("#thyContainer .abtn").forEach(btn => btn.disabled = true);
+  showResults();
+}
+
+function showResults() {
+  let total = state.objMarks + state.thyMarks;
+  document.getElementById("finalScore").innerText = total;
+  document.getElementById("finalObjMarks").innerText = state.objMarks;
+  document.getElementById("finalThyMarks").innerText = state.thyMarks;
+  let grade = total>=75?"A1":total>=70?"B2":total>=65?"B3":total>=60?"C4":total>=55?"C5":total>=50?"C6":total>=45?"D7":total>=40?"E8":"F9";
+  document.getElementById("finalGrade").innerText = grade;
+  document.getElementById("resultsScreen").classList.add("show");
+}
+
+function hideResults() {
+  document.getElementById("resultsScreen").classList.remove("show");
+}
+
+// Tab switching
+document.getElementById("tabObjBtn").addEventListener("click", () => {
+  document.getElementById("panelObj").classList.add("active");
+  document.getElementById("panelThy").classList.remove("active");
+  document.getElementById("tabObjBtn").classList.add("active");
+  document.getElementById("tabThyBtn").classList.remove("active");
+  document.getElementById("hdr-meta").innerHTML = `Section A · <span id="answered-count">${state.objCount}</span> answered`;
+});
+document.getElementById("tabThyBtn").addEventListener("click", () => {
+  document.getElementById("panelThy").classList.add("active");
+  document.getElementById("panelObj").classList.remove("active");
+  document.getElementById("tabThyBtn").classList.add("active");
+  document.getElementById("tabObjBtn").classList.remove("active");
+  document.getElementById("hdr-meta").innerHTML = `Section B · <span id="answered-count">${state.thyCount}</span> answered`;
+});
+
+// Modal handlers
+document.getElementById("submitExamBtn").addEventListener("click", () => {
+  document.getElementById("modalOverlay").classList.add("show");
+});
+document.getElementById("modalCancelBtn").addEventListener("click", () => {
+  document.getElementById("modalOverlay").classList.remove("show");
+});
+document.getElementById("modalConfirmBtn").addEventListener("click", () => {
+  document.getElementById("modalOverlay").classList.remove("show");
+  finalSubmit();
+});
+document.getElementById("reviewBtn").addEventListener("click", () => {
+  hideResults();
+  document.getElementById("tabObjBtn").click();
+});
+document.getElementById("pdfBtn").addEventListener("click", () => window.print());
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+// Initialize
+renderMCQ();
+renderTheory();
+startTimer();
+updateUI();
+</script>
+</body>
+</html>
