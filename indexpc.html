@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WinNaija — Know Who Represents You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+  --g0:#f0faf3; --g1:#2d8c4e; --g2:#1a5c32; --g3:#0d3a1f;
+  --white:#f8f7f2;
+  --gold:#d4a017; --gold-l:#f5d060; --gold-d:#8a6005;
+  --r1:#e83a2a; --b1:#5ab4e0;
+  --ink:#0c0c0b; --ink2:#2e2e2a; --ink3:#666660; --ink4:#9e9e98;
+  --paper:#f8f7f2;
+  --apc:#008751; --pdp:#c8102e; --nnpp:#1b4fa8; --lp:#d4a017;
+  --display:'Bebas Neue',sans-serif;
+  --body:'Manrope',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --serif:'Playfair Display',serif;
+  --syne:'Syne',sans-serif;
+  --r-sm:6px; --r-md:12px; --r-lg:20px; --r-xl:28px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:15px;}
+body{font-family:var(--body);background:#05050a;color:var(--white);overflow-x:hidden;line-height:1.6;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+img{display:block;width:100%;height:100%;object-fit:cover;}
+a{color:inherit;text-decoration:none;}
+
+/* ============================================================
+   SITE HEADER
+   ============================================================ */
+.site-header{
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:20px;
+  padding:14px 48px;
+  background:rgba(5,5,10,.9);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.site-brand{display:flex;align-items:center;gap:12px;}
+.site-brand img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(212,160,23,.3);}
+.site-brand-text{font-family:var(--display);font-size:20px;letter-spacing:.08em;color:var(--gold-l);}
+.site-brand-sub{font-size:10px;font-family:var(--body);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-left:4px;vertical-align:middle;}
+.site-nav{display:flex;gap:4px;margin-left:auto;align-items:center;}
+.nav-chip{
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:7px 16px;border-radius:99px;
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.4);
+  transition:all .2s;
+}
+.nav-chip:hover{border-color:var(--gold);color:var(--gold-l);}
+.nav-chip.active{background:rgba(212,160,23,.12);border-color:rgba(212,160,23,.4);color:var(--gold-l);}
+.nav-cta{
+  margin-left:8px;padding:8px 18px;border-radius:4px;
+  background:var(--g2);color:#fff;
+  font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  transition:background .2s;
+}
+.nav-cta:hover{background:var(--g1);}
+
+/* ============================================================
+   SECTION SEPARATOR
+   ============================================================ */
+.section-sep{
+  padding:40px 48px 0;
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;color:#222;
+  display:flex;align-items:center;gap:14px;
+}
+.section-sep::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.04);}
+
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* ============================================================
+   §01 — PARTICLE HERO
+   ============================================================ */
+.particle-hero{
+  position:relative;height:100vh;min-height:600px;
+  background:#020304;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+#particle-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.particle-hero-content{position:relative;z-index:2;text-align:center;padding:0 24px;}
+.particle-hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(212,160,23,.3);
+  padding:6px 16px;border-radius:20px;margin-bottom:28px;
+  background:rgba(212,160,23,.06);
+}
+.particle-hero-tag::before{content:'●';font-size:7px;animation:pulse 2s infinite;}
+.particle-hero-title{
+  font-family:var(--display);font-size:clamp(64px,10vw,140px);
+  letter-spacing:.05em;line-height:.88;color:var(--white);margin-bottom:20px;
+}
+.particle-hero-title em{color:var(--g1);font-style:normal;}
+.particle-hero-sub{font-size:15px;color:rgba(255,255,255,.45);max-width:480px;margin:0 auto 36px;line-height:1.75;}
+.particle-hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.particle-hero-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 36px;border-radius:4px;background:var(--g2);color:#fff;
+  font-family:var(--body);font-size:14px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;
+  transition:background .2s,transform .2s;
+}
+.particle-hero-cta:hover{background:var(--g1);transform:translateY(-2px);}
+.particle-hero-secondary{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 24px;border-radius:4px;
+  background:transparent;color:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.12);
+  font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;
+}
+.particle-hero-secondary:hover{border-color:var(--g1);color:var(--g0);}
+.particle-scroll-hint{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#333;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.scroll-arrow{width:1px;height:32px;background:linear-gradient(to bottom,rgba(45,140,78,.6),transparent);animation:scrolldrop 2s ease-in-out infinite;}
+@keyframes scrolldrop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ============================================================
+   §02 — PRESIDENTIAL CANDIDATE
+   ============================================================ */
+.presidential{position:relative;min-height:100vh;background:#08060a;overflow:hidden;}
+.presidential-glow{position:absolute;top:-20%;right:-10%;width:70%;height:140%;background:radial-gradient(ellipse,rgba(45,140,78,.08),transparent 65%);pointer-events:none;}
+.presidential-glow-2{position:absolute;bottom:-20%;left:-10%;width:50%;height:100%;background:radial-gradient(ellipse,rgba(212,160,23,.05),transparent 60%);pointer-events:none;}
+.portrait-stage{position:absolute;right:0;top:0;bottom:0;width:52%;overflow:hidden;}
+.portrait-layer{position:absolute;inset:0;background-size:cover;background-position:center top;will-change:transform;}
+.portrait-bg{background:linear-gradient(135deg,rgba(13,58,31,.6),rgba(8,6,10,1));z-index:0;}
+.portrait-mid{background:linear-gradient(to left,rgba(8,6,10,0) 0%,rgba(8,6,10,.15) 80%,rgba(8,6,10,1) 100%);z-index:2;}
+.portrait-main-slot{position:absolute;inset:0;z-index:1;display:flex;align-items:flex-end;justify-content:center;}
+.portrait-img-real{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.portrait-name-overlay{
+  position:absolute;bottom:0;left:0;right:0;z-index:3;
+  padding:60px 40px 32px;
+  background:linear-gradient(to top,rgba(8,6,10,1) 0%,transparent 100%);
+}
+.portrait-candidate-name{font-family:var(--display);font-size:clamp(28px,3vw,48px);letter-spacing:.06em;color:var(--white);line-height:1;margin-bottom:4px;}
+.portrait-candidate-title{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--g1);}
+.presidential-content{position:relative;z-index:3;padding:80px 0 80px 56px;max-width:52%;min-height:100vh;display:flex;flex-direction:column;justify-content:center;}
+.pres-level-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-l);border:1px solid rgba(212,160,23,.25);padding:4px 12px;border-radius:3px;margin-bottom:24px;background:rgba(212,160,23,.06);}
+.pres-title{font-family:var(--display);font-size:clamp(48px,6vw,88px);line-height:.92;letter-spacing:.04em;color:var(--white);margin-bottom:8px;}
+.pres-title em{color:var(--g1);font-style:normal;display:block;}
+.typewriter-wrap{margin:28px 0;border-left:3px solid var(--g1);padding-left:20px;min-height:80px;}
+.typewriter-text{font-family:var(--serif);font-size:18px;font-style:italic;color:rgba(255,255,255,.8);line-height:1.65;}
+.typewriter-cursor{display:inline-block;width:2px;height:1.1em;background:var(--g1);vertical-align:middle;margin-left:2px;animation:blink .7s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.typewriter-attr{font-family:var(--mono);font-size:10px;color:#444;margin-top:10px;letter-spacing:.08em;}
+.confidence-meter{margin:32px 0;}
+.confidence-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.confidence-count{font-family:var(--mono);color:var(--g1);font-size:13px;}
+.meter-track{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.meter-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--g2),var(--g1));width:0%;transition:width 1.8s cubic-bezier(.16,1,.3,1);}
+.meter-target{font-family:var(--mono);font-size:9px;color:#444;display:flex;justify-content:space-between;}
+.pres-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
+.btn-pledge{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:4px;background:var(--g2);color:#fff;border:none;font-family:var(--body);font-size:14px;font-weight:800;letter-spacing:.04em;cursor:pointer;transition:background .2s,transform .2s;text-transform:uppercase;}
+.btn-pledge:hover{background:var(--g1);transform:translateY(-2px);}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:4px;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.12);font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-outline:hover{border-color:var(--g1);color:var(--g0);}
+
+/* ============================================================
+   §03 — GUBERNATORIAL (light section)
+   ============================================================ */
+.gubernatorial{background:#f8f7f2;color:var(--ink);position:relative;overflow:hidden;}
+.gubernatorial::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent,transparent 39px,rgba(26,92,50,.05) 39px,rgba(26,92,50,.05) 40px);pointer-events:none;}
+.guber-header{padding:64px 56px 0;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.guber-eyebrow{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--g1);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.guber-eyebrow::before{content:'';width:24px;height:2px;background:var(--g1);display:inline-block;}
+.guber-title{font-family:var(--display);font-size:clamp(40px,5.5vw,72px);letter-spacing:.04em;color:var(--ink);line-height:.92;}
+.guber-title em{color:var(--g1);font-style:normal;}
+.counter-arena{padding:48px 56px;display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;}
+.counter-candidate{padding:32px;position:relative;overflow:hidden;}
+.counter-candidate-a{background:linear-gradient(135deg,rgba(13,58,31,.06),rgba(13,58,31,.02));border:1px solid rgba(26,92,50,.15);border-radius:6px 0 0 6px;border-right:none;}
+.counter-candidate-b{background:linear-gradient(225deg,rgba(176,32,16,.05),rgba(176,32,16,.01));border:1px solid rgba(232,58,42,.12);border-radius:0 6px 6px 0;border-left:none;}
+.counter-vs-divider{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 16px;gap:12px;background:var(--paper);border-top:1px solid rgba(0,0,0,.08);border-bottom:1px solid rgba(0,0,0,.08);z-index:1;}
+.vs-text{font-family:var(--display);font-size:32px;letter-spacing:.1em;color:rgba(0,0,0,.1);writing-mode:vertical-lr;}
+.vs-line{width:1px;flex:1;background:rgba(0,0,0,.08);}
+.counter-portrait{width:100%;aspect-ratio:3/4;max-height:300px;border-radius:4px;overflow:hidden;margin-bottom:16px;position:relative;border:1px solid rgba(0,0,0,.08);}
+.counter-portrait img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.counter-party-badge{position:absolute;bottom:0;left:0;right:0;padding:8px 12px;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.counter-candidate-a .counter-party-badge{color:var(--g0);}
+.counter-candidate-b .counter-party-badge{color:#ffb3ad;}
+.counter-name{font-family:var(--syne);font-size:20px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.counter-title-meta{font-family:var(--mono);font-size:10px;color:var(--ink4);margin-bottom:20px;}
+.counter-stat-block{text-align:center;padding:16px 0;}
+.counter-tally{font-family:var(--display);font-size:clamp(48px,6vw,80px);line-height:1;letter-spacing:.02em;color:var(--g2);}
+.counter-candidate-b .counter-tally{color:#b02010;}
+.counter-tally-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);margin-top:4px;}
+.guber-meter-wrap{margin-top:16px;}
+.guber-meter-track{height:4px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden;}
+.guber-meter-fill-a{height:100%;border-radius:2px;background:var(--g1);width:0%;transition:width 2s cubic-bezier(.16,1,.3,1);}
+.guber-meter-fill-b{height:100%;border-radius:2px;background:var(--r1);width:0%;transition:width 2s cubic-bezier(.16,1,.3,1);}
+.guber-meter-label{font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:6px;display:flex;justify-content:space-between;}
+.guber-states-grid{padding:0 56px 64px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.guber-state-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:20px;position:relative;overflow:hidden;box-shadow:0 2px 0 rgba(0,0,0,.04);transition:transform .2s,box-shadow .2s;}
+.guber-state-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.1);}
+.guber-state-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.guber-state-card.green::before{background:var(--g1);}
+.guber-state-card.contested::before{background:var(--gold);}
+.guber-state-card.watch::before{background:var(--r1);}
+.guber-state-name{font-family:var(--display);font-size:22px;letter-spacing:.04em;color:var(--ink);margin-bottom:4px;}
+.guber-state-candidate{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:2px;}
+.guber-state-party{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:10px;}
+.guber-mini-meter{height:3px;background:rgba(0,0,0,.06);border-radius:2px;margin-bottom:4px;}
+.guber-mini-fill{height:100%;border-radius:2px;background:var(--g1);}
+.guber-state-card.contested .guber-mini-fill{background:var(--gold);}
+.guber-state-card.watch .guber-mini-fill{background:var(--r1);}
+.guber-pledge-count{font-family:var(--mono);font-size:10px;color:var(--ink4);}
+.guber-state-avatar{position:absolute;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:rgba(45,140,78,.08);border:1px solid rgba(45,140,78,.15);overflow:hidden;}
+.guber-state-avatar img{width:100%;height:100%;object-fit:cover;}
+
+/* ============================================================
+   §04 — PRESIDENTIAL SUITE (Representatives Cards)
+   ============================================================ */
+.presidential-suite{padding:80px 48px;background:#030508;position:relative;overflow:hidden;}
+.presidential-suite::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(45,140,78,.08),transparent 60%);pointer-events:none;}
+.pol-section-header{margin-bottom:48px;}
+.pol-section-kicker{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.pol-section-kicker::before{content:'';width:28px;height:2px;background:var(--gold);display:inline-block;}
+.pol-section-title{font-family:var(--display);font-size:clamp(40px,5vw,72px);letter-spacing:.04em;line-height:.92;color:#fff;margin-bottom:10px;}
+.pol-section-title em{color:var(--g1);font-style:normal;}
+.pol-section-desc{font-size:13px;color:rgba(255,255,255,.35);max-width:520px;line-height:1.8;}
+.pres-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.section-label-strip{padding:20px 48px;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.15);}
+.section-label-strip::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.04);}
+.section-label-strip b{color:rgba(255,255,255,.4);}
+/* Card anatomy */
+.pres-card{position:relative;overflow:hidden;border-radius:var(--r-xl);background:#0a0c10;border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;--card-accent:var(--apc);transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s;}
+.pres-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.12);}
+.pres-card[data-party="pdp"]{--card-accent:var(--pdp);}
+.pres-card[data-party="nnpp"]{--card-accent:var(--nnpp);}
+.pres-card[data-party="lp"]{--card-accent:var(--lp);}
+.pres-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent);z-index:3;}
+.pres-visual{position:relative;height:420px;overflow:hidden;background:#06060a;}
+.pres-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;}
+.portrait-fade{position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,#0a0c10 0%,transparent 100%);z-index:2;pointer-events:none;}
+.badge-row{position:absolute;top:20px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center;z-index:4;}
+.party-badge{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border-radius:99px;background:var(--card-accent);color:#fff;opacity:.9;}
+.role-badge{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border-radius:99px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);backdrop-filter:blur(8px);}
+.pres-identity{padding:20px 28px 0;position:relative;z-index:3;}
+.pol-name{font-family:var(--display);font-size:clamp(28px,3.5vw,48px);letter-spacing:.04em;color:#fff;line-height:.95;margin-bottom:6px;}
+.pol-fullname{font-size:11px;font-weight:600;color:rgba(255,255,255,.35);letter-spacing:.04em;margin-bottom:4px;text-transform:uppercase;font-family:var(--mono);}
+.pol-office{font-family:var(--mono);font-size:11px;color:var(--card-accent);letter-spacing:.06em;opacity:.8;}
+.pol-specs{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.05);margin:20px 0 0;}
+.spec-cell{background:#0a0c10;padding:16px 18px;transition:background .2s;}
+.spec-cell:hover{background:rgba(255,255,255,.03);}
+.spec-val{display:block;font-family:var(--mono);font-size:18px;font-weight:700;color:#fff;line-height:1;margin-bottom:4px;}
+.spec-val.accent{color:var(--card-accent);}
+.spec-key{display:block;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);}
+.approval-wrap{padding:20px 28px 0;}
+.approval-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.approval-label-text{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:var(--mono);}
+.approval-pct{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--card-accent);}
+.approval-track{height:4px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;}
+.approval-fill{height:100%;border-radius:99px;background:var(--card-accent);width:0%;transition:width 1.8s cubic-bezier(.16,1,.3,1);}
+.pol-signature{margin:20px 28px 0;padding:16px 20px;border-left:3px solid var(--card-accent);background:rgba(255,255,255,.02);border-radius:0 var(--r-sm) var(--r-sm) 0;}
+.pol-signature-text{font-family:var(--serif);font-style:italic;font-size:13px;color:rgba(255,255,255,.55);line-height:1.65;}
+.pol-signature-text::before{content:'"';font-size:28px;color:var(--card-accent);opacity:.4;line-height:0;vertical-align:-.4em;margin-right:3px;}
+.pol-signature-attr{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.2);margin-top:8px;letter-spacing:.08em;}
+.pol-cta{display:flex;gap:10px;padding:20px 28px 28px;margin-top:auto;}
+.cta-primary{flex:1;padding:13px 20px;border-radius:var(--r-md);background:var(--card-accent);color:#fff;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;transition:opacity .2s,transform .15s;}
+.cta-primary:hover{opacity:.85;transform:scale(.99);}
+.cta-secondary{padding:13px 20px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s;}
+.cta-secondary:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.8);}
+.kudos-bar{display:flex;align-items:center;gap:6px;padding:0 28px 20px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.2);}
+.kudos-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.08);font-size:11px;font-weight:600;color:rgba(255,255,255,.3);transition:all .15s;}
+.kudos-btn:hover,.kudos-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(212,160,23,.07);}
+/* Governor cards */
+.governors-section{padding:80px 48px;background:#04060a;}
+.gov-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.gov-card{position:relative;overflow:hidden;border-radius:var(--r-xl);background:#0b0d12;border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;--card-accent:var(--apc);transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s;}
+.gov-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.1);}
+.gov-card[data-party="pdp"]{--card-accent:var(--pdp);}
+.gov-card[data-party="nnpp"]{--card-accent:var(--nnpp);}
+.gov-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent);z-index:3;}
+.gov-card .pres-visual{height:320px;}
+.gov-card .pol-name{font-size:clamp(22px,2.5vw,36px);}
+/* View all link */
+.view-all-row{display:flex;justify-content:center;padding:32px 0 16px;}
+.view-all-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:99px;border:1px solid rgba(255,255,255,.1);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);transition:all .2s;}
+.view-all-btn:hover{border-color:var(--gold);color:var(--gold-l);}
+
+/* ============================================================
+   §05 — CREATORS / CONTRIBUTORS (Engagement Section)
+   ============================================================ */
+.creator-section{background:#08080a;position:relative;overflow:hidden;}
+.creator-section::before{content:'';position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);pointer-events:none;}
+.creator-masthead{position:relative;z-index:1;padding:56px 48px 0;display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;border-bottom:2px solid rgba(212,160,23,.2);padding-bottom:20px;}
+.creator-volume{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.creator-volume::before{content:'';display:inline-block;width:24px;height:1px;background:var(--gold);}
+.creator-masthead-title{font-family:var(--syne);font-size:clamp(36px,5vw,72px);font-weight:800;line-height:.92;letter-spacing:-.02em;color:#fff;}
+.creator-masthead-title em{font-style:normal;-webkit-text-stroke:1px rgba(212,160,23,.7);color:transparent;}
+.creator-masthead-right{text-align:right;}
+.creator-issue-num{font-family:var(--display);font-size:96px;line-height:.85;color:rgba(212,160,23,.12);letter-spacing:-.02em;user-select:none;}
+.creator-feature-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.4fr 1fr;gap:0;min-height:420px;}
+.creator-feature-main{position:relative;background:#111;overflow:hidden;border-right:1px solid rgba(212,160,23,.15);}
+.creator-portrait-slot{width:100%;height:100%;min-height:420px;position:relative;overflow:hidden;}
+.creator-portrait-slot img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.creator-portrait-overlay{position:absolute;bottom:0;left:0;right:0;padding:48px 32px 32px;background:linear-gradient(to top,rgba(8,8,10,1),transparent);}
+.creator-featured-name{font-family:var(--display);font-size:clamp(28px,3vw,44px);letter-spacing:.05em;color:#fff;line-height:1;margin-bottom:4px;}
+.creator-featured-title{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
+.creator-feature-side{display:flex;flex-direction:column;gap:0;}
+.creator-side-card{padding:24px 28px;border-bottom:1px solid rgba(212,160,23,.1);display:flex;gap:16px;align-items:flex-start;cursor:pointer;transition:background .2s;}
+.creator-side-card:hover{background:rgba(212,160,23,.04);}
+.creator-side-avatar{width:52px;height:52px;border-radius:4px;flex-shrink:0;overflow:hidden;background:#1a1a1e;border:1px solid rgba(255,255,255,.06);}
+.creator-side-avatar img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.creator-side-name{font-family:var(--syne);font-size:15px;font-weight:800;color:#fff;margin-bottom:3px;}
+.creator-side-role{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;opacity:.7;}
+.creator-side-bio{font-size:12px;color:rgba(255,255,255,.35);line-height:1.5;}
+.creator-stats-bar{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.04);}
+.creator-stat{padding:20px 24px;border-right:1px solid rgba(255,255,255,.04);text-align:center;}
+.creator-stat:last-child{border-right:none;}
+.creator-stat-num{font-family:var(--display);font-size:32px;letter-spacing:.03em;color:var(--gold-l);line-height:1;}
+.creator-stat-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-top:4px;}
+/* Sponsor strip */
+.sponsor-strip{position:relative;z-index:1;padding:40px 48px;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.04);}
+.sponsor-strip-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.15);margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+.sponsor-strip-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05);}
+.sponsor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.sponsor-card{border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow:hidden;position:relative;aspect-ratio:16/9;background:#0c0c10;cursor:pointer;transition:border-color .2s,transform .2s;}
+.sponsor-card:hover{border-color:rgba(212,160,23,.3);transform:translateY(-2px);}
+.sponsor-card img{width:100%;height:100%;object-fit:cover;}
+.sponsor-card-label{position:absolute;bottom:0;left:0;right:0;padding:16px 14px 12px;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+
+/* ============================================================
+   §06 — PROJECTS SHOWCASE
+   ============================================================ */
+.showcase-hero{position:relative;min-height:60vh;background:#030407;overflow:hidden;display:flex;align-items:flex-end;padding:0 56px 64px;}
+.showcase-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(45,140,78,.07),transparent 55%),radial-gradient(ellipse at 20% 80%,rgba(212,160,23,.05),transparent 50%);}
+.showcase-hero-bg::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(45,140,78,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(45,140,78,.04) 1px,transparent 1px);background-size:48px 48px;}
+.showcase-hero-content{position:relative;z-index:1;max-width:700px;}
+.showcase-hero-kicker{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--g1);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.showcase-hero-kicker::before{content:'';width:24px;height:2px;background:var(--g1);}
+.showcase-hero-title{font-family:var(--display);font-size:clamp(56px,8vw,112px);line-height:.88;letter-spacing:.04em;color:var(--white);margin-bottom:20px;}
+.showcase-hero-title em{color:var(--g1);font-style:normal;display:block;}
+.showcase-hero-desc{font-size:15px;color:rgba(255,255,255,.4);max-width:520px;line-height:1.75;margin-bottom:32px;}
+.showcase-cat-row{display:flex;gap:8px;flex-wrap:wrap;}
+.cat-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s;border:1.5px solid;}
+.cat-pill-infra{color:#e8a020;border-color:rgba(232,160,32,.25);background:rgba(232,160,32,.07);}
+.cat-pill-health{color:#3bbfa0;border-color:rgba(59,191,160,.25);background:rgba(59,191,160,.07);}
+.cat-pill-edu{color:#7c5cfc;border-color:rgba(124,92,252,.25);background:rgba(124,92,252,.07);}
+.cat-pill-digital{color:var(--g1);border-color:rgba(45,140,78,.25);background:rgba(45,140,78,.07);}
+.showcase-tally{position:absolute;right:56px;bottom:64px;z-index:1;text-align:right;}
+.tally-num{font-family:var(--display);font-size:80px;line-height:1;color:rgba(255,255,255,.04);letter-spacing:-.02em;}
+.tally-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#333;}
+/* Project cards */
+.projects-section{padding:48px 48px 80px;background:#07070a;}
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.project-card{position:relative;overflow:hidden;display:flex;flex-direction:column;background:#0c0c10;border:1px solid rgba(255,255,255,.06);border-radius:8px;transition:transform .25s,border-color .25s,box-shadow .25s;}
+.project-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.12);box-shadow:0 16px 48px rgba(0,0,0,.4);}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;z-index:2;}
+.card-infra::before{background:#e8a020;}
+.card-health::before{background:#3bbfa0;}
+.card-edu::before{background:#7c5cfc;}
+.card-digital::before{background:var(--g1);}
+.project-media{height:200px;overflow:hidden;background:#06060a;position:relative;}
+.project-media img{width:100%;height:100%;object-fit:cover;}
+.project-body{padding:20px;}
+.project-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 10px;border-radius:3px;margin-bottom:12px;border:1px solid;}
+.tag-infra{color:#e8a020;border-color:rgba(232,160,32,.3);background:rgba(232,160,32,.08);}
+.tag-health{color:#3bbfa0;border-color:rgba(59,191,160,.3);background:rgba(59,191,160,.08);}
+.tag-edu{color:#7c5cfc;border-color:rgba(124,92,252,.3);background:rgba(124,92,252,.08);}
+.tag-digital{color:var(--g1);border-color:rgba(45,140,78,.3);background:rgba(45,140,78,.08);}
+.project-title{font-family:var(--syne);font-size:17px;font-weight:800;color:#fff;margin-bottom:6px;line-height:1.25;}
+.project-location{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.3);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.project-location::before{content:'◎';font-size:9px;color:var(--g1);}
+.project-desc{font-size:12px;color:rgba(255,255,255,.4);line-height:1.6;margin-bottom:14px;}
+.project-footer{display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.project-status{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;}
+.status-active{color:var(--g1);background:rgba(45,140,78,.1);}
+.status-complete{color:#3bbfa0;background:rgba(59,191,160,.1);}
+.status-planned{color:var(--gold);background:rgba(212,160,23,.1);}
+.project-cta{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:5px 12px;border:1px solid rgba(255,255,255,.08);border-radius:3px;cursor:pointer;transition:all .2s;background:none;}
+.project-cta:hover{border-color:var(--g1);color:var(--g0);}
+
+/* ============================================================
+   §07 — PLEDGE FUNNEL
+   ============================================================ */
+.data-funnel{background:#030507;color:var(--white);position:relative;overflow:hidden;min-height:100vh;display:flex;align-items:stretch;}
+#funnel-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+.funnel-content{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;width:100%;}
+.funnel-left{padding:80px 56px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,.04);}
+.funnel-step-counter{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--g1);margin-bottom:24px;}
+.funnel-title{font-family:var(--display);font-size:clamp(40px,5vw,72px);letter-spacing:.04em;line-height:.92;color:var(--white);margin-bottom:20px;}
+.funnel-title em{color:var(--g1);font-style:normal;}
+.funnel-desc{font-size:14px;color:#555;max-width:400px;line-height:1.8;margin-bottom:32px;}
+.funnel-privacy{display:flex;align-items:flex-start;gap:10px;padding:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;}
+.funnel-privacy-icon{font-size:18px;flex-shrink:0;margin-top:2px;}
+.funnel-privacy-text{font-size:11px;color:#444;line-height:1.65;}
+.funnel-privacy-text strong{color:#666;}
+.funnel-progress{display:flex;gap:6px;margin-bottom:28px;}
+.funnel-dot{width:28px;height:4px;border-radius:2px;background:rgba(255,255,255,.08);transition:background .3s,width .3s;}
+.funnel-dot.done{background:var(--g1);}
+.funnel-dot.active{background:var(--gold);width:40px;}
+.funnel-right{padding:80px 56px;display:flex;flex-direction:column;justify-content:center;}
+.funnel-form-wrap{max-width:440px;width:100%;}
+.funnel-step{display:none;}
+.funnel-step.visible{display:block;animation:stepIn .4s cubic-bezier(.16,1,.3,1);}
+@keyframes stepIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.funnel-question{font-family:var(--syne);font-size:22px;font-weight:800;color:var(--white);margin-bottom:6px;line-height:1.2;}
+.funnel-hint{font-size:12px;color:#444;margin-bottom:24px;}
+.funnel-input{width:100%;padding:14px 16px;border:1.5px solid rgba(255,255,255,.1);border-radius:4px;background:rgba(255,255,255,.04);font-family:var(--body);font-size:15px;font-weight:500;color:var(--white);outline:none;transition:border-color .2s,background .2s;margin-bottom:12px;appearance:none;}
+.funnel-input:focus{border-color:var(--g1);background:rgba(45,140,78,.06);}
+.funnel-input::placeholder{color:#333;}
+.funnel-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.funnel-option{padding:14px;border:1.5px solid rgba(255,255,255,.08);border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;color:#555;transition:all .15s;text-align:center;}
+.funnel-option:hover{border-color:var(--g1);color:var(--g0);background:rgba(45,140,78,.08);}
+.funnel-option.selected{border-color:var(--g1);background:rgba(45,140,78,.15);color:var(--g0);}
+.funnel-option-icon{font-size:22px;display:block;margin-bottom:6px;}
+.funnel-skills-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.skill-chip{padding:7px 14px;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);font-size:11px;font-weight:700;color:#555;cursor:pointer;transition:all .15s;}
+.skill-chip:hover{border-color:var(--g1);color:var(--g0);}
+.skill-chip.selected{border-color:var(--g1);background:rgba(45,140,78,.15);color:var(--g0);}
+.wallet-input-wrap{position:relative;margin-bottom:12px;}
+.wallet-input{width:100%;padding:14px 44px 14px 16px;border:1.5px solid rgba(212,160,23,.25);border-radius:4px;background:rgba(212,160,23,.04);font-family:var(--mono);font-size:13px;font-weight:500;color:var(--gold-l);outline:none;transition:border-color .2s;}
+.wallet-input:focus{border-color:var(--gold);}
+.wallet-input::placeholder{color:rgba(212,160,23,.3);}
+.wallet-chain-badge{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--gold);background:rgba(212,160,23,.1);padding:3px 8px;border-radius:3px;}
+.wallet-chains{display:flex;gap:6px;margin-bottom:20px;}
+.chain-btn{padding:5px 12px;border-radius:3px;border:1px solid rgba(255,255,255,.08);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;cursor:pointer;transition:all .15s;}
+.chain-btn.active{border-color:var(--gold);color:var(--gold-l);background:rgba(212,160,23,.08);}
+.funnel-next-btn{width:100%;padding:15px;border-radius:4px;background:var(--g2);color:#fff;border:none;font-family:var(--body);font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .2s;}
+.funnel-next-btn:hover{background:var(--g1);transform:translateY(-1px);}
+.funnel-back-btn{background:none;border:none;color:#444;font-size:12px;font-weight:700;cursor:pointer;padding:10px 0;transition:color .15s;margin-top:8px;font-family:var(--body);}
+.funnel-back-btn:hover{color:var(--white);}
+.funnel-success{display:none;text-align:center;padding:40px 0;}
+.funnel-success.visible{display:block;animation:stepIn .5s cubic-bezier(.16,1,.3,1);}
+.success-ring{width:80px;height:80px;border-radius:50%;border:2px solid var(--g1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 0 32px rgba(45,140,78,.3);animation:successglow 2s ease-in-out infinite;}
+@keyframes successglow{0%,100%{box-shadow:0 0 16px rgba(45,140,78,.3)}50%{box-shadow:0 0 40px rgba(45,140,78,.5)}}
+.success-check{font-size:32px;}
+.success-title{font-family:var(--display);font-size:40px;letter-spacing:.06em;color:var(--white);margin-bottom:8px;}
+.success-sub{font-size:13px;color:#555;line-height:1.7;}
+
+/* ============================================================
+   §08 — LIVE TICKER (fixed)
+   ============================================================ */
+.live-ticker{position:fixed;bottom:0;left:0;right:0;z-index:300;background:rgba(3,4,8,.92);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.06);padding:10px 0;display:flex;align-items:center;overflow:hidden;}
+.ticker-label-fixed{flex-shrink:0;padding:0 20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);white-space:nowrap;border-right:1px solid rgba(255,255,255,.06);}
+.ticker-live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-right:6px;animation:livepulse 2s ease-in-out infinite;}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+.ticker-track{overflow:hidden;flex:1;}
+.ticker-inner{display:flex;gap:40px;white-space:nowrap;animation:ticker 55s linear infinite;}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:8px;}
+.ticker-item::before{content:'◆';font-size:6px;color:rgba(255,255,255,.15);}
+.ticker-item b{color:rgba(255,255,255,.65);}
+.ticker-item .t-g{color:var(--apc);}
+.ticker-item .t-r{color:var(--pdp);}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer{background:#020204;border-top:1px solid rgba(255,255,255,.04);padding:48px;padding-bottom:80px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;}
+.footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.footer-brand img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(212,160,23,.2);}
+.footer-brand-name{font-family:var(--display);font-size:18px;letter-spacing:.08em;color:var(--gold-l);}
+.footer-tagline{font-size:12px;color:rgba(255,255,255,.25);line-height:1.7;max-width:260px;margin-bottom:20px;}
+.footer-col-title{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:16px;}
+.footer-links{display:flex;flex-direction:column;gap:10px;}
+.footer-link{font-size:13px;color:rgba(255,255,255,.35);transition:color .15s;}
+.footer-link:hover{color:var(--g0);}
+.footer-copy{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.12);margin-top:20px;letter-spacing:.06em;}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:960px){
+  .pres-grid,.gov-grid{grid-template-columns:1fr;}
+  .projects-grid{grid-template-columns:1fr 1fr;}
+  .creator-feature-grid{grid-template-columns:1fr;}
+  .sponsor-grid{grid-template-columns:1fr 1fr;}
+  .site-footer{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:700px){
+  .site-header,.presidential-suite,.governors-section{padding-left:20px;padding-right:20px;}
+  .counter-arena{grid-template-columns:1fr;gap:0;}
+  .counter-vs-divider{flex-direction:row;padding:12px 0;}
+  .vs-text{writing-mode:horizontal-tb;}
+  .presidential-content{max-width:100%;padding:48px 24px;}
+  .portrait-stage{display:none;}
+  .projects-grid{grid-template-columns:1fr;}
+  .funnel-content{grid-template-columns:1fr;}
+  .funnel-left{display:none;}
+  .funnel-right{padding:48px 24px;}
+  .site-nav .nav-chip:not(.nav-cta){display:none;}
+  .showcase-hero{padding:0 24px 48px;}
+  .projects-section{padding:32px 24px 60px;}
+  .creator-masthead,.sponsor-strip,.creator-stats-bar{padding-left:20px;padding-right:20px;}
+  .guber-header,.guber-states-grid,.counter-arena{padding-left:20px;padding-right:20px;}
+  .site-footer{grid-template-columns:1fr;padding:32px 20px 80px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SITE HEADER
+     ============================================================ -->
+<header class="site-header">
+  <a href="index.html" class="site-brand">
+    <img src="assets/Logo.jpg" alt="WinNaija Logo">
+    <span class="site-brand-text">WINNAIJA</span><span class="site-brand-sub">Know Your Representatives</span>
+  </a>
+  <nav class="site-nav" aria-label="Main navigation">
+    <a href="#candidates" class="nav-chip">Candidates</a>
+    <a href="#governors" class="nav-chip">Governors</a>
+    <a href="#projects" class="nav-chip">Projects</a>
+    <a href="progressive-carded.html" class="nav-chip">Representatives</a>
+    <a href="#pledge-section" class="nav-cta">Add My Name →</a>
+  </nav>
+</header>
+
+
+<!-- ============================================================
+     §01 — PARTICLE CONSTELLATION HERO
+     ============================================================ -->
+<section class="particle-hero" id="home">
+  <canvas id="particle-canvas"></canvas>
+  <div class="particle-hero-content">
+    <div class="particle-hero-tag">WinNaija · Campaign Season · Sprint Active</div>
+    <h1 class="particle-hero-title">
+      EVERY<br>
+      <em>NAME</em><br>
+      A VOTE
+    </h1>
+    <p class="particle-hero-sub">
+      Nigerians are not waiting. From Ward 001 to the presidency — the streets are already speaking.
+    </p>
+    <div class="particle-hero-actions">
+      <button class="particle-hero-cta" onclick="document.getElementById('pledge-section').scrollIntoView({behavior:'smooth'})">
+        Add Your Name to the Map →
+      </button>
+      <a href="progressive-carded.html" class="particle-hero-secondary">
+        Know Your Representatives
+      </a>
+    </div>
+  </div>
+  <div class="particle-scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     §02 — PRESIDENTIAL CANDIDATE
+     ============================================================ -->
+<div class="section-sep" id="candidates">02 — Presidential · Federal</div>
+<section class="presidential">
+  <div class="presidential-glow"></div>
+  <div class="presidential-glow-2"></div>
+
+  <div class="portrait-stage" id="portrait-stage">
+    <div class="portrait-layer portrait-bg" data-depth="0.1"></div>
+    <div class="portrait-main-slot">
+      <img class="portrait-img-real" src="assets/RenHo.jpg" alt="Presidential Candidate">
+    </div>
+    <div class="portrait-layer portrait-mid" data-depth="0.3"></div>
+    <div class="portrait-name-overlay">
+      <div class="portrait-candidate-name">Presidential Candidate</div>
+      <div class="portrait-candidate-title">Federal Republic of Nigeria · 2027</div>
+    </div>
+  </div>
+
+  <div class="presidential-content">
+    <div class="pres-level-tag">★ Presidential · Federal Republic of Nigeria</div>
+    <h2 class="pres-title">THE<br><em>PEOPLE'S</em><br>CANDIDATE</h2>
+    <div class="typewriter-wrap">
+      <div class="typewriter-text" id="typewriter-output"></div>
+      <span class="typewriter-cursor" id="typewriter-cursor"></span>
+      <div class="typewriter-attr" id="typewriter-attr"></div>
+    </div>
+    <div class="confidence-meter">
+      <div class="confidence-label">
+        <span>Public Confidence Pledges</span>
+        <span class="confidence-count" id="pres-pledge-count">— pledges</span>
+      </div>
+      <div class="meter-track">
+        <div class="meter-fill" id="pres-meter" data-target="72"></div>
+      </div>
+      <div class="meter-target">
+        <span id="pres-current">Counting pledges…</span>
+        <span>Target: 1,000,000 pledges</span>
+      </div>
+    </div>
+    <div class="pres-actions">
+      <button class="btn-pledge" onclick="document.getElementById('pledge-section').scrollIntoView({behavior:'smooth'})">
+        Pledge Your Support →
+      </button>
+      <a href="progressive-submit.html" class="btn-outline">Contribute Media</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     §03 — GUBERNATORIAL — Calabar vs Lagos vs PH
+     ============================================================ -->
+<div class="section-sep">03 — Gubernatorial · State Level</div>
+<section class="gubernatorial" id="governors">
+
+  <div class="guber-header">
+    <div>
+      <div class="guber-eyebrow">Governorship Races · 36 States + FCT</div>
+      <div class="guber-title">STATE BY<br><em>STATE</em></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);">Showing: Key Races ▾</div>
+  </div>
+
+  <div class="counter-arena" id="counter-arena">
+    <!-- Calabar -->
+    <div class="counter-candidate counter-candidate-a">
+      <div class="counter-portrait">
+        <img src="assets/Calabar.jpg" alt="Calabar Governorship Candidate">
+        <div class="counter-party-badge">APC · Cross River State</div>
+      </div>
+      <div class="counter-name">Calabar Candidate</div>
+      <div class="counter-title-meta">APC · Cross River · Governorship</div>
+      <div class="counter-stat-block">
+        <div class="counter-tally" data-target="14200" id="counter-a">0</div>
+        <div class="counter-tally-label">Community Pledges</div>
+      </div>
+      <div class="guber-meter-wrap">
+        <div class="guber-meter-track"><div class="guber-meter-fill-a" id="meter-a" data-target="68"></div></div>
+        <div class="guber-meter-label"><span>WinNaija Confidence</span><span id="meter-a-pct">—%</span></div>
+      </div>
+    </div>
+
+    <div class="counter-vs-divider">
+      <div class="vs-line"></div>
+      <div class="vs-text">VS</div>
+      <div class="vs-line"></div>
+    </div>
+
+    <!-- Port Harcourt -->
+    <div class="counter-candidate counter-candidate-b">
+      <div class="counter-portrait">
+        <img src="assets/PtHct.jpg" alt="Port Harcourt Governorship Candidate">
+        <div class="counter-party-badge" style="color:#ffb3ad;">PDP · Rivers State</div>
+      </div>
+      <div class="counter-name">Port Harcourt Candidate</div>
+      <div class="counter-title-meta">PDP · Rivers State · Governorship</div>
+      <div class="counter-stat-block">
+        <div class="counter-tally" data-target="9800" id="counter-b">0</div>
+        <div class="counter-tally-label">Community Pledges</div>
+      </div>
+      <div class="guber-meter-wrap">
+        <div class="guber-meter-track"><div class="guber-meter-fill-b" id="meter-b" data-target="41"></div></div>
+        <div class="guber-meter-label"><span>WinNaija Confidence</span><span id="meter-b-pct">—%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State mini cards -->
+  <div class="guber-states-grid">
+    <div class="guber-state-card green">
+      <div class="guber-state-avatar"><img src="assets/Lagos.jpg" alt="Lagos"></div>
+      <div class="guber-state-name">Lagos</div>
+      <div class="guber-state-candidate">Lagos State Candidate</div>
+      <div class="guber-state-party">APC · Incumbent</div>
+      <div class="guber-mini-meter"><div class="guber-mini-fill" style="width:68%"></div></div>
+      <div class="guber-pledge-count">— pledges</div>
+    </div>
+    <div class="guber-state-card green">
+      <div class="guber-state-avatar">🏛️</div>
+      <div class="guber-state-name">Kano</div>
+      <div class="guber-state-candidate">Kano Candidate</div>
+      <div class="guber-state-party">NNPP · Challenger</div>
+      <div class="guber-mini-meter"><div class="guber-mini-fill" style="width:55%"></div></div>
+      <div class="guber-pledge-count">— pledges</div>
+    </div>
+    <div class="guber-state-card contested">
+      <div class="guber-state-avatar">🏛️</div>
+      <div class="guber-state-name">Rivers</div>
+      <div class="guber-state-candidate">Rivers Candidate</div>
+      <div class="guber-state-party">PDP · Contested</div>
+      <div class="guber-mini-meter"><div class="guber-mini-fill" style="width:48%"></div></div>
+      <div class="guber-pledge-count">— pledges</div>
+    </div>
+    <div class="guber-state-card watch">
+      <div class="guber-state-avatar">🏛️</div>
+      <div class="guber-state-name">Anambra</div>
+      <div class="guber-state-candidate">Anambra Candidate</div>
+      <div class="guber-state-party">APGA · Watch</div>
+      <div class="guber-mini-meter"><div class="guber-mini-fill" style="width:38%"></div></div>
+      <div class="guber-pledge-count">— pledges</div>
+    </div>
+    <div class="guber-state-card green">
+      <div class="guber-state-avatar">🏛️</div>
+      <div class="guber-state-name">Oyo</div>
+      <div class="guber-state-candidate">Oyo Candidate</div>
+      <div class="guber-state-party">PDP · Strong</div>
+      <div class="guber-mini-meter"><div class="guber-mini-fill" style="width:72%"></div></div>
+      <div class="guber-pledge-count">— pledges</div>
+    </div>
+    <div class="guber-state-card contested">
+      <div class="guber-state-avatar">🏛️</div>
+      <div class="guber-state-name">Delta</div>
+      <div class="guber-state-candidate">Delta Candidate</div>
+      <div class="guber-state-party">PDP · Contested</div>
+      <div class="guber-mini-meter"><div class="guber-mini-fill" style="width:44%"></div></div>
+      <div class="guber-pledge-count">— pledges</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     §04 — PRESIDENTIAL SUITE (Main Candidate Cards)
+     ============================================================ -->
+<div class="section-label-strip" id="main-candidates">
+  <b>04</b> Featured Candidates — Presidential & Gubernatorial
+</div>
+<section class="presidential-suite">
+  <div class="pol-section-header">
+    <p class="pol-section-kicker">Main Candidates</p>
+    <h2 class="pol-section-title">The <em>Frontrunners</em></h2>
+    <p class="pol-section-desc">The candidates shaping the 2027 cycle. Track their pledges, read their promises, hold them accountable.</p>
+  </div>
+
+  <div class="pres-grid">
+    <!-- Candidate 1 — Lagos -->
+    <article class="pres-card" data-party="apc" data-fill="68">
+      <div class="pres-visual">
+        <img src="assets/Lagos.jpg" alt="Lagos Candidate">
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Lagos State</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">LAGOS<br>CANDIDATE</h2>
+        <p class="pol-office">Governor · Lagos State</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell"><span class="spec-val accent">25M+</span><span class="spec-key">State Population</span></div>
+        <div class="spec-cell"><span class="spec-val">2nd Term</span><span class="spec-key">2023–2027</span></div>
+        <div class="spec-cell"><span class="spec-val">20</span><span class="spec-key">LGAs</span></div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label"><span class="approval-label-text">Approval Rating</span><span class="approval-pct">68%</span></div>
+        <div class="approval-track"><div class="approval-fill" data-fill="68"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <p class="pol-signature-text">Building a Greater Lagos — smart city infrastructure, mass transit expansion, and economic inclusion for 25 million residents.</p>
+        <p class="pol-signature-attr">— Inauguration Address, 2023</p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <a href="progressive-carded.html" class="cta-secondary">Full Profile</a>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count">2,841</span> kudos</button>
+      </div>
+    </article>
+
+    <!-- Candidate 2 — Calabar -->
+    <article class="pres-card" data-party="apc" data-fill="53">
+      <div class="pres-visual">
+        <img src="assets/Calabar.jpg" alt="Calabar Candidate">
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Cross River</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">CALABAR<br>CANDIDATE</h2>
+        <p class="pol-office">Governor · Cross River State</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell"><span class="spec-val accent">3.8M</span><span class="spec-key">State Population</span></div>
+        <div class="spec-cell"><span class="spec-val">1st Term</span><span class="spec-key">2023–2027</span></div>
+        <div class="spec-cell"><span class="spec-val">18</span><span class="spec-key">LGAs</span></div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label"><span class="approval-label-text">Approval Rating</span><span class="approval-pct">53%</span></div>
+        <div class="approval-track"><div class="approval-fill" data-fill="53"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <p class="pol-signature-text">Unlocking Cross River's potential — tourism, agriculture, and cross-border trade anchored in Calabar.</p>
+        <p class="pol-signature-attr">— Inauguration Address, 2023</p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <a href="progressive-carded.html" class="cta-secondary">Full Profile</a>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count">1,204</span> kudos</button>
+      </div>
+    </article>
+  </div>
+
+  <div class="view-all-row">
+    <a href="progressive-carded.html" class="view-all-btn">View All Representatives & Senators →</a>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     §05 — CONTRIBUTORS / CREATORS (Engagement)
+     ============================================================ -->
+<div class="section-sep">05 — Content Creators & Contributors</div>
+<section class="creator-section">
+  <div class="creator-masthead">
+    <div class="creator-masthead-left">
+      <div class="creator-volume">Vol. I · Campaign Season 2027</div>
+      <div class="creator-masthead-title">THE VOICES<br>DRIVING <em>CHANGE</em></div>
+    </div>
+    <div class="creator-masthead-right">
+      <div class="creator-issue-num">03</div>
+    </div>
+  </div>
+
+  <div class="creator-feature-grid">
+    <!-- Featured creator — NatYth -->
+    <div class="creator-feature-main">
+      <div class="creator-portrait-slot">
+        <img src="assets/NatYth.jpg" alt="National Youth Creator">
+        <div class="creator-portrait-overlay">
+          <div class="creator-featured-name">NATIONAL YOUTH</div>
+          <div class="creator-featured-title">Youth Mobilisation · Lead Creator</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side creators -->
+    <div class="creator-feature-side">
+      <div class="creator-side-card">
+        <div class="creator-side-avatar">
+          <img src="assets/Natchr.jpg" alt="Nature Creator">
+        </div>
+        <div>
+          <div class="creator-side-name">Nat. Chronicle</div>
+          <div class="creator-side-role">Field Reporter · Grassroots</div>
+          <div class="creator-side-bio">Documenting ward-level wins and community infrastructure pledges across 12 states.</div>
+        </div>
+      </div>
+      <div class="creator-side-card">
+        <div class="creator-side-avatar">
+          <img src="assets/Natsec.jpg" alt="National Secretary">
+        </div>
+        <div>
+          <div class="creator-side-name">Nat. Secretary</div>
+          <div class="creator-side-role">Policy Analyst · Editor</div>
+          <div class="creator-side-bio">Tracking legislation, policy promises, and accountability across all 36 states and FCT.</div>
+        </div>
+      </div>
+      <div class="creator-side-card" style="border-bottom:none;">
+        <div class="creator-side-avatar" style="background:rgba(212,160,23,.1);display:flex;align-items:center;justify-content:center;font-size:20px;">📹</div>
+        <div>
+          <div class="creator-side-name">Your Story</div>
+          <div class="creator-side-role">Open Submission</div>
+          <div class="creator-side-bio">Have a win to document? Submit your media and join the creator network.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="creator-stats-bar">
+    <div class="creator-stat"><div class="creator-stat-num">774</div><div class="creator-stat-label">LGAs Covered</div></div>
+    <div class="creator-stat"><div class="creator-stat-num">36+</div><div class="creator-stat-label">States Tracked</div></div>
+    <div class="creator-stat"><div class="creator-stat-num">12K+</div><div class="creator-stat-label">Community Pledges</div></div>
+    <div class="creator-stat"><div class="creator-stat-num">100</div><div class="creator-stat-label">Sprint Days</div></div>
+  </div>
+
+  <!-- Sponsors -->
+  <div class="sponsor-strip">
+    <div class="sponsor-strip-label">Partners & Sponsors</div>
+    <div class="sponsor-grid">
+      <div class="sponsor-card">
+        <img src="assets/team.jpg" alt="Team Sponsor">
+        <div class="sponsor-card-label">Team Partner</div>
+      </div>
+      <div class="sponsor-card">
+        <img src="assets/lead.jpg" alt="Lead Sponsor">
+        <div class="sponsor-card-label">Lead Sponsor</div>
+      </div>
+      <div class="sponsor-card">
+        <img src="assets/lead poster.jpg" alt="Campaign Poster">
+        <div class="sponsor-card-label">Campaign Partner</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     §06 — PROJECTS SHOWCASE
+     ============================================================ -->
+<div class="section-sep" id="projects">06 — Community Projects & Impact</div>
+<section class="showcase-hero">
+  <div class="showcase-hero-bg"></div>
+  <div class="showcase-hero-content">
+    <div class="showcase-hero-kicker">WinNaija · Project Showcase</div>
+    <h2 class="showcase-hero-title">WHAT<br><em>WE'VE</em><br>BUILT</h2>
+    <p class="showcase-hero-desc">From roads in Calabar to clinics in Kano — every project logged is a promise kept. Every win, verified on the map.</p>
+    <div class="showcase-cat-row">
+      <span class="cat-pill cat-pill-infra">🏗️ Infrastructure</span>
+      <span class="cat-pill cat-pill-health">🏥 Health</span>
+      <span class="cat-pill cat-pill-edu">📚 Education</span>
+      <span class="cat-pill cat-pill-digital">💻 Digital</span>
+    </div>
+  </div>
+  <div class="showcase-tally">
+    <div class="tally-num">47</div>
+    <div class="tally-label">Projects Logged</div>
+  </div>
+</section>
+
+<section class="projects-section">
+  <div class="projects-grid">
+
+    <div class="project-card card-infra">
+      <div class="project-media">
+        <img src="assets/Lagos.jpg" alt="Lagos Road Project">
+      </div>
+      <div class="project-body">
+        <span class="project-tag tag-infra">🏗️ Infrastructure</span>
+        <div class="project-title">Lekki–Epe Expressway Phase 2 Rehabilitation</div>
+        <div class="project-location">Lagos Island · Lagos State</div>
+        <div class="project-desc">14km of road rehabilitation connecting Lekki and Epe — reducing commute times for 400,000 daily users.</div>
+        <div class="project-footer">
+          <span class="project-status status-active">Active</span>
+          <button class="project-cta">View Details →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card card-health">
+      <div class="project-media">
+        <img src="assets/Calabar.jpg" alt="Calabar Clinic">
+      </div>
+      <div class="project-body">
+        <span class="project-tag tag-health">🏥 Health</span>
+        <div class="project-title">Cross River Rural Health Clinics Initiative</div>
+        <div class="project-location">Calabar · Cross River State</div>
+        <div class="project-desc">12 primary health care centres across underserved LGAs, serving communities with no prior access to formal healthcare.</div>
+        <div class="project-footer">
+          <span class="project-status status-complete">Complete</span>
+          <button class="project-cta">View Details →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card card-edu">
+      <div class="project-media">
+        <img src="assets/PtHct.jpg" alt="Port Harcourt School">
+      </div>
+      <div class="project-body">
+        <span class="project-tag tag-edu">📚 Education</span>
+        <div class="project-title">Rivers State Digital Learning Centres</div>
+        <div class="project-location">Port Harcourt · Rivers State</div>
+        <div class="project-desc">8 community learning hubs equipped with tablets, solar power, and locally-relevant curricula for 5,000 learners.</div>
+        <div class="project-footer">
+          <span class="project-status status-planned">Planned</span>
+          <button class="project-cta">View Details →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="view-all-row" style="margin-top:32px;">
+    <a href="progressive-projects.html" class="view-all-btn">View All 47 Projects →</a>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     §07 — PLEDGE FUNNEL
+     ============================================================ -->
+<div class="section-sep">07 — Join · Pledge · Register · Volunteer</div>
+<section class="data-funnel" id="pledge-section">
+  <canvas id="funnel-canvas"></canvas>
+  <div class="funnel-content">
+    <div class="funnel-left" id="funnel-left-content">
+      <div class="funnel-step-counter" id="funnel-left-step">Step 1 of 5 — Identity</div>
+      <h2 class="funnel-title" id="funnel-left-title">YOUR<br><em>NAME</em><br>MATTERS</h2>
+      <p class="funnel-desc" id="funnel-left-desc">This is how Nigeria will know you stood up. Your name joins the map. It will never be sold, shared, or used for advertising.</p>
+      <div class="funnel-privacy">
+        <div class="funnel-privacy-icon">🔒</div>
+        <div class="funnel-privacy-text"><strong>Your data is yours.</strong> WinNaija collects only what's needed to verify wins and send rewards. We do not share with parties, advertisers, or government.</div>
+      </div>
+    </div>
+    <div class="funnel-right">
+      <div class="funnel-form-wrap">
+        <div class="funnel-progress" id="funnel-progress">
+          <div class="funnel-dot active" id="fdot-0"></div>
+          <div class="funnel-dot" id="fdot-1"></div>
+          <div class="funnel-dot" id="fdot-2"></div>
+          <div class="funnel-dot" id="fdot-3"></div>
+          <div class="funnel-dot" id="fdot-4"></div>
+        </div>
+        <div class="funnel-step visible" id="fstep-0">
+          <div class="funnel-question">What's your first name?</div>
+          <div class="funnel-hint">This is how your wins appear on the national map</div>
+          <input class="funnel-input" type="text" id="fi-name" placeholder="e.g. Chiamaka" autocomplete="given-name"/>
+          <input class="funnel-input" type="tel" id="fi-phone" placeholder="Phone number (08XXXXXXXXX)" autocomplete="tel"/>
+          <button class="funnel-next-btn" onclick="funnelNext(0)">Continue →</button>
+        </div>
+        <div class="funnel-step" id="fstep-1">
+          <div class="funnel-question">Where are you from?</div>
+          <div class="funnel-hint">Your LGA and state — this places you on the map</div>
+          <input class="funnel-input" type="text" id="fi-state" placeholder="State (e.g. Lagos)" autocomplete="address-level1"/>
+          <input class="funnel-input" type="text" id="fi-lga" placeholder="LGA (e.g. Surulere)" autocomplete="address-level2"/>
+          <button class="funnel-next-btn" onclick="funnelNext(1)">Continue →</button>
+          <button class="funnel-back-btn" onclick="funnelBack(1)">← Back</button>
+        </div>
+        <div class="funnel-step" id="fstep-2">
+          <div class="funnel-question">How do you want to show up?</div>
+          <div class="funnel-hint">Pick all that describe you</div>
+          <div class="funnel-select-grid">
+            <div class="funnel-option" onclick="toggleOption(this)"><span class="funnel-option-icon">🏃</span>Runner / Walker</div>
+            <div class="funnel-option" onclick="toggleOption(this)"><span class="funnel-option-icon">🎥</span>Creator</div>
+            <div class="funnel-option" onclick="toggleOption(this)"><span class="funnel-option-icon">💻</span>Builder / Tech</div>
+            <div class="funnel-option" onclick="toggleOption(this)"><span class="funnel-option-icon">🌿</span>Community Work</div>
+            <div class="funnel-option" onclick="toggleOption(this)"><span class="funnel-option-icon">📚</span>Teaching</div>
+            <div class="funnel-option" onclick="toggleOption(this)"><span class="funnel-option-icon">🌍</span>Diaspora</div>
+          </div>
+          <div class="funnel-skills-wrap">
+            <div class="skill-chip" onclick="this.classList.toggle('selected')">Video Editing</div>
+            <div class="skill-chip" onclick="this.classList.toggle('selected')">Graphic Design</div>
+            <div class="skill-chip" onclick="this.classList.toggle('selected')">Photography</div>
+            <div class="skill-chip" onclick="this.classList.toggle('selected')">Social Media</div>
+            <div class="skill-chip" onclick="this.classList.toggle('selected')">Translation</div>
+            <div class="skill-chip" onclick="this.classList.toggle('selected')">Logistics</div>
+          </div>
+          <button class="funnel-next-btn" onclick="funnelNext(2)">Continue →</button>
+          <button class="funnel-back-btn" onclick="funnelBack(2)">← Back</button>
+        </div>
+        <div class="funnel-step" id="fstep-3">
+          <div class="funnel-question">Log your first win</div>
+          <div class="funnel-hint">What have you done for your neighbourhood this sprint?</div>
+          <div class="funnel-select-grid">
+            <div class="funnel-option" onclick="selectOne(this,'win-type')"><span class="funnel-option-icon">🏃</span>Run / Walk</div>
+            <div class="funnel-option" onclick="selectOne(this,'win-type')"><span class="funnel-option-icon">🌿</span>Clean-Up</div>
+            <div class="funnel-option" onclick="selectOne(this,'win-type')"><span class="funnel-option-icon">📚</span>Taught Someone</div>
+            <div class="funnel-option" onclick="selectOne(this,'win-type')"><span class="funnel-option-icon">🌱</span>Planted / Built</div>
+          </div>
+          <input class="funnel-input" type="text" id="fi-win" placeholder="Describe your win in one line…"/>
+          <button class="funnel-next-btn" onclick="funnelNext(3)">Continue →</button>
+          <button class="funnel-back-btn" onclick="funnelBack(3)">← Back</button>
+        </div>
+        <div class="funnel-step" id="fstep-4">
+          <div class="funnel-question">Claim your rewards</div>
+          <div class="funnel-hint">Connect a wallet to receive ₦, USDT, eNGN, or SOL rewards. Optional — skip to finish.</div>
+          <div class="wallet-chains">
+            <div class="chain-btn active" onclick="setChain(this)">Solana</div>
+            <div class="chain-btn" onclick="setChain(this)">EVM</div>
+            <div class="chain-btn" onclick="setChain(this)">eNaira</div>
+          </div>
+          <div class="wallet-input-wrap">
+            <input class="wallet-input" type="text" id="fi-wallet" placeholder="Paste wallet address…"/>
+            <div class="wallet-chain-badge" id="chain-badge">SOL</div>
+          </div>
+          <button class="funnel-next-btn" onclick="funnelSubmit()">Finish & Add My Name to the Map 🇳🇬</button>
+          <button class="funnel-back-btn" onclick="funnelBack(4)">← Back</button>
+          <button class="funnel-back-btn" onclick="funnelSubmit()" style="color:var(--g1);margin-top:0;">Skip wallet, finish anyway →</button>
+        </div>
+        <div class="funnel-success" id="funnel-success">
+          <div class="success-ring"><div class="success-check">✓</div></div>
+          <div class="success-title">YOU'RE ON THE MAP</div>
+          <div class="success-sub">Your name is now part of the WinNaija campaign. Wins from <strong id="success-lga">your LGA</strong> will appear in the national feed.<br><br>Share this with someone who should be on the map too.</div>
+          <button style="margin-top:24px;padding:14px 28px;background:var(--g2);color:#fff;border:none;border-radius:4px;font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--body)">Share on WhatsApp 📱</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div>
+    <div class="footer-brand">
+      <img src="assets/Logo.jpg" alt="WinNaija Logo">
+      <span class="footer-brand-name">WINNAIJA</span>
+    </div>
+    <div class="footer-tagline">Know who represents you. Track every promise. Log every win. Nigeria is becoming.</div>
+    <div class="footer-copy">© 2027 WinNaija. All rights reserved.</div>
+  </div>
+  <div>
+    <div class="footer-col-title">Navigate</div>
+    <div class="footer-links">
+      <a href="#candidates" class="footer-link">Candidates</a>
+      <a href="#governors" class="footer-link">Governors</a>
+      <a href="progressive-carded.html" class="footer-link">Representatives</a>
+      <a href="progressive-projects.html" class="footer-link">Projects</a>
+    </div>
+  </div>
+  <div>
+    <div class="footer-col-title">Participate</div>
+    <div class="footer-links">
+      <a href="#pledge-section" class="footer-link">Add My Name</a>
+      <a href="progressive-submit.html" class="footer-link">Contribute Media</a>
+      <a href="#pledge-section" class="footer-link">Volunteer</a>
+      <a href="#pledge-section" class="footer-link">Connect Wallet</a>
+    </div>
+  </div>
+  <div>
+    <div class="footer-col-title">Platform</div>
+    <div class="footer-links">
+      <a href="progressive-campaign-section.html" class="footer-link">Full Campaign Hub</a>
+      <a href="progressive-engagement-section.html" class="footer-link">Creators Network</a>
+      <a href="progressive-projects.html" class="footer-link">Project Showcase</a>
+      <a href="#" class="footer-link">Privacy Policy</a>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ============================================================
+     LIVE TICKER (fixed bottom)
+     ============================================================ -->
+<div class="live-ticker" role="complementary" aria-label="Live updates">
+  <span class="ticker-label-fixed"><span class="ticker-live-dot"></span>LIVE</span>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker-inner">
+      <span class="ticker-item"><b>LAGOS</b> <span class="t-g">APC</span> — Blue Line rail extension Phase 2 confirmed</span>
+      <span class="ticker-item"><b>CALABAR</b> <span class="t-g">Cross River</span> — Carnival 2027 budget approved</span>
+      <span class="ticker-item"><b>SPRINT</b> — Day 14 of 100 · <span class="t-g">3,240 wins verified</span> nationwide</span>
+      <span class="ticker-item"><b>AIRDROP</b> — <span class="t-g">8,412 wallets</span> connected and counting</span>
+      <span class="ticker-item"><b>PORT HARCOURT</b> <span class="t-r">PDP</span> — Digital learning centre groundbreaking scheduled</span>
+      <span class="ticker-item"><b>SENATE</b> — Next plenary session · date TBC</span>
+      <span class="ticker-item"><b>HOUSE OF REPS</b> — Committee sittings this week</span>
+      <span class="ticker-item"><b>LAGOS</b> <span class="t-g">APC</span> — Blue Line rail extension Phase 2 confirmed</span>
+      <span class="ticker-item"><b>CALABAR</b> <span class="t-g">Cross River</span> — Carnival 2027 budget approved</span>
+      <span class="ticker-item"><b>SPRINT</b> — Day 14 of 100 · <span class="t-g">3,240 wins verified</span> nationwide</span>
+      <span class="ticker-item"><b>AIRDROP</b> — <span class="t-g">8,412 wallets</span> connected and counting</span>
+      <span class="ticker-item"><b>PORT HARCOURT</b> <span class="t-r">PDP</span> — Digital learning centre groundbreaking scheduled</span>
+      <span class="ticker-item"><b>SENATE</b> — Next plenary session · date TBC</span>
+      <span class="ticker-item"><b>HOUSE OF REPS</b> — Committee sittings this week</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+'use strict';
+
+/* ── PARTICLE HERO ── */
+(function() {
+  var canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W, H, particles = [], animId;
+  var nigeriaShape = [
+    [.18,.18],[.28,.12],[.38,.1],[.5,.08],[.62,.1],[.72,.12],[.8,.18],
+    [.85,.28],[.82,.38],[.78,.48],[.75,.55],[.72,.62],[.68,.68],[.62,.75],
+    [.56,.8],[.5,.82],[.44,.8],[.38,.75],[.32,.68],[.28,.62],[.25,.55],
+    [.22,.48],[.18,.38],[.15,.28]
+  ];
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; init(); }
+  function init() {
+    particles = [];
+    var count = Math.min(280, Math.floor(W * H / 4000));
+    for (var i = 0; i < count; i++) {
+      var inShape = Math.random() < 0.6;
+      var x, y;
+      if (inShape) { var pt = nigeriaShape[Math.floor(Math.random() * nigeriaShape.length)]; x = (pt[0] + (Math.random()-.5)*.18)*W; y = (pt[1] + (Math.random()-.5)*.18)*H; }
+      else { x = Math.random()*W; y = Math.random()*H; }
+      particles.push({ x:x, y:y, ox:x, oy:y, r:Math.random()*1.5+.4, alpha:Math.random()*.5+.1, speed:Math.random()*.02+.005, color:inShape?'rgba(45,140,78,1)':'rgba(212,160,23,1)', connected:inShape, phase:Math.random()*Math.PI*2 });
+    }
+  }
+  var mouseX = -9999, mouseY = -9999;
+  canvas.addEventListener('mousemove', function(e) { var r = canvas.getBoundingClientRect(); mouseX = e.clientX-r.left; mouseY = e.clientY-r.top; });
+  canvas.addEventListener('mouseleave', function() { mouseX = mouseY = -9999; });
+  function draw(t) {
+    ctx.clearRect(0,0,W,H);
+    var time = t * .001;
+    for (var i = 0; i < particles.length; i++) {
+      if (!particles[i].connected) continue;
+      for (var j = i+1; j < particles.length; j++) {
+        if (!particles[j].connected) continue;
+        var dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx*dx+dy*dy);
+        if (dist < 80) { ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle = 'rgba(45,140,78,'+(1-dist/80)*.1+')'; ctx.lineWidth=.5; ctx.stroke(); }
+      }
+    }
+    particles.forEach(function(p) {
+      p.x = p.ox + Math.sin(time * p.speed * 60 + p.phase) * 8;
+      p.y = p.oy + Math.cos(time * p.speed * 40 + p.phase) * 6;
+      var mdx = p.x - mouseX, mdy = p.y - mouseY, mdist = Math.sqrt(mdx*mdx+mdy*mdy);
+      if (mdist < 120) { var force = (120-mdist)/120; p.x += (mdx/mdist)*force*30; p.y += (mdy/mdist)*force*30; }
+      var a = p.alpha * (.7 + .3*Math.sin(time*2+p.phase));
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = p.color.replace('1)', a+')');
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(draw);
+})();
+
+/* ── TYPEWRITER ── */
+(function() {
+  var lines = ["Nigeria is not broken. Nigeria is becoming.", "Every street cleaned, every child taught, every kilometre run —", "these are the votes that cannot be rigged.", "I am running because the country I love", "deserves a government that has already seen it win."];
+  var output = document.getElementById('typewriter-output');
+  var attr = document.getElementById('typewriter-attr');
+  if (!output) return;
+  var charIdx = 0, fullText = lines.join('\n'), displayText = '';
+  function tick() {
+    if (charIdx < fullText.length) { displayText += fullText[charIdx]; output.innerHTML = displayText.replace(/\n/g,'<br>'); charIdx++; setTimeout(tick, charIdx%7===0?60:28); }
+    else { attr.textContent = '— WinNaija Manifesto, 2027'; }
+  }
+  var observer = new IntersectionObserver(function(entries) { if(entries[0].isIntersecting){tick();observer.disconnect();} }, {threshold:.3});
+  var wrap = document.querySelector('.typewriter-wrap');
+  if (wrap) observer.observe(wrap);
+})();
+
+/* ── PARALLAX PORTRAIT ── */
+(function() {
+  var stage = document.getElementById('portrait-stage');
+  if (!stage) return;
+  var layers = stage.querySelectorAll('.portrait-layer[data-depth]');
+  document.addEventListener('mousemove', function(e) {
+    var cx = window.innerWidth/2, cy = window.innerHeight/2;
+    var dx = (e.clientX-cx)/cx, dy = (e.clientY-cy)/cy;
+    layers.forEach(function(layer) { var d = parseFloat(layer.dataset.depth); layer.style.transform = 'translate('+(dx*d*24)+'px,'+(dy*d*16)+'px)'; });
+  });
+})();
+
+/* ── SCROLL-TRIGGERED METERS & COUNTERS ── */
+(function() {
+  function fillMeter(el) { if(!el)return; el.style.width=(el.dataset.target||el.dataset.fill||0)+'%'; }
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if(e.isIntersecting){ fillMeter(document.getElementById('pres-meter')); obs.disconnect(); } });
+  }, {threshold:.3});
+  var meter = document.querySelector('.confidence-meter');
+  if (meter) obs.observe(meter);
+
+  /* Approval fill on cards */
+  var cardObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var fill = entry.target.querySelector('.approval-fill');
+        if (fill) fill.style.width = (fill.dataset.fill || 0) + '%';
+        cardObs.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.2});
+  document.querySelectorAll('[data-fill]').forEach(function(c){ cardObs.observe(c); });
+
+  /* Counter war */
+  function animateCounter(el, target, duration) {
+    var start = null;
+    function step(ts) { if(!start)start=ts; var progress=Math.min((ts-start)/duration,1), eased=1-Math.pow(1-progress,3); el.textContent=Math.floor(eased*target).toLocaleString(); if(progress<1)requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }
+  var arena = document.getElementById('counter-arena');
+  if (arena) {
+    var fired = false;
+    new IntersectionObserver(function(entries) {
+      if(entries[0].isIntersecting && !fired) {
+        fired = true;
+        var ca = document.getElementById('counter-a'), cb = document.getElementById('counter-b');
+        if(ca) animateCounter(ca, parseInt(ca.dataset.target)||14200, 2000);
+        if(cb) animateCounter(cb, parseInt(cb.dataset.target)||9800, 2000);
+        var ma = document.getElementById('meter-a'), mb = document.getElementById('meter-b');
+        if(ma){ ma.style.width=(ma.dataset.target||68)+'%'; document.getElementById('meter-a-pct').textContent=(ma.dataset.target||68)+'%'; }
+        if(mb){ mb.style.width=(mb.dataset.target||41)+'%'; document.getElementById('meter-b-pct').textContent=(mb.dataset.target||41)+'%'; }
+      }
+    }, {threshold:.3}).observe(arena);
+  }
+})();
+
+/* ── KUDOS ── */
+document.querySelectorAll('.kudos-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var active = btn.classList.toggle('active');
+    var countEl = btn.querySelector('.kudos-count');
+    if (!countEl) return;
+    var current = parseInt(countEl.textContent.replace(',','')) || 0;
+    countEl.textContent = (active ? current+1 : Math.max(0,current-1)).toLocaleString();
+  });
+});
+
+/* ── FUNNEL ── */
+var stepData = [
+  {step:'Step 1 of 5 — Identity', title:'YOUR<br><em>NAME</em><br>MATTERS', desc:'This is how Nigeria will know you stood up. Your name joins the map.'},
+  {step:'Step 2 of 5 — Location', title:'WHERE<br>ARE<br><em>YOU?</em>', desc:'Your LGA and state — this places you on the map.'},
+  {step:'Step 3 of 5 — Role', title:'HOW DO<br>YOU<br><em>SHOW UP?</em>', desc:'Choose how you want to contribute to the movement.'},
+  {step:'Step 4 of 5 — Win', title:'LOG<br>YOUR<br><em>FIRST WIN</em>', desc:'What have you done for your neighbourhood this sprint?'},
+  {step:'Step 5 of 5 — Rewards', title:'CLAIM<br>YOUR<br><em>REWARDS</em>', desc:'Connect a wallet to receive airdrop rewards for your wins.'}
+];
+function updateFunnelLeft(idx) {
+  var d = stepData[idx];
+  document.getElementById('funnel-left-step').textContent = d.step;
+  document.getElementById('funnel-left-title').innerHTML = d.title;
+  document.getElementById('funnel-left-desc').textContent = d.desc;
+  for(var i=0;i<5;i++){ var dot=document.getElementById('fdot-'+i); dot.className='funnel-dot'+(i<idx?' done':i===idx?' active':''); }
+}
+function funnelNext(current) {
+  document.getElementById('fstep-'+current).classList.remove('visible');
+  var next = current+1;
+  document.getElementById('fstep-'+next).classList.add('visible');
+  updateFunnelLeft(next);
+}
+function funnelBack(current) {
+  document.getElementById('fstep-'+current).classList.remove('visible');
+  var prev = current-1;
+  document.getElementById('fstep-'+prev).classList.add('visible');
+  updateFunnelLeft(prev);
+}
+function funnelSubmit() {
+  document.getElementById('fstep-4').classList.remove('visible');
+  document.getElementById('funnel-success').classList.add('visible');
+  var lga = document.getElementById('fi-lga');
+  if(lga&&lga.value) document.getElementById('success-lga').textContent = lga.value;
+}
+function toggleOption(el) { el.classList.toggle('selected'); }
+function selectOne(el, group) {
+  document.querySelectorAll('[onclick*="'+group+'"]').forEach(function(o){o.classList.remove('selected');});
+  el.classList.add('selected');
+}
+function setChain(el) {
+  document.querySelectorAll('.chain-btn').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  var chains = {'Solana':'SOL','EVM':'ETH','eNaira':'NGN'};
+  document.getElementById('chain-badge').textContent = chains[el.textContent] || 'SOL';
+}
+
+/* ── ACTIVE NAV ON SCROLL ── */
+(function(){
+  var sections = [{id:'home',chip:'#home'},{id:'candidates',chip:'[href="#candidates"]'},{id:'governors',chip:'[href="#governors"]'},{id:'projects',chip:'[href="#projects"]'}];
+  var chips = document.querySelectorAll('.nav-chip');
+  var secObs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        chips.forEach(function(c){c.classList.remove('active');});
+        var target = document.querySelector('.nav-chip[href="#'+entry.target.id+'"]');
+        if(target) target.classList.add('active');
+      }
+    });
+  },{rootMargin:'-40% 0px -55% 0px'});
+  ['home','candidates','governors','main-candidates','projects','pledge-section'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) secObs.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
