@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WinNaija — Know Who Represents You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+  /* Brand */
+  --g1:#2d8c4e; --g2:#1a5c32; --g3:#0d3a1f; --g0:#f0faf3;
+  --gold:#d4a017; --gold-l:#f5d060; --gold-d:#8a6005;
+  --r1:#e83a2a; --b1:#5ab4e0;
+  /* Neutrals */
+  --ink:#0c0c0b; --ink2:#1e1e1c; --ink3:#666660; --ink4:#9e9e98;
+  --paper:#f8f7f2; --card:#ffffff;
+  /* Party colours */
+  --apc:#008751;   /* APC green */
+  --pdp:#c8102e;   /* PDP red */
+  --nnpp:#1b4fa8;  /* NNPP blue */
+  --lp:#d4a017;    /* Labour Party gold */
+  /* Type */
+  --display:'Bebas Neue',sans-serif;
+  --body:'Manrope',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --serif:'DM Serif Display',serif;
+  --syne:'Syne',sans-serif;
+  /* Radius */
+  --r-sm:6px; --r-md:12px; --r-lg:20px; --r-xl:28px;
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:15px;}
+body{font-family:var(--body);background:#05050a;color:#fff;overflow-x:hidden;line-height:1.6;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+img{display:block;width:100%;height:100%;object-fit:cover;}
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:20px;
+  padding:14px 48px;
+  background:rgba(5,5,10,.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.site-brand{font-family:var(--display);font-size:20px;letter-spacing:.08em;color:var(--gold-l);}
+.site-brand span{font-size:10px;font-family:var(--body);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-left:8px;vertical-align:middle;}
+.site-nav{display:flex;gap:4px;margin-left:auto;}
+.nav-chip{
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:7px 16px;border-radius:99px;
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.4);
+  transition:all .2s;text-decoration:none;
+}
+.nav-chip:hover{border-color:var(--gold);color:var(--gold-l);}
+.nav-chip.active{background:rgba(212,160,23,.12);border-color:rgba(212,160,23,.4);color:var(--gold-l);}
+
+/* ============================================================
+   SECTION WRAPPER
+   ============================================================ */
+.pol-section{padding:80px 48px;}
+.pol-section-header{margin-bottom:48px;}
+.pol-section-kicker{
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;
+  display:flex;align-items:center;gap:12px;
+}
+.pol-section-kicker::before{content:'';width:28px;height:2px;background:var(--gold);display:inline-block;}
+.pol-section-title{
+  font-family:var(--display);font-size:clamp(40px,5vw,72px);
+  letter-spacing:.04em;line-height:.92;color:#fff;margin-bottom:10px;
+}
+.pol-section-title em{color:var(--g1);font-style:normal;}
+.pol-section-desc{font-size:13px;color:rgba(255,255,255,.35);max-width:520px;line-height:1.8;}
+.section-divider{height:1px;background:rgba(255,255,255,.05);margin:0 48px;}
+
+/* ============================================================
+   PRESIDENTIAL SUITE — full-width hero product treatment
+   ============================================================ */
+.presidential-suite{
+  padding:80px 48px;
+  background:#030508;
+  position:relative;overflow:hidden;
+}
+.presidential-suite::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 100%,rgba(45,140,78,.08),transparent 60%);
+  pointer-events:none;
+}
+.pres-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+/* President card — premium hero treatment */
+.pres-card{
+  position:relative;overflow:hidden;border-radius:var(--r-xl);
+  background:#0a0c10;border:1px solid rgba(255,255,255,.06);
+  display:flex;flex-direction:column;
+  --card-accent:var(--apc);
+  transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s;
+}
+.pres-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.12);}
+.pres-card[data-party="pdp"]{--card-accent:var(--pdp);}
+.pres-card[data-party="nnpp"]{--card-accent:var(--nnpp);}
+.pres-card[data-party="lp"]{--card-accent:var(--lp);}
+
+/* Top accent bar */
+.pres-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--card-accent);z-index:3;
+}
+
+/* VISUAL ZONE */
+.pres-visual{position:relative;height:440px;overflow:hidden;}
+
+/* SVG MAP BACKGROUND */
+.map-bg{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:.14;
+  transition:opacity .4s;
+}
+.pres-card:hover .map-bg{opacity:.22;}
+.map-bg svg{width:100%;height:100%;}
+.region-path{
+  fill:none;
+  stroke:var(--card-accent);
+  stroke-width:1.5;
+  vector-effect:non-scaling-stroke;
+}
+.region-fill{
+  fill:var(--card-accent);
+  opacity:.3;
+}
+.region-dot{
+  fill:var(--card-accent);
+  opacity:.8;
+}
+
+/* Glow behind the map */
+.map-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,var(--card-accent) 0%,transparent 65%);
+  opacity:.06;pointer-events:none;
+}
+
+/* PORTRAIT SLOT */
+.portrait-slot{
+  position:absolute;inset:0;z-index:2;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.portrait-slot img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:top center;
+}
+/* Placeholder — removed when real portrait is inserted */
+.portrait-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;
+  border:1.5px dashed rgba(255,255,255,.08);
+  margin:20px;border-radius:12px;
+}
+.portrait-placeholder-icon{font-size:40px;opacity:.15;}
+.portrait-placeholder-text{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.18);text-align:center;
+}
+/* Gradient fade from portrait into card body */
+.portrait-fade{
+  position:absolute;bottom:0;left:0;right:0;height:60%;
+  background:linear-gradient(to top,#0a0c10 0%,transparent 100%);
+  z-index:2;pointer-events:none;
+}
+
+/* BADGES */
+.badge-row{
+  position:absolute;top:20px;left:20px;right:20px;
+  display:flex;justify-content:space-between;align-items:center;z-index:4;
+}
+.party-badge{
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 12px;border-radius:99px;
+  background:var(--card-accent);color:#fff;
+  opacity:.9;
+}
+.role-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 12px;border-radius:99px;
+  background:rgba(0,0,0,.6);
+  border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.6);
+  backdrop-filter:blur(8px);
+}
+
+/* IDENTITY */
+.pres-identity{
+  padding:20px 28px 0;position:relative;z-index:3;
+}
+.pol-name{
+  font-family:var(--display);font-size:clamp(28px,3.5vw,48px);
+  letter-spacing:.04em;color:#fff;line-height:.95;
+  margin-bottom:6px;
+}
+.pol-fullname{
+  font-size:11px;font-weight:600;color:rgba(255,255,255,.35);
+  letter-spacing:.04em;margin-bottom:4px;text-transform:uppercase;
+  font-family:var(--mono);
+}
+.pol-office{
+  font-family:var(--mono);font-size:11px;color:var(--card-accent);
+  letter-spacing:.06em;opacity:.8;
+}
+
+/* SPECS — Apple-inspired spec grid */
+.pol-specs{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:rgba(255,255,255,.05);
+  margin:20px 0 0;
+}
+.spec-cell{
+  background:#0a0c10;padding:16px 18px;
+  transition:background .2s;
+}
+.spec-cell:hover{background:rgba(255,255,255,.03);}
+.spec-val{
+  display:block;font-family:var(--mono);
+  font-size:18px;font-weight:700;color:#fff;
+  line-height:1;margin-bottom:4px;
+}
+.spec-val.accent{color:var(--card-accent);}
+.spec-key{
+  display:block;font-size:9px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.25);
+}
+
+/* APPROVAL METER — Tesla range indicator style */
+.approval-wrap{padding:20px 28px 0;}
+.approval-label{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:8px;
+}
+.approval-label-text{
+  font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);font-family:var(--mono);
+}
+.approval-pct{
+  font-family:var(--mono);font-size:13px;font-weight:700;
+  color:var(--card-accent);
+}
+.approval-track{
+  height:4px;background:rgba(255,255,255,.07);
+  border-radius:99px;overflow:hidden;
+}
+.approval-fill{
+  height:100%;border-radius:99px;
+  background:var(--card-accent);
+  width:0%;
+  transition:width 1.8s cubic-bezier(.16,1,.3,1);
+}
+
+/* SIGNATURE — key promise/quote */
+.pol-signature{
+  margin:20px 28px 0;padding:16px 20px;
+  border-left:3px solid var(--card-accent);
+  background:rgba(255,255,255,.02);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+}
+.pol-signature-text{
+  font-family:var(--serif);font-style:italic;
+  font-size:13px;color:rgba(255,255,255,.55);
+  line-height:1.65;
+}
+/* SLOT: replace with real signature promise */
+.pol-signature-text::before{
+  content:'"';font-size:28px;color:var(--card-accent);
+  opacity:.4;line-height:0;vertical-align:-.4em;margin-right:3px;
+}
+.pol-signature-attr{
+  font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.2);
+  margin-top:8px;letter-spacing:.08em;
+}
+
+/* CTA ROW */
+.pol-cta{
+  display:flex;gap:10px;padding:20px 28px 28px;margin-top:auto;
+}
+.cta-primary{
+  flex:1;padding:13px 20px;border-radius:var(--r-md);
+  background:var(--card-accent);color:#fff;
+  font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  transition:opacity .2s,transform .15s;
+}
+.cta-primary:hover{opacity:.85;transform:scale(.99);}
+.cta-secondary{
+  padding:13px 20px;border-radius:var(--r-md);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.5);
+  font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  transition:all .2s;
+}
+.cta-secondary:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.8);}
+
+/* Kudos counter */
+.kudos-bar{
+  display:flex;align-items:center;gap:6px;
+  padding:0 28px 20px;font-family:var(--mono);
+  font-size:11px;color:rgba(255,255,255,.2);
+}
+.kudos-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:99px;
+  border:1px solid rgba(255,255,255,.08);
+  font-size:11px;font-weight:600;color:rgba(255,255,255,.3);
+  transition:all .15s;
+}
+.kudos-btn:hover,.kudos-btn.active{
+  border-color:var(--gold);color:var(--gold);
+  background:rgba(212,160,23,.07);
+}
+.kudos-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.1);}
+
+/* ============================================================
+   GOVERNOR GRID
+   ============================================================ */
+.governors-section{padding:80px 48px;background:#04060a;}
+.gov-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+
+/* Governor card — same anatomy, different proportions */
+.gov-card{
+  position:relative;overflow:hidden;border-radius:var(--r-xl);
+  background:#0b0d12;border:1px solid rgba(255,255,255,.06);
+  display:flex;flex-direction:column;
+  --card-accent:var(--apc);
+  transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s;
+}
+.gov-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.1);}
+.gov-card[data-party="pdp"]{--card-accent:var(--pdp);}
+.gov-card[data-party="nnpp"]{--card-accent:var(--nnpp);}
+.gov-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent);z-index:3;}
+.gov-card .pres-visual{height:320px;}
+.gov-card .pol-name{font-size:clamp(22px,2.5vw,36px);}
+.gov-card .pol-specs{grid-template-columns:repeat(3,1fr);}
+
+/* ============================================================
+   SENATORS & REPS — compact product cards
+   ============================================================ */
+.chamber-section{padding:80px 48px;background:#030408;}
+.chamber-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
+.chamber-card{
+  position:relative;overflow:hidden;border-radius:var(--r-lg);
+  background:#0c0e14;border:1px solid rgba(255,255,255,.06);
+  display:flex;flex-direction:column;
+  --card-accent:var(--apc);
+  transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s;
+}
+.chamber-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.1);}
+.chamber-card[data-party="pdp"]{--card-accent:var(--pdp);}
+.chamber-card[data-party="nnpp"]{--card-accent:var(--nnpp);}
+.chamber-card[data-party="lp"]{--card-accent:var(--lp);}
+.chamber-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent);z-index:3;}
+
+.chamber-card .pres-visual{height:240px;}
+.chamber-card .pol-name{font-size:22px;}
+.chamber-card .pol-specs{grid-template-columns:repeat(2,1fr);}
+.chamber-card .spec-val{font-size:15px;}
+.chamber-card .pol-signature{margin:14px 20px 0;padding:12px 14px;font-size:12px;}
+.chamber-card .pol-cta{padding:14px 20px 20px;}
+.chamber-card .pres-identity{padding:16px 20px 0;}
+.chamber-card .approval-wrap{padding:14px 20px 0;}
+.chamber-card .kudos-bar{padding:0 20px 14px;}
+.chamber-card .cta-primary,.chamber-card .cta-secondary{padding:10px 14px;font-size:11px;}
+
+/* ============================================================
+   SECTION LABEL STRIP — between sections
+   ============================================================ */
+.section-label-strip{
+  padding:20px 48px;background:rgba(255,255,255,.02);
+  border-top:1px solid rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:16px;
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.15);
+}
+.section-label-strip::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.04);}
+.section-label-strip b{color:rgba(255,255,255,.4);}
+
+/* ============================================================
+   LIVE TICKER — fixed bottom
+   ============================================================ */
+.live-ticker{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(3,4,8,.92);backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,.06);
+  padding:10px 0;
+  display:flex;align-items:center;
+  overflow:hidden;
+}
+.ticker-label{
+  flex-shrink:0;padding:0 20px;
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.06);
+}
+.ticker-live-dot{
+  display:inline-block;width:5px;height:5px;
+  border-radius:50%;background:var(--gold);
+  margin-right:6px;
+}
+.ticker-track{overflow:hidden;flex:1;}
+.ticker-inner{
+  display:flex;gap:40px;white-space:nowrap;
+  width:max-content;
+}
+.ticker-item{
+  font-family:var(--mono);font-size:11px;
+  color:rgba(255,255,255,.35);
+  display:flex;align-items:center;gap:8px;
+}
+.ticker-item::before{content:'◆';font-size:6px;color:rgba(255,255,255,.15);}
+.ticker-item b{color:rgba(255,255,255,.65);}
+.ticker-item .t-g{color:var(--apc);}
+.ticker-item .t-r{color:var(--pdp);}
+
+/* ============================================================
+   ANIMATIONS — all gated behind prefers-reduced-motion
+   ============================================================ */
+@media(prefers-reduced-motion:no-preference){
+  .ticker-inner{animation:ticker 55s linear infinite;}
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  .ticker-live-dot{animation:livepulse 2s ease-in-out infinite;}
+  @keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+
+  .map-bg{animation:mapbreathe 6s ease-in-out infinite;}
+  @keyframes mapbreathe{0%,100%{opacity:.14}50%{opacity:.19}}
+
+  .pres-card:hover .map-bg{animation:none;}
+
+  .approval-fill{transition:width 2s cubic-bezier(.16,1,.3,1);}
+}
+@media(prefers-reduced-motion:reduce){
+  .approval-fill{transition:none;}
+  .ticker-inner{animation:none;}
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:960px){
+  .pres-grid,.gov-grid{grid-template-columns:1fr;}
+  .chamber-grid{grid-template-columns:1fr 1fr;}
+  .site-nav{display:none;}
+}
+@media(max-width:640px){
+  .site-header,.pol-section,.presidential-suite,.governors-section,.chamber-section{padding-left:20px;padding-right:20px;}
+  .section-divider{margin:0 20px;}
+  .section-label-strip{padding:16px 20px;}
+  .chamber-grid{grid-template-columns:1fr;}
+  .pol-specs{grid-template-columns:1fr 1fr !important;}
+  .pres-visual{height:280px !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SITE HEADER
+     ============================================================ -->
+<header class="site-header">
+  <div class="site-brand">WINNAIJA <span>Know Your Representatives</span></div>
+  <nav class="site-nav" aria-label="Jump to section">
+    <a href="#president" class="nav-chip active">President</a>
+    <a href="#governors" class="nav-chip">Governors</a>
+    <a href="#senate" class="nav-chip">Senate</a>
+    <a href="#house" class="nav-chip">House</a>
+  </nav>
+</header>
+
+
+<!-- ============================================================
+     SECTION 1: PRESIDENTIAL SUITE
+     ============================================================ -->
+<div class="section-label-strip" id="president">
+  <b>01</b> Executive — Federal Level
+</div>
+
+<section class="presidential-suite">
+  <div class="pol-section-header">
+    <p class="pol-section-kicker">Presidential Office</p>
+    <h2 class="pol-section-title">The Executive<br><em>Federal Republic</em></h2>
+    <p class="pol-section-desc">The President and Vice President represent 220 million Nigerians. Their mandate shapes every federal policy, law, and institution.</p>
+  </div>
+
+  <div class="pres-grid">
+
+    <!-- PRESIDENT -->
+    <article class="pres-card" data-party="apc" data-fill="62">
+      <div class="pres-visual">
+        <!-- MAP BACKGROUND: Nigeria national outline -->
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 500 480" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="f-nga" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="8"/>
+              </filter>
+            </defs>
+            <!-- Nigeria glow -->
+            <path class="region-fill" filter="url(#f-nga)"
+              d="M 82,32 L 170,18 L 310,14 L 420,22 L 458,70 L 448,140 L 430,200 L 415,270 L 360,340 L 305,400 L 250,440 L 175,448 L 110,418 L 55,360 L 18,280 L 22,200 L 48,110 Z"/>
+            <!-- Nigeria border -->
+            <path class="region-path"
+              d="M 82,32 L 170,18 L 310,14 L 420,22 L 458,70 L 448,140 L 430,200 L 415,270 L 360,340 L 305,400 L 250,440 L 175,448 L 110,418 L 55,360 L 18,280 L 22,200 L 48,110 Z"/>
+            <!-- FCT dot -->
+            <circle class="region-dot" cx="248" cy="228" r="8"/>
+            <!-- Niger delta indicator -->
+            <path class="region-path" stroke-dasharray="4 4" opacity=".4"
+              d="M 175,390 Q 210,430 250,440 Q 290,430 305,400"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+
+        <!-- PORTRAIT SLOT — replace div with <img src="…" alt="…"> -->
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🏛️</div>
+            <!-- SLOT: portrait of Bola Ahmed Tinubu -->
+            <div class="portrait-placeholder-text">Portrait<br><!-- SLOT: /assets/portraits/tinubu.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Commander-in-Chief</span>
+        </div>
+      </div>
+
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">BOLA AHMED<br>TINUBU</h2>
+        <p class="pol-office">President · Federal Republic of Nigeria</p>
+      </div>
+
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <!-- SLOT: data-stat from backend -->
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Registered Voters</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">2023–2027</span>
+          <span class="spec-key">Current Term</span>
+        </div>
+        <div class="spec-cell">
+          <!-- SLOT: data-stat -->
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Bills Signed</span>
+        </div>
+      </div>
+
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <!-- SLOT: approval percentage -->
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track">
+          <div class="approval-fill" data-fill="62"></div>
+        </div>
+      </div>
+
+      <blockquote class="pol-signature">
+        <!-- SLOT: key presidential promise or statement -->
+        <p class="pol-signature-text">Renewed hope for every Nigerian — creating jobs, restoring security, rebuilding infrastructure from Lagos to Maiduguri.</p>
+        <p class="pol-signature-attr">— Inaugural Address, May 29 2023</p>
+      </blockquote>
+
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count" data-stat>—</span> kudos</button>
+        <span class="kudos-dot"></span>
+        <span><!-- SLOT: last activity timestamp --></span>
+      </div>
+    </article>
+
+    <!-- VICE PRESIDENT -->
+    <article class="pres-card" data-party="apc" data-fill="58">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 500 480" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="f-vp" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="8"/>
+              </filter>
+            </defs>
+            <path class="region-fill" filter="url(#f-vp)"
+              d="M 82,32 L 170,18 L 310,14 L 420,22 L 458,70 L 448,140 L 430,200 L 415,270 L 360,340 L 305,400 L 250,440 L 175,448 L 110,418 L 55,360 L 18,280 L 22,200 L 48,110 Z"/>
+            <path class="region-path"
+              d="M 82,32 L 170,18 L 310,14 L 420,22 L 458,70 L 448,140 L 430,200 L 415,270 L 360,340 L 305,400 L 250,440 L 175,448 L 110,418 L 55,360 L 18,280 L 22,200 L 48,110 Z"/>
+            <!-- Borno State highlight — VP's home state -->
+            <path class="region-path" stroke-width="2.5" opacity=".6"
+              d="M 320,14 L 420,22 L 458,70 L 448,140 L 390,190 L 320,160 L 310,80 Z"/>
+            <circle class="region-dot" cx="390" cy="80" r="6" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🏛️</div>
+            <!-- SLOT: portrait of Kashim Shettima -->
+            <div class="portrait-placeholder-text">Portrait<br><!-- SLOT: /assets/portraits/shettima.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Vice President</span>
+        </div>
+      </div>
+
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">KASHIM<br>SHETTIMA</h2>
+        <p class="pol-office">Vice President · Federal Republic of Nigeria</p>
+      </div>
+
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Votes Won</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">2023–2027</span>
+          <span class="spec-key">Current Term</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Initiatives Led</span>
+        </div>
+      </div>
+
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track">
+          <div class="approval-fill" data-fill="58"></div>
+        </div>
+      </div>
+
+      <blockquote class="pol-signature">
+        <!-- SLOT: VP's signature statement -->
+        <p class="pol-signature-text">A united Nigeria built on education, security cooperation, and economic diversification across every zone.</p>
+        <p class="pol-signature-attr">— Campaign Manifesto, 2023</p>
+      </blockquote>
+
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count" data-stat>—</span> kudos</button>
+        <span class="kudos-dot"></span>
+        <span><!-- SLOT: last activity --></span>
+      </div>
+    </article>
+
+  </div><!-- /pres-grid -->
+</section>
+
+
+<!-- ============================================================
+     SECTION 2: GOVERNORS
+     ============================================================ -->
+<div class="section-label-strip" id="governors">
+  <b>02</b> Executive — State Level
+</div>
+
+<section class="governors-section">
+  <div class="pol-section-header">
+    <p class="pol-section-kicker">State Governors</p>
+    <h2 class="pol-section-title">Your State<br><em>Executive</em></h2>
+    <p class="pol-section-desc">Governors control state budgets, security, and public services. They are your most direct link to government action.</p>
+  </div>
+
+  <div class="gov-grid">
+
+    <!-- GOVERNOR — LAGOS (APC) -->
+    <article class="gov-card" data-party="apc" data-fill="71">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="f-lag" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="14"/>
+              </filter>
+            </defs>
+            <!-- Lagos State — distinctive coastal southwestern shape -->
+            <path class="region-fill" filter="url(#f-lag)"
+              d="M 60,60 L 220,40 L 320,60 L 360,120 L 350,220 L 300,310 L 220,360 L 120,370 L 40,320 L 10,220 L 20,120 Z"/>
+            <path class="region-path"
+              d="M 60,60 L 220,40 L 320,60 L 360,120 L 350,220 L 300,310 L 220,360 L 120,370 L 40,320 L 10,220 L 20,120 Z"/>
+            <!-- Lagos Island indicator -->
+            <ellipse class="region-dot" cx="155" cy="340" rx="18" ry="8" opacity=".6"/>
+            <!-- Lagos Lagoon curve -->
+            <path class="region-path" stroke-dasharray="5 4" opacity=".3"
+              d="M 60,310 Q 120,350 200,355 Q 280,350 310,320"/>
+            <!-- State capital dot -->
+            <circle class="region-dot" cx="160" cy="310" r="5"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🌊</div>
+            <!-- SLOT: portrait of Babajide Sanwo-Olu -->
+            <div class="portrait-placeholder-text">Portrait<br><!-- SLOT: /assets/portraits/sanwoolu.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Lagos State</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">BABAJIDE SANWO-OLU</h2>
+        <p class="pol-office">Governor · Lagos State</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">State Population</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">2nd Term</span>
+          <span class="spec-key">2023–2027</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">LGAs</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="71"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <!-- SLOT: Sanwo-Olu's key commitment -->
+        <p class="pol-signature-text">Building a Greater Lagos — smart city infrastructure, mass transit expansion, and economic inclusion for 25 million residents.</p>
+        <p class="pol-signature-attr">— 2023 Inauguration Address</p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count" data-stat>—</span> kudos</button>
+      </div>
+    </article>
+
+    <!-- GOVERNOR — PLATEAU (PDP) -->
+    <article class="gov-card" data-party="pdp" data-fill="55">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="f-pla" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="14"/>
+              </filter>
+            </defs>
+            <!-- Plateau State — roughly pentagonal, elevated central -->
+            <path class="region-fill" filter="url(#f-pla)"
+              d="M 120,30 L 280,20 L 370,90 L 380,200 L 340,310 L 220,380 L 100,360 L 30,270 L 20,150 L 60,60 Z"/>
+            <path class="region-path"
+              d="M 120,30 L 280,20 L 370,90 L 380,200 L 340,310 L 220,380 L 100,360 L 30,270 L 20,150 L 60,60 Z"/>
+            <!-- Jos Plateau elevation lines -->
+            <path class="region-path" opacity=".25" stroke-dasharray="6 4"
+              d="M 140,120 L 300,110 L 340,200 L 300,290 L 140,300 L 90,210 Z"/>
+            <circle class="region-dot" cx="200" cy="200" r="7"/>
+            <circle class="region-dot" cx="200" cy="200" r="18" opacity=".2"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🏔️</div>
+            <!-- SLOT: portrait of Caleb Mutfwang -->
+            <div class="portrait-placeholder-text">Portrait<br><!-- SLOT: /assets/portraits/mutfwang.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge" style="background:var(--pdp)">PDP</span>
+          <span class="role-badge">Plateau State</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">CALEB MUTFWANG</h2>
+        <p class="pol-office">Governor · Plateau State</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">State Population</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">1st Term</span>
+          <span class="spec-key">2023–2027</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">17</span>
+          <span class="spec-key">LGAs</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="55"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <!-- SLOT: Mutfwang's key statement -->
+        <p class="pol-signature-text">Restoring peace to Plateau — community policing, farmer-herder dialogue, and rural economic revival across all 17 LGAs.</p>
+        <p class="pol-signature-attr">— Inauguration Address, 2023</p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count" data-stat>—</span> kudos</button>
+      </div>
+    </article>
+
+    <!-- GOVERNOR — KANO (NNPP) -->
+    <article class="gov-card" data-party="nnpp" data-fill="60">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="f-kan" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="14"/>
+              </filter>
+            </defs>
+            <!-- Kano State — one of Nigeria's largest states, roughly rectangular north -->
+            <path class="region-fill" filter="url(#f-kan)"
+              d="M 40,25 L 340,18 L 385,55 L 390,160 L 370,280 L 300,360 L 160,375 L 40,355 L 10,240 L 15,90 Z"/>
+            <path class="region-path"
+              d="M 40,25 L 340,18 L 385,55 L 390,160 L 370,280 L 300,360 L 160,375 L 40,355 L 10,240 L 15,90 Z"/>
+            <!-- Kano city dot -->
+            <circle class="region-dot" cx="200" cy="190" r="9"/>
+            <circle class="region-dot" cx="200" cy="190" r="22" opacity=".15"/>
+            <!-- Trade route lines -->
+            <path class="region-path" opacity=".2" stroke-dasharray="4 6"
+              d="M 200,190 L 340,18 M 200,190 L 40,25 M 200,190 L 200,375"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🌾</div>
+            <!-- SLOT: portrait of Abba Kabir Yusuf -->
+            <div class="portrait-placeholder-text">Portrait<br><!-- SLOT: /assets/portraits/abba-yusuf.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge" style="background:var(--nnpp)">NNPP</span>
+          <span class="role-badge">Kano State</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">ABBA KABIR YUSUF</h2>
+        <p class="pol-office">Governor · Kano State</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">State Population</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">1st Term</span>
+          <span class="spec-key">2023–2027</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">44</span>
+          <span class="spec-key">LGAs</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="60"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <!-- SLOT: Abba Yusuf's key statement -->
+        <p class="pol-signature-text">A new Kano — accountable governance, investment in education, and youth employment for the most populous state in Nigeria.</p>
+        <p class="pol-signature-attr">— Inauguration Address, 2023</p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count" data-stat>—</span> kudos</button>
+      </div>
+    </article>
+
+    <!-- GOVERNOR — CROSS RIVER / CALABAR (APC) -->
+    <article class="gov-card" data-party="apc" data-fill="53">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="f-crv" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="14"/>
+              </filter>
+            </defs>
+            <!-- Cross River State — southeastern, Cameroon border on east -->
+            <path class="region-fill" filter="url(#f-crv)"
+              d="M 80,20 L 240,15 L 340,40 L 380,110 L 380,220 L 360,320 L 290,390 L 160,395 L 60,350 L 20,250 L 20,130 L 50,50 Z"/>
+            <path class="region-path"
+              d="M 80,20 L 240,15 L 340,40 L 380,110 L 380,220 L 360,320 L 290,390 L 160,395 L 60,350 L 20,250 L 20,130 L 50,50 Z"/>
+            <!-- Cameroon border emphasis -->
+            <path class="region-path" opacity=".4" stroke-width="2.5"
+              d="M 340,40 L 380,110 L 380,220 L 360,320 L 290,390"/>
+            <!-- Cross River line -->
+            <path class="region-path" stroke-dasharray="5 5" opacity=".3"
+              d="M 80,20 Q 140,180 200,350"/>
+            <!-- Calabar capital dot -->
+            <circle class="region-dot" cx="155" cy="340" r="7"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🌿</div>
+            <!-- SLOT: portrait of Bassey Otu -->
+            <div class="portrait-placeholder-text">Portrait<br><!-- SLOT: /assets/portraits/bassey-otu.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Cross River State</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">His Excellency</p>
+        <h2 class="pol-name">BASSEY OTU</h2>
+        <p class="pol-office">Governor · Cross River State (Calabar)</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">State Population</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">1st Term</span>
+          <span class="spec-key">2023–2027</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val">18</span>
+          <span class="spec-key">LGAs</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="53"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <!-- SLOT: Bassey Otu's key statement -->
+        <p class="pol-signature-text">Unlocking Cross River's potential — tourism, agriculture, and cross-border trade with our Cameroon neighbours.</p>
+        <p class="pol-signature-attr">— Inauguration Address, 2023</p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span class="kudos-count" data-stat>—</span> kudos</button>
+      </div>
+    </article>
+
+  </div><!-- /gov-grid -->
+</section>
+
+
+<!-- ============================================================
+     SECTION 3: RETURNING SENATORS
+     ============================================================ -->
+<div class="section-label-strip" id="senate">
+  <b>03</b> Legislative — Senate Chamber
+</div>
+
+<section class="chamber-section">
+  <div class="pol-section-header">
+    <p class="pol-section-kicker">Returning Senators</p>
+    <h2 class="pol-section-title">Senate<br><em>Chamber</em></h2>
+    <p class="pol-section-desc">Nigeria's 109 senators write federal law, confirm presidential appointments, and control the budget. These are your returning voices in the upper chamber.</p>
+  </div>
+
+  <div class="chamber-grid">
+
+    <!-- SENATOR 1 — Lagos Central (SLOT) -->
+    <article class="chamber-card" data-party="apc" data-fill="68">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs><filter id="f-s1"><feGaussianBlur stdDeviation="12"/></filter></defs>
+            <!-- Lagos State — senators represent senatorial districts within the state -->
+            <path class="region-fill" filter="url(#f-s1)"
+              d="M 60,60 L 220,40 L 320,60 L 360,120 L 350,220 L 300,310 L 220,360 L 120,370 L 40,320 L 10,220 L 20,120 Z"/>
+            <path class="region-path"
+              d="M 60,60 L 220,40 L 320,60 L 360,120 L 350,220 L 300,310 L 220,360 L 120,370 L 40,320 L 10,220 L 20,120 Z"/>
+            <!-- Senatorial district highlight — Lagos Central -->
+            <path class="region-path" stroke-width="2.5" opacity=".5"
+              d="M 140,120 L 280,130 L 270,260 L 130,260 Z"/>
+            <circle class="region-dot" cx="200" cy="195" r="6"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <!-- SLOT: Senator portrait -->
+            <div class="portrait-placeholder-icon">⚖️</div>
+            <div class="portrait-placeholder-text">Senator Portrait<br><!-- SLOT: /assets/portraits/senator-lagos-central.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Lagos Central</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">Senator, Lagos Central</p>
+        <!-- SLOT: Real name -->
+        <h2 class="pol-name"><!-- SLOT: NAME --><span style="font-size:16px;opacity:.3;letter-spacing:.02em">SENATOR NAME</span></h2>
+        <p class="pol-office">Senate · Lagos Central Senatorial District</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Bills Sponsored</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Terms Served</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="68"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <!-- SLOT: Senator's key legislative commitment -->
+        <p class="pol-signature-text">Championing Lagos-specific infrastructure bills and constituency development for Central Lagos residents.</p>
+        <p class="pol-signature-attr"><!-- SLOT: source & date --></p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span data-stat>—</span></button>
+      </div>
+    </article>
+
+    <!-- SENATOR 2 — Plateau North (SLOT) -->
+    <article class="chamber-card" data-party="pdp" data-fill="52">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs><filter id="f-s2"><feGaussianBlur stdDeviation="12"/></filter></defs>
+            <path class="region-fill" filter="url(#f-s2)"
+              d="M 120,30 L 280,20 L 370,90 L 380,200 L 340,310 L 220,380 L 100,360 L 30,270 L 20,150 L 60,60 Z"/>
+            <path class="region-path"
+              d="M 120,30 L 280,20 L 370,90 L 380,200 L 340,310 L 220,380 L 100,360 L 30,270 L 20,150 L 60,60 Z"/>
+            <!-- North senatorial district highlight -->
+            <path class="region-path" stroke-width="2.5" opacity=".5"
+              d="M 120,30 L 280,20 L 370,90 L 320,180 L 150,180 L 60,90 Z"/>
+            <circle class="region-dot" cx="200" cy="110" r="6"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">⚖️</div>
+            <div class="portrait-placeholder-text">Senator Portrait<br><!-- SLOT: /assets/portraits/senator-plateau-north.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge" style="background:var(--pdp)">PDP</span>
+          <span class="role-badge">Plateau North</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">Senator, Plateau North</p>
+        <h2 class="pol-name"><span style="font-size:16px;opacity:.3;letter-spacing:.02em">SENATOR NAME</span></h2>
+        <p class="pol-office">Senate · Plateau North Senatorial District</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Bills Sponsored</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Terms Served</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="52"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <p class="pol-signature-text">Peace legislation, food security funding, and rural infrastructure for the farming communities of Plateau North.</p>
+        <p class="pol-signature-attr"><!-- SLOT: source & date --></p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span data-stat>—</span></button>
+      </div>
+    </article>
+
+    <!-- SENATOR 3 — Kano Central (SLOT) -->
+    <article class="chamber-card" data-party="nnpp" data-fill="65">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs><filter id="f-s3"><feGaussianBlur stdDeviation="12"/></filter></defs>
+            <path class="region-fill" filter="url(#f-s3)"
+              d="M 40,25 L 340,18 L 385,55 L 390,160 L 370,280 L 300,360 L 160,375 L 40,355 L 10,240 L 15,90 Z"/>
+            <path class="region-path"
+              d="M 40,25 L 340,18 L 385,55 L 390,160 L 370,280 L 300,360 L 160,375 L 40,355 L 10,240 L 15,90 Z"/>
+            <!-- Kano Central district highlight -->
+            <path class="region-path" stroke-width="2.5" opacity=".5"
+              d="M 120,130 L 290,120 L 310,250 L 120,260 Z"/>
+            <circle class="region-dot" cx="200" cy="190" r="7"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">⚖️</div>
+            <div class="portrait-placeholder-text">Senator Portrait<br><!-- SLOT: /assets/portraits/senator-kano-central.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge" style="background:var(--nnpp)">NNPP</span>
+          <span class="role-badge">Kano Central</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">Senator, Kano Central</p>
+        <h2 class="pol-name"><span style="font-size:16px;opacity:.3;letter-spacing:.02em">SENATOR NAME</span></h2>
+        <p class="pol-office">Senate · Kano Central Senatorial District</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Bills Sponsored</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Terms Served</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Approval Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="65"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <p class="pol-signature-text">Industry, trade, and education reform bills that position Kano as northern Nigeria's economic engine.</p>
+        <p class="pol-signature-attr"><!-- SLOT: source & date --></p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span data-stat>—</span></button>
+      </div>
+    </article>
+
+  </div><!-- /chamber-grid senators -->
+</section>
+
+
+<!-- ============================================================
+     SECTION 4: RETURNING HOUSE MEMBERS
+     ============================================================ -->
+<div class="section-label-strip" id="house">
+  <b>04</b> Legislative — House of Representatives
+</div>
+
+<section class="chamber-section" style="background:#030307;padding-bottom:120px;">
+  <div class="pol-section-header">
+    <p class="pol-section-kicker">Returning Members</p>
+    <h2 class="pol-section-title">House of<br><em>Representatives</em></h2>
+    <p class="pol-section-desc">360 federal constituencies. These members represent your specific local area in the lower chamber — closer to the ground, closer to you.</p>
+  </div>
+
+  <div class="chamber-grid">
+
+    <!-- REP 1 — Lagos Island Fed. Constituency -->
+    <article class="chamber-card" data-party="apc" data-fill="74">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs><filter id="f-r1"><feGaussianBlur stdDeviation="10"/></filter></defs>
+            <!-- Lagos state faint background -->
+            <path class="region-fill" filter="url(#f-r1)" opacity=".4"
+              d="M 60,60 L 220,40 L 320,60 L 360,120 L 350,220 L 300,310 L 220,360 L 120,370 L 40,320 L 10,220 L 20,120 Z"/>
+            <path class="region-path" opacity=".4"
+              d="M 60,60 L 220,40 L 320,60 L 360,120 L 350,220 L 300,310 L 220,360 L 120,370 L 40,320 L 10,220 L 20,120 Z"/>
+            <!-- Lagos Island constituency — coastal tip, highlighted -->
+            <ellipse class="region-fill" filter="url(#f-r1)" cx="160" cy="330" rx="50" ry="25"/>
+            <ellipse class="region-path" cx="160" cy="330" rx="50" ry="25" stroke-width="2.5"/>
+            <circle class="region-dot" cx="160" cy="330" r="6"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🏛️</div>
+            <div class="portrait-placeholder-text">Hon. Member Portrait<br><!-- SLOT: /assets/portraits/rep-lagos-island.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge">APC</span>
+          <span class="role-badge">Lagos Island</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">Honourable Member</p>
+        <h2 class="pol-name"><span style="font-size:16px;opacity:.3;letter-spacing:.02em">HON. NAME</span></h2>
+        <p class="pol-office">House of Reps · Lagos Island Fed. Constituency</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Constituency Pop.</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Terms Served</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Constituency Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="74"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <!-- SLOT -->
+        <p class="pol-signature-text">Representing the oldest constituency in Lagos — heritage preservation, port economy, and island community welfare.</p>
+        <p class="pol-signature-attr"><!-- SLOT: source & date --></p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span data-stat>—</span></button>
+      </div>
+    </article>
+
+    <!-- REP 2 — Jos North/Bassa Fed. Constituency -->
+    <article class="chamber-card" data-party="pdp" data-fill="49">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs><filter id="f-r2"><feGaussianBlur stdDeviation="10"/></filter></defs>
+            <path class="region-fill" filter="url(#f-r2)" opacity=".35"
+              d="M 120,30 L 280,20 L 370,90 L 380,200 L 340,310 L 220,380 L 100,360 L 30,270 L 20,150 L 60,60 Z"/>
+            <path class="region-path" opacity=".35"
+              d="M 120,30 L 280,20 L 370,90 L 380,200 L 340,310 L 220,380 L 100,360 L 30,270 L 20,150 L 60,60 Z"/>
+            <!-- Jos North/Bassa constituency highlight -->
+            <path class="region-fill" filter="url(#f-r2)" opacity=".8"
+              d="M 140,100 L 250,90 L 280,160 L 260,230 L 160,240 L 120,170 Z"/>
+            <path class="region-path"
+              d="M 140,100 L 250,90 L 280,160 L 260,230 L 160,240 L 120,170 Z" stroke-width="2"/>
+            <circle class="region-dot" cx="200" cy="165" r="6"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🏛️</div>
+            <div class="portrait-placeholder-text">Hon. Member Portrait<br><!-- SLOT: /assets/portraits/rep-jos-north.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge" style="background:var(--pdp)">PDP</span>
+          <span class="role-badge">Jos North/Bassa</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">Honourable Member</p>
+        <h2 class="pol-name"><span style="font-size:16px;opacity:.3;letter-spacing:.02em">HON. NAME</span></h2>
+        <p class="pol-office">House of Reps · Jos North/Bassa Fed. Constituency</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Constituency Pop.</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Terms Served</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Constituency Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="49"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <p class="pol-signature-text">Conflict resolution funding, peace education, and infrastructure bills for Jos North and Bassa communities.</p>
+        <p class="pol-signature-attr"><!-- SLOT: source & date --></p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span data-stat>—</span></button>
+      </div>
+    </article>
+
+    <!-- REP 3 — Kano Municipal Fed. Constituency -->
+    <article class="chamber-card" data-party="nnpp" data-fill="61">
+      <div class="pres-visual">
+        <div class="map-bg" aria-hidden="true">
+          <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs><filter id="f-r3"><feGaussianBlur stdDeviation="10"/></filter></defs>
+            <path class="region-fill" filter="url(#f-r3)" opacity=".35"
+              d="M 40,25 L 340,18 L 385,55 L 390,160 L 370,280 L 300,360 L 160,375 L 40,355 L 10,240 L 15,90 Z"/>
+            <path class="region-path" opacity=".35"
+              d="M 40,25 L 340,18 L 385,55 L 390,160 L 370,280 L 300,360 L 160,375 L 40,355 L 10,240 L 15,90 Z"/>
+            <!-- Kano Municipal constituency highlight -->
+            <circle class="region-fill" filter="url(#f-r3)" cx="200" cy="190" r="70" opacity=".8"/>
+            <circle class="region-path" cx="200" cy="190" r="70" stroke-width="2"/>
+            <circle class="region-dot" cx="200" cy="190" r="7"/>
+          </svg>
+        </div>
+        <div class="map-glow"></div>
+        <div class="portrait-slot">
+          <div class="portrait-placeholder">
+            <div class="portrait-placeholder-icon">🏛️</div>
+            <div class="portrait-placeholder-text">Hon. Member Portrait<br><!-- SLOT: /assets/portraits/rep-kano-municipal.webp --></div>
+          </div>
+        </div>
+        <div class="portrait-fade"></div>
+        <div class="badge-row">
+          <span class="party-badge" style="background:var(--nnpp)">NNPP</span>
+          <span class="role-badge">Kano Municipal</span>
+        </div>
+      </div>
+      <div class="pres-identity">
+        <p class="pol-fullname">Honourable Member</p>
+        <h2 class="pol-name"><span style="font-size:16px;opacity:.3;letter-spacing:.02em">HON. NAME</span></h2>
+        <p class="pol-office">House of Reps · Kano Municipal Fed. Constituency</p>
+      </div>
+      <div class="pol-specs">
+        <div class="spec-cell">
+          <span class="spec-val accent" data-stat>—</span>
+          <span class="spec-key">Constituency Pop.</span>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-val" data-stat>—</span>
+          <span class="spec-key">Terms Served</span>
+        </div>
+      </div>
+      <div class="approval-wrap">
+        <div class="approval-label">
+          <span class="approval-label-text">Constituency Rating</span>
+          <span class="approval-pct" data-stat>—%</span>
+        </div>
+        <div class="approval-track"><div class="approval-fill" data-fill="61"></div></div>
+      </div>
+      <blockquote class="pol-signature">
+        <p class="pol-signature-text">Urban renewal, small business grants, and technology education bills targeted at Kano's city-centre youth.</p>
+        <p class="pol-signature-attr"><!-- SLOT: source & date --></p>
+      </blockquote>
+      <div class="pol-cta">
+        <button class="cta-primary">Pledge Support</button>
+        <button class="cta-secondary">Full Profile</button>
+      </div>
+      <div class="kudos-bar">
+        <button class="kudos-btn" aria-label="Give kudos">👊 <span data-stat>—</span></button>
+      </div>
+    </article>
+
+  </div><!-- /chamber-grid reps -->
+</section>
+
+
+<!-- ============================================================
+     LIVE TICKER
+     ============================================================ -->
+<div class="live-ticker" role="complementary" aria-label="Live political updates">
+  <span class="ticker-label">
+    <span class="ticker-live-dot" aria-hidden="true"></span>LIVE
+  </span>
+  <div class="ticker-track">
+    <div class="ticker-inner" aria-live="polite">
+      <!-- First copy -->
+      <span class="ticker-item"><b>TINUBU</b> <span class="t-g">APC</span> — Federal budget presentation scheduled — <span data-stat>—</span></span>
+      <span class="ticker-item"><b>SANWO-OLU</b> <span class="t-g">Lagos</span> — Blue Line rail extension Phase 2 update pending</span>
+      <span class="ticker-item"><b>MUTFWANG</b> <span class="t-g">Plateau</span> — Security summit outcomes — <span data-stat>—</span></span>
+      <span class="ticker-item"><b>ABBA YUSUF</b> <span class="t-g">Kano</span> — State assembly session — <span data-stat>—</span></span>
+      <span class="ticker-item"><b>BASSEY OTU</b> <span class="t-g">Cross River</span> — Carnival Calabar 2025 budget approved</span>
+      <span class="ticker-item"><b>SENATE</b> — Next plenary session — <span data-stat>DATE TBC</span></span>
+      <span class="ticker-item"><b>HOUSE OF REPS</b> — Committee sittings this week — <span data-stat>—</span></span>
+      <!-- Duplicate for seamless loop -->
+      <span class="ticker-item" aria-hidden="true"><b>TINUBU</b> <span class="t-g">APC</span> — Federal budget presentation scheduled — <span data-stat>—</span></span>
+      <span class="ticker-item" aria-hidden="true"><b>SANWO-OLU</b> <span class="t-g">Lagos</span> — Blue Line rail extension Phase 2 update pending</span>
+      <span class="ticker-item" aria-hidden="true"><b>MUTFWANG</b> <span class="t-g">Plateau</span> — Security summit outcomes — <span data-stat>—</span></span>
+      <span class="ticker-item" aria-hidden="true"><b>ABBA YUSUF</b> <span class="t-g">Kano</span> — State assembly session — <span data-stat>—</span></span>
+      <span class="ticker-item" aria-hidden="true"><b>BASSEY OTU</b> <span class="t-g">Cross River</span> — Carnival Calabar 2025 budget approved</span>
+      <span class="ticker-item" aria-hidden="true"><b>SENATE</b> — Next plenary session — <span data-stat>DATE TBC</span></span>
+      <span class="ticker-item" aria-hidden="true"><b>HOUSE OF REPS</b> — Committee sittings this week — <span data-stat>—</span></span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     JAVASCRIPT — minimal: approval meters + kudos
+     ============================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  var motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+  /* ── APPROVAL METER ANIMATION ── */
+  function animateMeter(card) {
+    var fill    = card.querySelector('.approval-fill');
+    var pct     = parseInt(card.dataset.fill || '0', 10);
+    var display = card.querySelector('.approval-pct');
+
+    if (!fill) return;
+
+    if (motionOK) {
+      /* Slight delay so card entrance and meter don't race */
+      setTimeout(function () {
+        fill.style.width = pct + '%';
+        if (display && display.textContent.trim() === '—%') {
+          display.textContent = pct + '%';
+        }
+      }, 120);
+    } else {
+      fill.style.width = pct + '%';
+      if (display && display.textContent.trim() === '—%') {
+        display.textContent = pct + '%';
+      }
+    }
+  }
+
+  /* Trigger on IntersectionObserver — meters animate when card enters viewport */
+  var cards = document.querySelectorAll('[data-fill]');
+
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          animateMeter(entry.target);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    cards.forEach(function (c) { obs.observe(c); });
+  } else {
+    /* Fallback for older browsers */
+    cards.forEach(animateMeter);
+  }
+
+  /* ── KUDOS TOGGLE ── */
+  document.querySelectorAll('.kudos-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var active = btn.classList.toggle('active');
+      var countEl = btn.querySelector('[data-stat]');
+      if (!countEl) return;
+      var current = parseInt(countEl.textContent, 10) || 0;
+      countEl.textContent = active ? current + 1 : Math.max(0, current - 1);
+      /* SLOT: wire to backend kudos endpoint */
+    });
+  });
+
+  /* ── ACTIVE NAV CHIP ON SCROLL ── */
+  var sections = ['president','governors','senate','house'];
+  var navChips = document.querySelectorAll('.nav-chip');
+
+  if ('IntersectionObserver' in window) {
+    var secObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          navChips.forEach(function (c) { c.classList.remove('active'); });
+          var target = document.querySelector('.nav-chip[href="#' + entry.target.id + '"]');
+          if (target) target.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+
+    sections.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) secObs.observe(el);
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
