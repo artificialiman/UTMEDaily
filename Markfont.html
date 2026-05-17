@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTMEDaily · A2 — Typography</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mk-bg:      #272822;
+  --mk-surface: #1e1f1c;
+  --mk-line:    #3e3d32;
+  --mk-fg:      #f8f8f2;
+  --mk-comment: #75715e;
+  --mk-yellow:  #e6db74;
+  --mk-orange:  #fd971f;
+  --mk-red:     #f92672;
+  --mk-purple:  #ae81ff;
+  --mk-blue:    #66d9e8;
+  --mk-green:   #a6e22e;
+  --mk-ln:      #75715e;
+  --mono: 'DM Mono', 'Consolas', monospace;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; background:var(--mk-bg); color:var(--mk-fg); font-family:var(--mono); }
+.app { display:flex; flex-direction:column; height:100%; }
+
+/* TOPBAR */
+.topbar {
+  flex-shrink:0; display:flex; align-items:center; gap:12px;
+  padding:6px 14px; background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.dots { display:flex; gap:6px; }
+.dot { width:12px; height:12px; border-radius:50%; }
+.dot.r{background:#ff5f57;} .dot.y{background:#febc2e;} .dot.g{background:#28c840;}
+.tb-file { font-size:12px; color:var(--mk-comment); flex:1; text-align:center; letter-spacing:.04em; }
+.tb-right { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--mk-comment); }
+.save-dot { width:7px; height:7px; border-radius:50%; background:var(--mk-green); transition:background .3s; }
+.save-dot.dirty { background:var(--mk-orange); animation:blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.offline-pill {
+  display:none; font-size:10px; padding:2px 8px; border-radius:3px;
+  background:rgba(253,151,31,.1); border:1px solid rgba(253,151,31,.3); color:var(--mk-orange);
+}
+.offline-pill.on { display:block; }
+
+/* MAIN */
+.main { flex:1; display:flex; overflow:hidden; }
+
+/* EDITOR */
+.editor { display:flex; flex-direction:column; flex:1; min-width:0; overflow:hidden; }
+.ed-tabs {
+  display:flex; padding:4px 8px 0;
+  background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.etab {
+  padding:4px 18px 5px; font-size:11px; color:var(--mk-comment);
+  background:var(--mk-bg); border:1px solid var(--mk-line);
+  border-bottom:none; border-radius:4px 4px 0 0;
+}
+.etab.active { color:var(--mk-fg); }
+.ed-body { flex:1; display:flex; overflow:hidden; position:relative; }
+
+/* LINE NUMBERS */
+.line-nums {
+  width:44px; flex-shrink:0; background:var(--mk-surface); border-right:1px solid var(--mk-line);
+  padding:10px 0; overflow:hidden; text-align:right;
+  font-size:13px; line-height:1.6; color:var(--mk-ln); user-select:none; z-index:3;
+}
+.ln { padding-right:10px; display:block; }
+
+/* HIGHLIGHT OVERLAY — sits behind textarea, same font/size/padding */
+.hl-wrap { flex:1; position:relative; overflow:hidden; }
+.hl-layer {
+  position:absolute; inset:0;
+  font-family:var(--mono); font-size:13px; line-height:1.6;
+  padding:10px 14px; white-space:pre; overflow:hidden; pointer-events:none;
+  word-wrap:normal; z-index:1;
+  /* text transparent — only spans show colour */
+  color:transparent;
+}
+textarea {
+  position:absolute; inset:0;
+  background:transparent; border:none; outline:none; resize:none;
+  font-family:var(--mono); font-size:13px; line-height:1.6; color:var(--mk-fg);
+  padding:10px 14px; tab-size:2; caret-color:var(--mk-orange);
+  white-space:pre; overflow-wrap:normal; overflow-x:auto; overflow-y:auto;
+  z-index:2;
+  /* make text invisible so highlight shows through — use caret-color only */
+  color: var(--mk-fg);
+  /* We instead colour via mix-blend-mode trick: keep fg readable AND show highlights */
+}
+/* actually we layer differently: textarea on top with slight transparency,
+   highlight below. Simplest reliable approach: textarea text is the real colour,
+   highlight layer is decorative colour backdrop per token. But for a textarea
+   the only clean cross-browser approach is: transparent textarea text +
+   highlight layer showing coloured text, textarea captures input only.        */
+textarea { color: transparent; caret-color: var(--mk-fg); }
+textarea::selection { background: rgba(230,219,116,.28); color:transparent; }
+
+/* PREVIEW */
+.preview { width:46%; flex-shrink:0; display:flex; flex-direction:column; border-left:1px solid var(--mk-line); }
+.pv-bar {
+  flex-shrink:0; display:flex; align-items:center; gap:8px;
+  padding:6px 12px; background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.pv-label { font-size:10px; color:var(--mk-comment); letter-spacing:.1em; text-transform:uppercase; }
+.pv-url {
+  flex:1; background:var(--mk-bg); border:1px solid var(--mk-line); border-radius:4px;
+  padding:3px 10px; font-size:11px; color:var(--mk-comment);
+}
+.pv-btn {
+  padding:3px 11px; border-radius:4px; background:var(--mk-green);
+  color:var(--mk-surface); font-family:var(--mono); font-size:11px; font-weight:500;
+  border:none; cursor:pointer;
+}
+.pv-btn:hover { opacity:.82; }
+iframe { flex:1; border:none; background:#fff; }
+
+/* STATUSBAR */
+.statusbar {
+  flex-shrink:0; display:flex; align-items:center; gap:14px;
+  padding:3px 12px; background:var(--mk-surface); border-top:1px solid var(--mk-line);
+  font-size:10px; color:var(--mk-comment);
+}
+.statusbar b { color:var(--mk-blue); }
+.sb-r { margin-left:auto; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="dots">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    </div>
+    <span class="tb-file">UTMEDaily &mdash; Web Practical &mdash; Assignment 2 &mdash; Typography</span>
+    <div class="tb-right">
+      <span class="offline-pill" id="offline-pill">&#9889; offline</span>
+      <div class="save-dot" id="save-dot"></div>
+      <span id="save-lbl">saved</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="editor">
+      <div class="ed-tabs"><div class="etab active">article.html</div></div>
+      <div class="ed-body">
+        <div class="line-nums" id="lnums"></div>
+        <div class="hl-wrap">
+          <div class="hl-layer" id="hl" aria-hidden="true"></div>
+          <textarea id="ta" spellcheck="false"
+            oninput="onChange()" onkeydown="onKey(event)" onscroll="onScroll(event)"
+            autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="pv-bar">
+        <span class="pv-label">preview</span>
+        <div class="pv-url">article.html</div>
+        <button class="pv-btn" onclick="render()">&#8635;</button>
+      </div>
+      <iframe id="pv" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>Ln <b id="sb-ln">1</b></span>
+    <span>Col <b id="sb-col">1</b></span>
+    <span>Tags <b id="sb-tags">0</b></span>
+    <span class="sb-r" id="sb-msg"></span>
+  </div>
+
+</div>
+<script>
+// ── STARTER — closing tags escaped so browser parser ignores them ─────────────
+const STARTER = [
+'<!DOCTYPE html>',
+'<html lang="en">',
+'<head>',
+'  <meta charset="UTF-8">',
+'  <title>The Anatomy of Text<\/title>',
+'<\/head>',
+'<body>',
+'',
+'<h1>The Anatomy of Text<\/h1>',
+'<h2>A field guide to HTML text tags<\/h2>',
+'<hr>',
+'',
+'<h3>I. Bold &amp; Importance<\/h3>',
+'',
+'<p>',
+'  The tag <b>&lt;b&gt;<\/b> makes text <b>visually bold<\/b>',
+'  with no semantic weight attached.',
+'  The tag <strong>&lt;strong&gt;<\/strong> does the same visually',
+'  but signals <strong>semantic importance<\/strong> to screen readers',
+'  and search engines.',
+'  Use <strong>strong<\/strong> for content that genuinely matters;',
+'  use <b>b<\/b> for stylistic weight only.',
+'<\/p>',
+'',
+'<h3>II. Italics &amp; Emphasis<\/h3>',
+'',
+'<p>',
+'  <em>Emphasis<\/em> shifts the spoken stress of a sentence.',
+'  The tag <em>&lt;em&gt;<\/em> carries tonal weight &mdash;',
+'  <em>I<\/em> didn\'t say he stole it,',
+'  versus I didn\'t say <em>he<\/em> stole it.',
+'  Different words stressed, different meaning entirely.',
+'<\/p>',
+'',
+'<p>',
+'  The tag <i>&lt;i&gt;<\/i> is purely visual italic: foreign terms',
+'  (<i>per se<\/i>, <i>viva voce<\/i>), species names (<i>Homo sapiens<\/i>),',
+'  or titles &mdash; not for spoken stress.',
+'<\/p>',
+'',
+'<h3>III. Quotations<\/h3>',
+'',
+'<p>',
+'  An inline quotation uses <code>&lt;q&gt;<\/code> and the browser',
+'  supplies language-correct marks automatically:',
+'  Bringhurst wrote <q>typography exists to honour content.<\/q>',
+'  No manual quote characters needed inside <code>&lt;q&gt;<\/code>.',
+'<\/p>',
+'',
+'<blockquote>',
+'  <p>',
+'    The reader does not notice the type when it is doing its job.',
+'    The moment a font calls attention to itself,',
+'    the transmission has been interrupted.',
+'  <\/p>',
+'  <cite>&mdash; Beatrice Warde, <i>The Crystal Goblet<\/i>, 1955<\/cite>',
+'<\/blockquote>',
+'',
+'<h3>IV. The &lt;font&gt; Tag &mdash; Legacy vs Modern<\/h3>',
+'',
+'<p>',
+'  The old <code>&lt;font&gt;<\/code> tag ran from size 1 to 7:<br>',
+'  <font size="1">size=1 (smallest)<\/font> &nbsp;',
+'  <font size="2">size=2 (small)<\/font> &nbsp;',
+'  <font size="3">size=3 (default)<\/font> &nbsp;',
+'  <font size="4">size=4 (large)<\/font> &nbsp;',
+'  <font size="5">size=5 (larger)<\/font> &nbsp;',
+'  <font size="6">size=6 (big)<\/font>',
+'<\/p>',
+'',
+'<p>',
+'  The modern equivalent uses a <code>style<\/code> attribute:<br>',
+'  <span style="font-size:0.75em">0.75em small<\/span> &nbsp;',
+'  <span style="font-size:1em">1em normal<\/span> &nbsp;',
+'  <span style="font-size:1.35em">1.35em large<\/span> &nbsp;',
+'  <span style="font-size:1.75em">1.75em bigger<\/span>',
+'<\/p>',
+'',
+'<p>',
+'  Colour: <font color="crimson">font color=crimson<\/font>',
+'  versus <span style="color:crimson">style=color:crimson<\/span>.',
+'  Face: <font face="Georgia,serif">font face=Georgia<\/font>',
+'  versus <span style="font-family:Georgia,serif">style=font-family:Georgia<\/span>.',
+'  The <code>&lt;font&gt;<\/code> tag is deprecated. CSS is the right tool.',
+'<\/p>',
+'',
+'<h3>V. Utility Tags<\/h3>',
+'',
+'<p>',
+'  <mark>&lt;mark&gt;<\/mark> highlights like a yellow pen.',
+'  <small>&lt;small&gt; shrinks text for fine print and captions.<\/small>',
+'  <code>&lt;code&gt;<\/code> renders inline monospace for tag names.',
+'  <del>&lt;del&gt; shows removed content.<\/del>',
+'  <ins>&lt;ins&gt; shows inserted content.<\/ins>',
+'<\/p>',
+'',
+'<p>',
+'  Superscript sits above the line: E&nbsp;=&nbsp;mc<sup>2<\/sup>.',
+'  Subscript sits below: H<sub>2<\/sub>O.',
+'  Both preserve surrounding line-height.',
+'<\/p>',
+'',
+'<p>',
+'  <abbr title="HyperText Markup Language">HTML<\/abbr>',
+'  uses <code>&lt;abbr&gt;<\/code> to attach a full definition',
+'  to any abbreviation &mdash; hover the dotted underline to see it.',
+'<\/p>',
+'',
+'<h3>VI. What the White Parts Mean<\/h3>',
+'',
+'<p>',
+'  In a Monokai-themed editor the <b>white text is what you author<\/b>:',
+'  the content, the tag names, the values you choose.',
+'  Everything else &mdash; angle brackets, quotes, structure &mdash;',
+'  is scaffolding the language provides.',
+'  Learning HTML means seeing that boundary clearly,',
+'  and working only within it.',
+'<\/p>',
+'',
+'<hr>',
+'<p><small>UTMEDaily &mdash; Web Practical &mdash; Assignment 2 &mdash; Typography &amp; Text Appearance<\/small><\/p>',
+'',
+'<\/body>',
+'<\/html>'
+].join('\n');
+
+// ── MONOKAI TOKENISER ────────────────────────────────────────────────────────
+// colours: tag=#f92672 attr=#a6e22e val=#e6db74 text=#f8f8f2 comment=#75715e entity=#ae81ff
+function monokai(src) {
+  // escape HTML so we can inject spans safely
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  let out = '', i = 0, len = src.length;
+
+  while (i < len) {
+    // HTML comment
+    if (src.startsWith('<!--', i)) {
+      let end = src.indexOf('-->', i);
+      end = end === -1 ? len : end + 3;
+      out += `<span style="color:#75715e">${esc(src.slice(i, end))}</span>`;
+      i = end; continue;
+    }
+    // Tag
+    if (src[i] === '<') {
+      let end = src.indexOf('>', i);
+      end = end === -1 ? len : end + 1;
+      const raw = src.slice(i, end);
+      // tokenise inside tag
+      out += tokenTag(raw);
+      i = end; continue;
+    }
+    // HTML entity
+    if (src[i] === '&') {
+      let end = src.indexOf(';', i);
+      end = end === -1 ? i + 1 : end + 1;
+      out += `<span style="color:#ae81ff">${esc(src.slice(i, end))}</span>`;
+      i = end; continue;
+    }
+    // plain text — accumulate
+    let j = i;
+    while (j < len && src[j] !== '<' && src[j] !== '&') j++;
+    out += `<span style="color:#f8f8f2">${esc(src.slice(i, j))}</span>`;
+    i = j;
+  }
+  return out;
+}
+
+function tokenTag(raw) {
+  // raw includes < and >
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  let s = raw, out = '';
+  // opening <
+  out += `<span style="color:#f8f8f2">&lt;</span>`;
+  s = s.slice(1);
+  // closing tag slash
+  if (s[0] === '/') { out += `<span style="color:#f8f8f2">/</span>`; s = s.slice(1); }
+  // tag name
+  const tn = s.match(/^[a-zA-Z!][^\s>\/]*/);
+  if (tn) {
+    out += `<span style="color:#f92672">${esc(tn[0])}</span>`;
+    s = s.slice(tn[0].length);
+  }
+  // attributes
+  while (s.length && s !== '>' && s !== '/>') {
+    // whitespace
+    const ws = s.match(/^\s+/);
+    if (ws) { out += esc(ws[0]); s = s.slice(ws[0].length); continue; }
+    // self-close or close
+    if (s.startsWith('/>')) { out += `<span style="color:#f8f8f2">/&gt;</span>`; s = s.slice(2); break; }
+    if (s.startsWith('>'))  { out += `<span style="color:#f8f8f2">&gt;</span>`;  s = s.slice(1); break; }
+    // attr name
+    const an = s.match(/^[^\s=>"'\/]+/);
+    if (an) {
+      out += `<span style="color:#a6e22e">${esc(an[0])}</span>`;
+      s = s.slice(an[0].length); continue;
+    }
+    // = sign
+    if (s[0] === '=') {
+      out += `<span style="color:#f8f8f2">=</span>`; s = s.slice(1);
+      // quoted value
+      if (s[0] === '"' || s[0] === "'") {
+        const q = s[0];
+        const end = s.indexOf(q, 1);
+        const val = end === -1 ? s : s.slice(0, end + 1);
+        out += `<span style="color:#e6db74">${esc(val)}</span>`;
+        s = s.slice(val.length);
+      }
+      continue;
+    }
+    // fallback — skip one char
+    out += esc(s[0]); s = s.slice(1);
+  }
+  // trailing > if any left
+  if (s === '>') out += `<span style="color:#f8f8f2">&gt;</span>`;
+  return out;
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const KEY = 'utme-a2-v3';
+const ta  = document.getElementById('ta');
+const hl  = document.getElementById('hl');
+let saveTimer, pvTimer;
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+(function boot(){
+  let s; try { s = localStorage.getItem(KEY); } catch(e){}
+  ta.value = s || STARTER;
+  highlight(); updateNums(); updateStatus(); render(); watchNet();
+})();
+
+// ── INPUT ─────────────────────────────────────────────────────────────────────
+function onChange() { highlight(); updateNums(); updateStatus(); markDirty(); debounce(); }
+
+function onKey(e) {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const s = ta.selectionStart, n = ta.selectionEnd;
+  ta.value = ta.value.slice(0,s) + '  ' + ta.value.slice(n);
+  ta.selectionStart = ta.selectionEnd = s + 2;
+  onChange();
+}
+
+function onScroll(e) {
+  document.getElementById('lnums').scrollTop = ta.scrollTop;
+  hl.scrollTop  = ta.scrollTop;
+  hl.scrollLeft = ta.scrollLeft;
+}
+
+ta.addEventListener('click',  updateStatus);
+ta.addEventListener('keyup',  updateStatus);
+
+// ── HIGHLIGHT ─────────────────────────────────────────────────────────────────
+function highlight() {
+  hl.innerHTML = monokai(ta.value);
+}
+
+// ── LINE NUMBERS ──────────────────────────────────────────────────────────────
+function updateNums() {
+  const n = ta.value.split('\n').length;
+  document.getElementById('lnums').innerHTML =
+    Array.from({length:n},(_,i)=>`<span class="ln">${i+1}</span>`).join('');
+}
+
+// ── STATUS ────────────────────────────────────────────────────────────────────
+function updateStatus() {
+  const before = ta.value.slice(0, ta.selectionStart).split('\n');
+  document.getElementById('sb-ln').textContent  = before.length;
+  document.getElementById('sb-col').textContent = before[before.length-1].length + 1;
+  document.getElementById('sb-tags').textContent = (ta.value.match(/<[a-z][^>\/]*>/gi)||[]).length;
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────────────────────
+function debounce(){ clearTimeout(pvTimer); pvTimer = setTimeout(render, 700); }
+
+function render() {
+  const pv  = document.getElementById('pv');
+  const doc = pv.contentDocument || pv.contentWindow.document;
+  const css = '<style>' +
+    'body{font-family:Georgia,"Times New Roman",serif;max-width:660px;' +
+         'margin:36px auto;padding:0 24px 56px;line-height:1.82;font-size:16px;color:#1a1a1a;}' +
+    'h1{font-size:2.1em;margin:0 0 .12em;line-height:1.15;}' +
+    'h2{font-size:1.05em;font-weight:400;color:#666;margin:0 0 1.4em;font-style:italic;}' +
+    'h3{font-family:"DM Mono",monospace;font-size:.78em;font-weight:500;' +
+       'text-transform:uppercase;letter-spacing:.1em;color:#444;' +
+       'margin:2em 0 .6em;border-bottom:1px solid #e8e8e8;padding-bottom:.4em;}' +
+    'p{margin:0 0 1em;}' +
+    'hr{border:none;border-top:1px solid #d8d8d8;margin:1.2em 0;}' +
+    'blockquote{margin:1.5em 0;padding:.9em 1.4em;border-left:3px solid #c8c8c8;' +
+               'background:#f8f8f6;font-style:italic;color:#444;}' +
+    'blockquote p{margin:0 0 .5em;}' +
+    'cite{font-size:.85em;color:#888;font-style:normal;display:block;}' +
+    'code{font-family:"DM Mono",monospace;font-size:.8em;background:#efefef;' +
+         'padding:1px 5px;border-radius:3px;color:#c7254e;}' +
+    'q::before{content:"\\u201c"} q::after{content:"\\u201d"}' +
+    'mark{background:#fff176;padding:0 2px;}' +
+    'abbr{border-bottom:1px dotted #aaa;cursor:help;text-decoration:none;}' +
+    'ins{color:#2e7d32;text-decoration:underline;} del{color:#aaa;}' +
+    '<\/style>';
+  let html = ta.value;
+  // inject preview styles — use string replace on the escaped version won't match;
+  // work on the raw value
+  if (html.indexOf('<\/head>') !== -1) {
+    html = html.replace('<\/head>', css + '<\/head>');
+  } else if (html.indexOf('</head>') !== -1) {
+    html = html.replace('</head>', css + '</head>');
+  } else {
+    html = css + html;
+  }
+  doc.open(); doc.write(html); doc.close();
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────────────
+function markDirty() {
+  document.getElementById('save-dot').classList.add('dirty');
+  document.getElementById('save-lbl').textContent = 'unsaved';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persist, 1400);
+}
+function persist() {
+  try {
+    localStorage.setItem(KEY, ta.value);
+    document.getElementById('save-dot').classList.remove('dirty');
+    document.getElementById('save-lbl').textContent = 'saved';
+  } catch(e) {
+    document.getElementById('save-lbl').textContent = 'save failed';
+  }
+}
+
+// ── NETWORK ───────────────────────────────────────────────────────────────────
+function watchNet() {
+  const pill = document.getElementById('offline-pill');
+  function upd() {
+    if (!navigator.onLine) { persist(); pill.classList.add('on'); }
+    else { pill.classList.remove('on'); }
+  }
+  window.addEventListener('online',  upd);
+  window.addEventListener('offline', upd);
+  upd();
+}
+</script>
+</body>
+</html>

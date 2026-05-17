@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTMEDaily · A3 — Buttons, Links &amp; Routes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mk-bg:      #272822;
+  --mk-surface: #1e1f1c;
+  --mk-line:    #3e3d32;
+  --mk-fg:      #f8f8f2;
+  --mk-comment: #75715e;
+  --mk-yellow:  #e6db74;
+  --mk-orange:  #fd971f;
+  --mk-red:     #f92672;
+  --mk-purple:  #ae81ff;
+  --mk-blue:    #66d9e8;
+  --mk-green:   #a6e22e;
+  --mk-ln:      #75715e;
+  --mono: 'DM Mono', 'Consolas', monospace;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; background:var(--mk-bg); color:var(--mk-fg); font-family:var(--mono); }
+.app { display:flex; flex-direction:column; height:100%; }
+
+/* TOPBAR */
+.topbar {
+  flex-shrink:0; display:flex; align-items:center; gap:12px;
+  padding:6px 14px; background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.dots { display:flex; gap:6px; }
+.dot { width:12px; height:12px; border-radius:50%; }
+.dot.r{background:#ff5f57;} .dot.y{background:#febc2e;} .dot.g{background:#28c840;}
+.tb-file { font-size:12px; color:var(--mk-comment); flex:1; text-align:center; letter-spacing:.04em; }
+.tb-right { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--mk-comment); }
+.save-dot { width:7px; height:7px; border-radius:50%; background:var(--mk-green); transition:background .3s; }
+.save-dot.dirty { background:var(--mk-orange); animation:blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.offline-pill {
+  display:none; font-size:10px; padding:2px 8px; border-radius:3px;
+  background:rgba(253,151,31,.1); border:1px solid rgba(253,151,31,.3); color:var(--mk-orange);
+}
+.offline-pill.on { display:block; }
+
+/* MAIN */
+.main { flex:1; display:flex; overflow:hidden; }
+
+/* EDITOR */
+.editor { display:flex; flex-direction:column; flex:1; min-width:0; overflow:hidden; }
+.ed-tabs {
+  display:flex; padding:4px 8px 0;
+  background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.etab {
+  padding:4px 18px 5px; font-size:11px; color:var(--mk-comment);
+  background:var(--mk-bg); border:1px solid var(--mk-line);
+  border-bottom:none; border-radius:4px 4px 0 0;
+}
+.etab.active { color:var(--mk-fg); }
+.ed-body { flex:1; display:flex; overflow:hidden; position:relative; }
+
+/* LINE NUMBERS */
+.line-nums {
+  width:44px; flex-shrink:0; background:var(--mk-surface); border-right:1px solid var(--mk-line);
+  padding:10px 0; overflow:hidden; text-align:right;
+  font-size:13px; line-height:1.6; color:var(--mk-ln); user-select:none; z-index:3;
+}
+.ln { padding-right:10px; display:block; }
+
+/* HIGHLIGHT OVERLAY */
+.hl-wrap { flex:1; position:relative; overflow:hidden; }
+.hl-layer {
+  position:absolute; inset:0;
+  font-family:var(--mono); font-size:13px; line-height:1.6;
+  padding:10px 14px; white-space:pre; overflow:hidden; pointer-events:none;
+  word-wrap:normal; z-index:1; color:transparent;
+}
+textarea {
+  position:absolute; inset:0;
+  background:transparent; border:none; outline:none; resize:none;
+  font-family:var(--mono); font-size:13px; line-height:1.6;
+  padding:10px 14px; tab-size:2; caret-color:var(--mk-fg);
+  white-space:pre; overflow-wrap:normal; overflow-x:auto; overflow-y:auto;
+  z-index:2; color:transparent;
+}
+textarea::selection { background:rgba(230,219,116,.28); color:transparent; }
+
+/* PREVIEW */
+.preview { width:46%; flex-shrink:0; display:flex; flex-direction:column; border-left:1px solid var(--mk-line); }
+.pv-bar {
+  flex-shrink:0; display:flex; align-items:center; gap:8px;
+  padding:6px 12px; background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.pv-label { font-size:10px; color:var(--mk-comment); letter-spacing:.1em; text-transform:uppercase; }
+.pv-url {
+  flex:1; background:var(--mk-bg); border:1px solid var(--mk-line); border-radius:4px;
+  padding:3px 10px; font-size:11px; color:var(--mk-comment);
+}
+.pv-btn {
+  padding:3px 11px; border-radius:4px; background:var(--mk-green);
+  color:var(--mk-surface); font-family:var(--mono); font-size:11px; font-weight:500;
+  border:none; cursor:pointer;
+}
+.pv-btn:hover { opacity:.82; }
+iframe { flex:1; border:none; background:#fff; }
+
+/* STATUSBAR */
+.statusbar {
+  flex-shrink:0; display:flex; align-items:center; gap:14px;
+  padding:3px 12px; background:var(--mk-surface); border-top:1px solid var(--mk-line);
+  font-size:10px; color:var(--mk-comment);
+}
+.statusbar b { color:var(--mk-blue); }
+.sb-r { margin-left:auto; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="dots">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    </div>
+    <span class="tb-file">UTMEDaily &mdash; Web Practical &mdash; Assignment 3 &mdash; Buttons, Links &amp; Routes</span>
+    <div class="tb-right">
+      <span class="offline-pill" id="offline-pill">&#9889; offline</span>
+      <div class="save-dot" id="save-dot"></div>
+      <span id="save-lbl">saved</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="editor">
+      <div class="ed-tabs"><div class="etab active">buttons-and-links.html</div></div>
+      <div class="ed-body">
+        <div class="line-nums" id="lnums"></div>
+        <div class="hl-wrap">
+          <div class="hl-layer" id="hl" aria-hidden="true"></div>
+          <textarea id="ta" spellcheck="false"
+            oninput="onChange()" onkeydown="onKey(event)" onscroll="onScroll(event)"
+            autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="pv-bar">
+        <span class="pv-label">preview</span>
+        <div class="pv-url">buttons-and-links.html</div>
+        <button class="pv-btn" onclick="render()">&#8635;</button>
+      </div>
+      <iframe id="pv" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>Ln <b id="sb-ln">1</b></span>
+    <span>Col <b id="sb-col">1</b></span>
+    <span>Tags <b id="sb-tags">0</b></span>
+    <span class="sb-r" id="sb-msg"></span>
+  </div>
+
+</div>
+<script>
+const STARTER = [
+'<!DOCTYPE html>',
+'<html lang="en">',
+'<head>',
+'  <meta charset="UTF-8">',
+'  <title>Buttons, Links &amp; Routes<\/title>',
+'  <style>',
+'    body { font-family: Georgia, serif; max-width: 680px; margin: 32px auto; padding: 0 24px 64px; line-height: 1.8; color: #1a1a1a; }',
+'    h1 { font-size: 2em; margin-bottom: .1em; }',
+'    h2 { font-size: .9em; font-style: italic; color: #666; margin-bottom: 1.6em; }',
+'    h3 { font-family: monospace; font-size: .8em; text-transform: uppercase; letter-spacing: .1em; color: #444; margin: 2em 0 .5em; border-bottom: 1px solid #ddd; padding-bottom: .3em; }',
+'    p { margin: 0 0 .9em; }',
+'    code { font-family: monospace; font-size: .85em; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; color: #c7254e; }',
+'    hr { border: none; border-top: 1px solid #ddd; margin: 1.4em 0; }',
+'    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: .6em 0 1em; }',
+'',
+'    /* ----- the only CSS in this assignment ----- */',
+'    a               { color: steelblue; }',
+'    a:visited       { color: purple; }',
+'    a.external      { color: teal; }',
+'    a.download-link { color: crimson; }',
+'    a.anchor-link   { color: darkorange; }',
+'',
+'    button, input[type="button"],',
+'    input[type="submit"], input[type="reset"] {',
+'      padding: 6px 14px;',
+'      border: 1px solid currentColor;',
+'      background: white;',
+'      cursor: pointer;',
+'    }',
+'    button[type="button"] { color: steelblue; }',
+'    button[type="submit"] { color: green; }',
+'    button[type="reset"]  { color: crimson; }',
+'    input[type="button"]  { color: darkorange; }',
+'    input[type="submit"]  { color: green; }',
+'    input[type="reset"]   { color: crimson; }',
+'  <\/style>',
+'<\/head>',
+'<body>',
+'',
+'<h1>Buttons, Links &amp; Routes<\/h1>',
+'<h2>A field guide to every type of link and button in HTML<\/h2>',
+'<hr>',
+'',
+'',
+'<h3>I. The Anchor Tag &mdash; &lt;a&gt;<\/h3>',
+'',
+'<p>',
+'  The <code>&lt;a&gt;<\/code> tag is the fundamental routing primitive of the web.',
+'  Every navigation, every file download, every email draft, every phone dial',
+'  is triggered by an anchor. The <code>href<\/code> attribute decides where it goes.',
+'<\/p>',
+'',
+'',
+'<h3>II. Page Navigation<\/h3>',
+'',
+'<p>',
+'  A standard link routes the browser to another page.',
+'  <code>target="_blank"<\/code> opens it in a new tab;',
+'  without it the current tab is replaced.',
+'<\/p>',
+'',
+'<div class="row">',
+'  <a href="https://example.com">href (same tab)<\/a>',
+'  <a href="https://example.com" target="_blank" class="external">target="_blank" (new tab)<\/a>',
+'  <a href="https://example.com" target="_self">target="_self" (explicit same tab)<\/a>',
+'  <a href="https://example.com" target="_parent">target="_parent" (parent frame)<\/a>',
+'  <a href="https://example.com" target="_top">target="_top" (top-level frame)<\/a>',
+'<\/div>',
+'',
+'',
+'<h3>III. Anchor Links &mdash; Same-Page Navigation<\/h3>',
+'',
+'<p>',
+'  When <code>href<\/code> starts with <code>#<\/code> the browser',
+'  scrolls to the element whose <code>id<\/code> matches.',
+'  This is how all in-page navigation and table-of-contents links work.',
+'<\/p>',
+'',
+'<div class="row">',
+'  <a href="#section-v" class="anchor-link">#section-v (jump to Section V below)<\/a>',
+'  <a href="#top" class="anchor-link">#top (jump to top)<\/a>',
+'<\/div>',
+'',
+'',
+'<h3>IV. Non-HTTP Routes &mdash; mailto, tel, sms<\/h3>',
+'',
+'<p>',
+'  <code>href<\/code> is not limited to HTTP URLs.',
+'  The protocol prefix tells the OS which application to hand off to.',
+'<\/p>',
+'',
+'<div class="row">',
+'  <a href="mailto:hello@example.com">mailto: (open mail client)<\/a>',
+'  <a href="mailto:hello@example.com?subject=Hello&amp;body=Hi%20there">mailto: with subject &amp; body<\/a>',
+'  <a href="tel:+2348000000000">tel: (dial a number)<\/a>',
+'  <a href="sms:+2348000000000">sms: (open SMS app)<\/a>',
+'<\/div>',
+'',
+'',
+'<h3>V. File Download<\/h3>',
+'',
+'<p id="section-v">',
+'  The <code>download<\/code> attribute tells the browser to save the file',
+'  instead of navigating to it.',
+'  An optional value sets the filename the user sees.',
+'<\/p>',
+'',
+'<div class="row">',
+'  <a href="/files/report.pdf" download class="download-link">download (use server filename)<\/a>',
+'  <a href="/files/report.pdf" download="annual-report-2026.pdf" class="download-link">download="annual-report-2026.pdf" (rename on save)<\/a>',
+'<\/div>',
+'',
+'',
+'<h3>VI. The &lt;button&gt; Element &mdash; Three Types<\/h3>',
+'',
+'<p>',
+'  <code>&lt;button&gt;<\/code> has a <code>type<\/code> attribute with three values.',
+'  Inside a <code>&lt;form&gt;<\/code> the default type is <code>submit<\/code>.',
+'  Outside a form the safe default is <code>button<\/code>.',
+'  Always write the type explicitly.',
+'<\/p>',
+'',
+'<div class="row">',
+'  <button type="button">type="button" (does nothing alone &mdash; needs JS)<\/button>',
+'  <button type="submit">type="submit" (submits the nearest form)<\/button>',
+'  <button type="reset">type="reset" (resets the nearest form)<\/button>',
+'<\/div>',
+'',
+'',
+'<h3>VII. Input Buttons &mdash; The Legacy Equivalents<\/h3>',
+'',
+'<p>',
+'  Before <code>&lt;button&gt;<\/code> existed, buttons were',
+'  <code>&lt;input&gt;<\/code> elements with a <code>type<\/code> attribute.',
+'  They are still valid and widely used.',
+'  The difference: <code>&lt;input&gt;<\/code> is void (no closing tag,',
+'  no inner HTML); <code>&lt;button&gt;<\/code> can contain any HTML.',
+'<\/p>',
+'',
+'<div class="row">',
+'  <input type="button" value="type=&quot;button&quot;">',
+'  <input type="submit" value="type=&quot;submit&quot;">',
+'  <input type="reset"  value="type=&quot;reset&quot;">',
+'<\/div>',
+'',
+'',
+'<h3>VIII. Buttons Inside a Form &mdash; The Route<\/h3>',
+'',
+'<p>',
+'  A <code>&lt;form&gt;<\/code> defines a route: the <code>action<\/code>',
+'  attribute is the URL, <code>method<\/code> is <code>GET<\/code> or <code>POST<\/code>.',
+'  A submit button triggers that route.',
+'  The <code>formaction<\/code> attribute on a button overrides the form\'s action',
+'  for that button only.',
+'<\/p>',
+'',
+'<form action="/search" method="get">',
+'  <p>',
+'    <input type="text" name="q" placeholder="search term" size="24">',
+'  <\/p>',
+'  <div class="row">',
+'    <button type="submit">Submit to /search<\/button>',
+'    <button type="submit" formaction="/search-archive">formaction="/search-archive"<\/button>',
+'    <button type="reset">Reset<\/button>',
+'  <\/div>',
+'<\/form>',
+'',
+'',
+'<h3>IX. Disabled State<\/h3>',
+'',
+'<p>',
+'  The <code>disabled<\/code> attribute blocks interaction and prevents form submission.',
+'  It works on both <code>&lt;button&gt;<\/code> and <code>&lt;input&gt;<\/code> buttons.',
+'  A disabled link requires CSS or JS &mdash; there is no native HTML attribute for it.',
+'<\/p>',
+'',
+'<div class="row">',
+'  <button type="button" disabled>button disabled<\/button>',
+'  <input type="submit" value="input disabled" disabled>',
+'<\/div>',
+'',
+'',
+'<h3>X. Image Map &mdash; &lt;map&gt; and &lt;area&gt;<\/h3>',
+'',
+'<p>',
+'  An image map turns regions of an <code>&lt;img&gt;<\/code> into clickable links',
+'  using <code>&lt;map&gt;<\/code> and <code>&lt;area&gt;<\/code>.',
+'  The <code>usemap<\/code> attribute on <code>&lt;img&gt;<\/code> links it to the map by name.',
+'  Each <code>&lt;area&gt;<\/code> defines a shape, coordinates, and an <code>href<\/code>.',
+'<\/p>',
+'',
+'<img src="https://via.placeholder.com/400x80/e0e0e0/666?text=image+map+%28click+left+or+right%29"',
+'     alt="image map demo" usemap="#demo-map" width="400" height="80">',
+'',
+'<map name="demo-map">',
+'  <area shape="rect" coords="0,0,200,80"   href="https://example.com" alt="left half"  target="_blank">',
+'  <area shape="rect" coords="200,0,400,80" href="https://example.org" alt="right half" target="_blank">',
+'<\/map>',
+'',
+'',
+'<h3>XI. The &lt;base&gt; Tag<\/h3>',
+'',
+'<p>',
+'  <code>&lt;base&gt;<\/code> sits inside <code>&lt;head&gt;<\/code>',
+'  and sets a default URL and target for every relative link on the page.',
+'  All <code>&lt;a href="..."&gt;<\/code> paths resolve against it.',
+'  There can only be one <code>&lt;base&gt;<\/code> per document.',
+'<\/p>',
+'',
+'<p>',
+'  <code>&lt;base href="https://example.com/" target="_blank"&gt;<\/code><br>',
+'  After that tag, a link written as <code>href="about"<\/code>',
+'  resolves to <code>https://example.com/about<\/code>',
+'  and opens in a new tab by default.',
+'<\/p>',
+'',
+'<hr>',
+'<p><small>UTMEDaily &mdash; Web Practical &mdash; Assignment 3 &mdash; Buttons, Links &amp; Routes<\/small><\/p>',
+'',
+'<\/body>',
+'<\/html>'
+].join('\n');
+
+// ── MONOKAI TOKENISER (same as A2) ────────────────────────────────────────────
+function monokai(src) {
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  let out = '', i = 0, len = src.length;
+  while (i < len) {
+    if (src.startsWith('<!--', i)) {
+      let end = src.indexOf('-->', i); end = end === -1 ? len : end + 3;
+      out += `<span style="color:#75715e">${esc(src.slice(i,end))}</span>`; i = end; continue;
+    }
+    if (src[i] === '<') {
+      let end = src.indexOf('>', i); end = end === -1 ? len : end + 1;
+      out += tokenTag(src.slice(i, end)); i = end; continue;
+    }
+    if (src[i] === '&') {
+      let end = src.indexOf(';', i); end = end === -1 ? i+1 : end+1;
+      out += `<span style="color:#ae81ff">${esc(src.slice(i,end))}</span>`; i = end; continue;
+    }
+    let j = i;
+    while (j < len && src[j] !== '<' && src[j] !== '&') j++;
+    out += `<span style="color:#f8f8f2">${esc(src.slice(i,j))}</span>`; i = j;
+  }
+  return out;
+}
+function tokenTag(raw) {
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  let s = raw, out = '';
+  out += `<span style="color:#f8f8f2">&lt;</span>`; s = s.slice(1);
+  if (s[0] === '/') { out += `<span style="color:#f8f8f2">/</span>`; s = s.slice(1); }
+  const tn = s.match(/^[a-zA-Z!][^\s>\/]*/);
+  if (tn) { out += `<span style="color:#f92672">${esc(tn[0])}</span>`; s = s.slice(tn[0].length); }
+  while (s.length) {
+    const ws = s.match(/^\s+/);
+    if (ws) { out += esc(ws[0]); s = s.slice(ws[0].length); continue; }
+    if (s.startsWith('/>')) { out += `<span style="color:#f8f8f2">/&gt;</span>`; break; }
+    if (s.startsWith('>'))  { out += `<span style="color:#f8f8f2">&gt;</span>`;  break; }
+    const an = s.match(/^[^\s=>"'\/]+/);
+    if (an) { out += `<span style="color:#a6e22e">${esc(an[0])}</span>`; s = s.slice(an[0].length); continue; }
+    if (s[0] === '=') {
+      out += `<span style="color:#f8f8f2">=</span>`; s = s.slice(1);
+      if (s[0] === '"' || s[0] === "'") {
+        const q = s[0], end = s.indexOf(q,1);
+        const val = end === -1 ? s : s.slice(0, end+1);
+        out += `<span style="color:#e6db74">${esc(val)}</span>`; s = s.slice(val.length);
+      }
+      continue;
+    }
+    out += esc(s[0]); s = s.slice(1);
+  }
+  return out;
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const KEY = 'utme-a3-v1';
+const ta  = document.getElementById('ta');
+const hl  = document.getElementById('hl');
+let saveTimer, pvTimer;
+
+(function boot(){
+  let s; try { s = localStorage.getItem(KEY); } catch(e){}
+  ta.value = s || STARTER;
+  highlight(); updateNums(); updateStatus(); render(); watchNet();
+})();
+
+function onChange() { highlight(); updateNums(); updateStatus(); markDirty(); debounce(); }
+
+function onKey(e) {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const s = ta.selectionStart, n = ta.selectionEnd;
+  ta.value = ta.value.slice(0,s) + '  ' + ta.value.slice(n);
+  ta.selectionStart = ta.selectionEnd = s + 2;
+  onChange();
+}
+
+function onScroll() {
+  document.getElementById('lnums').scrollTop = ta.scrollTop;
+  hl.scrollTop  = ta.scrollTop;
+  hl.scrollLeft = ta.scrollLeft;
+}
+
+ta.addEventListener('click', updateStatus);
+ta.addEventListener('keyup', updateStatus);
+
+function highlight() { hl.innerHTML = monokai(ta.value); }
+
+function updateNums() {
+  const n = ta.value.split('\n').length;
+  document.getElementById('lnums').innerHTML =
+    Array.from({length:n},(_,i)=>`<span class="ln">${i+1}</span>`).join('');
+}
+
+function updateStatus() {
+  const before = ta.value.slice(0, ta.selectionStart).split('\n');
+  document.getElementById('sb-ln').textContent  = before.length;
+  document.getElementById('sb-col').textContent = before[before.length-1].length + 1;
+  document.getElementById('sb-tags').textContent = (ta.value.match(/<[a-z][^>\/]*>/gi)||[]).length;
+}
+
+function debounce(){ clearTimeout(pvTimer); pvTimer = setTimeout(render, 700); }
+
+function render() {
+  const pv  = document.getElementById('pv');
+  const doc = pv.contentDocument || pv.contentWindow.document;
+  let html = ta.value;
+  doc.open(); doc.write(html); doc.close();
+}
+
+function markDirty() {
+  document.getElementById('save-dot').classList.add('dirty');
+  document.getElementById('save-lbl').textContent = 'unsaved';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persist, 1400);
+}
+function persist() {
+  try {
+    localStorage.setItem(KEY, ta.value);
+    document.getElementById('save-dot').classList.remove('dirty');
+    document.getElementById('save-lbl').textContent = 'saved';
+  } catch(e) {
+    document.getElementById('save-lbl').textContent = 'save failed';
+  }
+}
+function watchNet() {
+  const pill = document.getElementById('offline-pill');
+  function upd() {
+    if (!navigator.onLine) { persist(); pill.classList.add('on'); }
+    else { pill.classList.remove('on'); }
+  }
+  window.addEventListener('online',  upd);
+  window.addEventListener('offline', upd);
+  upd();
+}
+</script>
+</body>
+</html>
