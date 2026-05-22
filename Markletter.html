@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTMEDaily · A3 — Letter Markup</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#272822; --sf:#1e1f1c; --ln:#3e3d32;
+  --fg:#f8f8f2; --cm:#75715e;
+  --y:#e6db74; --o:#fd971f; --r:#f92672;
+  --p:#ae81ff; --b:#66d9e8; --g:#a6e22e;
+  --gold:#febc2e;
+  --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--mono)}
+.app{display:flex;flex-direction:column;height:100%}
+
+/* TOPBAR */
+.topbar{flex-shrink:0;display:flex;align-items:center;gap:12px;padding:6px 14px;background:var(--sf);border-bottom:1px solid var(--ln)}
+.dots{display:flex;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%}
+.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+.tb-file{font-size:12px;color:var(--cm);flex:1;text-align:center;letter-spacing:.04em}
+.tb-right{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--cm)}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--g);transition:background .3s}
+.save-dot.dirty{background:var(--o);animation:blink 1.2s infinite}
+.offline-pill{display:none;font-size:10px;padding:2px 8px;border-radius:3px;background:rgba(253,151,31,.1);border:1px solid rgba(253,151,31,.3);color:var(--o)}
+.offline-pill.on{display:block}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* MAIN */
+.main{flex:1;display:flex;overflow:hidden}
+
+/* EDITOR */
+.editor{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden}
+.ed-tabs{display:flex;padding:4px 8px 0;background:var(--sf);border-bottom:1px solid var(--ln)}
+.etab{padding:4px 18px 5px;font-size:11px;color:var(--cm);background:var(--bg);border:1px solid var(--ln);border-bottom:none;border-radius:4px 4px 0 0}
+.etab.active{color:var(--fg)}
+.ed-body{flex:1;display:flex;overflow:hidden;position:relative}
+.line-nums{width:44px;flex-shrink:0;background:var(--sf);border-right:1px solid var(--ln);padding:10px 0;overflow:hidden;text-align:right;font-size:13px;line-height:1.6;color:var(--cm);user-select:none}
+.ln{padding-right:10px;display:block}
+.hl-wrap{flex:1;position:relative;overflow:hidden}
+.hl-layer{position:absolute;inset:0;font-family:var(--mono);font-size:13px;line-height:1.6;padding:10px 14px;white-space:pre;overflow:hidden;pointer-events:none;z-index:1;color:transparent}
+textarea{position:absolute;inset:0;background:transparent;border:none;outline:none;resize:none;font-family:var(--mono);font-size:13px;line-height:1.6;padding:10px 14px;tab-size:2;white-space:pre;overflow-wrap:normal;overflow-x:auto;overflow-y:auto;z-index:2;color:transparent;caret-color:var(--fg)}
+textarea::selection{background:rgba(230,219,116,.28);color:transparent}
+
+/* PREVIEW */
+.preview{width:46%;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--ln)}
+.pv-bar{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--sf);border-bottom:1px solid var(--ln)}
+.pv-label{font-size:10px;color:var(--cm);letter-spacing:.1em;text-transform:uppercase}
+.pv-url{flex:1;background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:3px 10px;font-size:11px;color:var(--cm)}
+.pv-btn{padding:3px 11px;border-radius:4px;background:var(--g);color:var(--sf);font-family:var(--mono);font-size:11px;font-weight:500;border:none;cursor:pointer}
+.pv-btn:hover{opacity:.82}
+iframe{flex:1;border:none;background:#fff}
+
+/* STATUSBAR */
+.statusbar{flex-shrink:0;display:flex;align-items:center;gap:14px;padding:3px 12px;background:var(--sf);border-top:1px solid var(--ln);font-size:10px;color:var(--cm)}
+.statusbar b{color:var(--b)}
+.sb-r{margin-left:auto}
+
+/* TASKS PILL */
+.tasks-wrap{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:500;display:flex;align-items:center}
+.tasks-tab{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);background:var(--gold);color:#000;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:12px 7px;border-radius:8px 0 0 8px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;flex-shrink:0;box-shadow:-4px 0 20px rgba(0,0,0,.4);transition:background .2s}
+.tasks-tab:hover{background:#f5c842}
+.pill-count{writing-mode:horizontal-tb;transform:rotate(90deg);background:rgba(0,0,0,.25);border-radius:99px;padding:1px 5px;font-size:9px;font-weight:600}
+.tasks-drawer{width:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1);background:var(--sf);border-left:1px solid var(--ln);display:flex;flex-direction:column;height:80vh;max-height:640px;border-radius:10px 0 0 10px;box-shadow:-8px 0 40px rgba(0,0,0,.5)}
+.tasks-drawer.open{width:300px}
+.td-inner{width:300px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.td-hdr{flex-shrink:0;padding:14px 16px 12px;border-bottom:1px solid var(--ln)}
+.td-badge{font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(254,188,46,.1);border:1px solid rgba(254,188,46,.28);color:var(--gold);display:inline-block;margin-bottom:8px}
+.td-title{font-size:13px;color:var(--fg);margin-bottom:4px}
+.td-sub{font-size:11px;color:var(--cm);line-height:1.65}
+.td-scroll{flex:1;overflow-y:auto;padding:10px 14px 14px}
+.td-scroll::-webkit-scrollbar{width:3px}
+.td-scroll::-webkit-scrollbar-thumb{background:var(--ln)}
+.task-item{display:flex;gap:8px;padding:8px;border-radius:5px;border:1px solid transparent;margin-bottom:4px;transition:all .2s}
+.task-item.done{background:rgba(166,226,46,.05);border-color:rgba(166,226,46,.15)}
+.t-num{font-size:10px;color:var(--b);flex-shrink:0;width:16px;padding-top:1px}
+.t-ck{font-size:12px;flex-shrink:0;padding-top:1px;width:14px;color:var(--cm)}
+.task-item.done .t-ck{color:var(--g)}
+.t-body{font-size:11px;color:var(--cm);line-height:1.65}
+.task-item.done .t-body{color:rgba(248,248,242,.3);text-decoration:line-through}
+.t-hint{display:block;margin-top:4px;font-size:10px;color:rgba(102,217,232,.7);font-style:italic;text-decoration:none}
+.task-item.done .t-hint{display:none}
+.td-footer{flex-shrink:0;padding:10px 14px;border-top:1px solid var(--ln);font-size:10px;color:var(--cm);text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="dots">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    </div>
+    <span class="tb-file">UTMEDaily &mdash; Web Practical &mdash; Assignment 3 &mdash; Letter Markup</span>
+    <div class="tb-right">
+      <span class="offline-pill" id="offline-pill">&#9889; offline</span>
+      <div class="save-dot" id="save-dot"></div>
+      <span id="save-lbl">saved</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="editor">
+      <div class="ed-tabs"><div class="etab active">letter.html</div></div>
+      <div class="ed-body">
+        <div class="line-nums" id="lnums"></div>
+        <div class="hl-wrap">
+          <div class="hl-layer" id="hl" aria-hidden="true"></div>
+          <textarea id="ta" spellcheck="false"
+            oninput="onChange()" onkeydown="onKey(event)" onscroll="onScroll(event)"
+            autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="pv-bar">
+        <span class="pv-label">preview</span>
+        <div class="pv-url">letter.html</div>
+        <button class="pv-btn" onclick="render()">&#8635;</button>
+      </div>
+      <iframe id="pv" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>Ln <b id="sb-ln">1</b></span>
+    <span>Col <b id="sb-col">1</b></span>
+    <span>Tags <b id="sb-tags">0</b></span>
+    <span class="sb-r" id="sb-tasks">Tasks: 0/8</span>
+  </div>
+
+</div>
+
+<!-- TASKS PILL -->
+<div class="tasks-wrap" id="tasks-wrap">
+  <div class="tasks-tab" onclick="toggleDrawer()">
+    Tasks
+    <span class="pill-count" id="pill-count">0/8</span>
+  </div>
+  <div class="tasks-drawer" id="tasks-drawer">
+    <div class="td-inner">
+      <div class="td-hdr">
+        <span class="td-badge">Assignment 3 &mdash; Semantic Markup</span>
+        <div class="td-title">Fix the letter&rsquo;s HTML tags</div>
+        <div class="td-sub">Each task swaps a presentational tag for a semantic one. The visual result is mostly the same &mdash; the meaning improves.</div>
+      </div>
+      <div class="td-scroll" id="td-scroll"></div>
+      <div class="td-footer" id="td-footer">0 of 8 tasks complete</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── TASKS ─────────────────────────────────────────────────────────────────────
+const TASKS = [
+  {
+    id:'t1',
+    label:'Add <code>lang="en"</code> to <code>&lt;html&gt;</code>',
+    hint:'Line 2: change <code>&lt;html&gt;</code> to <code>&lt;html lang="en"&gt;</code>',
+    check: h => /<html[^>]+lang\s*=/.test(h),
+  },
+  {
+    id:'t2',
+    label:'Recipient name: <code>&lt;b&gt;</code> &rarr; <code>&lt;strong&gt;</code>',
+    hint:'Inside <code>&lt;address&gt;</code> — the name is important, not just bold.',
+    check: h => /<address[\s\S]*?<strong>[\s\S]*?<\/strong>[\s\S]*?<\/address>/i.test(h) && !/<address[\s\S]*?<b>Master/i.test(h),
+  },
+  {
+    id:'t3',
+    label:'Date: <code>&lt;b&gt;</code> &rarr; <code>&lt;time&gt;</code>',
+    hint:'<code>&lt;time datetime="2026-01-15"&gt;15th January, 2026&lt;/time&gt;</code>',
+    check: h => /<time[^>]*>[\s\S]*?January[\s\S]*?<\/time>/i.test(h) || /<time[^>]+datetime=["']2026-01-15["']/.test(h),
+  },
+  {
+    id:'t4',
+    label:'Subject: <code>&lt;div&gt;</code> &rarr; <code>&lt;h2&gt;</code>',
+    hint:'Change <code>&lt;div class="subject"&gt;</code> to <code>&lt;h2&gt;</code>. Remove the class.',
+    check: h => h.includes('<h2') && h.includes('Cultural Day') && !h.includes('class="subject"'),
+  },
+  {
+    id:'t5',
+    label:'<code>&lt;span class="emphasis"&gt;</code> &rarr; <code>&lt;em&gt;</code>',
+    hint:'Remove the span. Wrap "cordially invite" in <code>&lt;em&gt;&lt;/em&gt;</code> instead.',
+    check: h => !/<span[^>]*class="emphasis"/.test(h) && /<em>[\s\S]*?cordially/i.test(h),
+  },
+  {
+    id:'t6',
+    label:'Theme title: <code>&lt;span style&gt;</code> &rarr; <code>&lt;i&gt;</code>',
+    hint:'It&rsquo;s a title phrase, not spoken stress &mdash; <code>&lt;i&gt;</code> not <code>&lt;em&gt;</code>. Remove the inline style.',
+    check: h => !/<span[^>]*font-style/.test(h) && h.includes('<i>'),
+  },
+  {
+    id:'t7',
+    label:'Event time: <code>&lt;b&gt;</code> &rarr; <code>&lt;time&gt;</code>',
+    hint:'<code>&lt;time datetime="10:00"&gt;10:00 a.m.&lt;/time&gt;</code>',
+    check: h => /<time[^>]*>[\s\S]*?10:00[\s\S]*?<\/time>/i.test(h) || /<time[^>]+datetime=["']10:00["']/.test(h),
+  },
+  {
+    id:'t8',
+    label:'Signature: <code>&lt;b&gt;</code> &rarr; <code>&lt;strong&gt;</code>',
+    hint:'In <code>.sig</code> &mdash; the principal&rsquo;s name carries authority, not just weight.',
+    check: h => !/<b>Mrs/.test(h) && (/<strong>[\s\S]*?Nwosu[\s\S]*?<\/strong>/i.test(h) || /<strong>[\s\S]*?Adaeze[\s\S]*?<\/strong>/i.test(h)),
+  },
+];
+
+// ── STARTER HTML ──────────────────────────────────────────────────────────────
+const STARTER = [
+'<!DOCTYPE html>',
+'<html>',
+'<head>',
+'  <meta charset="UTF-8">',
+'  <title>Invitation \u2014 JSS Model Secondary School<\/title>',
+'<\/head>',
+'<body>',
+'',
+'<header class="letterhead">',
+'  <div class="logo">JSS<\/div>',
+'  <div class="lh-info">',
+'    <div class="lh-name">JSS Model Secondary School<\/div>',
+'    <div class="lh-tagline">Excellence \u00b7 Integrity \u00b7 Service<\/div>',
+'    <div class="lh-contact">12 Education Way, Abuja \u00b7 08012345678 \u00b7 info@jssmodel.edu.ng<\/div>',
+'  <\/div>',
+'  <div class="stamp">OFFICIAL<br><span class="stamp-yr">2026<\/span><br>JSS<\/div>',
+'<\/header>',
+'<div class="lh-rule"><\/div>',
+'',
+'<div class="meta">',
+'  <address>',
+'    The Parent\/Guardian,<br>',
+'    <b>Master Chukwuemeka Obi<\/b>,<br>',
+'    14 Palm Avenue, Garki, Abuja.',
+'  <\/address>',
+'  <div class="date-block">',
+'    <b>15th January, 2026<\/b>',
+'  <\/div>',
+'<\/div>',
+'',
+'<p class="ref">Ref: JSS\/ADMIN\/2026\/001<\/p>',
+'',
+'<div class="subject">Invitation: Annual Cultural Day \u2014 Saturday 1st February 2026<\/div>',
+'',
+'<p>Dear Parent\/Guardian,<\/p>',
+'',
+'<p>We write to <span class="emphasis">cordially invite<\/span> you to our Annual',
+'Cultural Day, themed <span style="font-style:italic">\u201cRoots and Wings:',
+'Celebrating Nigerian Heritage.\u201d<\/span><\/p>',
+'',
+'<p>Students will present <strong>traditional dances, poetry, and crafts<\/strong>',
+'from across Nigeria\'s <abbr title="thirty-six">36<\/abbr> states.<\/p>',
+'',
+'<p>The event holds at <b>10:00 a.m.<\/b> prompt. Refreshments will be served.',
+'Kindly confirm attendance by <b>25th January, 2026<\/b>.<\/p>',
+'',
+'<p>Yours faithfully,<\/p>',
+'',
+'<div class="sig">',
+'  <b>Mrs. Adaeze Nwosu<\/b>',
+'  <span class="sig-title">Principal, JSS Model Secondary School<\/span>',
+'<\/div>',
+'',
+'<hr>',
+'<p><small>JSS Model Secondary School \u00b7 Est. 1998',
+'\u00b7 Accredited by the Federal Ministry of Education<\/small><\/p>',
+'',
+'<\/body>',
+'<\/html>',
+].join('\n');
+
+// ── PREVIEW INJECTION ─────────────────────────────────────────────────────────
+const PREVIEW_HEAD =
+  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap">' +
+  '<style>' +
+  '@keyframes lh-in{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}' +
+  '@keyframes rule-in{from{transform:scaleX(0)}to{transform:scaleX(1)}}' +
+  '@keyframes stamp-in{0%{opacity:0;transform:rotate(-15deg) scale(0.3)}60%{opacity:.78;transform:rotate(-13deg) scale(1.07)}100%{opacity:.78;transform:rotate(-15deg) scale(1)}}' +
+  '*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}' +
+  'html{background:#cdc9bf;min-height:100%}' +
+  'body{font-family:"EB Garamond",Georgia,serif;font-size:16px;color:#1a1a1a;max-width:660px;margin:0 auto;padding:40px 52px 60px;background:#faf9f5;min-height:100vh}' +
+  'header.letterhead{display:flex;align-items:center;gap:16px;padding-bottom:12px;animation:lh-in 0.65s ease both}' +
+  '.logo{width:58px;height:58px;border-radius:50%;background:#1a3261;color:#fff;display:flex;align-items:center;justify-content:center;font-family:"Playfair Display",serif;font-size:17px;font-weight:700;flex-shrink:0}' +
+  '.lh-info{flex:1;min-width:0}' +
+  '.lh-name{font-family:"Playfair Display",serif;font-size:1.22em;color:#1a3261;font-weight:700;line-height:1.2}' +
+  '.lh-tagline{font-size:.76em;color:#666;font-style:italic;margin-top:3px;letter-spacing:.04em}' +
+  '.lh-contact{font-size:.71em;color:#999;margin-top:4px}' +
+  '.stamp{width:82px;height:82px;border-radius:50%;border:2px dashed #8b1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#8b1a1a;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:center;line-height:1.35;flex-shrink:0;opacity:0;transform:rotate(-15deg);animation:stamp-in 0.7s 0.8s ease both}' +
+  '.stamp-yr{font-size:15px;font-weight:700;line-height:1.1}' +
+  '.lh-rule{height:2px;background:#1a3261;transform-origin:left center;animation:rule-in 0.7s 0.35s ease both;margin-bottom:24px}' +
+  '.meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:20px}' +
+  'address{font-style:normal;font-size:.9em;line-height:1.88}' +
+  '.date-block{font-size:.9em;text-align:right;white-space:nowrap}' +
+  'p.ref{font-size:.8em;color:#888;margin:12px 0;font-family:monospace}' +
+  'div.subject{font-size:.95em;font-weight:700;text-decoration:underline;text-underline-offset:3px;margin:18px 0 22px}' +
+  'h2{font-family:"EB Garamond",Georgia,serif;font-size:1em;font-weight:700;text-decoration:underline;text-underline-offset:3px;margin:18px 0 22px;font-style:normal}' +
+  'p{line-height:1.88;margin:0 0 1em;font-size:.95em}' +
+  'em{font-style:italic}strong{font-weight:700}i{font-style:italic}b{font-weight:700}' +
+  'abbr{border-bottom:1px dotted #aaa;cursor:help;text-decoration:none}' +
+  'time{font-style:normal}' +
+  '.sig{margin-top:36px}' +
+  '.sig-title{font-size:.87em;color:#555;display:block;margin-top:3px}' +
+  'hr{border:none;border-top:1px solid #d5d2c8;margin:20px 0}' +
+  'small{font-size:.78em;color:#aaa}' +
+  '<\/style>';
+
+// ── MONOKAI TOKENISER ─────────────────────────────────────────────────────────
+function monokai(src) {
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  let out='', i=0, len=src.length;
+  while (i<len) {
+    if (src.startsWith('<!--',i)) {
+      let end=src.indexOf('-->',i); end=end===-1?len:end+3;
+      out+=`<span style="color:#75715e">${esc(src.slice(i,end))}</span>`; i=end; continue;
+    }
+    if (src[i]==='<') {
+      let end=src.indexOf('>',i); end=end===-1?len:end+1;
+      out+=tokenTag(src.slice(i,end)); i=end; continue;
+    }
+    if (src[i]==='&') {
+      let end=src.indexOf(';',i); end=end===-1?i+1:end+1;
+      out+=`<span style="color:#ae81ff">${esc(src.slice(i,end))}</span>`; i=end; continue;
+    }
+    let j=i;
+    while (j<len && src[j]!=='<' && src[j]!=='&') j++;
+    out+=`<span style="color:#f8f8f2">${esc(src.slice(i,j))}</span>`; i=j;
+  }
+  return out;
+}
+
+function tokenTag(raw) {
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  let s=raw, out='';
+  out+=`<span style="color:#f8f8f2">&lt;</span>`; s=s.slice(1);
+  if (s[0]==='/') { out+=`<span style="color:#f8f8f2">/</span>`; s=s.slice(1); }
+  const tn=s.match(/^[a-zA-Z!][^\s>\/]*/);
+  if (tn) { out+=`<span style="color:#f92672">${esc(tn[0])}</span>`; s=s.slice(tn[0].length); }
+  while (s.length && s!=='>' && s!=='/>') {
+    const ws=s.match(/^\s+/);
+    if (ws) { out+=esc(ws[0]); s=s.slice(ws[0].length); continue; }
+    if (s.startsWith('/>')) { out+=`<span style="color:#f8f8f2">/&gt;</span>`; s=s.slice(2); break; }
+    if (s.startsWith('>'))  { out+=`<span style="color:#f8f8f2">&gt;</span>`;  s=s.slice(1); break; }
+    const an=s.match(/^[^\s=>"'\/]+/);
+    if (an) { out+=`<span style="color:#a6e22e">${esc(an[0])}</span>`; s=s.slice(an[0].length); continue; }
+    if (s[0]==='=') {
+      out+=`<span style="color:#f8f8f2">=</span>`; s=s.slice(1);
+      if (s[0]==='"'||s[0]==="'") {
+        const q=s[0], end=s.indexOf(q,1);
+        const val=end===-1?s:s.slice(0,end+1);
+        out+=`<span style="color:#e6db74">${esc(val)}</span>`; s=s.slice(val.length);
+      }
+      continue;
+    }
+    out+=esc(s[0]); s=s.slice(1);
+  }
+  if (s==='>') out+=`<span style="color:#f8f8f2">&gt;</span>`;
+  return out;
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const KEY = 'utme-a3-v1';
+const ta  = document.getElementById('ta');
+const hl  = document.getElementById('hl');
+let saveTimer, pvTimer, drawerOpen=false;
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+(function boot(){
+  let s; try { s=localStorage.getItem(KEY); } catch(e){}
+  ta.value = s || STARTER;
+  buildTasksUI();
+  highlight(); updateNums(); updateStatus(); checkTasks(); render();
+  watchNet();
+})();
+
+// ── TASK UI ───────────────────────────────────────────────────────────────────
+function buildTasksUI() {
+  document.getElementById('td-scroll').innerHTML = TASKS.map((t,i) => `
+    <div class="task-item" id="${t.id}">
+      <span class="t-num">${i+1}.</span>
+      <span class="t-ck" id="ck-${t.id}">○</span>
+      <span class="t-body">${t.label}<em class="t-hint">${t.hint}</em></span>
+    </div>`).join('');
+}
+
+function checkTasks() {
+  const h=ta.value; let done=0;
+  TASKS.forEach(t => {
+    const ok=t.check(h); if(ok) done++;
+    document.getElementById(t.id)?.classList.toggle('done',ok);
+    const ck=document.getElementById('ck-'+t.id);
+    if(ck) ck.textContent=ok?'✓':'○';
+  });
+  const lbl=`${done}/8`;
+  document.getElementById('pill-count').textContent=lbl;
+  document.getElementById('sb-tasks').textContent=`Tasks: ${lbl}`;
+  document.getElementById('td-footer').textContent=`${done} of 8 tasks complete`;
+}
+
+// ── INPUT ─────────────────────────────────────────────────────────────────────
+function onChange() { highlight(); updateNums(); updateStatus(); markDirty(); debounce(); checkTasks(); }
+
+function onKey(e) {
+  if (e.key!=='Tab') return;
+  e.preventDefault();
+  const s=ta.selectionStart, n=ta.selectionEnd;
+  ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(n);
+  ta.selectionStart=ta.selectionEnd=s+2;
+  onChange();
+}
+
+function onScroll() {
+  document.getElementById('lnums').scrollTop=ta.scrollTop;
+  hl.scrollTop=ta.scrollTop; hl.scrollLeft=ta.scrollLeft;
+}
+
+ta.addEventListener('click', updateStatus);
+ta.addEventListener('keyup', updateStatus);
+
+// ── HIGHLIGHT / NUMS / STATUS ─────────────────────────────────────────────────
+function highlight() { hl.innerHTML=monokai(ta.value); }
+
+function updateNums() {
+  const n=ta.value.split('\n').length;
+  document.getElementById('lnums').innerHTML=
+    Array.from({length:n},(_,i)=>`<span class="ln">${i+1}</span>`).join('');
+}
+
+function updateStatus() {
+  const before=ta.value.slice(0,ta.selectionStart).split('\n');
+  document.getElementById('sb-ln').textContent=before.length;
+  document.getElementById('sb-col').textContent=before[before.length-1].length+1;
+  document.getElementById('sb-tags').textContent=(ta.value.match(/<[a-z][^>\/]*>/gi)||[]).length;
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────────────────────
+function debounce(){ clearTimeout(pvTimer); pvTimer=setTimeout(render,700); }
+
+function render() {
+  let html=ta.value;
+  if (/<\/head>/i.test(html)) {
+    html=html.replace(/<\/head>/i, PREVIEW_HEAD+'</head>');
+  } else {
+    html=PREVIEW_HEAD+html;
+  }
+  const pv=document.getElementById('pv');
+  const doc=pv.contentDocument||pv.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────────────
+function markDirty() {
+  document.getElementById('save-dot').classList.add('dirty');
+  document.getElementById('save-lbl').textContent='unsaved';
+  clearTimeout(saveTimer); saveTimer=setTimeout(persist,1400);
+}
+function persist() {
+  try {
+    localStorage.setItem(KEY,ta.value);
+    document.getElementById('save-dot').classList.remove('dirty');
+    document.getElementById('save-lbl').textContent='saved';
+  } catch(e) {
+    document.getElementById('save-lbl').textContent='save failed';
+  }
+}
+
+// ── DRAWER ────────────────────────────────────────────────────────────────────
+function toggleDrawer() {
+  drawerOpen=!drawerOpen;
+  document.getElementById('tasks-drawer').classList.toggle('open',drawerOpen);
+}
+
+// ── NETWORK ───────────────────────────────────────────────────────────────────
+function watchNet() {
+  const pill=document.getElementById('offline-pill');
+  function upd() {
+    if (!navigator.onLine) { persist(); pill.classList.add('on'); }
+    else { pill.classList.remove('on'); }
+  }
+  window.addEventListener('online',upd);
+  window.addEventListener('offline',upd);
+  upd();
+}
+</script>
+</body>
+</html>

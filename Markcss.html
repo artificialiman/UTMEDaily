@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTMEDaily · A4 — CSS &amp; Inline Styles</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mk-bg:      #272822;
+  --mk-surface: #1e1f1c;
+  --mk-line:    #3e3d32;
+  --mk-fg:      #f8f8f2;
+  --mk-comment: #75715e;
+  --mk-yellow:  #e6db74;
+  --mk-orange:  #fd971f;
+  --mk-red:     #f92672;
+  --mk-purple:  #ae81ff;
+  --mk-blue:    #66d9e8;
+  --mk-green:   #a6e22e;
+  --mk-ln:      #75715e;
+  --mono: 'DM Mono', 'Consolas', monospace;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; background:var(--mk-bg); color:var(--mk-fg); font-family:var(--mono); }
+.app { display:flex; flex-direction:column; height:100%; }
+
+.topbar {
+  flex-shrink:0; display:flex; align-items:center; gap:12px;
+  padding:6px 14px; background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.dots { display:flex; gap:6px; }
+.dot { width:12px; height:12px; border-radius:50%; }
+.dot.r { background:#ff5f57; } .dot.y { background:#febc2e; } .dot.g { background:#28c840; }
+.tb-file { font-size:12px; color:var(--mk-comment); flex:1; text-align:center; letter-spacing:.04em; }
+.tb-right { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--mk-comment); }
+.save-dot { width:7px; height:7px; border-radius:50%; background:var(--mk-green); transition:background .3s; }
+.save-dot.dirty { background:var(--mk-orange); animation:blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.offline-pill {
+  display:none; font-size:10px; padding:2px 8px; border-radius:3px;
+  background:rgba(253,151,31,.1); border:1px solid rgba(253,151,31,.3); color:var(--mk-orange);
+}
+.offline-pill.on { display:block; }
+
+.main { flex:1; display:flex; overflow:hidden; }
+
+.editor { display:flex; flex-direction:column; flex:1; min-width:0; overflow:hidden; }
+.ed-tabs {
+  display:flex; padding:4px 8px 0;
+  background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.etab {
+  padding:4px 18px 5px; font-size:11px; color:var(--mk-comment);
+  background:var(--mk-bg); border:1px solid var(--mk-line);
+  border-bottom:none; border-radius:4px 4px 0 0; cursor:pointer; transition:color .15s;
+}
+.etab.active { color:var(--mk-fg); }
+.ed-body { flex:1; display:flex; overflow:hidden; position:relative; }
+
+.line-nums {
+  width:44px; flex-shrink:0; background:var(--mk-surface); border-right:1px solid var(--mk-line);
+  padding:10px 0; overflow:hidden; text-align:right;
+  font-size:13px; line-height:1.6; color:var(--mk-ln); user-select:none; z-index:3;
+}
+.ln { padding-right:10px; display:block; }
+
+.hl-wrap { flex:1; position:relative; overflow:hidden; }
+.hl-layer {
+  position:absolute; inset:0;
+  font-family:var(--mono); font-size:13px; line-height:1.6;
+  padding:10px 14px; white-space:pre; overflow:hidden; pointer-events:none;
+  word-wrap:normal; z-index:1; color:transparent;
+}
+textarea {
+  position:absolute; inset:0;
+  background:transparent; border:none; outline:none; resize:none;
+  font-family:var(--mono); font-size:13px; line-height:1.6;
+  padding:10px 14px; tab-size:2; caret-color:var(--mk-fg);
+  white-space:pre; overflow-wrap:normal; overflow-x:auto; overflow-y:auto;
+  z-index:2; color:transparent;
+}
+textarea::selection { background:rgba(230,219,116,.28); color:transparent; }
+
+.preview { width:46%; flex-shrink:0; display:flex; flex-direction:column; border-left:1px solid var(--mk-line); }
+.pv-bar {
+  flex-shrink:0; display:flex; align-items:center; gap:8px;
+  padding:6px 12px; background:var(--mk-surface); border-bottom:1px solid var(--mk-line);
+}
+.pv-label { font-size:10px; color:var(--mk-comment); letter-spacing:.1em; text-transform:uppercase; }
+.pv-url {
+  flex:1; background:var(--mk-bg); border:1px solid var(--mk-line); border-radius:4px;
+  padding:3px 10px; font-size:11px; color:var(--mk-comment);
+}
+.pv-btn {
+  padding:3px 11px; border-radius:4px; background:var(--mk-green);
+  color:var(--mk-surface); font-family:var(--mono); font-size:11px; font-weight:500;
+  border:none; cursor:pointer;
+}
+.pv-btn:hover { opacity:.82; }
+iframe { flex:1; border:none; background:#fff; }
+
+.statusbar {
+  flex-shrink:0; display:flex; align-items:center; gap:14px;
+  padding:3px 12px; background:var(--mk-surface); border-top:1px solid var(--mk-line);
+  font-size:10px; color:var(--mk-comment);
+}
+.statusbar b { color:var(--mk-blue); }
+.sb-r { margin-left:auto; display:flex; gap:14px; align-items:center; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="dots">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    </div>
+    <span class="tb-file">UTMEDaily &mdash; Web Practical &mdash; Assignment 4 &mdash; CSS &amp; Inline Styles</span>
+    <div class="tb-right">
+      <span class="offline-pill" id="offline-pill">&#9889; offline</span>
+      <div class="save-dot" id="save-dot"></div>
+      <span id="save-lbl">saved</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="editor">
+      <div class="ed-tabs">
+        <div class="etab active" id="tab-html" onclick="switchTab('html')">letter.html</div>
+        <div class="etab" id="tab-css"  onclick="switchTab('css')">letter.css</div>
+      </div>
+      <div class="ed-body">
+        <div class="line-nums" id="lnums"></div>
+        <div class="hl-wrap">
+          <div class="hl-layer" id="hl" aria-hidden="true"></div>
+          <textarea id="ta" spellcheck="false"
+            oninput="onChange()" onkeydown="onKey(event)" onscroll="onScroll(event)"
+            autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="pv-bar">
+        <span class="pv-label">preview</span>
+        <div class="pv-url" id="pv-url">letter.html</div>
+        <button class="pv-btn" onclick="render()">&#8635;</button>
+      </div>
+      <iframe id="pv" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>Ln <b id="sb-ln">1</b></span>
+    <span>Col <b id="sb-col">1</b></span>
+    <span>Tags <b id="sb-tags">0</b></span>
+    <div class="sb-r">
+      <span id="sb-file" style="color:var(--mk-orange)">letter.html</span>
+      <span id="sb-msg"></span>
+    </div>
+  </div>
+
+</div>
+<script>
+// =============================================================================
+// STARTER CONTENT
+// Using a function that returns a string avoids any parser/escaping issues.
+// =============================================================================
+
+function getStarterHTML() {
+return '<!DOCTYPE html>\n' +
+'<html lang="en">\n' +
+'<head>\n' +
+'  <meta charset="UTF-8">\n' +
+'  <title>Letter to TenderCare Comprehensive College</title>\n' +
+'  <link rel="stylesheet" href="letter.css">\n' +
+'</head>\n' +
+'<body>\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     LETTERHEAD\n' +
+'     font-family   changes the typeface entirely.\n' +
+'     letter-spacing  spreads characters apart.\n' +
+'     text-transform: uppercase  forces caps without retyping.\n' +
+'     color  names the shade. Try: navy, crimson, #2d6a4f.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<div class="letterhead">\n' +
+'  <h1 style="font-family: Georgia, serif; font-size: 1.9em; letter-spacing: 0.06em; text-transform: uppercase; color: #1a3a5c; margin-bottom: 0.1em;">Greenfield Academy</h1>\n' +
+'\n' +
+'  <p style="font-family: monospace; font-size: 0.78em; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 0.3em;">12 Blossom Avenue, Lagos &middot; +234 800 000 0000</p>\n' +
+'\n' +
+'  <hr style="border: none; border-top: 3px solid #1a3a5c; margin: 0.5em 0 1.8em;">\n' +
+'</div>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     DATE & RECIPIENT\n' +
+'     font-style: italic   slants the text.\n' +
+'     font-weight: bold    makes it heavier.\n' +
+'     font-size: 0.9em     relative to parent. 1em = same size.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="font-size: 0.88em; color: #555; margin-bottom: 1.4em;">\n' +
+'  <span style="font-style: italic;">17th May, 2026</span>\n' +
+'</p>\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; font-weight: bold; font-size: 1em; margin-bottom: 0.2em;">The Principal,</p>\n' +
+'\n' +
+'<p style="font-style: italic; font-size: 0.95em; color: #333; margin-bottom: 1.6em;">TenderCare Comprehensive College,<br>Victoria Island, Lagos.</p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     SUBJECT LINE\n' +
+'     text-decoration  adds underline, overline, or line-through.\n' +
+'     background-color on a span highlights like a marker pen.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="margin-bottom: 1.6em;">\n' +
+'  <strong style="font-family: Georgia, serif; text-decoration: underline; text-transform: uppercase; letter-spacing: 0.04em;">Re: Request for Joint Science and Theatre Excursions</strong>\n' +
+'</p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     SALUTATION\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; font-size: 1.05em; margin-bottom: 1.2em;">Dear <span style="font-weight: bold;">Ma\'am / Sir,</span></p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     OPENING PARAGRAPH\n' +
+'     line-height  controls space between lines.\n' +
+'     1.0 = cramped.  1.6 = comfortable.  2.2 = very airy.\n' +
+'     word-spacing  adds space between every word.\n' +
+'     background-color  highlights a phrase like a marker.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; line-height: 1.9; font-size: 1em; margin-bottom: 1.2em; word-spacing: 0.04em;">\n' +
+'  We write on behalf of the students and staff of\n' +
+'  <span style="font-weight: bold; color: #1a3a5c;">Greenfield Academy</span>\n' +
+'  to formally request the pleasure of your institution\'s participation in\n' +
+'  <span style="font-style: italic; background-color: #fff9c4; padding: 0 3px;">two co-curricular excursions</span>\n' +
+'  planned for the final term of the academic session.\n' +
+'</p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     SCIENCE EXCURSION PARAGRAPH\n' +
+'     font-variant: small-caps  lowercase becomes small capitals.\n' +
+'     text-shadow: x  y  blur  color  shadow behind the text.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; line-height: 1.85; margin-bottom: 1.2em;">\n' +
+'  The first excursion is a visit to the\n' +
+'  <span style="font-variant: small-caps; letter-spacing: 0.05em; color: #1a5c3a;">Lagos Science Museum</span>\n' +
+'  scheduled for the\n' +
+'  <span style="font-weight: bold; font-size: 1.05em; text-shadow: 1px 1px 0px rgba(0,0,0,0.12);">12th of June, 2026.</span>\n' +
+'  This visit will expose students to live demonstrations in\n' +
+'  <span style="color: #1a5c3a; font-style: italic;">chemistry, physics,</span>\n' +
+'  and <span style="color: #1a5c3a; font-style: italic;">biology</span>\n' +
+'  that extend beyond what the classroom can offer.\n' +
+'</p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     THEATRE EXCURSION PARAGRAPH\n' +
+'     text-decoration-style: wavy  makes a wavy underline.\n' +
+'     text-underline-offset  lifts the line away from text.\n' +
+'     font-size can be px, em, rem, %, or vw.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; line-height: 1.85; margin-bottom: 1.2em;">\n' +
+'  The second excursion is an evening at the\n' +
+'  <span style="font-style: italic; font-size: 1.08em; color: #5c1a4a; letter-spacing: 0.02em;">National Arts Theatre</span>,\n' +
+'  scheduled for the\n' +
+'  <span style="font-weight: bold;">19th of June, 2026.</span>\n' +
+'  Students will attend a live staging of\n' +
+'  <span style="font-style: italic; text-decoration: underline; text-decoration-color: #5c1a4a; text-underline-offset: 3px;">Wole Soyinka\'s The Trials of Brother Jero</span>,\n' +
+'  a work that appears on\n' +
+'  <span style="font-weight: bold; font-variant: small-caps;">both our syllabi.</span>\n' +
+'</p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     APPEAL PARAGRAPH\n' +
+'     animation  makes CSS properties change over time.\n' +
+'     @keyframes defines the animation in letter.css.\n' +
+'     The class "pulse" triggers it. See the CSS tab.\n' +
+'     text-decoration-style: wavy  makes a wavy underline.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; line-height: 1.85; margin-bottom: 1.2em;">\n' +
+'  We believe these excursions will leave a\n' +
+'  <span class="pulse" style="font-weight: bold; color: #b85c00;">lasting impression</span>\n' +
+'  on every student who attends, bridging the gap between\n' +
+'  <span style="font-style: italic; color: #444;">academic theory</span>\n' +
+'  and\n' +
+'  <span style="font-style: italic; color: #444;">lived experience.</span>\n' +
+'  We would be\n' +
+'  <span style="text-decoration: underline; text-decoration-style: wavy; text-decoration-color: crimson; text-underline-offset: 4px;">deeply honoured</span>\n' +
+'  by your school\'s participation.\n' +
+'</p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     CLOSING & SIGNATURE\n' +
+'     The signature uses a different font entirely.\n' +
+'     font-family can shift personality at any point on the page.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; line-height: 1.85; margin-bottom: 2em;">\n' +
+'  We look forward to your\n' +
+'  <span style="font-weight: bold;">favourable response.</span>\n' +
+'  Please do not hesitate to contact us at\n' +
+'  <span style="font-family: monospace; font-size: 0.92em; background: #f0f0f0; padding: 1px 5px; border-radius: 3px;">principal@greenfield.edu.ng</span>.\n' +
+'</p>\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; margin-bottom: 0.3em;">Yours faithfully,</p>\n' +
+'\n' +
+'<p style="font-family: Georgia, serif; font-size: 1.45em; font-style: italic; color: #1a3a5c; margin-bottom: 0.1em; letter-spacing: 0.02em;">Mrs. Adaeze Okonkwo</p>\n' +
+'\n' +
+'<p style="font-family: monospace; font-size: 0.78em; letter-spacing: 0.15em; text-transform: uppercase; color: #888;">Head Teacher, Greenfield Academy</p>\n' +
+'\n' +
+'\n' +
+'<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'     POSTSCRIPT\n' +
+'     The P.S. is the most informal part of a formal letter.\n' +
+'     It earns a looser style: smaller, lighter, different font.\n' +
+'     text-decoration-style: dotted  makes a dotted underline.\n' +
+'     \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n' +
+'\n' +
+'<hr style="border: none; border-top: 1px solid #ddd; margin: 2em 0 1em;">\n' +
+'\n' +
+'<p style="font-family: monospace; font-size: 0.8em; color: #999; line-height: 1.7;">\n' +
+'  <span style="font-weight: bold; color: #b85c00;">P.S.</span>\n' +
+'  Should you wish to propose alternative dates or a combined itinerary, we remain\n' +
+'  <span style="font-style: italic; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px;">entirely flexible.</span>\n' +
+'</p>\n' +
+'\n' +
+'</body>\n' +
+'</html>';
+}
+
+function getStarterCSS() {
+return '/* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n' +
+'   letter.css  -  Assignment 4\n' +
+'   This file styles letter.html.\n' +
+'   A <link rel="stylesheet"> in <head> connects them.\n' +
+'\n' +
+'   CSS selectors pick HTML elements by tag, class, or id.\n' +
+'   The browser reads both files and paints the result.\n' +
+'   \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n' +
+'\n' +
+'/* PAGE */\n' +
+'body {\n' +
+'  max-width: 680px;\n' +
+'  margin: 40px auto;\n' +
+'  padding: 0 32px 80px;\n' +
+'  background: #fdfcfa;\n' +
+'  color: #1a1a1a;\n' +
+'  font-size: 16px;\n' +
+'}\n' +
+'\n' +
+'/* LETTERHEAD BLOCK */\n' +
+'.letterhead {\n' +
+'  margin-bottom: 2em;\n' +
+'}\n' +
+'\n' +
+'/* ALL PARAGRAPHS */\n' +
+'p {\n' +
+'  margin-bottom: 1em;\n' +
+'}\n' +
+'\n' +
+'/* \u2500\u2500 @media print \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n' +
+'   ONLY applies when printing or saving as PDF (Ctrl+P).\n' +
+'   On screen it is completely invisible.\n' +
+'   This is why the web is different from a hard print:\n' +
+'   one file, two designed experiences.\n' +
+'   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n' +
+'@media print {\n' +
+'  body {\n' +
+'    font-size: 12pt;\n' +
+'    margin: 0;\n' +
+'    padding: 20mm 24mm;\n' +
+'    background: white;\n' +
+'    color: black;\n' +
+'    box-shadow: none;\n' +
+'  }\n' +
+'  .pulse {\n' +
+'    animation: none !important;\n' +
+'    color: #b85c00 !important;\n' +
+'  }\n' +
+'}\n' +
+'\n' +
+'/* \u2500\u2500 @keyframes \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n' +
+'   @keyframes defines what changes and when.\n' +
+'   0% is the start. 100% is the end.\n' +
+'   animation: name  duration  easing  iteration-count\n' +
+'   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n' +
+'@keyframes breathe {\n' +
+'  0%   { opacity: 1;   color: #b85c00; }\n' +
+'  50%  { opacity: 0.5; color: #e07000; }\n' +
+'  100% { opacity: 1;   color: #b85c00; }\n' +
+'}\n' +
+'\n' +
+'.pulse {\n' +
+'  animation: breathe 2.8s ease-in-out infinite;\n' +
+'}\n' +
+'\n' +
+'/* \u2500\u2500 @media screen \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n' +
+'   Only applies on a display. Never in print.\n' +
+'   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n' +
+'@media screen {\n' +
+'  body {\n' +
+'    box-shadow: 0 2px 24px rgba(0,0,0,0.08);\n' +
+'    border-radius: 2px;\n' +
+'  }\n' +
+'}';
+}
+
+// =============================================================================
+// STATE
+// =============================================================================
+const KEY_HTML = 'utme-a4-html-v3';
+const KEY_CSS  = 'utme-a4-css-v3';
+
+const ta = document.getElementById('ta');
+const hl = document.getElementById('hl');
+
+let activeTab = 'html';
+let files = { html: '', css: '' };
+let saveTimer, pvTimer;
+
+// =============================================================================
+// BOOT
+// =============================================================================
+(function boot() {
+  let h, c;
+  try { h = localStorage.getItem(KEY_HTML); } catch(e){}
+  try { c = localStorage.getItem(KEY_CSS);  } catch(e){}
+  files.html = h || getStarterHTML();
+  files.css  = c || getStarterCSS();
+  ta.value   = files.html;
+  highlight(); updateNums(); updateStatus(); render(); watchNet();
+})();
+
+// =============================================================================
+// TAB SWITCHING
+// =============================================================================
+function switchTab(name) {
+  files[activeTab] = ta.value;
+  activeTab = name;
+  document.getElementById('tab-html').classList.toggle('active', name === 'html');
+  document.getElementById('tab-css').classList.toggle('active',  name === 'css');
+  document.getElementById('pv-url').textContent  = name === 'html' ? 'letter.html' : 'letter.css';
+  document.getElementById('sb-file').textContent = name === 'html' ? 'letter.html' : 'letter.css';
+  ta.value = files[name];
+  highlight(); updateNums(); updateStatus();
+}
+
+// =============================================================================
+// INPUT
+// =============================================================================
+function onChange() {
+  files[activeTab] = ta.value;
+  highlight(); updateNums(); updateStatus(); markDirty(); debounce();
+}
+
+function onKey(e) {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const s = ta.selectionStart, n = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + '  ' + ta.value.slice(n);
+  ta.selectionStart = ta.selectionEnd = s + 2;
+  onChange();
+}
+
+function onScroll() {
+  document.getElementById('lnums').scrollTop = ta.scrollTop;
+  hl.scrollTop  = ta.scrollTop;
+  hl.scrollLeft = ta.scrollLeft;
+}
+
+ta.addEventListener('click', updateStatus);
+ta.addEventListener('keyup', updateStatus);
+
+// =============================================================================
+// MONOKAI TOKENISER
+// =============================================================================
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Colorize contents of style="..." inline CSS
+function colorizeInlineCSS(raw) {
+  var out = '', i = 0;
+  while (i < raw.length) {
+    var ws = raw.slice(i).match(/^[\s\n\r]+/);
+    if (ws) { out += esc(ws[0]); i += ws[0].length; continue; }
+    var ci = raw.indexOf(':', i);
+    if (ci === -1) { out += esc(raw.slice(i)); break; }
+    out += '<span style="color:#66d9e8">' + esc(raw.slice(i, ci)) + '</span>';
+    out += '<span style="color:#75715e">:</span>';
+    i = ci + 1;
+    var si = raw.indexOf(';', i);
+    var ve = si === -1 ? raw.length : si;
+    out += '<span style="color:#e6db74">' + esc(raw.slice(i, ve)) + '</span>';
+    if (si !== -1) { out += '<span style="color:#75715e">;</span>'; i = ve + 1; }
+    else { i = ve; }
+  }
+  return out;
+}
+
+// Tokenize a single HTML tag, tracking attribute name for style="" detection
+function tokenTag(raw) {
+  var s = raw, out = '', lastAttr = '';
+  out += '<span style="color:#f8f8f2">&lt;</span>';
+  s = s.slice(1);
+  if (s[0] === '/') { out += '<span style="color:#f8f8f2">/</span>'; s = s.slice(1); }
+  var tn = s.match(/^[a-zA-Z!][^\s>\/]*/);
+  if (tn) { out += '<span style="color:#f92672">' + esc(tn[0]) + '</span>'; s = s.slice(tn[0].length); }
+  while (s.length) {
+    var ws = s.match(/^\s+/);
+    if (ws) { out += esc(ws[0]); s = s.slice(ws[0].length); continue; }
+    if (s.slice(0,2) === '/>') { out += '<span style="color:#f8f8f2">/&gt;</span>'; break; }
+    if (s[0] === '>') { out += '<span style="color:#f8f8f2">&gt;</span>'; break; }
+    var an = s.match(/^[^\s=>"'\/]+/);
+    if (an) {
+      lastAttr = an[0];
+      out += '<span style="color:#a6e22e">' + esc(an[0]) + '</span>';
+      s = s.slice(an[0].length); continue;
+    }
+    if (s[0] === '=') {
+      out += '<span style="color:#f8f8f2">=</span>';
+      s = s.slice(1);
+      if (s[0] === '"' || s[0] === "'") {
+        var q = s[0];
+        var end = s.indexOf(q, 1);
+        if (end === -1) end = s.length - 1;
+        var val = s.slice(1, end);
+        out += '<span style="color:#e6db74">' + esc(q) + '</span>';
+        if (lastAttr === 'style') {
+          out += colorizeInlineCSS(val);
+        } else {
+          out += '<span style="color:#e6db74">' + esc(val) + '</span>';
+        }
+        out += '<span style="color:#e6db74">' + esc(q) + '</span>';
+        s = s.slice(end + 1);
+      }
+      continue;
+    }
+    out += esc(s[0]); s = s.slice(1);
+  }
+  return out;
+}
+
+function monokaiHTML(src) {
+  var out = '', i = 0, len = src.length;
+  while (i < len) {
+    if (src.slice(i, i+4) === '<!--') {
+      var end = src.indexOf('-->', i); end = end === -1 ? len : end + 3;
+      out += '<span style="color:#75715e">' + esc(src.slice(i, end)) + '</span>';
+      i = end; continue;
+    }
+    if (src[i] === '<') {
+      var end2 = src.indexOf('>', i); end2 = end2 === -1 ? len : end2 + 1;
+      out += tokenTag(src.slice(i, end2)); i = end2; continue;
+    }
+    if (src[i] === '&') {
+      var end3 = src.indexOf(';', i); end3 = end3 === -1 ? i + 1 : end3 + 1;
+      out += '<span style="color:#ae81ff">' + esc(src.slice(i, end3)) + '</span>';
+      i = end3; continue;
+    }
+    var j = i;
+    while (j < len && src[j] !== '<' && src[j] !== '&') j++;
+    out += '<span style="color:#f8f8f2">' + esc(src.slice(i, j)) + '</span>';
+    i = j;
+  }
+  return out;
+}
+
+function monokaiCSS(src) {
+  var out = '', i = 0, len = src.length;
+  while (i < len) {
+    if (src.slice(i, i+2) === '/*') {
+      var end = src.indexOf('*/', i); end = end === -1 ? len : end + 2;
+      out += '<span style="color:#75715e">' + esc(src.slice(i, end)) + '</span>';
+      i = end; continue;
+    }
+    if (src[i] === '@') {
+      var m = src.slice(i).match(/^@[a-z-]+/);
+      if (m) { out += '<span style="color:#f92672">' + esc(m[0]) + '</span>'; i += m[0].length; continue; }
+    }
+    if (src[i] === '#') {
+      var h = src.slice(i).match(/^#[0-9a-fA-F]{3,8}/);
+      if (h) { out += '<span style="color:#ae81ff">' + esc(h[0]) + '</span>'; i += h[0].length; continue; }
+    }
+    var prop = src.slice(i).match(/^([a-z][a-z-]*)(\s*:)(?!:)/);
+    if (prop) {
+      out += '<span style="color:#66d9e8">' + esc(prop[1]) + '</span>';
+      out += '<span style="color:#75715e">' + esc(prop[2]) + '</span>';
+      i += prop[0].length; continue;
+    }
+    var num = src.slice(i).match(/^[0-9]+\.?[0-9]*(px|pt|em|rem|%|s|ms|vw|vh)?/);
+    if (num && num[0].length > 0) {
+      out += '<span style="color:#ae81ff">' + esc(num[0]) + '</span>';
+      i += num[0].length; continue;
+    }
+    if (src[i] === '{' || src[i] === '}') { out += '<span style="color:#f8f8f2">' + esc(src[i]) + '</span>'; i++; continue; }
+    if (src[i] === ';') { out += '<span style="color:#75715e">;</span>'; i++; continue; }
+    var j = i;
+    while (j < len && !/[{};:@#\/\n]/.test(src[j])) j++;
+    if (j === i) { out += esc(src[i]); i++; continue; }
+    out += '<span style="color:#a6e22e">' + esc(src.slice(i, j)) + '</span>';
+    i = j;
+  }
+  return out;
+}
+
+function highlight() {
+  hl.innerHTML = activeTab === 'css' ? monokaiCSS(ta.value) : monokaiHTML(ta.value);
+}
+
+// =============================================================================
+// LINE NUMBERS
+// =============================================================================
+function updateNums() {
+  var n = ta.value.split('\n').length;
+  var html = '';
+  for (var i = 0; i < n; i++) html += '<span class="ln">' + (i+1) + '</span>';
+  document.getElementById('lnums').innerHTML = html;
+}
+
+// =============================================================================
+// STATUS BAR
+// =============================================================================
+function updateStatus() {
+  var before = ta.value.slice(0, ta.selectionStart).split('\n');
+  document.getElementById('sb-ln').textContent  = before.length;
+  document.getElementById('sb-col').textContent = before[before.length - 1].length + 1;
+  var tags = (files.html.match(/<[a-z][^>\/]*>/gi) || []).length;
+  document.getElementById('sb-tags').textContent = tags;
+}
+
+// =============================================================================
+// PREVIEW
+// =============================================================================
+function debounce() { clearTimeout(pvTimer); pvTimer = setTimeout(render, 700); }
+
+function render() {
+  files[activeTab] = ta.value;
+  var pv  = document.getElementById('pv');
+  var doc = pv.contentDocument || pv.contentWindow.document;
+  var styleBlock = '<style>\n' + files.css + '\n</style>';
+  var html = files.html;
+  if (html.indexOf('</head>') !== -1) {
+    html = html.replace('</head>', styleBlock + '</head>');
+  } else {
+    html = styleBlock + html;
+  }
+  doc.open(); doc.write(html); doc.close();
+}
+
+// =============================================================================
+// AUTOSAVE
+// =============================================================================
+function markDirty() {
+  document.getElementById('save-dot').classList.add('dirty');
+  document.getElementById('save-lbl').textContent = 'unsaved';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persist, 1400);
+}
+
+function persist() {
+  try {
+    localStorage.setItem(KEY_HTML, files.html);
+    localStorage.setItem(KEY_CSS,  files.css);
+    document.getElementById('save-dot').classList.remove('dirty');
+    document.getElementById('save-lbl').textContent = 'saved';
+  } catch(e) {
+    document.getElementById('save-lbl').textContent = 'save failed';
+  }
+}
+
+// =============================================================================
+// NETWORK WATCH
+// =============================================================================
+function watchNet() {
+  var pill = document.getElementById('offline-pill');
+  function upd() {
+    if (!navigator.onLine) { persist(); pill.classList.add('on'); }
+    else { pill.classList.remove('on'); }
+  }
+  window.addEventListener('online',  upd);
+  window.addEventListener('offline', upd);
+  upd();
+}
+</script>
+</body>
+</html>
