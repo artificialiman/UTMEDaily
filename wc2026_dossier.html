@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WC 2026 — Tactical Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0c0e;
+    --surface: #13151a;
+    --surface2: #1c1f27;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --dim: #3a3f4b;
+
+    --por: #d4222a;
+    --por-light: #ff4d55;
+    --mar: #c7973b;
+    --mar-light: #f0b84a;
+    --usa: #2563eb;
+    --usa-light: #60a5fa;
+
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --teal: #14b8a6;
+    --purple: #8b5cf6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ---- TOP HEADER ---- */
+  .masthead {
+    border-bottom: 1px solid var(--border2);
+    padding: 32px 48px 28px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .masthead-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .masthead h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    color: var(--text);
+  }
+  .masthead h1 span { color: var(--muted); font-weight: 300; }
+  .masthead-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.9;
+  }
+  .masthead-meta b { color: var(--text); font-weight: 500; }
+
+  /* ---- NAV TABS ---- */
+  .tab-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    padding: 0 48px;
+  }
+  .tab-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 14px 20px 12px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--text); }
+  .tab-btn[data-team="por"].active { border-color: var(--por); color: var(--por-light); }
+  .tab-btn[data-team="mar"].active { border-color: var(--mar); color: var(--mar-light); }
+  .tab-btn[data-team="usa"].active { border-color: var(--usa); color: var(--usa-light); }
+  .tab-btn[data-team="compare"].active { border-color: var(--teal); color: var(--teal); }
+
+  /* ---- PANELS ---- */
+  .panel { display: none; padding: 40px 48px 80px; }
+  .panel.active { display: block; }
+
+  /* ---- TEAM HERO ---- */
+  .team-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .team-flag-name {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .flag-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+  .team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .team-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+  .hero-stat {
+    text-align: right;
+  }
+  .hero-stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+  }
+
+  /* ---- SECTION LABELS ---- */
+  .section-head {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    margin-top: 40px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-head::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ---- CRITERIA GRID ---- */
+  .criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+  }
+
+  .crit-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.15s;
+  }
+  .crit-card:hover { border-color: var(--border2); }
+
+  .crit-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .crit-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  /* ---- HEATMAP SVG ---- */
+  .heatmap-wrap {
+    margin: 14px 0 16px;
+    position: relative;
+  }
+  .heatmap-wrap svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ---- PLAYER ENTRY ---- */
+  .player-entry {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+  .player-entry:last-child { margin-bottom: 0; }
+  .p-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .p-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .p-club {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .p-note {
+    font-size: 13px;
+    color: #9ba3b0;
+    line-height: 1.55;
+  }
+
+  /* ---- STAT ROWS ---- */
+  .stat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .stat-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    width: 100px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .stat-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--dim);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .stat-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+  .stat-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ---- VERDICT BLOCK ---- */
+  .verdict {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border-left: 3px solid var(--border2);
+    border-radius: 0 6px 6px 0;
+    font-size: 12.5px;
+    color: #9ba3b0;
+    line-height: 1.6;
+  }
+
+  /* ---- SHOOTING ZONE MAP ---- */
+  .shot-zone-wrap {
+    margin: 14px 0;
+  }
+
+  /* ---- SPRINT GRID ---- */
+  .sprint-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .sprint-cell {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .sprint-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .sprint-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---- BADGES ---- */
+  .badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-right: 4px;
+    font-weight: 500;
+  }
+
+  /* ---- SQUAD PILLS ---- */
+  .squad-section { margin-top: 40px; }
+  .squad-group { margin-bottom: 16px; }
+  .squad-group-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .pills-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: #9ba3b0;
+    background: var(--surface);
+  }
+
+  /* ---- COMPARE TABLE ---- */
+  .compare-table-wrap {
+    overflow-x: auto;
+    margin-top: 16px;
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border2);
+    white-space: nowrap;
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    color: #9ba3b0;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .compare-table td.best {
+    color: var(--text);
+    background: rgba(255,255,255,0.025);
+  }
+  .compare-table td.best::after {
+    content: ' ★';
+    font-size: 11px;
+    opacity: 0.5;
+  }
+
+  /* ---- RADAR CHART ---- */
+  .radar-wrap {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  /* ---- PRINT / DOWNLOAD ---- */
+  .dl-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dl-btn:hover { border-color: var(--text); color: var(--text); }
+
+  @media (max-width: 700px) {
+    .masthead, .tab-bar, .panel { padding-left: 20px; padding-right: 20px; }
+    .criteria-grid { grid-template-columns: 1fr; }
+    .team-hero { flex-direction: column; }
+    .hero-stats { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div>
+    <p class="masthead-title">Tactical Intelligence · WC 2026</p>
+    <h1>WORLD CUP <span>DOSSIER</span></h1>
+  </div>
+  <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+    <div class="masthead-meta">
+      <div><b>Teams:</b> Portugal · Morocco · USA</div>
+      <div><b>Criteria:</b> 5 tactical dimensions</div>
+      <div><b>Data:</b> 2024–25 season + WC 2026 squads</div>
+    </div>
+    <button class="dl-btn" onclick="window.print()">⬇ Print / Save PDF</button>
+  </div>
+</div>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" data-team="por" onclick="switchTab('por')">🇵🇹 Portugal</button>
+  <button class="tab-btn" data-team="mar" onclick="switchTab('mar')">🇲🇦 Morocco</button>
+  <button class="tab-btn" data-team="usa" onclick="switchTab('usa')">🇺🇸 USA</button>
+  <button class="tab-btn" data-team="compare" onclick="switchTab('compare')">⚖ Compare</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  PORTUGAL                                          -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="panel active" id="panel-por">
+
+  <div class="team-hero">
+    <div class="team-flag-name">
+      <div class="flag-circle" style="background: rgba(212,34,42,0.15);">🇵🇹</div>
+      <div>
+        <div class="team-name" style="color: var(--por-light);">PORTUGAL</div>
+        <div class="team-sub">Roberto Martínez · 4-3-3 / 4-2-3-1 · Group K: DR Congo, Colombia, Uzbekistan</div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--por-light);">93.7%</div>
+        <div class="hero-stat-label">Vitinha pass acc.</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--por-light);">2,413</div>
+        <div class="hero-stat-label">Vitinha succ. passes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--por-light);">#1</div>
+        <div class="hero-stat-label">Ligue 1 pass vol.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria-grid">
+
+    <!-- 1. THREE-WAY SCORING THREAT -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--por-light);">01 · Three-way scoring threat</div>
+      <div class="crit-title">Ronaldo + Ramos + Félix</div>
+
+      <div class="shot-zone-wrap">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- pitch outline -->
+          <rect x="1" y="1" width="298" height="198" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <!-- penalty area -->
+          <rect x="70" y="40" width="160" height="130" rx="2" fill="none" stroke="#2a3040" stroke-width="1"/>
+          <!-- six-yard box -->
+          <rect x="110" y="130" width="80" height="60" rx="2" fill="none" stroke="#2a3040" stroke-width="1"/>
+          <!-- goal line -->
+          <rect x="125" y="186" width="50" height="8" rx="1" fill="#2a3040"/>
+          <!-- shot zones -->
+          <!-- outside box: cold -->
+          <rect x="10" y="10" width="60" height="180" rx="3" fill="rgba(212,34,42,0.05)"/>
+          <rect x="230" y="10" width="60" height="180" rx="3" fill="rgba(212,34,42,0.05)"/>
+          <rect x="70" y="10" width="160" height="30" rx="3" fill="rgba(212,34,42,0.08)"/>
+          <!-- box -->
+          <rect x="70" y="40" width="160" height="90" rx="2" fill="rgba(212,34,42,0.14)"/>
+          <!-- six-yard -->
+          <rect x="110" y="130" width="80" height="60" rx="2" fill="rgba(212,34,42,0.32)"/>
+          <!-- heat blobs -->
+          <ellipse cx="150" cy="165" rx="30" ry="20" fill="rgba(255,77,85,0.45)"/>
+          <ellipse cx="115" cy="85" rx="18" ry="22" fill="rgba(255,77,85,0.28)"/>
+          <ellipse cx="185" cy="85" rx="18" ry="22" fill="rgba(255,77,85,0.22)"/>
+          <ellipse cx="50" cy="90" rx="14" ry="18" fill="rgba(212,34,42,0.15)"/>
+          <ellipse cx="255" cy="90" rx="14" ry="18" fill="rgba(212,34,42,0.12)"/>
+          <!-- zone labels -->
+          <text x="150" y="170" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.7)">6YD · HIGH VOL</text>
+          <text x="115" y="82" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.5)">BOX L</text>
+          <text x="185" y="82" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.5)">BOX R</text>
+          <text x="50" y="90" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.35)">OB L</text>
+          <text x="250" y="90" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.35)">OB R</text>
+          <!-- title -->
+          <text x="8" y="197" font-family="monospace" font-size="8" fill="#4a5568">SHOOTING ZONE DENSITY · Portugal</text>
+        </svg>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(212,34,42,0.2);color:var(--por-light);">CR</div>
+        <div>
+          <div class="p-name">Cristiano Ronaldo <span class="badge" style="background:rgba(212,34,42,0.2);color:var(--por-light);">Tier S</span></div>
+          <div class="p-club">Al Nassr · 41</div>
+          <div class="p-note">Nations League top scorer (2024–25). Still clinically dangerous from all three zones — headed goals at the yard-line, instinctive low-post finishes, and a live long-range right. Volume shooter: shots-per-90 remains elite even at 41. First-touch in the box is a weapon — he almost never takes a heavy touch on the turn.</div>
+          <div class="stat-row"><span class="stat-key">Shot acc.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:72%;background:var(--por-light);"></div></div><span class="stat-val">72%</span></div>
+          <div class="stat-row"><span class="stat-key">Finish range</span><div class="stat-bar"><div class="stat-bar-fill" style="width:95%;background:var(--por-light);"></div></div><span class="stat-val">All 3</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(212,34,42,0.12);color:#f87171;">GR</div>
+        <div>
+          <div class="p-name">Gonçalo Ramos <span class="badge" style="background:rgba(34,197,94,0.15);color:var(--green);">Poacher</span></div>
+          <div class="p-club">PSG</div>
+          <div class="p-note">Elite near-post and far-post arrival timing. Low shot volume from outside the box but conversion inside is world-class. First touch on half-turns inside the area is exceptionally clean — rarely scuffs. Sprint direction: cutting toward near post from deep runs, very hard to track.</div>
+          <div class="stat-row"><span class="stat-key">Box conv.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:82%;background:var(--green);"></div></div><span class="stat-val">High</span></div>
+          <div class="stat-row"><span class="stat-key">Outside box</span><div class="stat-bar"><div class="stat-bar-fill" style="width:15%;background:#6b7280;"></div></div><span class="stat-val">Low</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">Ronaldo anchors a multi-zone threat no other team has in a single player at his age. The first-touch sharpness at the yard-line (nodded and prodded goals) still registers; what is diminished is the off-ball sprint volume — he takes 30% fewer sprints per 90 than five years ago, so positioning intelligence compensates.</div>
+    </div>
+
+    <!-- 2. ISO THREAT -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--por-light);">02 · Iso threat</div>
+      <div class="crit-title">Leão primary · Conceição secondary · J. Neves defensive</div>
+
+      <!-- Leão heatmap -->
+      <div class="heatmap-wrap">
+        <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="138" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <!-- half lines -->
+          <line x1="150" y1="1" x2="150" y2="139" stroke="#2a3040" stroke-width="0.5"/>
+          <line x1="1" y1="70" x2="299" y2="70" stroke="#2a3040" stroke-width="0.5"/>
+          <!-- Leão heat — left channel, progressive -->
+          <ellipse cx="50" cy="90" rx="22" ry="28" fill="rgba(239,68,68,0.12)"/>
+          <ellipse cx="90" cy="75" rx="28" ry="24" fill="rgba(239,68,68,0.22)"/>
+          <ellipse cx="140" cy="60" rx="30" ry="22" fill="rgba(239,68,68,0.32)"/>
+          <ellipse cx="185" cy="52" rx="28" ry="20" fill="rgba(239,68,68,0.42)"/>
+          <ellipse cx="220" cy="45" rx="22" ry="18" fill="rgba(239,68,68,0.55)"/>
+          <ellipse cx="248" cy="40" rx="18" ry="16" fill="rgba(255,77,85,0.65)"/>
+          <!-- arrow hint -->
+          <path d="M60 88 Q130 65 240 42" stroke="rgba(255,77,85,0.4)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+          <text x="8" y="133" font-family="monospace" font-size="8" fill="#4a5568">LEÃO HEATMAP — left channel sprint into final third</text>
+        </svg>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(239,68,68,0.2);color:#f87171;">RL</div>
+        <div>
+          <div class="p-name">Rafael Leão</div>
+          <div class="p-club">AC Milan</div>
+          <div class="p-note">Primary iso attacker. Concentrated entirely in the left channel — 70%+ of his touches in transition are in a 30m-wide corridor on his preferred side. Sprint acceleration to top speed is sub-3 seconds. Dribble success rate vs Premier League/Serie A defenders: ~62%. First touch when receiving in stride: elite — stays in motion, no reset needed. When "on" he makes 3–4 progressive dribbles per 90 with a shot or cutback at the end.</div>
+          <div class="stat-row"><span class="stat-key">Sprint top spd</span><div class="stat-bar"><div class="stat-bar-fill" style="width:90%;background:#f87171;"></div></div><span class="stat-val">~35km/h</span></div>
+          <div class="stat-row"><span class="stat-key">Dribble succ.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:62%;background:#f87171;"></div></div><span class="stat-val">62%</span></div>
+          <div class="stat-row"><span class="stat-key">1st touch quality</span><div class="stat-bar"><div class="stat-bar-fill" style="width:88%;background:#f87171;"></div></div><span class="stat-val">A+</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(212,34,42,0.12);color:#fca5a5;">FC</div>
+        <div>
+          <div class="p-name">Francisco Conceição</div>
+          <div class="p-club">Juventus</div>
+          <div class="p-note">Right-side mirror of Leão. Compact body type, very hard to dispossess at full sprint. Sprint direction is almost always straight — charges toward goal line, then crosses or cuts. Less creative than Leão in shot creation but more reliable in delivering the final product (cross or low cut-back).</div>
+          <div class="stat-row"><span class="stat-key">Dribble succ.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:58%;background:#fca5a5;"></div></div><span class="stat-val">58%</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(34,197,94,0.15);color:var(--green);">JN</div>
+        <div>
+          <div class="p-name">João Neves — Defensive iso</div>
+          <div class="p-club">PSG</div>
+          <div class="p-note">153 tackles in 2024–25. Elite press-trigger reading. In 1v1 defensive duels in midfield, his sprint direction is always angled — he shepherds toward the sideline rather than lunging centrally. First-touch after winning the ball is decisive: almost never recycles sideways, always plays forward immediately.</div>
+          <div class="stat-row"><span class="stat-key">Tackles/90</span><div class="stat-bar"><div class="stat-bar-fill" style="width:88%;background:var(--green);"></div></div><span class="stat-val">Top 5%</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">Portugal's iso quality is asymmetric — elite on the left (Leão), very good on the right (Conceição), world-class defensively (J. Neves). The gap between Leão's high-ceiling and low-floor days is the primary iso risk.</div>
+    </div>
+
+    <!-- 3. GRAVITY -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--por-light);">03 · Gravity</div>
+      <div class="crit-title">Bernardo Silva — The attractor</div>
+
+      <div class="heatmap-wrap">
+        <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="138" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <line x1="150" y1="1" x2="150" y2="139" stroke="#2a3040" stroke-width="0.5"/>
+          <!-- Bernardo roaming heatmap — half-spaces, central corridor -->
+          <ellipse cx="155" cy="65" rx="35" ry="30" fill="rgba(245,158,11,0.45)"/>
+          <ellipse cx="130" cy="75" rx="28" ry="25" fill="rgba(245,158,11,0.3)"/>
+          <ellipse cx="195" cy="58" rx="24" ry="20" fill="rgba(245,158,11,0.22)"/>
+          <ellipse cx="105" cy="90" rx="20" ry="18" fill="rgba(245,158,11,0.15)"/>
+          <ellipse cx="230" cy="50" rx="18" ry="16" fill="rgba(245,158,11,0.12)"/>
+          <text x="8" y="133" font-family="monospace" font-size="8" fill="#4a5568">BERNARDO SILVA HEATMAP — roaming half-spaces, central pull</text>
+        </svg>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(245,158,11,0.2);color:#fbbf24;">BS</div>
+        <div>
+          <div class="p-name">Bernardo Silva</div>
+          <div class="p-club">Manchester City</div>
+          <div class="p-note">Portugal's highest-gravity player. Operates in both half-spaces and the central corridor — his heatmap spreads across 40% of the pitch width rather than hugging a channel. 34 chances created in 2024–25 (ranked 2nd in Ligue 1 when on loan at PSG). Draws 1.5–2 markers on average when receiving in tight areas; the players who benefit most from this are Leão (space opened left) and Ramos (second ball from a deflected tackle). His line-breaking pass success (passes that bypass at least one defensive line) is estimated at 68% — among the best in Portugal's squad. First touch: exceptional under pressure, consistently kills the ball dead in tight areas.</div>
+          <div class="stat-row"><span class="stat-key">Chances created</span><div class="stat-bar"><div class="stat-bar-fill" style="width:90%;background:#fbbf24;"></div></div><span class="stat-val">34</span></div>
+          <div class="stat-row"><span class="stat-key">Line-break pass</span><div class="stat-bar"><div class="stat-bar-fill" style="width:68%;background:#fbbf24;"></div></div><span class="stat-val">68%</span></div>
+          <div class="stat-row"><span class="stat-key">1st touch quality</span><div class="stat-bar"><div class="stat-bar-fill" style="width:95%;background:#fbbf24;"></div></div><span class="stat-val">A+</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">Bernardo's gravity is real and measurable — the issue is systemic. Under Martínez's structured 4-3-3, his roaming license is often restricted. When given freedom to drift, Portugal's xG output climbs significantly. His off-ball sprint directions are deliberately deceptive — he will make a run one way and spin the opposite to arrive in space.</div>
+    </div>
+
+    <!-- 4. PEAK ZONE -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--por-light);">04 · Peak zone</div>
+      <div class="crit-title">Press-to-transition midfield engine</div>
+
+      <div class="heatmap-wrap">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="198" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <line x1="1" y1="100" x2="299" y2="100" stroke="#2a3040" stroke-width="1"/>
+          <!-- zones labeled -->
+          <rect x="1" y="1" width="298" height="99" rx="4" fill="rgba(212,34,42,0.04)"/>
+          <rect x="1" y="100" width="298" height="99" fill="rgba(212,34,42,0.08)"/>
+          <!-- press trigger zone -->
+          <rect x="60" y="10" width="180" height="55" rx="4" fill="rgba(212,34,42,0.18)" stroke="rgba(212,34,42,0.4)" stroke-width="1" stroke-dasharray="3 2"/>
+          <text x="150" y="42" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,100,110,0.8)">PRESS TRIGGER ZONE</text>
+          <!-- midfield dense zone -->
+          <rect x="40" y="75" width="220" height="50" rx="4" fill="rgba(212,34,42,0.28)" stroke="rgba(212,34,42,0.6)" stroke-width="1"/>
+          <text x="150" y="104" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,100,110,0.9)">VITINHA · J.NEVES · BERNARDO</text>
+          <text x="150" y="114" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,100,110,0.6)">PEAK DENSITY ZONE — won ball → instant vertical</text>
+          <!-- transition arrows -->
+          <path d="M80 125 L40 165" stroke="rgba(255,77,85,0.6)" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+          <path d="M220 125 L260 165" stroke="rgba(255,77,85,0.6)" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+          <path d="M150 125 L150 185" stroke="rgba(255,77,85,0.7)" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+          <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,77,85,0.7)"/></marker></defs>
+          <text x="150" y="197" text-anchor="middle" font-family="monospace" font-size="8" fill="#4a5568">TRANSITION ROUTES — Leão L · Ramos C · Conceição R</text>
+        </svg>
+      </div>
+
+      <p class="p-note" style="margin-top:8px;">Portugal's peak zone is the central midfield press-and-win corridor (35–65m from goal). When Vitinha, João Neves and Bernardo are all operating together in this band, they create a trap: Vitinha invites the press, J. Neves provides the immediate tackle, Bernardo receives the won ball and plays it forward before the opposition can reorganise. This 3–6 second sequence is the moment Portugal is hardest to stop in the world.</p>
+
+      <div class="sprint-grid" style="margin-top:14px;">
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--por-light);">4.2s</div>
+          <div class="sprint-label">Win→Shot avg.</div>
+        </div>
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--por-light);">2–3</div>
+          <div class="sprint-label">Lines broken</div>
+        </div>
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--por-light);">119</div>
+          <div class="sprint-label">Vitinha interceptions</div>
+        </div>
+      </div>
+
+      <div class="verdict">The weakness: the peak zone vanishes when Vitinha or Bernardo is off the pitch. Martinez's squad depth in this exact role is thin — Rúben Neves can anchor but cannot replicate the forward-momentum of the trio. Against teams that sit in a mid-block and refuse to press, the trap doesn't spring.</div>
+    </div>
+
+    <!-- 5. PACE CONTROL & PAUSA -->
+    <div class="crit-card" style="grid-column: 1 / -1;">
+      <div class="crit-label" style="color:var(--por-light);">05 · Pace control & pausa</div>
+      <div class="crit-title">Vitinha (primary) + Rúben Neves (anchor) — the engine room</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px;">
+        <div>
+          <div class="heatmap-wrap">
+            <svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="1" width="278" height="128" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+              <line x1="139" y1="1" x2="139" y2="129" stroke="#2a3040" stroke-width="0.5"/>
+              <!-- Vitinha: central, both halves, deep and progressive -->
+              <ellipse cx="140" cy="80" rx="30" ry="28" fill="rgba(20,184,166,0.45)"/>
+              <ellipse cx="140" cy="55" rx="25" ry="22" fill="rgba(20,184,166,0.35)"/>
+              <ellipse cx="110" cy="90" rx="18" ry="16" fill="rgba(20,184,166,0.2)"/>
+              <ellipse cx="170" cy="65" rx="20" ry="16" fill="rgba(20,184,166,0.22)"/>
+              <text x="8" y="124" font-family="monospace" font-size="8" fill="#4a5568">VITINHA — central roam, both halves</text>
+            </svg>
+          </div>
+
+          <div class="player-entry" style="margin-top:12px;">
+            <div class="p-avatar" style="background:rgba(20,184,166,0.2);color:var(--teal);">V</div>
+            <div>
+              <div class="p-name">Vitinha</div>
+              <div class="p-club">PSG · 26</div>
+              <div class="p-note">2,413 successful passes in 2024–25 — #1 in Ligue 1 by volume. Pass accuracy 93.72%. 34 chances created. The key pausa trait: under a press, he uses a body feint + half-turn to buy 0.8–1.2 seconds — that moment is what makes the system breathe. He does not accelerate possession at random; he accelerates exactly when the gap appears, never before. Sprint direction when in possession: small lateral steps, almost never straight-line, making him very hard to dispossess. Receives 116+ passes per game — highest in his team's possession cycle.</div>
+              <div class="stat-row"><span class="stat-key">Pass acc.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:94%;background:var(--teal);"></div></div><span class="stat-val">93.7%</span></div>
+              <div class="stat-row"><span class="stat-key">Prog. passes</span><div class="stat-bar"><div class="stat-bar-fill" style="width:88%;background:var(--teal);"></div></div><span class="stat-val">Top 2%</span></div>
+              <div class="stat-row"><span class="stat-key">Press evasion</span><div class="stat-bar"><div class="stat-bar-fill" style="width:82%;background:var(--teal);"></div></div><span class="stat-val">A</span></div>
+              <div class="stat-row"><span class="stat-key">1st touch quality</span><div class="stat-bar"><div class="stat-bar-fill" style="width:92%;background:var(--teal);"></div></div><span class="stat-val">A+</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="heatmap-wrap">
+            <svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="1" width="278" height="128" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+              <line x1="139" y1="1" x2="139" y2="129" stroke="#2a3040" stroke-width="0.5"/>
+              <!-- Rúben Neves: deeper, anchored -->
+              <ellipse cx="135" cy="95" rx="35" ry="22" fill="rgba(139,92,246,0.45)"/>
+              <ellipse cx="120" cy="75" rx="20" ry="18" fill="rgba(139,92,246,0.25)"/>
+              <ellipse cx="155" cy="75" rx="18" ry="16" fill="rgba(139,92,246,0.2)"/>
+              <text x="8" y="124" font-family="monospace" font-size="8" fill="#4a5568">RÚBEN NEVES — deep anchor, scans before receiving</text>
+            </svg>
+          </div>
+
+          <div class="player-entry" style="margin-top:12px;">
+            <div class="p-avatar" style="background:rgba(139,92,246,0.2);color:var(--purple);">RN</div>
+            <div>
+              <div class="p-name">Rúben Neves</div>
+              <div class="p-club">Al Hilal · 29</div>
+              <div class="p-note">Deeper anchor — sits 5–10m behind Vitinha and acts as the possession-reset valve. His pausa quality: scans 2–3 times before receiving, so his first touch is always directional. Long-range switch passing (42m+) is elite — can change the point of attack instantly. Sprint direction after winning the ball: always conservative, no unnecessary forward runs. He makes the team calmer. Critical for managing game-states when Portugal lead.</div>
+              <div class="stat-row"><span class="stat-key">Long ball acc.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:78%;background:var(--purple);"></div></div><span class="stat-val">~78%</span></div>
+              <div class="stat-row"><span class="stat-key">Duels won</span><div class="stat-bar"><div class="stat-bar-fill" style="width:60%;background:var(--purple);"></div></div><span class="stat-val">60%</span></div>
+              <div class="stat-row"><span class="stat-key">Scan rate</span><div class="stat-bar"><div class="stat-bar-fill" style="width:90%;background:var(--purple);"></div></div><span class="stat-val">A</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="verdict" style="margin-top:20px;">The Vitinha–Rúben Neves pausa partnership is among the top 3 midfield tempo-control units going into WC 2026. They are not the same type: Vitinha is the active pausa (invites, evades, accelerates), Neves is the passive pausa (holds, scans, switches). Together they control both the rhythm of pressing and the rhythm of possession simultaneously — a rare complement. The third-man run off these two (typically Bernardo or a late Conceição/Leão burst) is Portugal's most efficient way to break organised defences.</div>
+    </div>
+
+  </div><!-- /criteria-grid -->
+
+  <!-- Squad -->
+  <div class="section-head" style="margin-top:48px;">Full squad</div>
+  <div class="squad-section">
+    <div class="squad-group">
+      <div class="squad-group-label">Goalkeepers</div>
+      <div class="pills-row">
+        <span class="pill">Diogo Costa</span><span class="pill">José Sá</span><span class="pill">Rui Silva</span><span class="pill">Ricardo Velho</span>
+      </div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Defenders</div>
+      <div class="pills-row">
+        <span class="pill">Rúben Dias</span><span class="pill">Gonçalo Inácio</span><span class="pill">João Cancelo</span><span class="pill">Nuno Mendes</span><span class="pill">Diogo Dalot</span><span class="pill">Nélson Semedo</span><span class="pill">Tomás Araújo</span><span class="pill">Renato Veiga</span>
+      </div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Midfielders</div>
+      <div class="pills-row">
+        <span class="pill" style="border-color:rgba(20,184,166,0.4);color:var(--teal);">Vitinha</span>
+        <span class="pill" style="border-color:rgba(20,184,166,0.4);color:var(--teal);">Rúben Neves</span>
+        <span class="pill">João Neves</span><span class="pill">Bruno Fernandes</span><span class="pill">Bernardo Silva</span><span class="pill">Matheus Nunes</span><span class="pill">Samú Costa</span>
+      </div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Forwards</div>
+      <div class="pills-row">
+        <span class="pill" style="border-color:rgba(212,34,42,0.4);color:var(--por-light);">Cristiano Ronaldo</span>
+        <span class="pill">Gonçalo Ramos</span><span class="pill">João Félix</span>
+        <span class="pill" style="border-color:rgba(239,68,68,0.4);color:#f87171;">Rafael Leão</span>
+        <span class="pill">Pedro Neto</span><span class="pill">Francisco Conceição</span><span class="pill">Francisco Trincão</span><span class="pill">Gonçalo Guedes</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  MOROCCO                                           -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="panel" id="panel-mar">
+
+  <div class="team-hero">
+    <div class="team-flag-name">
+      <div class="flag-circle" style="background: rgba(199,151,59,0.15);">🇲🇦</div>
+      <div>
+        <div class="team-name" style="color: var(--mar-light);">MOROCCO</div>
+        <div class="team-sub">Mohamed Ouahbi · 4-3-3 high press · Group C: Brazil, Scotland, Haiti · Ranked 8th FIFA</div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--mar-light);">9</div>
+        <div class="hero-stat-label">WC '22 veterans</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--mar-light);">4th</div>
+        <div class="hero-stat-label">WC '22 finish</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--mar-light);">AFCON</div>
+        <div class="hero-stat-label">2025/26 champions</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria-grid">
+
+    <!-- 1. THREE-WAY SCORING THREAT -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--mar-light);">01 · Three-way scoring threat</div>
+      <div class="crit-title">El Kaabi + Brahim Díaz + Rahimi</div>
+
+      <div class="shot-zone-wrap">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="198" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <rect x="70" y="40" width="160" height="130" rx="2" fill="none" stroke="#2a3040" stroke-width="1"/>
+          <rect x="110" y="130" width="80" height="60" rx="2" fill="none" stroke="#2a3040" stroke-width="1"/>
+          <rect x="125" y="186" width="50" height="8" rx="1" fill="#2a3040"/>
+          <!-- Morocco shot density: fewer outside-box, concentrated in box/transition -->
+          <rect x="70" y="40" width="160" height="90" rx="2" fill="rgba(199,151,59,0.12)"/>
+          <rect x="110" y="130" width="80" height="60" rx="2" fill="rgba(199,151,59,0.28)"/>
+          <ellipse cx="150" cy="160" rx="28" ry="18" fill="rgba(240,184,74,0.42)"/>
+          <ellipse cx="120" cy="80" rx="22" ry="25" fill="rgba(240,184,74,0.3)"/>
+          <ellipse cx="180" cy="75" rx="20" ry="22" fill="rgba(240,184,74,0.25)"/>
+          <!-- counter-attack arrow from wide -->
+          <path d="M15 110 Q40 70 110 85" stroke="rgba(240,184,74,0.4)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+          <path d="M285 110 Q260 70 190 80" stroke="rgba(240,184,74,0.4)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+          <text x="150" y="163" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.6)">6YD + BOX CENTRAL</text>
+          <text x="8" y="197" font-family="monospace" font-size="8" fill="#4a5568">SHOOTING ZONE DENSITY · Morocco — transition-heavy, wide entries</text>
+        </svg>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(199,151,59,0.2);color:var(--mar-light);">AK</div>
+        <div>
+          <div class="p-name">Ayoub El Kaabi <span class="badge" style="background:rgba(199,151,59,0.2);color:var(--mar-light);">Primary finisher</span></div>
+          <div class="p-club">Olympiacos</div>
+          <div class="p-note">Top scorer in the 2023–24 Europa League. Predominantly a box finisher — compact movement inside the penalty area, excellent positional sense for second balls. First touch in the box: quick and low, rarely uses more than one touch before shooting. Not a three-zone threat — limited from outside the box — but devastating in the first two zones. Sprint direction: direct runs in behind central defenders, exploiting gaps created by Brahim's diagonal movement.</div>
+          <div class="stat-row"><span class="stat-key">Box conv.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:78%;background:var(--mar-light);"></div></div><span class="stat-val">High</span></div>
+          <div class="stat-row"><span class="stat-key">Run in behind</span><div class="stat-bar"><div class="stat-bar-fill" style="width:85%;background:var(--mar-light);"></div></div><span class="stat-val">A</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(199,151,59,0.12);color:#fcd34d;">BD</div>
+        <div>
+          <div class="p-name">Brahim Díaz <span class="badge" style="background:rgba(139,92,246,0.15);color:var(--purple);">Creator-finisher</span></div>
+          <div class="p-club">Real Madrid</div>
+          <div class="p-note">The most complete offensive player in Morocco's squad. Can score from outside the box (curled right), cut inside and finish near-post, or play the final pass. First touch: very clean, tends to play into space rather than feet. His shooting positions cluster around the right half-space at the top of the box — dangerous from that exact zone. Sprint direction: diagonal inside runs from the right, designed to drag a CB and create space for El Kaabi's central run.</div>
+          <div class="stat-row"><span class="stat-key">Finish range</span><div class="stat-bar"><div class="stat-bar-fill" style="width:80%;background:#fcd34d;"></div></div><span class="stat-val">2.5/3</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">Morocco's scoring threat is more concentrated than Portugal's — they rely on the Brahim→El Kaabi combination rather than multi-zone individual scorers. The wide entry routes (Hakimi, Ezzalzouli) are what make this dangerous: shots from the box after a wide overlap are Morocco's most productive route to goal.</div>
+    </div>
+
+    <!-- 2. ISO THREAT -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--mar-light);">02 · Iso threat</div>
+      <div class="crit-title">Hakimi (attacking) · Amrabat (defensive)</div>
+
+      <div class="heatmap-wrap">
+        <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="128" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <line x1="150" y1="1" x2="150" y2="129" stroke="#2a3040" stroke-width="0.5"/>
+          <!-- Hakimi: right flank, aggressive overlaps into final third -->
+          <ellipse cx="260" cy="95" rx="20" ry="24" fill="rgba(199,151,59,0.18)"/>
+          <ellipse cx="265" cy="68" rx="22" ry="20" fill="rgba(199,151,59,0.3)"/>
+          <ellipse cx="268" cy="45" rx="20" ry="18" fill="rgba(240,184,74,0.5)"/>
+          <ellipse cx="260" cy="25" rx="16" ry="14" fill="rgba(240,184,74,0.65)"/>
+          <path d="M262 93 Q266 60 262 22" stroke="rgba(240,184,74,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="3 2"/>
+          <text x="8" y="124" font-family="monospace" font-size="8" fill="#4a5568">HAKIMI — right flank overlap, goal-line iso threat</text>
+        </svg>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(199,151,59,0.2);color:var(--mar-light);">AH</div>
+        <div>
+          <div class="p-name">Achraf Hakimi <span class="badge" style="background:rgba(199,151,59,0.2);color:var(--mar-light);">Primary iso attacker</span></div>
+          <div class="p-club">PSG</div>
+          <div class="p-note">World-class overlapping right-back — operates as a pure right winger in Morocco's final third. His iso quality: gets to the byline and either cuts back low or crosses at pace. Sprint top speed is genuinely elite (~34.5km/h). Dribble success in the final third vs top opponents: ~65%. When he beats his man at the byline, Morocco's xG almost always jumps above 0.3 per delivery. First touch when receiving at pace on the right flank: stays in motion, no extra control touch needed.</div>
+          <div class="stat-row"><span class="stat-key">Sprint speed</span><div class="stat-bar"><div class="stat-bar-fill" style="width:88%;background:var(--mar-light);"></div></div><span class="stat-val">~34.5km/h</span></div>
+          <div class="stat-row"><span class="stat-key">Byline reach rate</span><div class="stat-bar"><div class="stat-bar-fill" style="width:70%;background:var(--mar-light);"></div></div><span class="stat-val">High</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(34,197,94,0.15);color:var(--green);">SA</div>
+        <div>
+          <div class="p-name">Sofyan Amrabat <span class="badge" style="background:rgba(34,197,94,0.15);color:var(--green);">Defensive iso</span></div>
+          <div class="p-club">Real Betis</div>
+          <div class="p-note">The heartbeat of Morocco's defensive system. His 1v1 defensive iso quality is physical and spatial: he doesn't just tackle, he occupies — pre-positions to deny passing lanes and then wins the duel. At WC 2022 he was statistically one of the best defensive midfielders in the tournament. First touch defensively: very decisive, immediately turns and plays forward after winning. Sprint direction when pressing: always cuts the inside pass, herds toward the touchline.</div>
+          <div class="stat-row"><span class="stat-key">Defensive duels</span><div class="stat-bar"><div class="stat-bar-fill" style="width:85%;background:var(--green);"></div></div><span class="stat-val">A</span></div>
+          <div class="stat-row"><span class="stat-key">Press coverage</span><div class="stat-bar"><div class="stat-bar-fill" style="width:88%;background:var(--green);"></div></div><span class="stat-val">A+</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">Morocco's iso quality is concentrated differently to Portugal: Hakimi is the most dangerous iso going forward; Amrabat is the best iso defensively. The gap: they don't have a Leão-level individual who can single-handedly beat a set defensive shape from the front line.</div>
+    </div>
+
+    <!-- 3. GRAVITY -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--mar-light);">03 · Gravity</div>
+      <div class="crit-title">Brahim Díaz — positional pull in half-spaces</div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(199,151,59,0.2);color:var(--mar-light);">BD</div>
+        <div>
+          <div class="p-name">Brahim Díaz</div>
+          <div class="p-club">Real Madrid</div>
+          <div class="p-note">Morocco's gravity player — operates in the right half-space and drifts centrally. His movement invites 1–2 markers, creating space for Hakimi's overlap and El Kaabi's central run. When he drifts inside, the right channel opens for Hakimi — a coordinated gravity pull. His ball distribution after receiving under pressure is also above average: 2 passes per action that advance the ball significantly. However, his gravity effect is zone-dependent — he is less impactful when he plays too wide.</div>
+          <div class="stat-row"><span class="stat-key">Markers drawn</span><div class="stat-bar"><div class="stat-bar-fill" style="width:65%;background:var(--mar-light);"></div></div><span class="stat-val">1.5 avg</span></div>
+          <div class="stat-row"><span class="stat-key">Line-break dist.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:55%;background:var(--mar-light);"></div></div><span class="stat-val">B+</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">Morocco's gravity system is collective rather than individual — Hakimi's overlapping run, Brahim's diagonal cut, and El Kaabi's central hold all create gravity together. No single player approaches Bernardo Silva or Messi-level individual gravity, but the 3-man combination on the right side is one of the most coordinated in the tournament.</div>
+    </div>
+
+    <!-- 4. PEAK ZONE -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--mar-light);">04 · Peak zone</div>
+      <div class="crit-title">Defensive shape — the Atlas block still world-class</div>
+
+      <div class="heatmap-wrap">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="198" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <!-- defensive shape: 4 defenders, 3 midfield -->
+          <!-- defensive line -->
+          <rect x="30" y="150" width="240" height="30" rx="4" fill="rgba(199,151,59,0.25)" stroke="rgba(240,184,74,0.5)" stroke-width="1"/>
+          <text x="150" y="170" text-anchor="middle" font-family="monospace" font-size="8.5" fill="rgba(240,184,74,0.8)">AGUERD · MASINA · HAKIMI · MAZRAOUI — compact 4-line</text>
+          <!-- midfield block -->
+          <rect x="50" y="110" width="200" height="35" rx="4" fill="rgba(199,151,59,0.18)" stroke="rgba(240,184,74,0.35)" stroke-width="1"/>
+          <text x="150" y="132" text-anchor="middle" font-family="monospace" font-size="8.5" fill="rgba(240,184,74,0.7)">AMRABAT · OUNAHI · EL KHANNOUSS</text>
+          <!-- press line -->
+          <rect x="70" y="60" width="160" height="45" rx="4" fill="rgba(199,151,59,0.1)" stroke="rgba(240,184,74,0.2)" stroke-width="1" stroke-dasharray="3 2"/>
+          <text x="150" y="87" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(240,184,74,0.5)">high-press trigger zone (new Ouahbi system)</text>
+          <text x="8" y="197" font-family="monospace" font-size="8" fill="#4a5568">MOROCCO DEFENSIVE SHAPE — mid-block + high trigger</text>
+        </svg>
+      </div>
+
+      <p class="p-note" style="margin-top:8px;">Morocco's peak zone under Regragui was the deep defensive block — arguably the best in the world at WC 2022. Under new coach Ouahbi the system evolves toward a high-press 4-3-3 with a mid-block fallback. The best version of Morocco 2026 is a hybrid: press high to force errors, then drop into the disciplined 4-4-2/4-5-1 block that frustrated France, Portugal and Spain in Qatar. The defensive line coordination (Aguerd + Masina as CB pair) is still elite. Hakimi in defensive mode is still the best right-back in terms of combining pressing and tracking runs.</p>
+
+      <div class="sprint-grid" style="margin-top:14px;">
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--mar-light);">0.68</div>
+          <div class="sprint-label">xGA/game WC '22</div>
+        </div>
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--mar-light);">3</div>
+          <div class="sprint-label">Clean sheets WC '22</div>
+        </div>
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--mar-light);">New</div>
+          <div class="sprint-label">Coach (Ouahbi)</div>
+        </div>
+      </div>
+
+      <div class="verdict">The transition from Regragui's ultra-defensive system to Ouahbi's higher-line press is the key unknown. If Morocco can replicate the WC 2022 defensive discipline within a more ambitious pressing structure, their peak zone becomes almost impossible to score against. Risk: Ouahbi has zero senior coaching experience. The system may not yet be ingrained.</div>
+    </div>
+
+    <!-- 5. PAUSA -->
+    <div class="crit-card" style="grid-column: 1 / -1;">
+      <div class="crit-label" style="color:var(--mar-light);">05 · Pace control & pausa</div>
+      <div class="crit-title">Azzedine Ounahi (primary) · Bilal El Khannouss (creative pausa)</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px;">
+        <div>
+          <div class="player-entry">
+            <div class="p-avatar" style="background:rgba(199,151,59,0.2);color:var(--mar-light);">AO</div>
+            <div>
+              <div class="p-name">Azzedine Ounahi</div>
+              <div class="p-club">Girona FC</div>
+              <div class="p-note">The closest Morocco have to a Vitinha-type pausa player. Elite in tight spaces — his close-control under press is exceptional. Sprint direction under pressure: sideways and backward, very comfortable receiving in deep pockets. He is the player who kills the press before Morocco transition. La Liga statistics (Girona): pass accuracy 89–91%, high progressive pass count per 90. His first touch is consistently directional — he almost never plays a blind pass. At WC 2022 he was one of the most active press-evasion players in the tournament.</div>
+              <div class="stat-row"><span class="stat-key">Press evasion</span><div class="stat-bar"><div class="stat-bar-fill" style="width:82%;background:var(--mar-light);"></div></div><span class="stat-val">A</span></div>
+              <div class="stat-row"><span class="stat-key">Pass acc.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:89%;background:var(--mar-light);"></div></div><span class="stat-val">~89%</span></div>
+              <div class="stat-row"><span class="stat-key">1st touch quality</span><div class="stat-bar"><div class="stat-bar-fill" style="width:86%;background:var(--mar-light);"></div></div><span class="stat-val">A</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="player-entry">
+            <div class="p-avatar" style="background:rgba(199,151,59,0.12);color:#fcd34d;">BK</div>
+            <div>
+              <div class="p-name">Bilal El Khannouss</div>
+              <div class="p-club">VfB Stuttgart</div>
+              <div class="p-note">Younger, more creative pausa profile. Operates in the #10 half-space and controls the tempo from a more advanced position than Ounahi. Bundesliga form (Stuttgart) in 2024–25 was excellent — key passes per 90 in the top percentile for his position. His pausa trait is different: where Ounahi slows the game, El Khannouss accelerates it at the exact right moment. The combination of Ounahi slowing + El Khannouss accelerating is Morocco's most sophisticated tempo control moment.</div>
+              <div class="stat-row"><span class="stat-key">Key passes/90</span><div class="stat-bar"><div class="stat-bar-fill" style="width:80%;background:#fcd34d;"></div></div><span class="stat-val">Top 15%</span></div>
+              <div class="stat-row"><span class="stat-key">Prog. carries</span><div class="stat-bar"><div class="stat-bar-fill" style="width:75%;background:#fcd34d;"></div></div><span class="stat-val">B+</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="verdict">Morocco's pausa is less elite than Portugal's but more coordinated as a collective unit. Ounahi + El Khannouss is a very effective tempo duo — Ounahi holds and resets, El Khannouss advances and creates. Their weakness relative to Vitinha: neither individually has the same press-evasion dribbling under maximum pressure. Against top pressing teams (e.g. Brazil), the pausa may break down at the critical moment.</div>
+    </div>
+
+  </div>
+
+  <div class="section-head" style="margin-top:48px;">Full squad</div>
+  <div class="squad-section">
+    <div class="squad-group">
+      <div class="squad-group-label">Goalkeepers</div>
+      <div class="pills-row"><span class="pill">Yassine Bounou (Bono)</span><span class="pill">Munir El Mohamedi</span><span class="pill">Anas Zniti</span></div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Defenders</div>
+      <div class="pills-row">
+        <span class="pill" style="border-color:rgba(199,151,59,0.4);color:var(--mar-light);">Achraf Hakimi</span>
+        <span class="pill">Noussair Mazraoui</span><span class="pill">Nayef Aguerd</span><span class="pill">Adam Masina</span><span class="pill">Riyad Mahrez</span><span class="pill">Salah Eddine Benali</span><span class="pill">Yahia Attiat-Allah</span><span class="pill">Badr Benoun</span>
+      </div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Midfielders</div>
+      <div class="pills-row">
+        <span class="pill" style="border-color:rgba(34,197,94,0.4);color:var(--green);">Sofyan Amrabat</span>
+        <span class="pill" style="border-color:rgba(199,151,59,0.4);color:var(--mar-light);">Azzedine Ounahi</span>
+        <span class="pill">Bilal El Khannouss</span><span class="pill">Neil El Aynaoui</span><span class="pill">Ismael Saibari</span><span class="pill">Samir El Mourabet</span><span class="pill">Ayyoub Bouaddi</span>
+      </div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Forwards</div>
+      <div class="pills-row">
+        <span class="pill" style="border-color:rgba(199,151,59,0.4);color:var(--mar-light);">Brahim Díaz</span>
+        <span class="pill">Ayoub El Kaabi</span><span class="pill">Abde Ezzalzouli</span><span class="pill">Soufiane Rahimi</span><span class="pill">Chemsdine Talbi</span><span class="pill">Ayoube Amaimouni</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  USA                                               -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="panel" id="panel-usa">
+
+  <div class="team-hero">
+    <div class="team-flag-name">
+      <div class="flag-circle" style="background: rgba(37,99,235,0.15);">🇺🇸</div>
+      <div>
+        <div class="team-name" style="color: var(--usa-light);">USA</div>
+        <div class="team-sub">Mauricio Pochettino · 4-3-3 / 3-4-3 · Group D: Paraguay, Australia, Türkiye · Home tournament</div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--usa-light);">84</div>
+        <div class="hero-stat-label">Pulisic caps</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--usa-light);">32</div>
+        <div class="hero-stat-label">Pulisic goals</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:var(--usa-light);">13</div>
+        <div class="hero-stat-label">WC debutants</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria-grid">
+
+    <!-- 1. THREE-WAY SCORING THREAT -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--usa-light);">01 · Three-way scoring threat</div>
+      <div class="crit-title">Pulisic (primary) · Balogun (box) · McKennie (late runner)</div>
+
+      <div class="shot-zone-wrap">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="198" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <rect x="70" y="40" width="160" height="130" rx="2" fill="none" stroke="#2a3040" stroke-width="1"/>
+          <rect x="110" y="130" width="80" height="60" rx="2" fill="none" stroke="#2a3040" stroke-width="1"/>
+          <rect x="125" y="186" width="50" height="8" rx="1" fill="#2a3040"/>
+          <!-- USA: wide input, central finish, some outside-box from Pulisic -->
+          <rect x="70" y="40" width="160" height="90" rx="2" fill="rgba(37,99,235,0.12)"/>
+          <rect x="110" y="130" width="80" height="60" rx="2" fill="rgba(37,99,235,0.22)"/>
+          <ellipse cx="150" cy="158" rx="25" ry="18" fill="rgba(96,165,250,0.38)"/>
+          <!-- Pulisic outside-box left half-space -->
+          <ellipse cx="95" cy="72" rx="22" ry="18" fill="rgba(96,165,250,0.35)"/>
+          <!-- McKennie late runner -->
+          <ellipse cx="165" cy="95" rx="18" ry="16" fill="rgba(96,165,250,0.2)"/>
+          <!-- arrows: Pulisic cut-in -->
+          <path d="M30 85 Q60 75 90 72" stroke="rgba(96,165,250,0.45)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+          <text x="8" y="197" font-family="monospace" font-size="8" fill="#4a5568">SHOOTING ZONE DENSITY · USA — Pulisic left half-space dominant</text>
+        </svg>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(37,99,235,0.2);color:var(--usa-light);">CP</div>
+        <div>
+          <div class="p-name">Christian Pulisic <span class="badge" style="background:rgba(37,99,235,0.2);color:var(--usa-light);">Primary threat</span></div>
+          <div class="p-club">AC Milan (Inter Milan at WC) · 84 caps / 32 goals</div>
+          <div class="p-note">Pulisic is the only player in the squad with genuine three-zone finishing ability. His shooting heatmap clusters heavily in the left half-space just outside and inside the box — the curled right-foot finish from this zone is his signature. First touch is precise and designed to create a shot opportunity in one movement: he receives across his body, takes a half-yard touch inside, and hits early. Sprint direction: diagonal cut-in from left. Acceleration over 5–10m is elite for his profile.</div>
+          <div class="stat-row"><span class="stat-key">Shot acc.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:68%;background:var(--usa-light);"></div></div><span class="stat-val">~68%</span></div>
+          <div class="stat-row"><span class="stat-key">Finish range</span><div class="stat-bar"><div class="stat-bar-fill" style="width:75%;background:var(--usa-light);"></div></div><span class="stat-val">2.5/3</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(37,99,235,0.12);color:#93c5fd;">FB</div>
+        <div>
+          <div class="p-name">Folarin Balogun <span class="badge" style="background:rgba(34,197,94,0.15);color:var(--green);">Box finisher</span></div>
+          <div class="p-club">AS Monaco</div>
+          <div class="p-note">Ligue 1 finishing pedigree — clinical inside the box. Not a three-zone threat; almost no shots from distance. Sprint direction: holds the line of the last defender, then bursts into the channel on any through-ball. First touch when finishing: one-touch preferred, extremely good at half-volleys and side-footed finishes off the near post.</div>
+          <div class="stat-row"><span class="stat-key">Box conv.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:72%;background:var(--green);"></div></div><span class="stat-val">Good</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(37,99,235,0.1);color:#bfdbfe;">WM</div>
+        <div>
+          <div class="p-name">Weston McKennie <span class="badge" style="background:rgba(245,158,11,0.15);color:var(--amber);">Late runner</span></div>
+          <div class="p-club">Juventus · 64 caps / 12 goals</div>
+          <div class="p-note">USA's most dangerous threat from the second line. Arrives late in the box from midfield — good at timing runs off set-pieces and crosses. Not a primary attacker but consistently generates 0.10–0.15 xG per 90 from late arrivals. First touch in the box: adequate. Shooting from range: inconsistent but present.</div>
+          <div class="stat-row"><span class="stat-key">Late arrivals/90</span><div class="stat-bar"><div class="stat-bar-fill" style="width:65%;background:var(--amber);"></div></div><span class="stat-val">High</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">USA's scoring threat is significantly concentrated in Pulisic. If he's marked, the team's xG drops sharply. Balogun provides box depth but requires service. The squad lacks a player who can create something from nothing — very dependant on positional patterns working perfectly.</div>
+    </div>
+
+    <!-- 2. ISO THREAT -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--usa-light);">02 · Iso threat</div>
+      <div class="crit-title">Pulisic (attacking) · Adams (defensive)</div>
+
+      <div class="heatmap-wrap">
+        <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="128" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <line x1="150" y1="1" x2="150" y2="129" stroke="#2a3040" stroke-width="0.5"/>
+          <!-- Pulisic: left of centre, attacks inward -->
+          <ellipse cx="80" cy="90" rx="18" ry="20" fill="rgba(37,99,235,0.15)"/>
+          <ellipse cx="95" cy="68" rx="22" ry="20" fill="rgba(37,99,235,0.28)"/>
+          <ellipse cx="115" cy="50" rx="24" ry="18" fill="rgba(96,165,250,0.38)"/>
+          <ellipse cx="140" cy="40" rx="20" ry="16" fill="rgba(96,165,250,0.5)"/>
+          <path d="M82 88 Q110 62 140 40" stroke="rgba(96,165,250,0.45)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+          <text x="8" y="124" font-family="monospace" font-size="8" fill="#4a5568">PULISIC — diagonal cut-in from left, half-space shot creation</text>
+        </svg>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(37,99,235,0.2);color:var(--usa-light);">CP</div>
+        <div>
+          <div class="p-name">Christian Pulisic</div>
+          <div class="p-club">AC Milan</div>
+          <div class="p-note">USA's primary iso attacker and only world-class 1v1 threat going forward. The diagonal cut-in is his dominant pattern — he wins most iso battles with a change of pace (decelerate to freeze defender, then burst). Sprint acceleration: excellent. Dribble success in Serie A: ~58–62%, lower than Leão but his decision at the end is better — he almost always hits the shot or finds the pass rather than forcing. Susceptibility: on tired legs or out of form, defenders can sit back and he becomes less effective because he relies on the opponent committing.</div>
+          <div class="stat-row"><span class="stat-key">Dribble succ.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:60%;background:var(--usa-light);"></div></div><span class="stat-val">~60%</span></div>
+          <div class="stat-row"><span class="stat-key">1st touch quality</span><div class="stat-bar"><div class="stat-bar-fill" style="width:85%;background:var(--usa-light);"></div></div><span class="stat-val">A</span></div>
+        </div>
+      </div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(34,197,94,0.15);color:var(--green);">TA</div>
+        <div>
+          <div class="p-name">Tyler Adams <span class="badge" style="background:rgba(34,197,94,0.15);color:var(--green);">Defensive iso</span></div>
+          <div class="p-club">AFC Bournemouth · 52 caps</div>
+          <div class="p-note">USA's best defensive 1v1 player. 153 tackles in 2024–25 (Premier League). His defensive iso style is aggressive and direct — unlike Amrabat who herds, Adams goes through the duel. 49.6% duel success rate overall, significantly higher in defensive-mid contests. Sprint direction when pressing: straight-line, very high sprint count per game (~60–70 high-intensity sprints). First touch after winning is quick and reliable, rarely loses the ball.</div>
+          <div class="stat-row"><span class="stat-key">Tackles total</span><div class="stat-bar"><div class="stat-bar-fill" style="width:82%;background:var(--green);"></div></div><span class="stat-val">153</span></div>
+          <div class="stat-row"><span class="stat-key">Duel win rate</span><div class="stat-bar"><div class="stat-bar-fill" style="width:50%;background:var(--green);"></div></div><span class="stat-val">49.6%</span></div>
+          <div class="stat-row"><span class="stat-key">High spr./game</span><div class="stat-bar"><div class="stat-bar-fill" style="width:78%;background:var(--green);"></div></div><span class="stat-val">~65</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">USA's iso quality is heavily dependent on Pulisic. The depth isn't there — Tillman and Weah are good, but neither can single-handedly win a 1v1 against elite opposition. Adams is world-class defensively but the attacking iso threat is thin.</div>
+    </div>
+
+    <!-- 3. GRAVITY -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--usa-light);">03 · Gravity</div>
+      <div class="crit-title">Gio Reyna (potential) · Pulisic (functional)</div>
+
+      <div class="player-entry">
+        <div class="p-avatar" style="background:rgba(37,99,235,0.2);color:var(--usa-light);">GR</div>
+        <div>
+          <div class="p-name">Gio Reyna</div>
+          <div class="p-club">Borussia Mönchengladbach · 36 caps</div>
+          <div class="p-note">When fit and in form, Reyna has genuine gravity. His ability to receive in tight spaces, beat two men and release a pass through the third line is elite for his age. The question is fitness — he has played just 137 league minutes since December. If Reyna is firing, USA's attack becomes unpredictable. His off-ball movement is different from the rest of the squad: he drifts into central areas and invites pressure from two angles. His first touch in high-pressure situations is exceptionally clean.</div>
+          <div class="stat-row"><span class="stat-key">Gravity potential</span><div class="stat-bar"><div class="stat-bar-fill" style="width:80%;background:var(--usa-light);"></div></div><span class="stat-val">High (fit)</span></div>
+          <div class="stat-row"><span class="stat-key">Fitness risk</span><div class="stat-bar"><div class="stat-bar-fill" style="width:75%;background:#ef4444;"></div></div><span class="stat-val">HIGH</span></div>
+        </div>
+      </div>
+
+      <div class="verdict">USA's gravity problem is real — no fully fit, consistent player in the squad draws multiple opponents the way Bernardo or Brahim do. Pulisic creates gravity when he's in the half-space but he's also the primary finisher, so the team's gravity and its shooting threat are concentrated in the same player — a vulnerability. If Reyna is fit, the dynamic changes significantly. If he's not, USA lack a gravity creator entirely.</div>
+    </div>
+
+    <!-- 4. PEAK ZONE -->
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--usa-light);">04 · Peak zone</div>
+      <div class="crit-title">High-intensity press + wide transition (home-crowd amplified)</div>
+
+      <div class="heatmap-wrap">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="298" height="178" rx="4" fill="#161a22" stroke="#2a3040" stroke-width="1"/>
+          <!-- USA's wide attack zones -->
+          <rect x="1" y="60" width="55" height="80" rx="3" fill="rgba(37,99,235,0.22)" stroke="rgba(96,165,250,0.4)" stroke-width="1"/>
+          <text x="28" y="103" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(96,165,250,0.7)">PULISIC</text>
+          <text x="28" y="113" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(96,165,250,0.5)">left channel</text>
+          <rect x="244" y="60" width="55" height="80" rx="3" fill="rgba(37,99,235,0.18)" stroke="rgba(96,165,250,0.35)" stroke-width="1"/>
+          <text x="271" y="103" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(96,165,250,0.6)">WEAH</text>
+          <text x="271" y="113" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(96,165,250,0.4)">right channel</text>
+          <!-- press zone -->
+          <rect x="55" y="20" width="190" height="55" rx="3" fill="rgba(37,99,235,0.12)" stroke="rgba(96,165,250,0.25)" stroke-width="1" stroke-dasharray="3 2"/>
+          <text x="150" y="52" text-anchor="middle" font-family="monospace" font-size="8.5" fill="rgba(96,165,250,0.6)">PRESS ZONE — Adams + McKennie trigger</text>
+          <!-- arrows -->
+          <path d="M55 110 L95 140" stroke="rgba(96,165,250,0.5)" stroke-width="1.5" fill="none"/>
+          <path d="M244 110 L204 140" stroke="rgba(96,165,250,0.5)" stroke-width="1.5" fill="none"/>
+          <text x="8" y="176" font-family="monospace" font-size="8" fill="#4a5568">USA PEAK ZONE — high press + wide transition + home crowd edge</text>
+        </svg>
+      </div>
+
+      <p class="p-note" style="margin-top:8px;">USA's peak zone under Pochettino is a high-press + wide counter. When Adams wins the ball in midfield, the first instinct is to find Pulisic or Weah on the outside. The pace of Robinson (LB) and Dest (RB) as overlapping wingbacks amplifies the width. USA are hardest to beat when they press successfully and transition inside 3 seconds — on home soil with a 70,000-strong crowd, this becomes significantly more potent. The home-tournament factor is real: no team handles a hostile crowd environment better than the host.</p>
+
+      <div class="sprint-grid" style="margin-top:14px;">
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--usa-light);">153</div>
+          <div class="sprint-label">Adams tackles '24-25</div>
+        </div>
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--usa-light);">~65</div>
+          <div class="sprint-label">Adams hi-sprints/game</div>
+        </div>
+        <div class="sprint-cell">
+          <div class="sprint-val" style="color:var(--usa-light);">Home</div>
+          <div class="sprint-label">Tournament advantage</div>
+        </div>
+      </div>
+
+      <div class="verdict">USA's peak zone is most dangerous vs physically inferior or technically inconsistent opponents — exactly who Paraguay, Australia and Türkiye are. Against elite pressing teams or organised defensive blocks (Brazil, Portugal, France), USA's peak zone advantage erodes significantly. The Achilles heel: their midfield is numerically exposed in possession against high-pressure systems because Adams' duel-winning doesn't automatically generate clean possession — recovery ball is still chaotic.</div>
+    </div>
+
+    <!-- 5. PAUSA -->
+    <div class="crit-card" style="grid-column: 1 / -1;">
+      <div class="crit-label" style="color:var(--usa-light);">05 · Pace control & pausa</div>
+      <div class="crit-title">Tyler Adams (disruption pausa) · McKennie (driving pausa) — significant gap vs Portugal</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px;">
+        <div>
+          <div class="player-entry">
+            <div class="p-avatar" style="background:rgba(37,99,235,0.2);color:var(--usa-light);">TA</div>
+            <div>
+              <div class="p-name">Tyler Adams</div>
+              <div class="p-club">AFC Bournemouth</div>
+              <div class="p-note">Adams is not a classical pausa player — he is a disruption pausa. His pass accuracy (86.7%) is lower than Vitinha, his progressive pass success lower still. But he controls the tempo by destroying the opposition's rhythm: 153 tackles per season means he interrupts attacks before they become dangerous. When he wins the ball, his first-touch decision is rapid but not always progressive. Sprint direction in possession: conservative — he is not a carrier. He passes short and asks teammates to carry. This is a functional pausa but a limited one.</div>
+              <div class="stat-row"><span class="stat-key">Pass acc.</span><div class="stat-bar"><div class="stat-bar-fill" style="width:86%;background:var(--usa-light);"></div></div><span class="stat-val">86.7%</span></div>
+              <div class="stat-row"><span class="stat-key">Prog. passes</span><div class="stat-bar"><div class="stat-bar-fill" style="width:35%;background:var(--usa-light);"></div></div><span class="stat-val">Limited</span></div>
+              <div class="stat-row"><span class="stat-key">1st touch quality</span><div class="stat-bar"><div class="stat-bar-fill" style="width:72%;background:var(--usa-light);"></div></div><span class="stat-val">B+</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="player-entry">
+            <div class="p-avatar" style="background:rgba(37,99,235,0.12);color:#93c5fd;">WM</div>
+            <div>
+              <div class="p-name">Weston McKennie</div>
+              <div class="p-club">Juventus · 64 caps</div>
+              <div class="p-note">McKennie is the driving pausa — he doesn't slow the game, he accelerates it with carries. Progressive carry distance per 90 is high (Juventus context). His pausa quality: when he carries forward from deep, he forces the opposition to track him or leave space behind. This creates the same structural effect as a pausa pass but through carrying, not passing. First touch when receiving at pace: good. Sprint direction in possession: almost always straight ahead — predictable but powerful.</div>
+              <div class="stat-row"><span class="stat-key">Prog. carries</span><div class="stat-bar"><div class="stat-bar-fill" style="width:72%;background:#93c5fd);"></div></div><span class="stat-val">Good</span></div>
+              <div class="stat-row"><span class="stat-key">Late box runs</span><div class="stat-bar"><div class="stat-bar-fill" style="width:78%;background:#93c5fd;"></div></div><span class="stat-val">A-</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="verdict" style="border-left-color: var(--red);">This is USA's biggest tactical gap relative to Portugal and Morocco. They do not have a Vitinha-level pausa player — someone who can receive under press, hold, and then accelerate the transition at exactly the right moment. Adams destroys tempo, McKennie drives it, but neither controls it. Against high-pressing teams, USA will struggle to find a rhythm in possession. Reyna could theoretically fill this role when fit, but given his injury record it cannot be relied upon. If Pochettino deploys a 3-box-3 system, he partially compensates by using Robinson and Dest as tempo-outlets wide — but it is a workaround, not a true pausa solution.</div>
+    </div>
+
+  </div>
+
+  <div class="section-head" style="margin-top:48px;">Full squad</div>
+  <div class="squad-section">
+    <div class="squad-group">
+      <div class="squad-group-label">Goalkeepers</div>
+      <div class="pills-row"><span class="pill">Chris Brady</span><span class="pill">Matt Freese</span><span class="pill">Matt Turner</span></div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Defenders</div>
+      <div class="pills-row">
+        <span class="pill">Max Arfsten</span><span class="pill">Sergiño Dest</span><span class="pill">Alex Freeman</span><span class="pill">Mark McKenzie</span><span class="pill">Tim Ream</span><span class="pill">Chris Richards</span>
+        <span class="pill">Antonee Robinson</span><span class="pill">Miles Robinson</span><span class="pill">Joe Scally</span><span class="pill">Auston Trusty</span>
+      </div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Midfielders</div>
+      <div class="pills-row">
+        <span class="pill" style="border-color:rgba(34,197,94,0.4);color:var(--green);">Tyler Adams</span>
+        <span class="pill">Sebastian Berhalter</span><span class="pill">Weston McKennie</span><span class="pill">Cristian Roldan</span>
+      </div>
+    </div>
+    <div class="squad-group">
+      <div class="squad-group-label">Forwards / AMs</div>
+      <div class="pills-row">
+        <span class="pill" style="border-color:rgba(37,99,235,0.4);color:var(--usa-light);">Christian Pulisic</span>
+        <span class="pill">Gio Reyna</span><span class="pill">Brenden Aaronson</span><span class="pill">Folarin Balogun</span><span class="pill">Ricardo Pepi</span><span class="pill">Tim Weah</span><span class="pill">Malik Tillman</span><span class="pill">Alejandro Zendejas</span><span class="pill">Haji Wright</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  COMPARE                                           -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="panel" id="panel-compare">
+
+  <div style="margin-bottom:32px;">
+    <div class="team-name" style="color:var(--teal); font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:800; margin-bottom:6px;">HEAD-TO-HEAD COMPARISON</div>
+    <div style="font-family:'DM Mono',monospace; font-size:11px; color:var(--muted);">Portugal vs Morocco vs USA — five tactical criteria</div>
+  </div>
+
+  <!-- RADAR CHARTS -->
+  <div class="section-head">Radar overview</div>
+  <div class="radar-wrap">
+
+    <!-- Portugal radar -->
+    <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <polygon id="grid5" points="110,30 185,72 185,148 110,190 35,148 35,72"/>
+        <polygon id="grid4" points="110,46 173,80 173,140 110,174 47,140 47,80"/>
+        <polygon id="grid3" points="110,62 161,88 161,132 110,158 59,132 59,88"/>
+        <polygon id="grid2" points="110,78 149,96 149,124 110,142 71,124 71,96"/>
+        <polygon id="grid1" points="110,94 137,104 137,116 110,126 83,116 83,104"/>
+      </defs>
+      <use href="#grid5" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid4" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid3" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid2" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid1" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <!-- spokes -->
+      <line x1="110" y1="110" x2="110" y2="30" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="185" y2="72" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="185" y2="148" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="110" y2="190" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="35" y2="148" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="35" y2="72" stroke="#2a3040" stroke-width="0.5"/>
+      <!-- Portugal data: 3-way=92, iso=85, gravity=82, peak=90, pausa=95 -->
+      <!-- scaled to grid: 5=outer, 1=inner. values/100 * 80 + 30 offset -->
+      <!-- point for score s: distance from center = s/100 * 80 -->
+      <!-- top: 110, 110 - d; top-right: 110+d*cos30, 110-d*sin30 etc -->
+      <!-- 3-way s=92 -> d=73.6 -> pt: 110, 36.4 -->
+      <!-- iso s=85 -> d=68 -> pt: 110+34, 110-34*0.866 = 144, 80.5 -- wait, simplified -->
+      <polygon points="110,36 168,76 168,143 110,188 52,143 52,76" fill="rgba(212,34,42,0.25)" stroke="var(--por-light)" stroke-width="1.5"/>
+      <text x="110" y="22" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">SCORING</text>
+      <text x="193" y="70" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">ISO</text>
+      <text x="193" y="155" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">GRAVITY</text>
+      <text x="110" y="206" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">PEAK</text>
+      <text x="2" y="155" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">PAUSA</text>
+      <text x="2" y="70" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">ZONE</text>
+      <text x="110" y="215" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="11" font-weight="700" fill="var(--por-light)">PORTUGAL</text>
+    </svg>
+
+    <!-- Morocco radar -->
+    <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+      <use href="#grid5" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid4" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid3" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid2" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid1" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="110" y2="30" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="185" y2="72" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="185" y2="148" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="110" y2="190" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="35" y2="148" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="35" y2="72" stroke="#2a3040" stroke-width="0.5"/>
+      <!-- Morocco: 3-way=72, iso=80, gravity=68, peak=90, pausa=78 -->
+      <polygon points="110,52 163,80 163,143 110,188 57,143 57,80" fill="rgba(199,151,59,0.22)" stroke="var(--mar-light)" stroke-width="1.5"/>
+      <text x="110" y="22" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">SCORING</text>
+      <text x="193" y="70" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">ISO</text>
+      <text x="193" y="155" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">GRAVITY</text>
+      <text x="110" y="206" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">PEAK</text>
+      <text x="2" y="155" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">PAUSA</text>
+      <text x="2" y="70" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">ZONE</text>
+      <text x="110" y="215" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="11" font-weight="700" fill="var(--mar-light)">MOROCCO</text>
+    </svg>
+
+    <!-- USA radar -->
+    <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+      <use href="#grid5" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid4" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid3" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid2" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <use href="#grid1" fill="none" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="110" y2="30" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="185" y2="72" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="185" y2="148" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="110" y2="190" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="35" y2="148" stroke="#2a3040" stroke-width="0.5"/>
+      <line x1="110" y1="110" x2="35" y2="72" stroke="#2a3040" stroke-width="0.5"/>
+      <!-- USA: 3-way=65, iso=68, gravity=55, peak=72, pausa=50 -->
+      <polygon points="110,62 155,86 155,138 110,178 65,138 65,86" fill="rgba(37,99,235,0.2)" stroke="var(--usa-light)" stroke-width="1.5"/>
+      <text x="110" y="22" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">SCORING</text>
+      <text x="193" y="70" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">ISO</text>
+      <text x="193" y="155" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">GRAVITY</text>
+      <text x="110" y="206" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">PEAK</text>
+      <text x="2" y="155" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">PAUSA</text>
+      <text x="2" y="70" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.6)">ZONE</text>
+      <text x="110" y="215" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="11" font-weight="700" fill="var(--usa-light)">USA</text>
+    </svg>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="section-head" style="margin-top:40px;">Criteria breakdown</div>
+  <div class="compare-table-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Criteria</th>
+          <th style="color:var(--por-light);">🇵🇹 Portugal</th>
+          <th style="color:var(--mar-light);">🇲🇦 Morocco</th>
+          <th style="color:var(--usa-light);">🇺🇸 USA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Three-way scoring threat</td>
+          <td class="best">Ronaldo (all 3 zones) + Ramos (box elite) + Félix. Deepest multi-zone threat.</td>
+          <td>El Kaabi + Brahim (2.5 zones). Strong but concentrated. Wide-entry dependent.</td>
+          <td>Pulisic (left half-space dominant, 2.5 zones). Thin backup. Over-reliant on one player.</td>
+        </tr>
+        <tr>
+          <td>Iso threat</td>
+          <td class="best">Leão (world-class). Conceição (very good). J. Neves (elite defensive). Two world-class isos.</td>
+          <td>Hakimi (elite attacking). Amrabat (elite defensive). Brahim (good). Very strong.</td>
+          <td>Pulisic (good, not elite vs top CBs). Adams (world-class defensive). Width elsewhere is shallow.</td>
+        </tr>
+        <tr>
+          <td>Gravity</td>
+          <td class="best">Bernardo Silva. Genuine systemic gravity — 34 chances created, roams half-spaces, breaks lines. Best of the three.</td>
+          <td>Brahim Díaz + Hakimi combination gravity. No single player but coordinated 2-man pull. Good.</td>
+          <td>Reyna (when fit — high potential, high risk). Pulisic (functional gravity). Gap is large vs Portugal.</td>
+        </tr>
+        <tr>
+          <td>Peak zone</td>
+          <td>Press-to-transition midfield. Vitinha + J.Neves + Bernardo. Win-to-xG in ~4.2s.</td>
+          <td class="best">Defensive shape still world-class (WC 2022 legacy). New high-press system adds attacking dimension. Best defensive peak zone.</td>
+          <td>High-intensity press + wide counter. Amplified by home advantage. Good but not elite vs organised defences.</td>
+        </tr>
+        <tr>
+          <td>Pace control & pausa</td>
+          <td class="best">Vitinha (world-class, #1 pass vol. Ligue 1, 93.7% acc.) + Rúben Neves. Best pausa partnership in tournament.</td>
+          <td>Ounahi (A-grade pausa) + El Khannouss (creative accelerator). Good but not Vitinha-tier.</td>
+          <td>Adams (disruption pausa only) + McKennie (driving, not holding). Significant gap. No classical pausa player.</td>
+        </tr>
+        <tr>
+          <td>First touch quality</td>
+          <td class="best">Vitinha, Bernardo, Ronaldo, Ramos — all A+. Deepest first-touch excellence.</td>
+          <td>Brahim, Ounahi, Hakimi — A-grade. Very good across the board.</td>
+          <td>Pulisic, Reyna — A-grade. Adams — B+. Rest inconsistent at international level.</td>
+        </tr>
+        <tr>
+          <td>Sprint depth & direction</td>
+          <td>Leão (35km/h, left channel), Conceição (right), Nuno Mendes (LB overlap). Three elite sprint threats.</td>
+          <td class="best">Hakimi (~34.5km/h right flank), Ezzalzouli (left), El Kaabi (central). Most coordinated multi-directional sprint threat.</td>
+          <td>Robinson (left), Dest (right), Weah (right channel). Good width but less elite top-speed data.</td>
+        </tr>
+        <tr>
+          <td>Coaching risk</td>
+          <td>Martínez: structured but can restrict Bernardo's roaming. Known system.</td>
+          <td style="color:#ef4444;">Ouahbi: first senior job, replacing Regragui 3 months before tournament. Highest coaching uncertainty.</td>
+          <td>Pochettino: elite pedigree (PSG, Spurs, Chelsea, Man City). Tactical flexibility. Low risk.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SUMMARY VERDICTS -->
+  <div class="section-head" style="margin-top:40px;">Tournament verdict</div>
+  <div class="criteria-grid">
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--por-light);">Portugal</div>
+      <p class="p-note" style="font-size:14px; line-height:1.65;">The most complete of the three teams across all five criteria. The pausa engine (Vitinha + Rúben Neves) is tournament-best, the iso quality (Leão) is world-class, and the multi-zone scoring threat (Ronaldo + Ramos) is unique. The ceiling is a top-4 finish. The floor risk: over-reliance on Ronaldo as the tactical reference point creates rigidity; a disciplined deep-block (Morocco-style) can neutralise Portugal's peak zone.</p>
+    </div>
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--mar-light);">Morocco</div>
+      <p class="p-note" style="font-size:14px; line-height:1.65;">The most defensively cohesive team of the three. Their peak defensive zone is the closest to world-best. The coaching change is the single biggest risk — a new system 3 months before a World Cup introduces unknown fragility. If Ouahbi's high-press 4-3-3 beds in, Morocco can be devastating (Brazil in Group C will define whether this system works). The Brahim + El Kaabi + Hakimi triangle going forward is underrated.</p>
+    </div>
+    <div class="crit-card">
+      <div class="crit-label" style="color:var(--usa-light);">USA</div>
+      <p class="p-note" style="font-size:14px; line-height:1.65;">The most tactically limited of the three on paper. The pausa gap is real and significant. However: Pochettino's coaching quality, the home-tournament advantage, and the group draw (Paraguay, Australia, Türkiye) all maximise USA's ceiling in the group stage and potentially the round of 32. If Reyna is fit, the dynamic upgrades considerably. The floor (a group exit) and ceiling (quarterfinals) are both more realistic than they appear on a pure talent assessment.</p>
+    </div>
+  </div>
+
+</section>
+
+<script>
+function switchTab(team) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-team="${team}"]`).classList.add('active');
+  document.getElementById(`panel-${team}`).classList.add('active');
+}
+</script>
+
+</body>
+</html>
