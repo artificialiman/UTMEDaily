@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portugal · Default Goal Sequence · WC 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --por: #e8232e;
+  --por2: rgba(232,35,46,0.15);
+  --gold: #f5c518;
+  --teal: #14b8a6;
+  --purple: #a78bfa;
+  --bg: #060608;
+  --surf: #0d0d10;
+  --surf2: #131318;
+  --surf3: #1a1a20;
+  --text: #e8e8ee;
+  --muted: #52525e;
+  --dim: #1e1e28;
+  --border: rgba(255,255,255,0.055);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html,body { width:100%; height:100%; overflow:hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── BG GRID ── */
+.bg-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.bg-ghost-text {
+  position: fixed;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(200px, 28vw, 400px);
+  color: rgba(232,35,46,0.03);
+  bottom: -4vh; right: -2vw;
+  pointer-events: none; user-select: none; z-index: 0;
+  letter-spacing: -.02em;
+}
+
+/* ── HEADER ── */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  padding: 22px 40px 18px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(var(--bg), rgba(6,6,8,0.6));
+  backdrop-filter: blur(8px);
+}
+.h-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--por);
+  display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+}
+.h-eyebrow::before { content:''; width:20px; height:1px; background:var(--por); }
+.h-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 4vw, 52px);
+  line-height: .92; letter-spacing: .01em; color: var(--text);
+}
+.h-title span { color: var(--por); }
+.h-meta {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); text-align: right; line-height: 1.9;
+}
+
+/* ── FOOTER CONTROLS ── */
+.footer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+  padding: 14px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(rgba(6,6,8,0.6), var(--bg));
+  backdrop-filter: blur(8px);
+}
+.btn {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .16em; text-transform: uppercase;
+  background: var(--surf2); border: 1px solid var(--border);
+  color: var(--muted); padding: 9px 18px; cursor: pointer;
+  transition: all .2s; border-radius: 2px;
+}
+.btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.btn.active-btn { color: var(--por); border-color: rgba(232,35,46,0.4); }
+.phase-label {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: var(--por); letter-spacing: .14em; text-transform: uppercase;
+  text-align: center;
+}
+.phase-step {
+  font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+  color: var(--muted); letter-spacing: .1em;
+}
+.seq-dots { display: flex; gap: 7px; align-items: center; }
+.seq-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  border: 1px solid var(--muted); background: transparent;
+  transition: all .3s; cursor: pointer;
+}
+.seq-dot.on { background: var(--por); border-color: var(--por); transform: scale(1.3); }
+
+/* ── MAIN CANVAS ── */
+.canvas-wrap {
+  position: relative; z-index: 5;
+  width: min(88vw, 1100px);
+  display: flex; gap: 24px; align-items: flex-start;
+}
+
+/* ── PITCH ── */
+.pitch-container {
+  flex: 1 1 auto;
+  max-width: 700px;
+}
+.pitch-svg { width: 100%; height: auto; display: block; }
+
+/* ── SIDE PANEL ── */
+.side-panel {
+  flex: 0 0 260px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+/* ── STAT BOX BESPOKE ── */
+.sbox {
+  background: var(--surf2);
+  position: relative; overflow: hidden; padding: 18px 20px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+}
+.sbox::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--por);
+}
+.sbox-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 5vw, 62px);
+  line-height: .88; color: var(--por); display: block;
+}
+.sbox-num.gold { color: var(--gold); }
+.sbox-num.teal { color: var(--teal); }
+.sbox-label {
+  font-family: 'DM Mono', monospace; font-size: 8.5px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px; display: block;
+}
+.sbox-desc {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12.5px;
+  color: #5a5a6e; line-height: 1.55; margin-top: 4px;
+}
+.sbox-ghost {
+  position: absolute; right: 10px; bottom: 6px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 40px;
+  color: rgba(232,35,46,0.06); line-height: 1;
+  pointer-events: none; user-select: none;
+}
+
+/* ── PHASE CARD ── */
+.phase-card {
+  background: var(--surf3); border: 1px solid rgba(232,35,46,0.15);
+  border-radius: 2px; padding: 14px 16px;
+}
+.pc-step {
+  font-family: 'Bebas Neue', sans-serif; font-size: 11px;
+  letter-spacing: .2em; color: var(--por); margin-bottom: 4px;
+}
+.pc-title {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 16px;
+  font-weight: 800; color: var(--text); margin-bottom: 6px;
+}
+.pc-body {
+  font-family: 'Barlow', sans-serif; font-size: 12px;
+  color: #5a5a6e; line-height: 1.6;
+}
+.pc-body strong { color: #8a8a9e; font-weight: 600; }
+
+/* ── ABSURD NOTE ── */
+.absurd {
+  font-family: 'DM Mono', monospace; font-size: 9.5px;
+  color: rgba(232,35,46,0.65); letter-spacing: .04em;
+  padding: 7px 0 7px 12px;
+  border-left: 1.5px solid rgba(232,35,46,0.25);
+  line-height: 1.65; margin-top: 8px;
+}
+
+/* ── PLAYER DOT LEGEND ── */
+.legend { display: flex; flex-direction: column; gap: 7px; padding: 14px 16px;
+  background: var(--surf2); border: 1px solid var(--border); border-radius: 2px; }
+.legend-row { display: flex; align-items: center; gap: 9px; }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.leg-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+  font-weight: 700; color: var(--text); line-height: 1;
+}
+.leg-role {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); margin-left: auto; text-transform: uppercase; letter-spacing: .06em;
+}
+
+/* ── ANIMATION: progress bars ── */
+.progress-bar-wrap { display: flex; flex-direction: column; gap: 6px; }
+.pb-row { display: flex; align-items: center; gap: 9px; }
+.pb-key {
+  font-family: 'DM Mono', monospace; font-size: 8.5px;
+  color: var(--muted); width: 100px; flex-shrink: 0;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.pb-track { flex: 1; height: 3px; background: var(--dim); border-radius: 0; overflow: hidden; }
+.pb-fill { height: 100%; background: var(--por); border-radius: 0;
+  transition: width 1.4s cubic-bezier(.25,.46,.45,.94); }
+.pb-fill.gold { background: var(--gold); }
+.pb-val {
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+  color: var(--text); width: 52px; text-align: right; flex-shrink: 0; line-height: 1;
+}
+
+/* ─────────────────────────────────────────────
+   SVG ANIMATION ELEMENTS
+───────────────────────────────────────────── */
+/* Ball is animated via JS using SMIL or JS transforms */
+.ball { filter: drop-shadow(0 0 4px rgba(232,35,46,0.6)); }
+.trail-dot { animation: trailFade 1.2s ease-out forwards; }
+@keyframes trailFade { from { opacity: .6; r: 3; } to { opacity: 0; r: 1; } }
+
+/* Player label fade */
+.plabel { transition: opacity .4s; }
+
+/* Phase highlight pulse */
+@keyframes zonePulse {
+  0%,100% { opacity: .18; }
+  50% { opacity: .35; }
+}
+.zone-active { animation: zonePulse 1.8s ease-in-out infinite; }
+
+/* Path draw animation */
+.path-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  transition: stroke-dashoffset 2.8s cubic-bezier(.4,0,.2,1);
+}
+.path-draw.drawn { stroke-dashoffset: 0; }
+
+/* Pass arc */
+.pass-arc {
+  fill: none;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  transition: stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1);
+}
+.pass-arc.drawn { stroke-dashoffset: 0; }
+
+/* defender collapse arrows */
+.def-arrow {
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.def-arrow.show { opacity: 1; }
+
+/* goal flash */
+@keyframes goalFlash {
+  0% { opacity: 0; }
+  20% { opacity: .45; }
+  100% { opacity: 0; }
+}
+.goal-flash { animation: goalFlash 1.8s ease-out forwards; }
+
+/* ball move via CSS custom properties */
+.ball-dot {
+  transition: cx 0.7s cubic-bezier(.45,.05,.55,.95), cy 0.7s cubic-bezier(.45,.05,.55,.95);
+}
+
+/* Sequence fade */
+.seq-fade { opacity: 0; transition: opacity .5s ease; }
+.seq-fade.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-ghost-text">GOL</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div>
+    <div class="h-eyebrow">Portugal · WC 2026 · Module 01</div>
+    <div class="h-title">DEFAULT <span>GOAL</span> SEQUENCE</div>
+  </div>
+  <div class="h-meta">
+    <div>System: 4-3-3 / 4-2-3-1 · Roberto Martínez</div>
+    <div>Based on last 2,000 min of play</div>
+    <div>Projection: 2.5 goals vs avg opponent</div>
+  </div>
+</header>
+
+<!-- MAIN CANVAS -->
+<div class="canvas-wrap" style="margin-top:90px;">
+
+  <!-- PITCH SVG -->
+  <div class="pitch-container">
+    <svg id="mainPitch" class="pitch-svg" viewBox="0 0 500 720" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow-red" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="rgba(232,35,46,0.7)" stroke-width="1.2"/>
+        </marker>
+        <marker id="arrow-gold" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="rgba(245,197,24,0.7)" stroke-width="1.2"/>
+        </marker>
+        <marker id="arrow-teal" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="rgba(20,184,166,0.7)" stroke-width="1.2"/>
+        </marker>
+        <marker id="arrow-white" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/>
+        </marker>
+        <radialGradient id="ballGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#e8232e" stop-opacity=".9"/>
+          <stop offset="100%" stop-color="#e8232e" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+
+      <!-- PITCH BODY -->
+      <rect width="500" height="720" fill="#07110c"/>
+
+      <!-- Touch lines -->
+      <rect x="18" y="18" width="464" height="684" fill="none" stroke="#0f2518" stroke-width="1.5"/>
+
+      <!-- Halfway line -->
+      <line x1="18" y1="360" x2="482" y2="360" stroke="#0f2518" stroke-width=".9" stroke-dasharray="6 5"/>
+
+      <!-- Centre circle -->
+      <circle cx="250" cy="360" r="60" fill="none" stroke="#0f2518" stroke-width=".9"/>
+      <circle cx="250" cy="360" r="2.5" fill="#0f2518"/>
+
+      <!-- Penalty arcs -->
+      <path d="M168 228 A82 82 0 0 1 332 228" fill="none" stroke="#0f2518" stroke-width=".9"/>
+      <path d="M168 492 A82 82 0 0 0 332 492" fill="none" stroke="#0f2518" stroke-width=".9"/>
+
+      <!-- OPPOSITION (top = north) penalty area -->
+      <rect x="108" y="18" width="284" height="115" fill="rgba(232,35,46,0.04)" stroke="#142a1a" stroke-width=".9"/>
+      <!-- Opposition 6-yard box -->
+      <rect x="170" y="18" width="160" height="46" fill="rgba(232,35,46,0.07)" stroke="#1a3020" stroke-width=".9"/>
+      <!-- Opposition goal -->
+      <rect x="208" y="10" width="84" height="18" rx="1" fill="rgba(232,35,46,0.25)" stroke="rgba(232,35,46,0.5)" stroke-width="1.2"/>
+      <text x="250" y="23" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="rgba(232,35,46,0.7)" font-weight="500">GOAL</text>
+
+      <!-- OWN (bottom) penalty area -->
+      <rect x="108" y="587" width="284" height="115" fill="rgba(255,255,255,0.015)" stroke="#0f2014" stroke-width=".9"/>
+      <rect x="170" y="656" width="160" height="46" fill="rgba(255,255,255,0.02)" stroke="#0f2014" stroke-width=".9"/>
+      <rect x="208" y="694" width="84" height="16" rx="1" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width=".9"/>
+
+      <!-- Penalty spots -->
+      <circle cx="250" cy="110" r="2.5" fill="#142a1a"/>
+      <circle cx="250" cy="610" r="2.5" fill="#142a1a"/>
+
+      <!-- ── ZONE LABELS (always visible) ── -->
+      <text x="490" y="40" text-anchor="end" font-family="'DM Mono',monospace" font-size="8" fill="rgba(232,35,46,0.35)" letter-spacing=".12em">OPPOSITION GOAL ↑</text>
+      <text x="490" y="716" text-anchor="end" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.15)" letter-spacing=".12em">OWN HALF ↓</text>
+
+      <!-- ══════════════════════════════════
+           SEQUENCE ZONES (shown/hidden per phase)
+      ══════════════════════════════════ -->
+
+      <!-- PHASE 0: Turnover/Deadball zone (bottom third) -->
+      <rect id="zone0" x="18" y="480" width="464" height="222" rx="2"
+        fill="rgba(232,35,46,0.06)" stroke="rgba(232,35,46,0.12)" stroke-width=".8"
+        opacity="0" class="seq-fade"/>
+      <text id="zone0-label" x="250" y="572" text-anchor="middle"
+        font-family="'DM Mono',monospace" font-size="9" fill="rgba(232,35,46,0.5)" letter-spacing=".14em"
+        opacity="0" class="seq-fade">TURNOVER / DEADBALL ORIGIN</text>
+
+      <!-- PHASE 1: Build-up zone highlight -->
+      <rect id="zone1" x="18" y="310" width="464" height="170" rx="2"
+        fill="rgba(167,139,250,0.05)" stroke="rgba(167,139,250,0.12)" stroke-width=".8"
+        opacity="0" class="seq-fade"/>
+
+      <!-- PHASE 2: High xG zone (in and around box) -->
+      <rect id="zone2" x="108" y="18" width="284" height="200" rx="2"
+        fill="rgba(232,35,46,0.12)" stroke="rgba(232,35,46,0.3)" stroke-width=".8"
+        opacity="0" class="seq-fade"/>
+      <text id="zone2-label" x="250" y="182" text-anchor="middle"
+        font-family="'DM Mono',monospace" font-size="9" fill="rgba(232,35,46,0.6)" letter-spacing=".12em"
+        opacity="0" class="seq-fade">HIGH xG ZONE · 0.35–0.52 xG</text>
+
+      <!-- ══════════════════════════════════
+           PASS PATHS (drawn progressively)
+      ══════════════════════════════════ -->
+
+      <!-- P0→P1: GK/defender long ball or short pass to João Neves -->
+      <path id="path01" class="pass-arc" d="M250 640 Q200 530 195 430"
+        stroke="rgba(167,139,250,0.5)" stroke-width="1.6" stroke-dasharray="5 4"
+        marker-end="url(#arrow-teal)" fill="none"/>
+
+      <!-- P1→P2: Vitinha receives, switches or progresses -->
+      <path id="path12" class="pass-arc" d="M195 430 Q210 380 250 340"
+        stroke="rgba(167,139,250,0.55)" stroke-width="1.6"
+        marker-end="url(#arrow-teal)" fill="none"/>
+
+      <!-- P2→P3: Vitinha into Bernardo's feet or left channel -->
+      <path id="path23" class="pass-arc" d="M250 340 Q180 295 142 240"
+        stroke="rgba(245,197,24,0.6)" stroke-width="1.6"
+        marker-end="url(#arrow-gold)" fill="none"/>
+
+      <!-- P3→P4: Bernardo/Leão cross or cutback to Ramos -->
+      <path id="path34" class="pass-arc" d="M142 240 Q168 120 230 85"
+        stroke="rgba(245,197,24,0.6)" stroke-width="1.6"
+        marker-end="url(#arrow-gold)" fill="none"/>
+
+      <!-- P4→GOAL: Ronaldo/Ramos finish -->
+      <path id="path45" class="pass-arc" d="M230 85 Q248 55 252 28"
+        stroke="rgba(232,35,46,0.8)" stroke-width="2"
+        marker-end="url(#arrow-red)" fill="none"/>
+
+      <!-- ══════════════════════════════════
+           DEFENSIVE COLLAPSE ARROWS
+      ══════════════════════════════════ -->
+      <!-- Defenders converging toward Ronaldo = gap opens left -->
+      <path id="def1" class="def-arrow" d="M310 160 Q290 130 262 100"
+        fill="none" stroke="rgba(255,80,80,0.4)" stroke-width="1.1"
+        stroke-dasharray="3 3" marker-end="url(#arrow-red)"/>
+      <path id="def2" class="def-arrow" d="M355 200 Q320 170 275 125"
+        fill="none" stroke="rgba(255,80,80,0.35)" stroke-width="1.1"
+        stroke-dasharray="3 3" marker-end="url(#arrow-red)"/>
+      <!-- Space opening on left after collapse -->
+      <ellipse id="gap-zone" cx="155" cy="100" rx="40" ry="28"
+        fill="rgba(245,197,24,0.14)" stroke="rgba(245,197,24,0.4)" stroke-width=".8"
+        opacity="0" class="seq-fade"/>
+      <text id="gap-label" x="155" y="97" text-anchor="middle"
+        font-family="'DM Mono',monospace" font-size="7.5" fill="rgba(245,197,24,0.7)"
+        opacity="0" class="seq-fade">GAP OPENED</text>
+
+      <!-- ══════════════════════════════════
+           PLAYER POSITIONS
+      ══════════════════════════════════ -->
+
+      <!-- GK / Defender (own half - source of sequence) -->
+      <circle cx="250" cy="640" r="9" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" class="seq-fade" id="p-gk" opacity="0"/>
+      <text x="250" y="644" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="9" fill="rgba(255,255,255,0.6)">  </text>
+      <text id="l-gk" x="264" y="638" font-family="'DM Mono',monospace" font-size="8.5" fill="rgba(255,255,255,0.4)" opacity="0" class="seq-fade">COSTA / INÁCIO</text>
+
+      <!-- João Neves - deep pivot receipt -->
+      <circle cx="195" cy="430" r="10" fill="rgba(167,139,250,0.2)" stroke="rgba(167,139,250,0.6)" stroke-width="1.5" class="seq-fade" id="p-neves" opacity="0"/>
+      <text x="195" y="434" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="9" fill="rgba(167,139,250,0.9)">JN</text>
+      <text id="l-neves" x="210" y="425" font-family="'DM Mono',monospace" font-size="8.5" fill="rgba(167,139,250,0.7)" opacity="0" class="seq-fade">JOÃO NEVES</text>
+
+      <!-- Vitinha - pivot, line-break trigger -->
+      <circle cx="250" cy="340" r="12" fill="rgba(167,139,250,0.25)" stroke="rgba(167,139,250,0.75)" stroke-width="1.8" class="seq-fade" id="p-vitinha" opacity="0"/>
+      <text x="250" y="344" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="10" fill="rgba(167,139,250,0.95)">V</text>
+      <text id="l-vitinha" x="266" y="337" font-family="'DM Mono',monospace" font-size="8.5" fill="rgba(167,139,250,0.8)" opacity="0" class="seq-fade">VITINHA</text>
+
+      <!-- Bernardo Silva / Leão wide left -->
+      <circle cx="142" cy="240" r="11" fill="rgba(245,197,24,0.2)" stroke="rgba(245,197,24,0.7)" stroke-width="1.5" class="seq-fade" id="p-bern" opacity="0"/>
+      <text x="142" y="244" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="9.5" fill="rgba(245,197,24,0.9)">B</text>
+      <text id="l-bern" x="20" y="238" font-family="'DM Mono',monospace" font-size="8.5" fill="rgba(245,197,24,0.7)" opacity="0" class="seq-fade">BERNARDO / LEÃO</text>
+
+      <!-- Ramos - box presence -->
+      <circle cx="230" cy="85" r="11" fill="rgba(20,184,166,0.2)" stroke="rgba(20,184,166,0.7)" stroke-width="1.5" class="seq-fade" id="p-ramos" opacity="0"/>
+      <text x="230" y="89" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="9.5" fill="rgba(20,184,166,0.9)">GR</text>
+      <text id="l-ramos" x="245" y="82" font-family="'DM Mono',monospace" font-size="8.5" fill="rgba(20,184,166,0.7)" opacity="0" class="seq-fade">RAMOS</text>
+
+      <!-- Ronaldo - penalty zone gravity anchor -->
+      <circle cx="290" cy="100" r="13" fill="rgba(232,35,46,0.25)" stroke="rgba(232,35,46,0.8)" stroke-width="2" class="seq-fade" id="p-ronaldo" opacity="0"/>
+      <text x="290" y="105" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="11" fill="rgba(232,35,46,0.95)">CR</text>
+      <text id="l-ronaldo" x="306" y="97" font-family="'DM Mono',monospace" font-size="8.5" fill="rgba(232,35,46,0.8)" opacity="0" class="seq-fade">RONALDO</text>
+
+      <!-- ══════════════════════════════════
+           BALL (animated)
+      ══════════════════════════════════ -->
+      <!-- glow halo -->
+      <circle id="ballHalo" cx="250" cy="640" r="14" fill="url(#ballGlow)" opacity=".5"/>
+      <!-- ball dot -->
+      <circle id="ball" cx="250" cy="640" r="5" fill="white" class="ball" filter="url(#glow)"/>
+      <!-- trail dots appended by JS -->
+      <g id="trailGroup"></g>
+
+      <!-- GOAL FLASH OVERLAY -->
+      <rect id="goalFlash" x="108" y="18" width="284" height="115" rx="2"
+        fill="rgba(232,35,46,0.5)" opacity="0"/>
+
+      <!-- PHASE INDICATOR TEXT -->
+      <text id="pitchPhaseText" x="250" y="358" text-anchor="middle"
+        font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.12)"
+        letter-spacing=".15em">PRESS PLAY</text>
+
+    </svg>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="side-panel">
+
+    <!-- Dynamic phase card -->
+    <div class="phase-card" id="phaseCard">
+      <div class="pc-step" id="pcStep">PHASE 00 · READY</div>
+      <div class="pc-title" id="pcTitle">Portugal Default Goal Pattern</div>
+      <div class="pc-body" id="pcBody">
+        A 4-3-3/4-2-3-1 system averaging <strong>2.5 goals per match</strong> against comparable opposition.
+        Ronaldo's off-ball gravity creates the structural opening every time.
+        Press play to trace the sequence from turnover to goal.
+      </div>
+      <div class="absurd" id="pcAbsurd">
+        Avg sequence length: 4.2 passes · completion rate: 91%
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">PLAYER KEY</div>
+      <div class="legend-row"><div class="leg-dot" style="background:rgba(167,139,250,0.8)"></div><div class="leg-name">João Neves</div><div class="leg-role">DM / PIVOT</div></div>
+      <div class="legend-row"><div class="leg-dot" style="background:rgba(167,139,250,0.8)"></div><div class="leg-name">Vitinha</div><div class="leg-role">CM / LINE-BREAKER</div></div>
+      <div class="legend-row"><div class="leg-dot" style="background:rgba(245,197,24,0.8)"></div><div class="leg-name">Bernardo / Leão</div><div class="leg-role">W / WIDE THREAT</div></div>
+      <div class="legend-row"><div class="leg-dot" style="background:rgba(20,184,166,0.8)"></div><div class="leg-name">Goncalo Ramos</div><div class="leg-role">CF / BOX ARRIVAL</div></div>
+      <div class="legend-row"><div class="leg-dot" style="background:rgba(232,35,46,0.9)"></div><div class="leg-name">Ronaldo</div><div class="leg-role">SS / GRAVITY ANCHOR</div></div>
+    </div>
+
+    <!-- Stat boxes -->
+    <div class="sbox">
+      <span class="sbox-ghost">2.5</span>
+      <span class="sbox-label">Default Goal Rate</span>
+      <span class="sbox-num">2.5</span>
+      <div class="sbox-desc">Goals per 90 vs avg-ranked opposition · based on last 2,000 min of play</div>
+    </div>
+
+    <div class="sbox">
+      <span class="sbox-label">Avg Sequence Passes</span>
+      <span class="sbox-num gold">4.2</span>
+      <div class="sbox-desc">Passes from turnover/deadball origin to shot. 91% completion rate across tracked sequences.</div>
+    </div>
+
+    <!-- Progress bars (sequence build) -->
+    <div class="sbox" style="padding:14px 18px;">
+      <span class="sbox-label" style="margin-bottom:10px;">Sequence Origin Split</span>
+      <div class="progress-bar-wrap">
+        <div class="pb-row"><div class="pb-key">From turnover</div><div class="pb-track"><div class="pb-fill" id="bar1" style="width:0%"></div></div><div class="pb-val">58%</div></div>
+        <div class="pb-row"><div class="pb-key">From deadball</div><div class="pb-track"><div class="pb-fill gold" id="bar2" style="width:0%"></div></div><div class="pb-val">28%</div></div>
+        <div class="pb-row"><div class="pb-key">Open play build</div><div class="pb-track"><div class="pb-fill" id="bar3" style="width:0%"></div></div><div class="pb-val">14%</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER CONTROLS -->
+<footer class="footer">
+  <div class="seq-dots" id="seqDots">
+    <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.1em;margin-right:4px;">SEQ</span>
+    <div class="seq-dot on" data-phase="0"></div>
+    <div class="seq-dot" data-phase="1"></div>
+    <div class="seq-dot" data-phase="2"></div>
+    <div class="seq-dot" data-phase="3"></div>
+    <div class="seq-dot" data-phase="4"></div>
+    <div class="seq-dot" data-phase="5"></div>
+  </div>
+  <div style="text-align:center;">
+    <div class="phase-label" id="footerLabel">READY TO PLAY</div>
+    <div class="phase-step" id="footerStep">DEFAULT GOAL SEQUENCE · PORTUGAL</div>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn" id="btnReset" onclick="resetSequence()">RESET</button>
+    <button class="btn active-btn" id="btnPlay" onclick="playSequence()">▶ PLAY</button>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   SEQUENCE DATA
+═══════════════════════════════════════════════════════════ */
+const PHASES = [
+  {
+    step: 'PHASE 00 · ORIGIN',
+    title: 'Turnover / Deadball — Own Half',
+    body: 'Díogo Costa distributes or a defensive clearance gives Portugal possession. <strong>Inácio or Rúben Dias</strong> plays short to João Neves in the deep-left half-space.',
+    absurd: 'Portugal win possession in their own half in 58% of all tracked goals. Turnover-to-goal avg time: 14.3 seconds.',
+    ball: { x: 250, y: 640 },
+    zones: ['zone0'],
+    players: ['p-gk','l-gk'],
+    paths: [],
+    defenders: [],
+    gaps: []
+  },
+  {
+    step: 'PHASE 01 · FIRST PASS',
+    title: 'João Neves — Deep Receipt',
+    body: '<strong>João Neves</strong> receives in the left half-space, immediately faces up. His body shape invites pressure — then he exits it with a one-touch pass or progressive carry into Vitinha\'s zone.',
+    absurd: '153 pressures won in the last 2,000 min — highest of any Portugal midfielder. He initiates 67% of Portugal\'s sequences from this position.',
+    ball: { x: 195, y: 430 },
+    zones: ['zone1'],
+    players: ['p-neves','l-neves','p-gk'],
+    paths: ['path01'],
+    defenders: [],
+    gaps: []
+  },
+  {
+    step: 'PHASE 02 · LINE-BREAK',
+    title: 'Vitinha — Pivot & Progression',
+    body: '<strong>Vitinha</strong> receives between the lines. 93.7% pass accuracy. His vertical or diagonal ball is the trigger that shifts the defensive structure. Bernardo or Leão begins the forward run.',
+    absurd: '93.7% pass accuracy is the highest of any player averaging 80+ passes/90 in Ligue 1. His progressive pass rate of 18.4/90 ranks him in the top 3 globally at his position.',
+    ball: { x: 250, y: 340 },
+    zones: ['zone1','zone2'],
+    players: ['p-neves','p-vitinha','l-vitinha'],
+    paths: ['path01','path12'],
+    defenders: [],
+    gaps: []
+  },
+  {
+    step: 'PHASE 03 · WIDE DELIVERY',
+    title: 'Bernardo / Leão — Left Channel Exploitation',
+    body: '<strong>Bernardo Silva or Rafael Leão</strong> receives wide-left, already in stride. Ronaldo\'s presence pins two central defenders. The wide player\'s run creates a 2v1 or direct crossing position.',
+    absurd: 'Leão reaches 35 km/h on runs from this position — the highest recorded sprint speed in the Portugal squad across the last 2,000 min.',
+    ball: { x: 142, y: 240 },
+    zones: ['zone2'],
+    players: ['p-neves','p-vitinha','p-bern','l-bern','p-ronaldo','l-ronaldo'],
+    paths: ['path01','path12','path23'],
+    defenders: ['def1','def2'],
+    gaps: []
+  },
+  {
+    step: 'PHASE 04 · GRAVITY COLLAPSE',
+    title: 'Ronaldo Pins Defenders — Gap Opens',
+    body: '<strong>Ronaldo\'s</strong> movement into the 6-yard zone pulls both central CBs. This creates the gap on the left side of the box. <strong>Ramos</strong> arrives late, unmarked, into the 6-yd xG pocket.',
+    absurd: 'Ronaldo forces 2.1 defensive repositionings per possession sequence in the final third — the highest off-ball gravity figure of any striker tracked in this tournament\'s pre-registration data.',
+    ball: { x: 230, y: 85 },
+    zones: ['zone2'],
+    players: ['p-neves','p-vitinha','p-bern','p-ramos','l-ramos','p-ronaldo'],
+    paths: ['path01','path12','path23','path34'],
+    defenders: ['def1','def2'],
+    gaps: ['gap-zone','gap-label']
+  },
+  {
+    step: 'PHASE 05 · FINISH',
+    title: 'Goal — 2.5 xG Materialised',
+    body: '<strong>Ramos</strong> taps in or <strong>Ronaldo</strong> converts from the gravity-induced space. The xG on this sequence type averages <strong>0.45</strong> — Portugal convert at 68% from here.',
+    absurd: '0.45 xG per sequence of this type. Portugal\'s conversion rate from 6-yd gravity sequences: 68%. Tournament average from equivalent positions: 43%.',
+    ball: { x: 252, y: 26 },
+    zones: ['zone2'],
+    players: ['p-ramos','p-ronaldo','p-bern','p-vitinha'],
+    paths: ['path01','path12','path23','path34','path45'],
+    defenders: ['def1','def2'],
+    gaps: ['gap-zone','gap-label'],
+    goal: true
+  }
+];
+
+let currentPhase = -1;
+let isPlaying = false;
+let playTimeout = null;
+
+/* ── HELPERS ── */
+function $id(id){ return document.getElementById(id); }
+
+function showElements(ids, show) {
+  ids.forEach(id => {
+    const el = $id(id);
+    if(el){
+      el.style.transition = 'opacity 0.5s ease';
+      el.style.opacity = show ? '1' : '0';
+    }
+  });
+}
+
+function drawPaths(ids) {
+  ids.forEach(id => {
+    const el = $id(id);
+    if(el){
+      const len = el.getTotalLength ? el.getTotalLength() : 600;
+      el.style.strokeDasharray = len;
+      el.style.strokeDashoffset = len;
+      el.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1)';
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{ el.style.strokeDashoffset = '0'; });
+      });
+    }
+  });
+}
+
+function hidePaths(ids) {
+  ids.forEach(id => {
+    const el = $id(id);
+    if(el){
+      const len = el.getTotalLength ? el.getTotalLength() : 600;
+      el.style.strokeDasharray = len;
+      el.style.strokeDashoffset = len;
+      el.style.transition = 'none';
+    }
+  });
+}
+
+function moveBall(x, y) {
+  const ball = $id('ball');
+  const halo = $id('ballHalo');
+  ball.style.transition = 'none';
+  halo.style.transition = 'none';
+  const dur = '0.8s';
+  const ease = 'cubic-bezier(.45,.05,.55,.95)';
+  ball.style.transition = `cx ${dur} ${ease}, cy ${dur} ${ease}`;
+  halo.style.transition = `cx ${dur} ${ease}, cy ${dur} ${ease}`;
+  ball.setAttribute('cx', x);
+  ball.setAttribute('cy', y);
+  halo.setAttribute('cx', x);
+  halo.setAttribute('cy', y);
+}
+
+function hideAllZones() {
+  ['zone0','zone1','zone2','zone0-label','zone2-label','gap-zone','gap-label'].forEach(id => {
+    const el = $id(id);
+    if(el){ el.style.opacity = '0'; }
+  });
+}
+
+function hideAllPlayers() {
+  ['p-gk','l-gk','p-neves','l-neves','p-vitinha','l-vitinha',
+   'p-bern','l-bern','p-ramos','l-ramos','p-ronaldo','l-ronaldo'].forEach(id => {
+    const el = $id(id);
+    if(el){ el.style.opacity = '0'; }
+  });
+}
+
+function hideAllDefenders() {
+  ['def1','def2'].forEach(id => {
+    const el = $id(id);
+    if(el){ el.style.opacity = '0'; }
+  });
+}
+
+function hideAllPaths() {
+  ['path01','path12','path23','path34','path45'].forEach(id => {
+    const el = $id(id);
+    if(el){
+      const len = el.getTotalLength ? el.getTotalLength() : 600;
+      el.style.transition = 'none';
+      el.style.strokeDasharray = len;
+      el.style.strokeDashoffset = len;
+    }
+  });
+}
+
+function updateDots(phase) {
+  document.querySelectorAll('.seq-dot').forEach((d,i) => {
+    d.classList.toggle('on', i === phase);
+  });
+}
+
+function goalEffect() {
+  const flash = $id('goalFlash');
+  flash.style.opacity = '0';
+  flash.style.transition = 'none';
+  requestAnimationFrame(()=>{
+    flash.style.transition = 'opacity 1.8s ease-out';
+    flash.style.opacity = '0.5';
+    setTimeout(()=>{ flash.style.opacity = '0'; }, 900);
+  });
+}
+
+function animateBars() {
+  setTimeout(()=>{ $id('bar1').style.width = '58%'; $id('bar1').style.transition = 'width 1.6s cubic-bezier(.25,.46,.45,.94)'; }, 200);
+  setTimeout(()=>{ $id('bar2').style.width = '28%'; $id('bar2').style.transition = 'width 1.6s cubic-bezier(.25,.46,.45,.94)'; }, 400);
+  setTimeout(()=>{ $id('bar3').style.width = '14%'; $id('bar3').style.transition = 'width 1.6s cubic-bezier(.25,.46,.45,.94)'; }, 600);
+}
+
+/* ── MAIN PHASE RENDER ── */
+function renderPhase(phaseIdx) {
+  if(phaseIdx < 0 || phaseIdx >= PHASES.length) return;
+  const ph = PHASES[phaseIdx];
+
+  /* update side panel */
+  $id('pcStep').textContent = ph.step;
+  $id('pcTitle').textContent = ph.title;
+  $id('pcBody').innerHTML = ph.body;
+  $id('pcAbsurd').textContent = ph.absurd;
+  $id('footerLabel').textContent = ph.step;
+  $id('pitchPhaseText').textContent = ph.step.replace('PHASE ','');
+
+  /* hide everything */
+  hideAllZones();
+  hideAllPlayers();
+  hideAllDefenders();
+  /* don't hide paths — keep cumulative */
+  if(phaseIdx === 0) { hideAllPaths(); }
+
+  /* show zones (delayed for smoothness) */
+  setTimeout(()=>{ showElements(ph.zones, true); }, 120);
+  if(ph.zones.includes('zone0')) { setTimeout(()=>{ showElements(['zone0-label'], true); }, 400); }
+  if(ph.zones.includes('zone2')) { setTimeout(()=>{ showElements(['zone2-label'], true); }, 500); }
+
+  /* show players */
+  setTimeout(()=>{ showElements(ph.players, true); }, 200);
+
+  /* draw paths */
+  setTimeout(()=>{ drawPaths(ph.paths); }, 100);
+
+  /* defenders */
+  setTimeout(()=>{ showElements(ph.defenders, true); }, 600);
+
+  /* gaps */
+  setTimeout(()=>{ showElements(ph.gaps, true); }, 800);
+
+  /* ball */
+  setTimeout(()=>{ moveBall(ph.ball.x, ph.ball.y); }, 50);
+
+  /* goal effect */
+  if(ph.goal) {
+    setTimeout(goalEffect, 900);
+  }
+
+  /* update dots */
+  updateDots(phaseIdx);
+  currentPhase = phaseIdx;
+
+  /* bars on first load */
+  if(phaseIdx === 0) { animateBars(); }
+}
+
+/* ── AUTO PLAY ── */
+function playSequence() {
+  if(isPlaying) { pauseSequence(); return; }
+  isPlaying = true;
+  $id('btnPlay').textContent = '❚❚ PAUSE';
+  $id('btnPlay').classList.add('active-btn');
+
+  const startPhase = (currentPhase < 0 || currentPhase >= PHASES.length - 1) ? 0 : currentPhase + 1;
+
+  function step(i) {
+    if(!isPlaying) return;
+    if(i >= PHASES.length) {
+      isPlaying = false;
+      $id('btnPlay').textContent = '▶ REPLAY';
+      return;
+    }
+    renderPhase(i);
+    /* longer pause on goal phase */
+    const delay = i === PHASES.length - 1 ? 3800 : 2600;
+    playTimeout = setTimeout(()=>{ step(i+1); }, delay);
+  }
+  step(startPhase);
+}
+
+function pauseSequence() {
+  isPlaying = false;
+  clearTimeout(playTimeout);
+  $id('btnPlay').textContent = '▶ RESUME';
+}
+
+function resetSequence() {
+  isPlaying = false;
+  clearTimeout(playTimeout);
+  currentPhase = -1;
+  hideAllZones();
+  hideAllPlayers();
+  hideAllDefenders();
+  hideAllPaths();
+  moveBall(250, 640);
+  $id('btnPlay').textContent = '▶ PLAY';
+  $id('pcStep').textContent = 'PHASE 00 · READY';
+  $id('pcTitle').textContent = 'Portugal Default Goal Pattern';
+  $id('pcBody').innerHTML = 'A 4-3-3/4-2-3-1 system averaging <strong>2.5 goals per match</strong> against comparable opposition. Ronaldo\'s off-ball gravity creates the structural opening every time. Press play to trace the sequence from turnover to goal.';
+  $id('pcAbsurd').textContent = 'Avg sequence length: 4.2 passes · completion rate: 91%';
+  $id('pitchPhaseText').textContent = 'PRESS PLAY';
+  $id('footerLabel').textContent = 'READY TO PLAY';
+  $id('goalFlash').style.opacity = '0';
+  document.querySelectorAll('.seq-dot').forEach((d,i)=>{ d.classList.toggle('on', i===0); });
+  /* reset bars */
+  ['bar1','bar2','bar3'].forEach(id=>{ const b=$id(id); b.style.transition='none'; b.style.width='0%'; });
+  animateBars();
+}
+
+/* ── DOT CLICK ── */
+document.getElementById('seqDots').addEventListener('click', e=>{
+  const dot = e.target.closest('.seq-dot');
+  if(!dot) return;
+  const ph = parseInt(dot.dataset.phase);
+  isPlaying = false;
+  clearTimeout(playTimeout);
+  $id('btnPlay').textContent = '▶ PLAY';
+  renderPhase(ph);
+});
+
+/* ── INIT ── */
+window.addEventListener('load', ()=>{
+  animateBars();
+  /* init ball pos */
+  $id('ball').setAttribute('cx', 250);
+  $id('ball').setAttribute('cy', 640);
+  $id('ballHalo').setAttribute('cx', 250);
+  $id('ballHalo').setAttribute('cy', 640);
+});
+</script>
+</body>
+</html>

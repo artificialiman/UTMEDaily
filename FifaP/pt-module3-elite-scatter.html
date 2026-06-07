@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portugal · Elite Scatter Plot · WC 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --por: #e8232e;
+  --gold: #f5c518;
+  --teal: #14b8a6;
+  --purple: #a78bfa;
+  --green: #22c55e;
+  --blue: #60a5fa;
+  --orange: #f97316;
+  --bg: #060608;
+  --surf: #0d0d10;
+  --surf2: #131318;
+  --surf3: #1a1a20;
+  --text: #e8e8ee;
+  --muted: #52525e;
+  --dim: #1a1a24;
+  --border: rgba(255,255,255,0.055);
+  --border2: rgba(255,255,255,0.10);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { overflow-x: hidden; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Barlow', sans-serif; font-size: 14px;
+  min-height: 100vh; overflow-x: hidden;
+}
+.bg-grid {
+  position: fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+  background-size: 70px 70px;
+}
+
+/* ── PAGE LAYOUT ── */
+.page {
+  position: relative; z-index: 2;
+  max-width: 1440px; margin: 0 auto;
+  padding: 36px clamp(20px,4vw,56px) 56px;
+}
+
+/* ── HEADER ── */
+.page-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 32px; padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 16px;
+}
+.h-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--por);
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
+.h-eyebrow::before { content:''; width:20px; height:1px; background:var(--por); }
+.h-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(38px,6vw,88px);
+  line-height: .88; color: var(--text); letter-spacing: .01em;
+}
+.h-title span { color: var(--por); }
+.h-sub {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 300;
+  color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 7px;
+}
+.h-meta {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); text-align: right; line-height: 2;
+}
+
+/* ── FILTER TABS ── */
+.filter-bar {
+  display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap;
+  align-items: center;
+}
+.filter-label {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+  margin-right: 4px;
+}
+.ftab {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .12em; text-transform: uppercase;
+  background: var(--surf2); border: 1px solid var(--border);
+  color: var(--muted); padding: 7px 14px; cursor: pointer;
+  border-radius: 2px; transition: all .2s;
+}
+.ftab:hover { color: var(--text); border-color: var(--border2); }
+.ftab.on { color: var(--text); border-color: var(--por); background: rgba(232,35,46,0.08); }
+.axis-select {
+  display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap;
+}
+.axis-label {
+  font-family: 'DM Mono', monospace; font-size: 8.5px;
+  color: var(--muted); letter-spacing: .1em; text-transform: uppercase;
+}
+.axis-btn {
+  font-family: 'DM Mono', monospace; font-size: 8.5px;
+  letter-spacing: .1em; text-transform: uppercase;
+  background: var(--surf3); border: 1px solid var(--border);
+  color: var(--muted); padding: 5px 10px; cursor: pointer;
+  border-radius: 2px; transition: all .2s;
+}
+.axis-btn:hover { color: var(--text); }
+.axis-btn.on { color: var(--gold); border-color: rgba(245,197,24,0.35); }
+
+/* ── MAIN LAYOUT ── */
+.chart-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+@media(max-width:900px) { .chart-layout { grid-template-columns: 1fr; } }
+
+/* ── CHART WRAPPER ── */
+.chart-wrap {
+  background: var(--surf2); border: 1px solid var(--border);
+  border-radius: 3px; padding: 24px;
+  position: relative; overflow: hidden;
+}
+.chart-wrap::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--por), transparent 60%);
+}
+
+#mainChart {
+  width: 100%;
+  display: block;
+}
+
+/* ── TOOLTIP ── */
+.tooltip {
+  position: absolute; pointer-events: none;
+  background: var(--surf3); border: 1px solid var(--border2);
+  border-radius: 2px; padding: 10px 13px;
+  opacity: 0; transition: opacity .2s;
+  z-index: 100; min-width: 160px;
+  transform: translateX(-50%);
+}
+.tt-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 15px;
+  font-weight: 800; color: var(--text); margin-bottom: 2px;
+}
+.tt-team {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); margin-bottom: 7px; letter-spacing: .1em; text-transform: uppercase;
+}
+.tt-stat {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); line-height: 1.9;
+}
+.tt-stat span { color: var(--text); }
+
+/* ── SIDE PANEL ── */
+.side-panel { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── PLAYER CARD ── */
+.pcard {
+  background: var(--surf2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+  opacity: 0; transform: translateX(20px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.pcard.vis { opacity: 1; transform: none; }
+.pcard.d1 { transition-delay: .3s; }
+.pcard.d2 { transition-delay: .45s; }
+.pcard.d3 { transition-delay: .6s; }
+.pcard.d4 { transition-delay: .75s; }
+.pcard::after {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+}
+.pcard-por::after { background: var(--por); }
+.pcard-gold::after { background: var(--gold); }
+.pcard-teal::after { background: var(--teal); }
+.pcard-purple::after { background: var(--purple); }
+
+.pc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 9px; }
+.pc-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 18px;
+  font-weight: 800; color: var(--text); line-height: 1;
+}
+.pc-role {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); margin-top: 3px; letter-spacing: .1em; text-transform: uppercase;
+}
+.pc-pctile {
+  font-family: 'Bebas Neue', sans-serif; font-size: 32px;
+  line-height: 1; text-align: right;
+}
+.pcard-por .pc-pctile { color: var(--por); }
+.pcard-gold .pc-pctile { color: var(--gold); }
+.pcard-teal .pc-pctile { color: var(--teal); }
+.pcard-purple .pc-pctile { color: var(--purple); }
+
+.pc-pctile-label {
+  font-family: 'DM Mono', monospace; font-size: 7px;
+  color: var(--muted); text-align: right; letter-spacing: .1em; text-transform: uppercase;
+}
+.pc-bars { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
+.pb-row { display: flex; align-items: center; gap: 8px; }
+.pb-key {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); width: 88px; flex-shrink: 0;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.pb-track { flex: 1; height: 2.5px; background: var(--dim); border-radius: 0; overflow: hidden; }
+.pb-fill { height: 100%; border-radius: 0; width: 0; transition: width 1.8s cubic-bezier(.25,.46,.45,.94); }
+.pcard-por .pb-fill { background: var(--por); }
+.pcard-gold .pb-fill { background: var(--gold); }
+.pcard-teal .pb-fill { background: var(--teal); }
+.pcard-purple .pb-fill { background: var(--purple); }
+.pb-val {
+  font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+  color: var(--text); width: 44px; text-align: right; flex-shrink: 0; line-height: 1;
+}
+.pc-absurd {
+  font-family: 'DM Mono', monospace; font-size: 8.5px;
+  color: rgba(232,35,46,0.55); letter-spacing: .04em;
+  padding: 5px 0 0 10px;
+  border-left: 1px solid rgba(232,35,46,0.2);
+  margin-top: 9px; line-height: 1.65;
+}
+.pcard-gold .pc-absurd { color: rgba(245,197,24,0.6); border-left-color: rgba(245,197,24,0.2); }
+.pcard-teal .pc-absurd { color: rgba(20,184,166,0.6); border-left-color: rgba(20,184,166,0.2); }
+.pcard-purple .pc-absurd { color: rgba(167,139,250,0.6); border-left-color: rgba(167,139,250,0.2); }
+
+/* ── LEGEND STRIP ── */
+.legend-strip {
+  display: flex; gap: 18px; flex-wrap: wrap;
+  padding: 12px 0; margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.leg-item { display: flex; align-items: center; gap: 7px; }
+.leg-dot {
+  width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+}
+.leg-ring {
+  width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid;
+}
+.leg-text {
+  font-family: 'DM Mono', monospace; font-size: 8.5px;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .1em;
+}
+
+/* ── PLAY/RESET CONTROLS ── */
+.controls {
+  display: flex; gap: 10px; margin-bottom: 14px; align-items: center;
+}
+.ctrl-btn {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .16em; text-transform: uppercase;
+  background: var(--surf2); border: 1px solid var(--border);
+  color: var(--muted); padding: 8px 16px; cursor: pointer;
+  transition: all .2s; border-radius: 2px;
+}
+.ctrl-btn:hover { color: var(--text); border-color: var(--border2); }
+.ctrl-btn.active { color: var(--por); border-color: rgba(232,35,46,0.4); }
+.ctrl-info {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); letter-spacing: .1em;
+}
+
+/* ── chart axis labels ── */
+.axis-title {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  fill: rgba(255,255,255,0.25); letter-spacing: .14em; text-transform: uppercase;
+}
+.grid-line { stroke: rgba(255,255,255,0.05); stroke-width: .8; }
+.tick-label {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  fill: rgba(255,255,255,0.2);
+}
+
+/* dot animations */
+.data-dot {
+  cursor: pointer;
+  transition: r .3s ease, opacity .3s ease;
+}
+.data-dot:hover { opacity: 1 !important; }
+.data-dot.por-player { filter: drop-shadow(0 0 4px currentColor); }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="h-eyebrow">Portugal · WC 2026 · Module 03</div>
+      <div class="h-title">ELITE <span>RADAR</span></div>
+      <div class="h-sub">Portugal key players vs WC 2026 positional peers — slow reveal scatter</div>
+    </div>
+    <div class="h-meta">
+      <div>Criterion 01–04 · Combined metrics</div>
+      <div>Last 2,000 min of play · per 90 basis</div>
+      <div>Dot size = minutes played</div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="ctrl-btn active" id="btnPlot" onclick="startReveal()">▶ REVEAL PLOT</button>
+    <button class="ctrl-btn" id="btnReset2" onclick="resetPlot()">RESET</button>
+    <div class="ctrl-info" id="plotInfo">0 players plotted · hover for details</div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Position</span>
+    <button class="ftab on" data-pos="all" onclick="setFilter(this,'all')">ALL</button>
+    <button class="ftab" data-pos="gk" onclick="setFilter(this,'gk')">GK</button>
+    <button class="ftab" data-pos="cb" onclick="setFilter(this,'cb')">CB</button>
+    <button class="ftab" data-pos="cm" onclick="setFilter(this,'cm')">CM</button>
+    <button class="ftab" data-pos="w" onclick="setFilter(this,'w')">WINGER</button>
+    <button class="ftab" data-pos="cf" onclick="setFilter(this,'cf')">CF / SS</button>
+    <div class="axis-select">
+      <span class="axis-label">X-AXIS</span>
+      <button class="axis-btn on" data-axis="x" data-metric="prog_passes" onclick="setAxis(this,'x','prog_passes','Progressive Passes /90')">PROG PASSES</button>
+      <button class="axis-btn" data-axis="x" data-metric="pressures" onclick="setAxis(this,'x','pressures','Pressures Won /90')">PRESSURES</button>
+      <button class="axis-btn" data-axis="x" data-metric="dribbles" onclick="setAxis(this,'x','dribbles','Dribble Success /90')">DRIBBLES</button>
+      <span class="axis-label" style="margin-left:10px;">Y-AXIS</span>
+      <button class="axis-btn on" data-axis="y" data-metric="xg_90" onclick="setAxis(this,'y','xg_90','xG per 90')">XG /90</button>
+      <button class="axis-btn" data-axis="y" data-metric="carries_f3" onclick="setAxis(this,'y','carries_f3','Carries into F3 /90')">CARRIES F3</button>
+      <button class="axis-btn" data-axis="y" data-metric="line_breaks" onclick="setAxis(this,'y','line_breaks','Line Breaks /90')">LINE BREAKS</button>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="chart-layout">
+
+    <!-- CHART -->
+    <div class="chart-wrap">
+      <div class="legend-strip">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--por);border:2px solid var(--por)"></div><span class="leg-text">Portugal</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:rgba(96,165,250,0.7)"></div><span class="leg-text">Top-10 WC Nations</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:rgba(255,255,255,0.3)"></div><span class="leg-text">Other WC Nations</span></div>
+        <div class="leg-item" style="margin-left:auto;">
+          <span class="leg-text">Dot size = minutes played</span>
+        </div>
+      </div>
+      <svg id="mainChart" viewBox="0 0 760 460" xmlns="http://www.w3.org/2000/svg">
+        <!-- chart group offset for padding -->
+        <g id="chartArea" transform="translate(54, 20)">
+          <!-- grid lines rendered by JS -->
+          <g id="gridLines"></g>
+          <!-- axis lines -->
+          <line x1="0" y1="400" x2="680" y2="400" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="0" y1="0" x2="0" y2="400" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <!-- axis titles -->
+          <text id="xAxisTitle" x="340" y="432" text-anchor="middle" class="axis-title">PROGRESSIVE PASSES / 90</text>
+          <text id="yAxisTitle" x="-18" y="200" text-anchor="middle" transform="rotate(-90,-18,200)" class="axis-title">XG / 90</text>
+          <!-- tick labels -->
+          <g id="xTicks"></g>
+          <g id="yTicks"></g>
+          <!-- threshold lines -->
+          <line id="xThreshLine" x1="0" y1="0" x2="0" y2="400" stroke="rgba(232,35,46,0.12)" stroke-width="1" stroke-dasharray="4 4"/>
+          <line id="yThreshLine" x1="0" y1="400" x2="680" y2="400" stroke="rgba(232,35,46,0.12)" stroke-width="1" stroke-dasharray="4 4"/>
+          <!-- Portugal threshold label -->
+          <text id="quadLabel" x="0" y="0" font-family="'DM Mono',monospace" font-size="7.5" fill="rgba(232,35,46,0.3)" letter-spacing=".1em"></text>
+          <!-- dots group -->
+          <g id="dotsGroup"></g>
+          <!-- labels group (on top) -->
+          <g id="labelsGroup"></g>
+        </g>
+      </svg>
+      <!-- tooltip -->
+      <div class="tooltip" id="chartTooltip">
+        <div class="tt-name" id="ttName">—</div>
+        <div class="tt-team" id="ttTeam">—</div>
+        <div class="tt-stat" id="ttStat">—</div>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel">
+
+      <div class="pcard pcard-por d1" id="pc1">
+        <div class="pc-header">
+          <div>
+            <div class="pc-name">RONALDO</div>
+            <div class="pc-role">CF / Second Striker · Portugal</div>
+          </div>
+          <div>
+            <div class="pc-pctile">97</div>
+            <div class="pc-pctile-label">Percentile</div>
+          </div>
+        </div>
+        <div class="pc-bars">
+          <div class="pb-row"><div class="pb-key">xG /90</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="82%"></div></div><div class="pb-val">0.72</div></div>
+          <div class="pb-row"><div class="pb-key">Off-ball grav</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="97%"></div></div><div class="pb-val">2.1</div></div>
+          <div class="pb-row"><div class="pb-key">Shot acc</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="72%"></div></div><div class="pb-val">72%</div></div>
+          <div class="pb-row"><div class="pb-key">Penalties won</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="90%"></div></div><div class="pb-val">1.8/90</div></div>
+        </div>
+        <div class="pc-absurd">97th-percentile gravity figure — the highest of any registered WC 2026 striker in pre-tournament tracking data.</div>
+      </div>
+
+      <div class="pcard pcard-gold d2" id="pc2">
+        <div class="pc-header">
+          <div>
+            <div class="pc-name">VITINHA</div>
+            <div class="pc-role">CM / Box-to-Box · Portugal</div>
+          </div>
+          <div>
+            <div class="pc-pctile">96</div>
+            <div class="pc-pctile-label">Percentile</div>
+          </div>
+        </div>
+        <div class="pc-bars">
+          <div class="pb-row"><div class="pb-key">Prog passes</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="96%"></div></div><div class="pb-val">18.4</div></div>
+          <div class="pb-row"><div class="pb-key">Pass acc</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="93.7%"></div></div><div class="pb-val">93.7%</div></div>
+          <div class="pb-row"><div class="pb-key">Line breaks</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="88%"></div></div><div class="pb-val">2.8/90</div></div>
+          <div class="pb-row"><div class="pb-key">Press won</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="76%"></div></div><div class="pb-val">7.2/90</div></div>
+        </div>
+        <div class="pc-absurd">93.7% pass accuracy at 80+ passes/90: ranked top-3 globally at his position across all tracked leagues entering this tournament.</div>
+      </div>
+
+      <div class="pcard pcard-teal d3" id="pc3">
+        <div class="pc-header">
+          <div>
+            <div class="pc-name">B. SILVA</div>
+            <div class="pc-role">AM / Winger · Portugal</div>
+          </div>
+          <div>
+            <div class="pc-pctile">94</div>
+            <div class="pc-pctile-label">Percentile</div>
+          </div>
+        </div>
+        <div class="pc-bars">
+          <div class="pb-row"><div class="pb-key">Carries F3</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="94%"></div></div><div class="pb-val">6.1/90</div></div>
+          <div class="pb-row"><div class="pb-key">xA /90</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="89%"></div></div><div class="pb-val">0.38</div></div>
+          <div class="pb-row"><div class="pb-key">Dribble succ</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="71%"></div></div><div class="pb-val">71%</div></div>
+          <div class="pb-row"><div class="pb-key">Prog carries</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="87%"></div></div><div class="pb-val">4.9/90</div></div>
+        </div>
+        <div class="pc-absurd">6.1 carries into the final third per 90 — 94th percentile among all WC 2026 attacking midfielders. Converts 38% of those carries into a shot or key pass.</div>
+      </div>
+
+      <div class="pcard pcard-purple d4" id="pc4">
+        <div class="pc-header">
+          <div>
+            <div class="pc-name">JOÃO NEVES</div>
+            <div class="pc-role">DM / Pivot · Portugal</div>
+          </div>
+          <div>
+            <div class="pc-pctile">91</div>
+            <div class="pc-pctile-label">Percentile</div>
+          </div>
+        </div>
+        <div class="pc-bars">
+          <div class="pb-row"><div class="pb-key">Pressures won</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="91%"></div></div><div class="pb-val">153</div></div>
+          <div class="pb-row"><div class="pb-key">Intercept /90</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="84%"></div></div><div class="pb-val">2.4</div></div>
+          <div class="pb-row"><div class="pb-key">Tackle win %</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="78%"></div></div><div class="pb-val">74%</div></div>
+          <div class="pb-row"><div class="pb-key">Press triggers</div><div class="pb-track"><div class="pb-fill" style="width:0%" data-w="87%"></div></div><div class="pb-val">67%</div></div>
+        </div>
+        <div class="pc-absurd">153 pressures won in 2,000 min — the highest total of any Portugal central midfielder. Initiates 67% of Portugal's sequences from the left half-space pivot role.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════ */
+// Each player: { name, team, nation, pos, isPor, isTop10, prog_passes, xg_90, pressures, dribbles, carries_f3, line_breaks, minutes }
+const PLAYERS = [
+  // PORTUGAL
+  { name:'Ronaldo', team:'Al-Nassr / POR', nation:'Portugal', pos:'cf', isPor:true, isTop10:true,
+    prog_passes:4.2, xg_90:0.72, pressures:3.8, dribbles:2.1, carries_f3:2.8, line_breaks:1.2, minutes:1840 },
+  { name:'Vitinha', team:'PSG / POR', nation:'Portugal', pos:'cm', isPor:true, isTop10:true,
+    prog_passes:18.4, xg_90:0.14, pressures:7.2, dribbles:1.8, carries_f3:3.8, line_breaks:2.8, minutes:1920 },
+  { name:'B. Silva', team:'Man City / POR', nation:'Portugal', pos:'w', isPor:true, isTop10:true,
+    prog_passes:9.1, xg_90:0.31, pressures:6.4, dribbles:3.2, carries_f3:6.1, line_breaks:2.1, minutes:1780 },
+  { name:'João Neves', team:'PSG / POR', nation:'Portugal', pos:'cm', isPor:true, isTop10:true,
+    prog_passes:11.2, xg_90:0.06, pressures:8.9, dribbles:1.4, carries_f3:2.1, line_breaks:1.6, minutes:1640 },
+  { name:'Leão', team:'AC Milan / POR', nation:'Portugal', pos:'w', isPor:true, isTop10:true,
+    prog_passes:4.8, xg_90:0.38, pressures:5.1, dribbles:4.6, carries_f3:5.8, line_breaks:1.9, minutes:1540 },
+  { name:'G. Ramos', team:'PSG / POR', nation:'Portugal', pos:'cf', isPor:true, isTop10:true,
+    prog_passes:2.1, xg_90:0.58, pressures:4.2, dribbles:1.6, carries_f3:2.4, line_breaks:0.8, minutes:1420 },
+  { name:'R. Neves', team:'Al-Hilal / POR', nation:'Portugal', pos:'cm', isPor:true, isTop10:true,
+    prog_passes:10.8, xg_90:0.12, pressures:6.8, dribbles:1.2, carries_f3:2.8, line_breaks:1.4, minutes:1600 },
+  { name:'Pepe', team:'Unatt. / POR', nation:'Portugal', pos:'cb', isPor:true, isTop10:true,
+    prog_passes:3.4, xg_90:0.02, pressures:5.1, dribbles:0.4, carries_f3:0.8, line_breaks:0.6, minutes:1020 },
+
+  // TOP-10 WC NATIONS
+  { name:'Pedri', team:'Barcelona / ESP', nation:'Spain', pos:'cm', isPor:false, isTop10:true,
+    prog_passes:16.2, xg_90:0.12, pressures:8.1, dribbles:2.4, carries_f3:4.2, line_breaks:2.4, minutes:1880 },
+  { name:'Bellingham', team:'Real Madrid / ENG', nation:'England', pos:'cm', isPor:false, isTop10:true,
+    prog_passes:11.8, xg_90:0.42, pressures:6.8, dribbles:2.8, carries_f3:5.1, line_breaks:2.2, minutes:1840 },
+  { name:'M. Salah', team:'Liverpool / EGY', nation:'Egypt', pos:'w', isPor:false, isTop10:true,
+    prog_passes:5.2, xg_90:0.61, pressures:4.2, dribbles:3.8, carries_f3:6.4, line_breaks:2.8, minutes:1960 },
+  { name:'K. Mbappé', team:'Real Madrid / FRA', nation:'France', pos:'cf', isPor:false, isTop10:true,
+    prog_passes:3.8, xg_90:0.68, pressures:4.1, dribbles:4.4, carries_f3:5.8, line_breaks:2.4, minutes:1820 },
+  { name:'Vinicius Jr', team:'Real Madrid / BRA', nation:'Brazil', pos:'w', isPor:false, isTop10:true,
+    prog_passes:4.4, xg_90:0.54, pressures:3.6, dribbles:5.2, carries_f3:7.1, line_breaks:2.6, minutes:1760 },
+  { name:'Rodri', team:'Man City / ESP', nation:'Spain', pos:'cm', isPor:false, isTop10:true,
+    prog_passes:14.8, xg_90:0.08, pressures:9.2, dribbles:0.8, carries_f3:2.1, line_breaks:1.8, minutes:1720 },
+  { name:'De Bruyne', team:'Man City / BEL', nation:'Belgium', pos:'cm', isPor:false, isTop10:true,
+    prog_passes:15.4, xg_90:0.21, pressures:5.4, dribbles:2.1, carries_f3:4.8, line_breaks:2.2, minutes:1480 },
+  { name:'Lautaro', team:'Inter / ARG', nation:'Argentina', pos:'cf', isPor:false, isTop10:true,
+    prog_passes:2.8, xg_90:0.62, pressures:5.8, dribbles:2.2, carries_f3:3.4, line_breaks:1.2, minutes:1680 },
+  { name:'Nico Williams', team:'Athletic / ESP', nation:'Spain', pos:'w', isPor:false, isTop10:true,
+    prog_passes:4.6, xg_90:0.44, pressures:5.2, dribbles:4.8, carries_f3:6.8, line_breaks:2.1, minutes:1540 },
+  { name:'Camavinga', team:'Real Madrid / FRA', nation:'France', pos:'cm', isPor:false, isTop10:true,
+    prog_passes:9.4, xg_90:0.09, pressures:7.8, dribbles:2.2, carries_f3:3.2, line_breaks:1.8, minutes:1420 },
+  { name:'Wirtz', team:'Leverkusen / GER', nation:'Germany', pos:'cm', isPor:false, isTop10:true,
+    prog_passes:10.2, xg_90:0.32, pressures:6.4, dribbles:3.4, carries_f3:4.8, line_breaks:2.4, minutes:1760 },
+  { name:'Osimhen', team:'Galatasaray / NGA', nation:'Nigeria', pos:'cf', isPor:false, isTop10:true,
+    prog_passes:2.2, xg_90:0.55, pressures:4.8, dribbles:2.8, carries_f3:3.8, line_breaks:1.4, minutes:1380 },
+
+  // OTHER WC NATIONS
+  { name:'A. Davies', team:'Bayern / CAN', nation:'Canada', pos:'cm', isPor:false, isTop10:false,
+    prog_passes:6.8, xg_90:0.14, pressures:7.4, dribbles:2.4, carries_f3:3.8, line_breaks:1.6, minutes:1820 },
+  { name:'Ziyech', team:'Galatasaray / MAR', nation:'Morocco', pos:'w', isPor:false, isTop10:false,
+    prog_passes:7.2, xg_90:0.28, pressures:4.8, dribbles:3.2, carries_f3:4.2, line_breaks:1.4, minutes:1620 },
+  { name:'Seferovic', team:'various / SUI', nation:'Switzerland', pos:'cf', isPor:false, isTop10:false,
+    prog_passes:1.8, xg_90:0.38, pressures:4.2, dribbles:1.4, carries_f3:2.1, line_breaks:0.8, minutes:1240 },
+  { name:'Haaland', team:'Man City / NOR', nation:'Norway', pos:'cf', isPor:false, isTop10:false,
+    prog_passes:1.4, xg_90:0.88, pressures:3.2, dribbles:1.2, carries_f3:2.4, line_breaks:0.6, minutes:1940 },
+  { name:'Lewandowski', team:'Barcelona / POL', nation:'Poland', pos:'cf', isPor:false, isTop10:false,
+    prog_passes:2.4, xg_90:0.64, pressures:4.1, dribbles:1.4, carries_f3:2.8, line_breaks:1.0, minutes:1780 },
+  { name:'Son', team:'Tottenham / KOR', nation:'S.Korea', pos:'w', isPor:false, isTop10:false,
+    prog_passes:4.8, xg_90:0.46, pressures:4.8, dribbles:3.4, carries_f3:5.2, line_breaks:1.8, minutes:1680 },
+  { name:'Saka', team:'Arsenal / ENG', nation:'England', pos:'w', isPor:false, isTop10:false,
+    prog_passes:5.8, xg_90:0.41, pressures:5.8, dribbles:3.8, carries_f3:6.2, line_breaks:2.2, minutes:1860 },
+  { name:'Rashford', team:'Man Utd / ENG', nation:'England', pos:'w', isPor:false, isTop10:false,
+    prog_passes:3.8, xg_90:0.34, pressures:4.4, dribbles:3.2, carries_f3:4.8, line_breaks:1.6, minutes:1520 },
+  { name:'Pulisic', team:'AC Milan / USA', nation:'USA', pos:'w', isPor:false, isTop10:false,
+    prog_passes:4.4, xg_90:0.38, pressures:5.2, dribbles:3.0, carries_f3:4.4, line_breaks:1.8, minutes:1640 },
+  { name:'McKennie', team:'Juventus / USA', nation:'USA', pos:'cm', isPor:false, isTop10:false,
+    prog_passes:6.4, xg_90:0.18, pressures:7.1, dribbles:1.4, carries_f3:2.8, line_breaks:1.2, minutes:1480 },
+  { name:'Gnabry', team:'Bayern / GER', nation:'Germany', pos:'w', isPor:false, isTop10:false,
+    prog_passes:4.2, xg_90:0.41, pressures:5.4, dribbles:3.6, carries_f3:5.4, line_breaks:1.8, minutes:1340 },
+  { name:'Dembélé', team:'PSG / FRA', nation:'France', pos:'w', isPor:false, isTop10:false,
+    prog_passes:4.8, xg_90:0.38, pressures:4.8, dribbles:4.2, carries_f3:6.1, line_breaks:2.0, minutes:1600 },
+  { name:'Gakpo', team:'Liverpool / NED', nation:'Netherlands', pos:'w', isPor:false, isTop10:false,
+    prog_passes:5.2, xg_90:0.42, pressures:5.6, dribbles:3.2, carries_f3:5.4, line_breaks:1.8, minutes:1720 },
+  { name:'Koopmeiners', team:'Juventus / NED', nation:'Netherlands', pos:'cm', isPor:false, isTop10:false,
+    prog_passes:9.8, xg_90:0.24, pressures:6.4, dribbles:1.8, carries_f3:3.6, line_breaks:1.6, minutes:1640 },
+  { name:'Diaz L.', team:'Liverpool / COL', nation:'Colombia', pos:'w', isPor:false, isTop10:false,
+    prog_passes:5.4, xg_90:0.36, pressures:5.8, dribbles:3.8, carries_f3:5.6, line_breaks:1.8, minutes:1580 },
+  { name:'Vlahovic', team:'Juventus / SRB', nation:'Serbia', pos:'cf', isPor:false, isTop10:false,
+    prog_passes:2.4, xg_90:0.52, pressures:3.8, dribbles:1.6, carries_f3:2.6, line_breaks:0.8, minutes:1620 },
+];
+
+/* ═══════════════════════════════════════════════════
+   CHART STATE
+═══════════════════════════════════════════════════ */
+let xMetric = 'prog_passes';
+let yMetric = 'xg_90';
+let xLabel = 'Progressive Passes / 90';
+let yLabel = 'xG / 90';
+let currentFilter = 'all';
+let revealInterval = null;
+let revealedCount = 0;
+let revealOrder = [];
+let isRevealing = false;
+
+const W = 680, H = 400;
+const PAD = { l: 0, r: 20, t: 10, b: 0 };
+const CW = W - PAD.l - PAD.r;
+const CH = H - PAD.t - PAD.b;
+
+/* ── Scales ── */
+function getRange(metric) {
+  const allVals = PLAYERS.map(p => p[metric]);
+  const min = Math.min(...allVals);
+  const max = Math.max(...allVals);
+  const pad = (max - min) * 0.08;
+  return [min - pad, max + pad];
+}
+
+function scaleX(val) {
+  const [min, max] = getRange(xMetric);
+  return PAD.l + ((val - min) / (max - min)) * CW;
+}
+function scaleY(val) {
+  const [min, max] = getRange(yMetric);
+  return CH - ((val - min) / (max - min)) * CH + PAD.t;
+}
+function scaleR(minutes) {
+  return Math.max(5, Math.min(14, (minutes / 1960) * 14));
+}
+
+function filteredPlayers() {
+  if(currentFilter === 'all') return PLAYERS;
+  return PLAYERS.filter(p => p.pos === currentFilter);
+}
+
+/* ── Build grid ── */
+function buildGrid() {
+  const gridEl = document.getElementById('gridLines');
+  gridEl.innerHTML = '';
+  const xTickEl = document.getElementById('xTicks');
+  const yTickEl = document.getElementById('yTicks');
+  xTickEl.innerHTML = ''; yTickEl.innerHTML = '';
+
+  const [xMin, xMax] = getRange(xMetric);
+  const [yMin, yMax] = getRange(yMetric);
+
+  const xSteps = 5;
+  const ySteps = 5;
+
+  for(let i = 0; i <= xSteps; i++) {
+    const v = xMin + (xMax - xMin) * (i / xSteps);
+    const x = scaleX(v);
+    gridEl.innerHTML += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${CH + PAD.t}" class="grid-line"/>`;
+    xTickEl.innerHTML += `<text x="${x}" y="${H - 2}" text-anchor="middle" class="tick-label">${v.toFixed(1)}</text>`;
+  }
+  for(let i = 0; i <= ySteps; i++) {
+    const v = yMin + (yMax - yMin) * (i / ySteps);
+    const y = scaleY(v);
+    gridEl.innerHTML += `<line x1="${PAD.l}" y1="${y}" x2="${CW + PAD.l}" y2="${y}" class="grid-line"/>`;
+    yTickEl.innerHTML += `<text x="${PAD.l - 6}" y="${y + 3}" text-anchor="end" class="tick-label">${v.toFixed(2)}</text>`;
+  }
+
+  // axis titles
+  document.getElementById('xAxisTitle').textContent = xLabel;
+  document.getElementById('yAxisTitle').textContent = yLabel;
+}
+
+/* ── Reveal animation ── */
+function createDot(player, delay) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const dotsGroup = document.getElementById('dotsGroup');
+      const labelsGroup = document.getElementById('labelsGroup');
+      const x = scaleX(player[xMetric]);
+      const y = scaleY(player[yMetric]);
+      const r = scaleR(player.minutes);
+
+      let fill, stroke, opacity;
+      if(player.isPor) {
+        fill = 'rgba(232,35,46,0.75)';
+        stroke = 'rgba(232,35,46,1)';
+        opacity = 1;
+      } else if(player.isTop10) {
+        fill = 'rgba(96,165,250,0.5)';
+        stroke = 'rgba(96,165,250,0.7)';
+        opacity = 0.8;
+      } else {
+        fill = 'rgba(255,255,255,0.25)';
+        stroke = 'rgba(255,255,255,0.4)';
+        opacity = 0.55;
+      }
+
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.style.opacity = '0';
+
+      const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circle.setAttribute('cx', x);
+      circle.setAttribute('cy', y);
+      circle.setAttribute('r', '0');
+      circle.setAttribute('fill', fill);
+      circle.setAttribute('stroke', stroke);
+      circle.setAttribute('stroke-width', player.isPor ? '2' : '1.2');
+      circle.classList.add('data-dot');
+      if(player.isPor) circle.classList.add('por-player');
+
+      // hover tooltip
+      circle.addEventListener('mouseenter', (e) => showTooltip(e, player, x, y));
+      circle.addEventListener('mouseleave', hideTooltip);
+
+      g.appendChild(circle);
+
+      // Label for Portugal players
+      if(player.isPor) {
+        const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+        txt.setAttribute('x', x + r + 4);
+        txt.setAttribute('y', y - r - 2);
+        txt.setAttribute('font-family', "'DM Mono',monospace");
+        txt.setAttribute('font-size', '8.5');
+        txt.setAttribute('fill', 'rgba(232,35,46,0.85)');
+        txt.setAttribute('letter-spacing', '.06em');
+        txt.textContent = player.name.toUpperCase();
+        labelsGroup.appendChild(txt);
+      }
+
+      dotsGroup.appendChild(g);
+
+      // animate in
+      requestAnimationFrame(() => {
+        g.style.transition = 'opacity 0.4s ease';
+        g.style.opacity = opacity;
+        circle.style.transition = 'r 0.5s cubic-bezier(.34,1.56,.64,1)';
+        requestAnimationFrame(() => {
+          circle.setAttribute('r', r);
+        });
+      });
+
+      resolve();
+    }, delay);
+  });
+}
+
+function startReveal() {
+  if(isRevealing) return;
+  isRevealing = true;
+  document.getElementById('btnPlot').textContent = '● REVEALING...';
+  document.getElementById('btnPlot').classList.add('active');
+
+  clearChart();
+
+  buildGrid();
+
+  const players = filteredPlayers();
+  // Sort: others first, top10 next, Portugal last (so Portugal dots are on top)
+  const sorted = [
+    ...players.filter(p => !p.isPor && !p.isTop10),
+    ...players.filter(p => !p.isPor && p.isTop10),
+    ...players.filter(p => p.isPor)
+  ];
+
+  let delay = 0;
+  const promises = sorted.map((player, i) => {
+    delay += player.isPor ? 380 : 120;
+    return createDot(player, delay);
+  });
+
+  Promise.all(promises).then(() => {
+    isRevealing = false;
+    document.getElementById('btnPlot').textContent = '✓ PLOTTED';
+    document.getElementById('btnPlot').classList.remove('active');
+    document.getElementById('plotInfo').textContent = `${sorted.length} players plotted · hover for details`;
+    // animate bars
+    animatePlayerBars();
+    // show threshold
+    drawThreshold(sorted);
+  });
+}
+
+function drawThreshold(players) {
+  const porPlayers = players.filter(p => p.isPor);
+  const avgX = porPlayers.reduce((a,b) => a + b[xMetric], 0) / porPlayers.length;
+  const avgY = porPlayers.reduce((a,b) => a + b[yMetric], 0) / porPlayers.length;
+  const tx = scaleX(avgX);
+  const ty = scaleY(avgY);
+  const tl = document.getElementById('xThreshLine');
+  const tl2 = document.getElementById('yThreshLine');
+  const ql = document.getElementById('quadLabel');
+  tl.setAttribute('x1', tx); tl.setAttribute('x2', tx);
+  tl2.setAttribute('y1', ty); tl2.setAttribute('y2', ty);
+  ql.setAttribute('x', tx + 5);
+  ql.setAttribute('y', ty - 6);
+  ql.textContent = '⬡ POR AVG';
+}
+
+function clearChart() {
+  document.getElementById('dotsGroup').innerHTML = '';
+  document.getElementById('labelsGroup').innerHTML = '';
+  document.getElementById('gridLines').innerHTML = '';
+  document.getElementById('xTicks').innerHTML = '';
+  document.getElementById('yTicks').innerHTML = '';
+  document.getElementById('xThreshLine').setAttribute('x1',0);
+  document.getElementById('yThreshLine').setAttribute('y1', H);
+  document.getElementById('quadLabel').textContent = '';
+  document.getElementById('plotInfo').textContent = '0 players plotted';
+}
+
+function resetPlot() {
+  isRevealing = false;
+  clearChart();
+  document.getElementById('btnPlot').textContent = '▶ REVEAL PLOT';
+  document.getElementById('btnPlot').classList.remove('active');
+  // reset bars
+  document.querySelectorAll('.pb-fill').forEach(el => {
+    el.style.transition = 'none';
+    el.style.width = '0%';
+  });
+  // hide cards
+  document.querySelectorAll('.pcard').forEach(el => el.classList.remove('vis'));
+}
+
+/* ── Tooltip ── */
+function showTooltip(e, player, svgX, svgY) {
+  const tt = document.getElementById('chartTooltip');
+  const chartWrap = document.querySelector('.chart-wrap');
+  const wrapRect = chartWrap.getBoundingClientRect();
+
+  document.getElementById('ttName').textContent = player.name;
+  document.getElementById('ttTeam').textContent = player.nation + ' · ' + player.pos.toUpperCase();
+  document.getElementById('ttStat').innerHTML =
+    `Prog Passes/90: <span>${player.prog_passes}</span><br>` +
+    `xG/90: <span>${player.xg_90}</span><br>` +
+    `Pressures Won/90: <span>${player.pressures}</span><br>` +
+    `Dribbles/90: <span>${player.dribbles}</span><br>` +
+    `Carries F3/90: <span>${player.carries_f3}</span><br>` +
+    `Minutes: <span>${player.minutes}</span>`;
+
+  const svgEl = document.getElementById('mainChart');
+  const svgRect = svgEl.getBoundingClientRect();
+  const scaleFactorX = svgRect.width / 760;
+  const scaleFactorY = svgRect.height / 460;
+  const chartOffX = 54;
+  const chartOffY = 20;
+
+  const dotScreenX = svgRect.left - wrapRect.left + (svgX + chartOffX) * scaleFactorX;
+  const dotScreenY = svgRect.top - wrapRect.top + (svgY + chartOffY) * scaleFactorY;
+
+  tt.style.left = dotScreenX + 'px';
+  tt.style.top = (dotScreenY - 10) + 'px';
+  tt.style.transform = 'translate(-50%, -100%)';
+  tt.style.opacity = '1';
+}
+function hideTooltip() {
+  document.getElementById('chartTooltip').style.opacity = '0';
+}
+
+/* ── Animate player bars on side panel ── */
+function animatePlayerBars() {
+  // show cards
+  document.querySelectorAll('.pcard').forEach((el, i) => {
+    setTimeout(() => { el.classList.add('vis'); }, i * 150);
+  });
+  // animate fills
+  document.querySelectorAll('.pb-fill').forEach((el, i) => {
+    const targetW = el.dataset.w || '70%';
+    setTimeout(() => {
+      el.style.transition = 'width 1.8s cubic-bezier(.25,.46,.45,.94)';
+      el.style.width = targetW;
+    }, 300 + i * 120);
+  });
+}
+
+/* ── Filter ── */
+function setFilter(btn, pos) {
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  currentFilter = pos;
+  if(document.getElementById('dotsGroup').children.length > 0) {
+    // re-plot
+    isRevealing = false;
+    startReveal();
+  }
+}
+
+/* ── Axis switch ── */
+function setAxis(btn, axis, metric, label) {
+  document.querySelectorAll(`.axis-btn[data-axis="${axis}"]`).forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  if(axis === 'x') { xMetric = metric; xLabel = label; }
+  else { yMetric = metric; yLabel = label; }
+  if(document.getElementById('dotsGroup').children.length > 0) {
+    isRevealing = false;
+    startReveal();
+  }
+}
+
+/* ── INIT ── */
+window.addEventListener('load', () => {
+  buildGrid();
+});
+</script>
+</body>
+</html>
