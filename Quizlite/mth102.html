@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>50 Mathematics Questions – Vectors, Matrices &amp; Transformations</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@700;900&display=swap');
+
+:root {
+  --bg:    #ffffff;
+  --paper: #fafaf8;
+  --rule:  #e2ddd6;
+  --rule2: #ccc6bc;
+  --text:  #1a1814;
+  --muted: #6b6560;
+  --faint: #a09a94;
+
+  --vec:    #0e7490;  --vec-bg:  #ecfeff;
+  --mat:    #7c3aed;  --mat-bg:  #f5f3ff;
+  --det:    #b45309;  --det-bg:  #fffbeb;
+  --inv:    #1d4ed8;  --inv-bg:  #eff6ff;
+  --trn:    #166534;  --trn-bg:  #f0fdf4;
+  --rep:    #be123c;  --rep-bg:  #fff1f2;
+  --mix:    #374151;  --mix-bg:  #f9fafb;
+
+  --radius: 6px;
+  --mono: 'DM Mono', 'Courier New', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.65;
+  padding: 2rem 1rem 5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.paper { max-width: 860px; width: 100%; }
+
+@media print {
+  body { padding: 0; font-size: 13px; }
+  .no-print { display: none; }
+  .q-block { break-inside: avoid; }
+  .block-header { break-after: avoid; }
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  border: 2px solid var(--text);
+  border-radius: 2px;
+  padding: 2.6rem 2.4rem 2rem;
+  margin-bottom: 2.4rem;
+  position: relative;
+  background: var(--bg);
+}
+.masthead::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--rule2);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.masthead h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2.7rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+.masthead h1 em {
+  font-style: italic;
+  font-family: 'EB Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.masthead .subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+  margin-top: 0.4rem;
+}
+.tag-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0 0.4rem; }
+.tag {
+  padding: 0.18rem 0.65rem;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+.tag.vec { color: var(--vec); border-color: var(--vec); background: var(--vec-bg); }
+.tag.mat { color: var(--mat); border-color: var(--mat); background: var(--mat-bg); }
+.tag.det { color: var(--det); border-color: var(--det); background: var(--det-bg); }
+.tag.inv { color: var(--inv); border-color: var(--inv); background: var(--inv-bg); }
+.tag.trn { color: var(--trn); border-color: var(--trn); background: var(--trn-bg); }
+.tag.rep { color: var(--rep); border-color: var(--rep); background: var(--rep-bg); }
+
+/* ── TOC ── */
+.toc {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 2.4rem;
+  background: var(--paper);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 2rem;
+  font-size: 0.83rem;
+  font-family: var(--mono);
+}
+.toc-item { display: flex; align-items: center; gap: 0.45rem; color: var(--muted); }
+.toc-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── BLOCK HEADER ── */
+.block-header {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 2.6rem 0 1.1rem;
+  padding: 0.55rem 1rem;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.block-header.vec { background: var(--vec-bg); border-left: 4px solid var(--vec); color: var(--vec); }
+.block-header.mat { background: var(--mat-bg); border-left: 4px solid var(--mat); color: var(--mat); }
+.block-header.det { background: var(--det-bg); border-left: 4px solid var(--det); color: var(--det); }
+.block-header.inv { background: var(--inv-bg); border-left: 4px solid var(--inv); color: var(--inv); }
+.block-header.trn { background: var(--trn-bg); border-left: 4px solid var(--trn); color: var(--trn); }
+.block-header.rep { background: var(--rep-bg); border-left: 4px solid var(--rep); color: var(--rep); }
+.block-header.mix { background: var(--mix-bg); border-left: 4px solid var(--mix); color: var(--mix); }
+
+/* ── QUESTION CARD ── */
+.q-block {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1rem;
+  background: var(--bg);
+  transition: border-color 0.15s;
+}
+.q-block:hover { border-color: var(--rule2); }
+
+.q-meta { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.55rem; flex-wrap: wrap; }
+.q-num {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.08em; color: var(--text);
+  background: var(--paper); border: 1px solid var(--rule2);
+  padding: 0.08rem 0.45rem; border-radius: 3px;
+}
+.q-cat {
+  font-family: var(--mono); font-size: 0.64rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.08rem 0.45rem; border-radius: 3px;
+}
+.q-cat.vec { color: var(--vec); background: var(--vec-bg); }
+.q-cat.mat { color: var(--mat); background: var(--mat-bg); }
+.q-cat.det { color: var(--det); background: var(--det-bg); }
+.q-cat.inv { color: var(--inv); background: var(--inv-bg); }
+.q-cat.trn { color: var(--trn); background: var(--trn-bg); }
+.q-cat.rep { color: var(--rep); background: var(--rep-bg); }
+.q-cat.mix { color: var(--mix); background: var(--mix-bg); }
+
+.q-text { font-size: 1.02rem; color: var(--text); margin-bottom: 0.9rem; line-height: 1.6; }
+
+/* ── CSS MATH ── */
+.frac {
+  display: inline-flex; flex-direction: column; align-items: center;
+  vertical-align: middle; margin: 0 0.12em; font-size: 0.9em; line-height: 1.1;
+}
+.frac .num { border-bottom: 1.5px solid currentColor; padding: 0 0.1em 0.05em; min-width: 1em; text-align: center; }
+.frac .den { padding: 0.05em 0.1em 0; min-width: 1em; text-align: center; }
+
+.math {
+  font-family: var(--mono); font-size: 0.92em;
+  color: var(--text); background: #f5f3ef;
+  border: 1px solid var(--rule);
+  padding: 0.05rem 0.35rem; border-radius: 3px; white-space: nowrap;
+}
+
+.math-block {
+  font-family: var(--mono); font-size: 0.88em;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 0.65rem 1rem;
+  margin: 0.5rem 0; display: block;
+  overflow-x: auto; color: var(--text); line-height: 1.95;
+  white-space: pre;
+}
+
+sup { font-size: 0.72em; line-height: 0; vertical-align: super; }
+sub { font-size: 0.72em; line-height: 0; vertical-align: sub; }
+
+/* ── MATRIX DISPLAY ── */
+.matrix {
+  display: inline-flex; flex-direction: column; align-items: center;
+  vertical-align: middle; margin: 0 0.05em;
+  gap: 0.1em; font-family: var(--mono); font-size: 0.87em;
+  padding: 0.2em 0.5em;
+  border-left: 2.5px solid var(--text);
+  border-right: 2.5px solid var(--text);
+}
+.dmat {
+  display: inline-flex; flex-direction: column; align-items: center;
+  vertical-align: middle; margin: 0 0.05em;
+  gap: 0.1em; font-family: var(--mono); font-size: 0.87em;
+  padding: 0.2em 0.45em;
+  border-left: 1.5px solid var(--text);
+  border-right: 1.5px solid var(--text);
+}
+.mat-row { display: flex; gap: 0.85em; }
+.mat-cell { min-width: 1.5em; text-align: right; line-height: 1.45; }
+
+/* Bold vector notation */
+.bv { font-weight: 700; font-style: italic; }
+
+/* ── OPTIONS ── */
+.options {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 1.5rem; margin-bottom: 0.9rem;
+  font-size: 0.93rem; color: var(--muted);
+}
+.options.col1 { grid-template-columns: 1fr; }
+.options span { padding: 0.2rem 0; line-height: 1.7; }
+.options .correct { color: var(--trn); font-weight: 700; }
+
+/* ── SOLUTION ── */
+.solution {
+  background: var(--paper); border-left: 3px solid var(--rule2);
+  padding: 0.7rem 1rem; border-radius: 0 4px 4px 0;
+  font-size: 0.875rem; color: var(--muted);
+  line-height: 1.65; margin-bottom: 0.6rem;
+}
+.solution strong { color: var(--text); }
+.solution em { color: var(--text); font-style: normal; font-weight: 600; }
+.solution .key { color: var(--inv); font-weight: 700; }
+.solution .step {
+  display: block; padding: 0.15rem 0 0.15rem 1rem;
+  border-left: 2px solid var(--rule); margin: 0.3rem 0;
+  font-family: var(--mono); font-size: 0.85em;
+  color: var(--text); overflow-x: auto; line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* ── ANSWER BADGE ── */
+.answer-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: #f0fdf4; color: var(--trn);
+  font-weight: 700; font-family: var(--mono);
+  font-size: 0.78rem; letter-spacing: 0.03em;
+  padding: 0.22rem 0.75rem; border-radius: 20px;
+  border: 1px solid #bbf7d0;
+}
+.answer-badge::before { content: '✓  '; }
+
+.hr-rule { border: none; border-top: 1px solid var(--rule); margin: 1.5rem 0; }
+
+.footer {
+  text-align: center; color: var(--faint);
+  font-family: var(--mono); font-size: 0.76rem;
+  margin-top: 3rem; padding-top: 1.2rem;
+  border-top: 1px solid var(--rule); letter-spacing: 0.06em;
+}
+
+@media (max-width: 600px) {
+  .masthead h1 { font-size: 1.9rem; }
+  .options, .toc { grid-template-columns: 1fr; }
+  .matrix, .dmat { font-size: 0.75em; }
+}
+</style>
+</head>
+<body>
+<div class="paper">
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <h1>50 Further <em>Mathematics</em> Questions</h1>
+  <div class="tag-row">
+    <span class="tag vec">Vectors</span>
+    <span class="tag vec">Dot &amp; Cross</span>
+    <span class="tag mat">Matrices</span>
+    <span class="tag det">Determinants</span>
+    <span class="tag inv">Inverse &amp; Systems</span>
+    <span class="tag trn">Transformations</span>
+    <span class="tag rep">Spaced Rep</span>
+  </div>
+  <p class="subtitle">MTH101 / Further Maths · 10 Flow · 10 Spaced Repetition · 30 JAMB-Standard · Q1–Q50</p>
+</div>
+
+<!-- ══ TABLE OF CONTENTS ══ -->
+<div class="toc">
+  <div class="toc-item"><span class="toc-dot" style="background:var(--vec)"></span>Vector Notation &amp; Fundamentals (Q1–Q7)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--vec)"></span>Dot Product — Core Conversions (Q8–Q14)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--vec)"></span>Cross Product — Core Conversions (Q15–Q21)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--rep)"></span>Spaced Rep Bridge (Q22)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--mat)"></span>Matrix Fundamentals &amp; Operations (Q23–Q30)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--rep)"></span>Spaced Rep Bridge (Q31)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--det)"></span>Determinants — Core Conversions (Q32–Q39)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--inv)"></span>Inverse &amp; Linear Systems (Q40–Q46)</div>
+  <div class="toc-item"><span class="toc-dot" style="background:var(--trn)"></span>Transformations &amp; Capstone (Q47–Q50)</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     BLOCK 1 — VECTOR NOTATION & FUNDAMENTALS · Flow Q1–Q7
+     ════════════════════════════════════════════════════════════════ -->
+<div class="block-header vec">→ Block 1 — Vector Notation &amp; Fundamentals · Flow Q1–Q7</div>
+
+<!-- Q1 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 01</span><span class="q-cat vec">Magnitude · Flow</span></div>
+  <div class="q-text">
+    If <b class="bv">a</b> = 3<b>i</b> + 4<b>j</b>, find |<b class="bv">a</b>|.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">7</span></span>
+    <span>(B) <span class="math">1</span></span>
+    <span class="correct">(C) <span class="math">5</span></span>
+    <span>(D) <span class="math">25</span></span>
+  </div>
+  <div class="solution">
+    <strong>Magnitude formula:</strong> |<b class="bv">a</b>| = √(a<sub>x</sub>² + a<sub>y</sub>²).
+    <span class="step">|<b class="bv">a</b>| = √(3² + 4²) = √(9 + 16) = √25 = 5</span>
+    <em>Core conversion:</em> Square each component separately, then sum, then √. Adding 3+4=7 (option A) skips both the squaring and the root — a double error. Option D forgets the √.
+  </div>
+  <span class="answer-badge">Answer: C — 5</span>
+</div>
+
+<!-- Q2 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 02</span><span class="q-cat vec">Unit Vector · Flow</span></div>
+  <div class="q-text">
+    Find the unit vector in the direction of <b class="bv">v</b> = 6<b>i</b> − 8<b>j</b>.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">6<b>i</b> − 8<b>j</b></span></span>
+    <span class="correct">(B) <span class="frac"><span class="num">3</span><span class="den">5</span></span><b>i</b> − <span class="frac"><span class="num">4</span><span class="den">5</span></span><b>j</b></span>
+    <span>(C) <span class="math"><b>i</b> − <b>j</b></span></span>
+    <span>(D) <span class="frac"><span class="num">3</span><span class="den">5</span></span><b>i</b> + <span class="frac"><span class="num">4</span><span class="den">5</span></span><b>j</b></span>
+  </div>
+  <div class="solution">
+    <strong>Unit vector formula:</strong> v̂ = <b class="bv">v</b> / |<b class="bv">v</b>|.
+    <span class="step">|<b class="bv">v</b>| = √(6² + (−8)²) = √(36 + 64) = √100 = 10</span>
+    <span class="step">v̂ = (6/10)<b>i</b> + (−8/10)<b>j</b> = (3/5)<b>i</b> − (4/5)<b>j</b></span>
+    <em>Check:</em> |(3/5)² + (−4/5)²| = √(9/25 + 16/25) = √1 = 1 ✓. Option D incorrectly flips the sign of the <b>j</b> component.
+  </div>
+  <span class="answer-badge">Answer: B — (3/5)<b>i</b> − (4/5)<b>j</b></span>
+</div>
+
+<!-- Q3 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 03</span><span class="q-cat vec">Position Vector · Flow</span></div>
+  <div class="q-text">
+    Write the position vector of point P(2, −3, 5) in <b>i</b>, <b>j</b>, <b>k</b> component form.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">2<b>i</b> + 3<b>j</b> + 5<b>k</b></span></span>
+    <span>(B) <span class="math">−2<b>i</b> + 3<b>j</b> − 5<b>k</b></span></span>
+    <span class="correct">(C) <span class="math">2<b>i</b> − 3<b>j</b> + 5<b>k</b></span></span>
+    <span>(D) <span class="math">3<b>i</b> + 2<b>j</b> + 5<b>k</b></span></span>
+  </div>
+  <div class="solution">
+    <strong>Direct read-off:</strong> each coordinate becomes the coefficient of its corresponding basis vector.
+    <span class="step">P(x, y, z) → x<b>i</b> + y<b>j</b> + z<b>k</b></span>
+    <span class="step">P(2, −3, 5) → 2<b>i</b> + (−3)<b>j</b> + 5<b>k</b> = 2<b>i</b> − 3<b>j</b> + 5<b>k</b></span>
+    The sign of the y-component carries through. Option A loses the negative sign on <b>j</b>.
+  </div>
+  <span class="answer-badge">Answer: C — 2<b>i</b> − 3<b>j</b> + 5<b>k</b></span>
+</div>
+
+<!-- Q4 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 04</span><span class="q-cat vec">Vector Arithmetic</span></div>
+  <div class="q-text">
+    Given <b class="bv">a</b> = (2, 5, −1) and <b class="bv">b</b> = (−3, 2, 4), find <b class="bv">a</b> + 2<b class="bv">b</b>.
+  </div>
+  <div class="options">
+    <span class="correct">(A) <span class="math">(−4, 9, 7)</span></span>
+    <span>(B) <span class="math">(4, 9, −7)</span></span>
+    <span>(C) <span class="math">(1, 7, 3)</span></span>
+    <span>(D) <span class="math">(−1, 7, 7)</span></span>
+  </div>
+  <div class="solution">
+    <strong>Scalar multiply first, then add component-wise.</strong>
+    <span class="step">2<b class="bv">b</b> = 2(−3, 2, 4) = (−6, 4, 8)</span>
+    <span class="step"><b class="bv">a</b> + 2<b class="bv">b</b> = (2+(−6), 5+4, −1+8) = (−4, 9, 7)</span>
+    Option B is the result of <em>|a| + 2|b|</em> thinking — mixing magnitudes with components.
+  </div>
+  <span class="answer-badge">Answer: A — (−4, 9, 7)</span>
+</div>
+
+<!-- Q5 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 05</span><span class="q-cat vec">Magnitude of Difference</span></div>
+  <div class="q-text">
+    Given <b class="bv">a</b> = 2<b>i</b> + 3<b>j</b> and <b class="bv">b</b> = <b>i</b> − <b>j</b>, find |<b class="bv">a</b> − <b class="bv">b</b>|.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">√5</span></span>
+    <span>(B) <span class="math">5</span></span>
+    <span class="correct">(C) <span class="math">√17</span></span>
+    <span>(D) <span class="math">3</span></span>
+  </div>
+  <div class="solution">
+    <strong>Two-step process:</strong> subtract first, then find magnitude.
+    <span class="step"><b class="bv">a</b> − <b class="bv">b</b> = (2−1)<b>i</b> + (3−(−1))<b>j</b> = <b>i</b> + 4<b>j</b></span>
+    <span class="step">|<b class="bv">a</b> − <b class="bv">b</b>| = √(1² + 4²) = √(1 + 16) = √17</span>
+    Option A (√5) would follow from subtracting the magnitudes, which is not a valid operation.
+  </div>
+  <span class="answer-badge">Answer: C — √17</span>
+</div>
+
+<!-- Q6 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 06</span><span class="q-cat vec">Core Conversion — Displacement Vector</span></div>
+  <div class="q-text">
+    Find the vector from A(1, 2, 3) to B(4, 0, −1) as a column vector. <em>This is the core A-to-B conversion — the direction matters.</em>
+  </div>
+  <div class="options">
+    <span>(A)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">3</span></span>
+        <span class="mat-row"><span class="mat-cell">2</span></span>
+        <span class="mat-row"><span class="mat-cell">4</span></span>
+      </span>
+    </span>
+    <span class="correct">(B)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">3</span></span>
+        <span class="mat-row"><span class="mat-cell">−2</span></span>
+        <span class="mat-row"><span class="mat-cell">−4</span></span>
+      </span>
+    </span>
+    <span>(C)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">5</span></span>
+        <span class="mat-row"><span class="mat-cell">2</span></span>
+        <span class="mat-row"><span class="mat-cell">2</span></span>
+      </span>
+    </span>
+    <span>(D)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">−3</span></span>
+        <span class="mat-row"><span class="mat-cell">2</span></span>
+        <span class="mat-row"><span class="mat-cell">4</span></span>
+      </span>
+    </span>
+  </div>
+  <div class="solution">
+    <strong>Core conversion:</strong> <b>AB</b> = B − A, not A − B.
+    <span class="step">
+AB = (4−1, 0−2, −1−3)
+   = (3, −2, −4)</span>
+    <em>Direction is encoded in the subtraction order.</em> Option D is the result of A − B (reversing the direction), giving the vector <b>BA</b> instead.
+  </div>
+  <span class="answer-badge">Answer: B — (3, −2, −4)</span>
+</div>
+
+<!-- Q7 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 07</span><span class="q-cat vec">Scalar vs Vector · Flow</span></div>
+  <div class="q-text">
+    Which of the following expressions always produces a <em>scalar</em> result?
+  </div>
+  <div class="options">
+    <span>(A) <span class="math"><b class="bv">a</b> × <b class="bv">b</b></span></span>
+    <span>(B) <span class="math"><b class="bv">a</b> + <b class="bv">b</b></span></span>
+    <span class="correct">(C) <span class="math"><b class="bv">a</b> · <b class="bv">b</b></span></span>
+    <span>(D) <span class="math">λ<b class="bv">a</b></span></span>
+  </div>
+  <div class="solution">
+    <strong>Type rules:</strong>
+    <span class="step">
+(A) a × b  → vector  (perpendicular to both a and b)
+(B) a + b  → vector  (component-wise addition)
+(C) a · b  → scalar  (a real number: |a||b|cosθ)
+(D) λa     → vector  (scaled in the same direction)</span>
+    The dot product collapses two vectors into a single number by summing the products of corresponding components. This is its defining property.
+  </div>
+  <span class="answer-badge">Answer: C — dot product a · b</span>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     BLOCK 2 — DOT PRODUCT: CORE CONVERSIONS
+     ════════════════════════════════════════════════════════════════ -->
+<div class="block-header vec">· Block 2 — Dot Product: Core Conversions · Q8–Q14</div>
+
+<!-- Q8 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 08</span><span class="q-cat vec">Dot Product — Computation</span></div>
+  <div class="q-text">
+    Find <b class="bv">a</b> · <b class="bv">b</b> where <b class="bv">a</b> = 2<b>i</b> + 3<b>j</b> − <b>k</b> and <b class="bv">b</b> = <b>i</b> − 2<b>j</b> + 3<b>k</b>.
+  </div>
+  <div class="options">
+    <span class="correct">(A) <span class="math">−7</span></span>
+    <span>(B) <span class="math">7</span></span>
+    <span>(C) <span class="math">−1</span></span>
+    <span>(D) <span class="math">5</span></span>
+  </div>
+  <div class="solution">
+    <strong>Formula:</strong> <b class="bv">a</b> · <b class="bv">b</b> = a<sub>1</sub>b<sub>1</sub> + a<sub>2</sub>b<sub>2</sub> + a<sub>3</sub>b<sub>3</sub>.
+    <span class="step">a · b = (2)(1) + (3)(−2) + (−1)(3)
+     = 2  −  6  −  3
+     = −7</span>
+    <em>Core conversion:</em> Multiply matching components, then sum — do not confuse with cross product. The result is a single number. Option B ignores the signs.
+  </div>
+  <span class="answer-badge">Answer: A — −7</span>
+</div>
+
+<!-- Q9 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 09</span><span class="q-cat vec">Perpendicularity Test</span></div>
+  <div class="q-text">
+    The angle between vectors <b class="bv">a</b> = (3, 4) and <b class="bv">b</b> = (4, −3) is:
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">0°</span></span>
+    <span>(B) <span class="math">45°</span></span>
+    <span class="correct">(C) <span class="math">90°</span></span>
+    <span>(D) <span class="math">180°</span></span>
+  </div>
+  <div class="solution">
+    <strong>Key identity:</strong> cosθ = <b class="bv">a</b>·<b class="bv">b</b> / (|<b class="bv">a</b>||<b class="bv">b</b>|).
+    <span class="step">a · b = (3)(4) + (4)(−3) = 12 − 12 = 0</span>
+    <span class="step">cos θ = 0  →  θ = 90°</span>
+    <em>Core conversion:</em> <b class="bv">a</b> · <b class="bv">b</b> = 0 is the algebraic signature of perpendicularity. You never need to compute |<b class="bv">a</b>| or |<b class="bv">b</b>| when testing for perpendicularity — if the dot product is zero, the vectors are orthogonal.
+  </div>
+  <span class="answer-badge">Answer: C — 90°</span>
+</div>
+
+<!-- Q10 — SPACED REP: revisits magnitude/perpendicularity -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 10</span><span class="q-cat rep">Spaced Rep — Perpendicularity Condition</span></div>
+  <div class="q-text">
+    Vectors <b class="bv">a</b> = (3, t) and <b class="bv">b</b> = (2, 6) are perpendicular. Find the value of t.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">t = 1</span></span>
+    <span class="correct">(B) <span class="math">t = −1</span></span>
+    <span>(C) <span class="math">t = −6</span></span>
+    <span>(D) <span class="math">t = 6</span></span>
+  </div>
+  <div class="solution">
+    <strong>Perpendicularity condition:</strong> <b class="bv">a</b> · <b class="bv">b</b> = 0.
+    <span class="step">a · b = (3)(2) + (t)(6) = 6 + 6t = 0</span>
+    <span class="step">6t = −6  →  t = −1</span>
+    <em>Verification:</em> <b class="bv">a</b> = (3, −1), <b class="bv">b</b> = (2, 6): (3)(2) + (−1)(6) = 6 − 6 = 0 ✓. The unknown appears inside the dot product as a coefficient — set the result to zero and solve linearly.
+  </div>
+  <span class="answer-badge">Answer: B — t = −1</span>
+</div>
+
+<!-- Q11 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 11</span><span class="q-cat vec">Scalar Projection</span></div>
+  <div class="q-text">
+    Find the scalar projection of <b class="bv">a</b> = (3, 4) onto <b class="bv">b</b> = (1, 2).
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">√5</span></span>
+    <span class="correct">(B) <span class="frac"><span class="num">11√5</span><span class="den">5</span></span></span>
+    <span>(C) <span class="frac"><span class="num">11</span><span class="den">5</span></span></span>
+    <span>(D) <span class="math">11</span></span>
+  </div>
+  <div class="solution">
+    <strong>Scalar projection</strong> of <b class="bv">a</b> onto <b class="bv">b</b> = <b class="bv">a</b> · b̂ = (<b class="bv">a</b> · <b class="bv">b</b>) / |<b class="bv">b</b>|.
+    <span class="step">a · b = (3)(1) + (4)(2) = 3 + 8 = 11</span>
+    <span class="step">|b| = √(1² + 2²) = √5</span>
+    <span class="step">Scalar projection = 11 / √5 = (11√5) / 5</span>
+    <em>Core conversion:</em> 1/√5 = √5/5 (rationalise by multiplying numerator and denominator by √5). Option C would be the scalar component of the vector projection, not the scalar projection itself.
+  </div>
+  <span class="answer-badge">Answer: B — 11√5 / 5</span>
+</div>
+
+<!-- Q12 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 12</span><span class="q-cat vec">Dot Product Properties</span></div>
+  <div class="q-text">
+    Which property of the dot product is <em>always</em> true for any non-zero vectors <b class="bv">a</b> and <b class="bv">b</b>?
+  </div>
+  <div class="options">
+    <span class="correct">(A) <span class="math"><b class="bv">a</b> · <b class="bv">b</b> = <b class="bv">b</b> · <b class="bv">a</b></span></span>
+    <span>(B) <span class="math"><b class="bv">a</b> · (<b class="bv">b</b> · <b class="bv">c</b>) = (<b class="bv">a</b> · <b class="bv">b</b>) · <b class="bv">c</b></span></span>
+    <span>(C) <span class="math"><b class="bv">a</b> · <b class="bv">b</b></span> is a vector</span>
+    <span>(D) <span class="math">|<b class="bv">a</b> · <b class="bv">b</b>| = |<b class="bv">a</b>| · |<b class="bv">b</b>|</span></span>
+  </div>
+  <div class="solution">
+    <strong>Commutativity:</strong> <b class="bv">a</b> · <b class="bv">b</b> = |<b class="bv">a</b>||<b class="bv">b</b>|cosθ = |<b class="bv">b</b>||<b class="bv">a</b>|cosθ = <b class="bv">b</b> · <b class="bv">a</b> ✓
+    <span class="step">
+(B) FALSE — b·c produces a scalar; you cannot then take a vector·scalar.
+    "Associativity" does not apply to the dot product.
+(C) FALSE — the dot product always produces a scalar (real number).
+(D) FALSE — |a·b| = |a||b||cosθ| ≤ |a||b|; equality only when θ = 0° or 180°.</span>
+  </div>
+  <span class="answer-badge">Answer: A — commutativity: a · b = b · a</span>
+</div>
+
+<!-- Q13 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 13</span><span class="q-cat vec">Dot Product from Angle</span></div>
+  <div class="q-text">
+    If |<b class="bv">a</b>| = 2, |<b class="bv">b</b>| = 3, and the angle between them is 60°, find <b class="bv">a</b> · <b class="bv">b</b>.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">6</span></span>
+    <span class="correct">(B) <span class="math">3</span></span>
+    <span>(C) <span class="math">3√3</span></span>
+    <span>(D) <span class="math">√3</span></span>
+  </div>
+  <div class="solution">
+    <strong>Formula:</strong> <b class="bv">a</b> · <b class="bv">b</b> = |<b class="bv">a</b>||<b class="bv">b</b>|cos θ.
+    <span class="step">a · b = (2)(3) cos 60° = 6 × (1/2) = 3</span>
+    Option A forgets to multiply by cos 60° (i.e., it uses cos 0° = 1 implicitly). Option C uses sin 60° = √3/2 instead of cos 60°.
+  </div>
+  <span class="answer-badge">Answer: B — 3</span>
+</div>
+
+<!-- Q14 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 14</span><span class="q-cat vec">Angle Between Vectors</span></div>
+  <div class="q-text">
+    Find the angle between <b class="bv">a</b> = <b>i</b> + <b>j</b> + <b>k</b> and <b class="bv">b</b> = <b>i</b> − <b>j</b> + <b>k</b>.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">45°</span></span>
+    <span>(B) <span class="math">60°</span></span>
+    <span class="correct">(C) <span class="math">cos<sup>−1</sup>(<span class="frac"><span class="num">1</span><span class="den">3</span></span>)</span></span>
+    <span>(D) <span class="math">cos<sup>−1</sup>(<span class="frac"><span class="num">1</span><span class="den">√3</span></span>)</span></span>
+  </div>
+  <div class="solution">
+    <strong>Three steps:</strong> compute the dot product, find both magnitudes, then apply the angle formula.
+    <span class="step">a · b = (1)(1) + (1)(−1) + (1)(1) = 1 − 1 + 1 = 1</span>
+    <span class="step">|a| = √(1+1+1) = √3,   |b| = √(1+1+1) = √3</span>
+    <span class="step">cos θ = 1 / (√3 · √3) = 1/3</span>
+    <span class="step">θ = cos⁻¹(1/3) ≈ 70.5°</span>
+    This does not simplify to a standard angle. Option D confuses 1/(√3·√3) = 1/3 with 1/√3.
+  </div>
+  <span class="answer-badge">Answer: C — cos⁻¹(1/3)</span>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     BLOCK 3 — CROSS PRODUCT: CORE CONVERSIONS
+     ════════════════════════════════════════════════════════════════ -->
+<div class="block-header vec">× Block 3 — Cross Product: Core Conversions · Q15–Q21</div>
+
+<!-- Q15 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 15</span><span class="q-cat vec">Cross Product — Definition · Flow</span></div>
+  <div class="q-text">
+    The cross product <b class="bv">a</b> × <b class="bv">b</b> of two non-zero, non-parallel vectors produces:
+  </div>
+  <div class="options">
+    <span>(A) a scalar equal to |<b class="bv">a</b>||<b class="bv">b</b>|sinθ</span>
+    <span class="correct">(B) a vector perpendicular to both <b class="bv">a</b> and <b class="bv">b</b></span>
+    <span>(C) a vector parallel to <b class="bv">a</b></span>
+    <span>(D) the zero vector always</span>
+  </div>
+  <div class="solution">
+    <strong>Defining properties of the cross product:</strong>
+    <span class="step">
+Direction: perpendicular to both a and b  (right-hand rule gives orientation)
+Magnitude: |a × b| = |a||b|sin θ          (sin θ, not cos θ — this is NOT the dot product)
+Type:      vector — the cross product of two vectors is always a vector</span>
+    Option A has the correct magnitude formula but wrong type. Option D is only true when <b class="bv">a</b> ∥ <b class="bv">b</b> (sinθ = 0).
+  </div>
+  <span class="answer-badge">Answer: B — vector perpendicular to both</span>
+</div>
+
+<!-- Q16 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 16</span><span class="q-cat vec">Cross Product — 3D Computation</span></div>
+  <div class="q-text">
+    Find <b class="bv">a</b> × <b class="bv">b</b> where <b class="bv">a</b> = <b>i</b> + 2<b>j</b> + 3<b>k</b> and <b class="bv">b</b> = 2<b>i</b> + <b>j</b> − <b>k</b>.
+  </div>
+  <div class="options col1">
+    <span class="correct">(A) <span class="math">−5<b>i</b> + 7<b>j</b> − 3<b>k</b></span></span>
+    <span>(B) <span class="math">−5<b>i</b> − 7<b>j</b> − 3<b>k</b></span></span>
+    <span>(C) <span class="math">5<b>i</b> + 7<b>j</b> + 3<b>k</b></span></span>
+    <span>(D) <span class="math">−5<b>i</b> + 7<b>j</b> + 3<b>k</b></span></span>
+  </div>
+  <div class="solution">
+    <strong>Determinant method:</strong> expand along row 1.
+    <span class="step">
+a × b = | i   j   k |
+        | 1   2   3 |
+        | 2   1  −1 |
+
+  i-component: (2)(−1) − (3)(1) = −2 − 3 = −5
+  j-component: −[(1)(−1) − (3)(2)] = −[−1 − 6] = −(−7) = +7
+  k-component: (1)(1) − (2)(2) = 1 − 4 = −3</span>
+    <em>Core conversion:</em> the <b>j</b>-component carries a minus sign in the cofactor expansion — the most common source of error (option D forgets to negate the k-component).
+  </div>
+  <span class="answer-badge">Answer: A — −5<b>i</b> + 7<b>j</b> − 3<b>k</b></span>
+</div>
+
+<!-- Q17 — SPACED REP: revisits perpendicularity/parallel from Q9 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 17</span><span class="q-cat rep">Spaced Rep — Parallel Vectors</span></div>
+  <div class="q-text">
+    If <b class="bv">a</b> and <b class="bv">b</b> are non-zero and <em>parallel</em>, then <b class="bv">a</b> × <b class="bv">b</b> = ?
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">1</span></span>
+    <span>(B) <span class="math">|<b class="bv">a</b>| · |<b class="bv">b</b>|</span></span>
+    <span class="correct">(C) <span class="math"><b>0</b></span> (the zero vector)</span>
+    <span>(D) <span class="math"><b class="bv">a</b> · <b class="bv">b</b></span></span>
+  </div>
+  <div class="solution">
+    <strong>Magnitude argument:</strong> |<b class="bv">a</b> × <b class="bv">b</b>| = |<b class="bv">a</b>||<b class="bv">b</b>|sin θ.
+    <span class="step">Parallel vectors → θ = 0° or 180°  →  sin θ = 0
+Therefore |a × b| = |a||b| × 0 = 0  →  a × b = 0</span>
+    <em>Symmetry pair:</em> dot product = 0 signals perpendicularity; cross product = <b>0</b> signals parallel. These are the two algebraic perpendicularity/parallelism tests.
+  </div>
+  <span class="answer-badge">Answer: C — 0 (zero vector)</span>
+</div>
+
+<!-- Q18 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 18</span><span class="q-cat vec">Area via Cross Product</span></div>
+  <div class="q-text">
+    Find the area of the triangle OAB where O is the origin, A = (2, 1, 0), B = (0, 3, 1).
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">√41</span></span>
+    <span class="correct">(B) <span class="frac"><span class="num">√41</span><span class="den">2</span></span></span>
+    <span>(C) <span class="frac"><span class="num">41</span><span class="den">2</span></span></span>
+    <span>(D) <span class="frac"><span class="num">√41</span><span class="den">4</span></span></span>
+  </div>
+  <div class="solution">
+    <strong>Formula:</strong> Area of △ = ½|<b>OA</b> × <b>OB</b>|.
+    <span class="step">
+OA = (2,1,0),  OB = (0,3,1)
+
+OA × OB = | i  j  k |
+          | 2  1  0 |
+          | 0  3  1 |
+
+  i: (1)(1)−(0)(3) = 1
+  j: −[(2)(1)−(0)(0)] = −2
+  k: (2)(3)−(1)(0) = 6
+
+OA × OB = i − 2j + 6k</span>
+    <span class="step">|OA × OB| = √(1 + 4 + 36) = √41</span>
+    <span class="step">Area = ½ · √41 = √41 / 2</span>
+    Option A forgets the ½ factor (that gives the parallelogram area, not the triangle area).
+  </div>
+  <span class="answer-badge">Answer: B — √41 / 2</span>
+</div>
+
+<!-- Q19 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 19</span><span class="q-cat vec">Basis Vector Cross Products</span></div>
+  <div class="q-text">
+    Evaluate <b>i</b> × (<b>j</b> × <b>k</b>).
+  </div>
+  <div class="options">
+    <span>(A) <span class="math"><b>i</b></span></span>
+    <span>(B) <span class="math"><b>j</b></span></span>
+    <span>(C) <span class="math"><b>k</b></span></span>
+    <span class="correct">(D) <span class="math"><b>0</b></span></span>
+  </div>
+  <div class="solution">
+    <strong>Evaluate inner bracket first:</strong>
+    <span class="step">
+Cyclic rule:  i × j = k,  j × k = i,  k × i = j
+
+Step 1: j × k = i
+Step 2: i × i = 0   (a vector crossed with itself is always 0)</span>
+    <em>Core conversion:</em> any vector crossed with <em>itself</em> yields the zero vector, because sin 0° = 0. Option A (just <b>i</b>) is the error of dropping the second step.
+  </div>
+  <span class="answer-badge">Answer: D — 0 (zero vector)</span>
+</div>
+
+<!-- Q20 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 20</span><span class="q-cat vec">Mixed Dot &amp; Cross Condition</span></div>
+  <div class="q-text">
+    Given that <b class="bv">a</b> · <b class="bv">b</b> &gt; 0 and |<b class="bv">a</b> × <b class="bv">b</b>| = <b class="bv">a</b> · <b class="bv">b</b>, find the acute angle between <b class="bv">a</b> and <b class="bv">b</b>.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">30°</span></span>
+    <span class="correct">(B) <span class="math">45°</span></span>
+    <span>(C) <span class="math">60°</span></span>
+    <span>(D) <span class="math">90°</span></span>
+  </div>
+  <div class="solution">
+    <strong>Write both sides in terms of θ:</strong>
+    <span class="step">|a × b| = |a||b|sinθ
+a · b   = |a||b|cosθ  (positive since a · b > 0 → 0 < θ < 90°)</span>
+    <span class="step">Setting them equal:
+|a||b|sinθ = |a||b|cosθ
+sinθ = cosθ
+tanθ = 1
+θ = 45°</span>
+    <em>The condition a·b > 0 is crucial:</em> it restricts the solution to the first quadrant, eliminating θ = 135° as a candidate.
+  </div>
+  <span class="answer-badge">Answer: B — 45°</span>
+</div>
+
+<!-- Q21 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 21</span><span class="q-cat vec">Magnitude of Cross Product</span></div>
+  <div class="q-text">
+    Given <b class="bv">a</b> = (1, −1, 1) and <b class="bv">b</b> = (2, 1, 3), find |<b class="bv">a</b> × <b class="bv">b</b>|.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">√14</span></span>
+    <span>(B) <span class="math">√23</span></span>
+    <span class="correct">(C) <span class="math">√26</span></span>
+    <span>(D) <span class="math">√22</span></span>
+  </div>
+  <div class="solution">
+    <strong>Compute the cross product, then its magnitude.</strong>
+    <span class="step">
+a × b = | i   j   k |
+        | 1  −1   1 |
+        | 2   1   3 |
+
+  i: (−1)(3)−(1)(1) = −3−1 = −4
+  j: −[(1)(3)−(1)(2)] = −[3−2] = −1
+  k: (1)(1)−(−1)(2) = 1+2 = 3
+
+a × b = −4i − j + 3k</span>
+    <span class="step">|a × b| = √((−4)² + (−1)² + 3²) = √(16 + 1 + 9) = √26</span>
+  </div>
+  <span class="answer-badge">Answer: C — √26</span>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     SPACED REP BRIDGE — Q22
+     ════════════════════════════════════════════════════════════════ -->
+<div class="block-header rep">↺ Spaced Rep Bridge · Q22 — Vector Midpoint (revisits Q3, Q4)</div>
+
+<!-- Q22 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 22</span><span class="q-cat rep">Spaced Rep — Midpoint Position Vector</span></div>
+  <div class="q-text">
+    A = (2, 4) and B = (6, −2). Find the position vector of the midpoint M of AB.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">8<b>i</b> + 2<b>j</b></span></span>
+    <span>(B) <span class="math">2<b>i</b> + 3<b>j</b></span></span>
+    <span class="correct">(C) <span class="math">4<b>i</b> + <b>j</b></span></span>
+    <span>(D) <span class="math">4<b>i</b> − 3<b>j</b></span></span>
+  </div>
+  <div class="solution">
+    <strong>Midpoint formula:</strong> M = ½(<b>OA</b> + <b>OB</b>) = ½(A + B).
+    <span class="step">
+M = ((2+6)/2, (4+(−2))/2)
+  = (8/2, 2/2)
+  = (4, 1)</span>
+    <span class="step">Position vector: 4<b>i</b> + 1<b>j</b> = 4<b>i</b> + <b>j</b></span>
+    Option A adds coordinates without halving. Option D incorrectly subtracts. This revisits position vector notation from Q3 and component arithmetic from Q4.
+  </div>
+  <span class="answer-badge">Answer: C — 4<b>i</b> + <b>j</b></span>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     BLOCK 4 — MATRIX FUNDAMENTALS & OPERATIONS
+     ════════════════════════════════════════════════════════════════ -->
+<div class="block-header mat">[·] Block 4 — Matrix Fundamentals &amp; Operations · Q23–Q30</div>
+
+<!-- Q23 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 23</span><span class="q-cat mat">Matrix Order · Flow</span></div>
+  <div class="q-text">
+    A matrix of order 3 × 2 has how many elements?
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">5</span></span>
+    <span class="correct">(B) <span class="math">6</span></span>
+    <span>(C) <span class="math">9</span></span>
+    <span>(D) <span class="math">2</span></span>
+  </div>
+  <div class="solution">
+    <strong>Order m × n:</strong> m rows, n columns → m × n total elements.
+    <span class="step">3 rows × 2 columns = 6 elements</span>
+    A 3 × 2 matrix looks like this:
+    <span class="step">
+[ a  b ]
+[ c  d ]
+[ e  f ]</span>
+    Option A (5) is the sum 3+2 — a common error. The number of elements is always the product of the dimensions.
+  </div>
+  <span class="answer-badge">Answer: B — 6</span>
+</div>
+
+<!-- Q24 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 24</span><span class="q-cat mat">Matrix Addition · Flow</span></div>
+  <div class="q-text">
+    Let A =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">2</span></span>
+      <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">4</span></span>
+    </span> and B =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">5</span><span class="mat-cell">6</span></span>
+      <span class="mat-row"><span class="mat-cell">7</span><span class="mat-cell">8</span></span>
+    </span>. Find A + B.
+  </div>
+  <div class="options col1">
+    <span class="correct">(A)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">6</span><span class="mat-cell">8</span></span>
+        <span class="mat-row"><span class="mat-cell">10</span><span class="mat-cell">12</span></span>
+      </span>
+    </span>
+    <span>(B)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">5</span><span class="mat-cell">12</span></span>
+        <span class="mat-row"><span class="mat-cell">21</span><span class="mat-cell">32</span></span>
+      </span>
+    </span>
+    <span>(C)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">6</span><span class="mat-cell">8</span></span>
+        <span class="mat-row"><span class="mat-cell">9</span><span class="mat-cell">12</span></span>
+      </span>
+    </span>
+    <span>(D)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">7</span><span class="mat-cell">8</span></span>
+        <span class="mat-row"><span class="mat-cell">9</span><span class="mat-cell">10</span></span>
+      </span>
+    </span>
+  </div>
+  <div class="solution">
+    <strong>Add corresponding elements:</strong>
+    <span class="step">
+(1,1): 1+5=6   (1,2): 2+6=8
+(2,1): 3+7=10  (2,2): 4+8=12</span>
+    Option B is element-wise multiplication (Hadamard product), not addition. Option D adds 1 to each element of A — ignoring B entirely.
+  </div>
+  <span class="answer-badge">Answer: A — [[6,8],[10,12]]</span>
+</div>
+
+<!-- Q25 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 25</span><span class="q-cat mat">Scalar Multiplication</span></div>
+  <div class="q-text">
+    If A =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">2</span><span class="mat-cell">−1</span></span>
+      <span class="mat-row"><span class="mat-cell">0</span><span class="mat-cell">3</span></span>
+    </span>, find 3A.
+  </div>
+  <div class="options col1">
+    <span>(A)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">5</span><span class="mat-cell">2</span></span>
+        <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">6</span></span>
+      </span>
+    </span>
+    <span class="correct">(B)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">6</span><span class="mat-cell">−3</span></span>
+        <span class="mat-row"><span class="mat-cell">0</span><span class="mat-cell">9</span></span>
+      </span>
+    </span>
+    <span>(C)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">6</span><span class="mat-cell">3</span></span>
+        <span class="mat-row"><span class="mat-cell">0</span><span class="mat-cell">9</span></span>
+      </span>
+    </span>
+    <span>(D)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">2</span><span class="mat-cell">−3</span></span>
+        <span class="mat-row"><span class="mat-cell">0</span><span class="mat-cell">9</span></span>
+      </span>
+    </span>
+  </div>
+  <div class="solution">
+    <strong>Scalar multiplication:</strong> multiply every element by the scalar.
+    <span class="step">3 × 2 = 6,  3 × (−1) = −3,  3 × 0 = 0,  3 × 3 = 9</span>
+    Option A adds 3 to each element (wrong operation). Option C loses the sign on −3. Option D only multiplies some elements.
+  </div>
+  <span class="answer-badge">Answer: B — [[6,−3],[0,9]]</span>
+</div>
+
+<!-- Q26 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 26</span><span class="q-cat mat">Core Conversion — Matrix Multiplication</span></div>
+  <div class="q-text">
+    Find AB where A =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">2</span></span>
+      <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">4</span></span>
+    </span> and B =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">2</span><span class="mat-cell">0</span></span>
+      <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">3</span></span>
+    </span>.
+  </div>
+  <div class="options col1">
+    <span class="correct">(A)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">4</span><span class="mat-cell">6</span></span>
+        <span class="mat-row"><span class="mat-cell">10</span><span class="mat-cell">12</span></span>
+      </span>
+    </span>
+    <span>(B)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">2</span><span class="mat-cell">6</span></span>
+        <span class="mat-row"><span class="mat-cell">12</span><span class="mat-cell">4</span></span>
+      </span>
+    </span>
+    <span>(C)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">4</span><span class="mat-cell">7</span></span>
+        <span class="mat-row"><span class="mat-cell">9</span><span class="mat-cell">12</span></span>
+      </span>
+    </span>
+    <span>(D)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">6</span></span>
+        <span class="mat-row"><span class="mat-cell">9</span><span class="mat-cell">12</span></span>
+      </span>
+    </span>
+  </div>
+  <div class="solution">
+    <strong>Core conversion:</strong> entry (i, j) = row i of A · column j of B.
+    <span class="step">
+(1,1): row1·col1 = 1×2 + 2×1 = 2+2 = 4
+(1,2): row1·col2 = 1×0 + 2×3 = 0+6 = 6
+(2,1): row2·col1 = 3×2 + 4×1 = 6+4 = 10
+(2,2): row2·col2 = 3×0 + 4×3 = 0+12 = 12</span>
+    Option B is element-wise multiplication. This is the most-tested matrix operation — always dot each row with each column, never multiply element by element.
+  </div>
+  <span class="answer-badge">Answer: A — [[4,6],[10,12]]</span>
+</div>
+
+<!-- Q27 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 27</span><span class="q-cat mat">Specific Entry of a Product</span></div>
+  <div class="q-text">
+    For A =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">7</span><span class="mat-cell">3</span></span>
+      <span class="mat-row"><span class="mat-cell">4</span><span class="mat-cell">2</span></span>
+    </span> and B =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">2</span></span>
+      <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">4</span></span>
+    </span>, find the (2, 1) entry of AB.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">7</span></span>
+    <span>(B) <span class="math">12</span></span>
+    <span class="correct">(C) <span class="math">10</span></span>
+    <span>(D) <span class="math">14</span></span>
+  </div>
+  <div class="solution">
+    <strong>Entry (2,1) = row 2 of A · column 1 of B.</strong>
+    <span class="step">Row 2 of A = [4, 2]
+Column 1 of B = [1, 3]ᵀ
+
+(2,1) entry = 4×1 + 2×3 = 4 + 6 = 10</span>
+    Option A (7) is entry (1,1). Option D (14) is entry (2,2). The notation (i, j) means row i, column j — order matters.
+  </div>
+  <span class="answer-badge">Answer: C — 10</span>
+</div>
+
+<!-- Q28 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 28</span><span class="q-cat mat">Commutativity · Flow</span></div>
+  <div class="q-text">
+    Matrix multiplication AB = BA is:
+  </div>
+  <div class="options col1">
+    <span>(A) always true for any two matrices</span>
+    <span>(B) never true under any circumstances</span>
+    <span>(C) always true if both matrices are square</span>
+    <span class="correct">(D) not generally true; holds only in special cases (e.g., A = I, or A = B)</span>
+  </div>
+  <div class="solution">
+    <strong>Matrix multiplication is NOT commutative in general.</strong>
+    <span class="step">
+Counterexample:
+A = [[1,2],[3,4]],  B = [[2,0],[1,3]]
+
+AB = [[4,6],[10,12]]    (computed in Q26)
+BA = [[2,4],[10,14]]    ← different!
+
+AB ≠ BA</span>
+    Option B is false — there are special cases (A = I, or functions of the same diagonal matrix). Option C is false — even square matrices rarely commute. Only diagonal matrices of the same size, scalar matrices, and functions of the same matrix reliably commute.
+  </div>
+  <span class="answer-badge">Answer: D — not generally true</span>
+</div>
+
+<!-- Q29 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 29</span><span class="q-cat mat">Transpose</span></div>
+  <div class="q-text">
+    Find the transpose of A =
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">2</span><span class="mat-cell">3</span></span>
+      <span class="mat-row"><span class="mat-cell">4</span><span class="mat-cell">5</span><span class="mat-cell">6</span></span>
+    </span>.
+    What is the order of A<sup>T</sup>?
+  </div>
+  <div class="options">
+    <span class="correct">(A)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">4</span></span>
+        <span class="mat-row"><span class="mat-cell">2</span><span class="mat-cell">5</span></span>
+        <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">6</span></span>
+      </span>, order 3 × 2</span>
+    <span>(B)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">4</span><span class="mat-cell">5</span><span class="mat-cell">6</span></span>
+        <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">2</span><span class="mat-cell">3</span></span>
+      </span>, order 2 × 3</span>
+    <span>(C)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">6</span></span>
+        <span class="mat-row"><span class="mat-cell">2</span><span class="mat-cell">5</span></span>
+        <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">4</span></span>
+      </span>, order 3 × 2</span>
+    <span>(D)
+      <span class="matrix">
+        <span class="mat-row"><span class="mat-cell">1</span><span class="mat-cell">2</span></span>
+        <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">4</span></span>
+        <span class="mat-row"><span class="mat-cell">5</span><span class="mat-cell">6</span></span>
+      </span>, order 3 × 2</span>
+  </div>
+  <div class="solution">
+    <strong>Transpose rule:</strong> rows become columns; (A<sup>T</sup>)<sub>ij</sub> = A<sub>ji</sub>.
+    <span class="step">A is 2×3 → A^T is 3×2  (dimensions always flip)
+
+Row 1 of A (1,2,3) → Column 1 of A^T
+Row 2 of A (4,5,6) → Column 2 of A^T
+
+So A^T = [[1,4],[2,5],[3,6]]</span>
+    Option B merely reverses the rows of A. Option C reverses and also flips the column order.
+  </div>
+  <span class="answer-badge">Answer: A — [[1,4],[2,5],[3,6]], order 3×2</span>
+</div>
+
+<!-- Q30 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 30</span><span class="q-cat mat">Order of Matrix Product</span></div>
+  <div class="q-text">
+    If A is a 2 × 3 matrix and B is a 3 × 4 matrix, what is the order of AB?
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">3 × 3</span></span>
+    <span class="correct">(B) <span class="math">2 × 4</span></span>
+    <span>(C) <span class="math">3 × 4</span></span>
+    <span>(D) <span class="math">2 × 3</span></span>
+  </div>
+  <div class="solution">
+    <strong>Compatibility rule:</strong> (m × n)(n × p) = (m × p). The inner dimensions must match; the outer dimensions give the result.
+    <span class="step">A is 2×3,  B is 3×4
+          ↑ ↑   ↑ ↑
+inner: 3 = 3  ✓  (multiplication is defined)
+outer: 2   4  →  AB is 2×4</span>
+    Option C gives the dimensions of B. If the inner dimensions did not match (e.g., A was 2×4 and B was 3×4), the product would be undefined.
+  </div>
+  <span class="answer-badge">Answer: B — 2 × 4</span>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     SPACED REP BRIDGE — Q31
+     ════════════════════════════════════════════════════════════════ -->
+<div class="block-header rep">↺ Spaced Rep Bridge · Q31 — Cross Product Component (revisits Q16, Q21)</div>
+
+<!-- Q31 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 31</span><span class="q-cat rep">Spaced Rep — Cross Product z-Component</span></div>
+  <div class="q-text">
+    For <b class="bv">p</b> = (2, −1, 3) and <b class="bv">q</b> = (1, 4, −2), find the <b>z</b>-component of <b class="bv">p</b> × <b class="bv">q</b> without computing the full cross product.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">−11</span></span>
+    <span>(B) <span class="math">7</span></span>
+    <span class="correct">(C) <span class="math">9</span></span>
+    <span>(D) <span class="math">−8</span></span>
+  </div>
+  <div class="solution">
+    <strong>z-component formula:</strong> (p × q)<sub>z</sub> = p<sub>x</sub>q<sub>y</sub> − p<sub>y</sub>q<sub>x</sub>.
+    <span class="step">= (2)(4) − (−1)(1)
+= 8 − (−1)
+= 8 + 1 = 9</span>
+    <em>Recall the pattern:</em> each component of a cross product is a 2×2 minor of the 3×3 determinant — this is why you can isolate any single component without computing the rest. Option A (−11) is the y-component ×(−1) — a sign error in the j-row negation.
+  </div>
+  <span class="answer-badge">Answer: C — 9</span>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     BLOCK 5 — DETERMINANTS: CORE CONVERSIONS
+     ════════════════════════════════════════════════════════════════ -->
+<div class="block-header det">|·| Block 5 — Determinants: Core Conversions to Exhaustion · Q32–Q39</div>
+
+<!-- Q32 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 32</span><span class="q-cat det">2×2 Determinant · Flow</span></div>
+  <div class="q-text">
+    The determinant of the 2 × 2 matrix
+    <span class="matrix">
+      <span class="mat-row"><span class="mat-cell">a</span><span class="mat-cell">b</span></span>
+      <span class="mat-row"><span class="mat-cell">c</span><span class="mat-cell">d</span></span>
+    </span> is:
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">ab − cd</span></span>
+    <span>(B) <span class="math">ad + bc</span></span>
+    <span class="correct">(C) <span class="math">ad − bc</span></span>
+    <span>(D) <span class="math">ac − bd</span></span>
+  </div>
+  <div class="solution">
+    <strong>Formula:</strong>
+    <span class="step">det [[a, b], [c, d]] = ad − bc
+
+Mnemonic: "main diagonal minus anti-diagonal"
+  Main diagonal: a × d   (top-left to bottom-right)
+  Anti-diagonal: b × c   (top-right to bottom-left)</span>
+    <em>Critical point:</em> The anti-diagonal is <em>subtracted</em>, not added. Option B (ad + bc) gives the wrong sign. Option D (ac − bd) reads across rows instead of along diagonals.
+  </div>
+  <span class="answer-badge">Answer: C — ad − bc</span>
+</div>
+
+<!-- Q33 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 33</span><span class="q-cat det">Core Conversion — 2×2 det</span></div>
+  <div class="q-text">
+    Evaluate
+    <span class="dmat">
+      <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">−2</span></span>
+      <span class="mat-row"><span class="mat-cell">4</span><span class="mat-cell">5</span></span>
+    </span>.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">7</span></span>
+    <span class="correct">(B) <span class="math">23</span></span>
+    <span>(C) <span class="math">−7</span></span>
+    <span>(D) <span class="math">2</span></span>
+  </div>
+  <div class="solution">
+    <strong>Apply ad − bc:</strong>
+    <span class="step">det = (3)(5) − (−2)(4)
+     = 15 − (−8)
+     = 15 + 8 = 23</span>
+    <em>Core conversion:</em> subtracting a negative <em>adds</em> — the most common source of sign errors. Option A (7) computes 15 − 8 = 7, forgetting that b = −2 makes bc negative.
+  </div>
+  <span class="answer-badge">Answer: B — 23</span>
+</div>
+
+<!-- Q34 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 34</span><span class="q-cat det">Core Conversion — 3×3 det (Cofactor Expansion)</span></div>
+  <div class="q-text">
+    Find the determinant of A =
+    <span class="math-block">| 2   1   0 |
+| 3  −1   2 |
+| 1   4  −3 |</span>
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">−1</span></span>
+    <span>(B) <span class="math">0</span></span>
+    <span class="correct">(C) <span class="math">1</span></span>
+    <span>(D) <span class="math">11</span></span>
+  </div>
+  <div class="solution">
+    <strong>Expand along Row 1</strong> — the zero in position (1,3) eliminates one minor.
+    <span class="step">
+det = 2·M₁₁ − 1·M₁₂ + 0·M₁₃
+
+M₁₁ = det|−1  2|  = (−1)(−3) − (2)(4) = 3 − 8 = −5
+         | 4 −3|
+
+M₁₂ = det| 3  2|  = (3)(−3) − (2)(1) = −9 − 2 = −11
+         | 1 −3|</span>
+    <span class="step">
+det = 2(−5) − 1(−11) + 0
+    = −10 + 11
+    = 1</span>
+    <em>Strategy:</em> always expand along the row or column with the most zeros to minimise computation. Here, row 1 has a zero — exploit it.
+  </div>
+  <span class="answer-badge">Answer: C — 1</span>
+</div>
+
+<!-- Q35 — SPACED REP -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 35</span><span class="q-cat rep">Spaced Rep — det(AB) Property</span></div>
+  <div class="q-text">
+    If det(A) = 5 and det(B) = 3, find det(AB).
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">8</span></span>
+    <span>(B) <span class="math">2</span></span>
+    <span class="correct">(C) <span class="math">15</span></span>
+    <span>(D) <span class="frac"><span class="num">5</span><span class="den">3</span></span></span>
+  </div>
+  <div class="solution">
+    <strong>Multiplicative property:</strong> det(AB) = det(A) · det(B).
+    <span class="step">det(AB) = 5 × 3 = 15</span>
+    This extends to any number of matrices: det(ABC) = det(A)·det(B)·det(C). It does not apply to addition: det(A+B) ≠ det(A)+det(B). Option A (8=5+3) confuses product with sum.
+  </div>
+  <span class="answer-badge">Answer: C — 15</span>
+</div>
+
+<!-- Q36 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 36</span><span class="q-cat det">Row Scaling Property</span></div>
+  <div class="q-text">
+    If one row of a square matrix is multiplied by a scalar k, the effect on the determinant is:
+  </div>
+  <div class="options">
+    <span>(A) det is divided by k</span>
+    <span>(B) det is unchanged</span>
+    <span class="correct">(C) det is multiplied by k</span>
+    <span>(D) det becomes zero</span>
+  </div>
+  <div class="solution">
+    <strong>Row scaling rule:</strong> multiplying one row by k multiplies the entire determinant by k.
+    <span class="step">
+Example:
+det [[1, 2], [3, 4]] = −2
+
+Multiply row 1 by 3:
+det [[3, 6], [3, 4]] = 12−18 = −6 = 3 × (−2)  ✓</span>
+    This extends: if all n rows are multiplied by k (i.e., kA), then det(kA) = k<sup>n</sup>·det(A). Multiplying a single row by k → det multiplied by k once. Option B (unchanged) is incorrect — only swapping rows preserves |det| while flipping its sign.
+  </div>
+  <span class="answer-badge">Answer: C — det is multiplied by k</span>
+</div>
+
+<!-- Q37 -->
+<div class="q-block">
+  <div class="q-meta"><span class="q-num">Q 37</span><span class="q-cat det">Determinant as Equation</span></div>
+  <div class="q-text">
+    Find all values of x such that
+    <span class="dmat">
+      <span class="mat-row"><span class="mat-cell">x</span><span class="mat-cell">2</span></span>
+      <span class="mat-row"><span class="mat-cell">3</span><span class="mat-cell">x</span></span>
+    </span> = 10.
+  </div>
+  <div class="options">
+    <span>(A) <span class="math">x = 4</span> only</span>
+    <span class="correct">(B) <span class="math">x = ±4</span></span>
+    <span>(C) <span class="math">x = −4</span> only</span>
+    <span>(D) <span class="math">x = ±2</span></span>
+  </div>
+  <div class="solution">
+    <strong>Apply ad − bc, then solve.</strong>
+    <span class="step">det = x·x − 2·3 = x² − 6 = 10</span>
+    <span class="step">x² = 16
+x = ±4</span>
+    <em>Core conversion:</em> the determinant condition yields a polynomial equation — here quadratic, giving two solutions. Rejecting x = −4 (option A) is wrong; both values satisfy the original equation. Check: det at x = 4: 16−6=10 ✓; at x = −4: 16−6=10 ✓.
+  </div>
+  <span class="answer-badge">Answer: B — x = ±4</span>
+</div
