@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Chemistry · 50Q Diagnostic</title>
+    <style>
+        :root{--bg:#F4F6F9;--card:#FFFFFF;--text:#1C1C1E;--sec:rgba(60,60,67,0.8);--ter:rgba(60,60,67,0.5);--blue:#007AFF;--green:#34C759;--red:#FF3B30;--orange:#FF9500;--purple:#AF52DE;--teal:#30B0C7;--sep:rgba(60,60,67,0.12);--hov:#F0F0F5;--r:12px;--sh:0 2px 8px rgba(0,0,0,0.04)}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:17px;color:var(--text);background:var(--bg);line-height:1.47;padding-bottom:env(safe-area-inset-bottom);-webkit-font-smoothing:antialiased}
+        
+        .hdr{background:var(--card);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;position:sticky;top:0;z-index:100}
+        .hdr-row{display:flex;align-items:center;justify-content:space-between}
+        .ttl{font-size:22px;font-weight:700}
+        .sub{font-size:13px;color:var(--ter);margin-top:2px}
+        
+        .gtimer{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:20px;background:var(--hov);border:1px solid var(--sep)}
+        .gtimer-txt{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.5px;color:var(--text);transition:color .3s}
+        .gtimer-txt.warn{color:var(--orange)}
+        .gtimer-txt.dang{color:var(--red)}
+        .gtimer-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;transition:background .3s}
+        .gtimer-dot.warn{background:var(--orange)}
+        .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+        
+        .scorecard{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 4px}
+        .sc-main{grid-column:1/-1;background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;align-items:center;justify-content:space-between}
+        .sc-score-lbl{font-size:13px;color:var(--ter)}
+        .sc-score-val{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+        .sc-score-val.pos{color:var(--green)}
+        .sc-score-val.neg{color:var(--red)}
+        .sc-score-val.zero{color:var(--text)}
+        .sc-out{font-size:13px;color:var(--ter);text-align:right}
+        .sc-out span{display:block;font-size:17px;font-weight:600;color:var(--sec)}
+        .sc-mini{background:var(--card);border-radius:var(--r);padding:11px 13px;box-shadow:var(--sh)}
+        .sc-mini-lbl{font-size:11px;color:var(--ter);letter-spacing:.2px}
+        .sc-mini-val{font-size:18px;font-weight:700;margin-top:3px}
+        .sc-mini-val.correct{color:var(--green)}
+        .sc-mini-val.wrong{color:var(--red)}
+        .sc-mini-val.skipped{color:var(--orange)}
+        .sc-mini-val.answered{color:var(--blue)}
+        .sc-rule{font-size:11px;color:var(--ter);padding:4px 16px 10px;text-align:center}
+        
+        .qcard{background:var(--card);border-radius:var(--r);margin:12px 16px;padding:20px;box-shadow:var(--sh);border:1px solid var(--sep)}
+        .qnum{font-size:13px;font-weight:600;color:var(--blue);margin-bottom:8px}
+        .sbadge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;margin-left:8px}
+        .sp{background:rgba(0,122,255,.12);color:var(--blue)}
+        .se{background:rgba(255,149,0,.12);color:var(--orange)}
+        .sa{background:rgba(175,82,222,.12);color:var(--purple)}
+        .stag{display:inline-block;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;margin-left:6px;vertical-align:middle;background:rgba(52,199,89,.12);color:var(--green)}
+        .qtxt{font-size:17px;margin-bottom:16px;line-height:1.5}
+        
+        .trow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+        .tring{width:38px;height:38px;flex-shrink:0}
+        .tring .bg{fill:none;stroke:var(--sep);stroke-width:4}
+        .tring .fg{fill:none;stroke:var(--green);stroke-width:4;stroke-linecap:round;transition:stroke .4s,stroke-dashoffset .25s linear;transform:rotate(-90deg);transform-origin:center}
+        .ttxt{font-size:14px;font-weight:600;color:var(--green);transition:color .4s;min-width:42px}
+        .tlbl{font-size:13px;color:var(--ter)}
+        .tring.warn .fg{stroke:var(--orange)}.tring.dang .fg{stroke:var(--red)}
+        .ttxt.warn{color:var(--orange)}.ttxt.dang{color:var(--red)}
+        
+        .opts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+        .opt{padding:12px;border-radius:8px;background:var(--hov);cursor:pointer;transition:all .2s;font-size:15px;border:2px solid transparent;user-select:none}
+        .opt:active{transform:scale(.98)}
+        .opt.sel{background:rgba(0,122,255,.1);border-color:var(--blue)}
+        .opt.ok{background:rgba(52,199,89,.1);border-color:var(--green)}
+        .opt.no{background:rgba(255,59,48,.1);border-color:var(--red)}
+        
+        .abtn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:17px;font-weight:500;cursor:pointer;transition:opacity .2s}
+        .abtn:active{opacity:.8}.abtn:disabled{opacity:.5;cursor:not-allowed}
+        
+        .exp{margin-top:16px;padding:12px;background:var(--hov);border-radius:8px;font-size:15px;color:var(--sec);display:none}
+        .exp.show{display:block;animation:si .3s ease}
+        .exp-mark{display:inline-block;padding:2px 8px;border-radius:5px;font-size:12px;font-weight:700;margin-bottom:6px}
+        .exp-mark.pos{background:rgba(52,199,89,.15);color:var(--green)}
+        .exp-mark.neg{background:rgba(255,59,48,.15);color:var(--red)}
+        .exp-mark.nt{background:rgba(255,149,0,.15);color:var(--orange)}
+        @keyframes si{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        
+        .timeup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;padding:24px}
+        .timeup.show{display:flex}
+        .timeup-box{background:var(--card);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+        .timeup-icon{font-size:48px;margin-bottom:12px}
+        .timeup-ttl{font-size:22px;font-weight:700;margin-bottom:8px}
+        .timeup-score{font-size:40px;font-weight:700;margin:16px 0 4px;font-variant-numeric:tabular-nums}
+        .timeup-score.pos{color:var(--green)}.timeup-score.neg{color:var(--red)}
+        .timeup-sub{font-size:15px;color:var(--ter);margin-bottom:20px}
+        .timeup-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+        .tu-stat{background:var(--hov);border-radius:10px;padding:10px 6px}
+        .tu-stat-v{font-size:20px;font-weight:700}
+        .tu-stat-v.c{color:var(--green)}.tu-stat-v.w{color:var(--red)}.tu-stat-v.s{color:var(--orange)}
+        .tu-stat-l{font-size:11px;color:var(--ter);margin-top:2px}
+        .timeup-btn{width:100%;padding:14px;border-radius:12px;border:none;background:var(--blue);color:#fff;font-size:17px;font-weight:600;cursor:pointer}
+    </style>
+</head>
+<body>
+
+<div class="hdr">
+    <div class="hdr-row">
+        <div>
+            <div class="ttl">Chemistry · 50Q</div>
+            <div class="sub">Principles to Applications</div>
+        </div>
+        <div class="gtimer">
+            <div class="gtimer-dot" id="gd"></div>
+            <div class="gtimer-txt" id="gt">1:00:00</div>
+        </div>
+    </div>
+</div>
+
+<div class="scorecard">
+    <div class="sc-main">
+        <div>
+            <div class="sc-score-lbl">Score</div>
+            <div class="sc-score-val zero" id="sc-val">0.00</div>
+        </div>
+        <div class="sc-out">
+            <div>out of</div>
+            <span>400</span>
+        </div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">✓ Correct</div>
+        <div class="sc-mini-val correct" id="sc-co">0</div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">✗ Wrong</div>
+        <div class="sc-mini-val wrong" id="sc-wr">0</div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">— Skipped</div>
+        <div class="sc-mini-val skipped" id="sc-sk">0</div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">Answered</div>
+        <div class="sc-mini-val answered" id="sc-an">0</div>
+    </div>
+</div>
+<div class="sc-rule">+8.00 correct · −0.50 wrong · 0 skipped</div>
+
+<div id="qc"></div>
+
+<div class="timeup" id="tu">
+    <div class="timeup-box">
+        <div class="timeup-icon">⏱</div>
+        <div class="timeup-ttl">Time's Up!</div>
+        <div id="tu-score" class="timeup-score pos">0.00</div>
+        <div class="timeup-sub">out of 400</div>
+        <div class="timeup-stats">
+            <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+            <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+            <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+        </div>
+        <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    </div>
+</div>
+
+<script>
+var PTS_CORRECT = 400/50;    // 8.00 per correct
+var PTS_WRONG   = -0.5;
+var TSECS_Q     = 180;       // 3 minutes per question
+var GLOBAL_SECS = 3600;      
+var CIRC        = 2*Math.PI*14;
+
+var D = {
+chemistry:[
+{q:"An atom of element X has 17 protons and 18 neutrons. Its mass number is:",o:["A. 1","B. 17","C. 18","D. 35"],a:"D",e:"Mass number = protons + neutrons = 17 + 18 = 35.",s:"p"},
+{q:"The electron configuration of Calcium (atomic no. 20) is:",o:["A. 2,8,8,2","B. 2,8,10","C. 2,10,8","D. 2,18"],a:"A",e:"Fill shells: 2, 8, 8, 2. Fourth shell gets the last 2 electrons.",s:"p"},
+{q:"Atoms of the same element with different mass numbers are called:",o:["A. Isobars","B. Isotopes","C. Allotropes","D. Ions"],a:"B",e:"Isotopes: same atomic number, different mass numbers (different neutron count).",s:"p"},
+{q:"Which particle has negligible mass and a negative charge?",o:["A. Proton","B. Neutron","C. Electron","D. Nucleus"],a:"C",e:"Electrons have charge −1 and mass ≈ 1/1836 of a proton — essentially negligible.",s:"p"},
+{q:"Elements in the same GROUP of the periodic table have:",o:["A. Same mass number","B. Same number of electron shells","C. Same number of valence electrons","D. Same number of neutrons"],a:"C",e:"Same group = same valence electrons = similar chemical properties.",s:"p"},
+{q:"Which element is in Period 3 and Group VII?",o:["A. Fluorine","B. Chlorine","C. Bromine","D. Iodine"],a:"B",e:"Period 3 means 3 shells. Group VII (halogens) in period 3 = Chlorine (Cl, Z=17).",s:"p"},
+{q:"The most electronegative element is:",o:["A. Oxygen","B. Nitrogen","C. Chlorine","D. Fluorine"],a:"D",e:"Fluorine has the highest electronegativity (3.98 on Pauling scale).",s:"p"},
+{q:"NaCl is formed by:",o:["A. Sharing of electrons","B. Transfer of electrons from Na to Cl","C. Transfer of electrons from Cl to Na","D. Metallic bonding"],a:"B",e:"Na (metal) loses 1 electron to Cl (non-metal), forming Na⁺ and Cl⁻ — ionic bond.",s:"p"},
+{q:"Which molecule has a triple bond?",o:["A. O₂","B. N₂","C. H₂","D. Cl₂"],a:"B",e:"N₂ has a triple bond (N≡N). O₂ has a double bond. H₂ and Cl₂ have single bonds.",s:"p"},
+{q:"Dative (coordinate) bond forms when:",o:["A. Both electrons come from one atom","B. Each atom donates one electron","C. Electrons are transferred","D. Metallic lattice is formed"],a:"A",e:"In a dative bond, one atom donates both electrons of the shared pair.",s:"p"},
+{q:"Universal indicator turns green at pH:",o:["A. 1","B. 5","C. 7","D. 11"],a:"C",e:"pH 7 = neutral. Universal indicator is green at neutrality.",s:"p"},
+{q:"Which is a strong acid?",o:["A. Ethanoic acid","B. Carbonic acid","C. Hydrochloric acid","D. Citric acid"],a:"C",e:"HCl fully dissociates in water — it is a strong acid. The others are weak acids.",s:"p"},
+{q:"Salt formed when NaOH reacts with H₂SO₄?",o:["A. NaCl","B. Na₂SO₄","C. NaHSO₄","D. Na₂SO₃"],a:"B",e:"2NaOH + H₂SO₄ → Na₂SO₄ + 2H₂O. The salt is sodium sulphate.",s:"p"},
+{q:"A solution turns red litmus blue. The solution is:",o:["A. Acidic","B. Neutral","C. Alkaline","D. Salt"],a:"C",e:"Alkaline (basic) solutions turn red litmus blue. Acids do the reverse.",s:"p"},
+{q:"In the electrolysis of brine, chlorine is produced at the:",o:["A. Cathode","B. Anode","C. Electrolyte","D. Battery"],a:"B",e:"Anode = oxidation. Cl⁻ ions migrate to anode and are oxidised to Cl₂ gas.",s:"p"},
+{q:"Which is the reducing agent in: Zn + CuSO₄ → ZnSO₄ + Cu?",o:["A. Cu","B. CuSO₄","C. Zn","D. ZnSO₄"],a:"C",e:"Zn is oxidised (loses electrons) — it is the reducing agent.",s:"p"},
+{q:"Oxidation state of Mn in KMnO₄?",o:["A. +4","B. +5","C. +6","D. +7"],a:"D",e:"K(+1) + Mn + 4O(−8) = 0 → Mn = +7.",s:"p"},
+{q:"The functional group of alcohols is:",o:["A. −COOH","B. −OH","C. −CHO","D. −CO−"],a:"B",e:"Alcohols contain the hydroxyl (−OH) group.",s:"p"},
+{q:"Which is a homologous series?",o:["A. CH₄, C₂H₆, C₃H₆","B. CH₄, C₂H₆, C₃H₈","C. CH₄, C₂H₂, C₃H₄","D. C₂H₄, C₃H₄, C₄H₆"],a:"B",e:"Alkanes: CH₄, C₂H₆, C₃H₈. Each differs by CH₂ — a homologous series.",s:"p"},
+{q:"Ethene (C₂H₄) undergoes addition polymerization to form:",o:["A. Polypropylene","B. Polyethylene","C. Nylon","D. Polystyrene"],a:"B",e:"nC₂H₄ → (−CH₂−CH₂−)ₙ. This is polyethylene (polythene).",s:"p"},
+{q:"The IUPAC name of CH₃CH₂CH₂OH is:",o:["A. Ethanol","B. Methanol","C. Propan-1-ol","D. Butan-1-ol"],a:"C",e:"3-carbon chain + OH at carbon 1 = propan-1-ol.",s:"p"},
+{q:"At STP, 1 mole of any ideal gas occupies:",o:["A. 11.2 L","B. 22.4 L","C. 44.8 L","D. 24.0 L"],a:"B",e:"Molar volume at STP = 22.4 L/mol.",s:"p"},
+{q:"Molar mass of CaCO₃? (Ca=40, C=12, O=16)",o:["A. 68","B. 84","C. 100","D. 116"],a:"C",e:"40 + 12 + (3×16) = 40+12+48 = 100 g/mol.",s:"p"},
+{q:"Number of moles in 11 g of CO₂? (C=12, O=16)",o:["A. 0.25","B. 0.50","C. 0.75","D. 1.00"],a:"A",e:"Molar mass CO₂ = 44 g/mol. n = 11/44 = 0.25 mol.",s:"p"},
+{q:"The Haber process produces:",o:["A. Sulphuric acid","B. Ammonia","C. Sodium hydroxide","D. Chlorine"],a:"B",e:"N₂ + 3H₂ ⇌ 2NH₃. The Haber process makes ammonia.",s:"p"},
+{q:"In the Contact process, SO₃ is dissolved in concentrated H₂SO₄ (not water) because:",o:["A. Water is unavailable","B. It prevents formation of acid mist","C. SO₃ is insoluble in water","D. It increases the rate"],a:"B",e:"Direct dissolution in water produces a dangerous acid mist. Oleum forms safely instead.",s:"p"},
+{q:"Acid rain is mainly caused by:",o:["A. CO₂ and O₃","B. SO₂ and NO₂","C. CH₄ and CO₂","D. H₂S and HCl"],a:"B",e:"SO₂ and NO₂ from combustion dissolve in rainwater forming H₂SO₃ and HNO₃.",s:"p"},
+{q:"Le Chatelier's principle states that a system at equilibrium will:",o:["A. Always favour the forward reaction","B. Shift to counteract any imposed change","C. Stop reacting when disturbed","D. Increase temperature on its own"],a:"B",e:"If stress is applied (T, P, concentration change), the equilibrium shifts to oppose that change.",s:"p"},
+{q:"Increasing pressure in a gas-phase equilibrium favours:",o:["A. The side with more moles of gas","B. The side with fewer moles of gas","C. No change","D. The reverse reaction always"],a:"B",e:"High pressure shifts equilibrium toward fewer gas molecules (lower volume side).",s:"p"},
+{q:"Anhydrous CaCl₂ is used in the lab as a:",o:["A. Reducing agent","B. Drying agent","C. Oxidising agent","D. Indicator"],a:"B",e:"Anhydrous CaCl₂ absorbs moisture and is a common desiccant (drying agent).",s:"p"},
+{q:"Allotropes are different physical forms of the same element. Which pair are allotropes?",o:["A. CO₂ and CO","B. O₂ and O₃","C. Na and NaCl","D. H₂O and H₂O₂"],a:"B",e:"O₂ (oxygen) and O₃ (ozone) are allotropes — both are pure oxygen, different structures.",s:"p"},
+{q:"Which gas turns limewater milky?",o:["A. O₂","B. SO₂","C. CO₂","D. HCl"],a:"C",e:"CO₂ + Ca(OH)₂ → CaCO₃↓ + H₂O. White CaCO₃ precipitate turns limewater milky.",s:"p"},
+{q:"When a metal is above hydrogen in the reactivity series, it:",o:["A. Cannot conduct electricity","B. Displaces hydrogen from dilute acids","C. Forms only ionic compounds","D. Does not react with oxygen"],a:"B",e:"Metals above H in the activity series react with dilute acid to release H₂ gas.",s:"p"},
+{q:"A substance that speeds up a reaction without being consumed is a:",o:["A. Reactant","B. Product","C. Catalyst","D. Solvent"],a:"C",e:"A catalyst increases reaction rate and is regenerated at the end — not consumed.",s:"p"},
+{q:"Which gas is produced when zinc reacts with dilute H₂SO₄?",o:["A. O₂","B. SO₂","C. CO₂","D. H₂"],a:"D",e:"Zn + H₂SO₄ → ZnSO₄ + H₂↑. Metals above hydrogen displace H₂ from dilute acids.",s:"p"},
+{q:"The atomic number of an element is equal to the number of:",o:["A. Neutrons","B. Protons","C. Electrons in the outermost shell","D. Nucleons"],a:"B",e:"Atomic number (Z) = number of protons in the nucleus.",s:"p"},
+{q:"Which quantum number describes the shape of an orbital?",o:["A. Principal (n)","B. Azimuthal (l)","C. Magnetic (m)","D. Spin (s)"],a:"B",e:"The azimuthal quantum number (l) determines the shape of an atomic orbital (s, p, d, f).",s:"p"},
+{q:"Two elements with the same number of protons but different number of neutrons are:",o:["A. Isotopes","B. Isobars","C. Isotones","D. Isomers"],a:"A",e:"Isotopes share the same number of protons but differ in neutrons.",s:"p"},
+{q:"The number of valence electrons in Chlorine (Cl, Z=17) is:",o:["A. 1","B. 2","C. 7","D. 17"],a:"C",e:"Chlorine is in Group VII (17). Group number = number of valence electrons.",s:"p"},
+{q:"Which of the following is an alkali metal?",o:["A. Beryllium","B. Magnesium","C. Sodium","D. Aluminium"],a:"C",e:"Sodium (Na) is in Group I — the alkali metals.",s:"p"},
+{q:"Metallic bonding can be described as:",o:["A. A network of covalent bonds between metal atoms","B. Electrostatic attraction between cations and delocalised electrons","C. The transfer of electrons from metal to non-metal","D. Sharing of pairs of electrons between metals"],a:"B",e:"Metallic bonding = positive metal ions held together by a 'sea' of delocalised electrons.",s:"p"},
+{q:"The pH of a 0.001 M solution of HCl is:",o:["A. 1","B. 2","C. 3","D. 4"],a:"C",e:"0.001 M = 10⁻³ M → pH = -log(10⁻³) = 3.",s:"p"},
+{q:"Which of the following pairs represents a conjugate acid-base pair?",o:["A. H₂O / OH⁻","B. HCl / Cl₂","C. NaOH / NaCl","D. NH₃ / NH₄⁺"],a:"D",e:"A conjugate acid-base pair differs by one H⁺. NH₄⁺ is the conjugate acid of NH₃.",s:"p"},
+{q:"Which substance is a strong electrolyte?",o:["A. Sugar","B. Acetic acid","C. Sodium chloride","D. Ethanol"],a:"C",e:"NaCl fully dissociates into ions in water — it is a strong electrolyte.",s:"p"},
+{q:"In an electrochemical cell, the anode is the electrode where:",o:["A. Reduction occurs","B. Oxidation occurs","C. Electrons enter the cell","D. Hydrogen gas is produced"],a:"B",e:"Anode = site of oxidation. Electrons leave the cell at the anode.",s:"p"},
+{q:"The number of grams of NaCl (M=58.5) required to prepare 500 cm³ of 0.2 M solution is:",o:["A. 5.85 g","B. 11.7 g","C. 2.925 g","D. 29.25 g"],a:"A",e:"n = M×V = 0.2×0.5 = 0.1 mol. Mass = 0.1×58.5 = 5.85 g.",s:"p"},
+{q:"A compound with the empirical formula CH₂ has a molar mass of 56 g/mol. The molecular formula is:",o:["A. C₂H₄","B. C₃H₆","C. C₄H₈","D. C₅H₁₀"],a:"C",e:"Empirical mass = 14 g/mol. n = 56/14 = 4. Molecular formula = (CH₂)₄ = C₄H₈.",s:"p"},
+{q:"The colour of methyl orange in alkaline solution is:",o:["A. Red","B. Yellow","C. Colourless","D. Blue"],a:"B",e:"Methyl orange changes from red (acidic) to yellow (alkaline).",s:"p"},
+{q:"Which of the following processes is endothermic?",o:["A. Combustion of methane","B. Neutralisation of NaOH by HCl","C. Evaporation of water","D. Dissolution of NaOH in water"],a:"C",e:"Evaporation requires heat input to break intermolecular forces — it is endothermic.",s:"p"},
+{q:"The Avogadro constant is the number of particles in:",o:["A. 1 g of a substance","B. 1 mole of a substance","C. 1 L of gas at STP","D. 1 kg of a substance"],a:"B",e:"Avogadro's number (6.02×10²³) is the number of particles in exactly 1 mole of a substance.",s:"p"}
+]};
+
+var sub="chemistry", UA={}, ST={correct:0,wrong:0,skipped:0,answered:0};
+var TI={}, TS={}, CIRC2=2*Math.PI*14;
+var globalSecs=GLOBAL_SECS, globalTI=null, globalDone=false;
+
+function calcScore(){ return (ST.correct*PTS_CORRECT) + (ST.wrong*PTS_WRONG); }
+
+function updStats(){
+    var raw=calcScore();
+    var el=document.getElementById("sc-val");
+    el.textContent=raw.toFixed(2);
+    el.className="sc-score-val "+(raw>0?"pos":raw<0?"neg":"zero");
+    document.getElementById("sc-co").textContent=ST.correct;
+    document.getElementById("sc-wr").textContent=ST.wrong;
+    document.getElementById("sc-sk").textContent=ST.skipped;
+    document.getElementById("sc-an").textContent=ST.answered;
+}
+
+function startGlobalTimer(){
+    globalTI=setInterval(function(){
+        globalSecs--;
+        if(globalSecs<=0){clearInterval(globalTI);globalSecs=0;tickGlobalUI();timeUp();return;}
+        tickGlobalUI();
+    },1000);
+}
+
+function tickGlobalUI(){
+    var s=globalSecs;
+    var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
+    var txt=(h>0?h+":":"")+(h>0&&m<10?"0":"")+m+":"+(ss<10?"0":"")+ss;
+    var el=document.getElementById("gt"), dot=document.getElementById("gd");
+    el.textContent=txt;
+    el.className="gtimer-txt";dot.className="gtimer-dot";
+    if(s<=600){el.classList.add("dang");dot.classList.add("dang");}
+    else if(s<=1800){el.classList.add("warn");dot.classList.add("warn");}
+}
+
+function timeUp(){
+    globalDone=true;
+    var btns=document.querySelectorAll(".abtn:not([disabled])");
+    for(var i=0;i<btns.length;i++)btns[i].disabled=true;
+    var qs=D[sub];
+    for(var i=0;i<qs.length;i++){
+        var k=sub+i;
+        if(!UA[k]){ST.skipped++;UA[k]="SKIP";}
+    }
+    updStats();
+    var raw=calcScore();
+    document.getElementById("tu-score").textContent=raw.toFixed(2);
+    document.getElementById("tu-score").className="timeup-score "+(raw>=0?"pos":"neg");
+    document.getElementById("tu-co").textContent=ST.correct;
+    document.getElementById("tu-wr").textContent=ST.wrong;
+    document.getElementById("tu-sk").textContent=ST.skipped;
+    document.getElementById("tu").classList.add("show");
+}
+
+function startQTimers(){
+    var qs=D[sub];
+    for(var i=0;i<qs.length;i++){
+        (function(idx){
+            var k=sub+idx; TS[k]=TSECS_Q;
+            TI[k]=setInterval(function(){
+                if(globalDone){clearInterval(TI[k]);return;}
+                TS[k]--;
+                if(TS[k]<=0){clearInterval(TI[k]);TI[k]=null;tUI(idx,0);autoShow(idx);return;}
+                tUI(idx,TS[k]);
+            },1000);
+        })(i);
+    }
+}
+
+function tUI(i,s){
+    var r=document.getElementById("rn"+i), t=document.getElementById("tt"+i);
+    if(!r||!t)return;
+    r.querySelector(".fg").style.strokeDashoffset=CIRC2*(1-s/TSECS_Q);
+    r.classList.remove("warn","dang"); t.classList.remove("warn","dang");
+    if(s<=30){r.classList.add("dang");t.classList.add("dang");}
+    else if(s<=60){r.classList.add("warn");t.classList.add("warn");}
+    var m=Math.floor(s/60), sc=s%60;
+    t.textContent=m+":"+(sc<10?"0":"")+sc;
+}
+
+function stopQTimer(i){var k=sub+i;if(TI[k]){clearInterval(TI[k]);TI[k]=null;}}
+
+function autoShow(i){
+    var card=document.querySelector('.qcard[data-i="'+i+'"]');
+    if(!card||card.querySelector(".exp.show"))return;
+    var q=D[sub][i], k=sub+i;
+    var opts=card.querySelectorAll(".opt");
+    for(var j=0;j<opts.length;j++){
+        if(opts[j].dataset.a===q.a)opts[j].classList.add("ok");
+        opts[j].style.pointerEvents="none";
+    }
+    var ex=card.querySelector(".exp");
+    ex.innerHTML='<span class="exp-mark nt">⏱ Time — no mark</span><br>'+'<b>Correct: '+q.a+'</b><br>'+(q.e||'');
+    ex.classList.add("show");
+    card.querySelector(".abtn").disabled=true;
+    if(!UA[k]){UA[k]="AUTO";ST.skipped++;ST.answered++;updStats();}
+}
+
+function render(){
+    var c=document.getElementById("qc"), qs=D[sub];
+    var h="";
+    for(var i=0;i<qs.length;i++){
+        var q=qs[i];
+        var sc=q.s==="p"?"sp":q.s==="e"?"se":"sa";
+        var sn=q.s==="p"?"Principles":q.s==="e"?"Exceptions":"Applications";
+        var oh="";
+        for(var j=0;j<q.o.length;j++){oh+='<div class="opt" data-a="'+q.o[j].charAt(0)+'">'+q.o[j]+'</div>';}
+        h+='<div class="qcard" data-i="'+i+'">'
+          +'<div class="qnum">Q'+(i+1)+' of '+qs.length
+          +' <span class="sbadge '+sc+'">'+sn+'</span>'
+          +' <span class="stag">Chemistry</span></div>'
+          +'<div class="qtxt">'+q.q+'</div>'
+          +'<div class="trow">'
+          +'<svg class="tring" id="rn'+i+'" viewBox="0 0 38 38"><circle class="bg" cx="19" cy="19" r="14"/><circle class="fg" cx="19" cy="19" r="14" style="stroke-dasharray:'+CIRC2+';stroke-dashoffset:0"/></svg>'
+          +'<span class="ttxt" id="tt'+i+'">3:00</span><span class="tlbl"> left</span></div>'
+          +'<div class="opts">'+oh+'</div>'
+          +'<button class="abtn" disabled>Check Answer</button>'
+          +'<div class="exp" id="ex'+i+'"></div>'
+          +'</div>';
+    }
+    c.innerHTML=h;
+    listen();
+    startQTimers();
+}
+
+function listen(){
+    document.querySelectorAll(".opt").forEach(function(o){
+        o.addEventListener("click",function(){
+            var card=this.closest(".qcard"), k=sub+card.dataset.i;
+            if(this.style.pointerEvents==="none"||globalDone)return;
+            card.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel");});
+            this.classList.add("sel");
+            UA[k]=this.dataset.a;
+            card.querySelector(".abtn").disabled=false;
+        });
+    });
+    document.querySelectorAll(".abtn").forEach(function(btn){
+        btn.addEventListener("click",function(){
+            if(globalDone)return;
+            var card=this.closest(".qcard"), idx=parseInt(card.dataset.i,10);
+            var k=sub+idx, q=D[sub][idx], chosen=UA[k];
+            var ok=chosen===q.a;
+            stopQTimer(idx);
+            card.querySelectorAll(".opt").forEach(function(x){
+                if(x.dataset.a===q.a)x.classList.add("ok");
+                else if(x.dataset.a===chosen)x.classList.add("no");
+                x.style.pointerEvents="none";
+            });
+            var pts=ok?PTS_CORRECT:PTS_WRONG;
+            var ptsLabel=ok?"+"+pts.toFixed(2):pts.toFixed(2);
+            var ptsCls=ok?"pos":"neg";
+            var ex=card.querySelector(".exp");
+            ex.innerHTML='<span class="exp-mark '+ptsCls+'">'+(ok?"✓ ":"✗ ")+ptsLabel+' pts</span><br>'
+                +(ok?"":"<b>Correct: "+q.a+"</b><br>")+(q.e||'');
+            ex.classList.add("show");
+            this.disabled=true;
+            ST.answered++;
+            if(ok)ST.correct++;else ST.wrong++;
+            updStats();
+        });
+    });
+}
+
+updStats();
+render();
+startGlobalTimer();
+</script>
+</body>
+</html>

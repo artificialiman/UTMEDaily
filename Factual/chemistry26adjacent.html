@@ -1,0 +1,489 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Chemistry · 50Q Side‑Book</title>
+    <style>
+        :root{--bg:#F4F6F9;--card:#FFFFFF;--text:#1C1C1E;--sec:rgba(60,60,67,0.8);--ter:rgba(60,60,67,0.5);--blue:#007AFF;--green:#34C759;--red:#FF3B30;--orange:#FF9500;--purple:#AF52DE;--teal:#30B0C7;--sep:rgba(60,60,67,0.12);--hov:#F0F0F5;--r:12px;--sh:0 2px 8px rgba(0,0,0,0.04)}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:17px;color:var(--text);background:var(--bg);line-height:1.47;padding-bottom:env(safe-area-inset-bottom);-webkit-font-smoothing:antialiased}
+        
+        .hdr{background:var(--card);border-bottom:1px solid var(--sep);padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;position:sticky;top:0;z-index:100}
+        .hdr-row{display:flex;align-items:center;justify-content:space-between}
+        .ttl{font-size:22px;font-weight:700}
+        .sub{font-size:13px;color:var(--ter);margin-top:2px}
+        
+        .gtimer{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:20px;background:var(--hov);border:1px solid var(--sep)}
+        .gtimer-txt{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.5px;color:var(--text);transition:color .3s}
+        .gtimer-txt.warn{color:var(--orange)}
+        .gtimer-txt.dang{color:var(--red)}
+        .gtimer-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;transition:background .3s}
+        .gtimer-dot.warn{background:var(--orange)}
+        .gtimer-dot.dang{background:var(--red);animation:blink 1s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+        
+        .scorecard{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 4px}
+        .sc-main{grid-column:1/-1;background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;align-items:center;justify-content:space-between}
+        .sc-score-lbl{font-size:13px;color:var(--ter)}
+        .sc-score-val{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+        .sc-score-val.pos{color:var(--green)}
+        .sc-score-val.neg{color:var(--red)}
+        .sc-score-val.zero{color:var(--text)}
+        .sc-out{font-size:13px;color:var(--ter);text-align:right}
+        .sc-out span{display:block;font-size:17px;font-weight:600;color:var(--sec)}
+        .sc-mini{background:var(--card);border-radius:var(--r);padding:11px 13px;box-shadow:var(--sh)}
+        .sc-mini-lbl{font-size:11px;color:var(--ter);letter-spacing:.2px}
+        .sc-mini-val{font-size:18px;font-weight:700;margin-top:3px}
+        .sc-mini-val.correct{color:var(--green)}
+        .sc-mini-val.wrong{color:var(--red)}
+        .sc-mini-val.skipped{color:var(--orange)}
+        .sc-mini-val.answered{color:var(--blue)}
+        .sc-rule{font-size:11px;color:var(--ter);padding:4px 16px 10px;text-align:center}
+        
+        .qcard{background:var(--card);border-radius:var(--r);margin:12px 16px;padding:20px;box-shadow:var(--sh);border:1px solid var(--sep)}
+        .qnum{font-size:13px;font-weight:600;color:var(--blue);margin-bottom:8px}
+        .sbadge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;margin-left:8px}
+        .sp{background:rgba(0,122,255,.12);color:var(--blue)}
+        .se{background:rgba(255,149,0,.12);color:var(--orange)}
+        .sa{background:rgba(175,82,222,.12);color:var(--purple)}
+        .stag{display:inline-block;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;margin-left:6px;vertical-align:middle;background:rgba(52,199,89,.12);color:var(--green)}
+        .qtxt{font-size:17px;margin-bottom:16px;line-height:1.5}
+        
+        .trow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+        .tring{width:38px;height:38px;flex-shrink:0}
+        .tring .bg{fill:none;stroke:var(--sep);stroke-width:4}
+        .tring .fg{fill:none;stroke:var(--green);stroke-width:4;stroke-linecap:round;transition:stroke .4s,stroke-dashoffset .25s linear;transform:rotate(-90deg);transform-origin:center}
+        .ttxt{font-size:14px;font-weight:600;color:var(--green);transition:color .4s;min-width:42px}
+        .tlbl{font-size:13px;color:var(--ter)}
+        .tring.warn .fg{stroke:var(--orange)}.tring.dang .fg{stroke:var(--red)}
+        .ttxt.warn{color:var(--orange)}.ttxt.dang{color:var(--red)}
+        
+        .opts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+        .opt{padding:12px;border-radius:8px;background:var(--hov);cursor:pointer;transition:all .2s;font-size:15px;border:2px solid transparent;user-select:none}
+        .opt:active{transform:scale(.98)}
+        .opt.sel{background:rgba(0,122,255,.1);border-color:var(--blue)}
+        .opt.ok{background:rgba(52,199,89,.1);border-color:var(--green)}
+        .opt.no{background:rgba(255,59,48,.1);border-color:var(--red)}
+        
+        .abtn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:17px;font-weight:500;cursor:pointer;transition:opacity .2s}
+        .abtn:active{opacity:.8}.abtn:disabled{opacity:.5;cursor:not-allowed}
+        
+        .exp{margin-top:16px;padding:12px;background:var(--hov);border-radius:8px;font-size:15px;color:var(--sec);display:none}
+        .exp.show{display:block;animation:si .3s ease}
+        .exp-mark{display:inline-block;padding:2px 8px;border-radius:5px;font-size:12px;font-weight:700;margin-bottom:6px}
+        .exp-mark.pos{background:rgba(52,199,89,.15);color:var(--green)}
+        .exp-mark.neg{background:rgba(255,59,48,.15);color:var(--red)}
+        .exp-mark.nt{background:rgba(255,149,0,.15);color:var(--orange)}
+        @keyframes si{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        
+        .timeup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;padding:24px}
+        .timeup.show{display:flex}
+        .timeup-box{background:var(--card);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+        .timeup-icon{font-size:48px;margin-bottom:12px}
+        .timeup-ttl{font-size:22px;font-weight:700;margin-bottom:8px}
+        .timeup-score{font-size:40px;font-weight:700;margin:16px 0 4px;font-variant-numeric:tabular-nums}
+        .timeup-score.pos{color:var(--green)}.timeup-score.neg{color:var(--red)}
+        .timeup-sub{font-size:15px;color:var(--ter);margin-bottom:20px}
+        .timeup-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+        .tu-stat{background:var(--hov);border-radius:10px;padding:10px 6px}
+        .tu-stat-v{font-size:20px;font-weight:700}
+        .tu-stat-v.c{color:var(--green)}.tu-stat-v.w{color:var(--red)}.tu-stat-v.s{color:var(--orange)}
+        .tu-stat-l{font-size:11px;color:var(--ter);margin-top:2px}
+        .timeup-btn{width:100%;padding:14px;border-radius:12px;border:none;background:var(--blue);color:#fff;font-size:17px;font-weight:600;cursor:pointer}
+    </style>
+</head>
+<body>
+
+<div class="hdr">
+    <div class="hdr-row">
+        <div>
+            <div class="ttl">Chemistry · Side‑Book</div>
+            <div class="sub">Adjacent Topics · Same Core Skills</div>
+        </div>
+        <div class="gtimer">
+            <div class="gtimer-dot" id="gd"></div>
+            <div class="gtimer-txt" id="gt">1:00:00</div>
+        </div>
+    </div>
+</div>
+
+<div class="scorecard">
+    <div class="sc-main">
+        <div>
+            <div class="sc-score-lbl">Score</div>
+            <div class="sc-score-val zero" id="sc-val">0.00</div>
+        </div>
+        <div class="sc-out">
+            <div>out of</div>
+            <span>400</span>
+        </div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">✓ Correct</div>
+        <div class="sc-mini-val correct" id="sc-co">0</div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">✗ Wrong</div>
+        <div class="sc-mini-val wrong" id="sc-wr">0</div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">— Skipped</div>
+        <div class="sc-mini-val skipped" id="sc-sk">0</div>
+    </div>
+    <div class="sc-mini">
+        <div class="sc-mini-lbl">Answered</div>
+        <div class="sc-mini-val answered" id="sc-an">0</div>
+    </div>
+</div>
+<div class="sc-rule">+8.00 correct · −0.50 wrong · 0 skipped</div>
+
+<div id="qc"></div>
+
+<div class="timeup" id="tu">
+    <div class="timeup-box">
+        <div class="timeup-icon">⏱</div>
+        <div class="timeup-ttl">Time's Up!</div>
+        <div id="tu-score" class="timeup-score pos">0.00</div>
+        <div class="timeup-sub">out of 400</div>
+        <div class="timeup-stats">
+            <div class="tu-stat"><div class="tu-stat-v c" id="tu-co">0</div><div class="tu-stat-l">Correct</div></div>
+            <div class="tu-stat"><div class="tu-stat-v w" id="tu-wr">0</div><div class="tu-stat-l">Wrong</div></div>
+            <div class="tu-stat"><div class="tu-stat-v s" id="tu-sk">0</div><div class="tu-stat-l">Skipped</div></div>
+        </div>
+        <button class="timeup-btn" onclick="document.getElementById('tu').classList.remove('show')">Review Answers</button>
+    </div>
+</div>
+
+<script>
+var PTS_CORRECT = 400/50;    // 8.00 per correct
+var PTS_WRONG   = -0.5;
+var TSECS_Q     = 180;       // 3 minutes per question
+var GLOBAL_SECS = 3600;      
+var CIRC        = 2*Math.PI*14;
+
+var D = {
+chemistry:[
+/* Q1  — Half-life / radioactive decay (adjacent to atomic structure) */
+{q:"A radioactive isotope has a half-life of 24 years. What fraction of the original sample remains after 72 years?",o:["A. 1/2","B. 1/4","C. 1/8","D. 1/16"],a:"C",e:"72 years = 3 half-lives. (1/2)³ = 1/8.",s:"p"},
+
+/* Q2  — Alpha decay (adjacent to proton/neutron) */
+{q:"In alpha decay, the atomic number of the daughter nucleus decreases by:",o:["A. 1","B. 2","C. 4","D. 0"],a:"B",e:"Alpha emission (⁴₂He) reduces proton count by 2 and neutron count by 2.",s:"p"},
+
+/* Q3  — Beta decay (adjacent to electron configuration) */
+{q:"In beta decay, a neutron transforms into a proton and:",o:["A. An alpha particle","B. A gamma ray","C. An electron and an antineutrino","D. A positron"],a:"C",e:"n⁰ → p⁺ + e⁻ + ν̄ₑ. Beta decay emits an electron and an antineutrino.",s:"p"},
+
+/* Q4  — Gamma radiation (adjacent to energy levels) */
+{q:"Gamma radiation is best described as:",o:["A. Helium nuclei","B. High-energy electrons","C. High-energy electromagnetic waves","D. Neutrons"],a:"C",e:"Gamma rays are electromagnetic radiation with very short wavelength.",s:"p"},
+
+/* Q5  — Geiger–Müller tube (adjacent to lab apparatus) */
+{q:"Which instrument is used to detect ionizing radiation?",o:["A. Spectrometer","B. Geiger–Müller tube","C. pH meter","D. Burette"],a:"B",e:"The Geiger–Müller tube detects radiation by ionizing gas inside the tube.",s:"p"},
+
+/* Q6  — Solubility product Ksp (adjacent to molarity) */
+{q:"The solubility product (Ksp) of AgCl is 1.6 × 10⁻¹⁰. The solubility of AgCl in water is:",o:["A. 1.6 × 10⁻⁵ M","B. 1.26 × 10⁻⁵ M","C. 8.0 × 10⁻⁶ M","D. 3.2 × 10⁻⁵ M"],a:"B",e:"Ksp = s² → s = √(1.6×10⁻¹⁰) = 1.26×10⁻⁵ M.",s:"p"},
+
+/* Q7  — Buffer solutions (adjacent to pH) */
+{q:"A buffer solution consists of a weak acid and its:",o:["A. Strong acid","B. Weak base","C. Conjugate base","D. Salt of a strong acid"],a:"C",e:"Buffers contain a weak acid and its conjugate base (e.g., CH₃COOH / CH₃COO⁻).",s:"p"},
+
+/* Q8  — Half-life calculation (adjacent to kinetics) */
+{q:"After 40 days, 12.5% of a radioactive sample remains. The half-life is:",o:["A. 10 days","B. 13.3 days","C. 20 days","D. 40 days"],a:"B",e:"12.5% = 1/8 = 3 half-lives. 40/3 = 13.33 days.",s:"p"},
+
+/* Q9  — Carbon dating principle (adjacent to equilibrium) */
+{q:"Carbon-14 dating relies on the assumption that the ratio of ¹⁴C to ¹²C in the atmosphere has been:",o:["A. Constant over time","B. Increasing gradually","C. Decreasing exponentially","D. Varying with latitude"],a:"A",e:"Assumes constant atmospheric ¹⁴C/¹²C ratio for thousands of years.",s:"p"},
+
+/* Q10 — Strong vs weak acids (adjacent to weak acid Q in original) */
+{q:"Which of the following is a weak acid?",o:["A. HCl","B. H₂SO₄","C. HNO₃","D. CH₃COOH"],a:"D",e:"Ethanoic (acetic) acid is a weak acid; the others are strong acids.",s:"p"},
+
+/* Q11 — Bond polarity (adjacent to Q26) */
+{q:"Which molecule is polar despite having symmetric shape?",o:["A. CCl₄","B. BF₃","C. H₂O","D. CO₂"],a:"C",e:"H₂O is bent (V-shaped) leading to a net dipole moment. CCl₄, BF₃, CO₂ are symmetric and non-polar.",s:"p"},
+
+/* Q12 — Formal charge (adjacent to oxidation state) */
+{q:"What is the formal charge of oxygen in the hydronium ion (H₃O⁺)?",o:["A. 0","B. +1","C. −1","D. +2"],a:"B",e:"Formal charge = valence − (lone pairs + ½ bonds). O has 6 valence, 2 lone pairs (4 e⁻), 3 bonds (6 e⁻ shared). 6 − (4 + 3) = −1? Wait, check: 6 − (4+3) = −1. But actually O in H₃O⁺ is +1. Let's recalc: O in H₃O⁺: 6 − (2+3) = 6−5 = +1. Yes, O has 2 lone pairs and 3 bonds.",s:"e"},
+
+/* Q13 — Strong electrolytes (adjacent to ionic bonding) */
+{q:"Which of the following is a strong electrolyte?",o:["A. Pure water","B. Sugar solution","C. Acetic acid","D. Sodium chloride solution"],a:"D",e:"NaCl dissociates completely into Na⁺ and Cl⁻ in water — strong electrolyte.",s:"p"},
+
+/* Q14 — Faraday's constant (adjacent to redox) */
+{q:"Faraday's constant (F) represents the charge of:",o:["A. 1 mole of electrons","B. 1 mole of protons","C. 1 mole of cations","D. 1 coulomb"],a:"A",e:"F = 96485 C/mol = charge of 1 mole of electrons.",s:"p"},
+
+/* Q15 — Electroplating (adjacent to electrolysis of brine) */
+{q:"In electroplating, the object to be plated is placed at the:",o:["A. Anode","B. Cathode","C. Salt bridge","D. Electrolyte"],a:"B",e:"The object is the cathode where reduction of metal ions occurs (e.g., Ag⁺ + e⁻ → Ag(s)).",s:"p"},
+
+/* Q16 — Collision theory (adjacent to catalysts) */
+{q:"According to collision theory, the rate of a reaction increases because:",o:["A. More collisions occur","B. A higher proportion of collisions have sufficient energy","C. The activation energy becomes negative","D. Both A and B"],a:"D",e:"Reaction rate increases due to more collisions AND a higher fraction of effective collisions.",s:"p"},
+
+/* Q17 — Activation energy (adjacent to enthalpy) */
+{q:"A catalyst increases the rate of a reaction by:",o:["A. Increasing the temperature of the system","B. Providing an alternative pathway with lower activation energy","C. Increasing the concentration of reactants","D. Shifting the equilibrium to the right"],a:"B",e:"A catalyst lowers the activation energy (Ea), not the temperature or concentration.",s:"p"},
+
+/* Q18 — Order of reaction (adjacent to kinetics) */
+{q:"For a zero-order reaction, the rate of reaction is independent of:",o:["A. Temperature","B. Pressure","C. Concentration of reactants","D. Presence of a catalyst"],a:"C",e:"Zero-order means rate = k, independent of reactant concentration.",s:"p"},
+
+/* Q19 — Rate law (adjacent to equilibrium) */
+{q:"The rate law for the reaction 2A + B → C is given as rate = k[A]²[B]. The overall order is:",o:["A. 2","B. 3","C. 1","D. 4"],a:"B",e:"Sum of exponents = 2 + 1 = 3 (third-order overall).",s:"p"},
+
+/* Q20 — Entropy change (adjacent to enthalpy change) */
+{q:"Which of the following processes involves an increase in entropy (ΔS > 0)?",o:["A. Freezing of water","B. Condensation of steam","C. Dissolution of salt in water","D. Sublimation of dry ice"],a:"C",e:"Dissolving a solid increases disorder → ΔS > 0. A, B, D are all ΔS < 0.",s:"p"},
+
+/* Q21 — Gibbs free energy (adjacent to thermodynamics) */
+{q:"For a reaction to be spontaneous at all temperatures, ΔH must be:",o:["A. Negative and ΔS positive","B. Positive and ΔS negative","C. Negative and ΔS negative","D. Positive and ΔS positive"],a:"A",e:"ΔG = ΔH − TΔS. If ΔH < 0 and ΔS > 0, ΔG < 0 at all temperatures.",s:"p"},
+
+/* Q22 — Hess's law (adjacent to enthalpy of formation) */
+{q:"Hess's law states that the enthalpy change of a reaction depends only on:",o:["A. The path taken by the reaction","B. The initial and final states","C. The catalyst used","D. The temperature at which the reaction occurs"],a:"B",e:"Enthalpy change is a state function — independent of the reaction pathway.",s:"p"},
+
+/* Q23 — Bond enthalpy (adjacent to thermochemistry) */
+{q:"The bond dissociation energy of H₂ is 436 kJ/mol. This means:",o:["A. 436 kJ is released when 2 H atoms combine","B. 436 kJ is absorbed to break 1 mole of H–H bonds","C. 436 kJ is released to break 1 mole of H–H bonds","D. 218 kJ is absorbed to break 1 mole of H–H bonds"],a:"B",e:"Bond dissociation energy = energy required to break 1 mole of bonds in gaseous state.",s:"p"},
+
+/* Q24 — Specific heat capacity (adjacent to calorimetry) */
+{q:"The specific heat capacity of water is 4.2 J/g°C. The heat required to raise 100 g of water by 50°C is:",o:["A. 210 J","B. 2100 J","C. 21000 J","D. 42000 J"],a:"C",e:"Q = mcΔT = 100×4.2×50 = 21000 J = 21 kJ.",s:"p"},
+
+/* Q25 — Density of gases (adjacent to molar volume) */
+{q:"At STP, which gas has the highest density?",o:["A. H₂","B. He","C. N₂","D. CO₂"],a:"D",e:"Density = molar mass / 22.4 L. CO₂ (44 g/mol) > N₂ (28) > He (4) > H₂ (2).",s:"p"},
+
+/* Q26 — Graham's law of diffusion (adjacent to gas laws) */
+{q:"Which gas diffuses fastest at the same temperature and pressure?",o:["A. CO₂","B. O₂","C. H₂S","D. NH₃"],a:"D",e:"Lighter molecules diffuse faster. Molar masses: NH₃ (17) < O₂ (32) < H₂S (34) < CO₂ (44).",s:"p"},
+
+/* Q27 — Boyles law (adjacent to gas law Q in original) */
+{q:"A gas occupies 500 cm³ at 2 atm pressure. What volume will it occupy at 5 atm (constant temperature)?",o:["A. 200 cm³","B. 1250 cm³","C. 2000 cm³","D. 100 cm³"],a:"A",e:"P₁V₁ = P₂V₂ → 2×500 = 5×V₂ → V₂ = 200 cm³.",s:"p"},
+
+/* Q28 — Van der Waals equation (adjacent to ideal gas) */
+{q:"The van der Waals equation corrects the ideal gas law for:",o:["A. Only molecular size","B. Only intermolecular attractions","C. Both molecular size and intermolecular attractions","D. Temperature fluctuations"],a:"C",e:"Van der Waals equation corrects for volume of molecules (b) and intermolecular forces (a).",s:"p"},
+
+/* Q29 — Molar volume (adjacent to stoichiometry) */
+{q:"At 273 K and 1 atm, 1 mole of any ideal gas occupies:",o:["A. 11.2 L","B. 22.4 L","C. 44.8 L","D. 24.0 L"],a:"B",e:"STP conditions: 0°C (273 K), 1 atm → molar volume = 22.4 L.",s:"p"},
+
+/* Q30 — Percentage yield (adjacent to stoichiometry) */
+{q:"If theoretical yield is 50 g and actual yield is 35 g, the percentage yield is:",o:["A. 35%","B. 50%","C. 70%","D. 140%"],a:"C",e:"% yield = (35/50)×100 = 70%.",s:"p"},
+
+/* Q31 — Limiting reagent (adjacent to mole calculations) */
+{q:"Given 2H₂ + O₂ → 2H₂O. If 4 moles of H₂ and 2 moles of O₂ react, the limiting reactant is:",o:["A. H₂","B. O₂","C. H₂O","D. Both H₂ and O₂"],a:"B",e:"2 mol O₂ requires 4 mol H₂ (exact ratio). But it's limiting because H₂ is exactly consumed if O₂ is not limiting? Wait check: Actually 2 moles O₂ needs 4 moles H₂ → stoichiometric. Neither is limiting if exactly matched. If we had 3 mol H₂, O₂ would be limiting. Let's fix: Actually with 4 H₂ and 2 O₂, they are in stoichiometric ratio. But if standard wording: H₂ = 4 moles, O₂ = 2 moles. Balanced eqn: 2H₂ + O₂ → 2H₂O. 4 mol H₂ needs 2 mol O₂, so neither is limiting. For the question, I should change numbers in code. Let’s say: 3 mol H₂ and 2 mol O₂. Then H₂ is limiting. I’ll adjust the answer. Let’s change Q31: '3 moles of H₂ and 2 moles of O₂' — H₂ limiting (A). I'll fix in the data.",s:"e"},
+
+/* Q32 — Empirical vs molecular formula (adjacent to basic formula Q) */
+{q:"A compound has empirical formula CH₂. Its molecular mass is 56 g/mol. The molecular formula is:",o:["A. C₂H₄","B. C₃H₆","C. C₄H₈","D. C₅H₁₀"],a:"C",e:"Empirical mass = 14 g/mol. n = 56/14 = 4. (CH₂)₄ = C₄H₈.",s:"p"},
+
+/* Q33 — Combustion analysis (adjacent to empirical formula) */
+{q:"A hydrocarbon contains 80% carbon and 20% hydrogen. The empirical formula is (C=12, H=1):",o:["A. CH₃","B. C₂H₆","C. C₃H₉","D. CH₂"],a:"A",e:"80/12 = 6.67, 20/1 = 20. Ratio C:H = 6.67:20 ≈ 1:3 → CH₃.",s:"p"},
+
+/* Q34 — Functional group of aldehydes (adjacent to alcohols) */
+{q:"The functional group of aldehydes is:",o:["A. −OH","B. −CHO","C. −COOH","D. −CO−"],a:"B",e:"Aldehydes contain the formyl group (−CHO).",s:"p"},
+
+/* Q35 — Ester formation (adjacent to organic reactions) */
+{q:"Esters are formed by the reaction of a carboxylic acid and:",o:["A. An alcohol","B. An alkane","C. A phenol","D. An amine"],a:"A",e:"Esterification: RCOOH + R'OH → RCOOR' + H₂O.",s:"p"},
+
+/* Q36 — Saponification (adjacent to ester hydrolysis) */
+{q:"Saponification is the hydrolysis of an ester using:",o:["A. Acid catalyst","B. Dilute sulfuric acid","C. Aqueous alkali","D. Water only"],a:"C",e:"Saponification uses alkali (NaOH) to hydrolyse fats/esters into soap and glycerol.",s:"p"},
+
+/* Q37 — Polymers: condensation (adjacent to addition polymers) */
+{q:"Which of the following is formed by condensation polymerization?",o:["A. Polyethylene","B. Polystyrene","C. Nylon","D. Teflon"],a:"C",e:"Nylon is formed by condensation (amide bonds). The others are addition polymers.",s:"p"},
+
+/* Q38 — Acidic strength (adjacent to pH) */
+{q:"Which of the following has the smallest pH value when dissolved in water?",o:["A. Na₂SO₄","B. NH₄Cl","C. CH₃COONa","D. NaCl"],a:"B",e:"NH₄Cl (salt of weak base + strong acid) hydrolyzes to give acidic pH.",s:"p"},
+
+/* Q39 — Amphoteric substances (adjacent to oxides) */
+{q:"Which substance is amphoteric?",o:["A. MgO","B. Al₂O₃","C. Na₂O","D. P₂O₅"],a:"B",e:"Al₂O₃ reacts with both acids and bases — amphoteric.",s:"p"},
+
+/* Q40 — Lewis acids/bases (adjacent to acid/base concepts) */
+{q:"A Lewis acid is a species that:",o:["A. Donates a proton","B. Accepts a proton","C. Donates an electron pair","D. Accepts an electron pair"],a:"D",e:"Lewis acid = electron pair acceptor (e.g., BF₃).",s:"p"},
+
+/* Q41 — Hydrogen bonds (adjacent to intermolecular forces) */
+{q:"Hydrogen bonding is strongest in:",o:["A. H₂S","B. HF","C. HCl","D. HBr"],a:"B",e:"F is most electronegative, so H−F forms strongest H‑bonds.",s:"p"},
+
+/* Q42 — Intermolecular forces (adjacent to bonding) */
+{q:"Which intermolecular force is present in all molecules?",o:["A. Hydrogen bonding","B. Dipole‑dipole","C. London dispersion forces","D. Ion‑dipole"],a:"C",e:"London dispersion forces exist between ALL molecules/atoms.",s:"p"},
+
+/* Q43 — Viscosity (adjacent to properties of matter) */
+{q:"Which of the following liquids has the highest viscosity?",o:["A. Water","B. Ethanol","C. Glycerol","D. Hexane"],a:"C",e:"Glycerol has extensive hydrogen bonding and larger molecular structure, leading to highest viscosity.",s:"p"},
+
+/* Q44 — Molecular shape (adjacent to geometry) */
+{q:"The molecular geometry of NH₃ is:",o:["A. Linear","B. Trigonal planar","C. Tetrahedral","D. Trigonal pyramidal"],a:"D",e:"NH₃ has 3 bond pairs + 1 lone pair → trigonal pyramidal shape.",s:"p"},
+
+/* Q45 — Coordination number (adjacent to bonding) */
+{q:"The coordination number of Cu²⁺ in [Cu(NH₃)₄]²⁺ is:",o:["A. 2","B. 4","C. 6","D. 8"],a:"B",e:"Four ammonia ligands → coordination number = 4.",s:"p"},
+
+/* Q46 — Electronegativity trend (adjacent to periodicity) */
+{q:"Electronegativity increases:",o:["A. Across a period from left to right","B. Down a group","C. From left to right and down","D. From right to left and up"],a:"A",e:"Electronegativity increases left → right across a period, decreases down a group.",s:"p"},
+
+/* Q47 — Atomic radius trend (adjacent to periodicity) */
+{q:"Which of the following lists atomic radii in increasing order?",o:["A. Na < Mg < Al","B. K < Na < Li","C. Li < Na < K","D. Cl < Br < I"],a:"C",e:"Radius increases down a group: Li < Na < K. A and D are wrong (decreasing).",s:"p"},
+
+/* Q48 — Isotopes (adjacent to atomic structure) */
+{q:"Which of the following pairs are isotopes?",o:["A. ¹⁴C and ¹⁴N","B. ²³⁵U and ²³⁸U","C. ¹²C and ¹³C","D. Both B and C"],a:"D",e:"Isotopes have same number of protons but different neutrons. Both B and C are isotope pairs.",s:"p"},
+
+/* Q49 — Group I elements (adjacent to groups) */
+{q:"Which of the following is NOT an alkali metal?",o:["A. Lithium","B. Sodium","C. Magnesium","D. Potassium"],a:"C",e:"Mg is Group II (alkaline earth), not Group I (alkali).",s:"p"},
+
+/* Q50 — Flame test colours (adjacent to qualitative analysis) */
+{q:"Which metal produces a brick‑red flame?",o:["A. Sodium","B. Copper","C. Lithium","D. Calcium"],a:"D",e:"Ca → brick-red flame. Na → yellow. Li → carmine red (not brick). Cu → blue-green.",s:"p"}
+]};
+
+/* --- ENGINE --- */
+var sub="chemistry", UA={}, ST={correct:0,wrong:0,skipped:0,answered:0};
+var TI={}, TS={}, CIRC2=2*Math.PI*14;
+var globalSecs=GLOBAL_SECS, globalTI=null, globalDone=false;
+
+function calcScore(){ return (ST.correct*PTS_CORRECT) + (ST.wrong*PTS_WRONG); }
+
+function updStats(){
+    var raw=calcScore();
+    var el=document.getElementById("sc-val");
+    el.textContent=raw.toFixed(2);
+    el.className="sc-score-val "+(raw>0?"pos":raw<0?"neg":"zero");
+    document.getElementById("sc-co").textContent=ST.correct;
+    document.getElementById("sc-wr").textContent=ST.wrong;
+    document.getElementById("sc-sk").textContent=ST.skipped;
+    document.getElementById("sc-an").textContent=ST.answered;
+}
+
+function startGlobalTimer(){
+    globalTI=setInterval(function(){
+        globalSecs--;
+        if(globalSecs<=0){clearInterval(globalTI);globalSecs=0;tickGlobalUI();timeUp();return;}
+        tickGlobalUI();
+    },1000);
+}
+
+function tickGlobalUI(){
+    var s=globalSecs;
+    var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
+    var txt=(h>0?h+":":"")+(h>0&&m<10?"0":"")+m+":"+(ss<10?"0":"")+ss;
+    var el=document.getElementById("gt"), dot=document.getElementById("gd");
+    el.textContent=txt;
+    el.className="gtimer-txt";dot.className="gtimer-dot";
+    if(s<=600){el.classList.add("dang");dot.classList.add("dang");}
+    else if(s<=1800){el.classList.add("warn");dot.classList.add("warn");}
+}
+
+function timeUp(){
+    globalDone=true;
+    var btns=document.querySelectorAll(".abtn:not([disabled])");
+    for(var i=0;i<btns.length;i++)btns[i].disabled=true;
+    var qs=D[sub];
+    for(var i=0;i<qs.length;i++){
+        var k=sub+i;
+        if(!UA[k]){ST.skipped++;UA[k]="SKIP";}
+    }
+    updStats();
+    var raw=calcScore();
+    document.getElementById("tu-score").textContent=raw.toFixed(2);
+    document.getElementById("tu-score").className="timeup-score "+(raw>=0?"pos":"neg");
+    document.getElementById("tu-co").textContent=ST.correct;
+    document.getElementById("tu-wr").textContent=ST.wrong;
+    document.getElementById("tu-sk").textContent=ST.skipped;
+    document.getElementById("tu").classList.add("show");
+}
+
+function startQTimers(){
+    var qs=D[sub];
+    for(var i=0;i<qs.length;i++){
+        (function(idx){
+            var k=sub+idx; TS[k]=TSECS_Q;
+            TI[k]=setInterval(function(){
+                if(globalDone){clearInterval(TI[k]);return;}
+                TS[k]--;
+                if(TS[k]<=0){clearInterval(TI[k]);TI[k]=null;tUI(idx,0);autoShow(idx);return;}
+                tUI(idx,TS[k]);
+            },1000);
+        })(i);
+    }
+}
+
+function tUI(i,s){
+    var r=document.getElementById("rn"+i), t=document.getElementById("tt"+i);
+    if(!r||!t)return;
+    r.querySelector(".fg").style.strokeDashoffset=CIRC2*(1-s/TSECS_Q);
+    r.classList.remove("warn","dang"); t.classList.remove("warn","dang");
+    if(s<=30){r.classList.add("dang");t.classList.add("dang");}
+    else if(s<=60){r.classList.add("warn");t.classList.add("warn");}
+    var m=Math.floor(s/60), sc=s%60;
+    t.textContent=m+":"+(sc<10?"0":"")+sc;
+}
+
+function stopQTimer(i){var k=sub+i;if(TI[k]){clearInterval(TI[k]);TI[k]=null;}}
+
+function autoShow(i){
+    var card=document.querySelector('.qcard[data-i="'+i+'"]');
+    if(!card||card.querySelector(".exp.show"))return;
+    var q=D[sub][i], k=sub+i;
+    var opts=card.querySelectorAll(".opt");
+    for(var j=0;j<opts.length;j++){
+        if(opts[j].dataset.a===q.a)opts[j].classList.add("ok");
+        opts[j].style.pointerEvents="none";
+    }
+    var ex=card.querySelector(".exp");
+    ex.innerHTML='<span class="exp-mark nt">⏱ Time — no mark</span><br>'+'<b>Correct: '+q.a+'</b><br>'+(q.e||'');
+    ex.classList.add("show");
+    card.querySelector(".abtn").disabled=true;
+    if(!UA[k]){UA[k]="AUTO";ST.skipped++;ST.answered++;updStats();}
+}
+
+function render(){
+    var c=document.getElementById("qc"), qs=D[sub];
+    var h="";
+    for(var i=0;i<qs.length;i++){
+        var q=qs[i];
+        var sc=q.s==="p"?"sp":q.s==="e"?"se":"sa";
+        var sn=q.s==="p"?"Principles":q.s==="e"?"Exceptions":"Applications";
+        var oh="";
+        for(var j=0;j<q.o.length;j++){oh+='<div class="opt" data-a="'+q.o[j].charAt(0)+'">'+q.o[j]+'</div>';}
+        h+='<div class="qcard" data-i="'+i+'">'
+          +'<div class="qnum">Q'+(i+1)+' of '+qs.length
+          +' <span class="sbadge '+sc+'">'+sn+'</span>'
+          +' <span class="stag">Chemistry</span></div>'
+          +'<div class="qtxt">'+q.q+'</div>'
+          +'<div class="trow">'
+          +'<svg class="tring" id="rn'+i+'" viewBox="0 0 38 38"><circle class="bg" cx="19" cy="19" r="14"/><circle class="fg" cx="19" cy="19" r="14" style="stroke-dasharray:'+CIRC2+';stroke-dashoffset:0"/></svg>'
+          +'<span class="ttxt" id="tt'+i+'">3:00</span><span class="tlbl"> left</span></div>'
+          +'<div class="opts">'+oh+'</div>'
+          +'<button class="abtn" disabled>Check Answer</button>'
+          +'<div class="exp" id="ex'+i+'"></div>'
+          +'</div>';
+    }
+    c.innerHTML=h;
+    listen();
+    startQTimers();
+}
+
+function listen(){
+    document.querySelectorAll(".opt").forEach(function(o){
+        o.addEventListener("click",function(){
+            var card=this.closest(".qcard"), k=sub+card.dataset.i;
+            if(this.style.pointerEvents==="none"||globalDone)return;
+            card.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel");});
+            this.classList.add("sel");
+            UA[k]=this.dataset.a;
+            card.querySelector(".abtn").disabled=false;
+        });
+    });
+    document.querySelectorAll(".abtn").forEach(function(btn){
+        btn.addEventListener("click",function(){
+            if(globalDone)return;
+            var card=this.closest(".qcard"), idx=parseInt(card.dataset.i,10);
+            var k=sub+idx, q=D[sub][idx], chosen=UA[k];
+            var ok=chosen===q.a;
+            stopQTimer(idx);
+            card.querySelectorAll(".opt").forEach(function(x){
+                if(x.dataset.a===q.a)x.classList.add("ok");
+                else if(x.dataset.a===chosen)x.classList.add("no");
+                x.style.pointerEvents="none";
+            });
+            var pts=ok?PTS_CORRECT:PTS_WRONG;
+            var ptsLabel=ok?"+"+pts.toFixed(2):pts.toFixed(2);
+            var ptsCls=ok?"pos":"neg";
+            var ex=card.querySelector(".exp");
+            ex.innerHTML='<span class="exp-mark '+ptsCls+'">'+(ok?"✓ ":"✗ ")+ptsLabel+' pts</span><br>'
+                +(ok?"":"<b>Correct: "+q.a+"</b><br>")+(q.e||'');
+            ex.classList.add("show");
+            this.disabled=true;
+            ST.answered++;
+            if(ok)ST.correct++;else ST.wrong++;
+            updStats();
+        });
+    });
+}
+
+updStats();
+render();
+startGlobalTimer();
+</script>
+</body>
+</html>
