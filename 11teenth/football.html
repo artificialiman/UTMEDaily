@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper Eight — Football</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --pitch:#0d1410;
+  --pitch-line:#1a2620;
+  --paper:#e8e4d8;
+  --paper-dim:#a8a497;
+  --red:#a8201a;
+  --red-glow:rgba(168,32,26,0.35);
+  --gold:#c9a227;
+  --slate:#5a6e6a;
+  --slate-bright:#7e9892;
+
+  --display:'Bebas Neue', sans-serif;
+  --mono:'Space Mono', monospace;
+  --cond:'Barlow Condensed', sans-serif;
+  --body:'Barlow', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--pitch);
+  color:var(--paper);
+  font-family:var(--body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* texture: faint pitch lines across the whole doc */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 119px,
+      var(--pitch-line) 119px,
+      var(--pitch-line) 120px
+    );
+  opacity:0.4;
+}
+
+.wrap{
+  position:relative;
+  z-index:1;
+  max-width:1080px;
+  margin:0 auto;
+  padding:0 28px 120px;
+}
+
+/* ============ HERO ============ */
+
+.hero{
+  padding:64px 0 40px;
+  border-bottom:1px solid var(--slate);
+}
+
+.hero-eyebrow{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  margin-bottom:18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.hero-eyebrow::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--slate);
+}
+
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(3.2rem, 11vw, 7.4rem);
+  line-height:0.96;
+  letter-spacing:0.01em;
+  color:var(--paper);
+  text-transform:uppercase;
+}
+
+.hero h1 span{
+  color:var(--red);
+}
+
+.hero-sub{
+  font-family:var(--cond);
+  font-size:clamp(1.05rem, 2vw, 1.35rem);
+  font-weight:500;
+  color:var(--paper-dim);
+  max-width:640px;
+  margin-top:18px;
+}
+
+.hero-tour{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0;
+  margin-top:36px;
+  border:1px solid var(--slate);
+}
+
+.tour-stage{
+  flex:1;
+  min-width:130px;
+  padding:14px 16px;
+  border-right:1px solid var(--slate);
+  font-family:var(--mono);
+}
+
+.tour-stage:last-child{border-right:none;}
+
+.tour-stage .num{
+  font-size:0.68rem;
+  letter-spacing:0.18em;
+  color:var(--slate-bright);
+  text-transform:uppercase;
+}
+
+.tour-stage .name{
+  font-family:var(--cond);
+  font-size:1.15rem;
+  font-weight:600;
+  color:var(--paper);
+  text-transform:uppercase;
+  margin-top:4px;
+}
+
+/* ============ DOCTRINE BAR — signature element ============ */
+
+.doctrine{
+  padding:56px 0 48px;
+  border-bottom:1px solid var(--slate);
+}
+
+.doctrine-head{
+  font-family:var(--cond);
+  font-size:0.95rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--paper-dim);
+  margin-bottom:24px;
+}
+
+.doctrine-head strong{color:var(--paper);font-weight:700;}
+
+.doctrine-bar{
+  position:relative;
+  height:64px;
+  display:flex;
+  border:1px solid var(--slate);
+  background:var(--pitch-line);
+}
+
+.dseg{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  padding:0 16px;
+  border-right:1px solid var(--pitch);
+  overflow:hidden;
+  transition:filter 0.4s ease;
+}
+
+.dseg:last-child{border-right:none;}
+
+.dseg .pct{
+  font-family:var(--display);
+  font-size:1.7rem;
+  line-height:1;
+}
+
+.dseg .label{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin-top:2px;
+  white-space:nowrap;
+}
+
+.dseg.fitness{flex:5; background:linear-gradient(120deg, var(--red) 0%, #6b1410 100%);}
+.dseg.fitness .pct, .dseg.fitness .label{color:var(--paper);}
+
+.dseg.skill{flex:3; background:linear-gradient(120deg, var(--gold) 0%, #8a6f17 100%);}
+.dseg.skill .pct, .dseg.skill .label{color:var(--pitch);}
+
+.dseg.team{flex:1; background:var(--slate);}
+.dseg.team .pct, .dseg.team .label{color:var(--paper);}
+
+.dseg.coach{flex:1; background:var(--pitch-line); border-left:1px dashed var(--slate);}
+.dseg.coach .pct, .dseg.coach .label{color:var(--paper-dim);}
+
+/* the moving threshold line — the signature */
+.threshold-line{
+  position:absolute;
+  top:-8px;
+  bottom:-8px;
+  width:2px;
+  background:var(--paper);
+  left:50%;
+  transition:left 0.6s cubic-bezier(.4,0,.2,1), background 0.4s ease, box-shadow 0.4s ease;
+  z-index:5;
+}
+
+.threshold-line::before{
+  content:attr(data-load);
+  position:absolute;
+  top:-26px;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.1em;
+  white-space:nowrap;
+  color:var(--paper);
+  background:var(--pitch);
+  padding:2px 6px;
+  border:1px solid var(--slate);
+}
+
+.threshold-line.safe{box-shadow:0 0 0 0 transparent;}
+.threshold-line.warn{background:var(--gold); box-shadow:0 0 14px 1px var(--gold);}
+.threshold-line.danger{background:var(--red); box-shadow:0 0 18px 2px var(--red-glow); animation:pulse-line 1.4s ease-in-out infinite;}
+
+@keyframes pulse-line{
+  0%,100%{opacity:1;}
+  50%{opacity:0.45;}
+}
+
+.doctrine-foot{
+  margin-top:18px;
+  font-family:var(--mono);
+  font-size:0.78rem;
+  color:var(--paper-dim);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.doctrine-foot .reading{
+  font-weight:700;
+  letter-spacing:0.05em;
+}
+
+.doctrine-foot .reading.safe{color:var(--slate-bright);}
+.doctrine-foot .reading.warn{color:var(--gold);}
+.doctrine-foot .reading.danger{color:var(--red);}
+
+/* ============ TOGGLE — Probabilistic / Romantic ============ */
+
+.toggle-row{
+  margin-top:28px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.toggle-label{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  text-transform:uppercase;
+  letter-spacing:0.14em;
+  color:var(--paper-dim);
+}
+
+.toggle-pair{
+  display:inline-flex;
+  border:1px solid var(--slate);
+}
+
+.toggle-pair button{
+  font-family:var(--cond);
+  font-weight:600;
+  font-size:0.95rem;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  background:transparent;
+  border:none;
+  color:var(--paper-dim);
+  padding:10px 22px;
+  cursor:pointer;
+  transition:background 0.25s ease, color 0.25s ease;
+}
+
+.toggle-pair button + button{border-left:1px solid var(--slate);}
+
+.toggle-pair button.active{
+  background:var(--paper);
+  color:var(--pitch);
+}
+
+.toggle-pair button.active.romantic{
+  background:var(--red);
+  color:var(--paper);
+}
+
+.toggle-note{
+  font-family:var(--cond);
+  font-size:0.92rem;
+  color:var(--paper-dim);
+  font-style:italic;
+  max-width:480px;
+}
+
+/* ============ SECTION SHELL ============ */
+
+section.module{
+  padding:64px 0;
+  border-bottom:1px solid var(--slate);
+}
+
+section.module:last-of-type{border-bottom:none;}
+
+.module-eyebrow{
+  font-family:var(--mono);
+  font-size:0.74rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  margin-bottom:10px;
+}
+
+.module h2{
+  font-family:var(--display);
+  font-size:clamp(2.2rem, 6vw, 4rem);
+  text-transform:uppercase;
+  letter-spacing:0.01em;
+  color:var(--paper);
+  line-height:1;
+}
+
+.module-intro{
+  font-family:var(--cond);
+  font-size:1.1rem;
+  color:var(--paper-dim);
+  max-width:680px;
+  margin-top:14px;
+}
+
+/* ============ FITNESS CALENDAR ============ */
+
+.cal-controls{
+  margin-top:36px;
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.stage-select{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--paper);
+  background:var(--pitch-line);
+  border:1px solid var(--slate);
+  padding:10px 14px;
+  cursor:pointer;
+}
+
+.cal-meta{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  color:var(--paper-dim);
+}
+
+.cal-meta strong{color:var(--gold);}
+
+.week-grid{
+  margin-top:28px;
+  display:grid;
+  grid-template-columns:120px repeat(7, 1fr);
+  border:1px solid var(--slate);
+}
+
+.cal-head-cell{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  padding:10px 8px;
+  border-bottom:1px solid var(--slate);
+  border-right:1px solid var(--pitch-line);
+  text-align:center;
+}
+
+.cal-head-cell:last-child{border-right:none;}
+
+.cal-head-cell.corner{
+  text-align:left;
+  color:var(--paper-dim);
+}
+
+.day-cell{
+  position:relative;
+  border-right:1px solid var(--pitch-line);
+  border-bottom:1px solid var(--pitch-line);
+  padding:10px 8px;
+  min-height:78px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+  transition:background 0.2s ease;
+}
+
+.day-cell:hover{background:var(--pitch-line);}
+
+.day-cell:last-child{border-right:none;}
+
+.week-grid .row-end{border-right:none;}
+
+.day-cell .tag{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+}
+
+.day-cell .load-num{
+  font-family:var(--display);
+  font-size:1.9rem;
+  line-height:1;
+}
+
+.day-cell .dribble{
+  font-family:var(--mono);
+  font-size:0.6rem;
+  letter-spacing:0.06em;
+  color:var(--gold);
+}
+
+/* load coloring */
+.day-cell[data-band="rest"]{background:rgba(90,110,106,0.08);}
+.day-cell[data-band="rest"] .load-num{color:var(--slate-bright);}
+
+.day-cell[data-band="base"] .load-num{color:var(--paper);}
+
+.day-cell[data-band="build"]{background:rgba(201,162,39,0.06);}
+.day-cell[data-band="build"] .load-num{color:var(--gold);}
+
+.day-cell[data-band="peak"]{background:rgba(168,32,26,0.10);}
+.day-cell[data-band="peak"] .load-num{color:var(--red);}
+.day-cell[data-band="peak"]{box-shadow:inset 0 0 0 1px var(--red-glow);}
+
+.day-label-cell{
+  font-family:var(--cond);
+  font-weight:600;
+  font-size:0.95rem;
+  text-transform:uppercase;
+  color:var(--paper);
+  padding:10px 8px;
+  border-right:1px solid var(--pitch-line);
+  border-bottom:1px solid var(--pitch-line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.day-label-cell .week-total{
+  font-family:var(--mono);
+  font-size:0.7rem;
+  color:var(--paper-dim);
+  font-weight:400;
+}
+
+.cal-legend{
+  margin-top:18px;
+  display:flex;
+  gap:22px;
+  flex-wrap:wrap;
+  font-family:var(--mono);
+  font-size:0.7rem;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+}
+
+.legend-dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  margin-right:6px;
+  vertical-align:-1px;
+  border:1px solid var(--slate);
+}
+
+.legend-dot.rest{background:rgba(90,110,106,0.25);}
+.legend-dot.base{background:var(--pitch-line);}
+.legend-dot.build{background:rgba(201,162,39,0.4);}
+.legend-dot.peak{background:rgba(168,32,26,0.45);}
+
+.cal-note{
+  margin-top:28px;
+  border-left:2px solid var(--red);
+  padding-left:18px;
+  font-family:var(--cond);
+  font-size:1rem;
+  color:var(--paper-dim);
+  max-width:680px;
+}
+
+.cal-note strong{color:var(--paper);font-weight:600;}
+
+/* ============ INFLUENTIAL CLASSES ============ */
+
+.class-grid{
+  margin-top:36px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:1px;
+  background:var(--slate);
+  border:1px solid var(--slate);
+}
+
+.class-card{
+  background:var(--pitch);
+  padding:28px 24px;
+  display:flex;
+  flex-direction:column;
+}
+
+.class-card .cnum{
+  font-family:var(--mono);
+  font-size:0.7rem;
+  letter-spacing:0.18em;
+  color:var(--slate-bright);
+  text-transform:uppercase;
+}
+
+.class-card h3{
+  font-family:var(--display);
+  font-size:1.9rem;
+  text-transform:uppercase;
+  color:var(--paper);
+  margin-top:10px;
+  line-height:1.05;
+}
+
+.class-card .ctag{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-top:8px;
+}
+
+.class-card p{
+  font-family:var(--cond);
+  font-size:0.98rem;
+  color:var(--paper-dim);
+  margin-top:14px;
+  flex:1;
+}
+
+.class-card .position-note{
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--pitch-line);
+  font-family:var(--mono);
+  font-size:0.74rem;
+  color:var(--slate-bright);
+  line-height:1.6;
+}
+
+.class-card .position-note span{color:var(--paper-dim);}
+
+/* ============ PERIODIC TABLE ============ */
+
+.pt-filter{
+  margin-top:36px;
+  display:flex;
+  gap:1px;
+  flex-wrap:wrap;
+  background:var(--slate);
+  border:1px solid var(--slate);
+}
+
+.pt-filter button{
+  font-family:var(--mono);
+  font-size:0.7rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  background:var(--pitch);
+  color:var(--paper-dim);
+  border:none;
+  padding:10px 16px;
+  cursor:pointer;
+  transition:background 0.2s ease, color 0.2s ease;
+}
+
+.pt-filter button.active{
+  background:var(--paper);
+  color:var(--pitch);
+}
+
+.pt-grid{
+  margin-top:1px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(118px, 1fr));
+  gap:1px;
+  background:var(--slate);
+  border:1px solid var(--slate);
+  border-top:none;
+}
+
+.pt-cell{
+  background:var(--pitch);
+  padding:12px 10px;
+  min-height:104px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:default;
+  transition:background 0.2s ease, transform 0.15s ease;
+  position:relative;
+}
+
+.pt-cell:hover{
+  background:var(--pitch-line);
+  transform:translateY(-2px);
+  z-index:2;
+}
+
+.pt-cell .sym{
+  font-family:var(--display);
+  font-size:1.6rem;
+  line-height:1;
+}
+
+.pt-cell .num{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  color:var(--paper-dim);
+  align-self:flex-end;
+}
+
+.pt-cell .nm{
+  font-family:var(--cond);
+  font-size:0.74rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.02em;
+  margin-top:6px;
+}
+
+.pt-cell .group-tag{
+  font-family:var(--mono);
+  font-size:0.58rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+}
+
+/* group color coding via left border */
+.pt-cell[data-group="ground"]{border-left:3px solid var(--slate-bright);}
+.pt-cell[data-group="aerial"]{border-left:3px solid var(--gold);}
+.pt-cell[data-group="defensive"]{border-left:3px solid var(--red);}
+.pt-cell[data-group="transition"]{border-left:3px solid var(--paper-dim);}
+
+.pt-legend{
+  margin-top:18px;
+  display:flex;
+  gap:22px;
+  flex-wrap:wrap;
+  font-family:var(--mono);
+  font-size:0.7rem;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+}
+
+.pt-legend .swatch{
+  display:inline-block;
+  width:14px;
+  height:3px;
+  margin-right:8px;
+  vertical-align:1px;
+}
+
+.swatch.ground{background:var(--slate-bright);}
+.swatch.aerial{background:var(--gold);}
+.swatch.defensive{background:var(--red);}
+.swatch.transition{background:var(--paper-dim);}
+
+.pt-note{
+  margin-top:28px;
+  border-left:2px solid var(--gold);
+  padding-left:18px;
+  font-family:var(--cond);
+  font-size:1rem;
+  color:var(--paper-dim);
+  max-width:680px;
+}
+
+.pt-note strong{color:var(--paper);font-weight:600;}
+
+/* ============ UNCONTROLLABLES ============ */
+
+.unc-grid{
+  margin-top:36px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--slate);
+  border:1px solid var(--slate);
+}
+
+.unc-card{
+  background:var(--pitch);
+  padding:26px 24px;
+}
+
+.unc-card .pct-big{
+  font-family:var(--display);
+  font-size:3rem;
+  color:var(--slate-bright);
+  line-height:1;
+}
+
+.unc-card h4{
+  font-family:var(--cond);
+  font-size:1.2rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  color:var(--paper);
+  margin-top:8px;
+}
+
+.unc-card p{
+  font-family:var(--cond);
+  font-size:0.95rem;
+  color:var(--paper-dim);
+  margin-top:10px;
+}
+
+/* ============ FOOTER ============ */
+
+footer{
+  padding:48px 0 0;
+  font-family:var(--mono);
+  font-size:0.72rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width:720px){
+  .wrap{padding:0 18px 90px;}
+  .hero{padding:44px 0 32px;}
+  .week-grid{grid-template-columns:64px repeat(7, minmax(48px,1fr));}
+  .day-cell{padding:6px 4px; min-height:64px;}
+  .day-cell .load-num{font-size:1.3rem;}
+  .day-label-cell{font-size:0.78rem; padding:6px 4px;}
+  .day-label-cell .week-total{display:none;}
+  .cal-head-cell{font-size:0.58rem; padding:8px 2px;}
+  .unc-grid{grid-template-columns:1fr;}
+  .tour-stage{min-width:48%;}
+  .dseg .pct{font-size:1.3rem;}
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .threshold-line, .threshold-line.danger{transition:none; animation:none;}
+}
+
+/* focus visibility */
+button:focus-visible, .stage-select:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:2px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero-eyebrow">Paper Eight — 100 Day Programme</div>
+    <h1>The Game<br>Has No <span>Position.</span></h1>
+    <p class="hero-sub">
+      A doctrine for any shirt number. Fitness first, skill second — both trainable.
+      Teammates and coaching, third and fourth — not trainable, only accounted for.
+      Football is a tournament, and so is the syllabus.
+    </p>
+    <div class="hero-tour">
+      <div class="tour-stage">
+        <div class="num">Test 01</div>
+        <div class="name">Qualifiers</div>
+      </div>
+      <div class="tour-stage">
+        <div class="num">Test 02</div>
+        <div class="name">Group Stage</div>
+      </div>
+      <div class="tour-stage">
+        <div class="num">Test 03</div>
+        <div class="name">Knockouts</div>
+      </div>
+      <div class="tour-stage">
+        <div class="num">Test 04</div>
+        <div class="name">Final Four</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ DOCTRINE BAR ============ -->
+  <section class="doctrine" id="doctrine">
+    <div class="doctrine-head">
+      The split: <strong>50</strong> fitness, <strong>30</strong> skill (its own 100 once fitness clears),
+      <strong>10</strong> teammate level, <strong>10</strong> coaching.
+    </div>
+
+    <div class="doctrine-bar">
+      <div class="dseg fitness">
+        <div class="pct">50</div>
+        <div class="label">Fitness — trainable</div>
+      </div>
+      <div class="dseg skill">
+        <div class="pct">30</div>
+        <div class="label">Skill — gated by fitness</div>
+      </div>
+      <div class="dseg team">
+        <div class="pct">10</div>
+        <div class="label">Teammates</div>
+      </div>
+      <div class="dseg coach">
+        <div class="pct">10</div>
+        <div class="label">Coaching</div>
+      </div>
+      <div class="threshold-line safe" id="thresholdLine" data-load="LOAD — SAFE"></div>
+    </div>
+
+    <div class="doctrine-foot">
+      <span>The line marks today's training load against the 7-dribble ceiling. It moves with the calendar below.</span>
+      <span class="reading safe" id="readingText">Reading: Safe</span>
+    </div>
+
+    <!-- ============ PROBABILISTIC / ROMANTIC TOGGLE ============ -->
+    <div class="toggle-row">
+      <span class="toggle-label">Read the page as a:</span>
+      <div class="toggle-pair">
+        <button id="btnProb" class="active">Probabilistic player</button>
+        <button id="btnRomantic">Romantic player</button>
+      </div>
+      <span class="toggle-note" id="toggleNote">
+        The probabilistic player wins in the end — not because romance is wrong, but because it's already inside the numbers. You don't have to force it.
+      </span>
+    </div>
+  </section>
+
+  <!-- ============ FITNESS CALENDAR ============ -->
+  <section class="module" id="calendar">
+    <div class="module-eyebrow">Module One — Fitness (50%)</div>
+    <h2>The Calendar</h2>
+    <p class="module-intro">
+      Fourteen weeks, four tournament stages. Load is plotted, not guessed — every cell is a day's
+      training intensity (0–10). Tap a cell to cycle it. The threshold line above reacts to the week
+      you're viewing.
+    </p>
+
+    <div class="cal-controls">
+      <select class="stage-select" id="stageSelect">
+        <option value="0">Stage 01 — Qualifiers (Weeks 1–4)</option>
+        <option value="1">Stage 02 — Group Stage (Weeks 5–8)</option>
+        <option value="2">Stage 03 — Knockouts (Weeks 9–11)</option>
+        <option value="3">Stage 04 — Final Four (Weeks 12–14)</option>
+      </select>
+      <span class="cal-meta">Dribble allowance this match: <strong id="dribbleAllowance">7</strong></span>
+      <span class="cal-meta" id="weekIndicator">Showing Week 1</span>
+    </div>
+
+    <div class="week-grid" id="weekGrid">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="cal-legend">
+      <span><span class="legend-dot rest"></span>Rest / Recovery</span>
+      <span><span class="legend-dot base"></span>Base — technical</span>
+      <span><span class="legend-dot build"></span>Build — match sharpness</span>
+      <span><span class="legend-dot peak"></span>Peak — match week</span>
+    </div>
+
+    <div class="cal-note">
+      <strong>Anti-injury, maximum-gain rule:</strong> no more than seven dribbles in open play across a
+      full match — unless the match is a semi-final, where the ceiling lifts to ten. Dribbling is the
+      highest-load individual action a body performs in football: deceleration, change of direction,
+      contact absorption, repeated. Rationing it isn't caution for its own sake — it's where the 50%
+      and the 30% actually meet. A player who has done the fitness work can afford to spend one of
+      those seven dribbles on something decisive, rather than something habitual.
+    </div>
+  </section>
+
+  <!-- ============ INFLUENTIAL CLASSES ============ -->
+  <section class="module" id="classes">
+    <div class="module-eyebrow">Module Two — Doctrine</div>
+    <h2>Five Classes<br>Of The Game</h2>
+    <p class="module-intro">
+      Not formations, not positions — the five recurring situations every player, in every shirt,
+      will live inside repeatedly. Learn these and the position becomes a detail.
+    </p>
+
+    <div class="class-grid">
+      <div class="class-card">
+        <div class="cnum">Class 01</div>
+        <h3>The First Touch Under Pressure</h3>
+        <div class="ctag">Receiving</div>
+        <p>
+          The ball arrives with someone close behind you. Everything that follows — the next three
+          seconds of the entire match — is decided by where this touch goes, not by what you do after it.
+          Most goals and most turnovers begin here, unwatched.
+        </p>
+        <div class="position-note">
+          <span>GK</span> — distribution under press.
+          <span>CB</span> — first line under press.
+          <span>FW</span> — back to goal, defender touching.
+        </div>
+      </div>
+
+      <div class="class-card">
+        <div class="cnum">Class 02</div>
+        <h3>The Recovery Run</h3>
+        <div class="ctag">Defensive Transition</div>
+        <p>
+          You've just lost the ball. The next five seconds are the cheapest defensive work a team
+          does all match — cheaper than a tackle, cheaper than a block — if the run starts immediately
+          and at the right angle, not the fastest one.
+        </p>
+        <div class="position-note">
+          <span>FB</span> — recovering wide overlap.
+          <span>MID</span> — screening the second pass.
+          <span>WG</span> — tracking the underlap.
+        </div>
+      </div>
+
+      <div class="class-card">
+        <div class="cnum">Class 03</div>
+        <h3>The Third Man</h3>
+        <div class="ctag">Combination Play</div>
+        <p>
+          Two players are involved in a pass. A third — unmarked, often unnoticed — is the actual
+          point of it. Reading when you are that third man, and moving before the first pass is even
+          played, is the difference between supporting play and directing it.
+        </p>
+        <div class="position-note">
+          <span>CM</span> — the most common home.
+          <span>FB</span> — overlapping underneath.
+          <span>ST</span> — dropping to be the link.
+        </div>
+      </div>
+
+      <div class="class-card">
+        <div class="cnum">Class 04</div>
+        <h3>The Box Entry</h3>
+        <div class="ctag">Final Third</div>
+        <p>
+          Possession outside the box is patient. Possession inside it is final. The class is about the
+          half-second of recognising which one you're in — and that a touch that was acceptable five
+          yards earlier is now too slow.
+        </p>
+        <div class="position-note">
+          <span>ST</span> — timing the run across the line.
+          <span>WG</span> — the cutback decision.
+          <span>CM</span> — the late arrival.
+        </div>
+      </div>
+
+      <div class="class-card">
+        <div class="cnum">Class 05</div>
+        <h3>The Last Five Minutes</h3>
+        <div class="ctag">Game Management</div>
+        <p>
+          Fitness, skill, teammates and coaching all converge here under fatigue, and the doctrine's
+          ratios stop being theory. A tired probabilistic player still makes the simple pass. A tired
+          romantic player goes looking for the moment — and sometimes finds it, but rarely on purpose.
+        </p>
+        <div class="position-note">
+          <span>ALL</span> — discipline over heroics, almost always.
+          <span>EXC</span> — score margin, not personal feeling, decides which.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SKILL PERIODIC TABLE ============ -->
+  <section class="module" id="skills">
+    <div class="module-eyebrow">Module Three — Skill (its own 100%, once fitness clears)</div>
+    <h2>The Periodic<br>Table Of Moves</h2>
+    <p class="module-intro">
+      Eighteen essential moves, grouped by what they're for rather than how they look. Filter by group
+      to study one family at a time — every position draws from at least two of the four.
+    </p>
+
+    <div class="pt-filter" id="ptFilter">
+      <button class="active" data-filter="all">All 18</button>
+      <button data-filter="ground">Ground Control</button>
+      <button data-filter="aerial">Aerial &amp; Strike</button>
+      <button data-filter="defensive">Defensive Actions</button>
+      <button data-filter="transition">Transition</button>
+    </div>
+
+    <div class="pt-grid" id="ptGrid">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="pt-legend">
+      <span><span class="swatch ground"></span>Ground Control — first touch, dribble, pass</span>
+      <span><span class="swatch aerial"></span>Aerial &amp; Strike — finishing, heading, delivery</span>
+      <span><span class="swatch defensive"></span>Defensive Actions — the tackle family</span>
+      <span><span class="swatch transition"></span>Transition — the connective moves</span>
+    </div>
+
+    <div class="pt-note">
+      <strong>On the gate:</strong> this table is the 30%, and the 30% is gated by the 50%. A player
+      with elite ground control but no fitness base will lose the ball in the 70th minute exactly when
+      they had it in the 10th — not because the skill disappeared, but because the legs that delivered
+      it did. Train the table in order of your weakest group, but train the calendar first.
+    </div>
+  </section>
+
+  <!-- ============ UNCONTROLLABLES ============ -->
+  <section class="module" id="uncontrollables">
+    <div class="module-eyebrow">Module Four — The Other 20%</div>
+    <h2>What You<br>Don't Train</h2>
+    <p class="module-intro">
+      Teammate level and coaching aren't trainable by the player — but a probabilistic player accounts
+      for them instead of resenting them. This is the difference between adapting to context and
+      waiting for it to change.
+    </p>
+
+    <div class="unc-grid">
+      <div class="unc-card">
+        <div class="pct-big">10</div>
+        <h4>Teammate Level</h4>
+        <p>
+          The same pass into the same space is a goal with one teammate's movement and a turnover with
+          another's. You don't control this — but a probabilistic player adjusts the weight, timing,
+          and even the choice of pass based on who's making the run, every time, without complaint.
+        </p>
+      </div>
+      <div class="unc-card">
+        <div class="pct-big">10</div>
+        <h4>Coaching</h4>
+        <p>
+          Instructions, formations, substitution timing — set by someone else, for the team, not for
+          you specifically. The probabilistic player executes the framework precisely, because
+          precision inside someone else's structure is still inside your control. The romantic player
+          waits for a framework that suits them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Paper Eight — Football Doctrine</span>
+    <span>100 Days · 4 Tests · 1 Game</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+
+  /* ============================================================
+     DATA
+     ============================================================ */
+
+  // 14 weeks of load data. Each week: array of 7 values 0-10.
+  // Bands derived from value: 0-1 rest, 2-5 base, 6-8 build, 9-10 peak.
+  // Generated to roughly periodize toward each stage's "match week" (last week of each stage = peak).
+  const weeks = [
+    // Stage 0 — Qualifiers (weeks 1-4)
+    [2,3,3,4,2,5,1],   // wk1 - base, settling in
+    [3,4,5,4,3,6,1],   // wk2 - base rising
+    [4,5,6,5,4,7,2],   // wk3 - build
+    [3,6,7,8,5,9,1],   // wk4 - match week (qualifier)
+
+    // Stage 1 — Group Stage (weeks 5-8), 3 matches across the stage
+    [2,4,5,6,4,8,1],   // wk5 - match 1 mid-week
+    [3,4,6,7,5,9,1],   // wk6 - match 2, peak
+    [2,3,5,6,4,7,1],   // wk7 - recovery + build
+    [3,5,7,8,6,9,2],   // wk8 - match 3, decider
+
+    // Stage 2 — Knockouts (weeks 9-11)
+    [2,4,5,7,5,9,1],   // wk9 - round of 16
+    [3,5,6,8,6,9,2],   // wk10 - quarter-final
+    [2,4,6,8,6,10,1],  // wk11 - semi-final (10-dribble week)
+
+    // Stage 3 — Final Four (weeks 12-14)
+    [3,4,5,6,4,7,2],   // wk12 - recalibrate
+    [3,5,6,7,5,8,2],   // wk13 - build to final
+    [2,4,6,8,6,10,1],  // wk14 - the final
+  ];
+
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  const stages = [
+    { name:'Qualifiers',   weekStart:0,  weekEnd:3  },
+    { name:'Group Stage',  weekStart:4,  weekEnd:7  },
+    { name:'Knockouts',    weekStart:8,  weekEnd:10 },
+    { name:'Final Four',   weekStart:11, weekEnd:13 },
+  ];
+
+  // The 18-move periodic table
+  const moves = [
+    { sym:'Cu', num:1,  name:'Cushion Touch', group:'ground' },
+    { sym:'Rl', num:2,  name:'Roll & Drag', group:'ground' },
+    { sym:'Sb', num:3,  name:'Step-Over', group:'ground' },
+    { sym:'Ck', num:4,  name:'Cut Inside', group:'ground' },
+    { sym:'Sc', num:5,  name:'Scan Before Receiving', group:'ground' },
+    { sym:'Wp', num:6,  name:'Weighted Pass', group:'ground' },
+
+    { sym:'Vy', num:7,  name:'Volley', group:'aerial' },
+    { sym:'Hd', num:8,  name:'Glancing Header', group:'aerial' },
+    { sym:'Cb', num:9,  name:'Far-Post Cross', group:'aerial' },
+    { sym:'Cv', num:10, name:'Curl & Place', group:'aerial' },
+    { sym:'Pw', num:11, name:'Power Strike', group:'aerial' },
+    { sym:'Cb2',num:12, name:'Cutback', group:'aerial' },
+
+    { sym:'In', num:13, name:'Interception Read', group:'defensive' },
+    { sym:'Jt', num:14, name:'Jockey & Delay', group:'defensive' },
+    { sym:'Sl', num:15, name:'Slide & Recover', group:'defensive' },
+    { sym:'Bl', num:16, name:'Block Body Shape', group:'defensive' },
+
+    { sym:'Sw', num:17, name:'Switch of Play', group:'transition' },
+    { sym:'Pr', num:18, name:'Press Trigger', group:'transition' },
+  ];
+
+  const groupLabels = {
+    ground:'Ground Ctrl', aerial:'Aerial / Strike',
+    defensive:'Defensive', transition:'Transition'
+  };
+
+  /* ============================================================
+     CALENDAR RENDER
+     ============================================================ */
+
+  const weekGrid = document.getElementById('weekGrid');
+  const stageSelect = document.getElementById('stageSelect');
+  const weekIndicator = document.getElementById('weekIndicator');
+  const dribbleAllowance = document.getElementById('dribbleAllowance');
+  const thresholdLine = document.getElementById('thresholdLine');
+  const readingText = document.getElementById('readingText');
+
+  let currentWeek = 0; // index into weeks[]
+
+  function bandFor(val){
+    if(val <= 1) return 'rest';
+    if(val <= 5) return 'base';
+    if(val <= 8) return 'build';
+    return 'peak';
+  }
+
+  function buildHeaderRow(){
+    const corner = document.createElement('div');
+    corner.className = 'cal-head-cell corner';
+    corner.textContent = 'Week / Day';
+    weekGrid.appendChild(corner);
+    dayNames.forEach(d=>{
+      const c = document.createElement('div');
+      c.className = 'cal-head-cell';
+      c.textContent = d;
+      weekGrid.appendChild(c);
+    });
+  }
+
+  function renderWeek(weekIdx){
+    // clear all but header (first 8 children)
+    while(weekGrid.children.length > 8){
+      weekGrid.removeChild(weekGrid.lastChild);
+    }
+
+    const data = weeks[weekIdx];
+    const total = data.reduce((a,b)=>a+b,0);
+
+    const label = document.createElement('div');
+    label.className = 'day-label-cell';
+    label.innerHTML = `Week ${weekIdx+1} <span class="week-total">Σ ${total}</span>`;
+    weekGrid.appendChild(label);
+
+    data.forEach((val, i)=>{
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+      const band = bandFor(val);
+      cell.dataset.band = band;
+      cell.dataset.val = val;
+      cell.innerHTML = `
+        <span class="tag">${dayNames[i]}</span>
+        <span class="load-num">${val}</span>
+        ${band==='peak' ? '<span class="dribble">≤7 dribbles</span>' : ''}
+      `;
+      cell.addEventListener('click', ()=>{
+        let nv = (parseInt(cell.dataset.val,10) + 1) % 11;
+        cell.dataset.val = nv;
+        cell.querySelector('.load-num').textContent = nv;
+        const nb = bandFor(nv);
+        cell.dataset.band = nb;
+        const dribbleSpan = cell.querySelector('.dribble');
+        if(nb === 'peak' && !dribbleSpan){
+          cell.insertAdjacentHTML('beforeend', '<span class="dribble">≤7 dribbles</span>');
+        } else if(nb !== 'peak' && dribbleSpan){
+          dribbleSpan.remove();
+        }
+        weeks[weekIdx][i] = nv;
+        updateThreshold(weekIdx);
+        const newTotal = weeks[weekIdx].reduce((a,b)=>a+b,0);
+        label.querySelector('.week-total').textContent = `Σ ${newTotal}`;
+      });
+      weekGrid.appendChild(cell);
+    });
+
+    weekIndicator.textContent = `Showing Week ${weekIdx+1}`;
+    updateThreshold(weekIdx);
+  }
+
+  function updateThreshold(weekIdx){
+    const data = weeks[weekIdx];
+    const total = data.reduce((a,b)=>a+b,0);
+    const max = data.reduce((a,b)=>Math.max(a,b),0);
+    // position the line 0-100% based on total load relative to a safe ceiling (~42) and danger ceiling (~60)
+    const SAFE_CEIL = 42;
+    const DANGER_CEIL = 62;
+    let pct = (total / DANGER_CEIL) * 100;
+    pct = Math.max(6, Math.min(96, pct));
+    thresholdLine.style.left = pct + '%';
+
+    thresholdLine.classList.remove('safe','warn','danger');
+    let band, label;
+    if(total <= SAFE_CEIL && max <= 8){
+      band = 'safe'; label = 'LOAD — SAFE';
+      readingText.textContent = 'Reading: Safe — within the 7-dribble doctrine';
+    } else if(total <= DANGER_CEIL){
+      band = 'warn'; label = 'LOAD — BUILD';
+      readingText.textContent = 'Reading: Build — monitor recovery days';
+    } else {
+      band = 'danger'; label = 'LOAD — PEAK';
+      readingText.textContent = 'Reading: Peak — match week, ration the dribble count';
+    }
+    thresholdLine.classList.add(band);
+    thresholdLine.setAttribute('data-load', label);
+    readingText.className = 'reading ' + band;
+
+    // dribble allowance — 10 in a semi-final week (week 11, idx 10), else 7
+    dribbleAllowance.textContent = (weekIdx === 10) ? '10 (semi-final)' : '7';
+  }
+
+  buildHeaderRow();
+  renderWeek(0);
+
+  stageSelect.addEventListener('change', (e)=>{
+    const stageIdx = parseInt(e.target.value, 10);
+    const stage = stages[stageIdx];
+    currentWeek = stage.weekStart;
+    renderWeek(currentWeek);
+  });
+
+  /* ============================================================
+     PERIODIC TABLE RENDER + FILTER
+     ============================================================ */
+
+  const ptGrid = document.getElementById('ptGrid');
+  const ptFilter = document.getElementById('ptFilter');
+
+  function renderMoves(filter){
+    ptGrid.innerHTML = '';
+    moves.forEach(m=>{
+      if(filter !== 'all' && m.group !== filter) return;
+      const cell = document.createElement('div');
+      cell.className = 'pt-cell';
+      cell.dataset.group = m.group;
+      cell.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <span class="sym">${m.sym}</span>
+          <span class="num">${String(m.num).padStart(2,'0')}</span>
+        </div>
+        <div>
+          <div class="nm">${m.name}</div>
+          <div class="group-tag">${groupLabels[m.group]}</div>
+        </div>
+      `;
+      ptGrid.appendChild(cell);
+    });
+  }
+
+  renderMoves('all');
+
+  ptFilter.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    ptFilter.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMoves(btn.dataset.filter);
+  });
+
+  /* ============================================================
+     PROBABILISTIC / ROMANTIC TOGGLE
+     ============================================================ */
+
+  const btnProb = document.getElementById('btnProb');
+  const btnRomantic = document.getElementById('btnRomantic');
+  const toggleNote = document.getElementById('toggleNote');
+
+  const notes = {
+    prob: "The probabilistic player wins in the end — not because romance is wrong, but because it's already inside the numbers. You don't have to force it.",
+    romantic: "The romantic player chases the moment directly — and football, being football, sometimes hands it over anyway. But 'sometimes' is the whole problem with building a doctrine on it."
+  };
+
+  btnProb.addEventListener('click', ()=>{
+    btnProb.classList.add('active');
+    btnRomantic.classList.remove('active','romantic');
+    toggleNote.textContent = notes.prob;
+  });
+
+  btnRomantic.addEventListener('click', ()=>{
+    btnRomantic.classList.add('active','romantic');
+    btnProb.classList.remove('active');
+    toggleNote.textContent = notes.romantic;
+  });
+
+})();
+</script>
+
+</body>
+</html>

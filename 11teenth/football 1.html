@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper Eight — Football</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --pitch:#0d1410;
+  --pitch-line:#1a2620;
+  --paper:#e8e4d8;
+  --paper-dim:#a8a497;
+  --red:#a8201a;
+  --red-glow:rgba(168,32,26,0.35);
+  --gold:#c9a227;
+  --slate:#5a6e6a;
+  --slate-bright:#7e9892;
+
+  --display:'Bebas Neue', sans-serif;
+  --mono:'Space Mono', monospace;
+  --cond:'Barlow Condensed', sans-serif;
+  --body:'Barlow', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--pitch);
+  color:var(--paper);
+  font-family:var(--body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* texture: faint pitch lines across the whole doc */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 119px,
+      var(--pitch-line) 119px,
+      var(--pitch-line) 120px
+    );
+  opacity:0.4;
+}
+
+.wrap{
+  position:relative;
+  z-index:1;
+  max-width:1080px;
+  margin:0 auto;
+  padding:0 28px 120px;
+}
+
+/* ============ HERO ============ */
+
+.hero{
+  padding:64px 0 40px;
+  border-bottom:1px solid var(--slate);
+}
+
+.hero-eyebrow{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  margin-bottom:18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.hero-eyebrow::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--slate);
+}
+
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(3.2rem, 11vw, 7.4rem);
+  line-height:0.96;
+  letter-spacing:0.01em;
+  color:var(--paper);
+  text-transform:uppercase;
+}
+
+.hero h1 span{
+  color:var(--red);
+}
+
+.hero-sub{
+  font-family:var(--cond);
+  font-size:clamp(1.05rem, 2vw, 1.35rem);
+  font-weight:500;
+  color:var(--paper-dim);
+  max-width:640px;
+  margin-top:18px;
+}
+
+.hero-tour{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0;
+  margin-top:36px;
+  border:1px solid var(--slate);
+}
+
+.tour-stage{
+  flex:1;
+  min-width:130px;
+  padding:14px 16px;
+  border-right:1px solid var(--slate);
+  font-family:var(--mono);
+}
+
+.tour-stage:last-child{border-right:none;}
+
+.tour-stage .num{
+  font-size:0.68rem;
+  letter-spacing:0.18em;
+  color:var(--slate-bright);
+  text-transform:uppercase;
+}
+
+.tour-stage .name{
+  font-family:var(--cond);
+  font-size:1.15rem;
+  font-weight:600;
+  color:var(--paper);
+  text-transform:uppercase;
+  margin-top:4px;
+}
+
+/* ============ DOCTRINE BAR — signature element ============ */
+
+.doctrine{
+  padding:56px 0 48px;
+  border-bottom:1px solid var(--slate);
+}
+
+.doctrine-head{
+  font-family:var(--cond);
+  font-size:0.95rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--paper-dim);
+  margin-bottom:24px;
+}
+
+.doctrine-head strong{color:var(--paper);font-weight:700;}
+
+.doctrine-bar{
+  position:relative;
+  height:64px;
+  display:flex;
+  border:1px solid var(--slate);
+  background:var(--pitch-line);
+}
+
+.dseg{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  padding:0 16px;
+  border-right:1px solid var(--pitch);
+  overflow:hidden;
+  transition:filter 0.4s ease;
+}
+
+.dseg:last-child{border-right:none;}
+
+.dseg .pct{
+  font-family:var(--display);
+  font-size:1.7rem;
+  line-height:1;
+}
+
+.dseg .label{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin-top:2px;
+  white-space:nowrap;
+}
+
+.dseg.fitness{flex:5; background:linear-gradient(120deg, var(--red) 0%, #6b1410 100%);}
+.dseg.fitness .pct, .dseg.fitness .label{color:var(--paper);}
+
+.dseg.skill{flex:3; background:linear-gradient(120deg, var(--gold) 0%, #8a6f17 100%);}
+.dseg.skill .pct, .dseg.skill .label{color:var(--pitch);}
+
+.dseg.team{flex:1; background:var(--slate);}
+.dseg.team .pct, .dseg.team .label{color:var(--paper);}
+
+.dseg.coach{flex:1; background:var(--pitch-line); border-left:1px dashed var(--slate);}
+.dseg.coach .pct, .dseg.coach .label{color:var(--paper-dim);}
+
+/* the moving threshold line — the signature */
+.threshold-line{
+  position:absolute;
+  top:-8px;
+  bottom:-8px;
+  width:2px;
+  background:var(--paper);
+  left:50%;
+  transition:left 0.6s cubic-bezier(.4,0,.2,1), background 0.4s ease, box-shadow 0.4s ease;
+  z-index:5;
+}
+
+.threshold-line::before{
+  content:attr(data-load);
+  position:absolute;
+  top:-26px;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.1em;
+  white-space:nowrap;
+  color:var(--paper);
+  background:var(--pitch);
+  padding:2px 6px;
+  border:1px solid var(--slate);
+}
+
+.threshold-line.safe{box-shadow:0 0 0 0 transparent;}
+.threshold-line.warn{background:var(--gold); box-shadow:0 0 14px 1px var(--gold);}
+.threshold-line.danger{background:var(--red); box-shadow:0 0 18px 2px var(--red-glow); animation:pulse-line 1.4s ease-in-out infinite;}
+
+@keyframes pulse-line{
+  0%,100%{opacity:1;}
+  50%{opacity:0.45;}
+}
+
+.doctrine-foot{
+  margin-top:18px;
+  font-family:var(--mono);
+  font-size:0.78rem;
+  color:var(--paper-dim);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.doctrine-foot .reading{
+  font-weight:700;
+  letter-spacing:0.05em;
+}
+
+.doctrine-foot .reading.safe{color:var(--slate-bright);}
+.doctrine-foot .reading.warn{color:var(--gold);}
+.doctrine-foot .reading.danger{color:var(--red);}
+
+/* ============ TOGGLE — Probabilistic / Romantic ============ */
+
+.toggle-row{
+  margin-top:28px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.toggle-label{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  text-transform:uppercase;
+  letter-spacing:0.14em;
+  color:var(--paper-dim);
+}
+
+.toggle-pair{
+  display:inline-flex;
+  border:1px solid var(--slate);
+}
+
+.toggle-pair button{
+  font-family:var(--cond);
+  font-weight:600;
+  font-size:0.95rem;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  background:transparent;
+  border:none;
+  color:var(--paper-dim);
+  padding:10px 22px;
+  cursor:pointer;
+  transition:background 0.25s ease, color 0.25s ease;
+}
+
+.toggle-pair button + button{border-left:1px solid var(--slate);}
+
+.toggle-pair button.active{
+  background:var(--paper);
+  color:var(--pitch);
+}
+
+.toggle-pair button.active.romantic{
+  background:var(--red);
+  color:var(--paper);
+}
+
+.toggle-note{
+  font-family:var(--cond);
+  font-size:0.92rem;
+  color:var(--paper-dim);
+  font-style:italic;
+  max-width:480px;
+}
+
+/* ============ SECTION SHELL ============ */
+
+section.module{
+  padding:64px 0;
+  border-bottom:1px solid var(--slate);
+}
+
+section.module:last-of-type{border-bottom:none;}
+
+.module-eyebrow{
+  font-family:var(--mono);
+  font-size:0.74rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  margin-bottom:10px;
+}
+
+.module h2{
+  font-family:var(--display);
+  font-size:clamp(2.2rem, 6vw, 4rem);
+  text-transform:uppercase;
+  letter-spacing:0.01em;
+  color:var(--paper);
+  line-height:1;
+}
+
+.module-intro{
+  font-family:var(--cond);
+  font-size:1.1rem;
+  color:var(--paper-dim);
+  max-width:680px;
+  margin-top:14px;
+}
+
+/* ============ FITNESS CALENDAR ============ */
+
+.cal-controls{
+  margin-top:36px;
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.stage-select{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--paper);
+  background:var(--pitch-line);
+  border:1px solid var(--slate);
+  padding:10px 14px;
+  cursor:pointer;
+}
+
+.cal-meta{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  color:var(--paper-dim);
+}
+
+.cal-meta strong{color:var(--gold);}
+
+.week-grid{
+  margin-top:28px;
+  display:grid;
+  grid-template-columns:120px repeat(7, 1fr);
+  border:1px solid var(--slate);
+}
+
+.cal-head-cell{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  padding:10px 8px;
+  border-bottom:1px solid var(--slate);
+  border-right:1px solid var(--pitch-line);
+  text-align:center;
+}
+
+.cal-head-cell:last-child{border-right:none;}
+
+.cal-head-cell.corner{
+  text-align:left;
+  color:var(--paper-dim);
+}
+
+.day-cell{
+  position:relative;
+  border-right:1px solid var(--pitch-line);
+  border-bottom:1px solid var(--pitch-line);
+  padding:10px 8px;
+  min-height:78px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+  transition:background 0.2s ease;
+}
+
+.day-cell:hover{background:var(--pitch-line);}
+
+.day-cell:last-child{border-right:none;}
+
+.week-grid .row-end{border-right:none;}
+
+.day-cell .tag{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+}
+
+.day-cell .load-num{
+  font-family:var(--display);
+  font-size:1.9rem;
+  line-height:1;
+}
+
+.day-cell .dribble{
+  font-family:var(--mono);
+  font-size:0.6rem;
+  letter-spacing:0.06em;
+  color:var(--gold);
+}
+
+/* load coloring */
+.day-cell[data-band="rest"]{background:rgba(90,110,106,0.08);}
+.day-cell[data-band="rest"] .load-num{color:var(--slate-bright);}
+
+.day-cell[data-band="base"] .load-num{color:var(--paper);}
+
+.day-cell[data-band="build"]{background:rgba(201,162,39,0.06);}
+.day-cell[data-band="build"] .load-num{color:var(--gold);}
+
+.day-cell[data-band="peak"]{background:rgba(168,32,26,0.10);}
+.day-cell[data-band="peak"] .load-num{color:var(--red);}
+.day-cell[data-band="peak"]{box-shadow:inset 0 0 0 1px var(--red-glow);}
+
+.day-label-cell{
+  font-family:var(--cond);
+  font-weight:600;
+  font-size:0.95rem;
+  text-transform:uppercase;
+  color:var(--paper);
+  padding:10px 8px;
+  border-right:1px solid var(--pitch-line);
+  border-bottom:1px solid var(--pitch-line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.day-label-cell .week-total{
+  font-family:var(--mono);
+  font-size:0.7rem;
+  color:var(--paper-dim);
+  font-weight:400;
+}
+
+.cal-legend{
+  margin-top:18px;
+  display:flex;
+  gap:22px;
+  flex-wrap:wrap;
+  font-family:var(--mono);
+  font-size:0.7rem;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+}
+
+.legend-dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  margin-right:6px;
+  vertical-align:-1px;
+  border:1px solid var(--slate);
+}
+
+.legend-dot.rest{background:rgba(90,110,106,0.25);}
+.legend-dot.base{background:var(--pitch-line);}
+.legend-dot.build{background:rgba(201,162,39,0.4);}
+.legend-dot.peak{background:rgba(168,32,26,0.45);}
+
+.cal-note{
+  margin-top:28px;
+  border-left:2px solid var(--red);
+  padding-left:18px;
+  font-family:var(--cond);
+  font-size:1rem;
+  color:var(--paper-dim);
+  max-width:680px;
+}
+
+.cal-note strong{color:var(--paper);font-weight:600;}
+
+/* ============ SUBCLASS SUBTABLES — shared system ============ */
+/* Each of the 4 skill subclasses gets its own periodic table.
+   Group colours are set per-subclass via data-attrs / CSS vars below,
+   so no two subtables share the same two-colour pairing. */
+
+.subclass{
+  margin-top:56px;
+}
+
+.subclass:first-of-type{margin-top:36px;}
+
+.subclass-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:10px;
+  border-bottom:1px solid var(--slate);
+  padding-bottom:12px;
+}
+
+.subclass-head .sc-num{
+  font-family:var(--mono);
+  font-size:0.7rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+}
+
+.subclass-head h3{
+  font-family:var(--display);
+  font-size:clamp(1.7rem, 4vw, 2.6rem);
+  text-transform:uppercase;
+  color:var(--paper);
+  line-height:1;
+  flex:1;
+  min-width:200px;
+}
+
+.subclass-head .sc-tag{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+  text-align:right;
+}
+
+.subclass-intro{
+  font-family:var(--cond);
+  font-size:0.98rem;
+  color:var(--paper-dim);
+  max-width:680px;
+  margin-top:12px;
+}
+
+/* filter row */
+.sc-filter{
+  margin-top:20px;
+  display:flex;
+  gap:1px;
+  flex-wrap:wrap;
+  background:var(--slate);
+  border:1px solid var(--slate);
+}
+
+.sc-filter button{
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  background:var(--pitch);
+  color:var(--paper-dim);
+  border:none;
+  padding:9px 14px;
+  cursor:pointer;
+  transition:background 0.2s ease, color 0.2s ease;
+}
+
+.sc-filter button.active{
+  background:var(--paper);
+  color:var(--pitch);
+}
+
+/* the grid itself */
+.sc-grid{
+  margin-top:1px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+  gap:1px;
+  background:var(--slate);
+  border:1px solid var(--slate);
+  border-top:none;
+}
+
+/* cells with a single line description (Vision, Sprints) */
+.sc-grid.compact{
+  grid-template-columns:repeat(auto-fill, minmax(128px, 1fr));
+}
+
+.sc-cell{
+  background:var(--pitch);
+  padding:12px 12px;
+  min-height:118px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:background 0.2s ease, transform 0.15s ease;
+  position:relative;
+}
+
+.sc-grid.compact .sc-cell{min-height:104px;}
+
+.sc-cell:hover{
+  background:var(--pitch-line);
+  transform:translateY(-2px);
+  z-index:2;
+}
+
+.sc-cell .sym{
+  font-family:var(--display);
+  font-size:1.5rem;
+  line-height:1;
+}
+
+.sc-cell .num{
+  font-family:var(--mono);
+  font-size:0.6rem;
+  color:var(--paper-dim);
+  align-self:flex-end;
+}
+
+.sc-cell .nm{
+  font-family:var(--cond);
+  font-size:0.78rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.01em;
+  margin-top:6px;
+  line-height:1.15;
+}
+
+.sc-cell .reason,
+.sc-cell .desc{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.02em;
+  color:var(--slate-bright);
+  margin-top:5px;
+  line-height:1.45;
+}
+
+.sc-cell .group-tag{
+  font-family:var(--mono);
+  font-size:0.56rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+  margin-top:6px;
+}
+
+/* legend */
+.sc-legend{
+  margin-top:16px;
+  display:flex;
+  gap:22px;
+  flex-wrap:wrap;
+  font-family:var(--mono);
+  font-size:0.68rem;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--paper-dim);
+}
+
+.sc-legend .swatch{
+  display:inline-block;
+  width:14px;
+  height:3px;
+  margin-right:8px;
+  vertical-align:1px;
+}
+
+.sc-note{
+  margin-top:18px;
+  border-left:2px solid var(--paper-dim);
+  padding-left:18px;
+  font-family:var(--cond);
+  font-size:0.96rem;
+  color:var(--paper-dim);
+  max-width:680px;
+}
+
+.sc-note strong{color:var(--paper);font-weight:600;}
+
+/* ===== Per-subclass group colour pairings ===== */
+/* Table 1 — Vision & Presence: reactive scans (slate-bright) vs output discipline (paper/quiet) */
+.sc-cell[data-group="scan"]{border-left:3px solid var(--slate-bright);}
+.sc-cell[data-group="touch"]{border-left:3px solid var(--paper);}
+.swatch.scan{background:var(--slate-bright);}
+.swatch.touch{background:var(--paper);}
+
+/* Table 2 — Ball Protection: control variants (gold) vs 1v1 variants (red) */
+.sc-cell[data-group="control"]{border-left:3px solid var(--gold);}
+.sc-cell[data-group="duel1v1"]{border-left:3px solid var(--red);}
+.swatch.control{background:var(--gold);}
+.swatch.duel1v1{background:var(--red);}
+
+/* Table 3 — Sprints & Carries: attacking archetypes (red) vs defending archetypes (slate) */
+.sc-cell[data-group="attack"]{border-left:3px solid var(--red);}
+.sc-cell[data-group="defend"]{border-left:3px solid var(--slate-bright);}
+.swatch.attack{background:var(--red);}
+.swatch.defend{background:var(--slate-bright);}
+
+/* Table 4 — Shooting & Kicking: gradient from impossible (gold) to craft (red), no two-group split */
+.sc-cell[data-tier="0"]{border-left:3px solid var(--gold); background:linear-gradient(120deg, rgba(201,162,39,0.10), transparent 60%);}
+.sc-cell[data-tier="1"]{border-left:3px solid var(--gold);}
+.sc-cell[data-tier="2"]{border-left:3px solid var(--paper-dim);}
+.sc-cell[data-tier="3"]{border-left:3px solid var(--red);}
+.sc-cell[data-tier="0"] .sym{color:var(--gold);}
+.swatch.tier0{background:var(--gold);}
+.swatch.tier1{background:linear-gradient(90deg, var(--gold), var(--paper-dim));}
+.swatch.tier2{background:var(--paper-dim);}
+.swatch.tier3{background:var(--red);}
+
+/* ============ UNCONTROLLABLES ============ */
+
+.unc-grid{
+  margin-top:36px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--slate);
+  border:1px solid var(--slate);
+}
+
+.unc-card{
+  background:var(--pitch);
+  padding:26px 24px;
+}
+
+.unc-card .pct-big{
+  font-family:var(--display);
+  font-size:3rem;
+  color:var(--slate-bright);
+  line-height:1;
+}
+
+.unc-card h4{
+  font-family:var(--cond);
+  font-size:1.2rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  color:var(--paper);
+  margin-top:8px;
+}
+
+.unc-card p{
+  font-family:var(--cond);
+  font-size:0.95rem;
+  color:var(--paper-dim);
+  margin-top:10px;
+}
+
+/* ============ FOOTER ============ */
+
+footer{
+  padding:48px 0 0;
+  font-family:var(--mono);
+  font-size:0.72rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--slate-bright);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width:720px){
+  .wrap{padding:0 18px 90px;}
+  .hero{padding:44px 0 32px;}
+  .week-grid{grid-template-columns:64px repeat(7, minmax(48px,1fr));}
+  .day-cell{padding:6px 4px; min-height:64px;}
+  .day-cell .load-num{font-size:1.3rem;}
+  .day-label-cell{font-size:0.78rem; padding:6px 4px;}
+  .day-label-cell .week-total{display:none;}
+  .cal-head-cell{font-size:0.58rem; padding:8px 2px;}
+  .unc-grid{grid-template-columns:1fr;}
+  .tour-stage{min-width:48%;}
+  .dseg .pct{font-size:1.3rem;}
+
+  /* doctrine bar: stack segments vertically so labels never truncate */
+  .doctrine-bar{
+    flex-direction:column;
+    height:auto;
+  }
+  .dseg{
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-right:none;
+    border-bottom:1px solid var(--pitch);
+    flex:none;
+  }
+  .dseg:last-child{border-bottom:none;}
+  .dseg.coach{border-left:none; border-top:1px dashed var(--slate);}
+  .dseg .pct{font-size:1.4rem;}
+  .dseg .label{
+    margin-top:0;
+    white-space:normal;
+    text-align:right;
+  }
+  /* threshold line becomes a horizontal marker spanning full width */
+  .threshold-line{
+    left:0 !important;
+    right:0;
+    top:auto;
+    bottom:-9px;
+    width:auto;
+    height:2px;
+  }
+  .threshold-line::before{
+    top:auto;
+    bottom:6px;
+    left:auto;
+    right:8px;
+    transform:none;
+  }
+}
+
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .threshold-line, .threshold-line.danger{transition:none; animation:none;}
+}
+
+/* focus visibility */
+button:focus-visible, .stage-select:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:2px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero-eyebrow">Paper Eight — 100 Day Programme</div>
+    <h1>The Game<br>Has No <span>Position.</span></h1>
+    <p class="hero-sub">
+      A doctrine for any shirt number. Fitness first, skill second — both trainable.
+      Teammates and coaching, third and fourth — not trainable, only accounted for.
+      Football is a tournament, and so is the syllabus.
+    </p>
+    <div class="hero-tour">
+      <div class="tour-stage">
+        <div class="num">Test 01</div>
+        <div class="name">Qualifiers</div>
+      </div>
+      <div class="tour-stage">
+        <div class="num">Test 02</div>
+        <div class="name">Group Stage</div>
+      </div>
+      <div class="tour-stage">
+        <div class="num">Test 03</div>
+        <div class="name">Knockouts</div>
+      </div>
+      <div class="tour-stage">
+        <div class="num">Test 04</div>
+        <div class="name">Final Four</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ DOCTRINE BAR ============ -->
+  <section class="doctrine" id="doctrine">
+    <div class="doctrine-head">
+      The split: <strong>50</strong> fitness, <strong>30</strong> skill (its own 100 once fitness clears),
+      <strong>10</strong> teammate level, <strong>10</strong> coaching.
+    </div>
+
+    <div class="doctrine-bar">
+      <div class="dseg fitness">
+        <div class="pct">50</div>
+        <div class="label">Fitness — trainable</div>
+      </div>
+      <div class="dseg skill">
+        <div class="pct">30</div>
+        <div class="label">Skill — gated by fitness</div>
+      </div>
+      <div class="dseg team">
+        <div class="pct">10</div>
+        <div class="label">Teammates</div>
+      </div>
+      <div class="dseg coach">
+        <div class="pct">10</div>
+        <div class="label">Coaching</div>
+      </div>
+      <div class="threshold-line safe" id="thresholdLine" data-load="LOAD — SAFE"></div>
+    </div>
+
+    <div class="doctrine-foot">
+      <span>The line marks today's training load against the 7-dribble ceiling. It moves with the calendar below.</span>
+      <span class="reading safe" id="readingText">Reading: Safe</span>
+    </div>
+
+    <!-- ============ PROBABILISTIC / ROMANTIC TOGGLE ============ -->
+    <div class="toggle-row">
+      <span class="toggle-label">Read the page as a:</span>
+      <div class="toggle-pair">
+        <button id="btnProb" class="active">Probabilistic player</button>
+        <button id="btnRomantic">Romantic player</button>
+      </div>
+      <span class="toggle-note" id="toggleNote">
+        The probabilistic player wins in the end — not because romance is wrong, but because it's already inside the numbers. You don't have to force it.
+      </span>
+    </div>
+  </section>
+
+  <!-- ============ FITNESS CALENDAR ============ -->
+  <section class="module" id="calendar">
+    <div class="module-eyebrow">Module One — Fitness (50%)</div>
+    <h2>The Calendar</h2>
+    <p class="module-intro">
+      Fourteen weeks, four tournament stages. Load is plotted, not guessed — every cell is a day's
+      training intensity (0–10). Tap a cell to cycle it. The threshold line above reacts to the week
+      you're viewing.
+    </p>
+
+    <div class="cal-controls">
+      <select class="stage-select" id="stageSelect">
+        <option value="0">Stage 01 — Qualifiers (Weeks 1–4)</option>
+        <option value="1">Stage 02 — Group Stage (Weeks 5–8)</option>
+        <option value="2">Stage 03 — Knockouts (Weeks 9–11)</option>
+        <option value="3">Stage 04 — Final Four (Weeks 12–14)</option>
+      </select>
+      <span class="cal-meta">Dribble allowance this match: <strong id="dribbleAllowance">7</strong></span>
+      <span class="cal-meta" id="weekIndicator">Showing Week 1</span>
+    </div>
+
+    <div class="week-grid" id="weekGrid">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="cal-legend">
+      <span><span class="legend-dot rest"></span>Rest / Recovery</span>
+      <span><span class="legend-dot base"></span>Base — technical</span>
+      <span><span class="legend-dot build"></span>Build — match sharpness</span>
+      <span><span class="legend-dot peak"></span>Peak — match week</span>
+    </div>
+
+    <div class="cal-note">
+      <strong>Anti-injury, maximum-gain rule:</strong> no more than seven dribbles in open play across a
+      full match — unless the match is a semi-final, where the ceiling lifts to ten. Dribbling is the
+      highest-load individual action a body performs in football: deceleration, change of direction,
+      contact absorption, repeated. Rationing it isn't caution for its own sake — it's where the 50%
+      and the 30% actually meet. A player who has done the fitness work can afford to spend one of
+      those seven dribbles on something decisive, rather than something habitual.
+    </div>
+  </section>
+
+  <!-- ============ SKILL — FOUR SUBCLASS TABLES ============ -->
+  <section class="module" id="skills">
+    <div class="module-eyebrow">Module Two — Skill (its own 100%, once fitness clears)</div>
+    <h2>Four Subclasses.<br>Four Tables.</h2>
+    <p class="module-intro">
+      The 30% doesn't sit as one block — it splits into four families, and each family has earned its
+      own periodic table. Read them in order if you're starting from zero: vision changes what you see,
+      protection changes what you keep, carries change where it goes, and shooting is what all three were for.
+    </p>
+
+    <!-- ===== SUBCLASS 1 — VISION & PRESENCE ===== -->
+    <div class="subclass" id="sc-vision">
+      <div class="subclass-head">
+        <span class="sc-num">Subclass 01</span>
+        <h3>Vision &amp; Presence</h3>
+        <span class="sc-tag">9 elements · 2 families</span>
+      </div>
+      <p class="subclass-intro">
+        The reactive family fires before the ball arrives — fast, low-effort, almost involuntary once
+        trained, the way a reactive metal doesn't wait to be asked. The touch family is the output
+        discipline: if the scan was right, one or two touches is all the situation needed. Both families
+        are light on the body, which makes this subclass the best entry point for re-onboarding after
+        injury or for a player just starting.
+      </p>
+
+      <div class="sc-filter" data-table="vision">
+        <button class="active" data-filter="all">All 9</button>
+        <button data-filter="scan">Scanning Family</button>
+        <button data-filter="touch">1–2 Touch Family</button>
+      </div>
+
+      <div class="sc-grid compact" id="gridVision"><!-- JS --></div>
+
+      <div class="sc-legend">
+        <span><span class="swatch scan"></span>Scanning — reads space, gaps, overloads, angles before contact</span>
+        <span><span class="swatch touch"></span>1–2 Touch — output discipline, zero/low contact, re-onboarding safe</span>
+      </div>
+
+      <div class="sc-note">
+        <strong>Why it's first:</strong> a correct scan turns a "1-touch" situation into an easy
+        two-touch one, and a missed scan turns an easy two-touch into a desperate three. The touch count
+        isn't the skill — it's the receipt the scan prints.
+      </div>
+    </div>
+
+    <!-- ===== SUBCLASS 2 — BALL PROTECTION ===== -->
+    <div class="subclass" id="sc-protection">
+      <div class="subclass-head">
+        <span class="sc-num">Subclass 02</span>
+        <h3>Ball Protection</h3>
+        <span class="sc-tag">8 elements · 2 families</span>
+      </div>
+      <p class="subclass-intro">
+        Two questions, asked in order. <em>How</em> do you keep the ball when someone's close — that's
+        Control. <em>Why</em> are you keeping it right now — that's the 1v1 family, and the reason
+        changes the choice. Shielding to wait for a runner is a different shape than shielding to draw
+        a foul, even if the body position looks identical from the stands.
+      </p>
+
+      <div class="sc-filter" data-table="protection">
+        <button class="active" data-filter="all">All 8</button>
+        <button data-filter="control">Control Variants</button>
+        <button data-filter="duel1v1">1v1 Variants</button>
+      </div>
+
+      <div class="sc-grid" id="gridProtection"><!-- JS --></div>
+
+      <div class="sc-legend">
+        <span><span class="swatch control"></span>Control — the body mechanics of keeping it</span>
+        <span><span class="swatch duel1v1"></span>1v1 — the tactical reason you're keeping it</span>
+      </div>
+
+      <div class="sc-note">
+        <strong>The tell:</strong> watch the eyes, not the feet. A control variant aimed at the 1v1
+        reason "hold for support" keeps checking over the shoulder for the runner. The same shape aimed
+        at "draw the foul" stops checking entirely — because the contact is the point.
+      </div>
+    </div>
+
+    <!-- ===== SUBCLASS 3 — SPRINTS & CARRIES ===== -->
+    <div class="subclass" id="sc-sprints">
+      <div class="subclass-head">
+        <span class="sc-num">Subclass 03</span>
+        <h3>Sprints &amp; Carries</h3>
+        <span class="sc-tag">8 elements · 2 families</span>
+      </div>
+      <p class="subclass-intro">
+        One duel, two sides of it. These aren't moves so much as roles a player settles into during a
+        sprint contest — the archetype tells you what the body is optimising for in that half-second,
+        on either side of the ball. Most players are strong in one attacking and one defending archetype,
+        rarely all four.
+      </p>
+
+      <div class="sc-filter" data-table="sprints">
+        <button class="active" data-filter="all">All 8</button>
+        <button data-filter="attack">Attacking Archetypes</button>
+        <button data-filter="defend">Defending Archetypes</button>
+      </div>
+
+      <div class="sc-grid" id="gridSprints"><!-- JS --></div>
+
+      <div class="sc-legend">
+        <span><span class="swatch attack"></span>Attacking — the player carrying or beating</span>
+        <span><span class="swatch defend"></span>Defending — the player stopping or recovering</span>
+      </div>
+
+      <div class="sc-note">
+        <strong>The 7-dribble link:</strong> The Eliminator and The Engine are the two archetypes that
+        spend dribbles fastest. If your training week shows a player drifting toward both at once, the
+        calendar's dribble ceiling is the thing keeping the body honest — not the coach.
+      </div>
+    </div>
+
+    <!-- ===== SUBCLASS 4 — SHOOTING & KICKING ===== -->
+    <div class="subclass" id="sc-shooting">
+      <div class="subclass-head">
+        <span class="sc-num">Subclass 04</span>
+        <h3>Shooting &amp; Kicking</h3>
+        <span class="sc-tag">7 elements · 1 gradient</span>
+      </div>
+      <p class="subclass-intro">
+        This table has no two families — it's a single gradient. At the top is the impossible: receive,
+        one touch, goal, every time. Nobody lives there. Below it, in descending order of how close they
+        get, are the techniques that exist precisely because the ball travels faster and less predictably
+        than the player chasing it — every tier down is a different answer to that one problem.
+      </p>
+
+      <div class="sc-filter" data-table="shooting">
+        <button class="active" data-filter="all">All 7</button>
+        <button data-filter="0">The Impossible</button>
+        <button data-filter="1">Closest</button>
+        <button data-filter="2">Craft</button>
+        <button data-filter="3">Last Resort</button>
+      </div>
+
+      <div class="sc-grid" id="gridShooting"><!-- JS --></div>
+
+      <div class="sc-legend">
+        <span><span class="swatch tier0"></span>The Impossible — the unreachable standard</span>
+        <span><span class="swatch tier1"></span>Closest — first-time, minimal adjustment</span>
+        <span><span class="swatch tier2"></span>Craft — the ball didn't arrive clean, adapt</span>
+        <span><span class="swatch tier3"></span>Last Resort — distance, power, or improvisation over precision</span>
+      </div>
+
+      <div class="sc-note">
+        <strong>Why this is last:</strong> shooting is what the other three subclasses were building
+        toward. Vision finds the angle, protection survives long enough to reach it, the carry closes
+        the distance — and then the ball, which has never once in the history of the game arrived
+        perfectly, has to be turned into a shot anyway. The gap between Tier 0 and everything below it
+        is football's actual beauty. Closing it by a few centimetres, repeatedly, is the whole craft.
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ UNCONTROLLABLES ============ -->
+  <section class="module" id="uncontrollables">
+    <div class="module-eyebrow">Module Three — The Other 20%</div>
+    <h2>What You<br>Don't Train</h2>
+    <p class="module-intro">
+      Teammate level and coaching aren't trainable by the player — but a probabilistic player accounts
+      for them instead of resenting them. This is the difference between adapting to context and
+      waiting for it to change.
+    </p>
+
+    <div class="unc-grid">
+      <div class="unc-card">
+        <div class="pct-big">10</div>
+        <h4>Teammate Level</h4>
+        <p>
+          The same pass into the same space is a goal with one teammate's movement and a turnover with
+          another's. You don't control this — but a probabilistic player adjusts the weight, timing,
+          and even the choice of pass based on who's making the run, every time, without complaint.
+        </p>
+      </div>
+      <div class="unc-card">
+        <div class="pct-big">10</div>
+        <h4>Coaching</h4>
+        <p>
+          Instructions, formations, substitution timing — set by someone else, for the team, not for
+          you specifically. The probabilistic player executes the framework precisely, because
+          precision inside someone else's structure is still inside your control. The romantic player
+          waits for a framework that suits them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Paper Eight — Football Doctrine</span>
+    <span>100 Days · 4 Tests · 1 Game</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+
+  /* ============================================================
+     DATA
+     ============================================================ */
+
+  // 14 weeks of load data. Each week: array of 7 values 0-10.
+  // Bands derived from value: 0-1 rest, 2-5 base, 6-8 build, 9-10 peak.
+  // Generated to roughly periodize toward each stage's "match week" (last week of each stage = peak).
+  const weeks = [
+    // Stage 0 — Qualifiers (weeks 1-4)
+    [2,3,3,4,2,5,1],   // wk1 - base, settling in
+    [3,4,5,4,3,6,1],   // wk2 - base rising
+    [4,5,6,5,4,7,2],   // wk3 - build
+    [3,6,7,8,5,9,1],   // wk4 - match week (qualifier)
+
+    // Stage 1 — Group Stage (weeks 5-8), 3 matches across the stage
+    [2,4,5,6,4,8,1],   // wk5 - match 1 mid-week
+    [3,4,6,7,5,9,1],   // wk6 - match 2, peak
+    [2,3,5,6,4,7,1],   // wk7 - recovery + build
+    [3,5,7,8,6,9,2],   // wk8 - match 3, decider
+
+    // Stage 2 — Knockouts (weeks 9-11)
+    [2,4,5,7,5,9,1],   // wk9 - round of 16
+    [3,5,6,8,6,9,2],   // wk10 - quarter-final
+    [2,4,6,8,6,10,1],  // wk11 - semi-final (10-dribble week)
+
+    // Stage 3 — Final Four (weeks 12-14)
+    [3,4,5,6,4,7,2],   // wk12 - recalibrate
+    [3,5,6,7,5,8,2],   // wk13 - build to final
+    [2,4,6,8,6,10,1],  // wk14 - the final
+  ];
+
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  const stages = [
+    { name:'Qualifiers',   weekStart:0,  weekEnd:3  },
+    { name:'Group Stage',  weekStart:4,  weekEnd:7  },
+    { name:'Knockouts',    weekStart:8,  weekEnd:10 },
+    { name:'Final Four',   weekStart:11, weekEnd:13 },
+  ];
+
+  /* ============================================================
+     SUBCLASS DATA — one dataset per periodic table
+     ============================================================ */
+
+  // Subclass 01 — Vision & Presence (compact cells: sym, name, group)
+  const visionData = [
+    { sym:'Sh', num:1, name:'Shoulder Check', group:'scan' },
+    { sym:'Sp', num:2, name:'Space Read', group:'scan' },
+    { sym:'Gp', num:3, name:'Gap Identification', group:'scan' },
+    { sym:'Ov', num:4, name:'Overload Awareness', group:'scan' },
+    { sym:'An', num:5, name:'Angle Pre-Read', group:'scan' },
+    { sym:'Ot', num:6, name:'One-Touch Release', group:'touch' },
+    { sym:'Tt', num:7, name:'Two-Touch Set', group:'touch' },
+    { sym:'Ob', num:8, name:'Open-Body Touch', group:'touch' },
+    { sym:'Cs', num:9, name:'Check-to-Space', group:'touch' },
+  ];
+
+  // Subclass 02 — Ball Protection (full cells: sym, name, group, reason)
+  const protectionData = [
+    { sym:'Fs', num:1, name:'Far-Shoulder Shield', group:'control', reason:'Body between ball and challenge' },
+    { sym:'Rb', num:2, name:'Sole Roll-Back', group:'control', reason:'Buys half a second, resets angle' },
+    { sym:'Ds', num:3, name:'Drop-Shoulder Cushion', group:'control', reason:'Absorbs pace on first contact' },
+    { sym:'Wl', num:4, name:'Body-as-Wall', group:'control', reason:'Static screen, ball pinned to far foot' },
+    { sym:'Hs', num:5, name:'Hold for Support', group:'duel1v1', reason:'Buying time for a runner' },
+    { sym:'Df', num:6, name:'Draw the Foul', group:'duel1v1', reason:'Contact is the outcome sought' },
+    { sym:'Tr', num:7, name:'Tempo Reset', group:'duel1v1', reason:'Slow the game, not the player' },
+    { sym:'Bp', num:8, name:'Backboard Pass', group:'duel1v1', reason:'Shield only to release first-time' },
+  ];
+
+  // Subclass 03 — Sprints & Carries (full cells: sym, name, group, desc)
+  const sprintsData = [
+    { sym:'El', num:1, name:'The Eliminator', group:'attack', desc:'Beats the marker 1v1, repeatedly' },
+    { sym:'En', num:2, name:'The Engine', group:'attack', desc:'Carries 40+ yards at sustained pace' },
+    { sym:'Bu', num:3, name:'The Burst', group:'attack', desc:'Explosive over 5 yards, then resets' },
+    { sym:'Cn', num:4, name:'The Connector', group:'attack', desc:'Carries to bridge lines, not to beat' },
+    { sym:'Wa', num:5, name:'The Wall', group:'defend', desc:'Jockeys, delays, never dives in' },
+    { sym:'Sn', num:6, name:'The Snatcher', group:'defend', desc:'One well-timed tackle, high success' },
+    { sym:'Rc', num:7, name:'The Recovery', group:'defend', desc:'Covers the most ground back to shape' },
+    { sym:'De', num:8, name:'The Destroyer', group:'defend', desc:'Wins the physical duel, every time' },
+  ];
+
+  // Subclass 04 — Shooting & Kicking (full cells: sym, name, tier 0-3, desc)
+  const shootingData = [
+    { sym:'∞',  num:0, name:'One-Touch, Every Time', tier:0, desc:'The unreachable standard — receive, finish, score, repeat' },
+    { sym:'Ft', num:1, name:'First-Time Strike', tier:1, desc:'Minimal adjustment, ball arrives clean' },
+    { sym:'Pl', num:2, name:'Placed Finish', tier:1, desc:'Sacrifice power for accuracy, time permitting' },
+    { sym:'Cu', num:3, name:'Cushion-and-Strike', tier:2, desc:'Tame an awkward ball, then shoot' },
+    { sym:'Hv', num:4, name:'Half-Volley', tier:2, desc:'Strike on the bounce — timing over technique' },
+    { sym:'Dr', num:5, name:'Driven Shot', tier:3, desc:'Power over placement, distance compensates' },
+    { sym:'Im', num:6, name:'Improvised Strike', tier:3, desc:'Whatever the body can get on it, on target' },
+  ];
+
+  const tierLabels = { 0:'The Impossible', 1:'Closest', 2:'Craft', 3:'Last Resort' };
+
+
+  /* ============================================================
+     CALENDAR RENDER
+     ============================================================ */
+
+  const weekGrid = document.getElementById('weekGrid');
+  const stageSelect = document.getElementById('stageSelect');
+  const weekIndicator = document.getElementById('weekIndicator');
+  const dribbleAllowance = document.getElementById('dribbleAllowance');
+  const thresholdLine = document.getElementById('thresholdLine');
+  const readingText = document.getElementById('readingText');
+
+  let currentWeek = 0; // index into weeks[]
+
+  function bandFor(val){
+    if(val <= 1) return 'rest';
+    if(val <= 5) return 'base';
+    if(val <= 8) return 'build';
+    return 'peak';
+  }
+
+  function buildHeaderRow(){
+    const corner = document.createElement('div');
+    corner.className = 'cal-head-cell corner';
+    corner.textContent = 'Week / Day';
+    weekGrid.appendChild(corner);
+    dayNames.forEach(d=>{
+      const c = document.createElement('div');
+      c.className = 'cal-head-cell';
+      c.textContent = d;
+      weekGrid.appendChild(c);
+    });
+  }
+
+  function renderWeek(weekIdx){
+    // clear all but header (first 8 children)
+    while(weekGrid.children.length > 8){
+      weekGrid.removeChild(weekGrid.lastChild);
+    }
+
+    const data = weeks[weekIdx];
+    const total = data.reduce((a,b)=>a+b,0);
+
+    const label = document.createElement('div');
+    label.className = 'day-label-cell';
+    label.innerHTML = `Week ${weekIdx+1} <span class="week-total">Σ ${total}</span>`;
+    weekGrid.appendChild(label);
+
+    data.forEach((val, i)=>{
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+      const band = bandFor(val);
+      cell.dataset.band = band;
+      cell.dataset.val = val;
+      cell.innerHTML = `
+        <span class="tag">${dayNames[i]}</span>
+        <span class="load-num">${val}</span>
+        ${band==='peak' ? '<span class="dribble">≤7 dribbles</span>' : ''}
+      `;
+      cell.addEventListener('click', ()=>{
+        let nv = (parseInt(cell.dataset.val,10) + 1) % 11;
+        cell.dataset.val = nv;
+        cell.querySelector('.load-num').textContent = nv;
+        const nb = bandFor(nv);
+        cell.dataset.band = nb;
+        const dribbleSpan = cell.querySelector('.dribble');
+        if(nb === 'peak' && !dribbleSpan){
+          cell.insertAdjacentHTML('beforeend', '<span class="dribble">≤7 dribbles</span>');
+        } else if(nb !== 'peak' && dribbleSpan){
+          dribbleSpan.remove();
+        }
+        weeks[weekIdx][i] = nv;
+        updateThreshold(weekIdx);
+        const newTotal = weeks[weekIdx].reduce((a,b)=>a+b,0);
+        label.querySelector('.week-total').textContent = `Σ ${newTotal}`;
+      });
+      weekGrid.appendChild(cell);
+    });
+
+    weekIndicator.textContent = `Showing Week ${weekIdx+1}`;
+    updateThreshold(weekIdx);
+  }
+
+  function updateThreshold(weekIdx){
+    const data = weeks[weekIdx];
+    const total = data.reduce((a,b)=>a+b,0);
+    const max = data.reduce((a,b)=>Math.max(a,b),0);
+    // position the line 0-100% based on total load relative to a safe ceiling (~42) and danger ceiling (~60)
+    const SAFE_CEIL = 42;
+    const DANGER_CEIL = 62;
+    let pct = (total / DANGER_CEIL) * 100;
+    pct = Math.max(6, Math.min(96, pct));
+    thresholdLine.style.left = pct + '%';
+
+    thresholdLine.classList.remove('safe','warn','danger');
+    let band, label;
+    if(total <= SAFE_CEIL && max <= 8){
+      band = 'safe'; label = 'LOAD — SAFE';
+      readingText.textContent = 'Reading: Safe — within the 7-dribble doctrine';
+    } else if(total <= DANGER_CEIL){
+      band = 'warn'; label = 'LOAD — BUILD';
+      readingText.textContent = 'Reading: Build — monitor recovery days';
+    } else {
+      band = 'danger'; label = 'LOAD — PEAK';
+      readingText.textContent = 'Reading: Peak — match week, ration the dribble count';
+    }
+    thresholdLine.classList.add(band);
+    thresholdLine.setAttribute('data-load', label);
+    readingText.className = 'reading ' + band;
+
+    // dribble allowance — 10 in a semi-final week (week 11, idx 10), else 7
+    dribbleAllowance.textContent = (weekIdx === 10) ? '10 (semi-final)' : '7';
+  }
+
+  buildHeaderRow();
+  renderWeek(0);
+
+  stageSelect.addEventListener('change', (e)=>{
+    const stageIdx = parseInt(e.target.value, 10);
+    const stage = stages[stageIdx];
+    currentWeek = stage.weekStart;
+    renderWeek(currentWeek);
+  });
+
+  /* ============================================================
+     SUBCLASS TABLE RENDER + FILTER — generic, drives all four
+     ============================================================ */
+
+  function renderCompact(gridEl, data, filter){
+    gridEl.innerHTML = '';
+    data.forEach(m=>{
+      if(filter !== 'all' && m.group !== filter) return;
+      const cell = document.createElement('div');
+      cell.className = 'sc-cell';
+      cell.dataset.group = m.group;
+      cell.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <span class="sym">${m.sym}</span>
+          <span class="num">${String(m.num).padStart(2,'0')}</span>
+        </div>
+        <div class="nm">${m.name}</div>
+      `;
+      gridEl.appendChild(cell);
+    });
+  }
+
+  function renderReasoned(gridEl, data, filter){
+    gridEl.innerHTML = '';
+    data.forEach(m=>{
+      if(filter !== 'all' && m.group !== filter) return;
+      const cell = document.createElement('div');
+      cell.className = 'sc-cell';
+      cell.dataset.group = m.group;
+      const sub = m.reason || m.desc || '';
+      cell.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <span class="sym">${m.sym}</span>
+          <span class="num">${String(m.num).padStart(2,'0')}</span>
+        </div>
+        <div>
+          <div class="nm">${m.name}</div>
+          <div class="reason">${sub}</div>
+        </div>
+      `;
+      gridEl.appendChild(cell);
+    });
+  }
+
+  function renderTiered(gridEl, data, filter){
+    gridEl.innerHTML = '';
+    data.forEach(m=>{
+      if(filter !== 'all' && String(m.tier) !== filter) return;
+      const cell = document.createElement('div');
+      cell.className = 'sc-cell';
+      cell.dataset.tier = m.tier;
+      cell.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <span class="sym">${m.sym}</span>
+          <span class="num">${String(m.num).padStart(2,'0')}</span>
+        </div>
+        <div>
+          <div class="nm">${m.name}</div>
+          <div class="desc">${m.desc}</div>
+          <div class="group-tag">${tierLabels[m.tier]}</div>
+        </div>
+      `;
+      gridEl.appendChild(cell);
+    });
+  }
+
+  // grid elements
+  const gridVision     = document.getElementById('gridVision');
+  const gridProtection = document.getElementById('gridProtection');
+  const gridSprints    = document.getElementById('gridSprints');
+  const gridShooting   = document.getElementById('gridShooting');
+
+  // initial paint
+  renderCompact(gridVision, visionData, 'all');
+  renderReasoned(gridProtection, protectionData, 'all');
+  renderReasoned(gridSprints, sprintsData, 'all');
+  renderTiered(gridShooting, shootingData, 'all');
+
+  // wire each .sc-filter independently via its data-table attribute
+  document.querySelectorAll('.sc-filter').forEach(filterEl=>{
+    const table = filterEl.dataset.table;
+    filterEl.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      filterEl.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+
+      switch(table){
+        case 'vision':
+          renderCompact(gridVision, visionData, f);
+          break;
+        case 'protection':
+          renderReasoned(gridProtection, protectionData, f);
+          break;
+        case 'sprints':
+          renderReasoned(gridSprints, sprintsData, f);
+          break;
+        case 'shooting':
+          renderTiered(gridShooting, shootingData, f);
+          break;
+      }
+    });
+  });
+
+  /* ============================================================
+     PROBABILISTIC / ROMANTIC TOGGLE
+     ============================================================ */
+
+  const btnProb = document.getElementById('btnProb');
+  const btnRomantic = document.getElementById('btnRomantic');
+  const toggleNote = document.getElementById('toggleNote');
+
+  const notes = {
+    prob: "The probabilistic player wins in the end — not because romance is wrong, but because it's already inside the numbers. You don't have to force it.",
+    romantic: "The romantic player chases the moment directly — and football, being football, sometimes hands it over anyway. But 'sometimes' is the whole problem with building a doctrine on it."
+  };
+
+  btnProb.addEventListener('click', ()=>{
+    btnProb.classList.add('active');
+    btnRomantic.classList.remove('active','romantic');
+    toggleNote.textContent = notes.prob;
+  });
+
+  btnRomantic.addEventListener('click', ()=>{
+    btnRomantic.classList.add('active','romantic');
+    btnProb.classList.remove('active');
+    toggleNote.textContent = notes.romantic;
+  });
+
+})();
+</script>
+
+</body>
+</html>

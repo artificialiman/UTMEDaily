@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football — The 8th Subject</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --pitch:    #060608;
+    --turf:     #1a472a;
+    --turf-mid: #236334;
+    --chalk:    #f0ede6;
+    --chalk-dim:#b0a898;
+    --amber:    #e8a020;
+    --amber-dim:#7a5410;
+    --steel:    #2d6a8f;
+    --steel-dim:#1a3e55;
+    --red:      #c0392b;
+    --red-dim:  #6b1f17;
+    --violet:   #6c3483;
+    --violet-dim:#3d1d4a;
+    --teal:     #117a65;
+    --teal-dim: #0a4a3d;
+
+    /* subclass colours */
+    --c-vision:  #2d6a8f;
+    --c-protect: #1a472a;
+    --c-sprint:  #e8a020;
+    --c-shoot:   #c0392b;
+    --c-synergy: #6c3483;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--pitch);
+    color: var(--chalk);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* ── SECTIONS ─────────────────────────────────────── */
+  section {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  section::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 24px;
+    right: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--chalk-dim);
+    text-transform: uppercase;
+  }
+
+  /* ── TYPOGRAPHY ───────────────────────────────────── */
+  .display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 10vw, 120px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--chalk);
+  }
+
+  .display em {
+    color: var(--amber);
+    font-style: normal;
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--chalk-dim);
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 5vw, 56px);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  p {
+    font-size: 15px;
+    font-weight: 300;
+    max-width: 640px;
+    color: var(--chalk-dim);
+    line-height: 1.7;
+  }
+
+  p strong { color: var(--chalk); font-weight: 600; }
+
+  /* ── NAV ──────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--chalk-dim);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    border: none;
+    outline: none;
+  }
+
+  .nav-dot.active { background: var(--amber); transform: scale(1.4); }
+
+  /* ── DOCTRINE SECTION ─────────────────────────────── */
+  #doctrine {
+    background: var(--pitch);
+  }
+
+  .doctrine-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 40px;
+    max-width: 800px;
+  }
+
+  .doctrine-card {
+    background: #0d0d10;
+    border: 1px solid #1a1a22;
+    padding: 20px 24px;
+    position: relative;
+  }
+
+  .doctrine-card .pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--amber);
+    line-height: 1;
+  }
+
+  .doctrine-card .pct-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--chalk);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .doctrine-card .pct-sub {
+    font-size: 12px;
+    color: var(--chalk-dim);
+    margin-top: 6px;
+    font-weight: 300;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .doctrine-bar {
+    height: 3px;
+    background: var(--amber);
+    margin-top: 14px;
+  }
+
+  .doctrine-card:nth-child(1) .doctrine-bar { background: var(--amber); width: 100%; }
+  .doctrine-card:nth-child(2) .doctrine-bar { background: var(--steel); width: 60%; }
+  .doctrine-card:nth-child(3) .doctrine-bar { background: var(--turf-mid); width: 20%; }
+  .doctrine-card:nth-child(4) .doctrine-bar { background: var(--chalk-dim); width: 20%; }
+
+  .philosophy-block {
+    margin-top: 40px;
+    max-width: 580px;
+  }
+
+  .philosophy-block blockquote {
+    border-left: 2px solid var(--amber);
+    padding-left: 20px;
+    font-size: 14px;
+    color: var(--chalk-dim);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  /* ── ANTI-INJURY RULES ───────────────────────────── */
+  .rule-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0d0d10;
+    border: 1px solid var(--turf-mid);
+    padding: 8px 16px;
+    margin: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--chalk);
+  }
+
+  .rule-chip::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--turf-mid);
+  }
+
+  /* ── FITNESS CALENDAR ─────────────────────────────── */
+  #fitness {
+    background: #08080c;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-top: 32px;
+    max-width: 900px;
+  }
+
+  .cal-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--chalk-dim);
+    text-align: center;
+    padding: 8px 4px;
+    text-transform: uppercase;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    background: #0d0d12;
+    border: 1px solid #1a1a22;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+    min-height: 56px;
+  }
+
+  .cal-day:hover { background: #14141c; border-color: var(--chalk-dim); }
+  .cal-day.active { border-color: var(--amber); background: #1a1508; }
+
+  .cal-day .day-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--chalk-dim);
+  }
+
+  .cal-day .day-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 4px;
+  }
+
+  .day-type-aerobic   .day-dot { background: var(--amber); }
+  .day-type-strength  .day-dot { background: var(--steel); }
+  .day-type-technical .day-dot { background: var(--turf-mid); }
+  .day-type-tactical  .day-dot { background: var(--violet); }
+  .day-type-rest      .day-dot { background: #333; }
+  .day-type-match     .day-dot { background: var(--red); }
+
+  .cal-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--chalk-dim);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* detail panel */
+  .day-detail {
+    margin-top: 28px;
+    max-width: 680px;
+    background: #0d0d12;
+    border: 1px solid #1a1a22;
+    padding: 24px;
+    min-height: 140px;
+    transition: opacity 0.2s;
+  }
+
+  .day-detail .detail-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--amber);
+    margin-bottom: 10px;
+  }
+
+  .day-detail .detail-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .detail-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    background: #14141c;
+    border: 1px solid #2a2a36;
+    color: var(--chalk);
+  }
+
+  /* ── SKILL SECTIONS ───────────────────────────────── */
+  .skill-section {
+    background: var(--pitch);
+  }
+
+  .skill-section.vision   { --accent: var(--c-vision); }
+  .skill-section.protect  { --accent: var(--c-protect); }
+  .skill-section.sprint   { --accent: var(--c-sprint); }
+  .skill-section.shoot    { --accent: var(--c-shoot); }
+  .skill-section.synergy  { --accent: var(--c-synergy); }
+
+  .subclass-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .subclass-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: var(--accent);
+    line-height: 1;
+    opacity: 0.25;
+  }
+
+  .subclass-title-block h2 { color: var(--accent); }
+
+  /* ── PERIODIC TABLE ───────────────────────────────── */
+  .periodic-table {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 900px;
+  }
+
+  .element {
+    width: 96px;
+    height: 96px;
+    background: #0d0d12;
+    border: 1px solid #1a1a22;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    border-top: 3px solid var(--accent);
+  }
+
+  .element:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    background: #14141c;
+    z-index: 10;
+  }
+
+  .element.pulse {
+    animation: pulse-in 0.4s ease both;
+  }
+
+  @keyframes pulse-in {
+    0%   { transform: scale(0.88); }
+    60%  { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .el-symbol {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: var(--chalk);
+    line-height: 1;
+  }
+
+  .el-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--chalk-dim);
+    text-align: center;
+    line-height: 1.3;
+    margin-top: 4px;
+  }
+
+  .el-num {
+    position: absolute;
+    top: 5px;
+    left: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--chalk-dim);
+  }
+
+  .el-cat {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  /* category variant shading */
+  .element.family-a { border-top-color: var(--amber); }
+  .element.family-b { border-top-color: var(--steel); }
+  .element.family-c { border-top-color: var(--turf-mid); }
+  .element.family-d { border-top-color: var(--red); }
+  .element.family-e { border-top-color: var(--violet); }
+
+  /* table group labels */
+  .table-group-label {
+    width: 100%;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 16px;
+    margin-bottom: 4px;
+    padding-left: 2px;
+    border-bottom: 1px solid #1a1a22;
+    padding-bottom: 4px;
+  }
+
+  /* ── CLASSES SECTION ──────────────────────────────── */
+  #classes {
+    background: #08080c;
+  }
+
+  .class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    margin-top: 32px;
+    max-width: 900px;
+  }
+
+  .class-card {
+    background: #0d0d12;
+    border: 1px solid #1a1a22;
+    border-top: 3px solid var(--card-accent, var(--chalk-dim));
+    padding: 24px;
+  }
+
+  .class-card h3 { color: var(--card-accent, var(--chalk)); margin-bottom: 8px; font-size: 15px; }
+  .class-card p  { font-size: 13px; max-width: none; }
+
+  .class-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--card-accent, var(--chalk-dim));
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  /* ── PHILOSOPHY CLOSE ─────────────────────────────── */
+  #philosophy {
+    background: var(--pitch);
+    min-height: 80vh;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 40px;
+    max-width: 860px;
+  }
+
+  .phil-block {
+    background: #0d0d12;
+    border: 1px solid #1a1a22;
+    padding: 28px;
+  }
+
+  .phil-block h3 {
+    font-size: 16px;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+
+  .phil-block.romantic h3 { color: var(--steel); }
+
+  .phil-block ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .phil-block ul li {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--chalk-dim);
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .phil-block ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--amber);
+  }
+
+  .phil-block.romantic ul li::before { color: var(--steel); }
+
+  /* synergy table */
+  .synergy-chain {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 32px;
+    max-width: 820px;
+    flex-wrap: wrap;
+  }
+
+  .chain-step {
+    background: #0d0d12;
+    border: 1px solid #1a1a22;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .chain-step .cs-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--chalk-dim);
+    margin-bottom: 6px;
+  }
+
+  .chain-step .cs-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: var(--chalk);
+  }
+
+  .chain-arrow {
+    font-family: 'DM Mono', monospace;
+    color: var(--chalk-dim);
+    font-size: 18px;
+  }
+
+  /* ── SCROLLBAR ────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--pitch); }
+  ::-webkit-scrollbar-thumb { background: var(--chalk-dim); }
+
+  /* ── RESPONSIVE ───────────────────────────────────── */
+  @media (max-width: 700px) {
+    section { padding: 48px 20px; }
+    .doctrine-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .calendar-grid { grid-template-columns: repeat(7, 1fr); }
+    .element { width: 72px; height: 72px; }
+    .el-symbol { font-size: 20px; }
+    nav { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV DOTS ──────────────────────────────────────── -->
+<nav id="nav-dots" aria-label="Section navigation"></nav>
+
+<!-- ══════════════════════════════════════════════════════
+  §1  DOCTRINE
+══════════════════════════════════════════════════════ -->
+<section id="doctrine" data-label="01 / Doctrine">
+  <div class="eyebrow">The 8th Subject</div>
+  <div class="display">FOOT<br><em>BALL</em></div>
+
+  <div class="doctrine-grid">
+    <div class="doctrine-card">
+      <div class="pct">50%</div>
+      <div class="pct-label">Fitness</div>
+      <div class="pct-sub">// foundation. non-negotiable.</div>
+      <div class="doctrine-bar"></div>
+    </div>
+    <div class="doctrine-card">
+      <div class="pct">30%</div>
+      <div class="pct-label">Skill Set</div>
+      <div class="pct-sub">// treated as 100% once fitness clears</div>
+      <div class="doctrine-bar"></div>
+    </div>
+    <div class="doctrine-card">
+      <div class="pct">10%</div>
+      <div class="pct-label">Teammate Level</div>
+      <div class="pct-sub">// you select, you elevate</div>
+      <div class="doctrine-bar"></div>
+    </div>
+    <div class="doctrine-card">
+      <div class="pct">10%</div>
+      <div class="pct-label">Coaching</div>
+      <div class="pct-sub">// context, not control</div>
+      <div class="doctrine-bar"></div>
+    </div>
+  </div>
+
+  <div class="philosophy-block">
+    <p style="margin-bottom:20px;">
+      Football has an inherent romance that always comes out — and should never be forced.
+      <strong>Probabilistic players always win in the end.</strong> The romantic style is valid
+      and beautiful; it is simply not a strategy.
+    </p>
+
+    <div class="eyebrow" style="margin-top:24px;">Anti-Injury / Maximum Gain Rules</div>
+    <div style="margin-top:10px;">
+      <span class="rule-chip">≤ 7 dribbles per match (standard)</span>
+      <span class="rule-chip">Open dribble limit in semi-finals</span>
+      <span class="rule-chip">No forced flair — earn the moment</span>
+      <span class="rule-chip">Ball > runner, always</span>
+      <span class="rule-chip">Recover before you attack</span>
+      <span class="rule-chip">Position before possession</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §2  FITNESS CALENDAR (100-day model)
+══════════════════════════════════════════════════════ -->
+<section id="fitness" data-label="02 / Fitness">
+  <div class="eyebrow">100-Day Fitness Protocol</div>
+  <h2>THE BODY<br>COMES FIRST</h2>
+  <p style="margin-top:12px;">Each cell is one training day. Tap to inspect the session. Rest is not absence — it is adaptation.</p>
+
+  <div class="cal-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Aerobic Base</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--steel)"></div> Strength / Power</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--turf-mid)"></div> Technical</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--violet)"></div> Tactical</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#333"></div> Active Rest</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Match / Scrimmage</div>
+  </div>
+
+  <div class="calendar-grid" id="cal-grid">
+    <div class="cal-header">M</div>
+    <div class="cal-header">T</div>
+    <div class="cal-header">W</div>
+    <div class="cal-header">T</div>
+    <div class="cal-header">F</div>
+    <div class="cal-header">S</div>
+    <div class="cal-header">S</div>
+  </div>
+
+  <div class="day-detail" id="day-detail">
+    <div class="detail-title">Select a day</div>
+    <div class="detail-items">
+      <span class="detail-tag">tap any cell above</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §3  VISION & PRESENCE
+══════════════════════════════════════════════════════ -->
+<section id="vision" class="skill-section vision" data-label="03 / Subclass I">
+  <div class="subclass-header">
+    <div class="subclass-num">I</div>
+    <div class="subclass-title-block">
+      <div class="eyebrow">Subclass 1 of 5</div>
+      <h2>Vision &<br>Presence</h2>
+    </div>
+  </div>
+  <p>You cannot act on what you haven't seen. Scanning is the first move of every sequence. The scanning family operates like reactive metals — fast, decisive, transformative on contact.</p>
+
+  <div class="periodic-table" id="pt-vision"></div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §4  BALL PROTECTION
+══════════════════════════════════════════════════════ -->
+<section id="protect" class="skill-section protect" data-label="04 / Subclass II">
+  <div class="subclass-header">
+    <div class="subclass-num">II</div>
+    <div class="subclass-title-block">
+      <div class="eyebrow">Subclass 2 of 5</div>
+      <h2>Ball<br>Protection</h2>
+    </div>
+  </div>
+  <p>Control before everything. A ball you cannot keep cannot be used. Protection creates the pause that makes all other actions possible.</p>
+
+  <div class="periodic-table" id="pt-protect"></div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §5  SPRINTS & CARRIES
+══════════════════════════════════════════════════════ -->
+<section id="sprint" class="skill-section sprint" data-label="05 / Subclass III">
+  <div class="subclass-header">
+    <div class="subclass-num">III</div>
+    <div class="subclass-title-block">
+      <div class="eyebrow">Subclass 3 of 5</div>
+      <h2>Sprints &<br>Carries</h2>
+    </div>
+  </div>
+  <p>Speed is an argument. The best high-speed runs create problems no defender was trained to solve. Know when to run and where — position dictates the carry.</p>
+
+  <div class="periodic-table" id="pt-sprint"></div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §6  SHOOTING & KICKING
+══════════════════════════════════════════════════════ -->
+<section id="shoot" class="skill-section shoot" data-label="06 / Subclass IV">
+  <div class="subclass-header">
+    <div class="subclass-num">IV</div>
+    <div class="subclass-title-block">
+      <div class="eyebrow">Subclass 4 of 5</div>
+      <h2>Shooting &<br>Kicking</h2>
+    </div>
+  </div>
+  <p>The most important move in football. One touch, on target, every time — that is the impossible ideal. The whole game is the attempt to reach it. A ball moves faster and more unpredictably than the fastest runner.</p>
+
+  <div class="periodic-table" id="pt-shoot"></div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §7  GAME STATE SYNECHDOCHE  (the synthesis)
+══════════════════════════════════════════════════════ -->
+<section id="synergy" class="skill-section synergy" data-label="07 / Subclass V">
+  <div class="subclass-header">
+    <div class="subclass-num">V</div>
+    <div class="subclass-title-block">
+      <div class="eyebrow">Subclass 5 of 5</div>
+      <h2>Game State<br>Synechdoche</h2>
+    </div>
+  </div>
+  <p>The game in miniature. Presence → scan → carry/control → shoot. Every meaningful moment in football is some variant of this chain. Understand this and you understand any position.</p>
+
+  <!-- Game state chain diagram -->
+  <div class="synergy-chain">
+    <div class="chain-step">
+      <div class="cs-label">Phase 1</div>
+      <div class="cs-title">Presence / Scan</div>
+    </div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-step">
+      <div class="cs-label">Phase 2</div>
+      <div class="cs-title">Receive / Control</div>
+    </div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-step">
+      <div class="cs-label">Phase 3</div>
+      <div class="cs-title">Carry or Pass</div>
+    </div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-step">
+      <div class="cs-label">Phase 4</div>
+      <div class="cs-title">Shoot / Release</div>
+    </div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-step" style="border-top-color:var(--amber);">
+      <div class="cs-label">Outcome</div>
+      <div class="cs-title">Goal / Recycle</div>
+    </div>
+  </div>
+
+  <div class="periodic-table" style="margin-top:32px;" id="pt-synergy"></div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §8  THE 5 MOST INFLUENTIAL CLASSES
+══════════════════════════════════════════════════════ -->
+<section id="classes" data-label="08 / Classes">
+  <div class="eyebrow">Curriculum</div>
+  <h2>The 5 Classes</h2>
+  <p>Not a syllabus — a hierarchy of understanding. Master in order. Each class unlocks the next.</p>
+
+  <div class="class-grid">
+    <div class="class-card" style="--card-accent:var(--amber)">
+      <div class="class-rank">01</div>
+      <h3>Fitness & Athleticism</h3>
+      <p>Aerobic capacity, sprint mechanics, injury resilience, and recovery protocol. Nothing else exists until this class is passed.</p>
+    </div>
+    <div class="class-card" style="--card-accent:var(--steel)">
+      <div class="class-rank">02</div>
+      <h3>Spatial Intelligence</h3>
+      <p>Reading gaps, overloads, defensive shapes, and shooting angles before the ball arrives. Pre-scan habit formation.</p>
+    </div>
+    <div class="class-card" style="--card-accent:var(--turf-mid)">
+      <div class="class-rank">03</div>
+      <h3>Ball Mastery</h3>
+      <p>First touch, body shape on receipt, 1v1 shielding, turns, and weight of pass. Technical control at speed and under pressure.</p>
+    </div>
+    <div class="class-card" style="--card-accent:var(--red)">
+      <div class="class-rank">04</div>
+      <h3>Finishing & Set-Pieces</h3>
+      <p>Shot mechanics, placement over power, angle conversion, headers, free-kicks, and penalty psychology.</p>
+    </div>
+    <div class="class-card" style="--card-accent:var(--violet)">
+      <div class="class-rank">05</div>
+      <h3>Game Reading & Adaptation</h3>
+      <p>Positional rotations, pressing triggers, transition moments, and the meta-skill of reading what the game needs from you right now.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+  §9  PROBABILISTIC vs ROMANTIC
+══════════════════════════════════════════════════════ -->
+<section id="philosophy" data-label="09 / Philosophy">
+  <div class="eyebrow">The Two Natures of the Game</div>
+  <h2>You Choose<br>Your Language</h2>
+  <p>Both are valid. Only one wins tournaments. Football's romance always surfaces — when it is earned, not engineered.</p>
+
+  <div class="two-col">
+    <div class="phil-block probabilistic">
+      <h3>⬡ Probabilistic</h3>
+      <ul>
+        <li>Maximum output from minimum touches</li>
+        <li>High percentage passes, compounded over 90 min</li>
+        <li>Dribble budget strictly managed (≤7 standard)</li>
+        <li>Position always precedes possession</li>
+        <li>Anticipation over reaction</li>
+        <li>Discomfort is information, not failure</li>
+        <li>Win the small moments, let the scoreline follow</li>
+      </ul>
+    </div>
+    <div class="phil-block romantic">
+      <h3>♡ Romantic</h3>
+      <ul>
+        <li>Expressive, spontaneous, crowd-moving</li>
+        <li>Dribbles for their own beauty</li>
+        <li>Driven by feel and momentum</li>
+        <li>High ceiling, high variance</li>
+        <li>Great in highlight reels, fragile in finals</li>
+        <li>Can electrify a team — or strand it</li>
+        <li>The game's inheritance — not its strategy</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="margin-top:32px; font-style:italic; border-left:2px solid var(--chalk-dim); padding-left:16px; max-width:500px;">
+    "Football has an inherent romance that always comes out. It should never be forced. The probabilistic player creates the conditions for that beauty to emerge naturally — and when it does, it is unforgettable."
+  </p>
+</section>
+
+
+<script>
+// ── DATA ─────────────────────────────────────────────
+
+const fitnessData = [
+  // each week: [M, T, W, T, F, S, S]
+  // types: aerobic | strength | technical | tactical | rest | match
+  {type:'aerobic',   label:'Aerobic Base',    session:['Long run 5km — conversational pace','High-knee drills','Lateral shuffle x4','Breathing rhythm focus','Cool-down stretch 15min']},
+  {type:'strength',  label:'Lower Body Power',session:['Squats 4x12','Lunges 3x10 each','Calf raises 3x20','Glute bridges 3x15','Core hold 3x45s']},
+  {type:'technical', label:'First Touch',     session:['Wall pass 200 reps','Instep control drills','Thigh trap sequences','Cushion & roll','1-touch redirect sets']},
+  {type:'tactical',  label:'Shape & Position',session:['Positional shadow play','Press triggers walkthrough','Transition shape work','Wide-to-central rotations','Dead-ball organization']},
+  {type:'rest',      label:'Active Recovery', session:['Light 2km jog','Foam roll full body','Cold/warm contrast shower','Mobility circuits','Sleep: 8+ hours target']},
+  {type:'match',     label:'Scrimmage',       session:['Full 11v11 or 8v8','Video capture for review','Strict dribble budget enforced','Positional feedback post-match','Hydration protocol']},
+  {type:'rest',      label:'Full Rest',       session:['No ball work','No cardio','Sleep priority','Mental rehearsal OK','Nutrition focus']},
+
+  {type:'aerobic',   label:'Interval Running',session:['4x400m at 80% pace','Walk 90s between','Sprint finish last 50m','RPE tracking','HR recovery check']},
+  {type:'technical', label:'Passing Weights', session:['Short-medium-long sequences','Weak foot emphasis','Driven pass mechanics','Lofted ball technique','One-two wall drills']},
+  {type:'strength',  label:'Upper & Core',    session:['Push-ups 4x15','Plank 3x60s','Rotational med-ball x20','Pull-ups or rows 3x8','Hip flexor strength circuit']},
+  {type:'tactical',  label:'1v1 Defending',   session:['Jockey technique','Delay and recover','Angled approach drills','Tackle timing practice','Pressing angles map']},
+  {type:'technical', label:'Ball Mastery',    session:['Coervers x5min','Inside-outside rolls','L-cut & Cruyff turn','Drag-back sequences','Dribbling gates slow→fast']},
+  {type:'match',     label:'Tactical Match',  session:['Position-specific brief','Compact shape focus','Set-piece rehearsal','Budget 7 dribbles total','Post-match team debrief']},
+  {type:'rest',      label:'Active Recovery', session:['Yoga or pilates','Breathing work','Foam roll focus: hamstrings','Hydrate 3L+','No intensity, full adaptation']},
+
+  {type:'aerobic',   label:'Fartlek Run',     session:['30min varied pace run','No structure — read body','Hills if available','Maintain form throughout','End with 5min walk']},
+  {type:'strength',  label:'Explosive Power', session:['Box jumps 4x8','Broad jumps 3x6','Banded hip drives','Acceleration sprints 10x20m','Rest 2min between sets']},
+  {type:'technical', label:'Shooting Clinic', session:['Inside foot 50 reps','Driven shot 50 reps','Half-volley 30 reps','Weak foot 40 reps','Angle conversion drill']},
+  {type:'tactical',  label:'Game Reading',    session:['Video session: 30min','Identify 3 tactical patterns','Shadow press sequences','Overload recognition drills','Verbal walkthrough after']},
+  {type:'technical', label:'Heading & Aerial',session:['Jumping mechanics','Redirect header 30 reps','Defensive header technique','Flick-on sequences','Aerial duel body shape']},
+  {type:'match',     label:'Position Battle', session:['Small-sided 5v5','Positional rotation enforced','1v1 tournament format','Fitness tracking: heart rate','Competitor analysis notes']},
+  {type:'rest',      label:'Full Rest',       session:['No activity','Prepare gear','Mental focus session','Diet audit','Sleep 9 hours if possible']},
+
+  {type:'aerobic',   label:'Endurance Block', session:['7km easy run','No stop — build base','Nasal breathing practice','Heart rate ceiling: 70% max','Stride efficiency check']},
+  {type:'strength',  label:'Agility + Speed', session:['Ladder drills 10min','Cone zig-zag 5x','T-test 3 attempts','Reactive sprint triggers','Deceleration technique']},
+  {type:'tactical',  label:'Pressing Shape',  session:['High press trigger drills','Compactness at mid-block','Transition to counter','5-second rule after loss','Shape reset practice']},
+  {type:'technical', label:'Weak Foot Week',  session:['90% of all touches: weak foot','Shooting weak foot only','Passing weak foot only','Control — dominant foot receives, weak releases','Embrace the discomfort']},
+  {type:'aerobic',   label:'Recovery Run',    session:['4km easy','Active recovery pace','Mental imagery during run','Focus: game state chains','Light stretching after']},
+  {type:'match',     label:'Full Scrimmage',  session:['Full-length match','All rules enforced','Dribble log kept','Video review booked','Post-match: 3 wins, 1 fix each']},
+  {type:'rest',      label:'Active Recovery', session:['Ice bath or contrast shower','Mobility focus: hips & ankles','Journaling session','Review week stats','Plan next 7 days']},
+
+  // Weeks 5–14: cycle continues with progressive overload (abbreviated here)
+  ...Array.from({length:70}, (_, i) => {
+    const types = ['aerobic','strength','technical','tactical','rest','match','rest'];
+    return { type: types[i % 7], label: `Day ${29+i}`, session: [`Session ${29+i} — progressive overload cycle`,'Form check','Load adjustment','Recovery monitored','Coach feedback'] };
+  })
+];
+
+const periodicTables = {
+  vision: {
+    accent: 'var(--c-vision)',
+    groups: [
+      { label: 'Scanning Family — Reactive Metals', family: 'a', elements: [
+        { sym: 'SpSc', name: 'Space Scan', num: 1, cat: 'read' },
+        { sym: 'GpSc', name: 'Gap Scan', num: 2, cat: 'read' },
+        { sym: 'OvSc', name: 'Overload Scan', num: 3, cat: 'read' },
+        { sym: 'AnSc', name: 'Angle Scan', num: 4, cat: 'read' },
+        { sym: 'Pre', name: 'Pre-scan (before receive)', num: 5, cat: 'read' },
+        { sym: 'Pst', name: 'Post-scan (after touch)', num: 6, cat: 'read' },
+      ]},
+      { label: 'Touch Economy — Noble Gases (stable, minimal)', family: 'b', elements: [
+        { sym: '1Tc', name: '1-Touch Max', num: 7, cat: 'economy' },
+        { sym: '2Tc', name: '2-Touch Max', num: 8, cat: 'economy' },
+        { sym: 'ZrT', name: 'Zero Contact (redirect)', num: 9, cat: 'economy' },
+        { sym: 'ReO', name: 'Re-onboard Touch', num: 10, cat: 'economy' },
+      ]},
+      { label: 'Positional Awareness — Transition Metals', family: 'c', elements: [
+        { sym: 'Shd', name: 'Shadow Cover', num: 11, cat: 'position' },
+        { sym: 'Hmk', name: 'Half-space Mark', num: 12, cat: 'position' },
+        { sym: 'Thd', name: 'Third-man Run', num: 13, cat: 'position' },
+        { sym: 'Wid', name: 'Wide Pin', num: 14, cat: 'position' },
+        { sym: 'Dph', name: 'Depth Run', num: 15, cat: 'position' },
+      ]},
+      { label: 'Shooting Angle Intelligence — Lanthanides', family: 'd', elements: [
+        { sym: 'NPC', name: 'Near Post Cut', num: 16, cat: 'angle' },
+        { sym: 'FPC', name: 'Far Post Arrival', num: 17, cat: 'angle' },
+        { sym: 'PnT', name: 'Penalty Touch Zone', num: 18, cat: 'angle' },
+        { sym: 'SxY', name: 'Six-yard Box Attack', num: 19, cat: 'angle' },
+      ]},
+    ]
+  },
+  protect: {
+    accent: 'var(--c-protect)',
+    groups: [
+      { label: 'Ball Control Variants — Alkali Metals', family: 'a', elements: [
+        { sym: 'SftT', name: 'Soft Trap (cushion)', num: 1, cat: 'control' },
+        { sym: 'ChsT', name: 'Chest Control', num: 2, cat: 'control' },
+        { sym: 'ThT', name: 'Thigh Trap', num: 3, cat: 'control' },
+        { sym: 'InsT', name: 'Instep Trap', num: 4, cat: 'control' },
+        { sym: 'DrgB', name: 'Drag-Back Settle', num: 5, cat: 'control' },
+        { sym: 'BdyC', name: 'Body Shape Control', num: 6, cat: 'control' },
+      ]},
+      { label: 'Control Reasons — Alkaline Earth', family: 'b', elements: [
+        { sym: 'TrSp', name: 'Turn to Space', num: 7, cat: 'reason' },
+        { sym: 'ShSt', name: 'Shield from Press', num: 8, cat: 'reason' },
+        { sym: 'RecT', name: 'Recycle the Play', num: 9, cat: 'reason' },
+        { sym: 'LayO', name: 'Lay-off Setup', num: 10, cat: 'reason' },
+      ]},
+      { label: '1v1 Variants — Halogens', family: 'c', elements: [
+        { sym: 'Shd', name: 'Body Shield', num: 11, cat: '1v1' },
+        { sym: 'Spn', name: 'Spin Turn', num: 12, cat: '1v1' },
+        { sym: 'Stl', name: 'Step-over Stall', num: 13, cat: '1v1' },
+        { sym: 'Scr', name: 'Screen Hold', num: 14, cat: '1v1' },
+        { sym: 'Fnt', name: 'Feint & Shield', num: 15, cat: '1v1' },
+      ]},
+      { label: '1v1 Reasons — Noble Gases', family: 'd', elements: [
+        { sym: 'BuT', name: 'Buy Time', num: 16, cat: 'reason' },
+        { sym: 'DwT', name: 'Draw Tackle', num: 17, cat: 'reason' },
+        { sym: 'CrP', name: 'Create Pass Lane', num: 18, cat: 'reason' },
+        { sym: 'AdvP', name: 'Advance Position', num: 19, cat: 'reason' },
+      ]},
+    ]
+  },
+  sprint: {
+    accent: 'var(--c-sprint)',
+    groups: [
+      { label: 'High-Speed Drbblers — Noble Gases', family: 'a', elements: [
+        { sym: 'Mbp', name: 'Mbappé Burst', num: 1, cat: 'dribbler' },
+        { sym: 'Sn8', name: 'Salah Cut-in', num: 2, cat: 'dribbler' },
+        { sym: 'Vn6', name: 'Vinícius Jr. Diagonal', num: 3, cat: 'dribbler' },
+        { sym: 'Drk', name: 'Doku Shuffle-Run', num: 4, cat: 'dribbler' },
+      ]},
+      { label: 'Elite Tacklers / Breakers — Transition Metals', family: 'b', elements: [
+        { sym: 'Knt', name: 'Kantonian Press-Sprint', num: 5, cat: 'press' },
+        { sym: 'Cas', name: 'Casellas Interception', num: 6, cat: 'press' },
+        { sym: 'Ref', name: 'Refusal Sprint (block)', num: 7, cat: 'press' },
+        { sym: 'Rec', name: 'Recovery Run', num: 8, cat: 'press' },
+      ]},
+      { label: 'Carry Mechanics — Post-Transition', family: 'c', elements: [
+        { sym: 'Out', name: 'Outside-Foot Carry', num: 9, cat: 'carry' },
+        { sym: 'Ins', name: 'Inside-Cut Carry', num: 10, cat: 'carry' },
+        { sym: 'TgC', name: 'Tight Carry (1m buffer)', num: 11, cat: 'carry' },
+        { sym: 'WdC', name: 'Wide-open Burst', num: 12, cat: 'carry' },
+        { sym: 'Chn', name: 'Channel Sprint', num: 13, cat: 'carry' },
+      ]},
+      { label: 'Destroyers — Lanthanides', family: 'd', elements: [
+        { sym: 'TkS', name: 'Sliding Tackle Sprint', num: 14, cat: 'destroy' },
+        { sym: 'PrD', name: 'Press-to-Dispossess', num: 15, cat: 'destroy' },
+        { sym: 'TrA', name: 'Transition Attack Run', num: 16, cat: 'destroy' },
+        { sym: 'CnR', name: 'Counter-run Trigger', num: 17, cat: 'destroy' },
+      ]},
+    ]
+  },
+  shoot: {
+    accent: 'var(--c-shoot)',
+    groups: [
+      { label: 'Shot Mechanics — Alkali Metals', family: 'a', elements: [
+        { sym: 'InF', name: 'Inside Foot (placement)', num: 1, cat: 'mechanic' },
+        { sym: 'Lst', name: 'Laces Driven', num: 2, cat: 'mechanic' },
+        { sym: 'OtF', name: 'Outside Foot (Rabona)', num: 3, cat: 'mechanic' },
+        { sym: 'Vol', name: 'Volley', num: 4, cat: 'mechanic' },
+        { sym: 'HVl', name: 'Half-Volley', num: 5, cat: 'mechanic' },
+        { sym: 'Hdr', name: 'Header (redirect)', num: 6, cat: 'mechanic' },
+      ]},
+      { label: 'Placement Zones — Halogens', family: 'b', elements: [
+        { sym: 'NPc', name: 'Near Post', num: 7, cat: 'zone' },
+        { sym: 'FPc', name: 'Far Post', num: 8, cat: 'zone' },
+        { sym: 'LwC', name: 'Low Corner', num: 9, cat: 'zone' },
+        { sym: 'HgC', name: 'High Corner', num: 10, cat: 'zone' },
+        { sym: 'Pnl', name: 'Penalty Spot', num: 11, cat: 'zone' },
+      ]},
+      { label: 'Finishing Contexts — Noble Gases', family: 'c', elements: [
+        { sym: 'OvR', name: 'One-on-one (GK)', num: 12, cat: 'context' },
+        { sym: 'CtA', name: 'Counter Attack End', num: 13, cat: 'context' },
+        { sym: 'StB', name: 'Set-piece Ball', num: 14, cat: 'context' },
+        { sym: 'FrK', name: 'Free Kick', num: 15, cat: 'context' },
+        { sym: 'Pnt', name: 'Penalty', num: 16, cat: 'context' },
+      ]},
+      { label: 'Setup to Shoot — Transition Metals', family: 'd', elements: [
+        { sym: 'CrS', name: 'Create Space (shift body)', num: 17, cat: 'setup' },
+        { sym: 'FkS', name: 'Fake Shot Setup', num: 18, cat: 'setup' },
+        { sym: 'CuB', name: 'Cut Back for Shooter', num: 19, cat: 'setup' },
+        { sym: 'PuS', name: 'Pull-back Square', num: 20, cat: 'setup' },
+        { sym: 'FlP', name: 'First-time Pass-shoot', num: 21, cat: 'setup' },
+      ]},
+    ]
+  },
+  synergy: {
+    accent: 'var(--c-synergy)',
+    groups: [
+      { label: 'Tactical Compounding — Rare Earth', family: 'a', elements: [
+        { sym: 'PoB', name: 'Possession Build-up', num: 1, cat: 'chain' },
+        { sym: 'PrT', name: 'Press Trigger', num: 2, cat: 'chain' },
+        { sym: 'TrM', name: 'Transition Moment', num: 3, cat: 'chain' },
+        { sym: 'CnC', name: 'Counter Chain', num: 4, cat: 'chain' },
+        { sym: 'OvL', name: 'Overload & Release', num: 5, cat: 'chain' },
+      ]},
+      { label: 'Player Roles in Chain — Actinides', family: 'b', elements: [
+        { sym: 'Anc', name: 'Anchor (holds shape)', num: 6, cat: 'role' },
+        { sym: 'Rel', name: 'Relay (2-touch link)', num: 7, cat: 'role' },
+        { sym: 'Brk', name: 'Breaker (presses & wins)', num: 8, cat: 'role' },
+        { sym: 'Fin', name: 'Finisher (final pass/shot)', num: 9, cat: 'role' },
+        { sym: 'Ovr', name: 'Overlap Runner', num: 10, cat: 'role' },
+      ]},
+      { label: 'Match State Intelligence — Metalloids', family: 'c', elements: [
+        { sym: 'EGs', name: 'Early Game (feel-out)', num: 11, cat: 'state' },
+        { sym: 'MGs', name: 'Mid Game (control)', num: 12, cat: 'state' },
+        { sym: 'LGs', name: 'Late Game (manage)', num: 13, cat: 'state' },
+        { sym: 'WnG', name: 'Winning (protect)', num: 14, cat: 'state' },
+        { sym: 'LsG', name: 'Losing (risk)', num: 15, cat: 'state' },
+        { sym: 'DwG', name: 'Draw (decide)', num: 16, cat: 'state' },
+      ]},
+    ]
+  }
+};
+
+// ── BUILD CALENDAR ─────────────────────────────────
+
+function buildCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const detail = document.getElementById('day-detail');
+  let days = fitnessData.slice(0, 100);
+
+  days.forEach((day, i) => {
+    const cell = document.createElement('div');
+    cell.className = `cal-day day-type-${day.type}`;
+    cell.dataset.idx = i;
+    cell.innerHTML = `<span class="day-num">${String(i+1).padStart(2,'0')}</span><div class="day-dot"></div>`;
+    cell.addEventListener('click', () => {
+      document.querySelectorAll('.cal-day').forEach(c => c.classList.remove('active'));
+      cell.classList.add('active');
+      detail.innerHTML = `
+        <div class="detail-title">Day ${i+1} — ${day.label}</div>
+        <div class="detail-items">
+          ${day.session.map(s => `<span class="detail-tag">${s}</span>`).join('')}
+        </div>
+      `;
+    });
+    grid.appendChild(cell);
+  });
+}
+
+// ── BUILD PERIODIC TABLES ──────────────────────────
+
+function buildTable(containerId, tableKey) {
+  const container = document.getElementById(containerId);
+  const data = periodicTables[tableKey];
+  if (!container || !data) return;
+
+  let globalIdx = 0;
+  data.groups.forEach(group => {
+    const lbl = document.createElement('div');
+    lbl.className = 'table-group-label';
+    lbl.style.color = data.accent;
+    lbl.textContent = group.label;
+    container.appendChild(lbl);
+
+    group.elements.forEach((el) => {
+      const card = document.createElement('div');
+      card.className = `element family-${group.family}`;
+      card.style.borderTopColor = data.accent;
+      card.innerHTML = `
+        <span class="el-num">${String(el.num).padStart(2,'0')}</span>
+        <div class="el-symbol">${el.sym}</div>
+        <div class="el-name">${el.name}</div>
+        <span class="el-cat">${el.cat}</span>
+      `;
+      container.appendChild(card);
+      globalIdx++;
+    });
+  });
+}
+
+// ── INTERSECTION OBSERVER (pulse on scroll) ────────
+// Elements are visible by default; pulse is a scroll-triggered bonus
+
+function setupPulse() {
+  if (!('IntersectionObserver' in window)) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const els = entry.target.querySelectorAll('.element');
+        els.forEach((el, i) => {
+          el.classList.remove('pulse');
+          void el.offsetWidth; // force reflow to re-trigger animation
+          setTimeout(() => el.classList.add('pulse'), i * 35);
+        });
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.periodic-table').forEach(pt => obs.observe(pt));
+}
+
+// ── NAV DOTS ──────────────────────────────────────
+
+function buildNav() {
+  const sections = document.querySelectorAll('section');
+  const nav = document.getElementById('nav-dots');
+
+  sections.forEach((sec, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-dot';
+    btn.setAttribute('aria-label', `Section ${i+1}`);
+    btn.addEventListener('click', () => sec.scrollIntoView({ behavior: 'smooth' }));
+    nav.appendChild(btn);
+  });
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = Array.from(sections).indexOf(entry.target);
+        document.querySelectorAll('.nav-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === idx);
+        });
+      }
+    });
+  }, { threshold: 0.5 });
+
+  sections.forEach(s => obs.observe(s));
+}
+
+// ── INIT ──────────────────────────────────────────
+
+buildCalendar();
+buildTable('pt-vision',  'vision');
+buildTable('pt-protect', 'protect');
+buildTable('pt-sprint',  'sprint');
+buildTable('pt-shoot',   'shoot');
+buildTable('pt-synergy', 'synergy');
+setupPulse();
+buildNav();
+</script>
+</body>
+</html>

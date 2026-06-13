@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football — Unified Periodic Table of Skills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & ROOT ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --pitch:     #060608;
+  --surface:   #0c0c10;
+  --border:    #1e1e28;
+  --chalk:     #f0ede6;
+  --chalk-dim: #8a8278;
+  --chalk-faint:#2e2c2a;
+
+  /* Family colours — mapped to real PT families */
+  --alkali:     #e8a020;   /* Group 1  — Vision/Scanning     */
+  --alkaline:   #c47f17;   /* Group 2  — Positioning         */
+  --trans-a:    #2d6a8f;   /* Group 3-6 — Ball Control       */
+  --trans-b:    #1f4e6b;   /* Group 7-9 — Carry / Sprint     */
+  --trans-c:    #155280;   /* Group 10-12 — 1v1 Protect      */
+  --post-trans: #117a65;   /* Post-transition — Feints       */
+  --metalloid:  #6c3483;   /* Metalloids — Deception         */
+  --nonmetal:   #c0392b;   /* Non-metals — Shooting core     */
+  --halogen:    #96281b;   /* Group 17 — Set pieces          */
+  --noble:      #2e4057;   /* Group 18 — Game intelligence   */
+  --lanthanide: #1a472a;   /* Row 8 — Tactical roles         */
+  --actinide:   #2c3e50;   /* Row 9 — Doctrine / anti-injury */
+
+  --cell: 88px;
+  --gap:  3px;
+  --font-cell: 'DM Mono', monospace;
+}
+
+/* ── BODY ─────────────────────────────────────────── */
+html, body {
+  min-height: 100vh;
+  background: var(--pitch);
+  color: var(--chalk);
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+body {
+  padding: 48px 32px 80px;
+}
+
+/* ── HEADER ───────────────────────────────────────── */
+header {
+  margin-bottom: 40px;
+}
+
+.eyebrow {
+  font-family: var(--font-cell);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(42px, 7vw, 96px);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+}
+
+h1 em {
+  color: var(--alkali);
+  font-style: normal;
+}
+
+.header-sub {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--chalk-dim);
+  margin-top: 14px;
+  max-width: 620px;
+  line-height: 1.6;
+}
+
+/* ── LEGEND ───────────────────────────────────────── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-bottom: 36px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-cell);
+  font-size: 10px;
+  color: var(--chalk-dim);
+  letter-spacing: 0.05em;
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* ── PERIOD LABELS ────────────────────────────────── */
+.period-label {
+  font-family: var(--font-cell);
+  font-size: 9px;
+  color: var(--chalk-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--cell);
+  width: 22px;
+  letter-spacing: 0.1em;
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+
+/* ── GROUP HEADERS ────────────────────────────────── */
+.group-header {
+  font-family: var(--font-cell);
+  font-size: 9px;
+  color: var(--chalk-dim);
+  text-align: center;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.05em;
+}
+
+/* ── TABLE GRID ───────────────────────────────────── */
+.pt-wrapper {
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+/* 19 columns: 1 period-label + 18 groups */
+.pt-grid {
+  display: grid;
+  grid-template-columns: 22px repeat(18, var(--cell));
+  grid-template-rows: 20px repeat(7, var(--cell)) 20px repeat(2, var(--cell));
+  gap: var(--gap);
+  width: max-content;
+}
+
+/* Lanthanide/Actinide separator row */
+.pt-sep {
+  grid-column: 1 / -1;
+  height: 20px;
+}
+
+/* ── ELEMENT CELL ─────────────────────────────────── */
+.el {
+  width: var(--cell);
+  height: var(--cell);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--el-color, var(--border));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px 4px;
+  position: relative;
+  cursor: default;
+  transition: background 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+
+.el:hover {
+  background: #14141e;
+  border-color: var(--el-color, var(--chalk-dim));
+  z-index: 20;
+}
+
+/* cell content */
+.el-num {
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  font-family: var(--font-cell);
+  font-size: 8px;
+  color: var(--chalk-dim);
+  line-height: 1;
+}
+
+.el-sym {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--chalk);
+  line-height: 1;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.el-name {
+  font-family: var(--font-cell);
+  font-size: 7px;
+  color: var(--chalk-dim);
+  text-align: center;
+  line-height: 1.25;
+  margin-top: 3px;
+  max-width: 78px;
+  overflow: hidden;
+}
+
+.el-cat {
+  position: absolute;
+  bottom: 3px;
+  right: 4px;
+  font-family: var(--font-cell);
+  font-size: 6.5px;
+  color: var(--el-color, var(--chalk-dim));
+  opacity: 0.8;
+}
+
+/* ── HOVER TOOLTIP ────────────────────────────────── */
+.el::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a24;
+  border: 1px solid var(--el-color, var(--border));
+  color: var(--chalk);
+  font-family: var(--font-cell);
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 8px 12px;
+  width: 200px;
+  white-space: pre-wrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.el:hover::after {
+  opacity: 1;
+}
+
+/* prevent top-row tooltips from clipping */
+.el.tip-down::after {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+
+/* ── EMPTY CELL (spacing placeholder) ────────────── */
+.empty {
+  width: var(--cell);
+  height: var(--cell);
+  background: transparent;
+}
+
+/* ── DOCTRINE BAR ─────────────────────────────────── */
+.doctrine {
+  margin-top: 48px;
+  max-width: 820px;
+}
+
+.doctrine h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.06em;
+  color: var(--alkali);
+  margin-bottom: 16px;
+}
+
+.doctrine-row {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.doctrine-cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  flex: 1;
+}
+
+.doctrine-cell .d-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--alkali);
+  line-height: 1;
+}
+
+.doctrine-cell .d-label {
+  font-family: var(--font-cell);
+  font-size: 10px;
+  color: var(--chalk);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.doctrine-cell .d-note {
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--chalk-dim);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.doctrine-cell.fitness .d-pct { color: var(--alkali); }
+.doctrine-cell.skill   .d-pct { color: var(--trans-a); }
+.doctrine-cell.team    .d-pct { color: var(--lanthanide); }
+.doctrine-cell.coach   .d-pct { color: var(--chalk-dim); }
+
+/* ── ANTI-INJURY RULES ───────────────────────────── */
+.rules {
+  margin-top: 32px;
+  max-width: 820px;
+}
+
+.rules h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--chalk-dim);
+  margin-bottom: 12px;
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2px;
+}
+
+.rule-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--lanthanide);
+  padding: 10px 14px;
+  font-family: var(--font-cell);
+  font-size: 11px;
+  color: var(--chalk-dim);
+  line-height: 1.4;
+}
+
+/* ── PHILOSOPHY ───────────────────────────────────── */
+.phil {
+  margin-top: 48px;
+  max-width: 820px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.phil-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.phil-card h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.phil-card.prob h3 { color: var(--alkali); }
+.phil-card.rom  h3 { color: var(--trans-a); }
+
+.phil-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.phil-card ul li {
+  font-family: var(--font-cell);
+  font-size: 11px;
+  color: var(--chalk-dim);
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.phil-card.prob ul li::before { content: '→'; position:absolute; left:0; color:var(--alkali); }
+.phil-card.rom  ul li::before { content: '~'; position:absolute; left:0; color:var(--trans-a); }
+
+/* ── FAMILY COLOUR CLASSES ───────────────────────── */
+.f-alkali    { --el-color: var(--alkali);    }
+.f-alkaline  { --el-color: var(--alkaline);  }
+.f-trans-a   { --el-color: var(--trans-a);   }
+.f-trans-b   { --el-color: var(--trans-b);   }
+.f-trans-c   { --el-color: var(--trans-c);   }
+.f-post      { --el-color: var(--post-trans);}
+.f-metalloid { --el-color: var(--metalloid); }
+.f-nonmetal  { --el-color: var(--nonmetal);  }
+.f-halogen   { --el-color: var(--halogen);   }
+.f-noble     { --el-color: var(--noble);     }
+.f-lant      { --el-color: var(--lanthanide);}
+.f-acti      { --el-color: var(--actinide);  }
+
+/* ── RESPONSIVE ───────────────────────────────────── */
+@media (max-width: 700px) {
+  body { padding: 32px 16px 60px; }
+  :root { --cell: 72px; }
+  .el-sym { font-size: 18px; }
+  .phil { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .el, .el::after { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────── -->
+<header>
+  <div class="eyebrow">The 8th Subject · Football / Soccer</div>
+  <h1>PERIODIC TABLE<br>OF <em>SKILLS</em></h1>
+  <p class="header-sub">
+    Every skill, move, and game-state awareness mapped to its real chemical family.
+    Reactive metals initiate. Transition metals do the work. Noble gases know when to stay still.
+    Hover any element to read the field instruction.
+  </p>
+</header>
+
+<!-- ── LEGEND ─────────────────────────────────────── -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--alkali)"></div>Alkali — Vision/Scan</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--alkaline)"></div>Alkaline Earth — Presence</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--trans-a)"></div>Transition A — Ball Control</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--trans-b)"></div>Transition B — Carries</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--trans-c)"></div>Transition C — 1v1 Protect</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--post-trans)"></div>Post-Transition — Feints</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--metalloid)"></div>Metalloid — Deception</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--nonmetal)"></div>Non-Metal — Shooting</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--halogen)"></div>Halogen — Set Pieces</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--noble)"></div>Noble Gas — Game State IQ</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--lanthanide)"></div>Lanthanide — Tactical Roles</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--actinide)"></div>Actinide — Doctrine</div>
+</div>
+
+<!-- ── PERIODIC TABLE ──────────────────────────────── -->
+<div class="pt-wrapper">
+<div class="pt-grid">
+
+  <!-- ROW 0: group headers -->
+  <div></div><!-- period col -->
+  <div class="group-header">1</div>
+  <div class="group-header">2</div>
+  <div class="group-header">3</div>
+  <div class="group-header">4</div>
+  <div class="group-header">5</div>
+  <div class="group-header">6</div>
+  <div class="group-header">7</div>
+  <div class="group-header">8</div>
+  <div class="group-header">9</div>
+  <div class="group-header">10</div>
+  <div class="group-header">11</div>
+  <div class="group-header">12</div>
+  <div class="group-header">13</div>
+  <div class="group-header">14</div>
+  <div class="group-header">15</div>
+  <div class="group-header">16</div>
+  <div class="group-header">17</div>
+  <div class="group-header">18</div>
+
+  <!-- PERIOD 1 ─────────────────────────────────── -->
+  <div class="period-label">P1</div>
+
+  <!-- Gp1: Alkali — Vision -->
+  <div class="el f-alkali tip-down" data-tip="Space Scan&#10;Look for free zones&#10;before the ball arrives.">
+    <span class="el-num">1</span>
+    <div class="el-sym">SpSc</div>
+    <div class="el-name">Space Scan</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <!-- Gp2: Alkaline — Presence -->
+  <div class="el f-alkaline tip-down" data-tip="Half-space Pin&#10;Occupy the channel&#10;between fullback & CB.">
+    <span class="el-num">2</span>
+    <div class="el-sym">HsP</div>
+    <div class="el-name">Half-space Pin</div>
+    <span class="el-cat">position</span>
+  </div>
+
+  <!-- Gp3–12: empty in period 1 -->
+  <div class="empty"></div><div class="empty"></div><div class="empty"></div>
+  <div class="empty"></div><div class="empty"></div><div class="empty"></div>
+  <div class="empty"></div><div class="empty"></div><div class="empty"></div>
+  <div class="empty"></div>
+
+  <!-- Gp13: post-transition -->
+  <div class="el f-post tip-down" data-tip="Step-over Stall&#10;Pause the defender's&#10;momentum with a fake step.">
+    <span class="el-num">3</span>
+    <div class="el-sym">StO</div>
+    <div class="el-name">Step-over Stall</div>
+    <span class="el-cat">feint</span>
+  </div>
+
+  <!-- Gp14: metalloid -->
+  <div class="el f-metalloid tip-down" data-tip="Fake Shot&#10;Disguise intent.&#10;Commit the keeper.">
+    <span class="el-num">4</span>
+    <div class="el-sym">FkS</div>
+    <div class="el-name">Fake Shot</div>
+    <span class="el-cat">deceive</span>
+  </div>
+
+  <!-- Gp15: non-metal -->
+  <div class="el f-nonmetal tip-down" data-tip="Inside Foot Shot&#10;Placement over power.&#10;Pick the corner first.">
+    <span class="el-num">5</span>
+    <div class="el-sym">InF</div>
+    <div class="el-name">Inside Foot Shot</div>
+    <span class="el-cat">shoot</span>
+  </div>
+
+  <!-- Gp16: non-metal -->
+  <div class="el f-nonmetal tip-down" data-tip="Laces Drive&#10;Maximum power channel.&#10;Strike through the ball.">
+    <span class="el-num">6</span>
+    <div class="el-sym">Lac</div>
+    <div class="el-name">Laces Drive</div>
+    <span class="el-cat">shoot</span>
+  </div>
+
+  <!-- Gp17: halogen -->
+  <div class="el f-halogen tip-down" data-tip="Free Kick&#10;Dead ball. Rehearsed.&#10;Placement + curve.">
+    <span class="el-num">7</span>
+    <div class="el-sym">FrK</div>
+    <div class="el-name">Free Kick</div>
+    <span class="el-cat">set-piece</span>
+  </div>
+
+  <!-- Gp18: noble gas -->
+  <div class="el f-noble tip-down" data-tip="Early Game Read&#10;Feel the shape.&#10;Don't force anything yet.">
+    <span class="el-num">8</span>
+    <div class="el-sym">EGr</div>
+    <div class="el-name">Early Game Read</div>
+    <span class="el-cat">IQ</span>
+  </div>
+
+  <!-- PERIOD 2 ─────────────────────────────────── -->
+  <div class="period-label">P2</div>
+
+  <div class="el f-alkali" data-tip="Gap Scan&#10;Find the line-breaking&#10;pass before you receive.">
+    <span class="el-num">9</span>
+    <div class="el-sym">GpSc</div>
+    <div class="el-name">Gap Scan</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <div class="el f-alkaline" data-tip="Depth Run&#10;Hold the defensive&#10;line with your run.">
+    <span class="el-num">10</span>
+    <div class="el-sym">DpR</div>
+    <div class="el-name">Depth Run</div>
+    <span class="el-cat">position</span>
+  </div>
+
+  <!-- Gp3: transition A — ball control starts -->
+  <div class="el f-trans-a" data-tip="Soft Trap&#10;Cushion on contact.&#10;Kill the ball's pace.">
+    <span class="el-num">11</span>
+    <div class="el-sym">SftT</div>
+    <div class="el-name">Soft Trap</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Chest Control&#10;Use the sternum.&#10;Drop to thigh or foot.">
+    <span class="el-num">12</span>
+    <div class="el-sym">ChsC</div>
+    <div class="el-name">Chest Control</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Thigh Trap&#10;Mid-height ball solution.&#10;Pivot into space after.">
+    <span class="el-num">13</span>
+    <div class="el-sym">ThT</div>
+    <div class="el-name">Thigh Trap</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Instep Trap&#10;Laces cushion.&#10;Most versatile receive.">
+    <span class="el-num">14</span>
+    <div class="el-sym">InsT</div>
+    <div class="el-name">Instep Trap</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <!-- Gp7-9: transition B — carry/sprint -->
+  <div class="el f-trans-b" data-tip="Outside-Foot Carry&#10;Speed + direction.&#10;Body naturally shields.">
+    <span class="el-num">15</span>
+    <div class="el-sym">OtC</div>
+    <div class="el-name">Outside Carry</div>
+    <span class="el-cat">carry</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Channel Sprint&#10;Run the corridor.&#10;Force the diagonal.">
+    <span class="el-num">16</span>
+    <div class="el-sym">ChS</div>
+    <div class="el-name">Channel Sprint</div>
+    <span class="el-cat">carry</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Recovery Run&#10;Sprint back behind&#10;the ball immediately.">
+    <span class="el-num">17</span>
+    <div class="el-sym">RecR</div>
+    <div class="el-name">Recovery Run</div>
+    <span class="el-cat">sprint</span>
+  </div>
+
+  <!-- Gp10-12: transition C — 1v1 protect -->
+  <div class="el f-trans-c" data-tip="Body Shield&#10;Mass between ball&#10;and opponent.">
+    <span class="el-num">18</span>
+    <div class="el-sym">Shd</div>
+    <div class="el-name">Body Shield</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Spin Turn&#10;180° under pressure.&#10;Exit away from tackle.">
+    <span class="el-num">19</span>
+    <div class="el-sym">Spn</div>
+    <div class="el-name">Spin Turn</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Screen Hold&#10;Freeze. Let teammate&#10;make the run.">
+    <span class="el-num">20</span>
+    <div class="el-sym">Scr</div>
+    <div class="el-name">Screen Hold</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <!-- Gp13: post-transition -->
+  <div class="el f-post" data-tip="Inside Cut&#10;Plant outside foot.&#10;Drive inside off marker.">
+    <span class="el-num">21</span>
+    <div class="el-sym">InC</div>
+    <div class="el-name">Inside Cut</div>
+    <span class="el-cat">feint</span>
+  </div>
+
+  <!-- Gp14: metalloid -->
+  <div class="el f-metalloid" data-tip="Cruyff Turn&#10;Pass fake → drag behind&#10;standing foot.">
+    <span class="el-num">22</span>
+    <div class="el-sym">Cry</div>
+    <div class="el-name">Cruyff Turn</div>
+    <span class="el-cat">deceive</span>
+  </div>
+
+  <!-- Gp15-16: non-metal shooting -->
+  <div class="el f-nonmetal" data-tip="Half-Volley&#10;Strike at the bounce.&#10;Maximum whip.">
+    <span class="el-num">23</span>
+    <div class="el-sym">HVl</div>
+    <div class="el-name">Half-Volley</div>
+    <span class="el-cat">shoot</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Outside Foot Shot&#10;Rabona or driven curl.&#10;Unreadable trajectory.">
+    <span class="el-num">24</span>
+    <div class="el-sym">OtF</div>
+    <div class="el-name">Outside Foot Shot</div>
+    <span class="el-cat">shoot</span>
+  </div>
+
+  <!-- Gp17: halogen -->
+  <div class="el f-halogen" data-tip="Corner Kick&#10;Delivery shape.&#10;Near or far post target.">
+    <span class="el-num">25</span>
+    <div class="el-sym">Cor</div>
+    <div class="el-name">Corner Kick</div>
+    <span class="el-cat">set-piece</span>
+  </div>
+
+  <!-- Gp18: noble -->
+  <div class="el f-noble" data-tip="Mid-Game Control&#10;Possession with purpose.&#10;Slow to accelerate later.">
+    <span class="el-num">26</span>
+    <div class="el-sym">MGc</div>
+    <div class="el-name">Mid-Game Control</div>
+    <span class="el-cat">IQ</span>
+  </div>
+
+  <!-- PERIOD 3 ─────────────────────────────────── -->
+  <div class="period-label">P3</div>
+
+  <div class="el f-alkali" data-tip="Overload Scan&#10;Count bodies in zone.&#10;Who has the numbers?">
+    <span class="el-num">27</span>
+    <div class="el-sym">OvSc</div>
+    <div class="el-name">Overload Scan</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <div class="el f-alkaline" data-tip="Third-man Run&#10;Dummy the pass.&#10;Move after giving it.">
+    <span class="el-num">28</span>
+    <div class="el-sym">ThM</div>
+    <div class="el-name">Third-man Run</div>
+    <span class="el-cat">position</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Drag-back Settle&#10;Pull ball away from press.&#10;Reset your angle.">
+    <span class="el-num">29</span>
+    <div class="el-sym">DrgB</div>
+    <div class="el-name">Drag-back Settle</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Body-shape Control&#10;Open body pre-touch.&#10;Exit direction set early.">
+    <span class="el-num">30</span>
+    <div class="el-sym">BdyC</div>
+    <div class="el-name">Body-shape Control</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="1-Touch Redirect&#10;Zero settle. Re-route ball&#10;with single contact.">
+    <span class="el-num">31</span>
+    <div class="el-sym">1TR</div>
+    <div class="el-name">1-Touch Redirect</div>
+    <span class="el-cat">economy</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Zero Contact&#10;Let ball run through.&#10;Deceive with stillness.">
+    <span class="el-num">32</span>
+    <div class="el-sym">ZrC</div>
+    <div class="el-name">Zero Contact</div>
+    <span class="el-cat">economy</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Inside-Cut Carry&#10;Drive in on the angle.&#10;Forces defensive shift.">
+    <span class="el-num">33</span>
+    <div class="el-sym">IcC</div>
+    <div class="el-name">Inside-Cut Carry</div>
+    <span class="el-cat">carry</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Wide-open Burst&#10;Full speed, open field.&#10;Don't slow to control.">
+    <span class="el-num">34</span>
+    <div class="el-sym">WdB</div>
+    <div class="el-name">Wide-open Burst</div>
+    <span class="el-cat">sprint</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Acceleration Sprint&#10;0→max in 10m.&#10;Burst from standing.">
+    <span class="el-num">35</span>
+    <div class="el-sym">AcS</div>
+    <div class="el-name">Acceleration Sprint</div>
+    <span class="el-cat">sprint</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Feint & Shield&#10;Fake direction then&#10;use body to hold ball.">
+    <span class="el-num">36</span>
+    <div class="el-sym">FnS</div>
+    <div class="el-name">Feint & Shield</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Draw Tackle&#10;Invite the foul.&#10;Win the free kick.">
+    <span class="el-num">37</span>
+    <div class="el-sym">DrT</div>
+    <div class="el-name">Draw Tackle</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Create Pass Lane&#10;Hold & turn until&#10;the lane opens behind.">
+    <span class="el-num">38</span>
+    <div class="el-sym">CrPL</div>
+    <div class="el-name">Create Pass Lane</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <div class="el f-post" data-tip="L-Cut&#10;Check away then&#10;receive in the space.">
+    <span class="el-num">39</span>
+    <div class="el-sym">LCt</div>
+    <div class="el-name">L-Cut</div>
+    <span class="el-cat">feint</span>
+  </div>
+
+  <div class="el f-metalloid" data-tip="Roulette&#10;360° turn under challenge.&#10;Exit behind the defender.">
+    <span class="el-num">40</span>
+    <div class="el-sym">Rou</div>
+    <div class="el-name">Roulette</div>
+    <span class="el-cat">deceive</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Volley&#10;Strike before it bounces.&#10;Power or redirect.">
+    <span class="el-num">41</span>
+    <div class="el-sym">Vol</div>
+    <div class="el-name">Volley</div>
+    <span class="el-cat">shoot</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Header — Redirect&#10;Angle across goal.&#10;Near post placement.">
+    <span class="el-num">42</span>
+    <div class="el-sym">HdR</div>
+    <div class="el-name">Header Redirect</div>
+    <span class="el-cat">shoot</span>
+  </div>
+
+  <div class="el f-halogen" data-tip="Penalty Kick&#10;Psychology first.&#10;Pick side. Commit.">
+    <span class="el-num">43</span>
+    <div class="el-sym">Pen</div>
+    <div class="el-name">Penalty Kick</div>
+    <span class="el-cat">set-piece</span>
+  </div>
+
+  <div class="el f-noble" data-tip="Winning State&#10;Protect the lead.&#10;Slow tempo. Make safe passes.">
+    <span class="el-num">44</span>
+    <div class="el-sym">WnG</div>
+    <div class="el-name">Winning State</div>
+    <span class="el-cat">IQ</span>
+  </div>
+
+  <!-- PERIOD 4 ─────────────────────────────────── -->
+  <div class="period-label">P4</div>
+
+  <div class="el f-alkali" data-tip="Angle Scan&#10;Find the shooting hotspot.&#10;Is the lane clear?">
+    <span class="el-num">45</span>
+    <div class="el-sym">AnSc</div>
+    <div class="el-name">Angle Scan</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <div class="el f-alkaline" data-tip="Wide Pin&#10;Stretch the defensive&#10;shape by holding wide.">
+    <span class="el-num">46</span>
+    <div class="el-sym">WdP</div>
+    <div class="el-name">Wide Pin</div>
+    <span class="el-cat">position</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Turn to Space&#10;First touch exits pressure.&#10;Face play, not defender.">
+    <span class="el-num">47</span>
+    <div class="el-sym">TrSp</div>
+    <div class="el-name">Turn to Space</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Lay-off Setup&#10;Receive, set for runner.&#10;Move after the pass.">
+    <span class="el-num">48</span>
+    <div class="el-sym">LyO</div>
+    <div class="el-name">Lay-off Setup</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Wall Pass (1-2)&#10;Pass and move.&#10;Receive in behind.">
+    <span class="el-num">49</span>
+    <div class="el-sym">WlP</div>
+    <div class="el-name">Wall Pass 1-2</div>
+    <span class="el-cat">economy</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Re-onboard Touch&#10;Learner's reset move.&#10;Slow down to catch up.">
+    <span class="el-num">50</span>
+    <div class="el-sym">ReO</div>
+    <div class="el-name">Re-onboard Touch</div>
+    <span class="el-cat">economy</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Diagonal Carry&#10;Cross zones via diagonal.&#10;Harder to press.">
+    <span class="el-num">51</span>
+    <div class="el-sym">DiC</div>
+    <div class="el-name">Diagonal Carry</div>
+    <span class="el-cat">carry</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Pressing Sprint&#10;Close down at pace.&#10;Angle the body to force.">
+    <span class="el-num">52</span>
+    <div class="el-sym">PrS</div>
+    <div class="el-name">Pressing Sprint</div>
+    <span class="el-cat">press</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Tackle Break&#10;Ride the challenge.&#10;Stay upright.">
+    <span class="el-num">53</span>
+    <div class="el-sym">TkB</div>
+    <div class="el-name">Tackle Break</div>
+    <span class="el-cat">sprint</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Advance Position&#10;While shielding, inch forward.&#10;Win space not just time.">
+    <span class="el-num">54</span>
+    <div class="el-sym">AdvP</div>
+    <div class="el-name">Advance Position</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Buy Time&#10;Hold until shape restores.&#10;Seconds = teammates.">
+    <span class="el-num">55</span>
+    <div class="el-sym">BuT</div>
+    <div class="el-name">Buy Time</div>
+    <span class="el-cat">1v1</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Jockey Delay&#10;Don't dive in.&#10;Show them outside.">
+    <span class="el-num">56</span>
+    <div class="el-sym">Jky</div>
+    <div class="el-name">Jockey Delay</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-post" data-tip="Elastico&#10;Outside-in flick.&#10;Changes direction instantly.">
+    <span class="el-num">57</span>
+    <div class="el-sym">Ela</div>
+    <div class="el-name">Elastico</div>
+    <span class="el-cat">feint</span>
+  </div>
+
+  <div class="el f-metalloid" data-tip="Dummy Run&#10;Dummy the ball.&#10;Let it through to runner.">
+    <span class="el-num">58</span>
+    <div class="el-sym">Dmm</div>
+    <div class="el-name">Dummy Run</div>
+    <span class="el-cat">deceive</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Near Post Shot&#10;Fast. Low. Keeper can't&#10;recover the angle.">
+    <span class="el-num">59</span>
+    <div class="el-sym">NPc</div>
+    <div class="el-name">Near Post Shot</div>
+    <span class="el-cat">zone</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Far Post Arrival&#10;Time the run to meet&#10;cross at the back stick.">
+    <span class="el-num">60</span>
+    <div class="el-sym">FPa</div>
+    <div class="el-name">Far Post Arrival</div>
+    <span class="el-cat">zone</span>
+  </div>
+
+  <div class="el f-halogen" data-tip="Throw-in Attack&#10;Use throw to bypass&#10;the press instantly.">
+    <span class="el-num">61</span>
+    <div class="el-sym">ThI</div>
+    <div class="el-name">Throw-in Attack</div>
+    <span class="el-cat">set-piece</span>
+  </div>
+
+  <div class="el f-noble" data-tip="Losing State&#10;Open the game.&#10;Risk up, compact less.">
+    <span class="el-num">62</span>
+    <div class="el-sym">LsG</div>
+    <div class="el-name">Losing State</div>
+    <span class="el-cat">IQ</span>
+  </div>
+
+  <!-- PERIOD 5 ─────────────────────────────────── -->
+  <div class="period-label">P5</div>
+
+  <div class="el f-alkali" data-tip="Pre-scan (before receive)&#10;Neck check before&#10;ball reaches your foot.">
+    <span class="el-num">63</span>
+    <div class="el-sym">Pre</div>
+    <div class="el-name">Pre-scan</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <div class="el f-alkaline" data-tip="Shadow Cover&#10;Mark blind-side.&#10;Stay goal-side always.">
+    <span class="el-num">64</span>
+    <div class="el-sym">ShC</div>
+    <div class="el-name">Shadow Cover</div>
+    <span class="el-cat">position</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Shield from Press&#10;Protect as you control.&#10;Scan before you turn.">
+    <span class="el-num">65</span>
+    <div class="el-sym">ShP</div>
+    <div class="el-name">Shield from Press</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Recycle the Play&#10;When nothing's on,&#10;go back. Reset.">
+    <span class="el-num">66</span>
+    <div class="el-sym">RcP</div>
+    <div class="el-name">Recycle Play</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Weak Foot Receive&#10;Train until non-dominant&#10;foot handles all zones.">
+    <span class="el-num">67</span>
+    <div class="el-sym">WkF</div>
+    <div class="el-name">Weak Foot Receive</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Post-scan&#10;Look up after controlling.&#10;Confirm what's changed.">
+    <span class="el-num">68</span>
+    <div class="el-sym">Pst</div>
+    <div class="el-name">Post-scan</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Tight Carry&#10;Ball within 1m.&#10;Dribble in traffic.">
+    <span class="el-num">69</span>
+    <div class="el-sym">TgC</div>
+    <div class="el-name">Tight Carry</div>
+    <span class="el-cat">carry</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Deceleration&#10;Slow to deceive.&#10;Defender overruns.">
+    <span class="el-num">70</span>
+    <div class="el-sym">Dec</div>
+    <div class="el-name">Deceleration</div>
+    <span class="el-cat">sprint</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Counter-run&#10;Trigger the run on&#10;the moment of turnover.">
+    <span class="el-num">71</span>
+    <div class="el-sym">CnR</div>
+    <div class="el-name">Counter-run</div>
+    <span class="el-cat">sprint</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Tackle Timing&#10;Read the plant foot.&#10;Commit only then.">
+    <span class="el-num">72</span>
+    <div class="el-sym">TkT</div>
+    <div class="el-name">Tackle Timing</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Angled Press&#10;Force play into&#10;weaker side or line.">
+    <span class="el-num">73</span>
+    <div class="el-sym">AnP</div>
+    <div class="el-name">Angled Press</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Aerial Duel&#10;Jump timing + body shape.&#10;Win the flick-on.">
+    <span class="el-num">74</span>
+    <div class="el-sym">AeD</div>
+    <div class="el-name">Aerial Duel</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-post" data-tip="Matthews Move&#10;Shift outside, explode inside.&#10;Classic winger opener.">
+    <span class="el-num">75</span>
+    <div class="el-sym">Mat</div>
+    <div class="el-name">Matthews Move</div>
+    <span class="el-cat">feint</span>
+  </div>
+
+  <div class="el f-metalloid" data-tip="Overlap Decoy&#10;Run the overlap to&#10;open the inside lane.">
+    <span class="el-num">76</span>
+    <div class="el-sym">OvD</div>
+    <div class="el-name">Overlap Decoy</div>
+    <span class="el-cat">deceive</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Low Corner Shot&#10;Ground-hugging.&#10;Hardest for GK.">
+    <span class="el-num">77</span>
+    <div class="el-sym">LwC</div>
+    <div class="el-name">Low Corner</div>
+    <span class="el-cat">zone</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="High Corner Shot&#10;Top bin. Power&#10;or dipping curve.">
+    <span class="el-num">78</span>
+    <div class="el-sym">HgC</div>
+    <div class="el-name">High Corner</div>
+    <span class="el-cat">zone</span>
+  </div>
+
+  <div class="el f-halogen" data-tip="Kick-off Press&#10;Set counter-press&#10;from the first whistle.">
+    <span class="el-num">79</span>
+    <div class="el-sym">KoP</div>
+    <div class="el-name">Kick-off Press</div>
+    <span class="el-cat">set-piece</span>
+  </div>
+
+  <div class="el f-noble" data-tip="Draw State&#10;One goal wins it.&#10;Stay compact. Wait.">
+    <span class="el-num">80</span>
+    <div class="el-sym">DrG</div>
+    <div class="el-name">Draw State</div>
+    <span class="el-cat">IQ</span>
+  </div>
+
+  <!-- PERIOD 6 ─────────────────────────────────── -->
+  <div class="period-label">P6</div>
+
+  <div class="el f-alkali" data-tip="Shooting Hotspot Scan&#10;Read the angle before&#10;the ball arrives.">
+    <span class="el-num">81</span>
+    <div class="el-sym">HtSc</div>
+    <div class="el-name">Hotspot Scan</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <div class="el f-alkaline" data-tip="Overlap Run&#10;Carry the fullback&#10;run as winger holds.">
+    <span class="el-num">82</span>
+    <div class="el-sym">OvR</div>
+    <div class="el-name">Overlap Run</div>
+    <span class="el-cat">position</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Juggling (touch training)&#10;Not a match skill.&#10;Pure touch calibration.">
+    <span class="el-num">83</span>
+    <div class="el-sym">Jgl</div>
+    <div class="el-name">Juggling</div>
+    <span class="el-cat">training</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Coervers Drill&#10;Inside-outside roll&#10;at speed. Muscle memory.">
+    <span class="el-num">84</span>
+    <div class="el-sym">Coe</div>
+    <div class="el-name">Coervers Drill</div>
+    <span class="el-cat">training</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Lofted Pass&#10;Weight over the line.&#10;Land softly for runner.">
+    <span class="el-num">85</span>
+    <div class="el-sym">LftP</div>
+    <div class="el-name">Lofted Pass</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Driven Pass&#10;Fast ground ball.&#10;Pace = pressure release.">
+    <span class="el-num">86</span>
+    <div class="el-sym">DrvP</div>
+    <div class="el-name">Driven Pass</div>
+    <span class="el-cat">control</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Press-to-Dispossess&#10;Sprint then steal.&#10;Don't just block.">
+    <span class="el-num">87</span>
+    <div class="el-sym">PrD</div>
+    <div class="el-name">Press-Dispossess</div>
+    <span class="el-cat">destroy</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Sliding Tackle&#10;Last resort only.&#10;Get the ball, not the man.">
+    <span class="el-num">88</span>
+    <div class="el-sym">SldT</div>
+    <div class="el-name">Sliding Tackle</div>
+    <span class="el-cat">destroy</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Transition Attack&#10;Ball won → sprint forward&#10;in 3 seconds max.">
+    <span class="el-num">89</span>
+    <div class="el-sym">TrA</div>
+    <div class="el-name">Transition Attack</div>
+    <span class="el-cat">destroy</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Interception Read&#10;Step the passing lane.&#10;Anticipate, don't react.">
+    <span class="el-num">90</span>
+    <div class="el-sym">IntR</div>
+    <div class="el-name">Interception Read</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="High Block&#10;Compact 4-4-2.&#10;Force long ball.">
+    <span class="el-num">91</span>
+    <div class="el-sym">HiB</div>
+    <div class="el-name">High Block</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Low Block&#10;Deep 5-4-1.&#10;No space behind.">
+    <span class="el-num">92</span>
+    <div class="el-sym">LoB</div>
+    <div class="el-name">Low Block</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-post" data-tip="Heel Flick&#10;Backheel to runner.&#10;Eyes forward, pass back.">
+    <span class="el-num">93</span>
+    <div class="el-sym">HeF</div>
+    <div class="el-name">Heel Flick</div>
+    <span class="el-cat">feint</span>
+  </div>
+
+  <div class="el f-metalloid" data-tip="Body Feint&#10;Lean one way.&#10;Go the other.">
+    <span class="el-num">94</span>
+    <div class="el-sym">BdF</div>
+    <div class="el-name">Body Feint</div>
+    <span class="el-cat">deceive</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="1v1 Finish (GK)&#10;Placement not power.&#10;Go low far post.">
+    <span class="el-num">95</span>
+    <div class="el-sym">1vG</div>
+    <div class="el-name">1v1 vs GK</div>
+    <span class="el-cat">finish</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Cut-back Square&#10;Pull to the penalty spot.&#10;Shooter arrives unmarked.">
+    <span class="el-num">96</span>
+    <div class="el-sym">CbSq</div>
+    <div class="el-name">Cut-back Square</div>
+    <span class="el-cat">setup</span>
+  </div>
+
+  <div class="el f-halogen" data-tip="Goal Kick Build&#10;Goalkeeper to CB.&#10;Don't launch aimlessly.">
+    <span class="el-num">97</span>
+    <div class="el-sym">GkB</div>
+    <div class="el-name">Goal Kick Build</div>
+    <span class="el-cat">set-piece</span>
+  </div>
+
+  <div class="el f-noble" data-tip="Late Game IQ&#10;Close it out or&#10;open it up. Decide.">
+    <span class="el-num">98</span>
+    <div class="el-sym">LtG</div>
+    <div class="el-name">Late Game IQ</div>
+    <span class="el-cat">IQ</span>
+  </div>
+
+  <!-- PERIOD 7 ─────────────────────────────────── -->
+  <div class="period-label">P7</div>
+
+  <div class="el f-alkali" data-tip="Post-scan Confirm&#10;Ball played. Look again.&#10;Picture has changed.">
+    <span class="el-num">99</span>
+    <div class="el-sym">PsC</div>
+    <div class="el-name">Post-scan Confirm</div>
+    <span class="el-cat">scan</span>
+  </div>
+
+  <div class="el f-alkaline" data-tip="6-yard Box Attack&#10;Arrive at the right moment.&#10;Don't be early.">
+    <span class="el-num">100</span>
+    <div class="el-sym">SyB</div>
+    <div class="el-name">6-yard Box Attack</div>
+    <span class="el-cat">position</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Possession Build&#10;Slow it down.&#10;Make them chase.">
+    <span class="el-num">101</span>
+    <div class="el-sym">PoB</div>
+    <div class="el-name">Possession Build</div>
+    <span class="el-cat">chain</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Press Trigger&#10;One signal. All press.&#10;Coordinate or don't bother.">
+    <span class="el-num">102</span>
+    <div class="el-sym">PrT</div>
+    <div class="el-name">Press Trigger</div>
+    <span class="el-cat">chain</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Overload & Release&#10;Build the 2v1.&#10;Release the spare man.">
+    <span class="el-num">103</span>
+    <div class="el-sym">OvL</div>
+    <div class="el-name">Overload Release</div>
+    <span class="el-cat">chain</span>
+  </div>
+
+  <div class="el f-trans-a" data-tip="Shape Reset&#10;After ball loss: find&#10;your zone. 5 seconds.">
+    <span class="el-num">104</span>
+    <div class="el-sym">ShR</div>
+    <div class="el-name">Shape Reset</div>
+    <span class="el-cat">chain</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="High-Press Burst&#10;Sprint 10m at 90% max.&#10;Close the GK.">
+    <span class="el-num">105</span>
+    <div class="el-sym">HiPB</div>
+    <div class="el-name">High-Press Burst</div>
+    <span class="el-cat">press</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Interception Sprint&#10;Read the pass line.&#10;Move before ball moves.">
+    <span class="el-num">106</span>
+    <div class="el-sym">IntS</div>
+    <div class="el-name">Interception Sprint</div>
+    <span class="el-cat">destroy</span>
+  </div>
+
+  <div class="el f-trans-b" data-tip="Goalside Recovery&#10;Sprint back between&#10;ball and your own goal.">
+    <span class="el-num">107</span>
+    <div class="el-sym">GsR</div>
+    <div class="el-name">Goalside Recovery</div>
+    <span class="el-cat">sprint</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Defensive Header&#10;Height + distance.&#10;Punch it to safety.">
+    <span class="el-num">108</span>
+    <div class="el-sym">DfH</div>
+    <div class="el-name">Defensive Header</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Block Shot&#10;Get any body part&#10;in the trajectory.">
+    <span class="el-num">109</span>
+    <div class="el-sym">BlkS</div>
+    <div class="el-name">Block Shot</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-trans-c" data-tip="Cover Shadow&#10;Position so you cover&#10;two opponents at once.">
+    <span class="el-num">110</span>
+    <div class="el-sym">CvS</div>
+    <div class="el-name">Cover Shadow</div>
+    <span class="el-cat">defend</span>
+  </div>
+
+  <div class="el f-post" data-tip="First-time Pass-shoot&#10;Receive angle is shoot angle.&#10;Don't settle. Strike.">
+    <span class="el-num">111</span>
+    <div class="el-sym">FtPs</div>
+    <div class="el-name">First-time Pass-shoot</div>
+    <span class="el-cat">setup</span>
+  </div>
+
+  <div class="el f-metalloid" data-tip="Backheel Pass&#10;Disguised exit.&#10;Eyes forward, ball back.">
+    <span class="el-num">112</span>
+    <div class="el-sym">BkH</div>
+    <div class="el-name">Backheel Pass</div>
+    <span class="el-cat">deceive</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Chip Shot&#10;Lob the GK.&#10;Read their position first.">
+    <span class="el-num">113</span>
+    <div class="el-sym">Chp</div>
+    <div class="el-name">Chip Shot</div>
+    <span class="el-cat">shoot</span>
+  </div>
+
+  <div class="el f-nonmetal" data-tip="Penalty Spot Finish&#10;Ideal distance.&#10;Every player must practice.">
+    <span class="el-num">114</span>
+    <div class="el-sym">PnF</div>
+    <div class="el-name">Penalty Spot Finish</div>
+    <span class="el-cat">finish</span>
+  </div>
+
+  <div class="el f-halogen" data-tip="Quick Free Kick&#10;Don't wait for wall.&#10;Catch them off-guard.">
+    <span class="el-num">115</span>
+    <div class="el-sym">QFk</div>
+    <div class="el-name">Quick Free Kick</div>
+    <span class="el-cat">set-piece</span>
+  </div>
+
+  <div class="el f-noble" data-tip="Transition Moment IQ&#10;Ball won or lost?&#10;React in 1 second.">
+    <span class="el-num">116</span>
+    <div class="el-sym">TrM</div>
+    <div class="el-name">Transition Moment</div>
+    <span class="el-cat">IQ</span>
+  </div>
+
+  <!-- separator row -->
+  <div class="pt-sep"></div>
+
+  <!-- LANTHANIDES — Tactical Roles ─────────────── -->
+  <div class="period-label">Roles</div>
+
+  <div class="empty"></div><div class="empty"></div><!-- offset cols 1-2 -->
+
+  <div class="el f-lant" data-tip="Anchor&#10;Hold the base.&#10;No unnecessary runs.">
+    <span class="el-num">Lr1</span>
+    <div class="el-sym">Anc</div>
+    <div class="el-name">Anchor</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Relay&#10;2-touch link.&#10;Connect zones.">
+    <span class="el-num">Lr2</span>
+    <div class="el-sym">Rly</div>
+    <div class="el-name">Relay</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Breaker&#10;Win the ball.&#10;Start counters.">
+    <span class="el-num">Lr3</span>
+    <div class="el-sym">Brk</div>
+    <div class="el-name">Breaker</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Finisher&#10;Arrive late.&#10;Finish with one touch.">
+    <span class="el-num">Lr4</span>
+    <div class="el-sym">Fin</div>
+    <div class="el-name">Finisher</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Overlap Runner&#10;Third-man channel.&#10;Arrive as the wall pass clears.">
+    <span class="el-num">Lr5</span>
+    <div class="el-sym">Ovr</div>
+    <div class="el-name">Overlap Runner</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Wide Stretcher&#10;Pin the fullback.&#10;Don't come inside.">
+    <span class="el-num">Lr6</span>
+    <div class="el-sym">WdS</div>
+    <div class="el-name">Wide Stretcher</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Deep Lying Creator&#10;Drop deep. Receive.&#10;Play forward immediately.">
+    <span class="el-num">Lr7</span>
+    <div class="el-sym">DLC</div>
+    <div class="el-name">Deep Lying Creator</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Target Man&#10;Hold up ball.&#10;Bring others into play.">
+    <span class="el-num">Lr8</span>
+    <div class="el-sym">TgM</div>
+    <div class="el-name">Target Man</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Shadow Striker&#10;Live in the pocket.&#10;Turn and shoot.">
+    <span class="el-num">Lr9</span>
+    <div class="el-sym">ShSt</div>
+    <div class="el-name">Shadow Striker</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Inverted Winger&#10;Start wide.&#10;Cut inside to shoot.">
+    <span class="el-num">Lr10</span>
+    <div class="el-sym">InvW</div>
+    <div class="el-name">Inverted Winger</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Box-to-box Mid&#10;Everywhere.&#10;High work rate, both phases.">
+    <span class="el-num">Lr11</span>
+    <div class="el-sym">B2B</div>
+    <div class="el-name">Box-to-box Mid</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Goalkeeper Sweeper&#10;Reads long balls.&#10;First outfield player.">
+    <span class="el-num">Lr12</span>
+    <div class="el-sym">GkSw</div>
+    <div class="el-name">GK Sweeper</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="Ball-playing CB&#10;Start build-up.&#10;Drive into space.">
+    <span class="el-num">Lr13</span>
+    <div class="el-sym">BpCB</div>
+    <div class="el-name">Ball-playing CB</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="el f-lant" data-tip="False 9&#10;Drop deep to drag CB.&#10;Create space behind.">
+    <span class="el-num">Lr14</span>
+    <div class="el-sym">F9</div>
+    <div class="el-name">False 9</div>
+    <span class="el-cat">role</span>
+  </div>
+
+  <div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div>
+
+  <!-- ACTINIDES — Doctrine / Anti-injury ───────── -->
+  <div class="period-label">Doctrine</div>
+
+  <div class="empty"></div><div class="empty"></div><!-- offset -->
+
+  <div class="el f-acti" data-tip="50% Fitness&#10;Non-negotiable foundation.&#10;Body before ball.">
+    <span class="el-num">Ac1</span>
+    <div class="el-sym">Fit</div>
+    <div class="el-name">Fitness First</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Dribble Budget&#10;≤7 dribbles/match standard.&#10;Open in semi-finals.">
+    <span class="el-num">Ac2</span>
+    <div class="el-sym">DbB</div>
+    <div class="el-name">Dribble Budget</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Ball > Runner&#10;A ball moves faster and&#10;more unpredictably.">
+    <span class="el-num">Ac3</span>
+    <div class="el-sym">BvR</div>
+    <div class="el-name">Ball over Runner</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Position > Possession&#10;Be in the right place&#10;before you touch it.">
+    <span class="el-num">Ac4</span>
+    <div class="el-sym">PvP</div>
+    <div class="el-name">Position > Possess</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Anti-injury&#10;Maximum gain.&#10;Never force flair.">
+    <span class="el-num">Ac5</span>
+    <div class="el-sym">AnI</div>
+    <div class="el-name">Anti-Injury</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Recover Before Attack&#10;Shape first.&#10;Then go forward.">
+    <span class="el-num">Ac6</span>
+    <div class="el-sym">RcA</div>
+    <div class="el-name">Recover First</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Probabilistic Play&#10;High % decisions.&#10;Compounded over 90min.">
+    <span class="el-num">Ac7</span>
+    <div class="el-sym">Prb</div>
+    <div class="el-name">Probabilistic</div>
+    <span class="el-cat">philosophy</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Romantic Play&#10;Valid and beautiful.&#10;Not a strategy. Let it emerge.">
+    <span class="el-num">Ac8</span>
+    <div class="el-sym">Rom</div>
+    <div class="el-name">Romantic</div>
+    <span class="el-cat">philosophy</span>
+  </div>
+
+  <div class="el f-acti" data-tip="30% Skill&#10;Treated as 100%&#10;once fitness clears.">
+    <span class="el-num">Ac9</span>
+    <div class="el-sym">Skl</div>
+    <div class="el-name">Skill Set</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="10% Teammates&#10;Select and elevate.&#10;Can't carry 10.">
+    <span class="el-num">Ac10</span>
+    <div class="el-sym">Tmm</div>
+    <div class="el-name">Teammate %</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="10% Coaching&#10;Context, not control.&#10;Player must self-organise.">
+    <span class="el-num">Ac11</span>
+    <div class="el-sym">Cch</div>
+    <div class="el-name">Coaching %</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Synechdoche&#10;Scan → Control → Carry →&#10;Shoot. The game in miniature.">
+    <span class="el-num">Ac12</span>
+    <div class="el-sym">Syn</div>
+    <div class="el-name">Game Synechdoche</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="el f-acti" data-tip="The Impossible Ideal&#10;1-touch, on target, every time.&#10;Play toward it. Never reach it.">
+    <span class="el-num">Ac13</span>
+    <div class="el-sym">Idl</div>
+    <div class="el-name">Impossible Ideal</div>
+    <span class="el-cat">philosophy</span>
+  </div>
+
+  <div class="el f-acti" data-tip="Discomfort = Data&#10;Pain is feedback.&#10;Adjust before it becomes injury.">
+    <span class="el-num">Ac14</span>
+    <div class="el-sym">DcD</div>
+    <div class="el-name">Discomfort = Data</div>
+    <span class="el-cat">doctrine</span>
+  </div>
+
+  <div class="empty"></div><div class="empty"></div><div class="empty"></div><div class="empty"></div>
+
+</div><!-- .pt-grid -->
+</div><!-- .pt-wrapper -->
+
+
+<!-- ── DOCTRINE SUMMARY ─────────────────────────────── -->
+<div class="doctrine">
+  <h2>The Doctrine</h2>
+  <div class="doctrine-row">
+    <div class="doctrine-cell fitness">
+      <div class="d-pct">50%</div>
+      <div class="d-label">Fitness</div>
+      <div class="d-note">Non-negotiable. Nothing else exists until this clears.</div>
+    </div>
+    <div class="doctrine-cell skill">
+      <div class="d-pct">30%</div>
+      <div class="d-label">Skill Set</div>
+      <div class="d-note">Treated as 100% once fitness is satisfied.</div>
+    </div>
+    <div class="doctrine-cell team">
+      <div class="d-pct">10%</div>
+      <div class="d-label">Teammates</div>
+      <div class="d-note">Select carefully. Elevate by example.</div>
+    </div>
+    <div class="doctrine-cell coach">
+      <div class="d-pct">10%</div>
+      <div class="d-label">Coaching</div>
+      <div class="d-note">Context, not control. Self-organise first.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ANTI-INJURY RULES ─────────────────────────────── -->
+<div class="rules">
+  <h2>Anti-Injury / Maximum Gain Protocol</h2>
+  <div class="rules-grid">
+    <div class="rule-chip">≤ 7 dribbles per match (standard)</div>
+    <div class="rule-chip">Open dribble limit in semi-finals</div>
+    <div class="rule-chip">Ball moves faster than any runner</div>
+    <div class="rule-chip">Position before possession</div>
+    <div class="rule-chip">Recover before attacking</div>
+    <div class="rule-chip">Never force flair — earn it</div>
+    <div class="rule-chip">Discomfort is data, not failure</div>
+    <div class="rule-chip">5-second rule: shape after turnover</div>
+  </div>
+</div>
+
+<!-- ── PROBABILISTIC VS ROMANTIC ──────────────────────── -->
+<div class="phil">
+  <div class="phil-card prob">
+    <h3>⬡ Probabilistic</h3>
+    <ul>
+      <li>Maximum output, minimum touches</li>
+      <li>High % passes, compounded over 90min</li>
+      <li>Dribble budget strictly managed</li>
+      <li>Anticipation over reaction</li>
+      <li>Win small moments; scoreline follows</li>
+      <li>Probabilistic players always win in the end</li>
+    </ul>
+  </div>
+  <div class="phil-card rom">
+    <h3>♡ Romantic</h3>
+    <ul>
+      <li>Expressive, spontaneous, crowd-moving</li>
+      <li>High ceiling, high variance</li>
+      <li>Football's inherent beauty — never force it</li>
+      <li>Let it emerge from good probabilistic play</li>
+      <li>Valid, beautiful — not a tournament strategy</li>
+      <li>The game's inheritance, not its engine</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>
