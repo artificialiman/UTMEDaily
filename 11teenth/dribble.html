@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pausa & Dribble — Periodic Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Surface */
+  --pitch:      #060608;
+  --surface:    #0c0c10;
+  --border:     #1e1e28;
+  --chalk:      #f0ede6;
+  --chalk-dim:  #7a7570;
+  --chalk-faint:#1e1e22;
+
+  /* Dribble families — mapped to PT groups */
+  --aerial:     #2d6a8f;   /* Group 1  — Aerial / flick-on        */
+  --channel:    #1a6b5a;   /* Group 2  — Into channels             */
+  --pressure:   #7b3f00;   /* Group 3-5 — Back to / under pressure */
+  --touchline:  #5c2d8a;   /* Group 6-8 — Near touch line          */
+  --marker:     #8b1a1a;   /* Group 9-12 — Into marker space       */
+  --shooting:   #c0392b;   /* Group 13-15 — Into shooting spots    */
+  --pausa:      #e8a020;   /* Group 16-17 — Pausa / decel dribble  */
+  --noble:      #2e4057;   /* Group 18 — Game-state dribble IQ     */
+
+  --lant:       #1a472a;   /* Lanthanides — All-time dribblers     */
+  --acti:       #1a2e3a;   /* Actinides — Doctrine / budget        */
+
+  --cell: 90px;
+  --gap: 3px;
+  --mono: 'DM Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+  --body: 'Barlow Condensed', sans-serif;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--pitch);
+  color: var(--chalk);
+  font-family: var(--body);
+}
+
+body { padding: 44px 28px 80px; }
+
+/* ── HEADER ───────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-family: var(--display);
+  font-size: clamp(48px, 8vw, 108px);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+}
+
+h1 em { color: var(--pausa); font-style: normal; }
+
+.header-sub {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--chalk-dim);
+  margin-top: 14px;
+  max-width: 680px;
+  line-height: 1.65;
+}
+
+/* ── RECORD BAR ───────────────────────────────────── */
+.records {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 28px 0 32px;
+  max-width: 900px;
+}
+
+.rec {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--pausa);
+  padding: 10px 16px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.rec .r-comp {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+  margin-bottom: 4px;
+}
+
+.rec .r-num {
+  font-family: var(--display);
+  font-size: 36px;
+  color: var(--chalk);
+  line-height: 1;
+}
+
+.rec .r-num span { color: var(--pausa); }
+
+.rec .r-note {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--chalk-dim);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* world cup record — amber border */
+.rec.wc { border-top-color: var(--pausa); }
+.rec.wc .r-num span { color: var(--pausa); }
+.rec.ucl { border-top-color: var(--aerial); }
+.rec.ucl .r-num span { color: var(--aerial); }
+.rec.prem { border-top-color: var(--touchline); }
+.rec.prem .r-num span { color: var(--touchline); }
+.rec.liga { border-top-color: var(--channel); }
+.rec.liga .r-num span { color: var(--channel); }
+.rec.clasico { border-top-color: var(--shooting); }
+.rec.clasico .r-num span { color: var(--shooting); }
+
+/* ── LEGEND ───────────────────────────────────────── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-bottom: 28px;
+}
+
+.lg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--chalk-dim);
+}
+
+.lgsw {
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* ── PERIODIC TABLE GRID ──────────────────────────── */
+.pt-wrap { overflow-x: auto; padding-bottom: 8px; }
+
+/* 19 cols: period-label + 18 groups */
+.pt {
+  display: grid;
+  grid-template-columns: 22px repeat(18, var(--cell));
+  gap: var(--gap);
+  width: max-content;
+}
+
+/* row headers */
+.ph { /* period header */
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--chalk-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  letter-spacing: 0.08em;
+}
+
+.pl { /* period label */
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--chalk-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--cell);
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.sep {
+  grid-column: 1 / -1;
+  height: 16px;
+}
+
+/* ── ELEMENT CELL ─────────────────────────────────── */
+.el {
+  width: var(--cell);
+  height: var(--cell);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--c, var(--border));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px 4px;
+  position: relative;
+  cursor: default;
+  transition: background 0.12s, border-color 0.12s, transform 0.12s;
+}
+
+.el:hover {
+  background: #16161f;
+  border-color: var(--c, var(--chalk-dim));
+  transform: translateY(-2px);
+  z-index: 30;
+}
+
+.el .n  { position: absolute; top:4px; left:5px; font-family:var(--mono); font-size:8px; color:var(--chalk-dim); line-height:1; }
+.el .s  { font-family:var(--display); font-size:21px; color:var(--chalk); line-height:1; text-align:center; margin-top:2px; }
+.el .nm { font-family:var(--mono); font-size:7px; color:var(--chalk-dim); text-align:center; line-height:1.25; margin-top:3px; max-width:84px; }
+.el .ct { position:absolute; bottom:3px; right:4px; font-family:var(--mono); font-size:6.5px; color:var(--c,var(--chalk-dim)); opacity:0.85; }
+
+/* best dribbler badge */
+.el .db { position:absolute; top:3px; right:4px; font-family:var(--mono); font-size:7px; color:var(--c, var(--chalk-dim)); opacity:0.7; }
+
+/* ── TOOLTIP ──────────────────────────────────────── */
+.el::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #12121a;
+  border: 1px solid var(--c, var(--border));
+  color: var(--chalk);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.55;
+  padding: 9px 13px;
+  width: 220px;
+  white-space: pre-wrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 100;
+}
+
+.el:hover::after { opacity: 1; }
+
+.el.td::after { /* tip-down */
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+
+/* ── EMPTY / SPACER ───────────────────────────────── */
+.e { width:var(--cell); height:var(--cell); }
+
+/* ── FAMILY COLOUR HELPERS ────────────────────────── */
+.fa { --c: var(--aerial); }
+.fc { --c: var(--channel); }
+.fp { --c: var(--pressure); }
+.ft { --c: var(--touchline); }
+.fm { --c: var(--marker); }
+.fs { --c: var(--shooting); }
+.fpa { --c: var(--pausa); }
+.fn { --c: var(--noble); }
+.fl { --c: var(--lant); }
+.fac { --c: var(--acti); }
+
+/* ── DOCTRINE ─────────────────────────────────────── */
+.doc {
+  margin-top: 48px;
+  max-width: 860px;
+}
+
+.doc h2 {
+  font-family: var(--display);
+  font-size: 26px;
+  letter-spacing: 0.06em;
+  color: var(--pausa);
+  margin-bottom: 14px;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2px;
+}
+
+.doc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--pausa);
+  padding: 12px 16px;
+}
+
+.doc-card .dc-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pausa);
+  margin-bottom: 4px;
+}
+
+.doc-card p {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--chalk-dim);
+  line-height: 1.5;
+}
+
+/* ── RESPONSIVE ───────────────────────────────────── */
+@media (max-width: 640px) {
+  body { padding: 28px 14px 60px; }
+  :root { --cell: 72px; }
+  .el .s { font-size: 17px; }
+  .records { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .el { transition: none; }
+  .el::after { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────── -->
+<div class="eyebrow">Football · Pausa & Dribbling · Verified Opta Data</div>
+<h1>PAUSA<br>& <em>DRIBBLE</em></h1>
+<p class="header-sub">
+  Every dribble type mapped to its chemical family. Reactive metals initiate contact and explode.
+  Noble gases read the moment and decide not to dribble — which is often the highest skill.
+  Hover any element for the field instruction and the master who owns it.
+</p>
+
+<!-- ── RECORD BAR ───────────────────────────────────── -->
+<div class="records">
+  <div class="rec wc">
+    <div class="r-comp">World Cup</div>
+    <div class="r-num"><span>7</span></div>
+    <div class="r-note">Doctrine ceiling (standard matches).<br>Semi-finals: open.</div>
+  </div>
+  <div class="rec ucl">
+    <div class="r-comp">UCL — Single Match</div>
+    <div class="r-num"><span>21</span> att / <span>16</span> comp</div>
+    <div class="r-note">Messi vs Man Utd, 2008 semi.<br>Zanetti: 16/20 also confirmed Opta.</div>
+  </div>
+  <div class="rec prem">
+    <div class="r-comp">Premier League</div>
+    <div class="r-num"><span>16</span></div>
+    <div class="r-note">Adama Traoré vs Watford,<br>New Year's Day 2020 (16/20).</div>
+  </div>
+  <div class="rec liga">
+    <div class="r-comp">La Liga</div>
+    <div class="r-num"><span>22</span></div>
+    <div class="r-note">Messi vs Almería, March 2010.<br>Opta all-time single-match high.</div>
+  </div>
+  <div class="rec clasico">
+    <div class="r-comp">El Clásico</div>
+    <div class="r-num"><span>18</span></div>
+    <div class="r-note">Messi single-match career best (Opta).<br>Ronaldo: 14 — UCL vs Roma, confirmed.</div>
+  </div>
+</div>
+
+<!-- ── LEGEND ─────────────────────────────────────────── -->
+<div class="legend">
+  <div class="lg"><div class="lgsw" style="background:var(--aerial)"></div>Gr 1 — Aerial / Flick-on</div>
+  <div class="lg"><div class="lgsw" style="background:var(--channel)"></div>Gr 2 — Into Channels</div>
+  <div class="lg"><div class="lgsw" style="background:var(--pressure)"></div>Gr 3–5 — Back to Pressure</div>
+  <div class="lg"><div class="lgsw" style="background:var(--touchline)"></div>Gr 6–8 — Near Touchline</div>
+  <div class="lg"><div class="lgsw" style="background:var(--marker)"></div>Gr 9–12 — Into Marker Space</div>
+  <div class="lg"><div class="lgsw" style="background:var(--shooting)"></div>Gr 13–15 — Into Shooting Spots</div>
+  <div class="lg"><div class="lgsw" style="background:var(--pausa)"></div>Gr 16–17 — Pausa / Decel</div>
+  <div class="lg"><div class="lgsw" style="background:var(--noble)"></div>Gr 18 — Dribble IQ / Don't</div>
+  <div class="lg"><div class="lgsw" style="background:var(--lant)"></div>Lanthanides — All-time Masters</div>
+  <div class="lg"><div class="lgsw" style="background:var(--acti)"></div>Actinides — Doctrine</div>
+</div>
+
+<!-- ── PERIODIC TABLE ──────────────────────────────────── -->
+<div class="pt-wrap">
+<div class="pt">
+
+  <!-- group header row -->
+  <div></div>
+  <div class="ph">1</div><div class="ph">2</div><div class="ph">3</div>
+  <div class="ph">4</div><div class="ph">5</div><div class="ph">6</div>
+  <div class="ph">7</div><div class="ph">8</div><div class="ph">9</div>
+  <div class="ph">10</div><div class="ph">11</div><div class="ph">12</div>
+  <div class="ph">13</div><div class="ph">14</div><div class="ph">15</div>
+  <div class="ph">16</div><div class="ph">17</div><div class="ph">18</div>
+
+  <!-- ═══ PERIOD 1 — Pure technique, single-touch dribbles ═══ -->
+  <div class="pl">P1</div>
+
+  <!-- Gr1: Aerial -->
+  <div class="el fa td" data-tip="Aerial Flick-on&#10;Meet the ball above shoulder height.&#10;Redirect into space. Don't trap, flow.&#10;→ Master: Ibrahimović">
+    <span class="n">1</span><div class="s">FlkO</div>
+    <div class="nm">Aerial Flick-on</div>
+    <span class="db">Ibra</span>
+    <span class="ct">aerial</span>
+  </div>
+
+  <!-- Gr2: Channel -->
+  <div class="el fc td" data-tip="Channel Run Dribble&#10;Burst into the corridor&#10;between fullback & CB.&#10;→ Master: Mbappé">
+    <span class="n">2</span><div class="s">ChDr</div>
+    <div class="nm">Channel Run Dribble</div>
+    <span class="db">Mbappé</span>
+    <span class="ct">channel</span>
+  </div>
+
+  <!-- Gr3-12: empty period 1 -->
+  <div class="e"></div><div class="e"></div><div class="e"></div>
+  <div class="e"></div><div class="e"></div><div class="e"></div>
+  <div class="e"></div><div class="e"></div><div class="e"></div>
+  <div class="e"></div>
+
+  <!-- Gr13: shooting -->
+  <div class="el fs td" data-tip="Penalty Box Entry&#10;One touch into the box.&#10;Position for the shot immediately.&#10;→ Master: Ronaldo '09">
+    <span class="n">3</span><div class="s">PbEn</div>
+    <div class="nm">Penalty Box Entry</div>
+    <span class="db">CR7</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <!-- Gr14: pausa -->
+  <div class="el fpa td" data-tip="Dead Stop Pause&#10;Kill momentum entirely.&#10;Defender can't react.&#10;→ Master: Xavi Hernández">
+    <span class="n">4</span><div class="s">DStP</div>
+    <div class="nm">Dead Stop Pause</div>
+    <span class="db">Xavi</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr15: pausa -->
+  <div class="el fpa td" data-tip="Tempo Change (Pausa)&#10;Slow to fast in one step.&#10;The dribble that isn't.&#10;→ Master: Pirlo">
+    <span class="n">5</span><div class="s">TpCh</div>
+    <div class="nm">Tempo Change</div>
+    <span class="db">Pirlo</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr16-17: pausa -->
+  <div class="el fpa td" data-tip="Hesitation Step&#10;Plant one foot, sell the move.&#10;Go the other way.&#10;→ Master: Hazard">
+    <span class="n">6</span><div class="s">HesS</div>
+    <div class="nm">Hesitation Step</div>
+    <span class="db">Hazard</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <div class="el fn td" data-tip="Don't Dribble (IQ)&#10;Noble gas. Inert by choice.&#10;The pass was always on.&#10;→ Master: Busquets">
+    <span class="n">7</span><div class="s">NoDb</div>
+    <div class="nm">Don't Dribble</div>
+    <span class="db">Busquets</span>
+    <span class="ct">IQ</span>
+  </div>
+
+  <div class="el fn td" data-tip="Release Before Contact&#10;Give it before they arrive.&#10;The anticipation dribble.&#10;→ Master: Iniesta">
+    <span class="n">8</span><div class="s">RelB</div>
+    <div class="nm">Release Before Contact</div>
+    <span class="db">Iniesta</span>
+    <span class="ct">IQ</span>
+  </div>
+
+  <!-- ═══ PERIOD 2 — Touchline & ground dribbles ═══ -->
+  <div class="pl">P2</div>
+
+  <!-- Gr1: Aerial -->
+  <div class="el fa" data-tip="Lofted Ball Control-Dribble&#10;Chest or thigh kill into carry.&#10;One motion — no separate settle.&#10;→ Master: Trézéguet">
+    <span class="n">9</span><div class="s">LftC</div>
+    <div class="nm">Lofted Ball Carry</div>
+    <span class="db">Tréz</span>
+    <span class="ct">aerial</span>
+  </div>
+
+  <!-- Gr2: Channel -->
+  <div class="el fc" data-tip="Line-breaking Carry&#10;Receive facing forward.&#10;Drive through the midfield line.&#10;→ Master: Vidal">
+    <span class="n">10</span><div class="s">LnBr</div>
+    <div class="nm">Line-breaking Carry</div>
+    <span class="db">Vidal</span>
+    <span class="ct">channel</span>
+  </div>
+
+  <!-- Gr3: Back to pressure — transition metals start -->
+  <div class="el fp" data-tip="Back-to-goal Dribble&#10;Receive with defender on back.&#10;Hold, spin, go.&#10;→ Master: Firmino">
+    <span class="n">11</span><div class="s">BkGl</div>
+    <div class="nm">Back-to-Goal Dribble</div>
+    <span class="db">Firmino</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="Turn Under Pressure&#10;Dragback or spin to exit.&#10;Only if scan said GO.&#10;→ Master: Messi (vs press)">
+    <span class="n">12</span><div class="s">TuPr</div>
+    <div class="nm">Turn Under Pressure</div>
+    <span class="db">Messi</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="Recycle Dribble&#10;Protect, assess, go back.&#10;The dribble that gives the pass.&#10;→ Master: Kroos">
+    <span class="n">13</span><div class="s">RcDr</div>
+    <div class="nm">Recycle Dribble</div>
+    <span class="db">Kroos</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <!-- Gr6-8: Touchline -->
+  <div class="el ft" data-tip="Touchline Hug Dribble&#10;Stay 1 metre from the line.&#10;Force defender to one side.&#10;→ Master: Robben">
+    <span class="n">14</span><div class="s">TlHg</div>
+    <div class="nm">Touchline Hug</div>
+    <span class="db">Robben</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Touchline Burst&#10;Sprint along the line at pace.&#10;Defender can't cut inside.&#10;→ Master: Salah">
+    <span class="n">15</span><div class="s">TlBu</div>
+    <div class="nm">Touchline Burst</div>
+    <span class="db">Salah</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Touchline Cutback Setup&#10;Carry to byline.&#10;Square to penalty spot.&#10;→ Master: Traoré">
+    <span class="n">16</span><div class="s">TlCb</div>
+    <div class="nm">Touchline Cutback</div>
+    <span class="db">Traoré</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <!-- Gr9-12: Marker space -->
+  <div class="el fm" data-tip="Into Marker (Commit)&#10;Run directly at the defender.&#10;Force the decision. Win it.&#10;→ Master: Doku">
+    <span class="n">17</span><div class="s">MkCm</div>
+    <div class="nm">Into Marker (Commit)</div>
+    <span class="db">Doku</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Marker Space Feint&#10;Sell the direction.&#10;Exit before contact.&#10;→ Master: Hazard (Chelsea era)">
+    <span class="n">18</span><div class="s">MkFt</div>
+    <div class="nm">Marker Space Feint</div>
+    <span class="db">Hazard</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Through-leg Nutmeg&#10;Push into marker gap.&#10;Take the legs, take the man.&#10;→ Master: Neymar">
+    <span class="n">19</span><div class="s">Ntmg</div>
+    <div class="nm">Nutmeg</div>
+    <span class="db">Neymar</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Shoulder-to-shoulder Win&#10;Physical carry into defender.&#10;Strength is the dribble.&#10;→ Master: Adama Traoré">
+    <span class="n">20</span><div class="s">ShSh</div>
+    <div class="nm">Strength Carry</div>
+    <span class="db">Traoré</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <!-- Gr13: shooting spot -->
+  <div class="el fs" data-tip="Cut Inside to Shoot&#10;Inverted winger classic.&#10;Right foot, left channel.&#10;→ Master: Robben / Salah">
+    <span class="n">21</span><div class="s">CtIs</div>
+    <div class="nm">Cut Inside to Shoot</div>
+    <span class="db">Robben</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <!-- Gr14: pausa -->
+  <div class="el fpa" data-tip="Slow-Down Dribble&#10;Decelerate to invite press.&#10;Explode when they commit.&#10;→ Master: Messi">
+    <span class="n">22</span><div class="s">SlDn</div>
+    <div class="nm">Slow-Down Dribble</div>
+    <span class="db">Messi</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr15-16: pausa -->
+  <div class="el fpa" data-tip="Double Stutter&#10;Two micro-feints, same direction.&#10;Defender resets twice.&#10;→ Master: Ronaldinho">
+    <span class="n">23</span><div class="s">DblS</div>
+    <div class="nm">Double Stutter</div>
+    <span class="db">R10</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <div class="el fpa" data-tip="Hold & Burst (Pausa)&#10;Wait until defender shifts weight.&#10;Then go. Timing IS the skill.&#10;→ Master: Iniesta">
+    <span class="n">24</span><div class="s">HldB</div>
+    <div class="nm">Hold & Burst</div>
+    <span class="db">Iniesta</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr18: noble -->
+  <div class="el fn" data-tip="Bait & Recycle&#10;Pretend to dribble.&#10;Draw the press. Pass.&#10;→ Master: Pirlo">
+    <span class="n">25</span><div class="s">BtRc</div>
+    <div class="nm">Bait & Recycle</div>
+    <span class="db">Pirlo</span>
+    <span class="ct">IQ</span>
+  </div>
+
+  <!-- ═══ PERIOD 3 — Directional / 1v1 dribbles ═══ -->
+  <div class="pl">P3</div>
+
+  <!-- Gr1: Aerial -->
+  <div class="el fa" data-tip="Header into Dribble&#10;Win the aerial. Land running.&#10;Transition in air.&#10;→ Master: Ibrahimović">
+    <span class="n">26</span><div class="s">HdDr</div>
+    <div class="nm">Header into Run</div>
+    <span class="db">Ibra</span>
+    <span class="ct">aerial</span>
+  </div>
+
+  <!-- Gr2: Channel -->
+  <div class="el fc" data-tip="Half-space Channel Dribble&#10;Drive the zone between winger&#10;& striker. Hard to mark.&#10;→ Master: De Bruyne">
+    <span class="n">27</span><div class="s">HsCh</div>
+    <div class="nm">Half-space Channel</div>
+    <span class="db">KDB</span>
+    <span class="ct">channel</span>
+  </div>
+
+  <!-- Gr3-5: Pressure -->
+  <div class="el fp" data-tip="Escape Press Dribble&#10;Receive under full press.&#10;One directional touch, exit.&#10;→ Master: Messi (22 dribbles La Liga '10)">
+    <span class="n">28</span><div class="s">EscP</div>
+    <div class="nm">Escape Press</div>
+    <span class="db">Messi×22</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="GK Dribble (Sweeper)&#10;Keeper comes out to play.&#10;First outfield player.&#10;→ Master: Neuer / Alisson">
+    <span class="n">29</span><div class="s">GkDr</div>
+    <div class="nm">GK Sweeper Dribble</div>
+    <span class="db">Neuer</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="Low Block Dribble&#10;Into packed defence.&#10;Create the gap that isn't there.&#10;→ Master: Hazard vs low blocks">
+    <span class="n">30</span><div class="s">LbDr</div>
+    <div class="nm">Low Block Dribble</div>
+    <span class="db">Hazard</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <!-- Gr6-8: Touchline -->
+  <div class="el ft" data-tip="Touchline Elastico&#10;Near the line: outside-in flick.&#10;Escape without stepping out.&#10;→ Master: Ronaldinho">
+    <span class="n">31</span><div class="s">TlEl</div>
+    <div class="nm">Touchline Elastico</div>
+    <span class="db">R10</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Byline Dribble&#10;Carry to the end line.&#10;Cut back or cross.&#10;→ Master: Arjen Robben">
+    <span class="n">32</span><div class="s">ByLn</div>
+    <div class="nm">Byline Dribble</div>
+    <span class="db">Robben</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Sideline Shield Dribble&#10;Use the line as a defender.&#10;Only one side for them to go.&#10;→ Master: Doku">
+    <span class="n">33</span><div class="s">SlSh</div>
+    <div class="nm">Sideline Shield</div>
+    <span class="db">Doku</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <!-- Gr9-12: Marker space -->
+  <div class="el fm" data-tip="Step-over into Marker&#10;Multiple step-overs.&#10;Then explode into the space.&#10;→ Master: CR7 (14 dribbles UCL)">
+    <span class="n">34</span><div class="s">StMk</div>
+    <div class="nm">Step-over into Marker</div>
+    <span class="db">CR7×14</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Drag-back in Marker Space&#10;Pull ball across body.&#10;Defender's momentum commits.&#10;→ Master: Messi">
+    <span class="n">35</span><div class="s">DrgM</div>
+    <div class="nm">Drag-back in Marker</div>
+    <span class="db">Messi</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Spin Off Marker&#10;Use defender's pressure.&#10;Spin the other direction.&#10;→ Master: Firmino">
+    <span class="n">36</span><div class="s">SpnM</div>
+    <div class="nm">Spin Off Marker</div>
+    <span class="db">Firmino</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Hold-up Marker Dribble&#10;Bring the defender with you.&#10;Open space for third man.&#10;→ Master: Van Dijk (carry)">
+    <span class="n">37</span><div class="s">HlMk</div>
+    <div class="nm">Hold-up Marker Carry</div>
+    <span class="db">VVD</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <!-- Gr13-15: Shooting spot -->
+  <div class="el fs" data-tip="Drive to Penalty Spot&#10;Enter from wide.&#10;Arrive on the spot.&#10;→ Master: Messi (El Clásico 18 drbs)">
+    <span class="n">38</span><div class="s">PnSp</div>
+    <div class="nm">Drive to Penalty Spot</div>
+    <span class="db">Messi×18</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <div class="el fs" data-tip="Six-yard Box Arrival&#10;Time the run to arrive&#10;inside the box unmarked.&#10;→ Master: Inzaghi">
+    <span class="n">39</span><div class="s">SyxA</div>
+    <div class="nm">Six-yard Arrival</div>
+    <span class="db">Inzaghi</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <div class="el fs" data-tip="Near-post Dash Dribble&#10;One touch, past the defender,&#10;into near-post angle.&#10;→ Master: Salah">
+    <span class="n">40</span><div class="s">NpDr</div>
+    <div class="nm">Near-post Dash</div>
+    <span class="db">Salah</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <!-- Gr16: pausa -->
+  <div class="el fpa" data-tip="La Pausa (Classic)&#10;Freeze everything.&#10;Make the defender choose first.&#10;→ Master: Iniesta">
+    <span class="n">41</span><div class="s">LaPa</div>
+    <div class="nm">La Pausa (Classic)</div>
+    <span class="db">Iniesta</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr17: pausa -->
+  <div class="el fpa" data-tip="Roulette Pause&#10;360° turn, decelerated.&#10;Exit at unexpected angle.&#10;→ Master: Zidane">
+    <span class="n">42</span><div class="s">ZdnR</div>
+    <div class="nm">Zidane Roulette</div>
+    <span class="db">Zidane</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr18: noble -->
+  <div class="el fn" data-tip="Positional Dribble (None)&#10;Move without the ball.&#10;Create for someone else.&#10;→ Master: Totti">
+    <span class="n">43</span><div class="s">PsDr</div>
+    <div class="nm">Positional (No-dribble)</div>
+    <span class="db">Totti</span>
+    <span class="ct">IQ</span>
+  </div>
+
+  <!-- ═══ PERIOD 4 — Speed-based dribbles ═══ -->
+  <div class="pl">P4</div>
+
+  <!-- Gr1: Aerial -->
+  <div class="el fa" data-tip="Dropping Shoulder Aerial&#10;Ball dropping from above.&#10;Shoulder feint before control.&#10;→ Master: Zlatan">
+    <span class="n">44</span><div class="s">DsAr</div>
+    <div class="nm">Dropping Shoulder Aerial</div>
+    <span class="db">Zlatan</span>
+    <span class="ct">aerial</span>
+  </div>
+
+  <!-- Gr2: Channel -->
+  <div class="el fc" data-tip="Wide-to-Narrow Channel&#10;Start wide, cut inward&#10;through the channel.&#10;→ Master: Vinícius Jr.">
+    <span class="n">45</span><div class="s">WnCh</div>
+    <div class="nm">Wide-to-Narrow Channel</div>
+    <span class="db">Vini Jr</span>
+    <span class="ct">channel</span>
+  </div>
+
+  <!-- Gr3-5: Pressure -->
+  <div class="el fp" data-tip="Press Escape 1-Touch&#10;Receive, one directional touch.&#10;No second touch before exit.&#10;→ Master: Iniesta">
+    <span class="n">46</span><div class="s">Pe1T</div>
+    <div class="nm">Press Escape 1-touch</div>
+    <span class="db">Iniesta</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="Absorb & Redirect&#10;Take the force of the press.&#10;Use their energy. Exit.&#10;→ Master: Busquets">
+    <span class="n">47</span><div class="s">AbsR</div>
+    <div class="nm">Absorb & Redirect</div>
+    <span class="db">Busquets</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="Double Press Escape&#10;Two defenders coming.&#10;Find the gap between.&#10;→ Master: Messi vs high press">
+    <span class="n">48</span><div class="s">DpEs</div>
+    <div class="nm">Double Press Escape</div>
+    <span class="db">Messi</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <!-- Gr6-8: Touchline -->
+  <div class="el ft" data-tip="Cruyff near Touchline&#10;Fake cross. Drag-back.&#10;Turn inside along the line.&#10;→ Master: Cruyff / Iniesta">
+    <span class="n">49</span><div class="s">CrTl</div>
+    <div class="nm">Cruyff near Line</div>
+    <span class="db">Cruyff</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Stepover near Line&#10;Classic wide winger move.&#10;Sell the cross, cut inside.&#10;→ Master: Ronaldo Young">
+    <span class="n">50</span><div class="s">SoTl</div>
+    <div class="nm">Step-over near Line</div>
+    <span class="db">CR7 2006</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Matthews Move at Touchline&#10;Inside dummy, outside run.&#10;Classic. Still works.&#10;→ Master: Stanley Matthews">
+    <span class="n">51</span><div class="s">MatT</div>
+    <div class="nm">Matthews at Touchline</div>
+    <span class="db">Matthews</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <!-- Gr9-12: Marker space -->
+  <div class="el fm" data-tip="Through Balls via Dribble&#10;Carry until defender commits.&#10;Thread the pass in the gap.&#10;→ Master: Messi">
+    <span class="n">52</span><div class="s">TbDr</div>
+    <div class="nm">Carry into Through Ball</div>
+    <span class="db">Messi</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Acceleration into Marker&#10;Burst before they're set.&#10;Speed IS the dribble.&#10;→ Master: Mbappé (UCL '22)">
+    <span class="n">53</span><div class="s">AcMk</div>
+    <div class="nm">Acceleration into Marker</div>
+    <span class="db">Mbappé</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Body-feint in Marker Space&#10;Lean one way. Go the other.&#10;Sell it before it happens.&#10;→ Master: Hazard">
+    <span class="n">54</span><div class="s">BfMk</div>
+    <div class="nm">Body-feint in Marker</div>
+    <span class="db">Hazard</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Backheel Escape in Space&#10;Surprise exit backwards.&#10;Only when unmarked runner is there.&#10;→ Master: Totti / Pirlo">
+    <span class="n">55</span><div class="s">BhEs</div>
+    <div class="nm">Backheel Escape</div>
+    <span class="db">Totti</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <!-- Gr13-15: Shooting spot -->
+  <div class="el fs" data-tip="Cut to Penalty Arc&#10;Drive to the D.&#10;Shoot from 20-22m.&#10;→ Master: Lampard / Gerrard">
+    <span class="n">56</span><div class="s">CtAr</div>
+    <div class="nm">Cut to Penalty Arc</div>
+    <span class="db">Lampard</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <div class="el fs" data-tip="Diagonal Entry Shoot&#10;Drive in at 45°.&#10;Arrive with shoot angle set.&#10;→ Master: Müller">
+    <span class="n">57</span><div class="s">DgEn</div>
+    <div class="nm">Diagonal Entry Shoot</div>
+    <span class="db">Müller</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <div class="el fs" data-tip="Far Post Arrive Dribble&#10;Carry to back post.&#10;Contact. Score.&#10;→ Master: Mandzukić">
+    <span class="n">58</span><div class="s">FpAr</div>
+    <div class="nm">Far Post Arrival Run</div>
+    <span class="db">Mandzukić</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <!-- Gr16-17: pausa -->
+  <div class="el fpa" data-tip="Weight Shift Pause&#10;Transfer bodyweight, hold.&#10;Read the defender's feet.&#10;→ Master: Zidane">
+    <span class="n">59</span><div class="s">WtSh</div>
+    <div class="nm">Weight Shift Pause</div>
+    <span class="db">Zidane</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <div class="el fpa" data-tip="Body Sway Pause&#10;Gentle side-to-side sway.&#10;Read their reaction. Pick side.&#10;→ Master: Messi vs UCL '08 (16 drbs)">
+    <span class="n">60</span><div class="s">BdSw</div>
+    <div class="nm">Body Sway Pause</div>
+    <span class="db">Messi×16</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr18: noble -->
+  <div class="el fn" data-tip="Ball Invite (No-dribble)&#10;Hold the ball.&#10;Make them come to you. Pass.&#10;→ Master: Zanetti (16/20 UCL)">
+    <span class="n">61</span><div class="s">BInv</div>
+    <div class="nm">Ball Invite</div>
+    <span class="db">Zanetti×16</span>
+    <span class="ct">IQ</span>
+  </div>
+
+  <!-- ═══ PERIOD 5 — Final third / match-deciding dribbles ═══ -->
+  <div class="pl">P5</div>
+
+  <!-- Gr1: Aerial -->
+  <div class="el fa" data-tip="Aerial to Counter Run&#10;Win the ball high.&#10;Land in stride. Counter.&#10;→ Master: Lukaku">
+    <span class="n">62</span><div class="s">AeCn</div>
+    <div class="nm">Aerial into Counter</div>
+    <span class="db">Lukaku</span>
+    <span class="ct">aerial</span>
+  </div>
+
+  <!-- Gr2: Channel -->
+  <div class="el fc" data-tip="Counter-press Channel Dribble&#10;Regain ball. Drive channel.&#10;One motion — regain & attack.&#10;→ Master: Kante">
+    <span class="n">63</span><div class="s">CpCh</div>
+    <div class="nm">Counter-press Channel</div>
+    <span class="db">Kanté</span>
+    <span class="ct">channel</span>
+  </div>
+
+  <!-- Gr3-5: Pressure -->
+  <div class="el fp" data-tip="Under Foul Risk Dribble&#10;Know the tackle is coming.&#10;Ride it or win the free kick.&#10;→ Master: Neymar">
+    <span class="n">64</span><div class="s">FrRk</div>
+    <div class="nm">Under Foul Risk</div>
+    <span class="db">Neymar</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="Isolated 1v2 Dribble&#10;Outnumbered. Dribble anyway.&#10;Create the foul or the space.&#10;→ Master: Messi vs PL sides">
+    <span class="n">65</span><div class="s">1v2D</div>
+    <div class="nm">1v2 Dribble</div>
+    <span class="db">Messi</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <div class="el fp" data-tip="Deep Zone Dribble&#10;Own half, under press.&#10;Exit safely; don't gamble.&#10;→ Master: Thiago Silva (carry)">
+    <span class="n">66</span><div class="s">DpZn</div>
+    <div class="nm">Deep Zone Dribble</div>
+    <span class="db">T.Silva</span>
+    <span class="ct">pressure</span>
+  </div>
+
+  <!-- Gr6-8: Touchline -->
+  <div class="el ft" data-tip="Touch-line Nutmeg Exit&#10;Near the line, nutmeg&#10;the defender. Burst.&#10;→ Master: Neymar (16 UCL vs Atalanta)">
+    <span class="n">67</span><div class="s">TlNt</div>
+    <div class="nm">Touchline Nutmeg</div>
+    <span class="db">Neymar×16</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Channel-Touchline Bridge&#10;Start in channel. Hit the line.&#10;Use line as 12th player.&#10;→ Master: Mbappé">
+    <span class="n">68</span><div class="s">ChTl</div>
+    <div class="nm">Channel-Touchline Bridge</div>
+    <span class="db">Mbappé</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <div class="el ft" data-tip="Recovery Dribble near Line&#10;Defender lunges.&#10;Tap out of reach. Keep going.&#10;→ Master: Salah">
+    <span class="n">69</span><div class="s">RcTl</div>
+    <div class="nm">Recovery Dribble at Line</div>
+    <span class="db">Salah</span>
+    <span class="ct">touchline</span>
+  </div>
+
+  <!-- Gr9-12: Marker space -->
+  <div class="el fm" data-tip="Dribble into Press Trap&#10;Recognise the trap.&#10;Bait, pass, disappear.&#10;→ Master: Messi (World Cup 2022)">
+    <span class="n">70</span><div class="s">PrTr</div>
+    <div class="nm">Dribble into Trap</div>
+    <span class="db">Messi WC22</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Winger Cut into CB Space&#10;Beat the fullback.&#10;Into the centre-back zone.&#10;→ Master: Vinícius Jr.">
+    <span class="n">71</span><div class="s">WgCb</div>
+    <div class="nm">Winger Cut to CB</div>
+    <span class="db">Vini Jr</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="False 9 Dribble&#10;Drop deep. Receive. Turn.&#10;Drive back into vacated space.&#10;→ Master: Messi 2010–12">
+    <span class="n">72</span><div class="s">Fs9D</div>
+    <div class="nm">False 9 Dribble</div>
+    <span class="db">Messi 2010</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <div class="el fm" data-tip="Overlapping Dribble (FB)&#10;Fullback overlaps.&#10;Creates 2v1. Dribble is the threat.&#10;→ Master: Alaba / Trent">
+    <span class="n">73</span><div class="s">OvFb</div>
+    <div class="nm">Overlapping FB Carry</div>
+    <span class="db">Trent</span>
+    <span class="ct">marker</span>
+  </div>
+
+  <!-- Gr13-15: Shooting spot -->
+  <div class="el fs" data-tip="Dribble to Shoot Hotspot&#10;Head down only to set touch.&#10;Head up to shoot.&#10;→ Master: Messi (La Liga 22 drbs '10)">
+    <span class="n">74</span><div class="s">DrHS</div>
+    <div class="nm">Dribble to Hotspot</div>
+    <span class="db">Messi×22</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <div class="el fs" data-tip="1-touch into Shoot Spot&#10;Receive with body open.&#10;One touch = shot position.&#10;→ Master: Van Nistelrooy">
+    <span class="n">75</span><div class="s">1tSS</div>
+    <div class="nm">1-touch into Spot</div>
+    <span class="db">RvN</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <div class="el fs" data-tip="Cross into Shoot Run&#10;Cross is coming.&#10;Time the dribble into the box.&#10;→ Master: Müller / Inzaghi">
+    <span class="n">76</span><div class="s">CrSR</div>
+    <div class="nm">Cross into Shoot Run</div>
+    <span class="db">Müller</span>
+    <span class="ct">shoot-spot</span>
+  </div>
+
+  <!-- Gr16-17: pausa -->
+  <div class="el fpa" data-tip="Pre-shot Pause&#10;Fake shot. Read GK movement.&#10;Then decide: shoot or dribble.&#10;→ Master: Messi vs GK">
+    <span class="n">77</span><div class="s">PrSP</div>
+    <div class="nm">Pre-shot Pause</div>
+    <span class="db">Messi</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <div class="el fpa" data-tip="Touch-pass Pause&#10;Look like you're passing.&#10;Touch to reset. Shoot.&#10;→ Master: Totti / Del Piero">
+    <span class="n">78</span><div class="s">TpPa</div>
+    <div class="nm">Touch-pass Pause</div>
+    <span class="db">Del Piero</span>
+    <span class="ct">pausa</span>
+  </div>
+
+  <!-- Gr18: noble -->
+  <div class="el fn" data-tip="Wait for the Foul (IQ)&#10;Know you're surrounded.&#10;Protect. Earn the set piece.&#10;→ Master: Busquets">
+    <span class="n">79</span><div class="s">WtFl</div>
+    <div class="nm">Wait for the Foul</div>
+    <span class="db">Busquets</span>
+    <span class="ct">IQ</span>
+  </div>
+
+  <!-- === SEPARATOR === -->
+  <div class="sep"></div>
+
+  <!-- ═══ LANTHANIDES — ALL-TIME MASTERS ═══ -->
+  <div class="pl">Masters</div>
+  <div class="e"></div><div class="e"></div>
+
+  <div class="el fl" data-tip="Lionel Messi&#10;La Liga single-match record: 22 dribbles (Almería 2010 — Opta).&#10;UCL: 16 completed (Man Utd 2008).&#10;El Clásico: 18 completed (career Opta best).&#10;Style: deceleration, body-sway pausa.">
+    <span class="n">Lr1</span><div class="s">LM10</div>
+    <div class="nm">Lionel Messi</div>
+    <span class="ct">GOAT</span>
+  </div>
+
+  <div class="el fl" data-tip="Cristiano Ronaldo&#10;UCL single-match: 14 completed (vs Roma, confirmed Opta).&#10;Most-feared: step-over family.&#10;Speed + body strength combination.&#10;Style: explosive step-over, burst.">
+    <span class="n">Lr2</span><div class="s">CR7</div>
+    <div class="nm">Cristiano Ronaldo</div>
+    <span class="ct">explosive</span>
+  </div>
+
+  <div class="el fl" data-tip="Ronaldinho&#10;Pure joy dribbler. No plan — all feel.&#10;Elastico inventor (widely credited).&#10;La Liga 2004-06: the benchmark era.&#10;Style: double stutter, roulette.">
+    <span class="n">Lr3</span><div class="s">R10</div>
+    <div class="nm">Ronaldinho</div>
+    <span class="ct">romantic</span>
+  </div>
+
+  <div class="el fl" data-tip="Eden Hazard&#10;PL single-game: 12+ confirmed, 3 separate games (Opta).&#10;2019-20: 183 successful dribbles — PL season record.&#10;Style: body-feint, shoulder-drop, low centre of gravity.">
+    <span class="n">Lr4</span><div class="s">EH10</div>
+    <div class="nm">Eden Hazard</div>
+    <span class="ct">low CoG</span>
+  </div>
+
+  <div class="el fl" data-tip="Adama Traoré&#10;PL single-match: 16 completed (vs Watford, Jan 1, 2020 — Opta).&#10;Style: pure strength dribble — not deception.&#10;Shoulder charge IS the dribble.">
+    <span class="n">Lr5</span><div class="s">Ada</div>
+    <div class="nm">Adama Traoré</div>
+    <span class="ct">strength</span>
+  </div>
+
+  <div class="el fl" data-tip="Neymar&#10;UCL single-match: 16 completed vs Atalanta, Aug 2020 (StatMuse).&#10;Style: skill moves, nutmeg, flair.&#10;Highest attempted dribbles — not always efficient.">
+    <span class="n">Lr6</span><div class="s">NJr</div>
+    <div class="nm">Neymar Jr.</div>
+    <span class="ct">flair</span>
+  </div>
+
+  <div class="el fl" data-tip="Javier Zanetti&#10;UCL confirmed Opta: 16 completed from 20 attempted.&#10;Wing-back — not a forward.&#10;Defensive dribble brilliance.">
+    <span class="n">Lr7</span><div class="s">JZ4</div>
+    <div class="nm">Javier Zanetti</div>
+    <span class="ct">UCL 16/20</span>
+  </div>
+
+  <div class="el fl" data-tip="Arjen Robben&#10;The most telegraphed dribble in football.&#10;Still couldn't be stopped.&#10;Left foot, left foot, left foot. Always.&#10;Style: touchline cut to left.">
+    <span class="n">Lr8</span><div class="s">Rbn</div>
+    <div class="nm">Arjen Robben</div>
+    <span class="ct">one-move</span>
+  </div>
+
+  <div class="el fl" data-tip="Kylian Mbappé&#10;Speed IS the dribble.&#10;PL/UCL: burst into channels.&#10;Doesn't need tricks — just first step.&#10;Style: acceleration channel run.">
+    <span class="n">Lr9</span><div class="s">KM7</div>
+    <div class="nm">Kylian Mbappé</div>
+    <span class="ct">speed</span>
+  </div>
+
+  <div class="el fl" data-tip="Vinícius Jr.&#10;UCL: elite touchline dribbler.&#10;Wide left, cut inside, shoot.&#10;Diagonal burst at pace.&#10;Style: wide burst, body-feint.">
+    <span class="n">Lr10</span><div class="s">VnJr</div>
+    <div class="nm">Vinícius Jr.</div>
+    <span class="ct">wide-burst</span>
+  </div>
+
+  <div class="el fl" data-tip="Andrés Iniesta&#10;The pausa master. Dribbles you didn't see.&#10;Receive. Pause. The defender moves. Go.&#10;Style: la pausa, 1-touch escape, hold & burst.">
+    <span class="n">Lr11</span><div class="s">AI8</div>
+    <div class="nm">Andrés Iniesta</div>
+    <span class="ct">pausa</span>
+  </div>
+
+  <div class="el fl" data-tip="Zinedine Zidane&#10;Roulette + weight-shift pausa.&#10;Made 1v2 look like 1v0.&#10;Style: Zidane roulette, deceleration turn.">
+    <span class="n">Lr12</span><div class="s">ZZ5</div>
+    <div class="nm">Zinedine Zidane</div>
+    <span class="ct">roulette</span>
+  </div>
+
+  <div class="el fl" data-tip="Jeremy Doku&#10;PL 2023-24: elite dribbler per 90.&#10;15 dribbles single-match (PL, tied record).&#10;Style: touchline burst + nutmeg.">
+    <span class="n">Lr13</span><div class="s">Dku</div>
+    <div class="nm">Jérémy Doku</div>
+    <span class="ct">PL×15</span>
+  </div>
+
+  <div class="el fl" data-tip="Mohammed Kudus&#10;PL all-time completed dribbles leader (258, StatMuse).&#10;2023-24: 124 dribbles — 37 clear of next.&#10;Style: compact, low CoG, channel dribble.">
+    <span class="n">Lr14</span><div class="s">Kds</div>
+    <div class="nm">Mohammed Kudus</div>
+    <span class="ct">PL all-time</span>
+  </div>
+
+  <div class="e"></div><div class="e"></div><div class="e"></div><div class="e"></div>
+
+  <!-- ═══ ACTINIDES — DOCTRINE ═══ -->
+  <div class="pl">Doctrine</div>
+  <div class="e"></div><div class="e"></div>
+
+  <div class="el fac" data-tip="WC Ceiling&#10;7 dribbles per match max.&#10;World Cup verified doctrine.&#10;Semi-finals: open.">
+    <span class="n">Ac1</span><div class="s">WcBg</div>
+    <div class="nm">WC Budget (7)</div>
+    <span class="ct">doctrine</span>
+  </div>
+
+  <div class="el fac" data-tip="Ball > Runner&#10;A ball moves faster and more&#10;unpredictably than the best dribbler.&#10;Pass when in doubt.">
+    <span class="n">Ac2</span><div class="s">BvR</div>
+    <div class="nm">Ball > Runner</div>
+    <span class="ct">doctrine</span>
+  </div>
+
+  <div class="el fac" data-tip="Pausa First&#10;Dribble only after&#10;the pause has read the situation.&#10;React → No. Read → Yes.">
+    <span class="n">Ac3</span><div class="s">PaFi</div>
+    <div class="nm">Pausa First</div>
+    <span class="ct">doctrine</span>
+  </div>
+
+  <div class="el fac" data-tip="Scan Before Dribble&#10;Pre-scan confirms the exit route.&#10;If you don't know where you're going,&#10;you're not ready to start.">
+    <span class="n">Ac4</span><div class="s">ScBD</div>
+    <div class="nm">Scan Before Dribble</div>
+    <span class="ct">doctrine</span>
+  </div>
+
+  <div class="el fac" data-tip="Probabilistic Budget&#10;Each dribble is a spend.&#10;Spend only when the return&#10;is greater than the pass alternative.">
+    <span class="n">Ac5</span><div class="s">PrBg</div>
+    <div class="nm">Probabilistic Budget</div>
+    <span class="ct">philosophy</span>
+  </div>
+
+  <div class="el fac" data-tip="Anti-injury&#10;Never dribble into contact&#10;if possession can be retained&#10;by simpler means.">
+    <span class="n">Ac6</span><div class="s">AnI</div>
+    <div class="nm">Anti-injury Rule</div>
+    <span class="ct">doctrine</span>
+  </div>
+
+  <div class="el fac" data-tip="Romantic Dribble&#10;Beautiful, spontaneous, crowd-moving.&#10;Valid. Never force it.&#10;Let fitness + IQ create the conditions.">
+    <span class="n">Ac7</span><div class="s">Rom</div>
+    <div class="nm">Romantic Dribble</div>
+    <span class="ct">philosophy</span>
+  </div>
+
+  <div class="el fac" data-tip="The Impossible Ideal&#10;1 touch, score, every time.&#10;All dribbling is the attempt&#10;to approach this limit.">
+    <span class="n">Ac8</span><div class="s">Idl</div>
+    <div class="nm">Impossible Ideal</div>
+    <span class="ct">philosophy</span>
+  </div>
+
+  <div class="el fac" data-tip="Dribble = Last Resort&#10;Pass > carry > dribble.&#10;In that order.&#10;Unless the dribble IS the goal.">
+    <span class="n">Ac9</span><div class="s">DLR</div>
+    <div class="nm">Dribble = Last Resort</div>
+    <span class="ct">doctrine</span>
+  </div>
+
+  <div class="el fac" data-tip="Semi-final Exception&#10;Open dribble budget in semis.&#10;Romance earns its moment&#10;on the largest stage.">
+    <span class="n">Ac10</span><div class="s">SfEx</div>
+    <div class="nm">Semi-final Exception</div>
+    <span class="ct">doctrine</span>
+  </div>
+
+  <div class="e"></div><div class="e"></div><div class="e"></div><div class="e"></div><div class="e"></div><div class="e"></div><div class="e"></div><div class="e"></div>
+
+</div><!-- .pt -->
+</div><!-- .pt-wrap -->
+
+<!-- ── DOCTRINE SUMMARY ─────────────────────────────── -->
+<div class="doc">
+  <h2>Dribble Doctrine</h2>
+  <div class="doc-grid">
+    <div class="doc-card">
+      <div class="dc-label">Budget (Standard)</div>
+      <p>≤ 7 per match. World Cup verified. Each dribble is a spend. The budget forces quality.</p>
+    </div>
+    <div class="doc-card">
+      <div class="dc-label">Budget (Semi-final)</div>
+      <p>Open. Romance earns its moment. The biggest stage, the freest game.</p>
+    </div>
+    <div class="doc-card">
+      <div class="dc-label">Order of Operations</div>
+      <p>Pass → Carry → Dribble. Only dribble when the pass is worse and the carry is blocked.</p>
+    </div>
+    <div class="doc-card">
+      <div class="dc-label">Pausa Before Action</div>
+      <p>Every dribble begins with a pause — whether visible or internal. Read first. React never.</p>
+    </div>
+    <div class="doc-card">
+      <div class="dc-label">La Pausa (Iniesta Rule)</div>
+      <p>Freeze everything. Let the defender make the first move. The dribble is the response.</p>
+    </div>
+    <div class="doc-card">
+      <div class="dc-label">Probabilistic vs Romantic</div>
+      <p>Probabilistic dribblers always win in the end. The romantic dribble is real — it must be earned, not forced.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
