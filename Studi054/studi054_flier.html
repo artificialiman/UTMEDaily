@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studi054 — Flier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --black:   #080705;
+  --panel:   #100d09;
+  --gold:    #c9972a;
+  --gold-lt: #ddb96a;
+  --gold-dk: #8a6318;
+  --white:   #f0ece4;
+  --dim:     rgba(240,236,228,0.72);
+  --rule:    rgba(201,151,42,0.35);
+
+  --cinzel:  'Cinzel Decorative', serif;
+  --bebas:   'Bebas Neue', sans-serif;
+  --mono:    'IBM Plex Mono', monospace;
+  --body:    'Manrope', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #3a3530;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px 60px;
+  font-family: var(--body);
+}
+
+/* ══════════════════════════════
+   A3 CANVAS
+══════════════════════════════ */
+.flier {
+  width: 297mm;
+  min-height: 420mm;
+  background: var(--black);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 60px rgba(0,0,0,.7);
+}
+
+/* ══════════════════════════════
+   PYTHON WATERMARK — diagonal
+══════════════════════════════ */
+.wm-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.wm-text {
+  position: absolute;
+  top: -60mm;
+  left: -40mm;
+  width: 700mm;
+  font-family: var(--mono);
+  font-size: 7pt;
+  font-weight: 300;
+  line-height: 1.6;
+  letter-spacing: .04em;
+  color: rgba(201,151,42,.055);
+  transform: rotate(-38deg);
+  transform-origin: top left;
+  white-space: pre;
+  user-select: none;
+}
+
+/* ══════════════════════════════
+   HERO — top 56%
+══════════════════════════════ */
+.hero {
+  position: relative;
+  height: 236mm;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Full-bleed hero from S54_read.jpeg */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: url('s54_flier_ref.jpeg') center top / cover no-repeat;
+  z-index: 0;
+}
+
+/* Dark vignette so bottom of hero bleeds into content */
+.hero-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(8,7,5,0) 0%,
+    rgba(8,7,5,0) 45%,
+    rgba(8,7,5,.55) 72%,
+    rgba(8,7,5,1) 100%
+  );
+  z-index: 2;
+}
+
+/* Left side vignette — leaves space for hex placeholder */
+.hero-left-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(8,7,5,.82) 0%,
+    rgba(8,7,5,.2) 30%,
+    rgba(8,7,5,0) 60%
+  );
+  z-index: 2;
+}
+
+/* ── HERO PLACEHOLDER 1 — Hexagon, top-left ── */
+.hex-placeholder {
+  position: absolute;
+  top: 14mm;
+  left: 14mm;
+  width: 52mm;
+  height: 58mm;
+  z-index: 3;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: rgba(201,151,42,.12);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.hex-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border: 1.5px solid rgba(201,151,42,.4);
+  background: rgba(8,7,5,.5);
+}
+.hex-label {
+  position: relative;
+  z-index: 1;
+  font-family: var(--mono);
+  font-size: 6pt;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(201,151,42,.5);
+  text-align: center;
+  line-height: 1.9;
+}
+
+/* ── HERO INNER PANEL — uses Duck grid image ── */
+.hero-panel {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  background: url('s54_hero_grid.jpeg') center center / cover no-repeat;
+  opacity: .22;
+  z-index: 1;
+  mix-blend-mode: luminosity;
+}
+
+/* ── CORNER ORNAMENT ── */
+.corner-ornament {
+  position: absolute;
+  top: 8mm;
+  right: 10mm;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2mm;
+}
+.co-line {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+}
+.co-rule { width: 20mm; height: 1px; background: var(--gold); opacity: .5; }
+.co-diamond {
+  width: 5px; height: 5px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  opacity: .7;
+}
+.co-tag {
+  font-family: var(--mono);
+  font-size: 5pt;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(201,151,42,.5);
+}
+
+/* ══════════════════════════════
+   CONTENT SECTION
+══════════════════════════════ */
+.content {
+  position: relative;
+  flex: 1;
+  background: var(--panel);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Subtle texture overlay */
+.content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 0%, rgba(201,151,42,.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 100%, rgba(201,151,42,.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Diagonal gold divider between columns */
+.content::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: calc(50% - 1px);
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(201,151,42,0) 0%, rgba(201,151,42,.4) 20%, rgba(201,151,42,.4) 80%, rgba(201,151,42,0) 100%);
+  z-index: 2;
+  transform: skewX(-4deg);
+}
+
+/* ── SECTION HEADERS ── */
+.col-programmes,
+.col-tracks {
+  padding: 8mm 9mm 6mm;
+  position: relative;
+  z-index: 3;
+}
+
+.sec-label {
+  font-family: var(--bebas);
+  font-size: 22pt;
+  letter-spacing: .12em;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 1.5mm;
+}
+
+.sec-rule {
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+  margin-bottom: 6mm;
+}
+.sr-line { flex: 1; height: 1px; background: rgba(201,151,42,.3); }
+.sr-diamond {
+  width: 5px; height: 5px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* ── PROGRAMMES LIST ── */
+.prog-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4mm;
+}
+.prog-item {
+  display: grid;
+  grid-template-columns: 7mm 1fr;
+  gap: 0 2mm;
+  align-items: start;
+}
+.prog-num {
+  font-family: var(--mono);
+  font-size: 6.5pt;
+  font-weight: 700;
+  color: var(--gold);
+  padding-top: 2px;
+  letter-spacing: .04em;
+}
+.prog-text {
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.6;
+}
+.prog-sub {
+  font-family: var(--mono);
+  font-size: 6.5pt;
+  font-weight: 400;
+  color: rgba(212,185,122,.65);
+  letter-spacing: .04em;
+}
+
+/* ── RHOMBUS PLACEHOLDER — sits in programmes col, mid ── */
+.rhombus-wrap {
+  grid-column: 1;
+  padding: 0 9mm 6mm;
+  position: relative;
+  z-index: 3;
+}
+.rhombus-placeholder {
+  width: 100%;
+  height: 38mm;
+  clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
+  background: rgba(201,151,42,.08);
+  border: 1px solid rgba(201,151,42,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.rhombus-placeholder::after {
+  content: '+  image';
+  font-family: var(--mono);
+  font-size: 6pt;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(201,151,42,.35);
+}
+
+/* ── TRACKS ── */
+.tracks-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 5mm;
+  position: relative;
+}
+
+.track-card {
+  position: relative;
+  padding: 4.5mm 5mm 4.5mm 10mm;
+  border-left: none;
+}
+
+/* Gold bracket accent */
+.track-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gold-dk);
+}
+.track-card.featured::before {
+  background: var(--gold);
+  width: 5px;
+}
+
+.tc-duration {
+  font-family: var(--mono);
+  font-size: 5.5pt;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(201,151,42,.55);
+  margin-bottom: 1.5mm;
+}
+.tc-name {
+  font-family: var(--bebas);
+  font-size: 14pt;
+  letter-spacing: .08em;
+  color: var(--gold-lt);
+  line-height: 1;
+  margin-bottom: 1.5mm;
+}
+.track-card.featured .tc-name {
+  font-size: 16pt;
+  color: var(--gold);
+}
+.tc-type {
+  font-family: var(--mono);
+  font-size: 6pt;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(201,151,42,.4);
+  margin-bottom: 2mm;
+}
+.tc-desc {
+  font-size: 7.5pt;
+  font-weight: 500;
+  color: var(--dim);
+  line-height: 1.75;
+}
+
+/* ── CIRCLE PLACEHOLDER — floats in tracks col ── */
+.circle-wrap {
+  grid-column: 2;
+  padding: 0 9mm 5mm;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+}
+.circle-placeholder {
+  width: 44mm;
+  height: 44mm;
+  border-radius: 50%;
+  background: rgba(201,151,42,.07);
+  border: 1px solid rgba(201,151,42,.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+.circle-placeholder::after {
+  content: '+  image';
+  font-family: var(--mono);
+  font-size: 6pt;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(201,151,42,.35);
+}
+
+/* ── TAGLINE FOOTER ── */
+.tagline-row {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 3;
+  border-top: 1px solid rgba(201,151,42,.25);
+  padding: 5mm 12mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8mm;
+}
+.tagline-rule { flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(201,151,42,.3)); }
+.tagline-rule.right { background: linear-gradient(to left, transparent, rgba(201,151,42,.3)); }
+
+.tagline-text {
+  font-family: var(--body);
+  font-size: 9pt;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold-lt);
+  white-space: nowrap;
+  font-style: italic;
+}
+
+/* ── ARROW PLACEHOLDER — bottom-right, angled ── */
+.arrow-placeholder {
+  position: absolute;
+  bottom: 18mm;
+  right: 12mm;
+  width: 36mm;
+  height: 22mm;
+  clip-path: polygon(0% 15%, 70% 0%, 100% 50%, 70% 100%, 0% 85%);
+  background: rgba(201,151,42,.07);
+  border: 1px solid rgba(201,151,42,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+.arrow-placeholder::after {
+  content: '+  img';
+  font-family: var(--mono);
+  font-size: 5pt;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: rgba(201,151,42,.3);
+  padding-left: 6mm;
+}
+
+@media print {
+  @page { size: A3 portrait; margin: 0; }
+  body { background: none; padding: 0; }
+  .flier { width: 297mm; min-height: 420mm; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="flier">
+
+  <!-- ══ PYTHON WATERMARK ══ -->
+  <div class="wm-wrap" aria-hidden="true">
+    <div class="wm-text">import subprocess, os, sys, pathlib, shutil, hashlib, json, time, re
+from typing import Optional, List, Dict, Any
+from dataclasses import dataclass, field
+from pathlib import Path
+
+@dataclass
+class SystemConfig:
+    root: Path = Path("/opt/studi054")
+    modules: List[str] = field(default_factory=lambda: [
+        "core", "security", "devtools", "agentic", "dist_systems"
+    ])
+    build_mode: str = "release"
+    version: str = "0.5.4"
+
+def bootstrap_environment(config: SystemConfig) -> bool:
+    """Initialise Studi054 core environment."""
+    print(f"[studi054] booting v{config.version} ...")
+    config.root.mkdir(parents=True, exist_ok=True)
+    for mod in config.modules:
+        mod_path = config.root / mod
+        mod_path.mkdir(exist_ok=True)
+        (mod_path / "__init__.py").write_text(f"# {mod} module\n")
+    return verify_integrity(config.root)
+
+def verify_integrity(root: Path) -> bool:
+    manifest = {}
+    for f in root.rglob("*.py"):
+        digest = hashlib.sha256(f.read_bytes()).hexdigest()
+        manifest[str(f.relative_to(root))] = digest
+    manifest_path = root / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2))
+    return True
+
+def install_module(name: str, config: SystemConfig) -> Optional[str]:
+    target = config.root / name
+    if not target.exists():
+        raise FileNotFoundError(f"module {name!r} not found in {config.root}")
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "-e", str(target), "--quiet"],
+        capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        return result.stderr
+    return None
+
+def run_pipeline(steps: List[Dict[str, Any]], config: SystemConfig) -> None:
+    for i, step in enumerate(steps):
+        label = step.get("name", f"step_{i}")
+        fn    = step.get("fn")
+        args  = step.get("args", {})
+        print(f"[pipeline] {i+1}/{len(steps)} — {label}")
+        t0 = time.monotonic()
+        fn(config=config, **args)
+        elapsed = time.monotonic() - t0
+        print(f"[pipeline] done in {elapsed:.2f}s")
+
+if __name__ == "__main__":
+    cfg = SystemConfig()
+    ok  = bootstrap_environment(cfg)
+    if not ok:
+        sys.exit(1)
+    pipeline = [
+        {"name": "install core",     "fn": lambda config, **_: install_module("core", config)},
+        {"name": "install security", "fn": lambda config, **_: install_module("security", config)},
+        {"name": "install devtools", "fn": lambda config, **_: install_module("devtools", config)},
+        {"name": "verify",           "fn": lambda config, **_: verify_integrity(config.root)},
+    ]
+    run_pipeline(pipeline, cfg)
+    print("[studi054] environment ready.")
+
+import subprocess, os, sys, pathlib, shutil, hashlib, json, time, re
+from typing import Optional, List, Dict, Any
+from dataclasses import dataclass, field
+from pathlib import Path
+
+@dataclass
+class SystemConfig:
+    root: Path = Path("/opt/studi054")
+    modules: List[str] = field(default_factory=lambda: [
+        "core", "security", "devtools", "agentic", "dist_systems"
+    ])
+    build_mode: str = "release"
+    version: str = "0.5.4"
+
+def bootstrap_environment(config: SystemConfig) -> bool:
+    print(f"[studi054] booting v{config.version} ...")
+    config.root.mkdir(parents=True, exist_ok=True)
+    for mod in config.modules:
+        mod_path = config.root / mod
+        mod_path.mkdir(exist_ok=True)
+        (mod_path / "__init__.py").write_text(f"# {mod} module\n")
+    return verify_integrity(config.root)
+
+def verify_integrity(root: Path) -> bool:
+    manifest = {}
+    for f in root.rglob("*.py"):
+        digest = hashlib.sha256(f.read_bytes()).hexdigest()
+        manifest[str(f.relative_to(root))] = digest
+    manifest_path = root / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2))
+    return True
+</div>
+  </div>
+
+  <!-- ══ HERO ══ -->
+  <div class="hero">
+    <div class="hero-panel"></div>
+    <div class="hero-bg"></div>
+    <div class="hero-left-fade"></div>
+    <div class="hero-fade"></div>
+
+    <!-- Hex placeholder — top left -->
+    <div class="hex-placeholder">
+      <div class="hex-label">+<br>image</div>
+    </div>
+
+    <!-- Corner ornament — top right -->
+    <div class="corner-ornament">
+      <div class="co-line">
+        <div class="co-rule"></div>
+        <div class="co-diamond"></div>
+        <div class="co-rule" style="width:8mm;"></div>
+      </div>
+      <div class="co-tag">Gbaga · Ogun State</div>
+    </div>
+  </div>
+
+  <!-- ══ CONTENT ══ -->
+  <div class="content">
+
+    <!-- ── PROGRAMMES ── -->
+    <div class="col-programmes">
+      <div class="sec-label">Programmes</div>
+      <div class="sec-rule">
+        <div class="sr-line"></div>
+        <div class="sr-diamond"></div>
+        <div class="sr-line" style="max-width:6mm;"></div>
+      </div>
+
+      <ul class="prog-list">
+        <li class="prog-item">
+          <span class="prog-num">01</span>
+          <div>
+            <div class="prog-text">Basic Computing &amp; Installation</div>
+          </div>
+        </li>
+        <li class="prog-item">
+          <span class="prog-num">02</span>
+          <div>
+            <div class="prog-text">Content Creation</div>
+            <div class="prog-sub">CapCut · FLStudio</div>
+          </div>
+        </li>
+        <li class="prog-item">
+          <span class="prog-num">03</span>
+          <div>
+            <div class="prog-text">Software Development<span style="font-weight:400;color:var(--dim);"> — Mobile First</span></div>
+            <div class="prog-sub">VSCode · Cloudflare</div>
+          </div>
+        </li>
+        <li class="prog-item">
+          <span class="prog-num">04</span>
+          <div>
+            <div class="prog-text">Cybersecurity</div>
+            <div class="prog-sub">TryHackMe · Granthacks</div>
+          </div>
+        </li>
+        <li class="prog-item">
+          <span class="prog-num">05</span>
+          <div>
+            <div class="prog-text">AI Applications &amp; Agentic Workflows</div>
+            <div class="prog-sub">LLMs · MCP</div>
+          </div>
+        </li>
+        <li class="prog-item">
+          <span class="prog-num">06</span>
+          <div>
+            <div class="prog-text">Engineering &amp; Computation Tutorials</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ── TRACKS ── -->
+    <div class="col-tracks">
+      <div class="sec-label">Tracks</div>
+      <div class="sec-rule">
+        <div class="sr-line"></div>
+        <div class="sr-diamond"></div>
+        <div class="sr-line" style="max-width:6mm;"></div>
+      </div>
+
+      <div class="tracks-stack">
+
+        <div class="track-card">
+          <div class="tc-duration">4 months</div>
+          <div class="tc-name">Content Editor Cert.</div>
+          <div class="tc-type">Bootcamp</div>
+        </div>
+
+        <div class="track-card">
+          <div class="tc-duration">6 months</div>
+          <div class="tc-name">Associate Dev Cert.</div>
+          <div class="tc-type">Bootcamp</div>
+        </div>
+
+        <div class="track-card featured">
+          <div class="tc-duration">1 year</div>
+          <div class="tc-name">Developer</div>
+          <div class="tc-type">Corporate Diploma</div>
+          <div class="tc-desc">Agentic software &amp; distributed systems development.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── RHOMBUS PLACEHOLDER — below programmes ── -->
+    <div class="rhombus-wrap">
+      <div class="rhombus-placeholder"></div>
+    </div>
+
+    <!-- ── CIRCLE PLACEHOLDER — below tracks ── -->
+    <div class="circle-wrap">
+      <div class="circle-placeholder"></div>
+    </div>
+
+    <!-- ── ARROW PLACEHOLDER — floating bottom-right ── -->
+    <div class="arrow-placeholder"></div>
+
+    <!-- ── TAGLINE ── -->
+    <div class="tagline-row">
+      <div class="tagline-rule"></div>
+      <div class="tagline-text">Admission by referral is rewarded.</div>
+      <div class="tagline-rule right"></div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
