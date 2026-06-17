@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Sheets — SS3 Science — TCC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --purple-deep: #2D1B69;
+      --purple:      #5B2D8E;
+      --purple-mid:  #7B4BB8;
+      --purple-light:#E8E0F5;
+      --purple-ghost:#F3EFFE;
+      --lemon:       #E8F000;
+      --lemon-soft:  #F5F7A0;
+      --ink:         #1A1A2E;
+      --ink-soft:    #3D3D5C;
+      --ash:         #8A8AA8;
+      --cream:       #F8F5EF;
+      --cream-deep:  #EDE8DF;
+      --white:       #FFFFFF;
+      --pass-bg:     #E8F8E8;
+      --pass-fg:     #1A6640;
+      --fail-bg:     #FFE8E8;
+      --fail-fg:     #C0392B;
+      --warn-bg:     #FFF3C4;
+      --warn-fg:     #8A5C00;
+
+      --font-serif:   'Cormorant Garamond', Georgia, serif;
+      --font-sans:    'DM Sans', system-ui, sans-serif;
+      --font-display: 'Bebas Neue', sans-serif;
+    }
+
+    /* ── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--ink);
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── SCREEN CONTROLS ────────────────────────────────── */
+    .screen-only {
+      background: var(--purple-deep);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .screen-only h1 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: 0.02em;
+    }
+    .screen-only span {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .print-btn {
+      background: var(--lemon);
+      color: var(--ink);
+      border: none;
+      padding: 8px 20px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .print-btn:hover { background: var(--lemon-soft); }
+
+    /* ── PAGE / SHEET ───────────────────────────────────── */
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      background: var(--white);
+      margin: 20px auto;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    /* ── HEADER BAND ────────────────────────────────────── */
+    .sheet-header {
+      background: var(--purple-deep);
+      color: var(--cream);
+      padding: 18px 24px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .sheet-header::after {
+      content: '';
+      position: absolute;
+      right: -40px; top: -40px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,240,0,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .school-name {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+    .school-sub {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-top: 3px;
+    }
+    .term-badge {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 6px 12px;
+      text-align: center;
+    }
+    .term-badge .t-term {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.45;
+      display: block;
+    }
+    .term-badge .t-val {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      color: var(--lemon);
+      line-height: 1.2;
+      display: block;
+    }
+
+    /* ── STUDENT IDENTITY BAR ───────────────────────────── */
+    .identity-bar {
+      background: var(--purple-ghost);
+      border-bottom: 1px solid var(--purple-light);
+      padding: 10px 24px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 24px;
+    }
+    .student-name {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .student-meta {
+      font-size: 10px;
+      color: var(--ash);
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+    .stat-chip {
+      text-align: center;
+      background: var(--white);
+      border: 1px solid var(--purple-light);
+      border-radius: 6px;
+      padding: 6px 14px;
+      min-width: 72px;
+    }
+    .stat-chip .s-num {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      line-height: 1;
+      color: var(--purple);
+    }
+    .stat-chip .s-lbl {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-top: 1px;
+    }
+    .grade-chip {
+      background: var(--purple-deep);
+      border-radius: 6px;
+      padding: 6px 14px;
+      text-align: center;
+      min-width: 64px;
+    }
+    .grade-chip .g-letter {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--lemon);
+      line-height: 1;
+    }
+    .grade-chip .g-lbl {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-top: 1px;
+    }
+
+    /* ── RESULTS TABLE ──────────────────────────────────── */
+    .results-wrap {
+      padding: 16px 24px 0;
+      flex: 1;
+    }
+
+    .section-label {
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 8px;
+    }
+
+    table.scores {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    table.scores thead tr {
+      background: var(--cream);
+      border-bottom: 2px solid var(--cream-deep);
+    }
+    table.scores thead th {
+      padding: 7px 10px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ash);
+      text-align: left;
+    }
+    table.scores thead th.num { text-align: right; }
+    table.scores tbody tr {
+      border-bottom: 1px solid #F0EDE8;
+      transition: background 0.1s;
+    }
+    table.scores tbody tr:last-child { border-bottom: none; }
+    table.scores tbody tr:hover { background: var(--cream); }
+
+    table.scores td {
+      padding: 8px 10px;
+      vertical-align: middle;
+    }
+    table.scores td.subject-col {
+      font-weight: 500;
+      color: var(--ink);
+    }
+    table.scores td.num-col {
+      text-align: right;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      line-height: 1;
+      color: var(--ink-soft);
+    }
+    table.scores td.total-col {
+      text-align: right;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .bar-cell { width: 80px; }
+    .bar-wrap {
+      width: 76px;
+      height: 5px;
+      background: var(--cream-deep);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .grade-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .remark-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* ── TOTALS ROW ─────────────────────────────────────── */
+    .totals-row {
+      margin: 12px 24px 0;
+      background: var(--purple-deep);
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .totals-row .t-label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+    .totals-row .t-val {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--lemon);
+      line-height: 1;
+    }
+    .totals-row .t-unit {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── REMARKS SECTION ────────────────────────────────── */
+    .remarks-section {
+      margin: 14px 24px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .remark-block {
+      background: var(--cream);
+      border: 1px solid var(--cream-deep);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .remark-block .r-label {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 6px;
+    }
+    .remark-block .r-line {
+      height: 1px;
+      background: var(--cream-deep);
+      margin: 5px 0;
+    }
+    .remark-block .r-sig {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 11px;
+      color: var(--ash);
+      margin-top: 4px;
+    }
+
+    /* ── FOOTER STRIP ───────────────────────────────────── */
+    .sheet-footer {
+      margin-top: 14px;
+      padding: 10px 24px;
+      border-top: 1px solid var(--cream-deep);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sheet-footer .f-left {
+      font-size: 9px;
+      color: var(--ash);
+      letter-spacing: 0.06em;
+    }
+    .sheet-footer .f-stamp {
+      font-family: var(--font-serif);
+      font-size: 11px;
+      font-style: italic;
+      color: var(--ash);
+    }
+    .grading-key {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .grading-key span {
+      font-size: 9px;
+      color: var(--ash);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── PRINT ──────────────────────────────────────────── */
+    @media print {
+      .screen-only { display: none !important; }
+      body { background: white; }
+      .sheet {
+        width: 100%;
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+      }
+    }
+
+    /* ── SCORE COLORS ───────────────────────────────────── */
+    .sc-a1 { color: #1A6640; }
+    .sc-b2, .sc-b3 { color: var(--purple); }
+    .sc-c4, .sc-c5, .sc-c6 { color: #8A5C00; }
+    .sc-d7 { color: #A04000; }
+    .sc-e8 { color: #7A2020; }
+    .sc-f9 { color: #C0392B; }
+
+    .bar-a1, .bar-b2, .bar-b3 { background: var(--purple); }
+    .bar-c4, .bar-c5, .bar-c6 { background: #F0A800; }
+    .bar-d7, .bar-e8, .bar-f9 { background: #E05030; }
+
+    .dot-a1 { background: #E8F8E8; color: #1A6640; }
+    .dot-b2, .dot-b3 { background: var(--purple-ghost); color: var(--purple); }
+    .dot-c4, .dot-c5, .dot-c6 { background: var(--warn-bg); color: var(--warn-fg); }
+    .dot-d7 { background: #FFE8D0; color: #A04000; }
+    .dot-e8 { background: #FFE0E0; color: #7A2020; }
+    .dot-f9 { background: var(--fail-bg); color: var(--fail-fg); }
+
+    .rm-pass { background: var(--pass-bg); color: var(--pass-fg); }
+    .rm-fail { background: var(--fail-bg); color: var(--fail-fg); }
+  </style>
+</head>
+<body>
+
+<!-- Screen toolbar -->
+<div class="screen-only">
+  <div>
+    <h1>SS3 Science — Report Sheets (Sample · 5 Students)</h1>
+    <span>Third Term 2024/2025 &nbsp;·&nbsp; Tendercare Comprehensive College</span>
+  </div>
+  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<script>
+/* ── DATA ─────────────────────────────────────────────────────── */
+const TERM   = "Third Term 2024/2025";
+const CLASS  = "SS3 Science";
+const SCHOOL = "Tendercare Comprehensive College";
+const TOTAL_STUDENTS = 22;
+
+/* WAEC 9-point grading */
+function grade(score) {
+  if (!score && score !== 0) return { g:'—', cls:'f9', pass:false };
+  if (score >= 75) return { g:'A1', cls:'a1', pass:true  };
+  if (score >= 70) return { g:'B2', cls:'b2', pass:true  };
+  if (score >= 65) return { g:'B3', cls:'b3', pass:true  };
+  if (score >= 60) return { g:'C4', cls:'c4', pass:true  };
+  if (score >= 55) return { g:'C5', cls:'c5', pass:true  };
+  if (score >= 50) return { g:'C6', cls:'c6', pass:true  };
+  if (score >= 45) return { g:'D7', cls:'d7', pass:false };
+  if (score >= 40) return { g:'E8', cls:'e8', pass:false };
+  return           { g:'F9', cls:'f9', pass:false };
+}
+
+/* Position suffix */
+function pos(n) {
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+/* Overall grade from sum-of-totals (rough average approach) */
+function overallGrade(sum, count) {
+  const avg = sum / count;
+  return grade(avg).g;
+}
+
+const students = [
+  {
+    sn: 3, id: 'TCH-2025-337', name: 'Bright',
+    position: 1,
+    subjects: [
+      { name: 'English Language',  ca: 27, exam: 61, total: 88 },
+      { name: 'Mathematics',       ca: 25, exam: 51, total: 76 },
+      { name: 'Physics',           ca: 27, exam: 66, total: 93 },
+      { name: 'Chemistry',         ca: 19, exam: 47, total: 66 },
+      { name: 'Biology',           ca: 30, exam: 62, total: 92 },
+      { name: 'Agriculture',       ca: 30, exam: 45, total: 75 },
+      { name: 'Commerce',          ca: 25, exam: 59, total: 84 },
+      { name: 'Data Processing',   ca: 30, exam: 60, total: 90 },
+    ],
+    sumTotals: 664,
+    teacher_comment: 'Bright shows exceptional ability across all science subjects. A consistent and focused student.',
+    principal_comment: 'Outstanding performance. Keep aiming higher.',
+  },
+  {
+    sn: 7, id: 'TCH-2025-341', name: 'Fauziyyah',
+    position: 2,
+    subjects: [
+      { name: 'English Language',  ca: 23, exam: 66, total: 89 },
+      { name: 'Mathematics',       ca: 25, exam: 57, total: 82 },
+      { name: 'Physics',           ca: 23, exam: 67, total: 90 },
+      { name: 'Chemistry',         ca: 12, exam: 42, total: 54 },
+      { name: 'Biology',           ca: 28, exam: 58, total: 86 },
+      { name: 'Agriculture',       ca: 30, exam: 44, total: 74 },
+      { name: 'Commerce',          ca: 25, exam: 49, total: 74 },
+      { name: 'Data Processing',   ca: 30, exam: 59, total: 89 },
+    ],
+    sumTotals: 638,
+    teacher_comment: 'Fauziyyah is a diligent and well-rounded student with particular strength in Physics and English.',
+    principal_comment: 'Very commendable result. Continue to work on Chemistry.',
+  },
+  {
+    sn: 21, id: 'TCH-2025-355', name: 'Temi',
+    position: 3,
+    subjects: [
+      { name: 'English Language',  ca: 25, exam: 64, total: 89 },
+      { name: 'Mathematics',       ca: 25, exam: 28, total: 53 },
+      { name: 'Physics',           ca: 19, exam: 65, total: 84 },
+      { name: 'Chemistry',         ca: 16, exam: 37, total: 53 },
+      { name: 'Biology',           ca: 30, exam: 47, total: 77 },
+      { name: 'Agriculture',       ca: 30, exam: 42, total: 72 },
+      { name: 'Commerce',          ca: 25, exam: 45, total: 70 },
+      { name: 'Data Processing',   ca: 30, exam: 59, total: 89 },
+    ],
+    sumTotals: 587,
+    teacher_comment: 'Temi shows great potential. Mathematics needs focused revision before WAEC.',
+    principal_comment: 'Good effort overall. More consistency required.',
+  },
+  {
+    sn: 22, id: 'TCH-2025-356', name: 'Zainab',
+    position: 4,
+    subjects: [
+      { name: 'English Language',  ca: 25, exam: 58, total: 83 },
+      { name: 'Mathematics',       ca: 25, exam: 43, total: 68 },
+      { name: 'Physics',           ca: 23, exam: 67, total: 90 },
+      { name: 'Chemistry',         ca: 15, exam: 46, total: 61 },
+      { name: 'Biology',           ca: 30, exam: 59, total: 89 },
+      { name: 'Commerce',          ca: 25, exam: 58, total: 83 },
+      { name: 'Data Processing',   ca: 30, exam: 59, total: 89 },
+    ],
+    sumTotals: 563,
+    teacher_comment: 'Zainab is a determined student. Physics is a clear strength. Chemistry can still improve.',
+    principal_comment: 'Solid performance. Strive for greater heights.',
+  },
+  {
+    sn: 14, id: 'TCH-2025-348', name: 'Michael',
+    position: 5,
+    subjects: [
+      { name: 'English Language',  ca: 26, exam: 66, total: 92 },
+      { name: 'Mathematics',       ca: 25, exam: 34, total: 59 },
+      { name: 'Physics',           ca: 15, exam: 43, total: 58 },
+      { name: 'Chemistry',         ca: 15, exam: 38, total: 53 },
+      { name: 'Biology',           ca: 30, exam: 52, total: 82 },
+      { name: 'Commerce',          ca: 25, exam: 38, total: 63 },
+      { name: 'Data Processing',   ca: 30, exam: 58, total: 88 },
+    ],
+    sumTotals: 495,
+    teacher_comment: 'Michael excels in English and Biology. Science core subjects require more attention.',
+    principal_comment: 'Average performance. More effort needed in Physics and Chemistry.',
+  },
+];
+
+/* ── RENDER ────────────────────────────────────────────────────── */
+function barColor(cls) {
+  if (['a1','b2','b3'].includes(cls)) return 'var(--purple)';
+  if (['c4','c5','c6'].includes(cls)) return '#F0A800';
+  return '#E05030';
+}
+
+function buildSheet(s) {
+  const subjectCount = s.subjects.length;
+  const avg = Math.round(s.sumTotals / subjectCount);
+  const overall = grade(avg);
+
+  const rows = s.subjects.map(sub => {
+    const g = grade(sub.total);
+    const pct = sub.total;
+    return `
+      <tr>
+        <td class="subject-col">${sub.name}</td>
+        <td class="num-col">${sub.ca}</td>
+        <td class="num-col">${sub.exam}</td>
+        <td class="total-col sc-${g.cls}">${sub.total}</td>
+        <td class="bar-cell">
+          <div class="bar-wrap">
+            <div class="bar-fill" style="width:${pct}%;background:${barColor(g.cls)};"></div>
+          </div>
+        </td>
+        <td><span class="grade-dot dot-${g.cls}">${g.g}</span></td>
+        <td><span class="remark-tag ${g.pass ? 'rm-pass':'rm-fail'}">${g.pass ? 'Pass':'Fail'}</span></td>
+      </tr>`;
+  }).join('');
+
+  return `
+  <div class="sheet">
+
+    <!-- Header -->
+    <div class="sheet-header">
+      <div>
+        <div class="school-name">${SCHOOL}</div>
+        <div class="school-sub">Student Academic Report Sheet</div>
+      </div>
+      <div class="term-badge">
+        <span class="t-term">Term</span>
+        <span class="t-val">3RD · 2024/25</span>
+      </div>
+    </div>
+
+    <!-- Identity -->
+    <div class="identity-bar">
+      <div>
+        <div class="student-name">${s.name}</div>
+        <div class="student-meta">${s.id} &nbsp;·&nbsp; ${CLASS}</div>
+      </div>
+      <div class="stat-chip">
+        <div class="s-num">${pos(s.position)}</div>
+        <div class="s-lbl">of ${TOTAL_STUDENTS}</div>
+      </div>
+      <div class="grade-chip">
+        <div class="g-letter">${overall.g}</div>
+        <div class="g-lbl">Overall</div>
+      </div>
+    </div>
+
+    <!-- Scores -->
+    <div class="results-wrap">
+      <div class="section-label">Subject Scores</div>
+      <table class="scores">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th class="num">CA / 30</th>
+            <th class="num">Exam / 70</th>
+            <th class="num">Total</th>
+            <th></th>
+            <th>Grade</th>
+            <th>Remark</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+
+    <!-- Totals band -->
+    <div class="totals-row">
+      <div>
+        <div class="t-label">Sum of Totals</div>
+        <div class="t-val">${s.sumTotals}</div>
+      </div>
+      <div>
+        <div class="t-label">Average Score</div>
+        <div class="t-val">${avg}<span class="t-unit"> / 100</span></div>
+      </div>
+      <div>
+        <div class="t-label">Subjects Sat</div>
+        <div class="t-val">${subjectCount}</div>
+      </div>
+      <div>
+        <div class="t-label">Overall Grade</div>
+        <div class="t-val">${overall.g}</div>
+      </div>
+    </div>
+
+    <!-- Remarks -->
+    <div class="remarks-section">
+      <div class="remark-block">
+        <div class="r-label">Class Teacher's Comment</div>
+        <div style="font-family:var(--font-serif);font-style:italic;font-size:12px;color:var(--ink-soft);line-height:1.5;">"${s.teacher_comment}"</div>
+        <div class="r-line"></div>
+        <div class="r-sig">Signature: ___________________________</div>
+      </div>
+      <div class="remark-block">
+        <div class="r-label">Principal's Comment</div>
+        <div style="font-family:var(--font-serif);font-style:italic;font-size:12px;color:var(--ink-soft);line-height:1.5;">"${s.principal_comment}"</div>
+        <div class="r-line"></div>
+        <div class="r-sig">Signature &amp; Stamp: ________________</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="sheet-footer">
+      <div class="f-left">
+        <div style="margin-bottom:2px;">TENDERCARE COMPREHENSIVE COLLEGE &nbsp;·&nbsp; ${TERM}</div>
+        <div class="grading-key">
+          <span>A1 ≥75</span><span>B2 70–74</span><span>B3 65–69</span>
+          <span>C4 60–64</span><span>C5 55–59</span><span>C6 50–54</span>
+          <span>D7 45–49</span><span>E8 40–44</span><span>F9 &lt;40</span>
+        </div>
+      </div>
+      <div class="f-stamp">Issued · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div>
+    </div>
+
+  </div>`;
+}
+
+document.write(students.map(buildSheet).join(''));
+</script>
+
+</body>
+</html>
