@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SS3 Science Report Cards – TCC 2025/2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pd: #1a3e60; --p: #2a5a8a; --pl: #dce8f5; --pg: #f0f5fc;
+      --lemon: #f0c040; --lemon-s: #f5d780; --ink: #1A1A2E; --ink-s: #3D3D5C;
+      --ash: #6a6a88; --cream: #F8F5EF; --cream-d: #EDE8DF; --white: #FFFFFF;
+      --pass-bg: #E8F8E8; --pass-fg: #1A6640; --fail-bg: #FFE8E8; --fail-fg: #C0392B;
+      --warn-bg: #FFF3C4; --warn-fg: #8A5C00;
+      --fs: 'Cormorant Garamond', Georgia, serif;
+      --fn: 'DM Sans', system-ui, sans-serif;
+      --fd: 'Bebas Neue', sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--fn);background:var(--cream);color:var(--ink);font-size:13px;-webkit-font-smoothing:antialiased}
+    .toolbar{background:var(--pd);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .toolbar h1{font-family:var(--fs);font-size:1.1rem;font-weight:400;color:var(--cream)}
+    .toolbar span{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase}
+    .toolbar .meta{display:flex;flex-direction:column;gap:2px}
+    .pbtn{background:var(--lemon);color:var(--ink);border:none;padding:8px 22px;font-family:var(--fn);font-size:12px;font-weight:600;letter-spacing:.04em;cursor:pointer;border-radius:4px}
+    .pbtn:hover{background:var(--lemon-s)}
+
+    .sheet{width:210mm;min-height:297mm;background:var(--white);margin:20px auto;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);display:flex;flex-direction:column;page-break-after:always;break-after:page}
+
+    .sh{background:var(--pd);color:var(--cream);padding:16px 22px 14px;display:grid;grid-template-columns:1fr auto;align-items:start;gap:12px;position:relative;overflow:hidden}
+    .sh::after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(240,192,64,.15) 0%,transparent 70%);pointer-events:none}
+    .sh-name{font-family:var(--fs);font-size:1.3rem;font-weight:500;letter-spacing:.02em;line-height:1.2}
+    .sh-sub{font-size:9px;letter-spacing:.12em;text-transform:uppercase;opacity:.45;margin-top:3px}
+    .term-b{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:6px 12px;text-align:center}
+    .term-b .tt{font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.4;display:block}
+    .term-b .tv{font-family:var(--fd);font-size:.95rem;letter-spacing:.06em;color:var(--lemon);line-height:1.2;display:block}
+
+    .ib{background:var(--pg);border-bottom:1px solid var(--pl);padding:10px 22px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:20px}
+    .sname{font-family:var(--fs);font-size:1.4rem;font-weight:400;color:var(--ink);line-height:1.1}
+    .smeta{font-size:10px;color:var(--ash);margin-top:2px;letter-spacing:.04em}
+    .chip{text-align:center;background:var(--white);border:1px solid var(--pl);border-radius:6px;padding:5px 13px;min-width:68px}
+    .chip .cn{font-family:var(--fd);font-size:1.5rem;line-height:1;color:var(--p)}
+    .chip .cl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);margin-top:1px}
+    .gchip{background:var(--pd);border-radius:6px;padding:5px 13px;text-align:center;min-width:60px}
+    .gchip .gl{font-family:var(--fd);font-size:1.9rem;color:var(--lemon);line-height:1}
+    .gchip .gll{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:1px}
+
+    .rw{padding:14px 22px 0;flex:1}
+    .sec-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);margin-bottom:7px}
+    table.sc{width:100%;border-collapse:collapse;font-size:12px}
+    table.sc thead tr{background:var(--cream);border-bottom:2px solid var(--cream-d)}
+    table.sc thead th{padding:6px 9px;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);text-align:left}
+    table.sc thead th.n{text-align:right}
+    table.sc tbody tr{border-bottom:1px solid #F0EDE8}
+    table.sc tbody tr:last-child{border-bottom:none}
+    table.sc td{padding:7px 9px;vertical-align:middle}
+    table.sc td.sc{font-weight:500;color:var(--ink)}
+    table.sc td.nc{text-align:right;font-family:var(--fd);font-size:1.05rem;line-height:1;color:var(--ink-s)}
+    table.sc td.tc{text-align:right;font-family:var(--fd);font-size:1.2rem;line-height:1;font-weight:700}
+    .gdot{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-weight:700;font-size:10px}
+
+    .tband{margin:10px 22px 0;background:var(--pd);border-radius:8px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .tband .tl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+    .tband .tv{font-family:var(--fd);font-size:1.5rem;color:var(--lemon);line-height:1}
+    .tband .tu{font-size:9px;color:rgba(255,255,255,.25)}
+
+    .remarks{margin:12px 22px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .rb{background:var(--cream);border:1px solid var(--cream-d);border-radius:6px;padding:9px 11px;position:relative}
+    .rb::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;border-radius:6px 6px 0 0}
+    .rb.teacher::before{background:var(--pd)}
+    .rb.principal::before{background:var(--lemon)}
+    .rb .rl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);margin-bottom:5px}
+    .rb .rtext{font-family:var(--fs);font-style:italic;font-size:11.5px;color:var(--ink-s);line-height:1.45}
+    .rb .rline{height:1px;background:var(--cream-d);margin:5px 0}
+    .rb .rsig{font-family:var(--fs);font-style:italic;font-size:10px;color:var(--ash);margin-top:3px}
+
+    .sfooter{margin-top:12px;padding:9px 22px;border-top:1px solid var(--cream-d);display:flex;align-items:center;justify-content:space-between}
+    .sfooter .fl{font-size:9px;color:var(--ash);letter-spacing:.04em}
+    .sfooter .fstamp{font-family:var(--fs);font-size:10px;font-style:italic;color:var(--ash)}
+    .gkey{display:flex;gap:7px;flex-wrap:wrap;margin-top:2px}
+    .gkey span{font-size:8.5px;color:var(--ash)}
+
+    /* pending */
+    .pending-body{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:40px 22px}
+    .pending-body .pb-icon{font-size:2.5rem;margin-bottom:4px}
+    .pending-body .pb-msg{font-family:var(--fs);font-size:1.1rem;color:var(--ash);font-style:italic}
+    .pending-body .pb-sub{font-size:10px;color:var(--ash);letter-spacing:.08em;text-transform:uppercase}
+
+    /* grade colours */
+    .ca1{color:#1A6640}.cb2,.cb3{color:var(--p)}.cc4,.cc5,.cc6{color:#8A5C00}
+    .cd7{color:#A04000}.ce8{color:#7A2020}.cf9{color:#C0392B}
+    .da1,.db2,.db3{background:var(--p)}.dc4,.dc5,.dc6{background:#F0A800}.dd7,.de8,.df9{background:#E05030}
+    .ga1{background:#E8F8E8;color:#1A6640}.gb2,.gb3{background:var(--pg);color:var(--p)}
+    .gc4,.gc5,.gc6{background:var(--warn-bg);color:var(--warn-fg)}
+    .gd7{background:#FFE8D0;color:#A04000}.ge8{background:#FFE0E0;color:#7A2020}
+    .gf9{background:var(--fail-bg);color:var(--fail-fg)}
+
+    @media print{
+      .toolbar{display:none!important}
+      body{background:white}
+      .sheet{width:100%;margin:0;box-shadow:none;page-break-after:always;break-after:page}
+    }
+  </style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="meta">
+    <h1>SS3 Science Report Cards (1–4 of 22)</h1>
+    <span>Third Term 2025/2026 · Tendercare Comprehensive College</span>
+  </div>
+  <button class="pbtn" onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<script>
+/* ========== DATA ========== */
+const students = [
+  {sn:1, id:'TCH-2025-335', name:'Angel', subjects:[
+    {n:'English Language', ca:22, ex:55, tot:77},
+    {n:'Mathematics', ca:25, ex:26, tot:51},
+    {n:'Physics', ca:20, ex:43, tot:63},
+    {n:'Chemistry', ca:10, ex:30, tot:40},
+    {n:'Biology', ca:30, ex:32, tot:62},
+    {n:'Agricultural Science', ca:20, ex:43, tot:63},
+    {n:'Commerce', ca:25, ex:39, tot:64},
+    {n:'Data Processing', ca:25, ex:29, tot:54}
+  ], sum:474},
+  {sn:2, id:'TCH-2025-336', name:'Bamise', subjects:[
+    {n:'English Language', ca:25, ex:53, tot:78},
+    {n:'Mathematics', ca:25, ex:31, tot:56},
+    {n:'Physics', ca:17, ex:57, tot:74},
+    {n:'Chemistry', ca:5, ex:37, tot:42},
+    {n:'Biology', ca:30, ex:30, tot:60},
+    {n:'Agricultural Science', ca:23, ex:50, tot:73},
+    {n:'Commerce', ca:25, ex:23, tot:48},
+    {n:'Data Processing', ca:15, ex:46, tot:61}
+  ], sum:492},
+  {sn:3, id:'TCH-2025-337', name:'Bright', subjects:[
+    {n:'English Language', ca:27, ex:61, tot:88},
+    {n:'Mathematics', ca:25, ex:51, tot:76},
+    {n:'Physics', ca:27, ex:66, tot:93},
+    {n:'Chemistry', ca:19, ex:47, tot:66},
+    {n:'Biology', ca:30, ex:62, tot:92},
+    {n:'Agricultural Science', ca:30, ex:45, tot:75},
+    {n:'Commerce', ca:25, ex:59, tot:84},
+    {n:'Data Processing', ca:30, ex:60, tot:90}
+  ], sum:664},
+  {sn:4, id:'TCH-2025-338', name:'Dorcas', pending:true}
+];
+
+/* WAEC 9-point */
+function grade(score){
+  if(score >= 75) return {g:'A1',c:'a1'};
+  if(score >= 70) return {g:'B2',c:'b2'};
+  if(score >= 65) return {g:'B3',c:'b3'};
+  if(score >= 60) return {g:'C4',c:'c4'};
+  if(score >= 55) return {g:'C5',c:'c5'};
+  if(score >= 50) return {g:'C6',c:'c6'};
+  if(score >= 45) return {g:'D7',c:'d7'};
+  if(score >= 40) return {g:'E8',c:'e8'};
+  return {g:'F9',c:'f9'};
+}
+function pos(n){const s=['th','st','nd','rd']; const v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]);}
+
+/* ========== BUILD SHEETS ========== */
+function buildSheet(s, rank, total){
+  if(s.pending){
+    return `<div class="sheet">
+      <div class="sh">
+        <div><div class="sh-name">TENDERCARE COMPREHENSIVE COLLEGE</div><div class="sh-sub">Student Academic Report Sheet</div></div>
+        <div class="term-b"><span class="tt">Term</span><span class="tv">3RD · 2025/2026</span></div>
+      </div>
+      <div class="ib">
+        <div><div class="sname">${s.name}</div><div class="smeta">${s.id} · SS3 Science</div></div>
+        <div class="chip"><div class="cn">—</div><div class="cl">Position</div></div>
+        <div class="gchip"><div class="gl">—</div><div class="gll">Overall</div></div>
+      </div>
+      <div class="pending-body">
+        <div class="pb-icon">📋</div>
+        <div class="pb-msg">Scores not yet recorded</div>
+        <div class="pb-sub">Report sheet will be issued once scores are entered</div>
+      </div>
+      <div class="sfooter">
+        <div class="fl">TENDERCARE COMPREHENSIVE COLLEGE · Third Term 2025/2026</div>
+        <div class="fstamp">Pending</div>
+      </div>
+    </div>`;
+  }
+
+  const n = s.subjects.length;
+  const avg = Math.round(s.sum / n * 100) / 100; // e.g., 59.25
+  const og = grade(avg);
+
+  const rows = s.subjects.map(sub => {
+    const g = grade(sub.tot);
+    return `<tr>
+      <td class="sc">${sub.n}</td>
+      <td class="nc">${sub.ca}</td>
+      <td class="nc">${sub.ex}</td>
+      <td class="tc c${g.c}">${sub.tot}</td>
+      <td><span class="gdot g${g.c}">${g.g}</span></td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="sheet">
+    <div class="sh">
+      <div><div class="sh-name">TENDERCARE COMPREHENSIVE COLLEGE</div><div class="sh-sub">Student Academic Report Sheet</div></div>
+      <div class="term-b"><span class="tt">Term</span><span class="tv">3RD · 2025/2026</span></div>
+    </div>
+    <div class="ib">
+      <div><div class="sname">${s.name}</div><div class="smeta">${s.id} · SS3 Science</div></div>
+      <div class="chip"><div class="cn">${pos(rank)}</div><div class="cl">of ${total}</div></div>
+      <div class="gchip"><div class="gl">${og.g}</div><div class="gll">Overall</div></div>
+    </div>
+    <div class="rw">
+      <div class="sec-lbl">Subject Scores</div>
+      <table class="sc">
+        <thead><tr>
+          <th>Subject</th>
+          <th class="n">CA /30</th>
+          <th class="n">Exam /70</th>
+          <th class="n">Total</th>
+          <th>Grade</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="tband">
+      <div><div class="tl">Sum of Totals</div><div class="tv">${s.sum}</div></div>
+      <div><div class="tl">Average Score</div><div class="tv">${avg}<span class="tu"> /100</span></div></div>
+      <div><div class="tl">Subjects Sat</div><div class="tv">${n}</div></div>
+      <div><div class="tl">Class Position</div><div class="tv">${pos(rank)}</div></div>
+      <div><div class="tl">Overall Grade</div><div class="tv">${og.g}</div></div>
+    </div>
+    <div class="remarks">
+      <div class="rb teacher">
+        <div class="rl">📝 Class Teacher's Comment</div>
+        <div class="rtext">${getTeacherComment(s, avg, og)}</div>
+        <div class="rline"></div>
+        <div class="rsig">Signature: ___________________________</div>
+      </div>
+      <div class="rb principal">
+        <div class="rl">🏫 Principal's Comment</div>
+        <div class="rtext">${getPrincipalComment(avg, og)}</div>
+        <div class="rline"></div>
+        <div class="rsig">Signature &amp; Stamp: ________________</div>
+      </div>
+    </div>
+    <div class="sfooter">
+      <div class="fl">
+        <div>TENDERCARE COMPREHENSIVE COLLEGE · Third Term 2025/2026</div>
+        <div class="gkey">
+          <span>A1 ≥75</span><span>B2 70-74</span><span>B3 65-69</span>
+          <span>C4 60-64</span><span>C5 55-59</span><span>C6 50-54</span>
+          <span>D7 45-49</span><span>E8 40-44</span><span>F9 &lt;40</span>
+        </div>
+      </div>
+      <div class="fstamp">Issued · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div>
+    </div>
+  </div>`;
+}
+
+/* Simple dynamic comments based on performance */
+function getTeacherComment(s, avg, og){
+  if(og.g === 'A1' || og.g === 'B2' || og.g === 'B3')
+    return `${s.name} has shown excellent commitment and consistently high performance. Continue to challenge yourself and maintain this momentum.`;
+  if(og.g === 'C4' || og.g === 'C5' || og.g === 'C6')
+    return `${s.name} has demonstrated satisfactory effort. Improvement in core areas and consistent revision will help push results higher.`;
+  if(og.g === 'D7' || og.g === 'E8')
+    return `${s.name} needs to address gaps in understanding. More focused study time and seeking help from teachers will be beneficial.`;
+  return `${s.name} requires urgent intervention. Weak foundational knowledge is evident; parents should meet with teachers to formulate a support plan.`;
+}
+function getPrincipalComment(avg, og){
+  if(og.g === 'A1' || og.g === 'B2' || og.g === 'B3')
+    return `Well done! Keep up the stellar work. The school commends your dedication and encourages you to aim even higher.`;
+  if(og.g === 'C4' || og.g === 'C5' || og.g === 'C6')
+    return `You are on the right track, but there is room for growth. Stay disciplined and make use of all available learning resources.`;
+  if(og.g === 'D7' || og.g === 'E8')
+    return `Your performance indicates the need for serious academic attention. The school is ready to help; do not hesitate to reach out.`;
+  return `We are concerned about your results. A meeting with the guidance counsellor is strongly recommended to chart a path forward.`;
+}
+
+/* Rank only scored students */
+const scored = students.filter(s => !s.pending);
+scored.sort((a,b) => b.sum - a.sum);
+scored.forEach((s,i) => s.pos = i+1);
+
+/* Output first 4 students */
+document.write(students.map((s,idx) => {
+  const rank = s.pending ? '—' : (scored.find(sc => sc.id === s.id)?.pos || '—');
+  return buildSheet(s, rank, students.length);
+}).join(''));
+</script>
+</body>
+</html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Report Card - Adeyemi A. - SS3 Science</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pd: #1a3e60;
+            --p: #2a5a8a;
+            --pl: #dce8f5;
+            --pg: #f0f5fc;
+            --lemon: #f0c040;
+            --lemon-s: #f5d780;
+            --ink: #1A1A2E;
+            --ink-s: #3D3D5C;
+            --ash: #6a6a88;
+            --cream: #F8F5EF;
+            --cream-d: #EDE8DF;
+            --white: #FFFFFF;
+            --pass-bg: #E8F8E8;
+            --pass-fg: #1A6640;
+            --fail-bg: #FFE8E8;
+            --fail-fg: #C0392B;
+            --warn-bg: #FFF3C4;
+            --warn-fg: #8A5C00;
+            --fs: 'Cormorant Garamond', Georgia, serif;
+            --fn: 'DM Sans', system-ui, sans-serif;
+            --fd: 'Bebas Neue', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--fn);
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .report-card {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            padding: 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            font-weight: 900;
+            color: #d9d9d9;
+            opacity: 0.15;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+            letter-spacing: 6px;
+            user-select: none;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* Card Inner */
+        .card-inner {
+            position: relative;
+            z-index: 1;
+            padding: 40px 35px 30px 35px;
+        }
+
+        /* School Header */
+        .school-header {
+            text-align: center;
+            border-bottom: 3px double var(--pd);
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+        .school-name {
+            font-family: var(--fs);
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--pd);
+            text-transform: uppercase;
+        }
+        .school-address {
+            font-size: 14px;
+            color: #333;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .school-phone {
+            font-size: 14px;
+            color: #333;
+            margin-top: 2px;
+        }
+
+        /* Term Badge */
+        .term-badge {
+            text-align: center;
+            margin: 6px 0 16px 0;
+        }
+        .term-badge-inner {
+            display: inline-block;
+            background: var(--pd);
+            color: var(--white);
+            padding: 5px 18px;
+            border-radius: 4px;
+        }
+        .term-badge .tb-label {
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            display: block;
+        }
+        .term-badge .tb-value {
+            font-family: var(--fd);
+            font-size: 1.1rem;
+            letter-spacing: 0.06em;
+            color: var(--lemon);
+            display: block;
+            line-height: 1.2;
+        }
+
+        /* Student Info */
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            margin-bottom: 18px;
+            padding: 10px 14px;
+            background: var(--pg);
+            border-radius: 4px;
+            border: 1px solid var(--pl);
+        }
+        .student-info .label {
+            font-weight: 600;
+            color: var(--pd);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .student-info .value {
+            font-family: var(--fs);
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--ink);
+            display: block;
+            margin-top: 1px;
+        }
+
+        /* Table */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: white;
+        }
+        .report-table th {
+            background: var(--pd);
+            color: white;
+            padding: 9px 6px;
+            text-align: center;
+            border: 1px solid var(--pd);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .report-table td {
+            border: 1px solid #bbb;
+            padding: 7px 6px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .report-table tbody tr:nth-child(even) {
+            background: #f8faff;
+        }
+        .subject-name {
+            text-align: left;
+            padding-left: 10px;
+            font-weight: 500;
+            color: var(--ink);
+        }
+        .total-row {
+            font-weight: 700;
+            background: #e6edf5 !important;
+        }
+        .total-row td {
+            border-top: 2px solid var(--pd);
+        }
+        .score-cell {
+            font-family: var(--fd);
+            font-size: 1.05rem;
+            color: var(--ink-s);
+        }
+        .total-score {
+            font-family: var(--fd);
+            font-size: 1.3rem;
+            color: var(--pd);
+            font-weight: 700;
+        }
+
+        /* Grade dot */
+        .gdot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 10px;
+            font-family: var(--fn);
+        }
+        .gdot.ga1 {
+            background: #E8F8E8;
+            color: #1A6640;
+        }
+        .gdot.gb2,
+        .gdot.gb3 {
+            background: var(--pg);
+            color: var(--p);
+        }
+        .gdot.gc4,
+        .gdot.gc5,
+        .gdot.gc6 {
+            background: var(--warn-bg);
+            color: var(--warn-fg);
+        }
+        .gdot.gd7 {
+            background: #FFE8D0;
+            color: #A04000;
+        }
+        .gdot.ge8 {
+            background: #FFE0E0;
+            color: #7A2020;
+        }
+        .gdot.gf9 {
+            background: var(--fail-bg);
+            color: var(--fail-fg);
+        }
+
+        /* Bar */
+        .bar-wrap {
+            width: 60px;
+            height: 5px;
+            background: #e0dce8;
+            border-radius: 3px;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        /* Summary Band */
+        .summary-band {
+            margin-top: 16px;
+            background: var(--pd);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .summary-band .sb-item {
+            text-align: center;
+        }
+        .summary-band .sb-label {
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            display: block;
+        }
+        .summary-band .sb-value {
+            font-family: var(--fd);
+            font-size: 1.4rem;
+            color: var(--lemon);
+            line-height: 1;
+            display: block;
+        }
+        .summary-band .sb-unit {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Remarks Section — THE BEAUTY FROM SECOND CODEBASE */
+        .remarks {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .remark-box {
+            background: var(--cream);
+            border: 1px solid var(--cream-d);
+            border-radius: 8px;
+            padding: 14px 16px;
+            position: relative;
+            min-height: 100px;
+        }
+        .remark-box .remark-label {
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ash);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .remark-box .remark-content {
+            font-family: var(--fs);
+            font-style: italic;
+            font-size: 13px;
+            color: var(--ink-s);
+            line-height: 1.5;
+            min-height: 40px;
+        }
+        .remark-box .remark-line {
+            height: 1px;
+            background: var(--cream-d);
+            margin: 8px 0;
+        }
+        .remark-box .remark-signature {
+            font-family: var(--fs);
+            font-style: italic;
+            font-size: 10px;
+            color: var(--ash);
+            margin-top: 4px;
+        }
+        .remark-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            border-radius: 8px 8px 0 0;
+        }
+        .remark-box.teacher::before {
+            background: var(--pd);
+        }
+        .remark-box.principal::before {
+            background: var(--lemon);
+        }
+
+        /* Footer */
+        .footer-note {
+            margin-top: 18px;
+            font-size: 11px;
+            text-align: right;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .footer-note .grade-key {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            font-size: 9px;
+            color: var(--ash);
+        }
+        .footer-note .grade-key span {
+            white-space: nowrap;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0.2in;
+            }
+            .report-card {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .card-inner {
+                padding: 20px;
+            }
+            .watermark {
+                opacity: 0.1;
+            }
+        }
+        @media screen and (max-width: 700px) {
+            .card-inner {
+                padding: 15px 10px;
+            }
+            .school-name {
+                font-size: 20px;
+            }
+            .report-table {
+                font-size: 11px;
+            }
+            .student-info {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .remarks {
+                grid-template-columns: 1fr;
+            }
+            .summary-band {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-card">
+        <!-- Watermark -->
+        <div class="watermark">TENDER CARE COMPREHENSIVE COLLEGE</div>
+
+        <div class="card-inner">
+            <!-- School Header -->
+            <div class="school-header">
+                <div class="school-name">TENDER CARE COMPREHENSIVE COLLEGE</div>
+                <div class="school-address">Kamalo Labori Sagamu Road, Gbaga, Ogun State.</div>
+                <div class="school-phone">Tel: 08149135960; 08085042982</div>
+            </div>
+
+            <!-- Term Badge -->
+            <div class="term-badge">
+                <div class="term-badge-inner">
+                    <span class="tb-label">Session</span>
+                    <span class="tb-value">THIRD TERM · 2025/2026</span>
+                </div>
+            </div>
+
+            <!-- Student Info -->
+            <div class="student-info">
+                <div>
+                    <span class="label">Student</span>
+                    <span class="value">Adeyemi A.</span>
+                </div>
+                <div>
+                    <span class="label">Student ID</span>
+                    <span class="value">TCH-2025-335</span>
+                </div>
+                <div>
+                    <span class="label">Class</span>
+                    <span class="value">SS3 Science</span>
+                </div>
+                <div>
+                    <span class="label">Term</span>
+                    <span class="value">Third</span>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width:32%;">Subject</th>
+                        <th style="width:13%;">CA (40)</th>
+                        <th style="width:13%;">Exam (60)</th>
+                        <th style="width:13%;">Total (100)</th>
+                        <th style="width:12%;">Bar</th>
+                        <th style="width:8%;">Grade</th>
+                        <th style="width:9%;">Remark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="subject-name">English</td>
+                        <td class="score-cell">15</td><td class="score-cell">32</td>
+                        <td class="score-cell total-score">47</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:47%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gd7">D7</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8D0;color:#A04000;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Mathematics</td>
+                        <td class="score-cell">12</td><td class="score-cell">45</td>
+                        <td class="score-cell total-score">57</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:57%;background:#F0A800;"></div></div></td>
+                        <td><span class="gdot gc5">C5</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFF3C4;color:#8A5C00;">Pass</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Physics</td>
+                        <td class="score-cell">10</td><td class="score-cell">30</td>
+                        <td class="score-cell total-score">40</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:40%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot ge8">E8</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE0E0;color:#7A2020;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Chemistry</td>
+                        <td class="score-cell">14</td><td class="score-cell">25</td>
+                        <td class="score-cell total-score">39</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:39%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gf9">F9</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8E8;color:#C0392B;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Biology</td>
+                        <td class="score-cell">11</td><td class="score-cell">28</td>
+                        <td class="score-cell total-score">39</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:39%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gf9">F9</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8E8;color:#C0392B;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Agricultural Science</td>
+                        <td class="score-cell">13</td><td class="score-cell">22</td>
+                        <td class="score-cell total-score">35</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:35%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gf9">F9</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8E8;color:#C0392B;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Geography</td>
+                        <td class="score-cell">10</td><td class="score-cell">20</td>
+                        <td class="score-cell total-score">30</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:30%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gf9">F9</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8E8;color:#C0392B;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Civic Education</td>
+                        <td class="score-cell">12</td><td class="score-cell">24</td>
+                        <td class="score-cell total-score">36</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:36%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gf9">F9</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8E8;color:#C0392B;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Data Processing</td>
+                        <td class="score-cell">14</td><td class="score-cell">20</td>
+                        <td class="score-cell total-score">34</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:34%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gf9">F9</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8E8;color:#C0392B;">Fail</span></td>
+                    </tr>
+                    <tr>
+                        <td class="subject-name">Trade / Entrepreneurship</td>
+                        <td class="score-cell">15</td><td class="score-cell">18</td>
+                        <td class="score-cell total-score">33</td>
+                        <td><div class="bar-wrap"><div class="bar-fill" style="width:33%;background:#E05030;"></div></div></td>
+                        <td><span class="gdot gf9">F9</span></td>
+                        <td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:#FFE8E8;color:#C0392B;">Fail</span></td>
+                    </tr>
+                    <!-- Grand Total Row -->
+                    <tr class="total-row">
+                        <td style="text-align:right; padding-right:15px; font-size:14px; font-weight:700;">GRAND TOTAL</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td style="font-family:var(--fd);font-size:1.4rem;color:var(--pd);">390</td>
+                        <td colspan="3" style="font-size:10px;color:var(--ash);text-align:left;padding-left:8px;">out of 1000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Summary Band -->
+            <div class="summary-band">
+                <div class="sb-item">
+                    <span class="sb-label">Total Score</span>
+                    <span class="sb-value">390<span class="sb-unit">/1000</span></span>
+                </div>
+                <div class="sb-item">
+                    <span class="sb-label">Average</span>
+                    <span class="sb-value">39.00<span class="sb-unit">%</span></span>
+                </div>
+                <div class="sb-item">
+                    <span class="sb-label">Subjects</span>
+                    <span class="sb-value">10</span>
+                </div>
+                <div class="sb-item">
+                    <span class="sb-label">Overall Grade</span>
+                    <span class="sb-value">F9</span>
+                </div>
+            </div>
+
+            <!-- ✨ Remarks Section — Merged Beauty from Second Codebase ✨ -->
+            <div class="remarks">
+                <!-- Class Teacher's Comment -->
+                <div class="remark-box teacher">
+                    <div class="remark-label">📝 Class Teacher's Comment</div>
+                    <div class="remark-content">
+                        Adeyemi A. has shown consistent effort throughout the term. There is room for significant improvement across all subjects, particularly in core sciences. A more focused approach to studies is strongly advised.
+                    </div>
+                    <div class="remark-line"></div>
+                    <div class="remark-signature">
+                        Signature: ___________________________<br>
+                        <span style="font-size:9px;opacity:0.7;">Class Teacher · SS3 Science</span>
+                    </div>
+                </div>
+
+                <!-- Principal's Comment -->
+                <div class="remark-box principal">
+                    <div class="remark-label">🏫 Principal's Comment</div>
+                    <div class="remark-content">
+                        Performance requires urgent attention. Parents are encouraged to meet with the class teacher to discuss strategies for academic improvement. The school remains committed to supporting this student's growth.
+                    </div>
+                    <div class="remark-line"></div>
+                    <div class="remark-signature">
+                        Signature &amp; Stamp: ________________<br>
+                        <span style="font-size:9px;opacity:0.7;">Principal · Tendercare Comprehensive College</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-note">
+                <div class="grade-key">
+                    <span>A1 ≥75</span><span>B2 70–74</span><span>B3 65–69</span>
+                    <span>C4 60–64</span><span>C5 55–59</span><span>C6 50–54</span>
+                    <span>D7 45–49</span><span>E8 40–44</span><span>F9 &lt;40</span>
+                </div>
+                <span>Generated: 2026-06-19 &nbsp;|&nbsp; Tendercare Comprehensive College</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
