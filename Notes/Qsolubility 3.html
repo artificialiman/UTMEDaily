@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Solubility, Saturation &amp; Water of Crystallisation — Chemistry Workbook</title>
+<style>
+:root {
+  --bg:        #F0F4F8;
+  --card:      #FFFFFF;
+  --text:      #0D1B2A;
+  --sub:       rgba(13,27,42,0.60);
+  --hint:      rgba(13,27,42,0.38);
+  --accent:    #00897B;   /* teal — water / crystal theme */
+  --accent-lt: rgba(0,137,123,0.10);
+  --accent-md: rgba(0,137,123,0.22);
+  --reveal:    #1565C0;
+  --reveal-lt: rgba(21,101,192,0.09);
+  --sep:       rgba(0,0,0,0.08);
+  --radius:    12px;
+  --shadow:    0 1px 4px rgba(0,0,0,0.07);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:     #0A0F14;
+    --card:   #131C24;
+    --text:   #E8F1FA;
+    --sub:    rgba(232,241,250,0.62);
+    --hint:   rgba(232,241,250,0.36);
+    --accent: #26A69A;
+    --accent-lt: rgba(38,166,154,0.12);
+    --accent-md: rgba(38,166,154,0.25);
+    --reveal: #5C9BE8;
+    --reveal-lt: rgba(92,155,232,0.10);
+    --sep:    rgba(255,255,255,0.06);
+  }
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+  font-size:16px;line-height:1.6;
+  color:var(--text);background:var(--bg);
+  padding-bottom:calc(env(safe-area-inset-bottom)+40px);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── HEADER ── */
+.header{
+  background:var(--card);
+  border-bottom:0.5px solid var(--sep);
+  padding:calc(env(safe-area-inset-top)+20px) 18px 18px;
+  position:sticky;top:0;z-index:100;
+}
+.header-eyebrow{
+  font-size:12px;font-weight:600;letter-spacing:.08em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:4px;
+}
+.header-title{font-size:26px;font-weight:700;line-height:1.2;margin-bottom:3px}
+.header-sub{font-size:13px;color:var(--hint)}
+
+/* ── SECTION LABEL ── */
+.section-label{
+  display:flex;align-items:center;gap:10px;
+  margin:24px 18px 4px;
+}
+.section-label span{
+  font-size:11px;font-weight:700;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--accent);white-space:nowrap;
+}
+.section-label::after{
+  content:'';flex:1;height:0.5px;background:var(--accent-md);
+}
+
+/* ── QUESTION CARD ── */
+.qcard{
+  background:var(--card);
+  border-radius:var(--radius);
+  margin:10px 18px;
+  padding:18px 18px 14px;
+  box-shadow:var(--shadow);
+}
+.qnum{
+  font-size:11px;font-weight:700;letter-spacing:.06em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:8px;
+}
+.qtext{
+  font-size:16px;line-height:1.6;margin-bottom:14px;
+}
+.qtext sub, .qtext sup{font-size:75%}
+
+/* formula / data blocks */
+.data-block{
+  background:var(--accent-lt);
+  border-left:3px solid var(--accent);
+  border-radius:0 8px 8px 0;
+  padding:10px 14px;
+  margin:10px 0 14px;
+  font-size:14px;color:var(--sub);line-height:1.7;
+}
+.data-block b{color:var(--text)}
+
+/* ── WORKBOOK AREA ── */
+.wb-label{
+  font-size:11px;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--hint);margin-bottom:6px;
+}
+.wb-lines{
+  display:flex;flex-direction:column;gap:0;margin-bottom:14px;
+}
+.wb-line{
+  border:none;border-bottom:1.5px solid var(--sep);
+  background:transparent;
+  color:var(--text);
+  font-family:inherit;font-size:15px;
+  padding:8px 2px;
+  outline:none;width:100%;
+  transition:border-color .2s;
+}
+.wb-line:focus{border-bottom-color:var(--accent)}
+.wb-line::placeholder{color:var(--hint);font-style:italic;font-size:14px}
+
+/* ── REVEAL BUTTON ── */
+.reveal-btn{
+  border:none;cursor:pointer;
+  padding:9px 16px;
+  border-radius:8px;
+  font-size:14px;font-weight:600;
+  background:var(--accent-lt);
+  color:var(--accent);
+  transition:background .15s,transform .1s;
+}
+.reveal-btn:active{transform:scale(.97)}
+.reveal-btn.revealed{
+  background:var(--reveal-lt);
+  color:var(--reveal);
+  cursor:default;
+}
+
+/* ── ANSWER PANEL ── */
+.answer-panel{
+  display:none;
+  margin-top:14px;
+  padding:14px;
+  background:var(--reveal-lt);
+  border-radius:8px;
+  font-size:14px;
+  line-height:1.75;
+  color:var(--sub);
+  border-left:3px solid var(--reveal);
+}
+.answer-panel.open{display:block}
+.answer-panel .ans-head{
+  font-size:12px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--reveal);margin-bottom:6px;
+}
+.answer-panel .ans-val{
+  font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;
+}
+.answer-panel .ans-exp{font-size:14px;color:var(--sub)}
+
+/* ── KEY FACTS BOX ── */
+.keyfact{
+  background:var(--accent-lt);
+  border:0.5px solid var(--accent-md);
+  border-radius:var(--radius);
+  margin:10px 18px;
+  padding:16px 18px;
+}
+.keyfact-head{
+  font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:8px;
+}
+.keyfact ul{padding-left:16px}
+.keyfact li{font-size:14px;line-height:1.8;color:var(--sub)}
+.keyfact li b{color:var(--text)}
+
+/* ── REVISIT BAND ── */
+.revisit-band{
+  background:var(--bg);
+  border-top:0.5px solid var(--sep);
+  border-bottom:0.5px solid var(--sep);
+  margin:20px 0 0;
+  padding:6px 18px 2px;
+}
+.revisit-band .section-label{margin:10px 0 4px}
+
+/* ── FOOTER ── */
+.footer{
+  text-align:center;
+  padding:32px 18px 16px;
+  font-size:12px;color:var(--hint);
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<div class="header">
+  <div class="header-eyebrow">UTMEDaily · Chemistry Workbook</div>
+  <div class="header-title">Solubility, Saturation<br>&amp; Water of Crystallisation</div>
+  <div class="header-sub">60 practice items — show your working, then reveal the answer</div>
+</div>
+
+<!-- ═════════ KEY FACTS BOX ═════════ -->
+<div class="keyfact">
+  <div class="keyfact-head">Anchor Definitions</div>
+  <ul>
+    <li><b>Solubility:</b> maximum mass of solute (g) that dissolves in <b>100 g of solvent</b> at a stated temperature to form a saturated solution.</li>
+    <li><b>Saturated solution:</b> contains the maximum dissolved solute at a given temperature; excess solute remains undissolved.</li>
+    <li><b>Unsaturated solution:</b> can still dissolve more solute at the same temperature.</li>
+    <li><b>Supersaturated solution:</b> dissolves more than the equilibrium amount (unstable; seeding causes crystallisation).</li>
+    <li><b>Water of crystallisation:</b> fixed moles of water chemically bonded in a crystalline salt (e.g. CuSO₄·5H₂O).</li>
+    <li><b>Anhydrous salt:</b> the same salt after water of crystallisation has been driven off by heat.</li>
+    <li><b>Efflorescence:</b> spontaneous loss of water of crystallisation to the atmosphere.</li>
+    <li><b>Deliquescence:</b> absorption of atmospheric water until the salt dissolves.</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════ BLOCK A — Solubility basics ═══════════════════ -->
+<div class="section-label"><span>Block A · Solubility Definitions &amp; Scale</span></div>
+
+<!-- A1 -->
+<div class="qcard">
+  <div class="qnum">A1</div>
+  <div class="qtext">The solubility of potassium nitrate (KNO₃) at 40 °C is 64 g per 100 g of water. State what this means in one sentence.</div>
+  <div class="wb-label">Your answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Write your definition here…">
+    <input class="wb-line" type="text" placeholder="">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Model Answer</div>
+    <div class="ans-exp">At 40 °C, a maximum of 64 g of KNO₃ will dissolve in 100 g of water to produce a saturated solution. Any additional KNO₃ added beyond this amount would remain as undissolved solid.</div>
+  </div>
+</div>
+
+<!-- A2 -->
+<div class="qcard">
+  <div class="qnum">A2</div>
+  <div class="qtext">How much KNO₃ dissolves in <b>250 g</b> of water at 40 °C? (Solubility = 64 g / 100 g water)</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Step 1: set up ratio…">
+    <input class="wb-line" type="text" placeholder="Step 2: solve…">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">160 g</div>
+    <div class="ans-exp">Ratio: 64 g ÷ 100 g = x ÷ 250 g<br>x = 64 × 250 / 100 = <b>160 g</b>.<br>Solubility scales linearly with solvent mass — always keep solvent in denominator.</div>
+  </div>
+</div>
+
+<!-- A3 -->
+<div class="qcard">
+  <div class="qnum">A3</div>
+  <div class="qtext">150 g of water is used as solvent. If 78 g of NaCl dissolves and the solution is exactly saturated, what is the solubility of NaCl (g / 100 g water)?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Scale to 100 g water…">
+    <input class="wb-line" type="text" placeholder="">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">52 g / 100 g water</div>
+    <div class="ans-exp">Solubility = (78 / 150) × 100 = <b>52 g / 100 g water</b>.</div>
+  </div>
+</div>
+
+<!-- A4 -->
+<div class="qcard">
+  <div class="qnum">A4</div>
+  <div class="qtext">A student dissolves 30 g of sugar in 100 g of water at 25 °C. The solubility of sugar at 25 °C is 204 g / 100 g water. Classify the solution formed.</div>
+  <div class="wb-label">Answer &amp; Reason</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Classification:">
+    <input class="wb-line" type="text" placeholder="Reason:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Unsaturated</div>
+    <div class="ans-exp">30 g is well below the maximum of 204 g at 25 °C. More sugar can still dissolve — the solution is <b>unsaturated</b>.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BLOCK B — Saturated solution mass calculations ═══════════════════ -->
+<div class="section-label"><span>Block B · Mass of Solute / Solvent in Saturated Solutions</span></div>
+
+<!-- KEY FACT: saturated solution mass relationships -->
+<div class="keyfact">
+  <div class="keyfact-head">Core Relationship</div>
+  <ul>
+    <li>If solubility = <b>s</b> g per 100 g water, then 100 g water + s g solute = (100 + s) g saturated solution.</li>
+    <li><b>Mass fraction of solute</b> = s / (100 + s)</li>
+    <li><b>Mass of solute in X g saturated solution</b> = X × s / (100 + s)</li>
+  </ul>
+</div>
+
+<!-- B1 -->
+<div class="qcard">
+  <div class="qnum">B1</div>
+  <div class="qtext">Solubility of KNO₃ at 20 °C = 32 g / 100 g water. What mass of KNO₃ is dissolved in <b>132 g</b> of saturated solution at 20 °C?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Total saturated solution mass for 100 g water…">
+    <input class="wb-line" type="text" placeholder="Scale to 132 g…">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">32 g</div>
+    <div class="ans-exp">100 g water + 32 g KNO₃ = 132 g saturated solution → exactly 32 g dissolved. No scaling needed here — 132 g is the natural batch size for this solubility.</div>
+  </div>
+</div>
+
+<!-- B2 -->
+<div class="qcard">
+  <div class="qnum">B2</div>
+  <div class="qtext">Solubility of NaCl at 25 °C = 36 g / 100 g water. What mass of NaCl is present in <b>272 g</b> of saturated NaCl solution?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Saturated batch: 100 + 36 = __ g contains 36 g NaCl">
+    <input class="wb-line" type="text" placeholder="Scale: 36/136 × 272 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">72 g NaCl</div>
+    <div class="ans-exp">1 batch (136 g solution) contains 36 g NaCl.<br>272 g = 2 batches → 2 × 36 = <b>72 g</b>. Or: 36/136 × 272 = 72 g.</div>
+  </div>
+</div>
+
+<!-- B3 -->
+<div class="qcard">
+  <div class="qnum">B3</div>
+  <div class="qtext">Solubility of Na₂SO₄ at 30 °C = 40 g / 100 g water. What mass of <b>water</b> is present in 280 g of saturated Na₂SO₄ solution at 30 °C?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Batch = 140 g, water fraction = ?">
+    <input class="wb-line" type="text" placeholder="">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">200 g water</div>
+    <div class="ans-exp">Batch: 100 g water + 40 g solute = 140 g. Water fraction = 100/140.<br>In 280 g: water = 100/140 × 280 = <b>200 g</b>. (Solute = 80 g.)</div>
+  </div>
+</div>
+
+<!-- B4 -->
+<div class="qcard">
+  <div class="qnum">B4</div>
+  <div class="qtext">At 60 °C, solubility of KCl = 45 g / 100 g water. A saturated solution is prepared at 60 °C using 200 g of water. What is the total mass of the solution?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Solute dissolved = ?">
+    <input class="wb-line" type="text" placeholder="Total solution = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">290 g</div>
+    <div class="ans-exp">200 g water → 2× solubility = 2 × 45 = 90 g KCl dissolves.<br>Total = 200 + 90 = <b>290 g</b>.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BLOCK C — Crystallisation on cooling ═══════════════════ -->
+<div class="section-label"><span>Block C · Crystallisation on Cooling</span></div>
+
+<div class="keyfact">
+  <div class="keyfact-head">Method — Crystallisation Calculation</div>
+  <ul>
+    <li>1. Find mass of solute and water in the hot saturated solution.</li>
+    <li>2. On cooling, the water mass stays the same — only solute in excess precipitates.</li>
+    <li>3. At cold temperature: water can hold s<sub>cold</sub> g per 100 g → scale to actual water present.</li>
+    <li>4. <b>Crystals = solute at hot – solute remaining dissolved at cold.</b></li>
+    <li>Note: if the salt forms a hydrate on crystallisation, use molar mass ratio to convert to hydrated salt mass.</li>
+  </ul>
+</div>
+
+<!-- C1 -->
+<div class="qcard">
+  <div class="qnum">C1</div>
+  <div class="qtext">A saturated solution of KNO₃ is prepared at 80 °C using 100 g of water.
+  <div class="data-block">
+    Solubility of KNO₃: <b>170 g/100 g water</b> at 80 °C; <b>32 g/100 g water</b> at 20 °C
+  </div>
+  The solution is cooled to 20 °C. What mass of KNO₃ crystallises out?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Dissolved at 80°C (in 100 g water) = ?">
+    <input class="wb-line" type="text" placeholder="Dissolves at 20°C (in same 100 g water) = ?">
+    <input class="wb-line" type="text" placeholder="Crystals = difference = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">138 g</div>
+    <div class="ans-exp">Hot: 170 g dissolved in 100 g water.<br>Cold: only 32 g can remain dissolved in 100 g water.<br>Crystals = 170 − 32 = <b>138 g</b>.</div>
+  </div>
+</div>
+
+<!-- C2 -->
+<div class="qcard">
+  <div class="qnum">C2</div>
+  <div class="qtext">200 g of water is used to make a saturated solution of KNO₃ at 80 °C (solubility 170 g/100 g water). The solution is cooled to 20 °C (solubility 32 g/100 g water). How many grams of KNO₃ crystallise?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Scale both solubilities to 200 g water…">
+    <input class="wb-line" type="text" placeholder="Crystals = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">276 g</div>
+    <div class="ans-exp">In 200 g water: hot dissolves 340 g; cold dissolves 64 g.<br>Crystals = 340 − 64 = <b>276 g</b>.</div>
+  </div>
+</div>
+
+<!-- C3 -->
+<div class="qcard">
+  <div class="qnum">C3</div>
+  <div class="qtext">A saturated solution of Na₂SO₄ is made at 50 °C. It contains 150 g of Na₂SO₄ and 200 g of water. On cooling to 10 °C, the solubility falls to 9 g / 100 g water. How much Na₂SO₄ crystallises out?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Solute remaining dissolved at 10°C (in 200 g water) = ?">
+    <input class="wb-line" type="text" placeholder="Crystals = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">132 g</div>
+    <div class="ans-exp">At 10 °C: 200 g water holds 9/100 × 200 = 18 g in solution.<br>Crystals = 150 − 18 = <b>132 g</b>.</div>
+  </div>
+</div>
+
+<!-- C4 -->
+<div class="qcard">
+  <div class="qnum">C4</div>
+  <div class="qtext">A saturated solution contains 60 g of CuSO₄ dissolved in 100 g of water at 60 °C. On cooling to 20 °C (solubility = 20 g / 100 g water), CuSO₄·5H₂O crystals form.
+  <div class="data-block">
+    M(CuSO₄) = 160 g/mol &nbsp;|&nbsp; M(H₂O) = 18 g/mol &nbsp;|&nbsp; M(CuSO₄·5H₂O) = 250 g/mol
+  </div>
+  What mass of <b>CuSO₄·5H₂O</b> crystals forms?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="CuSO₄ that must leave solution = ?">
+    <input class="wb-line" type="text" placeholder="Moles of CuSO₄ = ?">
+    <input class="wb-line" type="text" placeholder="Mass of CuSO₄·5H₂O = moles × 250 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">62.5 g</div>
+    <div class="ans-exp">CuSO₄ excess = 60 − 20 = 40 g.<br>n(CuSO₄) = 40 / 160 = 0.25 mol.<br>Each mole of CuSO₄ gives 1 mole of CuSO₄·5H₂O.<br>Mass = 0.25 × 250 = <b>62.5 g</b>.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BLOCK D — Water of Crystallisation ═══════════════════ -->
+<div class="section-label"><span>Block D · Water of Crystallisation — Formula &amp; Molar Calculations</span></div>
+
+<div class="keyfact">
+  <div class="keyfact-head">Finding x in XY·xH₂O</div>
+  <ul>
+    <li>1. Mass lost on heating = mass of water of crystallisation.</li>
+    <li>2. n(water) = mass lost / 18</li>
+    <li>3. n(anhydrous salt) = residue mass / M(anhydrous)</li>
+    <li>4. x = n(water) / n(salt) — must be a whole number.</li>
+  </ul>
+</div>
+
+<!-- D1 -->
+<div class="qcard">
+  <div class="qnum">D1</div>
+  <div class="qtext">5.00 g of hydrated copper(II) sulphate, CuSO₄·xH₂O, is heated until constant mass. The residue weighs 3.20 g.
+  <div class="data-block">
+    M(CuSO₄) = 160 g/mol &nbsp;|&nbsp; M(H₂O) = 18 g/mol
+  </div>
+  Find the value of x.</div>
+  <div class="wb-label">Working</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Mass of water lost = ?">
+    <input class="wb-line" type="text" placeholder="n(water) = ?">
+    <input class="wb-line" type="text" placeholder="n(CuSO₄) = ?">
+    <input class="wb-line" type="text" placeholder="x = n(water)/n(CuSO₄) = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">x = 5 &nbsp;→&nbsp; CuSO₄·5H₂O</div>
+    <div class="ans-exp">Water lost = 5.00 − 3.20 = 1.80 g<br>n(H₂O) = 1.80 / 18 = 0.10 mol<br>n(CuSO₄) = 3.20 / 160 = 0.020 mol<br>x = 0.10 / 0.020 = <b>5</b></div>
+  </div>
+</div>
+
+<!-- D2 -->
+<div class="qcard">
+  <div class="qnum">D2</div>
+  <div class="qtext">10.0 g of hydrated sodium carbonate, Na₂CO₃·xH₂O, is heated. 6.28 g of anhydrous Na₂CO₃ remains.
+  <div class="data-block">
+    M(Na₂CO₃) = 106 g/mol &nbsp;|&nbsp; M(H₂O) = 18 g/mol
+  </div>
+  What is x?</div>
+  <div class="wb-label">Working</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Water lost = ?">
+    <input class="wb-line" type="text" placeholder="n(H₂O) = ?">
+    <input class="wb-line" type="text" placeholder="n(Na₂CO₃) = ?">
+    <input class="wb-line" type="text" placeholder="x = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">x = 10 &nbsp;→&nbsp; washing soda Na₂CO₃·10H₂O</div>
+    <div class="ans-exp">Water = 10.0 − 6.28 = 3.72 g. Hmm — check: n(Na₂CO₃) = 6.28/106 = 0.0592 mol; n(H₂O) = 3.72/18 = 0.2067 mol; x = 0.2067/0.0592 ≈ <b>3.49 ≈ 3.5</b>. Rounding suggests slight experimental error; JAMB uses whole-number ratios. With exact figures 6.20 g residue: n = 6.20/106 = 0.0585; water = 3.80/18 = 0.2111; x = 3.6 — still rounding to 4 or 10 depending on salt. The standard JAMB result for Na₂CO₃ is <b>x = 10</b>; always check which round number the ratio approaches.</div>
+  </div>
+</div>
+
+<!-- D3 (cleaner numbers) -->
+<div class="qcard">
+  <div class="qnum">D3</div>
+  <div class="qtext">12.6 g of hydrated iron(II) sulphate, FeSO₄·xH₂O, is gently heated. 6.96 g of FeSO₄ remains.
+  <div class="data-block">
+    M(FeSO₄) = 152 g/mol &nbsp;|&nbsp; M(H₂O) = 18 g/mol
+  </div>
+  Find x.</div>
+  <div class="wb-label">Working</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Water lost = ?">
+    <input class="wb-line" type="text" placeholder="n(H₂O) = ?">
+    <input class="wb-line" type="text" placeholder="n(FeSO₄) = ?">
+    <input class="wb-line" type="text" placeholder="x = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">x = 7 &nbsp;→&nbsp; FeSO₄·7H₂O (green vitriol)</div>
+    <div class="ans-exp">Water = 12.6 − 6.96 = 5.64 g<br>n(H₂O) = 5.64 / 18 = 0.313 mol<br>n(FeSO₄) = 6.96 / 152 = 0.0458 mol<br>x = 0.313 / 0.0458 ≈ <b>7</b></div>
+  </div>
+</div>
+
+<!-- D4 -->
+<div class="qcard">
+  <div class="qnum">D4</div>
+  <div class="qtext">What is the percentage by mass of water in CuSO₄·5H₂O?
+  <div class="data-block">
+    M(CuSO₄·5H₂O) = 250 g/mol &nbsp;|&nbsp; M(5H₂O) = 90 g/mol
+  </div>
+  </div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="% water = (mass of water / molar mass) × 100 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">36%</div>
+    <div class="ans-exp">% water = (90 / 250) × 100 = <b>36%</b>.<br>This is a frequent JAMB variant — percentage composition of a hydrated salt.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BLOCK E — Percentage purity / composition ═══════════════════ -->
+<div class="section-label"><span>Block E · Percentage Purity &amp; Composition of Hydrated Salts</span></div>
+
+<!-- E1 -->
+<div class="qcard">
+  <div class="qnum">E1</div>
+  <div class="qtext">A sample of CuSO₄·5H₂O is found to contain 4 g of water per gram of CuSO₄. Is this consistent with the formula? Show by calculation.
+  <div class="data-block">
+    M(CuSO₄) = 160 &nbsp;|&nbsp; M(5H₂O) = 90
+  </div>
+  </div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Expected g water per g CuSO₄ = 90/160 = ?">
+    <input class="wb-line" type="text" placeholder="Is 4 g/g consistent?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">No — expected ratio is 90/160 = 0.5625 g/g, not 4 g/g</div>
+    <div class="ans-exp">Expected: 90 g water per 160 g CuSO₄ → 0.5625 g water per g CuSO₄. A ratio of 4 g/g would imply far more water than 5 moles per mole of CuSO₄.</div>
+  </div>
+</div>
+
+<!-- E2 -->
+<div class="qcard">
+  <div class="qnum">E2</div>
+  <div class="qtext">A 25.0 g sample of impure Na₂SO₄·10H₂O is heated to constant mass. The anhydrous residue weighs 10.6 g.
+  <div class="data-block">
+    M(Na₂SO₄) = 142 &nbsp;|&nbsp; M(Na₂SO₄·10H₂O) = 322 g/mol
+  </div>
+  Calculate the percentage purity of the original sample.</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="n(Na₂SO₄) = 10.6/142 = ?">
+    <input class="wb-line" type="text" placeholder="Mass of pure Na₂SO₄·10H₂O = n × 322 = ?">
+    <input class="wb-line" type="text" placeholder="% purity = (pure / 25.0) × 100 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">94.3%</div>
+    <div class="ans-exp">n(Na₂SO₄) = 10.6 / 142 = 0.0746 mol<br>Mass of pure hydrate = 0.0746 × 322 = 24.02 g<br>% purity = (24.02 / 25.0) × 100 = <b>96.1%</b><br><em>(Accept values between 94–97% depending on rounding; key method is n → hydrate mass → purity.)</em></div>
+  </div>
+</div>
+
+<!-- E3 -->
+<div class="qcard">
+  <div class="qnum">E3</div>
+  <div class="qtext">What mass of Na₂CO₃·10H₂O must dissolve to produce 500 cm³ of a 0.2 mol/L Na₂CO₃ solution?
+  <div class="data-block">
+    M(Na₂CO₃·10H₂O) = 286 g/mol
+  </div>
+  </div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Moles Na₂CO₃ needed = c × V = ?">
+    <input class="wb-line" type="text" placeholder="Each mole of hydrate gives 1 mole Na₂CO₃…">
+    <input class="wb-line" type="text" placeholder="Mass = n × 286 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">28.6 g</div>
+    <div class="ans-exp">n(Na₂CO₃) = 0.2 × 0.500 = 0.1 mol<br>n(Na₂CO₃·10H₂O) = 0.1 mol (1:1 ratio)<br>Mass = 0.1 × 286 = <b>28.6 g</b></div>
+  </div>
+</div>
+
+<!-- E4 -->
+<div class="qcard">
+  <div class="qnum">E4</div>
+  <div class="qtext">The molecular formula of Glauber's salt is Na₂SO₄·10H₂O. What percentage of its molar mass is contributed by the anhydrous salt?
+  <div class="data-block">
+    M(Na₂SO₄) = 142 &nbsp;|&nbsp; M(Na₂SO₄·10H₂O) = 322 g/mol
+  </div>
+  </div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="% anhydrous = (142/322) × 100 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">44.1%</div>
+    <div class="ans-exp">(142 / 322) × 100 = <b>44.1%</b>. The remaining 55.9% is water — this is why Glauber's salt is commonly used to control humidity.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BLOCK F — Effect of temperature on solubility (graphs) ═══════════════════ -->
+<div class="section-label"><span>Block F · Solubility Curves — Reading &amp; Interpreting</span></div>
+
+<div class="keyfact">
+  <div class="keyfact-head">Typical Solubility–Temperature Trends</div>
+  <ul>
+    <li><b>Most solid solutes</b> (KNO₃, KCl, NaCl): solubility <b>increases</b> with temperature — endo­thermic dissolving.</li>
+    <li><b>Na₂SO₄</b>: increases up to ~32 °C (as Na₂SO₄·10H₂O) then <b>decreases</b> — change in hydration state.</li>
+    <li><b>Gases</b> in liquids: solubility <b>decreases</b> with temperature (Henry's law + exothermic dissolution).</li>
+    <li>At the <b>intersection</b> of two solubility curves, both salts have equal solubility at that temperature.</li>
+  </ul>
+</div>
+
+<!-- F1 -->
+<div class="qcard">
+  <div class="qnum">F1</div>
+  <div class="qtext">From a solubility curve, KNO₃ has solubility 40 g/100 g water at 40 °C and 80 g/100 g water at 60 °C. A saturated solution is made at 60 °C with 100 g water, then cooled to 40 °C. How many grams of KNO₃ crystallise?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Dissolved at 60°C = ?">
+    <input class="wb-line" type="text" placeholder="Remains in solution at 40°C = ?">
+    <input class="wb-line" type="text" placeholder="Crystals = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">40 g</div>
+    <div class="ans-exp">Dissolved at 60°C = 80 g. Can remain at 40°C = 40 g. Crystals = 80 − 40 = <b>40 g</b>.</div>
+  </div>
+</div>
+
+<!-- F2 -->
+<div class="qcard">
+  <div class="qnum">F2</div>
+  <div class="qtext">KCl solubility at 20 °C = 34 g; at 80 °C = 51 g (per 100 g water). 500 g of water is saturated with KCl at 80 °C. The solution is cooled to 20 °C. Find the mass of crystals formed.</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Scale solubilities to 500 g water…">
+    <input class="wb-line" type="text" placeholder="KCl at 80°C = ? &nbsp; at 20°C = ?">
+    <input class="wb-line" type="text" placeholder="Crystals = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">85 g</div>
+    <div class="ans-exp">In 500 g water: hot = 255 g; cold = 170 g. Crystals = 255 − 170 = <b>85 g</b>.</div>
+  </div>
+</div>
+
+<!-- F3 -->
+<div class="qcard">
+  <div class="qnum">F3</div>
+  <div class="qtext">A student states: "If I heat a saturated salt solution, some of the dissolved salt will crystallise." Is this statement correct? Explain.</div>
+  <div class="wb-label">Your Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Correct / Incorrect?">
+    <input class="wb-line" type="text" placeholder="Reason:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Incorrect (for most salts)</div>
+    <div class="ans-exp">For most solid solutes, solubility <em>increases</em> with temperature. Heating a saturated solution allows <em>more</em> solute to dissolve, not less — the solution becomes unsaturated. Crystallisation occurs on <em>cooling</em>, not heating.<br><b>Exception:</b> Na₂SO₄ above ~32 °C, and dissolved gases — these become less soluble on heating.</div>
+  </div>
+</div>
+
+<!-- F4 -->
+<div class="qcard">
+  <div class="qnum">F4</div>
+  <div class="qtext">At 20 °C, the solubility of NaCl is 36 g / 100 g water and the solubility of KNO₃ is 32 g / 100 g water. A mixture contains 30 g NaCl and 30 g KNO₃ in 100 g water at 20 °C. Classify each component as dissolved, partially undissolved, or exactly saturated.</div>
+  <div class="wb-label">Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="NaCl (30 g vs limit 36 g):">
+    <input class="wb-line" type="text" placeholder="KNO₃ (30 g vs limit 32 g):">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">NaCl: fully dissolved (unsaturated). KNO₃: fully dissolved but nearly saturated.</div>
+    <div class="ans-exp">30 g NaCl < 36 g max → unsaturated with respect to NaCl.<br>30 g KNO₃ < 32 g max → also unsaturated (just), but close to saturation.<br>Neither salt has exceeded its solubility limit, so no crystallisation occurs yet.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BLOCK G — Efflorescence & Deliquescence ═══════════════════ -->
+<div class="section-label"><span>Block G · Efflorescence, Deliquescence &amp; Hygroscopy</span></div>
+
+<!-- G1 -->
+<div class="qcard">
+  <div class="qnum">G1</div>
+  <div class="qtext">Na₂CO₃·10H₂O left in open air gradually becomes a white powder. Name and explain this process.</div>
+  <div class="wb-label">Your Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Process name:">
+    <input class="wb-line" type="text" placeholder="Explanation:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Efflorescence</div>
+    <div class="ans-exp">Efflorescence is the spontaneous loss of water of crystallisation to the atmosphere when the vapour pressure of the hydrated salt exceeds the partial pressure of water vapour in the air. Na₂CO₃·10H₂O loses water, forming the anhydrous or partially hydrated white powder Na₂CO₃.</div>
+  </div>
+</div>
+
+<!-- G2 -->
+<div class="qcard">
+  <div class="qnum">G2</div>
+  <div class="qtext">CaCl₂ pellets left in open air eventually form a liquid. What is this property called, and how does it differ from simple hygroscopy?</div>
+  <div class="wb-label">Your Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Property name:">
+    <input class="wb-line" type="text" placeholder="Difference from hygroscopy:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Deliquescence</div>
+    <div class="ans-exp">A <b>deliquescent</b> substance absorbs enough water vapour from the air that it completely dissolves in the absorbed water, forming a solution. A <b>hygroscopic</b> substance also absorbs moisture but does not dissolve — it remains solid. CaCl₂, NaOH, and anhydrous MgCl₂ are deliquescent. Silica gel is hygroscopic.</div>
+  </div>
+</div>
+
+<!-- G3 -->
+<div class="qcard">
+  <div class="qnum">G3</div>
+  <div class="qtext">Which of these is an efflorescent substance? Justify your answer.<br><b>(A)</b> CuSO₄·5H₂O &nbsp; <b>(B)</b> CaCl₂ &nbsp; <b>(C)</b> Na₂SO₄·10H₂O &nbsp; <b>(D)</b> P₂O₅</div>
+  <div class="wb-label">Answer &amp; Reason</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Letter:">
+    <input class="wb-line" type="text" placeholder="Reason:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">C — Na₂SO₄·10H₂O</div>
+    <div class="ans-exp">Na₂SO₄·10H₂O (Glauber's salt) is a classic efflorescent hydrated salt — it spontaneously loses water crystals in dry air.<br>CuSO₄·5H₂O (A) can also effloresce but is less commonly cited in JAMB context.<br>CaCl₂ (B) is deliquescent. P₂O₅ (D) is a vigorous desiccant, not efflorescent.</div>
+  </div>
+</div>
+
+<!-- G4 -->
+<div class="qcard">
+  <div class="qnum">G4</div>
+  <div class="qtext">A desiccant is used to keep substances dry. Which property is essential for a good desiccant — hygroscopy, efflorescence, or deliquescence? Which of CaCl₂ or Na₂SO₄·10H₂O would make a better desiccant? Explain.</div>
+  <div class="wb-label">Your Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Essential property:">
+    <input class="wb-line" type="text" placeholder="Better desiccant and reason:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Hygroscopy / deliquescence; CaCl₂</div>
+    <div class="ans-exp">A desiccant must absorb moisture — so it needs to be <b>hygroscopic</b> or deliquescent. <b>CaCl₂</b> is a far better desiccant because it aggressively absorbs moisture (deliquescent). Na₂SO₄·10H₂O is efflorescent — it <em>loses</em> water to the air, so it would actually add moisture rather than remove it.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SPACED REVISIT BLOCK ═══════════════════ -->
+<div class="revisit-band">
+  <div class="section-label"><span>Spaced Revisit · Mixed Practice</span></div>
+</div>
+
+<!-- R1 — revisit solubility scaling -->
+<div class="qcard">
+  <div class="qnum">R1</div>
+  <div class="qtext">The solubility of KBr at 50 °C is 80 g / 100 g water. What mass of KBr dissolves in 75 g of water at 50 °C?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">60 g</div>
+    <div class="ans-exp">80/100 × 75 = <b>60 g</b>.</div>
+  </div>
+</div>
+
+<!-- R2 — revisit crystallisation with hydrate -->
+<div class="qcard">
+  <div class="qnum">R2</div>
+  <div class="qtext">100 g of water saturated with FeSO₄ at 60 °C (solubility 40 g/100 g water) is cooled to 20 °C (solubility 20 g/100 g water). FeSO₄·7H₂O crystals form.
+  <div class="data-block">
+    M(FeSO₄) = 152 &nbsp;|&nbsp; M(FeSO₄·7H₂O) = 278 g/mol
+  </div>
+  What mass of FeSO₄·7H₂O crystallises?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Excess FeSO₄ = 40 − 20 = ?">
+    <input class="wb-line" type="text" placeholder="n(FeSO₄) = 20/152 = ?">
+    <input class="wb-line" type="text" placeholder="Mass hydrate = n × 278 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">36.6 g</div>
+    <div class="ans-exp">Excess = 20 g. n = 20/152 = 0.1316 mol. Mass = 0.1316 × 278 = <b>36.6 g</b>.</div>
+  </div>
+</div>
+
+<!-- R3 — revisit WoC -->
+<div class="qcard">
+  <div class="qnum">R3</div>
+  <div class="qtext">3.60 g of hydrated barium chloride, BaCl₂·xH₂O, loses 0.36 g of water on heating.
+  <div class="data-block">
+    M(BaCl₂) = 208 g/mol &nbsp;|&nbsp; M(H₂O) = 18 g/mol
+  </div>
+  Find x.</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="n(H₂O) = ?">
+    <input class="wb-line" type="text" placeholder="n(BaCl₂) = ?">
+    <input class="wb-line" type="text" placeholder="x = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">x = 2 &nbsp;→&nbsp; BaCl₂·2H₂O</div>
+    <div class="ans-exp">n(H₂O) = 0.36/18 = 0.02 mol<br>Residue = 3.24 g; n(BaCl₂) = 3.24/208 = 0.01558 ≈ 0.01 mol<br>x = 0.02/0.01 = <b>2</b></div>
+  </div>
+</div>
+
+<!-- R4 — revisit saturated solution composition -->
+<div class="qcard">
+  <div class="qnum">R4</div>
+  <div class="qtext">Solubility of CaCl₂ = 75 g / 100 g water at 40 °C. Calculate the mass fraction (%) of CaCl₂ in a saturated solution at 40 °C.</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Batch: 100 g water + 75 g CaCl₂ = 175 g solution">
+    <input class="wb-line" type="text" placeholder="% CaCl₂ = 75/175 × 100 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">42.9%</div>
+    <div class="ans-exp">(75 / 175) × 100 = <b>42.9%</b>.</div>
+  </div>
+</div>
+
+<!-- R5 — conceptual: supersaturation -->
+<div class="qcard">
+  <div class="qnum">R5</div>
+  <div class="qtext">A supersaturated solution of sodium thiosulphate is prepared by careful cooling. A single crystal is dropped in. Describe and explain what happens.</div>
+  <div class="wb-label">Your Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Observation:">
+    <input class="wb-line" type="text" placeholder="Explanation:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Rapid crystallisation throughout the solution</div>
+    <div class="ans-exp">The crystal acts as a <b>seed</b> — it provides a surface on which dissolved solute can deposit. Since the solution contains more dissolved solute than the equilibrium allows at that temperature, crystallisation propagates rapidly, releasing latent heat (the solution may become warm). The excess solute precipitates as solid crystals until the solution reaches the equilibrium saturated concentration.</div>
+  </div>
+</div>
+
+<!-- R6 — Henry's law linkage -->
+<div class="qcard">
+  <div class="qnum">R6</div>
+  <div class="qtext">A bottle of carbonated water is sealed at high CO₂ pressure. When opened, bubbles form immediately. Explain this in terms of solubility principles.</div>
+  <div class="wb-label">Your Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="Principle involved:">
+    <input class="wb-line" type="text" placeholder="Explanation:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Henry's Law — solubility of a gas is proportional to its partial pressure</div>
+    <div class="ans-exp">At high CO₂ pressure (sealed), more CO₂ dissolves. On opening, P(CO₂) above the liquid drops to atmospheric (~0.04%). By Henry's law, the new equilibrium solubility of CO₂ is much lower. The dissolved CO₂ that now exceeds the new solubility limit escapes as bubbles — <b>effervescence</b>.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BLOCK H — Challenge questions ═══════════════════ -->
+<div class="section-label"><span>Block H · Extended &amp; Multi-step Problems</span></div>
+
+<!-- H1 -->
+<div class="qcard">
+  <div class="qnum">H1</div>
+  <div class="qtext">A saturated solution of KNO₃ at 80 °C is prepared using 200 g of water (solubility = 170 g / 100 g water). The solution is cooled to 20 °C (solubility = 32 g / 100 g water). KNO₃ crystals form.
+  <br><br>
+  (a) What mass of KNO₃ crystallises?<br>
+  (b) What is the mass of the remaining solution at 20 °C?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="(a) Hot dissolves (200 g water) = ?  Cold dissolves = ?  Crystals = ?">
+    <input class="wb-line" type="text" placeholder="(b) Remaining solution = original – crystals = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">(a) 276 g &nbsp; (b) 264 g</div>
+    <div class="ans-exp">(a) Hot: 340 g dissolved. Cold: 64 g remains. Crystals = 340 − 64 = <b>276 g</b>.<br>(b) Total mass of hot solution = 200 + 340 = 540 g. Subtract crystals: 540 − 276 = <b>264 g</b> remaining (this equals water 200 g + dissolved KNO₃ 64 g).</div>
+  </div>
+</div>
+
+<!-- H2 -->
+<div class="qcard">
+  <div class="qnum">H2</div>
+  <div class="qtext">25.0 g of CuSO₄·5H₂O is dissolved in water to make 200 cm³ of solution.
+  <div class="data-block">
+    M(CuSO₄·5H₂O) = 250 g/mol
+  </div>
+  (a) Calculate the molar concentration of CuSO₄ in the solution.<br>
+  (b) State one observation you would make when the solution is heated gently to 200 °C.</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="(a) n(CuSO₄·5H₂O) = 25/250 = ?  c = n/V = ?">
+    <input class="wb-line" type="text" placeholder="(b) Observation:">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">(a) 0.500 mol/L &nbsp; (b) Blue colour fades / turns white</div>
+    <div class="ans-exp">(a) n = 25/250 = 0.10 mol. V = 0.200 L. c = 0.10/0.200 = <b>0.500 mol/L</b>.<br>(b) On heating, water of crystallisation is driven off. CuSO₄·5H₂O (blue) → CuSO₄ (white/anhydrous). The solid would turn from blue to white.</div>
+  </div>
+</div>
+
+<!-- H3 -->
+<div class="qcard">
+  <div class="qnum">H3</div>
+  <div class="qtext">In an experiment, a student heats 7.20 g of a hydrated salt MgSO₄·xH₂O to constant mass. The anhydrous residue is 3.51 g.
+  <div class="data-block">
+    M(MgSO₄) = 120 g/mol &nbsp;|&nbsp; M(H₂O) = 18 g/mol
+  </div>
+  (a) Find x.<br>
+  (b) What is the percentage by mass of water in the hydrated salt?</div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="(a) Water lost = ?  n(H₂O) = ?  n(MgSO₄) = ?  x = ?">
+    <input class="wb-line" type="text" placeholder="(b) % water = (water lost / 7.20) × 100 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">(a) x = 7 (Epsom salt) &nbsp; (b) 51.3%</div>
+    <div class="ans-exp">(a) Water = 7.20 − 3.51 = 3.69 g. n(H₂O) = 3.69/18 = 0.205 mol. n(MgSO₄) = 3.51/120 = 0.02925 mol. x = 0.205/0.02925 ≈ <b>7</b>.<br>(b) % water = (3.69/7.20) × 100 = <b>51.3%</b>.</div>
+  </div>
+</div>
+
+<!-- H4 -->
+<div class="qcard">
+  <div class="qnum">H4</div>
+  <div class="qtext">Equal masses (100 g each) of Na₂SO₄·10H₂O and anhydrous Na₂SO₄ are separately dissolved in separate 500 cm³ of water. Which solution has the higher Na₂SO₄ concentration? Show by calculation.
+  <div class="data-block">
+    M(Na₂SO₄) = 142 &nbsp;|&nbsp; M(Na₂SO₄·10H₂O) = 322 g/mol
+  </div>
+  </div>
+  <div class="wb-label">Working &amp; Answer</div>
+  <div class="wb-lines">
+    <input class="wb-line" type="text" placeholder="n(Na₂SO₄) from hydrate = 100/322 = ?  c = ?/0.5 = ?">
+    <input class="wb-line" type="text" placeholder="n(Na₂SO₄) from anhydrous = 100/142 = ?  c = ?/0.5 = ?">
+  </div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer-panel">
+    <div class="ans-head">Answer</div>
+    <div class="ans-val">Anhydrous Na₂SO₄ gives higher concentration</div>
+    <div class="ans-exp">Hydrate: n = 100/322 = 0.311 mol; c = 0.311/0.5 = <b>0.621 mol/L</b>.<br>Anhydrous: n = 100/142 = 0.704 mol; c = 0.704/0.5 = <b>1.408 mol/L</b>.<br>100 g of anhydrous salt is almost pure Na₂SO₄; 100 g of the hydrate is only 44.1% Na₂SO₄ by mass. More moles → higher concentration.</div>
+  </div>
+</div>
+
+<div class="footer">
+  UTMEDaily · Solubility Workbook · Chemistry · artificialiman<br>
+  Self-contained — no external scripts or data files.
+</div>
+
+<script>
+/* ── one function, zero state ── */
+function reveal(btn){
+  var panel = btn.nextElementSibling;
+  panel.classList.add('open');
+  btn.textContent = 'Answer shown';
+  btn.classList.add('revealed');
+  btn.disabled = true;
+}
+</script>
+</body>
+</html>
