@@ -70,7 +70,40 @@ generation.
 
 ---
 
-## 4. Access & security requirements
+## 4. Data: full class roster (as of this pass)
+
+The repo's `Notes/` folder contains 9 broadsheet CSVs across 5 classes:
+JSS1A, JSS3B, SS1 Actuarial, SS1 Science, SS3 Science. All but JSS1A have
+**two versions** of the same class (a plain filename and a `(1)` suffixed
+one).
+
+**Important — do not auto-merge duplicate versions.** For every class with
+two versions, the pair is NOT a true duplicate: each version has a
+different subset of students populated vs. blank (e.g. one file has rows
+1–3 blank and 11–21 scored, the other has the opposite). The real broadsheet
+for that class is effectively the union of both files, but the merge isn't
+always simple positional overlap (seen one case, SS1 Actuarial, where a
+student's row shifted rather than lining up 1:1). **Policy: Claude does not
+attempt to merge these automatically. Manchi will supply the merged/clean
+file per class when needed.** Treat any two-version class as incomplete
+until a merged file is provided.
+
+**Column schema is consistent in structure, but subject list varies by
+class/track** — this confirms the multi-school/multi-class scaling risk
+flagged earlier:
+- JSS1A / JSS3B (junior classes): Basic Science, CCA, CRS, IRS,
+  Horticulture, PHE, Yoruba, French, plus DT/BT (JSS1A) or NVE/Computer
+  (JSS3B).
+- SS1 Actuarial: Government, Accounting, Literature — no Physics/Chemistry.
+- SS1 Science / SS3 Science: Physics, Chemistry, Further Math (science
+  track).
+
+Generator logic must read whichever subject columns are actually populated
+for a given class file, not assume a fixed subject list across all classes.
+
+---
+
+## 5. Access & security requirements
 
 - Each student's report page is **individually password-gated**.
 - **Passwords already exist / are already assigned per student** — this is
@@ -84,7 +117,7 @@ generation.
 
 ---
 
-## 5. House style / conventions carried over from adjacent projects
+## 6. House style / conventions carried over from adjacent projects
 
 (For consistency — these are established patterns in Manchi's broader
 Studi054 / UTMEDaily body of work, not necessarily mandates for this
@@ -114,7 +147,64 @@ specific project, but useful defaults absent other instruction.)
 
 ---
 
-## 6. Open questions / things to confirm before building
+## 7. Remarks: AI-generated, not human-authored
+
+Both remark fields on the report page are **AI-generated at build time**,
+once per CSV row, and baked into the static HTML (not generated live at
+page-view time — no runtime API dependency).
+
+- **Teacher's comment** = behavioral recommendations, generated from the
+  student's performance pattern.
+- **Principal's comment** = student-friendly result analysis — plain,
+  encouraging language, written *to* the student as primary reader (not to
+  the parent), summarizing how the term went.
+
+**Signal to drive generation, per student:**
+- Margin between the student's highest and lowest subject score.
+- The student's average compared to the class average (i.e. class-level
+  aggregates must be computed once per class/CSV before per-student
+  generation, so each student's remark can reference relative standing).
+
+**Tone requirement:** very warm, and concise. Not clinical, not padded.
+
+**Implication for the pipeline:** class-average and other cohort-level
+stats (high/low margin per student, class average) need to be computed as
+a **pre-pass over the whole class CSV** before remark generation runs, since
+remarks are comparative (student vs. class), not just derived from a single
+row in isolation. This pre-pass output (per-student margin + class-average
+comparison) becomes the actual input to the generation prompt, not the raw
+CSV row.
+
+**Guardrail to design in before scaling:** since this is student-facing and
+carries the principal's formal sign-off, generation should be constrained
+against factual errors (e.g. praising a subject the student failed) —
+worth deciding whether to spot-check generated output before full rollout,
+even though the design intent is zero manual review at steady state.
+
+---
+
+## 8. Scaling plan (5,000 students, multiple schools)
+
+Agreed order of operations — do not jump straight to full scale:
+
+1. **Class-by-class first.** One template (`reportSP_v2.html` as base),
+   one generator script per class: CSV row → rendered HTML file, keyed by
+   Student ID. Remarks generation (see §7) plugs in here as a pre-pass
+   (class aggregates) + per-row generation step, run once at build time.
+2. **Multi-class, multi-school next.** This is a config problem, not a new
+   template: each school's identity (letterhead text, crest asset, address,
+   phone, grading scale) becomes injected variables. Must confirm whether
+   all schools/classes share one CSV column schema before assuming one
+   generator script works everywhere — this is the most likely hidden
+   source of manual work at this stage.
+3. **Full 5,000-student scale last**, after 1 and 2 are proven on at least
+   one full school.
+
+This section reflects agreed direction, not yet built.
+
+---
+
+## 9. Open questions / things to confirm before building
 
 1. What should happen to the 2 blank-score students (Dorcas, Habitat) —
    generate an empty/placeholder transcript, or exclude them entirely?
@@ -131,7 +221,7 @@ specific project, but useful defaults absent other instruction.)
 
 ---
 
-## 7. Summary for a new agent picking this up
+## 10. Summary for a new agent picking this up
 
 You're building **one HTML report page per student**, for TCC's SS3 Science
 class, Second Term, from a CSV broadsheet. Every page is password-gated
