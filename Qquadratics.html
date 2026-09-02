@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Quadratic Equations — Mathematics · JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Quadratic Equations</div>
+    <div class="subtitle">60-question mastery drill · Mathematics</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs" id="tabs-container"></div>
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+const subjectLabels = {
+  factorisation: 'Factorisation',
+  completing_square: 'Completing the Square'
+};
+
+const questions = {
+  factorisation: [
+    {q:"Solve x² − 5x + 6 = 0", opts:["A. x = 2, 3","B. x = −2, −3","C. x = 1, 6","D. x = −1, −6"], ans:"A", exp:"(x−2)(x−3) = 0, so x = 2 or x = 3."},
+    {q:"Solve x² + 7x + 12 = 0", opts:["A. x = −3, −4","B. x = 3, 4","C. x = −3, 4","D. x = 3, −4"], ans:"A", exp:"(x+3)(x+4) = 0, so x = −3 or x = −4."},
+    {q:"Solve x² − 9 = 0", opts:["A. x = ±3","B. x = 9","C. x = 3 only","D. x = −3 only"], ans:"A", exp:"Difference of two squares: (x−3)(x+3) = 0, so x = 3 or x = −3."},
+    {q:"Solve x² − 16x = 0", opts:["A. x = 0, 16","B. x = 0, −16","C. x = 16 only","D. x = 0 only"], ans:"A", exp:"Take out the common factor: x(x−16) = 0, so x = 0 or x = 16."},
+    {q:"Solve 2x² + 5x − 3 = 0", opts:["A. x = 1/2, −3","B. x = −1/2, 3","C. x = 2, −3","D. x = 1/2, 3"], ans:"A", exp:"Split the middle term: 2x²+6x−x−3 = 2x(x+3)−1(x+3) = (2x−1)(x+3) = 0."},
+    {q:"Solve 3x² − 14x + 8 = 0", opts:["A. x = 2/3, 4","B. x = −2/3, 4","C. x = 2/3, −4","D. x = 3/2, 4"], ans:"A", exp:"3x²−12x−2x+8 = 3x(x−4)−2(x−4) = (3x−2)(x−4) = 0."},
+    {q:"Solve x² − x − 12 = 0", opts:["A. x = 4, −3","B. x = −4, 3","C. x = 4, 3","D. x = −4, −3"], ans:"A", exp:"(x−4)(x+3) = 0, so x = 4 or x = −3."},
+    {q:"Solve x² + 2x − 15 = 0", opts:["A. x = −5, 3","B. x = 5, −3","C. x = 5, 3","D. x = −5, −3"], ans:"A", exp:"(x+5)(x−3) = 0, so x = −5 or x = 3."},
+    {q:"Solve 6x² − x − 1 = 0", opts:["A. x = −1/3, 1/2","B. x = 1/3, −1/2","C. x = −1/3, −1/2","D. x = 1/3, 1/2"], ans:"A", exp:"6x²−3x+2x−1 = 3x(2x−1)+1(2x−1) = (3x+1)(2x−1) = 0."},
+    {q:"Solve x² = 4x − 4", opts:["A. x = 2 (repeated root)","B. x = −2 (repeated root)","C. x = 2, −2","D. x = 4, 0"], ans:"A", exp:"Rearrange first: x²−4x+4 = 0, which is (x−2)² = 0 — one repeated root, x = 2."},
+    {q:"Solve x(x − 3) = 10", opts:["A. x = 5, −2","B. x = −5, 2","C. x = 5, 2","D. x = −5, −2"], ans:"A", exp:"Expand and rearrange: x²−3x−10 = 0, giving (x−5)(x+2) = 0."},
+    {q:"Solve (x − 1)(x + 2) = 4", opts:["A. x = −3, 2","B. x = 3, −2","C. x = 3, 2","D. x = −3, −2"], ans:"A", exp:"Expand first: x²+x−2 = 4, so x²+x−6 = 0, giving (x+3)(x−2) = 0. Expanding before factorising is the step students most often skip here."},
+    {q:"Find the quadratic equation whose roots are 3 and −4.", opts:["A. x² + x − 12 = 0","B. x² − x − 12 = 0","C. x² + 7x − 12 = 0","D. x² − x + 12 = 0"], ans:"A", exp:"(x−3)(x+4) = 0 expands to x²+x−12 = 0."},
+    {q:"Find the quadratic equation whose roots are −2 and −5.", opts:["A. x² + 7x + 10 = 0","B. x² − 7x + 10 = 0","C. x² + 7x − 10 = 0","D. x² − 3x + 10 = 0"], ans:"A", exp:"(x+2)(x+5) = 0 expands to x²+7x+10 = 0."},
+    {q:"If the roots of a quadratic equation are 1/2 and −3, find the equation.", opts:["A. 2x² + 5x − 3 = 0","B. 2x² − 5x − 3 = 0","C. 2x² + 5x + 3 = 0","D. x² + 5x − 3 = 0"], ans:"A", exp:"(2x−1)(x+3) = 0 expands to 2x²+5x−3 = 0. Clearing the fractional root into a whole-number coefficient is the reverse of splitting the middle term."},
+    {q:"The sum and product of the roots of a quadratic equation are 5 and 6 respectively. Find the equation.", opts:["A. x² − 5x + 6 = 0","B. x² + 5x + 6 = 0","C. x² − 6x + 5 = 0","D. x² − 5x − 6 = 0"], ans:"A", exp:"For roots with sum S and product P, the equation is x² − Sx + P = 0."},
+    {q:"The sum of the roots of x² + px + 8 = 0 is −6. Find p.", opts:["A. 6","B. −6","C. 8","D. −8"], ans:"A", exp:"Sum of roots = −p, so −p = −6, giving p = 6."},
+    {q:"The product of the roots of 2x² − 7x + k = 0 is 3. Find k.", opts:["A. 6","B. 3","C. 14","D. 21/2"], ans:"A", exp:"Product of roots = k/2, so k/2 = 3, giving k = 6."},
+    {q:"Solve 4x² − 1 = 0", opts:["A. x = ±1/2","B. x = ±1","C. x = ±2","D. x = 1/4"], ans:"A", exp:"(2x−1)(2x+1) = 0, so x = 1/2 or x = −1/2."},
+    {q:"Solve 9x² − 12x + 4 = 0", opts:["A. x = 2/3 (repeated root)","B. x = −2/3","C. x = 4/3","D. x = 2/3, −2/3"], ans:"A", exp:"This is a perfect square trinomial: (3x−2)² = 0, giving one repeated root, x = 2/3."},
+    {q:"Solve x² − 0.5x − 0.5 = 0", opts:["A. x = −1/2, 1","B. x = 1/2, −1","C. x = −1/2, −1","D. x = 1/2, 1"], ans:"A", exp:"Multiply through by 2 to clear decimals: 2x²−x−1 = 0, giving (2x+1)(x−1) = 0."},
+    {q:"Solve x²/2 − 3x/2 + 1 = 0", opts:["A. x = 1, 2","B. x = −1, −2","C. x = 1, −2","D. x = −1, 2"], ans:"A", exp:"Multiply through by 2 to clear fractions: x²−3x+2 = 0, giving (x−1)(x−2) = 0."},
+    {q:"Solve x⁴ − 5x² + 4 = 0", opts:["A. x = ±1, ±2","B. x = ±1, ±4","C. x = 1, 4","D. x = ±5"], ans:"A", exp:"Let y = x². Then y²−5y+4 = 0 gives (y−1)(y−4) = 0, so y = 1 or 4. Taking square roots recovers x = ±1, ±2 — four roots from one quadratic in disguise."},
+    {q:"A rectangle has length (x+3) cm and width (x−1) cm. If its area is 21 cm², find x.", opts:["A. x = 4","B. x = −6","C. x = 4 or −6","D. x = 3"], ans:"A", exp:"(x+3)(x−1) = 21 gives x²+2x−24 = 0, so (x+6)(x−4) = 0. Reject x = −6, since it makes the width negative."},
+    {q:"Two consecutive positive integers multiply to give 132. Find the integers.", opts:["A. 11 and 12","B. 10 and 13","C. 12 and 13","D. 9 and 14"], ans:"A", exp:"n(n+1) = 132 gives n²+n−132 = 0, so (n+12)(n−11) = 0. Reject n = −12, keeping n = 11."},
+    {q:"Solve 5x² + 13x − 6 = 0", opts:["A. x = 2/5, −3","B. x = −2/5, 3","C. x = 2/5, 3","D. x = −2/5, −3"], ans:"A", exp:"5x²+15x−2x−6 = 5x(x+3)−2(x+3) = (5x−2)(x+3) = 0."},
+    {q:"Solve 7x² − 6x − 1 = 0", opts:["A. x = −1/7, 1","B. x = 1/7, −1","C. x = −1/7, −1","D. x = 1/7, 1"], ans:"A", exp:"7x²−7x+x−1 = 7x(x−1)+1(x−1) = (7x+1)(x−1) = 0."},
+    {q:"Solve (2x − 3)² = 25", opts:["A. x = 4, −1","B. x = −4, 1","C. x = 4, 1","D. x = −4, −1"], ans:"A", exp:"(2x−3)²−25 = 0 factors as (2x−8)(2x+2) = 0 via the difference of two squares, giving x = 4 or x = −1."},
+    {q:"x² − (a+b)x + ab = 0 — what are its roots, in terms of a and b?", opts:["A. x = a or b","B. x = a+b","C. x = ab","D. x = a−b"], ans:"A", exp:"(x−a)(x−b) = 0 gives x = a or x = b. Any quadratic with roots a and b expands to this exact form — sum in the middle, product at the end."},
+    {q:"Which of the following is the correct factorisation of x² − 3x − 10?", opts:["A. (x−5)(x+2)","B. (x+5)(x−2)","C. (x−10)(x+1)","D. (x−1)(x+10)"], ans:"A", exp:"(x−5)(x+2) expands to x²+2x−5x−10 = x²−3x−10. The other options expand to the wrong sign on the middle term or the wrong constant."}
+  ],
+  completing_square: [
+    {q:"Express x² + 6x in the form (x+p)² − q.", opts:["A. (x+3)² − 9","B. (x+3)² + 9","C. (x−3)² − 9","D. (x+6)² − 9"], ans:"A", exp:"Halve the coefficient of x (6/2 = 3) to get p; q = p² = 9."},
+    {q:"Express x² − 8x in the form (x−p)² − q.", opts:["A. (x−4)² − 16","B. (x−4)² + 16","C. (x+4)² − 16","D. (x−8)² − 16"], ans:"A", exp:"Half of −8 is −4, so p = 4 and q = p² = 16."},
+    {q:"Express x² + 10x + 3 in completed square form.", opts:["A. (x+5)² − 22","B. (x+5)² + 22","C. (x−5)² − 22","D. (x+10)² − 22"], ans:"A", exp:"(x+5)² = x²+10x+25, so x²+10x+3 = (x+5)² − 25 + 3 = (x+5)² − 22."},
+    {q:"Express x² − 4x − 5 in completed square form.", opts:["A. (x−2)² − 9","B. (x−2)² + 9","C. (x+2)² − 9","D. (x−4)² − 9"], ans:"A", exp:"(x−2)² = x²−4x+4, so x²−4x−5 = (x−2)² − 4 − 5 = (x−2)² − 9."},
+    {q:"Solve x² + 6x + 5 = 0 by completing the square.", opts:["A. x = −1, −5","B. x = 1, 5","C. x = −1, 5","D. x = 1, −5"], ans:"A", exp:"(x+3)² − 9 + 5 = 0 gives (x+3)² = 4, so x+3 = ±2, meaning x = −1 or x = −5."},
+    {q:"Solve x² − 4x − 12 = 0 by completing the square.", opts:["A. x = 6, −2","B. x = −6, 2","C. x = 6, 2","D. x = −6, −2"], ans:"A", exp:"(x−2)² − 4 − 12 = 0 gives (x−2)² = 16, so x−2 = ±4, meaning x = 6 or x = −2."},
+    {q:"Solve x² + 2x − 8 = 0 by completing the square.", opts:["A. x = 2, −4","B. x = −2, 4","C. x = 2, 4","D. x = −2, −4"], ans:"A", exp:"(x+1)² − 1 − 8 = 0 gives (x+1)² = 9, so x+1 = ±3, meaning x = 2 or x = −4."},
+    {q:"Solve x² − 10x + 21 = 0 by completing the square.", opts:["A. x = 7, 3","B. x = −7, −3","C. x = 7, −3","D. x = −7, 3"], ans:"A", exp:"(x−5)² − 25 + 21 = 0 gives (x−5)² = 4, so x = 7 or x = 3."},
+    {q:"Solve 2x² + 8x − 10 = 0 by completing the square.", opts:["A. x = 1, −5","B. x = −1, 5","C. x = 1, 5","D. x = −1, −5"], ans:"A", exp:"Divide by 2 first so the leading coefficient is 1: x²+4x−5 = 0, giving (x+2)² − 4 − 5 = 0, so (x+2)² = 9 and x = 1 or −5. Skipping this division is the most common error with a non-monic equation."},
+    {q:"Solve 3x² − 12x + 9 = 0 by completing the square.", opts:["A. x = 3, 1","B. x = −3, −1","C. x = 3, −1","D. x = −3, 1"], ans:"A", exp:"Divide by 3 first: x²−4x+3 = 0, giving (x−2)² − 4 + 3 = 0, so (x−2)² = 1 and x = 3 or 1."},
+    {q:"Solve x² + 3x − 4 = 0 by completing the square.", opts:["A. x = 1, −4","B. x = −1, 4","C. x = 1, 4","D. x = −1, −4"], ans:"A", exp:"(x+3/2)² − 9/4 − 4 = 0 gives (x+3/2)² = 25/4, so x+3/2 = ±5/2, meaning x = 1 or −4. An odd coefficient just means p is a fraction — the method doesn't change."},
+    {q:"Solve x² − 5x + 6 = 0 by completing the square.", opts:["A. x = 3, 2","B. x = −3, −2","C. x = 3, −2","D. x = −3, 2"], ans:"A", exp:"(x−5/2)² − 25/4 + 6 = 0 gives (x−5/2)² = 1/4, so x−5/2 = ±1/2, meaning x = 3 or 2."},
+    {q:"Find the minimum value of y = x² − 6x + 11.", opts:["A. 2","B. −2","C. 3","D. 11"], ans:"A", exp:"Completing the square gives y = (x−3)² + 2. The minimum value, 2, occurs when the squared term is zero, at x = 3."},
+    {q:"Find the minimum value of y = x² + 4x + 7.", opts:["A. 3","B. −3","C. 2","D. 7"], ans:"A", exp:"y = (x+2)² + 3, so the minimum value is 3, at x = −2."},
+    {q:"Find the maximum value of y = −x² + 6x − 5.", opts:["A. 4","B. −4","C. 3","D. 5"], ans:"A", exp:"Factor out −1 first, since the leading coefficient is negative: y = −(x²−6x)−5 = −[(x−3)²−9]−5 = −(x−3)²+4. The parabola opens downward, so this is a maximum: 4, at x = 3."},
+    {q:"Find the maximum value of y = −x² + 2x + 8.", opts:["A. 9","B. −9","C. 1","D. 8"], ans:"A", exp:"y = −(x²−2x)+8 = −[(x−1)²−1]+8 = −(x−1)²+9. Maximum value 9, at x = 1."},
+    {q:"Find the coordinates of the turning point of y = x² − 8x + 15.", opts:["A. (4, −1)","B. (−4, −1)","C. (4, 1)","D. (−4, 1)"], ans:"A", exp:"y = (x−4)² − 1, so the vertex is at (4, −1)."},
+    {q:"Find the coordinates of the turning point of y = x² + 4x − 1.", opts:["A. (−2, −5)","B. (2, −5)","C. (−2, 5)","D. (2, 5)"], ans:"A", exp:"y = (x+2)² − 5, so the vertex is at (−2, −5)."},
+    {q:"For what value of x does y = 2x² − 8x + 3 have its minimum value?", opts:["A. x = 2","B. x = −2","C. x = 4","D. x = 8"], ans:"A", exp:"y = 2(x²−4x)+3 = 2[(x−2)²−4]+3 = 2(x−2)²−5. Minimum occurs at x = 2 — factoring out the leading coefficient first doesn't change where the vertex sits, only its depth."},
+    {q:"Deriving the quadratic formula from ax² + bx + c = 0 by completing the square, what expression appears under the square root?", opts:["A. b² − 4ac","B. b² + 4ac","C. 4ac − b²","D. b² − 2ac"], ans:"A", exp:"Dividing by a and completing the square on x²+(b/a)x produces x = [−b ± √(b²−4ac)] / 2a. The discriminant b²−4ac falls directly out of this process — it isn't a separate rule to memorise."},
+    {q:"Using x² + bx + c = 0 → x = −b/2 ± √(b²/4 − c), what does the term under the root become when b = 6, c = 5?", opts:["A. 4","B. 9","C. 5","D. 6"], ans:"A", exp:"b²/4 − c = 36/4 − 5 = 9 − 5 = 4. This reproduces the earlier result (x+3)² = 4 for x²+6x+5=0 by the general formula rather than the step-by-step method."},
+    {q:"Solve x² + x − 1 = 0 by completing the square, giving your answer in surd form.", opts:["A. x = (−1 ± √5)/2","B. x = (1 ± √5)/2","C. x = (−1 ± √5)/4","D. x = −1 ± √5"], ans:"A", exp:"(x+1/2)² − 1/4 − 1 = 0 gives (x+1/2)² = 5/4, so x = −1/2 ± √5/2 = (−1 ± √5)/2. When the completed-square value isn't a perfect square, leave the answer as a surd rather than forcing a decimal."},
+    {q:"Solve x² − 4x + 1 = 0 by completing the square, giving your answer in surd form.", opts:["A. x = 2 ± √3","B. x = 2 ± √4","C. x = 4 ± √3","D. x = −2 ± √3"], ans:"A", exp:"(x−2)² − 4 + 1 = 0 gives (x−2)² = 3, so x = 2 ± √3."},
+    {q:"For x² + 2x + 5 = 0, completing the square gives (x+1)² = −4. What does this indicate about the roots?", opts:["A. No real roots exist — the roots are complex","B. Two equal real roots","C. Two distinct real roots","D. One root is zero"], ans:"A", exp:"A real number squared can never equal a negative number, so (x+1)² = −4 has no real solution. This is the same conclusion the discriminant test (b²−4ac < 0) gives, reached by a different route."},
+    {q:"For x² − 6x + 9 = 0, completing the square gives (x−3)² = 0. What does this indicate?", opts:["A. One repeated real root, x = 3","B. Two distinct real roots","C. No real roots","D. Two roots, x = 0 and x = 6"], ans:"A", exp:"(x−3)² = 0 has only one solution, x = 3, counted as a repeated (equal) root."},
+    {q:"A rectangular field of area 40 m² has width x metres and length (x+3) metres. Use completing the square on x²+3x−40=0 to find x.", opts:["A. x = 5","B. x = −8","C. x = 5 or −8","D. x = 8"], ans:"A", exp:"(x+3/2)² − 9/4 − 40 = 0 gives (x+3/2)² = 169/4, so x = 5 or x = −8. Reject the negative root — a width of −8 m has no physical meaning."},
+    {q:"A ball's height is h = −5t² + 20t (t in seconds). Use completing the square to find the maximum height and when it occurs.", opts:["A. 20 m at t = 2 s","B. 20 m at t = 4 s","C. 4 m at t = 2 s","D. 25 m at t = 2 s"], ans:"A", exp:"Factor out −5 first: h = −5(t²−4t) = −5[(t−2)²−4] = −5(t−2)²+20. Maximum height 20 m, at t = 2 s."},
+    {q:"Express 2x² − 4x + 7 in the form a(x−h)² + k.", opts:["A. 2(x−1)² + 5","B. 2(x−1)² + 7","C. 2(x+1)² + 5","D. 2(x−2)² + 5"], ans:"A", exp:"2(x²−2x)+7 = 2[(x−1)²−1]+7 = 2(x−1)²−2+7 = 2(x−1)²+5."},
+    {q:"Given x² − 8x + k = (x−4)² for some constant k, find k.", opts:["A. 16","B. 8","C. 4","D. 64"], ans:"A", exp:"(x−4)² = x²−8x+16, so k = 16. The constant that completes the square is always (half the x-coefficient)²."},
+    {q:"A student writes x² − 7x + 10 as (x − 7/2)² − 49/4 + 10. What is the simplified constant term?", opts:["A. −9/4","B. 9/4","C. −49/4","D. 51/4"], ans:"A", exp:"Convert 10 to quarters before combining: −49/4 + 40/4 = −9/4. Forgetting to convert to a common denominator is the usual slip when the x-coefficient is odd."}
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'factorisation';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── TABS ──────────────────────────────────────────────────
+function renderTabs() {
+    const container = document.getElementById('tabs-container');
+    container.innerHTML = Object.keys(subjectLabels).map(key => `
+        <button class="tab ${key === currentSubject ? 'active' : ''}" data-subject="${key}">
+            ${subjectLabels[key]}
+        </button>
+    `).join('');
+
+    container.querySelectorAll('.tab').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const subject = this.dataset.subject;
+            if (subject === currentSubject) return;
+            switchSubject(subject);
+        });
+    });
+}
+
+function switchSubject(subject) {
+    clearAllTimers();
+    currentSubject = subject;
+    stats = { answered: 0, correct: 0 };
+    updateStats();
+    renderTabs();
+    renderQuestions();
+}
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderTabs();
+renderQuestions();
+</script>
+</body>
+</html>
