@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Sequence and Series — Mathematics · JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="title">Sequence and Series</div>
+    <div class="subtitle">100-question mastery drill · Mathematics</div>
+</div>
+
+<div id="questions-container"></div>
+
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {q:"Find the 10th term of the AP 3, 7, 11, 15, ...", opts:["A. 39","B. 35","C. 43","D. 40"], ans:"A", exp:"Tn = a+(n−1)d = 3+9(4) = 39."},
+    {q:"Find the 15th term of the AP 5, 2, −1, −4, ...", opts:["A. −37","B. −40","C. −34","D. 37"], ans:"A", exp:"a=5, d=−3. T15 = 5+14(−3) = −37."},
+    {q:"Find the common difference of the AP: 8, 14, 20, 26, ...", opts:["A. 6","B. 8","C. 5","D. 7"], ans:"A", exp:"d = 14−8 = 6."},
+    {q:"The 5th term of an AP is 17 and the first term is 5. Find the common difference.", opts:["A. 3","B. 4","C. 2","D. 3.5"], ans:"A", exp:"17 = 5+4d, so d = 3."},
+    {q:"The 8th term of an AP is 22 and the common difference is 3. Find the first term.", opts:["A. 1","B. 4","C. −1","D. 7"], ans:"A", exp:"22 = a+7(3), so a = 1."},
+    {q:"How many terms are in the AP 4, 9, 14, ..., 124?", opts:["A. 25","B. 24","C. 26","D. 23"], ans:"A", exp:"d=5. 124 = 4+(n−1)5 gives n−1=24, so n=25."},
+    {q:"Find the 20th term of the AP whose first term is −6 and common difference is 5.", opts:["A. 89","B. 94","C. 84","D. 95"], ans:"A", exp:"T20 = −6+19(5) = 89."},
+    {q:"If the 3rd term of an AP is 13 and the 7th term is 29, find the common difference.", opts:["A. 4","B. 5","C. 3","D. 6"], ans:"A", exp:"T7−T3 = 4d, since the terms are 4 steps apart. 4d = 16, so d = 4."},
+    {q:"Using the AP where T3=13 and T7=29 (d=4), find the first term.", opts:["A. 5","B. 9","C. 1","D. 13"], ans:"A", exp:"T3 = a+2d = 13 gives a = 13−8 = 5."},
+    {q:"Find the number of terms in the AP 2, 5, 8, ..., 92.", opts:["A. 31","B. 30","C. 32","D. 29"], ans:"A", exp:"d=3. 92 = 2+(n−1)3 gives n−1=30, so n=31."},
+    {q:"The nth term of an AP is Tn = 4n − 1. Find the first term and common difference.", opts:["A. a=3, d=4","B. a=4, d=1","C. a=−1, d=4","D. a=3, d=−1"], ans:"A", exp:"Matching dn+(a−d) to 4n−1 gives d=4 and a−d=−1, so a=3."},
+    {q:"The nth term of an AP is Tn = 7 − 3n. Find the 10th term.", opts:["A. −23","B. −30","C. 23","D. −37"], ans:"A", exp:"T10 = 7−30 = −23."},
+    {q:"Three consecutive terms of an AP are (2x−1), (3x+2), and (5x−3). Find x.", opts:["A. 8","B. 5","C. 11","D. 3"], ans:"A", exp:"Equate consecutive differences: (3x+2)−(2x−1) = (5x−3)−(3x+2), giving x+3 = 2x−5, so x=8."},
+    {q:"The first term of an AP is 6 and the 12th term is 39. Find the common difference.", opts:["A. 3","B. 2.5","C. 3.5","D. 4"], ans:"A", exp:"39 = 6+11d gives d = 33/11 = 3."},
+    {q:"Insert 3 arithmetic means between 5 and 25. Find the second mean.", opts:["A. 15","B. 10","C. 20","D. 12.5"], ans:"A", exp:"Inserting 3 means creates 5 terms spanning 4 gaps: d = (25−5)/4 = 5. The means are 10, 15, 20 — the second is 15."},
+    {q:"Find the arithmetic mean between 12 and 28.", opts:["A. 20","B. 18","C. 22","D. 16"], ans:"A", exp:"Arithmetic mean = (12+28)/2 = 20."},
+    {q:"The 6th term of an AP exceeds the 2nd term by 20. Find the common difference.", opts:["A. 5","B. 4","C. 20","D. 10"], ans:"A", exp:"T6−T2 = 4d = 20, so d = 5."},
+    {q:"An AP has first term 10 and 20th term −47. Find the common difference.", opts:["A. −3","B. 3","C. −57","D. −19"], ans:"A", exp:"−47 = 10+19d gives d = −57/19 = −3."},
+    {q:"Find the 12th term of the AP with first term −4 and common difference 3.5.", opts:["A. 34.5","B. 38.5","C. 31","D. 42"], ans:"A", exp:"T12 = −4+11(3.5) = 34.5."},
+    {q:"If T5=23 and T9=39 in an AP, find T15.", opts:["A. 63","B. 59","C. 67","D. 55"], ans:"A", exp:"T9−T5 = 4d = 16 gives d=4. Then a = T5−4d = 7, and T15 = 7+14(4) = 63."},
+    {q:"Find the sum of the first 10 terms of the AP 3, 7, 11, 15, ...", opts:["A. 210","B. 200","C. 220","D. 190"], ans:"A", exp:"Sn = n/2[2a+(n−1)d] = 5[6+36] = 210."},
+    {q:"Find the sum of the first 15 terms of the AP 5, 2, −1, ...", opts:["A. −240","B. −230","C. −250","D. 240"], ans:"A", exp:"Sn = 15/2[10+14(−3)] = 7.5(−32) = −240."},
+    {q:"Find the sum of the AP 4, 9, 14, ..., 124 (25 terms).", opts:["A. 1600","B. 1550","C. 1650","D. 1500"], ans:"A", exp:"Sn = n/2(a+l) = 25/2(4+124) = 1600."},
+    {q:"Find the sum of the first 20 terms of the AP with first term 6 and common difference 4.", opts:["A. 880","B. 860","C. 900","D. 840"], ans:"A", exp:"Sn = 10[12+19(4)] = 10(88) = 880."},
+    {q:"The sum of the first n terms of an AP is Sn = 4n² + 2n. Find the first term.", opts:["A. 6","B. 4","C. 2","D. 8"], ans:"A", exp:"The first term equals S1: 4(1)+2(1) = 6."},
+    {q:"Using Sn = 4n² + 2n, find the common difference.", opts:["A. 8","B. 4","C. 2","D. 6"], ans:"A", exp:"For Sn = An²+Bn, the common difference is always d = 2A — here 2×4 = 8."},
+    {q:"Find the sum of the first 25 natural numbers.", opts:["A. 325","B. 300","C. 350","D. 312"], ans:"A", exp:"Sum = 25(26)/2 = 325."},
+    {q:"Find the sum of all odd numbers between 1 and 50.", opts:["A. 625","B. 600","C. 650","D. 576"], ans:"A", exp:"There are 25 odd numbers from 1 to 49. Sn = 25/2(1+49) = 625."},
+    {q:"Find the sum of the first 30 multiples of 7.", opts:["A. 3255","B. 3150","C. 3360","D. 3080"], ans:"A", exp:"a=7, d=7, n=30. Sn = 15[14+29(7)] = 15(217) = 3255."},
+    {q:"How many terms of the AP 2, 5, 8, ... must be taken for their sum to be 155?", opts:["A. 10","B. 12","C. 8","D. 11"], ans:"A", exp:"Sn = n/2[4+3(n−1)] = 155 leads to 3n²+n−310=0, which factorises to give n=10."},
+    {q:"The sum of the first 8 terms of an AP is 124 and the first term is 5. Find the common difference.", opts:["A. 3","B. 4","C. 2","D. 15/7"], ans:"A", exp:"S8 = 4[10+7d] = 124 gives 10+7d=31, so d=3."},
+    {q:"Find the sum of the first 12 terms of an AP where a=4 and the 12th term is 37.", opts:["A. 246","B. 240","C. 252","D. 235"], ans:"A", exp:"Sn = n/2(a+l) = 6(4+37) = 246."},
+    {q:"The sum of an AP's first n terms is Sn = 3n² − n. Find the sum of the first 5 terms.", opts:["A. 70","B. 65","C. 75","D. 60"], ans:"A", exp:"S5 = 3(25)−5 = 70."},
+    {q:"An AP has a=2, d=5. Find the least number of terms so that the sum exceeds 200.", opts:["A. 10","B. 9","C. 11","D. 8"], ans:"A", exp:"S9 = 198, which still falls short of 200, but S10 = 245 clears it, so the least n is 10."},
+    {q:"The first term of an AP is 12, the last term is 108, and the sum is 900. Find the number of terms.", opts:["A. 15","B. 12","C. 18","D. 20"], ans:"A", exp:"Sn = n/2(a+l) = 60n = 900, so n = 15."},
+    {q:"Find the 6th term of the GP 2, 6, 18, 54, ...", opts:["A. 486","B. 162","C. 972","D. 324"], ans:"A", exp:"a=2, r=3. T6 = 2(3⁵) = 486."},
+    {q:"Find the common ratio of the GP 5, 15, 45, 135, ...", opts:["A. 3","B. 5","C. 9","D. 10"], ans:"A", exp:"r = 15/5 = 3."},
+    {q:"Find the 5th term of the GP with first term 3 and common ratio 2.", opts:["A. 48","B. 24","C. 96","D. 32"], ans:"A", exp:"T5 = 3(2⁴) = 48."},
+    {q:"The 4th term of a GP is 24 and the first term is 3. Find the common ratio.", opts:["A. 2","B. 3","C. 4","D. 8"], ans:"A", exp:"24 = 3r³ gives r³=8, so r=2."},
+    {q:"Find the 7th term of the GP 1, −3, 9, −27, ...", opts:["A. 729","B. −729","C. 2187","D. −2187"], ans:"A", exp:"T7 = 1(−3)⁶. Since (−3) is raised to an even power, the result is positive: 729."},
+    {q:"Find the 8th term of the GP 1, −3, 9, −27, ...", opts:["A. −2187","B. 2187","C. −729","D. 729"], ans:"A", exp:"T8 = 1(−3)⁷. An odd power keeps the sign negative: −2187."},
+    {q:"Find the common ratio of a GP whose 3rd term is 20 and 6th term is 160.", opts:["A. 2","B. 8","C. 4","D. 3"], ans:"A", exp:"T6/T3 = r³ = 160/20 = 8, since terms 3 apart differ by r³. So r=2."},
+    {q:"Using the GP where T3=20 and T6=160 (r=2), find the first term.", opts:["A. 5","B. 10","C. 2.5","D. 20"], ans:"A", exp:"T3 = ar² = 20 gives a = 20/4 = 5."},
+    {q:"Find the number of terms in the GP 3, 6, 12, ..., 384.", opts:["A. 8","B. 7","C. 9","D. 6"], ans:"A", exp:"a=3, r=2. 384 = 3(2ⁿ⁻¹) gives 2ⁿ⁻¹=128=2⁷, so n=8."},
+    {q:"The 2nd term of a GP is 6 and the 5th term is 162. Find the common ratio.", opts:["A. 3","B. 27","C. 9","D. 6"], ans:"A", exp:"T5/T2 = r³ = 162/6 = 27, so r=3."},
+    {q:"Using the GP where T2=6 and T5=162 (r=3), find the first term.", opts:["A. 2","B. 6","C. 18","D. 3"], ans:"A", exp:"T2 = ar = 6 gives a = 6/3 = 2."},
+    {q:"Find the geometric mean between 4 and 16.", opts:["A. 8","B. 10","C. 20","D. 6"], ans:"A", exp:"Geometric mean = √(4×16) = √64 = 8."},
+    {q:"Find the geometric mean between 3 and 27.", opts:["A. 9","B. 15","C. 81","D. 12"], ans:"A", exp:"√(3×27) = √81 = 9."},
+    {q:"Insert a geometric mean between 5 and 45.", opts:["A. 15","B. 20","C. 25","D. 10"], ans:"A", exp:"√(5×45) = √225 = 15."},
+    {q:"Three consecutive terms of a GP are 2, x, 18. Find the value(s) of x.", opts:["A. x = ±6","B. x = 6 only","C. x = 36","D. x = ±36"], ans:"A", exp:"For three consecutive GP terms a, x, b: x² = ab, so x² = 36, giving x=±6 — both signs are valid since a GP can have a negative common ratio."},
+    {q:"Three consecutive terms of a GP are 5, x, 45. Find x.", opts:["A. x = ±15","B. x = 15 only","C. x = 225","D. x = ±225"], ans:"A", exp:"x² = 5×45 = 225, so x = ±15."},
+    {q:"Find the sum of the first 5 terms of the GP 2, 6, 18, 54, ...", opts:["A. 242","B. 240","C. 244","D. 121"], ans:"A", exp:"Sn = a(rⁿ−1)/(r−1) = 2(3⁵−1)/2 = 242."},
+    {q:"Find the sum of the first 6 terms of the GP 3, 6, 12, 24, ...", opts:["A. 189","B. 192","C. 186","D. 96"], ans:"A", exp:"Sn = 3(2⁶−1)/(2−1) = 3(63) = 189."},
+    {q:"Find the sum of the first 4 terms of the GP 1, −3, 9, −27, ...", opts:["A. −20","B. 20","C. −80","D. 80"], ans:"A", exp:"With a negative ratio, Sn = ((−3)⁴−1)/(−3−1) = 80/(−4) = −20."},
+    {q:"Find the sum of the first 7 terms of the GP 5, 10, 20, 40, ...", opts:["A. 635","B. 630","C. 640","D. 315"], ans:"A", exp:"Sn = 5(2⁷−1) = 5(127) = 635."},
+    {q:"Find the sum of the first 10 terms of the GP 1, 2, 4, 8, ...", opts:["A. 1023","B. 1024","C. 512","D. 2046"], ans:"A", exp:"Sn = (2¹⁰−1)/(2−1) = 1023."},
+    {q:"A GP has first term 4 and common ratio 3. Find the sum of the first 5 terms.", opts:["A. 484","B. 480","C. 488","D. 242"], ans:"A", exp:"Sn = 4(3⁵−1)/2 = 4(121) = 484."},
+    {q:"A GP has a=6 and r=1/2. Find the sum of the first 4 terms.", opts:["A. 11.25","B. 11","C. 12","D. 10.5"], ans:"A", exp:"When |r|<1, it's cleaner to use Sn = a(1−rⁿ)/(1−r) = 6(1−1/16)/(1/2) = 11.25."},
+    {q:"Find the sum to infinity of the GP 8, 4, 2, 1, ...", opts:["A. 16","B. 12","C. 8","D. 24"], ans:"A", exp:"a=8, r=1/2. S∞ = a/(1−r) = 8/(1/2) = 16."},
+    {q:"Find the sum to infinity of the GP 9, 3, 1, 1/3, ...", opts:["A. 13.5","B. 12","C. 27","D. 9"], ans:"A", exp:"a=9, r=1/3. S∞ = 9/(2/3) = 13.5."},
+    {q:"Find the sum to infinity of the GP 20, −10, 5, −2.5, ...", opts:["A. 40/3","B. 20/3","C. 60","D. −40/3"], ans:"A", exp:"With a negative ratio, S∞ = a/(1−r) still applies: 20/(1−(−1/2)) = 20/(3/2) = 40/3."},
+    {q:"For what values of r does a GP with first term 5 have a sum to infinity?", opts:["A. −1 < r < 1","B. r > 1","C. r < −1","D. r ≠ 0"], ans:"A", exp:"The sum to infinity only converges when |r| < 1; outside that range the terms don't shrink, and the series diverges."},
+    {q:"Express the recurring decimal 0.222... as a fraction using the sum of an infinite GP.", opts:["A. 2/9","B. 1/5","C. 2/10","D. 1/9"], ans:"A", exp:"Treat it as an infinite GP with a=0.2, r=0.1. S∞ = 0.2/0.9 = 2/9."},
+    {q:"Express the recurring decimal 0.454545... as a fraction using the sum of an infinite GP.", opts:["A. 5/11","B. 9/20","C. 45/100","D. 4/9"], ans:"A", exp:"a=0.45, r=0.01. S∞ = 0.45/0.99 = 45/99 = 5/11."},
+    {q:"Find the sum to infinity of the GP whose first term is 12 and common ratio is 2/3.", opts:["A. 36","B. 18","C. 24","D. 8"], ans:"A", exp:"S∞ = 12/(1−2/3) = 12/(1/3) = 36."},
+    {q:"The 3rd term of an AP is 15 and the 7th term is 35. Find the sum of the first 10 terms.", opts:["A. 275","B. 270","C. 280","D. 265"], ans:"A", exp:"T7−T3 = 4d = 20 gives d=5, and a = T3−2d = 5. S10 = 5[10+9(5)] = 275."},
+    {q:"A GP has 2nd term 10 and 4th term 40. Find the possible common ratio(s).", opts:["A. r = ±2","B. r = 2 only","C. r = 4","D. r = ±4"], ans:"A", exp:"T4/T2 = r² = 4. Squaring removes the sign, so both r=2 and r=−2 satisfy the ratio condition."},
+    {q:"A culture of bacteria doubles every hour, starting with 500. Find the population after 6 hours.", opts:["A. 32,000","B. 16,000","C. 64,000","D. 30,000"], ans:"A", exp:"Model as a GP with a=500 (hour 0) and r=2; after 6 hours, T7 = 500(2⁶) = 32,000."},
+    {q:"A ball dropped from 20 m rebounds to 3/4 of its previous height each bounce. Find the height after the 3rd bounce.", opts:["A. 8.4375 m","B. 11.25 m","C. 6.75 m","D. 15 m"], ans:"A", exp:"T1=20 is the drop height; each bounce multiplies by 3/4, so after the 3rd bounce the height is T4 = 20(3/4)³."},
+    {q:"A ball dropped from height h rebounds to half its previous height each time until it comes to rest. Find the total distance travelled, in terms of h.", opts:["A. 3h","B. 2h","C. 4h","D. h"], ans:"A", exp:"The initial drop is h; every bounce after that is travelled twice (up and down), forming an infinite GP that sums to h — doubled gives 2h, plus the initial drop gives 3h total."},
+    {q:"The sum of the first three terms of an AP is 27 and their product is 585. Find the three terms.", opts:["A. 5, 9, 13","B. 3, 9, 15","C. 7, 9, 11","D. 6, 9, 12"], ans:"A", exp:"Representing the terms as (a−d), a, (a+d) makes the sum simplify to 3a=27, so a=9. The product 9(81−d²)=585 gives d=±4, so the terms are 5, 9, 13."},
+    {q:"The sum of three consecutive terms of a GP is 26 and their product is 216. Find the three terms.", opts:["A. 2, 6, 18","B. 4, 6, 16","C. 3, 6, 12","D. 6, 6, 6"], ans:"A", exp:"Representing the terms as a/r, a, ar makes the product simplify to a³=216, so a=6. Solving 6/r+6+6r=26 gives r=3 (or 1/3), so the terms are 2, 6, 18."},
+    {q:"A man saves ₦1,000 in the first month and increases his savings by ₦500 each month. Find his total savings after 12 months.", opts:["A. ₦45,000","B. ₦42,000","C. ₦48,000","D. ₦40,000"], ans:"A", exp:"AP: a=1000, d=500, n=12. S12 = 6[2000+11(500)] = 45,000."},
+    {q:"A man's salary increases by 10% each year, starting at ₦200,000. Find his salary in the 4th year.", opts:["A. ₦266,200","B. ₦260,000","C. ₦242,000","D. ₦220,000"], ans:"A", exp:"GP with a=200,000, r=1.1. T4 = 200,000(1.1)³ = 266,200."},
+    {q:"Find the sum of all multiples of 3 between 1 and 100.", opts:["A. 1683","B. 1650","C. 1700","D. 1600"], ans:"A", exp:"There are 33 multiples of 3 up to 99. Sn = 33/2(3+99) = 1683."},
+    {q:"The sum of the first n terms of an AP is Sn = n(n+3). Find the 10th term.", opts:["A. 22","B. 20","C. 25","D. 18"], ans:"A", exp:"The nth term is Sn−S(n−1). S10=130, S9=108, so T10 = 130−108 = 22."},
+    {q:"Find the number of terms of the GP 2, 4, 8, ..., 1024.", opts:["A. 10","B. 9","C. 11","D. 8"], ans:"A", exp:"a=2, r=2. Tn = 2ⁿ = 1024 = 2¹⁰, so n=10."},
+    {q:"The 4th and 7th terms of a GP are 24 and 192 respectively. Find the common ratio.", opts:["A. 2","B. 8","C. 4","D. 3"], ans:"A", exp:"T7/T4 = r³ = 192/24 = 8, so r=2."},
+    {q:"Using the GP where T4=24 and T7=192 (r=2), find the first term.", opts:["A. 3","B. 6","C. 12","D. 1.5"], ans:"A", exp:"T4 = ar³ = 24 gives a = 24/8 = 3."},
+    {q:"The sum of the first 6 terms of a GP is 63 and the common ratio is 2. Find the first term.", opts:["A. 1","B. 3","C. 7","D. 9"], ans:"A", exp:"Since 2⁶−1=63, the sum simplifies to 63a — matching the given sum of 63 gives a=1."},
+    {q:"An AP and a GP both start at 2. The AP's 4th term is 20. Find the AP's common difference.", opts:["A. 6","B. 5","C. 18","D. 4"], ans:"A", exp:"20 = 2+3d gives d = 6."},
+    {q:"A GP has first term 2 and 3rd term 18. Find the possible common ratio(s).", opts:["A. r = ±3","B. r = 3 only","C. r = 9","D. r = ±9"], ans:"A", exp:"2r² = 18 gives r² = 9, so r = ±3."},
+    {q:"Find the positive value of x such that x, (x+6), 9x form three consecutive terms of a GP.", opts:["A. x = 3","B. x = 6","C. x = 9","D. x = 1.5"], ans:"A", exp:"(x+6)² = x(9x) expands to 2x²−3x−9=0, giving x=3 or x=−1.5; the positive solution is x=3."},
+    {q:"Three consecutive terms of an AP are (2x+1), (3x−2), and (5x+3). Find x.", opts:["A. x = −8","B. x = 8","C. x = −3","D. x = 3"], ans:"A", exp:"Equate consecutive differences: (3x−2)−(2x+1) = (5x+3)−(3x−2), giving x−3 = 2x+5, so x=−8."},
+    {q:"In an AP with first term 4, the 1st, 3rd, and 9th terms form a GP. Find the common difference (d≠0).", opts:["A. d = 4","B. d = 0","C. d = 2","D. d = 8"], ans:"A", exp:"Setting (T3)² = T1·T9 gives (4+2d)² = 4(4+8d), which expands to 4d²−16d=0. Rejecting the trivial d=0, d=4."},
+    {q:"Find the sum of the first 8 terms of the AP whose nth term is Tn = 3n + 2.", opts:["A. 124","B. 120","C. 128","D. 116"], ans:"A", exp:"a=5, d=3, n=8. S8 = 4[10+21] = 124."},
+    {q:"Find the 20th term of the sequence whose nth term is Tn = 2n² − 1.", opts:["A. 799","B. 800","C. 401","D. 798"], ans:"A", exp:"T20 = 2(400)−1 = 799."},
+    {q:"A sequence has Tn = 5 + (n−1)×2. Find the sum of the first 20 terms.", opts:["A. 480","B. 470","C. 490","D. 460"], ans:"A", exp:"This is an AP with a=5, d=2, n=20. S20 = 10[10+38] = 480."},
+    {q:"The sum of an infinite GP is 24 and its first term is 8. Find the common ratio.", opts:["A. 2/3","B. 1/3","C. 3/4","D. 1/2"], ans:"A", exp:"24 = 8/(1−r) gives 1−r = 1/3, so r = 2/3."},
+    {q:"The sum to infinity of a GP is twice its first term. Find the common ratio.", opts:["A. 1/2","B. 2","C. −1/2","D. 1/4"], ans:"A", exp:"Set a/(1−r) = 2a and cancel a: 1−r = 1/2, so r = 1/2."},
+    {q:"The 5th term of an AP is three times the 2nd term, and the 7th term exceeds the 3rd term by 20. Find the first term and common difference.", opts:["A. a = 2.5, d = 5","B. a = 5, d = 2.5","C. a = 2, d = 5","D. a = 5, d = 10"], ans:"A", exp:"T7−T3 = 4d = 20 gives d=5. From T5=3T2, a+4d=3(a+d) simplifies to d=2a, so a=2.5."},
+    {q:"An AP has a=3, d=2. Find the smallest n for which Sn > 168.", opts:["A. 13","B. 12","C. 14","D. 11"], ans:"A", exp:"Sn = n²+2n. n=12 gives exactly 168, not greater, so the smallest qualifying n is 13."},
+    {q:"A GP has common ratio −2 and first term 5. Find the sum of the first 5 terms.", opts:["A. 55","B. −55","C. 33","D. −33"], ans:"A", exp:"Sn = 5((−2)⁵−1)/(−2−1) = 5(−33)/(−3) = 55."},
+    {q:"An AP has 15 terms, first term 4 and last term 60. Find the sum.", opts:["A. 480","B. 470","C. 475","D. 460"], ans:"A", exp:"Sn = n/2(a+l) = 7.5(64) = 480."},
+    {q:"Find the sum of the first 5 terms of the sequence 100, 50, 25, 12.5, ...", opts:["A. 193.75","B. 187.5","C. 200","D. 175"], ans:"A", exp:"a=100, r=0.5, n=5. Sn = 100(1−0.5⁵)/0.5 = 193.75."},
+    {q:"The 2nd term of a GP is 12 and the 5th term is 96. Find the common ratio.", opts:["A. 2","B. 8","C. 4","D. 1.5"], ans:"A", exp:"T5/T2 = r³ = 8, so r=2."},
+    {q:"Using the GP where T2=12 and r=2, find the sum of the first 6 terms.", opts:["A. 378","B. 384","C. 372","D. 189"], ans:"A", exp:"a = T2/r = 6. Sn = 6(2⁶−1) = 6(63) = 378."},
+    {q:"An AP has first term 7 and the sum of the first 20 terms is 900. Find the common difference.", opts:["A. 4","B. 5","C. 3","D. 4.5"], ans:"A", exp:"S20 = 10[14+19d] = 900 gives 14+19d=90, so d=4."},
+    {q:"A GP has 4 terms. The sum of the first two is 6 and the sum of the last two is 96. Find the common ratio.", opts:["A. r = ±4","B. r = 4 only","C. r = 16","D. r = 8"], ans:"A", exp:"Dividing ar²(1+r)=96 by a(1+r)=6 cancels the common factor, leaving r²=16, so r=±4."},
+    {q:"Using the GP above (r=4), find the first term.", opts:["A. 1.2","B. 6","C. 1.5","D. 0.8"], ans:"A", exp:"a(1+4) = 6 gives a = 6/5 = 1.2."}
+
+];
+
+let userAnswers = {};
+let stats = { answered: 0, correct: 0 };
+let timerIds = {};
+let timerSecs = {};
+
+const TOTAL_SECS = 600;
+const CIRC = 2 * Math.PI * 14;
+
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+
+    container.innerHTML = questions.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${questions.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+function startAllTimers() {
+    questions.forEach((_, i) => {
+        timerSecs[i] = TOTAL_SECS;
+        timerIds[i] = setInterval(() => tickTimer(i), 1000);
+    });
+}
+
+function tickTimer(i) {
+    timerSecs[i]--;
+    const secs = timerSecs[i];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[i]);
+        timerIds[i] = null;
+        timerSecs[i] = 0;
+        updateTimerUI(i, 0);
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring = document.getElementById('ring-' + i);
+    const textEl = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg = ring.querySelector('.fg');
+    const frac = secs / TOTAL_SECS;
+    const offset = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    if (timerIds[i]) {
+        clearInterval(timerIds[i]);
+        timerIds[i] = null;
+    }
+}
+
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    if (!userAnswers[i]) {
+        userAnswers[i] = '—';
+        stats.answered++;
+        updateStats();
+    }
+}
+
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card = this.closest('.question-card');
+            const index = card.dataset.index;
+
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[index] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card = this.closest('.question-card');
+            const index = +card.dataset.index;
+            const q = questions[index];
+            const userAns = userAnswers[index];
+            const isCorrect = userAns === q.ans;
+
+            stopTimer(index);
+
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns) opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent = pct + '%';
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
