@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Procedure Drills — Mathematics · JAMB Practice</title>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="title">Procedure Drills</div>
+    <div class="subtitle">105-question drill · 35 procedures × 3</div>
+</div>
+
+<div id="questions-container"></div>
+
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 1 · Isolating a variable</span><br>Solve x + 7 = 15", opts:["A. x = 7", "B. x = −8", "C. x = 22", "D. x = 8"], ans:"D", exp:"Subtract 7 from both sides: x = 15 − 7 = 8."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 1 · Isolating a variable</span><br>Solve x + 12 = 30", opts:["A. x = 18", "B. x = −18", "C. x = 12", "D. x = 42"], ans:"A", exp:"Subtract 12 from both sides: x = 30 − 12 = 18."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 1 · Isolating a variable</span><br>Solve x + 9 = 23", opts:["A. x = 14", "B. x = 32", "C. x = 9", "D. x = −14"], ans:"A", exp:"Subtract 9 from both sides: x = 23 − 9 = 14."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 2 · Multiplying/dividing both sides</span><br>Solve 3x = 21", opts:["A. x = 3", "B. x = 18", "C. x = 7", "D. x = 63"], ans:"C", exp:"Divide both sides by 3: x = 21 ÷ 3 = 7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 2 · Multiplying/dividing both sides</span><br>Solve 4x = 32", opts:["A. x = 28", "B. x = 36", "C. x = 128", "D. x = 8"], ans:"D", exp:"Divide both sides by 4: x = 32 ÷ 4 = 8."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 2 · Multiplying/dividing both sides</span><br>Solve 5x = 40", opts:["A. x = 35", "B. x = 200", "C. x = 8", "D. x = 45"], ans:"C", exp:"Divide both sides by 5: x = 40 ÷ 5 = 8."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 3 · Expanding brackets</span><br>Expand 3(x + 4)", opts:["A. 3x + 7", "B. 3x + 4", "C. 3x + 12", "D. x + 12"], ans:"C", exp:"Multiply every term inside by 3: 3·x + 3·4 = 3x + 12."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 3 · Expanding brackets</span><br>Expand 5(x + 2)", opts:["A. 5x + 10", "B. 5x + 7", "C. 5x + 2", "D. x + 10"], ans:"A", exp:"Multiply every term inside by 5: 5x + 10."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 3 · Expanding brackets</span><br>Expand 2(x + 7)", opts:["A. 2x + 7", "B. 2x + 14", "C. x + 14", "D. 2x + 9"], ans:"B", exp:"Multiply every term inside by 2: 2x + 14."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 4 · Collecting like terms</span><br>Simplify 3x + 5x − 2x", opts:["A. 6", "B. 10x", "C. 6x", "D. 4x"], ans:"C", exp:"Add the coefficients of x: 3 + 5 − 2 = 6, giving 6x."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 4 · Collecting like terms</span><br>Simplify 4x + 6x − x", opts:["A. 9", "B. 9x", "C. 11x", "D. 3x"], ans:"B", exp:"Add the coefficients of x: 4 + 6 − 1 = 9, giving 9x."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 4 · Collecting like terms</span><br>Simplify 7x + 2x − 3x", opts:["A. 6", "B. 12x", "C. 6x", "D. 8x"], ans:"C", exp:"Add the coefficients of x: 7 + 2 − 3 = 6, giving 6x."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 5 · Factorising a common factor</span><br>Factorise 4x + 8", opts:["A. 4(x + 2)", "B. x(4 + 8)", "C. 4(x + 8)", "D. 2(x + 4)"], ans:"A", exp:"The highest common factor of 4x and 8 is 4: 4(x + 2)."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 5 · Factorising a common factor</span><br>Factorise 6x + 15", opts:["A. 2(3x + 5)", "B. 3(2x + 15)", "C. 6(x + 15)", "D. 3(2x + 5)"], ans:"D", exp:"The highest common factor of 6x and 15 is 3: 3(2x + 5)."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 5 · Factorising a common factor</span><br>Factorise 9x + 12", opts:["A. 3(x + 4)", "B. 3(3x + 12)", "C. 9(x + 12)", "D. 3(3x + 4)"], ans:"D", exp:"The highest common factor of 9x and 12 is 3: 3(3x + 4)."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 6 · Substituting into a formula</span><br>If f(x) = 2x + 3, find f(4).", opts:["A. 11", "B. 14", "C. 10", "D. 24"], ans:"A", exp:"Replace x with 4: 2(4) + 3 = 11."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 6 · Substituting into a formula</span><br>If f(x) = 3x + 1, find f(5).", opts:["A. 16", "B. 15", "C. 21", "D. 18"], ans:"A", exp:"Replace x with 5: 3(5) + 1 = 16."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 6 · Substituting into a formula</span><br>If f(x) = 4x + 2, find f(3).", opts:["A. 12", "B. 18", "C. 24", "D. 14"], ans:"D", exp:"Replace x with 3: 4(3) + 2 = 14."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 7 · Simplifying a fraction</span><br>Simplify 12/18", opts:["A. 6/8", "B. 4/5", "C. 2/3", "D. 3/4"], ans:"C", exp:"Divide numerator and denominator by their highest common factor, 6: 2/3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 7 · Simplifying a fraction</span><br>Simplify 15/25", opts:["A. 3/4", "B. 3/5", "C. 5/3", "D. 1/5"], ans:"B", exp:"Divide numerator and denominator by 5: 3/5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 7 · Simplifying a fraction</span><br>Simplify 20/35", opts:["A. 7/4", "B. 5/7", "C. 4/7", "D. 2/3"], ans:"C", exp:"Divide numerator and denominator by 5: 4/7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 8 · Cross-multiplication</span><br>Solve x/3 = 4/6", opts:["A. x = 2", "B. x = 4", "C. x = 8", "D. x = 3"], ans:"A", exp:"Cross-multiply: 6x = 3 × 4 = 12, so x = 2."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 8 · Cross-multiplication</span><br>Solve x/5 = 6/10", opts:["A. x = 3", "B. x = 12", "C. x = 2", "D. x = 6"], ans:"A", exp:"Cross-multiply: 10x = 5 × 6 = 30, so x = 3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 8 · Cross-multiplication</span><br>Solve x/4 = 9/12", opts:["A. x = 3", "B. x = 27", "C. x = 6", "D. x = 12"], ans:"A", exp:"Cross-multiply: 12x = 4 × 9 = 36, so x = 3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 9 · Factorising a trinomial</span><br>Solve x² + 5x + 6 = 0", opts:["A. x = −1 or −6", "B. x = −2 or −3", "C. x = 2 or 3", "D. x = 1 or 6"], ans:"B", exp:"Find two numbers with product 6 and sum 5 (2 and 3): (x+2)(x+3) = 0."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 9 · Factorising a trinomial</span><br>Solve x² + 7x + 12 = 0", opts:["A. x = 2 or 6", "B. x = −3 or −4", "C. x = 3 or 4", "D. x = −2 or −6"], ans:"B", exp:"Find two numbers with product 12 and sum 7 (3 and 4): (x+3)(x+4) = 0."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 9 · Factorising a trinomial</span><br>Solve x² + 9x + 20 = 0", opts:["A. x = −2 or −10", "B. x = 4 or 5", "C. x = 2 or 10", "D. x = −4 or −5"], ans:"D", exp:"Find two numbers with product 20 and sum 9 (4 and 5): (x+4)(x+5) = 0."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 10 · Completing the square</span><br>Write x² + 6x in the form (x + p)² − q.", opts:["A. (x + 6)² − 36", "B. (x + 3)² − 9", "C. (x + 3)² + 9", "D. (x + 3)² − 3"], ans:"B", exp:"Halve the coefficient of x (3), square it (9): (x+3)² − 9."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 10 · Completing the square</span><br>Write x² + 8x in the form (x + p)² − q.", opts:["A. (x + 4)² − 16", "B. (x + 4)² + 16", "C. (x + 4)² − 4", "D. (x + 8)² − 64"], ans:"A", exp:"Halve the coefficient of x (4), square it (16): (x+4)² − 16."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 10 · Completing the square</span><br>Write x² + 10x in the form (x + p)² − q.", opts:["A. (x + 5)² − 25", "B. (x + 5)² + 25", "C. (x + 10)² − 100", "D. (x + 5)² − 5"], ans:"A", exp:"Halve the coefficient of x (5), square it (25): (x+5)² − 25."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 11 · Dividing by a fraction</span><br>Evaluate (2/3) ÷ (4/5)", opts:["A. 8/15", "B. 5/6", "C. 6/5", "D. 4/5"], ans:"B", exp:"Flip the divisor and multiply: 2/3 × 5/4 = 10/12 = 5/6."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 11 · Dividing by a fraction</span><br>Evaluate (3/4) ÷ (2/3)", opts:["A. 9/8", "B. 9/4", "C. 1/2", "D. 8/9"], ans:"A", exp:"Flip the divisor and multiply: 3/4 × 3/2 = 9/8."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 11 · Dividing by a fraction</span><br>Evaluate (5/6) ÷ (3/4)", opts:["A. 5/2", "B. 9/10", "C. 5/8", "D. 10/9"], ans:"D", exp:"Flip the divisor and multiply: 5/6 × 4/3 = 20/18 = 10/9."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 12 · Common denominator (LCM)</span><br>Evaluate 1/3 + 1/4", opts:["A. 1/6", "B. 2/7", "C. 7/12", "D. 5/12"], ans:"C", exp:"The LCM of 3 and 4 is 12: 4/12 + 3/12 = 7/12."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 12 · Common denominator (LCM)</span><br>Evaluate 1/4 + 1/5", opts:["A. 1/20", "B. 2/9", "C. 9/20", "D. 1/4"], ans:"C", exp:"The LCM of 4 and 5 is 20: 5/20 + 4/20 = 9/20."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 12 · Common denominator (LCM)</span><br>Evaluate 1/5 + 1/6", opts:["A. 1/30", "B. 11/30", "C. 2/11", "D. 1/5"], ans:"B", exp:"The LCM of 5 and 6 is 30: 6/30 + 5/30 = 11/30."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 13 · Squaring both sides</span><br>Solve √(x + 3) = 4", opts:["A. x = 13", "B. x = 1", "C. x = 7", "D. x = 19"], ans:"A", exp:"Square both sides: x + 3 = 16, so x = 13. Check: √16 = 4 ✓."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 13 · Squaring both sides</span><br>Solve √(x + 5) = 3", opts:["A. x = 8", "B. x = 4", "C. x = 2", "D. x = 14"], ans:"B", exp:"Square both sides: x + 5 = 9, so x = 4. Check: √9 = 3 ✓."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 13 · Squaring both sides</span><br>Solve √(x + 2) = 6", opts:["A. x = 8", "B. x = 38", "C. x = 14", "D. x = 34"], ans:"D", exp:"Square both sides: x + 2 = 36, so x = 34. Check: √36 = 6 ✓."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 14 · Square-rooting both sides</span><br>Solve x² = 49", opts:["A. x = 7 only", "B. x = 49", "C. x = ±24.5", "D. x = ±7"], ans:"D", exp:"Take the square root of both sides, keeping both signs: x = ±7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 14 · Square-rooting both sides</span><br>Solve x² = 81", opts:["A. x = 81", "B. x = ±40.5", "C. x = ±9", "D. x = 9 only"], ans:"C", exp:"Take the square root of both sides, keeping both signs: x = ±9."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 14 · Square-rooting both sides</span><br>Solve x² = 121", opts:["A. x = ±11", "B. x = 11 only", "C. x = 121", "D. x = ±60.5"], ans:"A", exp:"Take the square root of both sides, keeping both signs: x = ±11."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 15 · Comparing coefficients</span><br>If (x + 2)(x + a) ≡ x² + 9x + b, find a and b.", opts:["A. a = 7, b = 9", "B. a = 11, b = 22", "C. a = 7, b = 14", "D. a = 9, b = 14"], ans:"C", exp:"Expanding gives x² + (2+a)x + 2a. Matching x: 2 + a = 9, so a = 7; matching constants: b = 2a = 14."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 15 · Comparing coefficients</span><br>If (x + 3)(x + a) ≡ x² + 10x + b, find a and b.", opts:["A. a = 10, b = 21", "B. a = 7, b = 21", "C. a = 7, b = 10", "D. a = 13, b = 39"], ans:"B", exp:"Expanding gives x² + (3+a)x + 3a. Matching x: 3 + a = 10, so a = 7; matching constants: b = 3a = 21."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 15 · Comparing coefficients</span><br>If (x + 4)(x + a) ≡ x² + 11x + b, find a and b.", opts:["A. a = 7, b = 11", "B. a = 7, b = 28", "C. a = 15, b = 60", "D. a = 11, b = 28"], ans:"B", exp:"Expanding gives x² + (4+a)x + 4a. Matching x: 4 + a = 11, so a = 7; matching constants: b = 4a = 28."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 16 · Quadratic formula</span><br>Solve x² + 5x + 3 = 0", opts:["A. x = (−5 ± √13)/4", "B. x = (5 ± √13)/2", "C. x = (−5 ± √13)/2", "D. x = (−5 ± √37)/2"], ans:"C", exp:"With a=1, b=5, c=3: b² − 4ac = 25 − 12 = 13, so x = (−5 ± √13)/2."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 16 · Quadratic formula</span><br>Solve x² + 4x + 1 = 0", opts:["A. x = −2 ± √5", "B. x = −4 ± √3", "C. x = −2 ± √3", "D. x = 2 ± √3"], ans:"C", exp:"With a=1, b=4, c=1: b² − 4ac = 12, so x = (−4 ± 2√3)/2 = −2 ± √3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 16 · Quadratic formula</span><br>Solve x² + 6x + 2 = 0", opts:["A. x = −3 ± √14", "B. x = −3 ± √7", "C. x = 3 ± √7", "D. x = −6 ± √7"], ans:"B", exp:"With a=1, b=6, c=2: b² − 4ac = 28, so x = (−6 ± 2√7)/2 = −3 ± √7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 17 · Changing the subject</span><br>Make x the subject of y = 3x + 2.", opts:["A. x = 3(y − 2)", "B. x = (y − 2)/3", "C. x = y − 2/3", "D. x = (y + 2)/3"], ans:"B", exp:"Subtract 2 from both sides, then divide by 3: x = (y − 2)/3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 17 · Changing the subject</span><br>Make x the subject of y = 5x − 4.", opts:["A. x = 5(y + 4)", "B. x = y + 4/5", "C. x = (y − 4)/5", "D. x = (y + 4)/5"], ans:"D", exp:"Add 4 to both sides, then divide by 5: x = (y + 4)/5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 17 · Changing the subject</span><br>Make x the subject of y = 2x + 9.", opts:["A. x = y − 9/2", "B. x = 2(y − 9)", "C. x = (y + 9)/2", "D. x = (y − 9)/2"], ans:"D", exp:"Subtract 9 from both sides, then divide by 2: x = (y − 9)/2."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 18 · Laws of indices</span><br>Simplify x³ × x⁴", opts:["A. x", "B. x¹²", "C. x³⁴", "D. x⁷"], ans:"D", exp:"Same base, multiply: add the powers, 3 + 4 = 7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 18 · Laws of indices</span><br>Simplify x⁵ × x²", opts:["A. x⁷", "B. x¹⁰", "C. x⁵²", "D. x³"], ans:"A", exp:"Same base, multiply: add the powers, 5 + 2 = 7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 18 · Laws of indices</span><br>Simplify x⁶ × x³", opts:["A. x³", "B. x⁹", "C. x¹⁸", "D. x⁶³"], ans:"B", exp:"Same base, multiply: add the powers, 6 + 3 = 9."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 19 · Laws of logarithms</span><br>Evaluate log₂8 + log₂4", opts:["A. 32", "B. 5", "C. 6", "D. 12"], ans:"B", exp:"Adding logs of the same base multiplies the arguments: log₂(8×4) = log₂32 = 5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 19 · Laws of logarithms</span><br>Evaluate log₂16 + log₂2", opts:["A. 8", "B. 5", "C. 32", "D. 18"], ans:"B", exp:"Adding logs of the same base multiplies the arguments: log₂(16×2) = log₂32 = 5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 19 · Laws of logarithms</span><br>Evaluate log₃9 + log₃3", opts:["A. 3", "B. 12", "C. 27", "D. 6"], ans:"A", exp:"Adding logs of the same base multiplies the arguments: log₃(9×3) = log₃27 = 3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 20 · Index form ↔ log form</span><br>Write 2³ = 8 in logarithmic form.", opts:["A. log₃8 = 2", "B. log₂8 = 3", "C. log₈2 = 3", "D. log₂3 = 8"], ans:"B", exp:"bⁿ = N is equivalent to log_b N = n: base 2, result 8, power 3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 20 · Index form ↔ log form</span><br>Write 5² = 25 in logarithmic form.", opts:["A. log₅2 = 25", "B. log₂25 = 5", "C. log₂₅5 = 2", "D. log₅25 = 2"], ans:"D", exp:"bⁿ = N is equivalent to log_b N = n: base 5, result 25, power 2."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 20 · Index form ↔ log form</span><br>Write 3⁴ = 81 in logarithmic form.", opts:["A. log₄81 = 3", "B. log₈₁3 = 4", "C. log₃4 = 81", "D. log₃81 = 4"], ans:"D", exp:"bⁿ = N is equivalent to log_b N = n: base 3, result 81, power 4."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 21 · Trig identity substitution</span><br>If sin θ = 3/5 and θ is acute, find cos θ.", opts:["A. 3/4", "B. 2/5", "C. 5/4", "D. 4/5"], ans:"D", exp:"sin²θ + cos²θ = 1, so cos²θ = 1 − 9/25 = 16/25, giving cos θ = 4/5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 21 · Trig identity substitution</span><br>If sin θ = 5/13 and θ is acute, find cos θ.", opts:["A. 5/12", "B. 12/13", "C. 13/12", "D. 8/13"], ans:"B", exp:"sin²θ + cos²θ = 1, so cos²θ = 1 − 25/169 = 144/169, giving cos θ = 12/13."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 21 · Trig identity substitution</span><br>If sin θ = 8/17 and θ is acute, find cos θ.", opts:["A. 8/15", "B. 15/17", "C. 17/15", "D. 9/17"], ans:"B", exp:"sin²θ + cos²θ = 1, so cos²θ = 1 − 64/289 = 225/289, giving cos θ = 15/17."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 22 · nth term of an AP</span><br>Find the 10th term of the AP 2, 5, 8, ...", opts:["A. 30", "B. 29", "C. 27", "D. 32"], ans:"B", exp:"a = 2, d = 3. Tₙ = a + (n−1)d = 2 + 9(3) = 29."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 22 · nth term of an AP</span><br>Find the 10th term of the AP 5, 9, 13, ...", opts:["A. 44", "B. 37", "C. 41", "D. 45"], ans:"C", exp:"a = 5, d = 4. Tₙ = a + (n−1)d = 5 + 9(4) = 41."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 22 · nth term of an AP</span><br>Find the 10th term of the AP 7, 12, 17, ...", opts:["A. 52", "B. 47", "C. 57", "D. 50"], ans:"A", exp:"a = 7, d = 5. Tₙ = a + (n−1)d = 7 + 9(5) = 52."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 23 · Sum of an AP</span><br>Find the sum of the first 5 terms of the AP with a = 2, d = 3.", opts:["A. 38", "B. 35", "C. 40", "D. 80"], ans:"C", exp:"Sₙ = n/2 [2a + (n−1)d] = 5/2 [4 + 12] = 40."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 23 · Sum of an AP</span><br>Find the sum of the first 5 terms of the AP with a = 5, d = 4.", opts:["A. 130", "B. 60", "C. 65", "D. 70"], ans:"C", exp:"Sₙ = n/2 [2a + (n−1)d] = 5/2 [10 + 16] = 65."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 23 · Sum of an AP</span><br>Find the sum of the first 5 terms of the AP with a = 7, d = 5.", opts:["A. 85", "B. 90", "C. 170", "D. 80"], ans:"A", exp:"Sₙ = n/2 [2a + (n−1)d] = 5/2 [14 + 20] = 85."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 24 · Cosine rule</span><br>In triangle ABC, b = 3, c = 8 and angle A = 60°. Find a.", opts:["A. 7", "B. 49", "C. 9.85", "D. 11"], ans:"A", exp:"a² = b² + c² − 2bc cos A = 9 + 64 − 24 = 49, so a = 7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 24 · Cosine rule</span><br>In triangle ABC, b = 8, c = 15 and angle A = 60°. Find a.", opts:["A. 169", "B. 20.22", "C. 13", "D. 17"], ans:"C", exp:"a² = b² + c² − 2bc cos A = 64 + 225 − 120 = 169, so a = 13."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 24 · Cosine rule</span><br>In triangle ABC, b = 5, c = 21 and angle A = 60°. Find a.", opts:["A. 361", "B. 19", "C. 23.90", "D. 26"], ans:"B", exp:"a² = b² + c² − 2bc cos A = 25 + 441 − 105 = 361, so a = 19."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 25 · Simultaneous equations — substitution</span><br>Solve x + y = 9 and y = 2x.", opts:["A. x = 6, y = 3", "B. x = 4.5, y = 4.5", "C. x = 3, y = 6", "D. x = 2, y = 7"], ans:"C", exp:"Substitute y = 2x: x + 2x = 9, so x = 3 and y = 6."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 25 · Simultaneous equations — substitution</span><br>Solve x + y = 12 and y = 3x.", opts:["A. x = 6, y = 6", "B. x = 4, y = 8", "C. x = 3, y = 9", "D. x = 9, y = 3"], ans:"C", exp:"Substitute y = 3x: x + 3x = 12, so x = 3 and y = 9."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 25 · Simultaneous equations — substitution</span><br>Solve x + y = 15 and y = 4x.", opts:["A. x = 3, y = 12", "B. x = 12, y = 3", "C. x = 5, y = 10", "D. x = 7.5, y = 7.5"], ans:"A", exp:"Substitute y = 4x: x + 4x = 15, so x = 3 and y = 12."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 26 · Simultaneous equations — elimination</span><br>Solve 2x + y = 7 and x − y = 2.", opts:["A. x = 1, y = 3", "B. x = 3, y = 1", "C. x = 3, y = −1", "D. x = 5, y = −3"], ans:"B", exp:"Add the equations to eliminate y: 3x = 9, so x = 3; then y = 1."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 26 · Simultaneous equations — elimination</span><br>Solve 3x + y = 10 and x − y = 2.", opts:["A. x = 3, y = −1", "B. x = 4, y = 2", "C. x = 1, y = 3", "D. x = 3, y = 1"], ans:"D", exp:"Add the equations to eliminate y: 4x = 12, so x = 3; then y = 1."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 26 · Simultaneous equations — elimination</span><br>Solve 2x + y = 9 and x − y = 3.", opts:["A. x = 1, y = 4", "B. x = 4, y = 1", "C. x = 6, y = −3", "D. x = 4, y = −1"], ans:"B", exp:"Add the equations to eliminate y: 3x = 12, so x = 4; then y = 1."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 27 · Differentiation (power rule)</span><br>Differentiate y = x³ with respect to x.", opts:["A. 3x", "B. x⁴", "C. 3x³", "D. 3x²"], ans:"D", exp:"Power rule: multiply by the power, reduce the power by 1."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 27 · Differentiation (power rule)</span><br>Differentiate y = x⁴ with respect to x.", opts:["A. 4x³", "B. 4x", "C. 4x⁴", "D. x⁵"], ans:"A", exp:"Power rule: multiply by the power, reduce the power by 1."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 27 · Differentiation (power rule)</span><br>Differentiate y = x⁵ with respect to x.", opts:["A. x⁶", "B. 5x⁴", "C. 5x", "D. 5x⁵"], ans:"B", exp:"Power rule: multiply by the power, reduce the power by 1."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 28 · Integration (power rule)</span><br>Evaluate ∫x² dx.", opts:["A. 2x + c", "B. x³/2 + c", "C. x³ + c", "D. x³/3 + c"], ans:"D", exp:"Raise the power by 1 and divide by the new power."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 28 · Integration (power rule)</span><br>Evaluate ∫x³ dx.", opts:["A. x⁴ + c", "B. 3x² + c", "C. x⁴/4 + c", "D. x⁴/3 + c"], ans:"C", exp:"Raise the power by 1 and divide by the new power."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 28 · Integration (power rule)</span><br>Evaluate ∫x⁴ dx.", opts:["A. 4x³ + c", "B. x⁵/4 + c", "C. x⁵ + c", "D. x⁵/5 + c"], ans:"D", exp:"Raise the power by 1 and divide by the new power."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 29 · Discriminant</span><br>State the discriminant and the nature of the roots of x² + 4x + 4 = 0.", opts:["A. Discriminant = 8: two distinct real roots", "B. Discriminant = 32: two distinct real roots", "C. Discriminant = −16: no real roots", "D. Discriminant = 0: equal real roots"], ans:"D", exp:"b² − 4ac = 16 − 16 = 0, which means equal real roots."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 29 · Discriminant</span><br>State the discriminant and the nature of the roots of x² + 5x + 6 = 0.", opts:["A. Discriminant = 0: equal real roots", "B. Discriminant = 1: two distinct real roots", "C. Discriminant = −1: no real roots", "D. Discriminant = 49: two distinct real roots"], ans:"B", exp:"b² − 4ac = 25 − 24 = 1, which is positive, so two distinct real roots."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 29 · Discriminant</span><br>State the discriminant and the nature of the roots of x² + 2x + 5 = 0.", opts:["A. Discriminant = 0: equal real roots", "B. Discriminant = −16: no real roots", "C. Discriminant = 16: two distinct real roots", "D. Discriminant = 24: two distinct real roots"], ans:"B", exp:"b² − 4ac = 4 − 20 = −16, which is negative, so no real roots."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 30 · Partial fractions</span><br>If (5x + 7)/((x + 1)(x + 2)) ≡ A/(x + 1) + B/(x + 2), find A and B.", opts:["A. A = 7, B = 5", "B. A = 2, B = 3", "C. A = 3, B = 2", "D. A = 5, B = 7"], ans:"B", exp:"Set x = −1: A(1) = 2, so A = 2. Set x = −2: B(−1) = −3, so B = 3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 30 · Partial fractions</span><br>If (5x + 7)/((x + 1)(x + 3)) ≡ A/(x + 1) + B/(x + 3), find A and B.", opts:["A. A = 2, B = 3", "B. A = 5, B = 7", "C. A = 4, B = 1", "D. A = 1, B = 4"], ans:"D", exp:"Set x = −1: A(2) = 2, so A = 1. Set x = −3: B(−2) = −8, so B = 4."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 30 · Partial fractions</span><br>If (5x + 12)/((x + 2)(x + 3)) ≡ A/(x + 2) + B/(x + 3), find A and B.", opts:["A. A = 3, B = 2", "B. A = 5, B = 12", "C. A = 2, B = 3", "D. A = 6, B = −1"], ans:"C", exp:"Set x = −2: A(1) = 2, so A = 2. Set x = −3: B(−1) = −3, so B = 3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 31 · Rationalising a surd</span><br>Rationalise the denominator of 1/√3.", opts:["A. √3", "B. 1/3", "C. 3√3", "D. √3/3"], ans:"D", exp:"Multiply top and bottom by √3: √3/3."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 31 · Rationalising a surd</span><br>Rationalise the denominator of 1/√5.", opts:["A. √5", "B. 5√5", "C. √5/5", "D. 1/5"], ans:"C", exp:"Multiply top and bottom by √5: √5/5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 31 · Rationalising a surd</span><br>Rationalise the denominator of 1/√7.", opts:["A. √7/7", "B. 7√7", "C. √7", "D. 1/7"], ans:"A", exp:"Multiply top and bottom by √7: √7/7."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 32 · Binomial expansion</span><br>Expand (x + 1)³.", opts:["A. x³ + 3x² + 1", "B. x³ + 3x + 1", "C. x³ + 1", "D. x³ + 3x² + 3x + 1"], ans:"D", exp:"Coefficients 1, 3, 3, 1: x³ + 3x²(1) + 3x(1²) + 1³."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 32 · Binomial expansion</span><br>Expand (x + 2)³.", opts:["A. x³ + 6x² + 12x + 8", "B. x³ + 3x² + 3x + 8", "C. x³ + 6x² + 6x + 8", "D. x³ + 8"], ans:"A", exp:"Coefficients 1, 3, 3, 1: x³ + 3x²(2) + 3x(2²) + 2³."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 32 · Binomial expansion</span><br>Expand (x + 3)³.", opts:["A. x³ + 27", "B. x³ + 9x² + 27x + 27", "C. x³ + 9x² + 9x + 27", "D. x³ + 3x² + 3x + 27"], ans:"B", exp:"Coefficients 1, 3, 3, 1: x³ + 3x²(3) + 3x(3²) + 3³."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 33 · Vector addition</span><br>Find the resultant of the vectors (3, 4) and (1, 2).", opts:["A. (4, 6)", "B. (2, 2)", "C. (4, 2)", "D. (3, 8)"], ans:"A", exp:"Add the components separately: (3+1, 4+2) = (4, 6)."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 33 · Vector addition</span><br>Find the resultant of the vectors (5, 2) and (2, 3).", opts:["A. (7, 5)", "B. (10, 6)", "C. (3, −1)", "D. (7, 6)"], ans:"A", exp:"Add the components separately: (5+2, 2+3) = (7, 5)."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 33 · Vector addition</span><br>Find the resultant of the vectors (4, 6) and (3, 1).", opts:["A. (7, 6)", "B. (1, 5)", "C. (12, 6)", "D. (7, 7)"], ans:"D", exp:"Add the components separately: (4+3, 6+1) = (7, 7)."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 34 · Determinant of a 2×2 matrix</span><br>Find the determinant of the matrix with rows (2, 3) and (1, 4).", opts:["A. 8", "B. −5", "C. 11", "D. 5"], ans:"D", exp:"ad − bc = (2)(4) − (3)(1) = 5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 34 · Determinant of a 2×2 matrix</span><br>Find the determinant of the matrix with rows (3, 2) and (4, 1).", opts:["A. 11", "B. −5", "C. 3", "D. 5"], ans:"B", exp:"ad − bc = (3)(1) − (2)(4) = −5."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 34 · Determinant of a 2×2 matrix</span><br>Find the determinant of the matrix with rows (5, 1) and (2, 3).", opts:["A. 13", "B. 15", "C. 17", "D. −13"], ans:"A", exp:"ad − bc = (5)(3) − (1)(2) = 13."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 35 · Combinations</span><br>In how many ways can 3 people be selected from 5?", opts:["A. 20", "B. 60", "C. 15", "D. 10"], ans:"D", exp:"ⁿCᵣ = 5!/(3! 2!) = 10. Order does not matter."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 35 · Combinations</span><br>In how many ways can 2 people be selected from 6?", opts:["A. 36", "B. 15", "C. 12", "D. 30"], ans:"B", exp:"ⁿCᵣ = 6!/(2! 4!) = 15. Order does not matter."},
+    {q:"<span style=\"color:var(--ios-text-tertiary);font-size:13px\">Procedure 35 · Combinations</span><br>In how many ways can 3 people be selected from 7?", opts:["A. 210", "B. 21", "C. 42", "D. 35"], ans:"D", exp:"ⁿCᵣ = 7!/(3! 4!) = 35. Order does not matter."}
+
+];
+
+let userAnswers = {};
+let stats = { answered: 0, correct: 0 };
+let timerIds = {};
+let timerSecs = {};
+
+const TOTAL_SECS = 600;
+const CIRC = 2 * Math.PI * 14;
+
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+
+    container.innerHTML = questions.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${questions.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+function startAllTimers() {
+    questions.forEach((_, i) => {
+        timerSecs[i] = TOTAL_SECS;
+        timerIds[i] = setInterval(() => tickTimer(i), 1000);
+    });
+}
+
+function tickTimer(i) {
+    timerSecs[i]--;
+    const secs = timerSecs[i];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[i]);
+        timerIds[i] = null;
+        timerSecs[i] = 0;
+        updateTimerUI(i, 0);
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring = document.getElementById('ring-' + i);
+    const textEl = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg = ring.querySelector('.fg');
+    const frac = secs / TOTAL_SECS;
+    const offset = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    if (timerIds[i]) {
+        clearInterval(timerIds[i]);
+        timerIds[i] = null;
+    }
+}
+
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    if (!userAnswers[i]) {
+        userAnswers[i] = '—';
+        stats.answered++;
+        updateStats();
+    }
+}
+
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card = this.closest('.question-card');
+            const index = card.dataset.index;
+
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[index] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card = this.closest('.question-card');
+            const index = +card.dataset.index;
+            const q = questions[index];
+            const userAns = userAnswers[index];
+            const isCorrect = userAns === q.ans;
+
+            stopTimer(index);
+
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns) opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent = pct + '%';
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
