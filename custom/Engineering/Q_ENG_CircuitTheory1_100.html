@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Circuit Theory I — Engineering · Mastery Drill</title>
+    <link rel="icon" id="fav" type="image/svg+xml" href="../favicon.svg">
+    <link rel="alternate icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+
+        sub, sup { font-size: .68em; line-height: 0; }
+        .fr { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 .22em; line-height: 1.2; }
+        .fr .n { border-bottom: .12em solid currentColor; padding: 0 .28em .06em; }
+        .fr .d { padding: .08em .28em 0; }
+        .ov { border-top: .1em solid currentColor; padding: 0 .08em; }
+        .dg { display: block; max-width: 100%; height: auto; margin: 12px 0 14px; color: inherit; }
+        .option .dg { margin: 2px 0; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Circuit Theory I</div>
+    <div class="subtitle">100-question mastery drill · Engineering · Network analysis, transients and AC steady state</div>
+</div>
+
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// CIRCUIT THEORY I · 100 QUESTIONS
+// Spine: replace the network by something simpler without changing what the load sees.
+//   Reduce (series/parallel, source transformation), solve (mesh = KVL on loops, node = KCL on nodes),
+//   or condense to a Thévenin source V_th with R_th. Storage elements add one rule: the capacitor voltage
+//   and the inductor current cannot jump. Then every first-order answer is x = x_final + (x_start − x_final)e^{−t/τ},
+//   with τ = R_th·C or L ÷ R_th. In AC the same laws hold with impedance: Z_L = jωL, Z_C = 1 ÷ jωC.
+// Every set runs rule → trap → calculation. Wrong options are the usual slips: a sum used for a parallel value,
+//   a missing 2π or ½, a time constant upside down, or magnitudes added when phasors must be added as vectors.
+// ─────────────────────────────────────────────────────────────────────────────
+// SET 1  · Kirchhoff’s laws, reduction, dividers and bridges    Q1–15
+// SET 2  · Mesh and nodal analysis, dependent sources and superposition Q16–27
+// SET 3  · Thévenin, Norton, maximum power and linearity        Q28–39
+// SET 4  · Capacitors and inductors: behaviour, combination and energy Q40–50
+// SET 5  · Transients: RC and RL circuits                       Q51–67
+// SET 6  · AC basics: sinusoids, phasors and impedance          Q68–76
+// SET 7  · AC circuits: series, parallel and power              Q77–85
+// SET 8  · Resonance, filters, matching and the transformer     Q86–100
+// ─────────────────────────────────────────────────────────────────────────────
+
+const questions = {
+  engineering: [
+
+  // ── SET 1 · Kirchhoff’s laws, reduction, dividers and bridges ──
+  {q:"Kirchhoff\u2019s current law states that, at any node, the algebraic sum of the currents is",
+   opts:["A. equal to the source voltage", "B. equal to the largest current", "C. equal to the sum of the resistances", "D. zero"],
+   ans:"D",
+   exp:"Charge cannot build up at a node, so the current going in equals the current going out. It is written with a sign for each current, taking those entering as positive and those leaving as negative."},
+  {q:"Going round a loop in the direction of the current, a resistor causes",
+   opts:["A. a drop only when R is larger than 1 \u03a9", "B. no change of voltage", "C. a voltage rise of IR", "D. a voltage drop of IR"],
+   ans:"D",
+   exp:"Current flows from high to low potential through a resistor, so travelling with the current we move downhill. A battery crossed from \u2212 to + gives a rise. The sum of rises equals the sum of drops (Kirchhoff\u2019s voltage law)."},
+  {q:"At a node, currents of 5 A and 3 A enter, and 2 A leaves along one branch. The current in the fourth branch is",
+   opts:["A. 6 A leaving the node", "B. 6 A entering the node", "C. 10 A leaving the node", "D. 0 A"],
+   ans:"A",
+   exp:"Total in = 5 + 3 = 8 A. One branch takes out 2 A, so the other must take out 8 \u2212 2 = 6 A. The 10 A adds the 2 A instead of subtracting it."},
+  {q:"Two resistors R\u2081 and R\u2082 in parallel have an equivalent resistance of",
+   opts:["A. R\u2081 + R\u2082", "B. R\u2081R\u2082", "C. R\u2081R\u2082 \u00f7 (R\u2081 + R\u2082)", "D. (R\u2081 + R\u2082) \u00f7 2"],
+   ans:"C",
+   exp:"The conductances add: 1/R = 1/R\u2081 + 1/R\u2082, which gives the product over the sum. The result is always smaller than the smaller resistor. R\u2081 + R\u2082 is the series value."},
+  {q:"A 6 \u03a9 and a 3 \u03a9 resistor are connected in parallel. The equivalent resistance is",
+   opts:["A. 9 \u03a9", "B. 18 \u03a9", "C. 4.5 \u03a9", "D. 2 \u03a9"],
+   ans:"D",
+   exp:"6 \u00d7 3 \u00f7 (6 + 3) = 2 \u03a9. The 9 \u03a9 is the series value. The 4.5 \u03a9 is the average. The 18 \u03a9 is the product alone. A parallel combination must be smaller than 3 \u03a9, which rules out all three."},
+  {q:"A 24 V source feeds a 4 \u03a9 resistor in series with a 12 \u03a9 and a 6 \u03a9 resistor in parallel. The source current is",
+   opts:["A. 4 A", "B. 1.1 A", "C. 6 A", "D. 3 A"],
+   ans:"D",
+   exp:"12 \u2225 6 = 12 \u00d7 6 \u00f7 18 = 4 \u03a9. Total = 4 + 4 = 8 \u03a9. I = 24 \u00f7 8 = 3 A. The 1.1 A treats all three resistors as in series (22 \u03a9). The 4 A uses 6 \u03a9 alone. The 6 A uses 4 \u03a9 alone."},
+  {q:"A voltage source V in series with a resistance R can be replaced by",
+   opts:["A. a current source V/R in series with R", "B. a current source V/R in parallel with R", "C. a current source V \u00d7 R in parallel with R", "D. a voltage source V/R in parallel with R"],
+   ans:"B",
+   exp:"Both give the same current into a short circuit (V/R) and the same open-circuit voltage (V). The resistance moves from series to parallel. A current source in series with a resistor is not equivalent to anything useful."},
+  {q:"In a source transformation, the arrow of the current source points",
+   opts:["A. in either direction", "B. towards the negative terminal", "C. towards the nearest resistor", "D. towards the positive terminal"],
+   ans:"D",
+   exp:"The current source must push current out of the same terminal that the voltage source would drive positive. A wrong arrow reverses the sign of the whole answer."},
+  {q:"A 10 V source in series with 2 \u03a9 is replaced by its equivalent current source. This is",
+   opts:["A. 0.2 A in parallel with 2 \u03a9", "B. 5 A in series with 2 \u03a9", "C. 5 A in parallel with 2 \u03a9", "D. 20 A in parallel with 2 \u03a9"],
+   ans:"C",
+   exp:"I = V \u00f7 R = 10 \u00f7 2 = 5 A, with the same 2 \u03a9 in parallel. The 20 A multiplies instead of dividing. The 0.2 A divides the other way round."},
+  {q:"For two resistors R\u2081 and R\u2082 in series across a voltage V, the voltage across R\u2082 is",
+   opts:["A. V \u00d7 R\u2082 \u00f7 R\u2081", "B. V \u00d7 R\u2082 \u00f7 (R\u2081 + R\u2082)", "C. V \u00d7 R\u2081 \u00f7 (R\u2081 + R\u2082)", "D. V \u00f7 (R\u2081 + R\u2082)"],
+   ans:"B",
+   exp:"The voltage divides in proportion to the resistance, and R\u2082 takes its share of the total. The same idea gives the current divider: in parallel, the branch with the smaller resistance takes the larger share of the current."},
+  {q:"A load is connected across the lower resistor of a voltage divider. The output voltage",
+   opts:["A. becomes equal to the source voltage", "B. falls, as the parallel resistance is smaller", "C. rises, since there is another path", "D. stays the same, as the divider is fixed"],
+   ans:"B",
+   exp:"The load in parallel with R\u2082 gives a smaller resistance, so R\u2082 takes a smaller share of the voltage. A divider is accurate only if the load is much larger than R\u2082."},
+  {q:"A 12 V source feeds a divider of two 6 k\u03a9 resistors. A 6 k\u03a9 load is connected across the lower resistor. The output voltage is",
+   opts:["A. 8 V", "B. 6 V", "C. 4 V", "D. 3 V"],
+   ans:"C",
+   exp:"The lower resistor and the load in parallel make 6 \u2225 6 = 3 k\u03a9. Output = 12 \u00d7 3 \u00f7 (6 + 3) = 4 V. The 6 V is the unloaded value. The 8 V is what the lower resistor would get if the load were in parallel with the upper resistor."},
+  {q:"A Wheatstone bridge is balanced when",
+   opts:["A. all four resistors are equal in value", "B. the arm ratios are equal and the meter reads zero", "C. the supply voltage is reduced to zero", "D. the meter reads full-scale deflection"],
+   ans:"B",
+   exp:"With arms P, Q, R and S, balance means P \u00f7 Q = R \u00f7 S. The two mid-points then are at the same potential, so no current passes through the meter. The resistors do not all have to be equal."},
+  {q:"A delta of three equal resistors R is changed into a star. Each arm of the star is",
+   opts:["A. R \u00f7 3", "B. R \u00f7 2", "C. 3R", "D. R"],
+   ans:"A",
+   exp:"Each star resistor is the product of the two adjacent delta resistors over the sum of all three: R \u00d7 R \u00f7 3R = R/3. A star of equal arms R becomes a delta of 3R."},
+  {q:"A bridge balances with P = 100 \u03a9, Q = 400 \u03a9 and R = 250 \u03a9. Using P \u00f7 Q = R \u00f7 S, the unknown S is",
+   opts:["A. 62.5 \u03a9", "B. 650 \u03a9", "C. 1 000 \u03a9", "D. 100 \u03a9"],
+   ans:"C",
+   exp:"S = R \u00d7 Q \u00f7 P = 250 \u00d7 400 \u00f7 100 = 1 000 \u03a9. The 62.5 \u03a9 turns the ratio upside down. The 100 \u03a9 repeats P. The 650 \u03a9 adds R and Q."},
+
+  // ── SET 2 · Mesh and nodal analysis, dependent sources and superposition ──
+  {q:"In mesh analysis, the unknowns are",
+   opts:["A. the power in each source", "B. the loop (mesh) currents, found with Kirchhoff\u2019s voltage law", "C. the node voltages, found with the current law", "D. the resistances of each branch"],
+   ans:"B",
+   exp:"One current is assigned to each mesh, usually clockwise, and KVL is written round each mesh. Node analysis does the opposite with node voltages and the current law."},
+  {q:"For a resistor R shared by two meshes with clockwise currents I\u2081 and I\u2082, the voltage across it is",
+   opts:["A. R (I\u2081 + I\u2082)", "B. R I\u2081 only", "C. R (I\u2081 \u2212 I\u2082)", "D. R I\u2082 only"],
+   ans:"C",
+   exp:"The two mesh currents pass through the shared resistor in opposite directions, so the net current is their difference. The sign of each term in the mesh equation follows from this."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 340 190\" width=\"340\" role=\"img\" aria-label=\"Two-mesh circuit with a 12 V and a 6 V source and mesh currents I1 and I2\"><line x1=\"50.0\" y1=\"44.0\" x2=\"90.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><polyline points=\"90.0,44.0 96.0,44.0 102.0,35.0 110.0,53.0 118.0,35.0 126.0,53.0 132.0,44.0 138.0,44.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"138.0\" y1=\"44.0\" x2=\"170.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"170.0\" y1=\"44.0\" x2=\"190.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><polyline points=\"190.0,44.0 196.0,44.0 202.0,35.0 210.0,53.0 218.0,35.0 226.0,53.0 232.0,44.0 238.0,44.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"238.0\" y1=\"44.0\" x2=\"290.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"44.0\" x2=\"50.0\" y2=\"78.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"78.0\" x2=\"50.0\" y2=\"96.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"38.0\" y1=\"96.0\" x2=\"62.0\" y2=\"96.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"104.0\" x2=\"56.0\" y2=\"104.0\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"104.0\" x2=\"50.0\" y2=\"122.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><text x=\"66.0\" y=\"92.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"start\" fill=\"currentColor\">+</text><line x1=\"50.0\" y1=\"122.0\" x2=\"50.0\" y2=\"156.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"290.0\" y1=\"44.0\" x2=\"290.0\" y2=\"78.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"290.0\" y1=\"78.0\" x2=\"290.0\" y2=\"96.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"278.0\" y1=\"96.0\" x2=\"302.0\" y2=\"96.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"284.0\" y1=\"104.0\" x2=\"296.0\" y2=\"104.0\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\"/><line x1=\"290.0\" y1=\"104.0\" x2=\"290.0\" y2=\"122.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><text x=\"306.0\" y=\"92.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"start\" fill=\"currentColor\">+</text><line x1=\"290.0\" y1=\"122.0\" x2=\"290.0\" y2=\"156.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"170.0\" y1=\"44.0\" x2=\"170.0\" y2=\"76.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><polyline points=\"170.0,76.0 170.0,82.0 161.0,88.0 179.0,96.0 161.0,104.0 179.0,112.0 170.0,118.0 170.0,124.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"170.0\" y1=\"124.0\" x2=\"170.0\" y2=\"156.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"156.0\" x2=\"290.0\" y2=\"156.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><circle cx=\"170.0\" cy=\"44.0\" r=\"4\" fill=\"currentColor\"/><circle cx=\"170.0\" cy=\"156.0\" r=\"4\" fill=\"currentColor\"/><text x=\"114.0\" y=\"32.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">2 \u03a9</text><text x=\"214.0\" y=\"32.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">2 \u03a9</text><text x=\"184.0\" y=\"105.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">4 \u03a9</text><text x=\"66.0\" y=\"128.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"start\" fill=\"currentColor\">12 V</text><text x=\"306.0\" y=\"128.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"start\" fill=\"currentColor\">6 V</text><path d=\"M108.2 76.4 A24 24 0 0 1 108.2 123.6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"108.2\" y1=\"123.6\" x2=\"115.5\" y2=\"118.4\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"108.2\" y1=\"123.6\" x2=\"116.8\" y2=\"126.1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><text x=\"98.0\" y=\"106.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">I1</text><path d=\"M242.2 76.4 A24 24 0 0 1 242.2 123.6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"242.2\" y1=\"123.6\" x2=\"249.5\" y2=\"118.4\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"242.2\" y1=\"123.6\" x2=\"250.8\" y2=\"126.1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><text x=\"232.0\" y=\"106.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">I2</text></svg>The mesh currents I\u2081 and I\u2082 in the diagram both run clockwise. The current in the 4 \u03a9 resistor, downwards, is",
+   opts:["A. 1.8 A", "B. 3.0 A", "C. 2.4 A", "D. 0.6 A"],
+   ans:"A",
+   exp:"Mesh 1: 12 = 2I\u2081 + 4(I\u2081 \u2212 I\u2082), so 6I\u2081 \u2212 4I\u2082 = 12. Mesh 2: 4(I\u2082 \u2212 I\u2081) + 2I\u2082 = \u22126, so \u22124I\u2081 + 6I\u2082 = \u22126. Solving, I\u2081 = 2.4 A and I\u2082 = 0.6 A. The current down the 4 \u03a9 is I\u2081 \u2212 I\u2082 = 1.8 A. The 3.0 A adds the currents. The 0.6 A and 2.4 A are the mesh currents themselves."},
+  {q:"In nodal analysis, the equations are written by applying",
+   opts:["A. the current law at every non-reference node", "B. Ohm\u2019s law to the supply source alone", "C. the maximum power transfer theorem", "D. Kirchhoff\u2019s voltage law round every mesh"],
+   ans:"A",
+   exp:"The reference node is given 0 V. At every other node the currents leaving through the resistors are written in terms of the node voltages, and their sum is set equal to the source current."},
+  {q:"A circuit has 5 nodes. The number of independent nodal equations is",
+   opts:["A. 10", "B. 3", "C. 5", "D. 4"],
+   ans:"D",
+   exp:"One node is the reference, with a known voltage of zero. Writing an equation for it would give no new information. So n \u2212 1 = 4 equations are needed."},
+  {q:"A 10 A current source feeds a node. The node is joined to ground by a 2 \u03a9 resistor and by a 3 \u03a9 resistor, in parallel. The node voltage is",
+   opts:["A. 20 V", "B. 50 V", "C. 12 V", "D. 30 V"],
+   ans:"C",
+   exp:"KCL at the node: V/2 + V/3 = 10, so 5V/6 = 10 and V = 12 V. The parallel resistance is 1.2 \u03a9, and 10 \u00d7 1.2 = 12 V. The 50 V takes the resistors in series (5 \u03a9). The 20 V and 30 V use only one resistor each."},
+  {q:"A dependent source differs from an independent source because its value",
+   opts:["A. changes with time only, like a sine wave", "B. is always zero unless switched on", "C. cannot supply power to the circuit", "D. depends on a voltage or current elsewhere"],
+   ans:"D",
+   exp:"It is the model of an amplifier or transistor: the output is set by a control quantity. An independent source keeps its own value whatever the rest of the circuit does."},
+  {q:"When superposition is used on a circuit with a dependent source, the dependent source is",
+   opts:["A. left in the circuit in every step", "B. removed with the independent sources", "C. replaced by a short circuit", "D. replaced by an open circuit"],
+   ans:"A",
+   exp:"Only independent sources are turned off. A dependent source is controlled by the circuit, so it must remain in the circuit and its control value is found as part of the answer."},
+  {q:"A dependent voltage source has the value 0.5 V<sub>x</sub>, where V<sub>x</sub> is the voltage across a 5 \u03a9 resistor carrying 2 A. The source voltage is",
+   opts:["A. 1 V", "B. 10 V", "C. 5 V", "D. 25 V"],
+   ans:"C",
+   exp:"V<sub>x</sub> = 2 \u00d7 5 = 10 V, so the source is 0.5 \u00d7 10 = 5 V. The 1 V multiplies the current by 0.5 and not the voltage. The 10 V is V<sub>x</sub> itself."},
+  {q:"To find the effect of one source alone, the other independent sources are",
+   opts:["A. all doubled in value", "B. voltage sources opened and current sources shorted", "C. all left in place", "D. voltage sources shorted and current sources opened"],
+   ans:"D",
+   exp:"A voltage source has zero voltage when turned off, which is a short circuit. A current source has zero current, which is an open circuit. The results from each source are then added with their signs."},
+  {q:"Superposition can be used directly to find",
+   opts:["A. only the power in resistors", "B. only the supply current", "C. currents and voltages, but not power", "D. power, but not currents"],
+   ans:"C",
+   exp:"Voltage and current are linear in the sources, so they add. Power depends on the square of the current, so the powers from each source cannot be added."},
+  {q:"A 4 \u03a9 resistor carries 2 A from source A alone, and 1 A in the opposite direction from source B alone. The power in the resistor with both sources is",
+   opts:["A. 36 W", "B. 4 W", "C. 12 W", "D. 20 W"],
+   ans:"B",
+   exp:"The net current is 2 \u2212 1 = 1 A, so P = 1\u00b2 \u00d7 4 = 4 W. The 20 W adds the separate powers (16 W + 4 W), which superposition does not allow. The 36 W adds the currents (3 A)."},
+
+  // ── SET 3 · Thévenin, Norton, maximum power and linearity ──
+  {q:"A Th\u00e9venin equivalent circuit consists of",
+   opts:["A. a current source in series with a resistance", "B. two voltage sources in parallel", "C. a resistor only", "D. a voltage source in series with a resistance"],
+   ans:"D",
+   exp:"Any linear network seen from two terminals behaves like one voltage source V_th and one series resistance R_th. The load cannot tell the difference."},
+  {q:"The Th\u00e9venin resistance of a network is found by",
+   opts:["A. adding up every resistor in the network in series", "B. dividing the supply voltage by the number of resistors", "C. measuring only the short-circuit current of the network", "D. turning off the sources and looking in at the terminals"],
+   ans:"D",
+   exp:"Voltage sources are shorted and current sources are opened. The resistance seen between the terminals is R_th. V_th is the open-circuit voltage."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 180\" width=\"320\" role=\"img\" aria-label=\"Source with a 6 ohm series resistor and a 3 ohm resistor across terminals a and b\"><line x1=\"44.0\" y1=\"44.0\" x2=\"80.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><polyline points=\"80.0,44.0 86.0,44.0 92.0,35.0 100.0,53.0 108.0,35.0 116.0,53.0 122.0,44.0 128.0,44.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"128.0\" y1=\"44.0\" x2=\"200.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"44.0\" x2=\"44.0\" y2=\"80.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"80.0\" x2=\"44.0\" y2=\"98.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"32.0\" y1=\"98.0\" x2=\"56.0\" y2=\"98.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"38.0\" y1=\"106.0\" x2=\"50.0\" y2=\"106.0\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"106.0\" x2=\"44.0\" y2=\"124.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><text x=\"60.0\" y=\"94.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"start\" fill=\"currentColor\">+</text><line x1=\"44.0\" y1=\"124.0\" x2=\"44.0\" y2=\"140.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"44.0\" x2=\"200.0\" y2=\"70.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><polyline points=\"200.0,70.0 200.0,76.0 191.0,82.0 209.0,90.0 191.0,98.0 209.0,106.0 200.0,112.0 200.0,118.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"118.0\" x2=\"200.0\" y2=\"140.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"140.0\" x2=\"260.0\" y2=\"140.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"44.0\" x2=\"260.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><circle cx=\"260.0\" cy=\"44.0\" r=\"4.0\" fill=\"#fff\" stroke=\"currentColor\" stroke-width=\"2.2\"/><circle cx=\"260.0\" cy=\"140.0\" r=\"4.0\" fill=\"#fff\" stroke=\"currentColor\" stroke-width=\"2.2\"/><text x=\"274.0\" y=\"49.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">a</text><text x=\"274.0\" y=\"145.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">b</text><text x=\"104.0\" y=\"32.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">6 \u03a9</text><text x=\"216.0\" y=\"98.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">3 \u03a9</text><text x=\"60.0\" y=\"128.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"start\" fill=\"currentColor\">24 V</text></svg>The Th\u00e9venin voltage and resistance seen at terminals a\u2013b are",
+   opts:["A. 24 V and 9 \u03a9", "B. 16 V and 2 \u03a9", "C. 8 V and 2 \u03a9", "D. 8 V and 9 \u03a9"],
+   ans:"C",
+   exp:"With a\u2013b open, the 3 \u03a9 carries the current and takes 24 \u00d7 3 \u00f7 9 = 8 V. With the source shorted, 6 \u03a9 and 3 \u03a9 are in parallel, 6 \u2225 3 = 2 \u03a9. The 24 V and 9 \u03a9 ignore the divider. The 16 V takes the share of the 6 \u03a9 resistor."},
+  {q:"A Norton equivalent circuit consists of",
+   opts:["A. a capacitor and an inductor", "B. a current source in series with a resistance", "C. a current source in parallel with a resistance", "D. a voltage source in series with a resistance"],
+   ans:"C",
+   exp:"It is the source transformation of the Th\u00e9venin form. The Norton current is the short-circuit current between the terminals."},
+  {q:"The Norton resistance R_N of a network is",
+   opts:["A. equal to its Th\u00e9venin resistance", "B. equal to V_th multiplied by I_N", "C. always exactly twice the value of R_th", "D. the reciprocal of the resistance R_th"],
+   ans:"A",
+   exp:"The same dead network is seen from the terminals in both cases. Also I_N = V_th \u00f7 R_th, so the two forms are linked."},
+  {q:"The network in the earlier diagram (24 V, 6 \u03a9 in series, 3 \u03a9 across the terminals) has V_th = 8 V and R_th = 2 \u03a9. The Norton current at a\u2013b is",
+   opts:["A. 4 A", "B. 8 A", "C. 2.7 A", "D. 12 A"],
+   ans:"A",
+   exp:"I_N = V_th \u00f7 R_th = 8 \u00f7 2 = 4 A. Check by shorting a\u2013b: the 3 \u03a9 is bypassed and the current is 24 \u00f7 6 = 4 A. The 2.7 A is 24 \u00f7 9 (all resistors in series). The 12 A is 24 \u00f7 2."},
+  {q:"A source with an internal resistance R_th delivers the greatest power to a load when the load resistance is",
+   opts:["A. zero", "B. equal to R_th", "C. very large", "D. twice R_th"],
+   ans:"B",
+   exp:"With a zero load there is no voltage, so no power. With a very large load there is no current. The best match lies between these, at R_L = R_th."},
+  {q:"When maximum power is transferred, the efficiency of the source is",
+   opts:["A. 25%", "B. 100%", "C. 75%", "D. 50%"],
+   ans:"D",
+   exp:"The same current flows through R_th and R_L, which are equal, so half of the power is wasted inside the source. For power lines, where efficiency matters, the load is made much larger than the source resistance, not equal to it."},
+  {q:"A network has V_th = 8 V and R_th = 2 \u03a9. The maximum power it can deliver to a load is",
+   opts:["A. 8 W", "B. 32 W", "C. 16 W", "D. 4 W"],
+   ans:"A",
+   exp:"P_max = V_th\u00b2 \u00f7 (4R_th) = 64 \u00f7 8 = 8 W. The 32 W is V_th\u00b2 \u00f7 R_th, which forgets the 4. The 16 W is V_th\u00b2 \u00f7 (2R_th). The 4 W is V_th\u00b2 \u00f7 (8R_th)."},
+  {q:"A circuit of resistors and independent sources is linear, which means that",
+   opts:["A. the circuit has no resistors", "B. the response is in proportion to the square of the source", "C. the response does not depend on the source", "D. the response is in proportion to the source"],
+   ans:"D",
+   exp:"If all sources are multiplied by k, every voltage and current in the circuit is multiplied by k. This allows the unit-output method, in which the answer is found from an assumed value."},
+  {q:"A source is doubled in a linear resistive circuit. The power in one resistor",
+   opts:["A. doubles", "B. stays the same", "C. becomes four times larger", "D. becomes half"],
+   ans:"C",
+   exp:"Voltage and current both double, and P = VI = I\u00b2R, so the power is multiplied by 2\u00b2 = 4. Power is not linear in the source."},
+  {q:"A linear circuit gives an output of 3 V when the source is 12 V. The source needed for an output of 5 V is",
+   opts:["A. 36 V", "B. 20 V", "C. 7.2 V", "D. 15 V"],
+   ans:"B",
+   exp:"The ratio is 12 \u00f7 3 = 4, so the source must be 4 \u00d7 5 = 20 V. The 7.2 V turns the ratio upside down. The 36 V multiplies 12 by 3."},
+
+  // ── SET 4 · Capacitors and inductors: behaviour, combination and energy ──
+  {q:"The current in a capacitor is given by",
+   opts:["A. i = v dt \u00f7 C", "B. i = v \u00f7 C", "C. i = C dv/dt", "D. i = C \u00d7 v"],
+   ans:"C",
+   exp:"The current depends on the rate of change of voltage, not on the voltage itself. A steady voltage means zero current, so a capacitor behaves as an open circuit in DC steady state."},
+  {q:"The voltage across a capacitor",
+   opts:["A. cannot jump, as that needs infinite current", "B. is always zero when current flows", "C. is always equal to the current in it", "D. can jump instantly at any moment"],
+   ans:"A",
+   exp:"A sudden jump in v would need dv/dt to be infinite. This gives the first rule of transient work: the capacitor voltage just after switching is the same as just before."},
+  {q:"The voltage across a 10 \u03bcF capacitor rises uniformly from 0 to 20 V in 2 ms. The current is",
+   opts:["A. 100 A", "B. 0.1 A", "C. 1.0 A", "D. 0.01 A"],
+   ans:"B",
+   exp:"i = C \u0394V \u00f7 \u0394t = 10 \u00d7 10\u207b\u2076 \u00d7 20 \u00f7 (2 \u00d7 10\u207b\u00b3) = 0.1 A. The 0.01 and 1.0 A are slips of a decimal place. The 100 A uses 2 \u03bcs for the time."},
+  {q:"The voltage across an inductor is given by",
+   opts:["A. v = L dv/dt", "B. v = L di/dt", "C. v = L \u00d7 i", "D. v = i \u00f7 L"],
+   ans:"B",
+   exp:"The voltage depends on how fast the current changes. In DC steady state di/dt is zero, so the inductor behaves as a short circuit."},
+  {q:"The current through an inductor",
+   opts:["A. cannot change instantly", "B. is always zero in DC", "C. is equal to the voltage", "D. can change instantly at any time"],
+   ans:"A",
+   exp:"A sudden change in current would need an infinite voltage. This is the second rule of transient work: the inductor current just after switching is the same as just before."},
+  {q:"The current in a 50 mH coil rises uniformly from 0 to 4 A in 20 ms. The voltage across it is",
+   opts:["A. 0.4 V", "B. 10 V", "C. 100 V", "D. 4 V"],
+   ans:"B",
+   exp:"v = L \u0394I \u00f7 \u0394t = 0.05 \u00d7 4 \u00f7 0.02 = 10 V. The 4 V is the current alone. The 0.4 V and 100 V are slips of a decimal place."},
+  {q:"Two equal capacitors C are connected in series. Their total capacitance is",
+   opts:["A. C\u00b2", "B. C", "C. 2C", "D. C \u00f7 2"],
+   ans:"D",
+   exp:"In series, 1/C_T = 1/C + 1/C = 2/C, so C_T = C/2. The total is less than either capacitor, since the series connection acts like a larger distance between the plates."},
+  {q:"A 4 \u03bcF and a 12 \u03bcF capacitor are connected in series. The total capacitance is",
+   opts:["A. 3 \u03bcF", "B. 16 \u03bcF", "C. 8 \u03bcF", "D. 48 \u03bcF"],
+   ans:"A",
+   exp:"C_T = 4 \u00d7 12 \u00f7 (4 + 12) = 3 \u03bcF. The 16 \u03bcF is the parallel value. The 8 \u03bcF is the average. The 48 \u03bcF is the product."},
+  {q:"The energy stored in a capacitor is",
+   opts:["A. \u00bd C V\u00b2", "B. C V\u00b2", "C. \u00bd C V", "D. \u00bd C\u00b2 V"],
+   ans:"A",
+   exp:"The energy is the area under the voltage\u2013charge line, \u00bd Q V, which becomes \u00bd C V\u00b2. For an inductor the matching formula is \u00bd L I\u00b2."},
+  {q:"The voltage across a capacitor is doubled. The energy stored becomes",
+   opts:["A. half as large", "B. the same", "C. four times larger", "D. twice as large"],
+   ans:"C",
+   exp:"The energy is in proportion to V\u00b2, so doubling V gives 2\u00b2 = 4 times the energy."},
+  {q:"A 100 \u03bcF capacitor is charged to 50 V. The energy stored is",
+   opts:["A. 0.25 J", "B. 0.0025 J", "C. 1.25 J", "D. 0.125 J"],
+   ans:"D",
+   exp:"E = \u00bd \u00d7 100 \u00d7 10\u207b\u2076 \u00d7 50\u00b2 = \u00bd \u00d7 10\u207b\u2074 \u00d7 2 500 = 0.125 J. The 0.25 J forgets the \u00bd. The 0.0025 J uses V instead of V\u00b2. The 1.25 J slips a decimal place."},
+
+  // ── SET 5 · Transients: RC and RL circuits ──
+  {q:"A capacitor charged through a resistor from a supply V has a voltage of",
+   opts:["A. v = V (1 \u2212 e<sup>-t/RC</sup>)", "B. v = V e<sup>-t/RC</sup>", "C. v = V t \u00f7 RC", "D. v = V (1 + e<sup>-t/RC</sup>)"],
+   ans:"A",
+   exp:"The voltage starts at zero and rises towards V, quickly at first and then more slowly. The form V e<sup>-t/RC</sup> is the discharge."},
+  {q:"The time constant of an RC circuit is \u03c4 = RC. After one time constant of charging, the voltage has reached",
+   opts:["A. about 50% of its final value", "B. about 37% of its final value", "C. about 63% of its final value", "D. 100% of its final value"],
+   ans:"C",
+   exp:"1 \u2212 e\u207b\u00b9 = 0.632. The 37% is what remains, e\u207b\u00b9. After 5\u03c4 the capacitor is above 99% charged."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 330 210\" width=\"330\" role=\"img\" aria-label=\"capacitor voltage during charging\"><line x1=\"52.0\" y1=\"166.0\" x2=\"52.0\" y2=\"18.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"52.0\" y1=\"166.0\" x2=\"314.0\" y2=\"166.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"52.0\" y1=\"166.0\" x2=\"52.0\" y2=\"171.0\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"52.0\" y=\"187.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">0</text><line x1=\"102.8\" y1=\"166.0\" x2=\"102.8\" y2=\"171.0\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"102.8\" y=\"187.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">1</text><line x1=\"153.6\" y1=\"166.0\" x2=\"153.6\" y2=\"171.0\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"153.6\" y=\"187.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">2</text><line x1=\"204.4\" y1=\"166.0\" x2=\"204.4\" y2=\"171.0\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"204.4\" y=\"187.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">3</text><line x1=\"255.2\" y1=\"166.0\" x2=\"255.2\" y2=\"171.0\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"255.2\" y=\"187.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">4</text><line x1=\"306.0\" y1=\"166.0\" x2=\"306.0\" y2=\"171.0\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"306.0\" y=\"187.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">5</text><line x1=\"47.0\" y1=\"166.0\" x2=\"52.0\" y2=\"166.0\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"43.0\" y=\"171.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"end\" fill=\"currentColor\">0</text><line x1=\"47.0\" y1=\"101.5\" x2=\"52.0\" y2=\"101.5\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"43.0\" y=\"106.5\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"end\" fill=\"currentColor\">0.5</text><line x1=\"47.0\" y1=\"36.9\" x2=\"52.0\" y2=\"36.9\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"43.0\" y=\"41.9\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"end\" fill=\"currentColor\">1</text><text x=\"312.0\" y=\"204.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"end\" fill=\"currentColor\">t / \u03c4</text><text x=\"58.0\" y=\"14.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"start\" fill=\"currentColor\">v / V</text><polyline points=\"52.0,166.0 58.4,150.8 64.7,137.4 71.0,125.6 77.4,115.2 83.8,106.0 90.1,97.9 96.4,90.7 102.8,84.4 109.2,78.8 115.5,73.9 121.8,69.5 128.2,65.7 134.6,62.3 140.9,59.3 147.2,56.7 153.6,54.4 159.9,52.3 166.3,50.5 172.6,48.9 179.0,47.5 185.3,46.3 191.7,45.2 198.0,44.2 204.4,43.3 210.8,42.6 217.1,41.9 223.4,41.3 229.8,40.8 236.1,40.3 242.5,39.9 248.8,39.6 255.2,39.3 261.5,39.0 267.9,38.8 274.2,38.5 280.6,38.3 286.9,38.2 293.3,38.0 299.6,37.9 306.0,37.8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"102.8\" cy=\"84.4\" r=\"3.2\" fill=\"currentColor\"/><text x=\"112.8\" y=\"110.4\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\">point P</text></svg>The graph shows a capacitor charging. Point P is at t = \u03c4. The capacitor voltage at P is",
+   opts:["A. 86% of V", "B. 37% of V", "C. 63% of V", "D. 50% of V"],
+   ans:"C",
+   exp:"At t = \u03c4, v = V(1 \u2212 e\u207b\u00b9) = 0.632 V. The 86% value is the voltage at t = 2\u03c4, 1 \u2212 e\u207b\u00b2 = 0.865. The 37% is the part of V still to be gained."},
+  {q:"A capacitor with an initial voltage V\u2080 discharging through a resistor has a voltage of",
+   opts:["A. v = V\u2080 + e<sup>-t/RC</sup>", "B. v = V\u2080 (1 \u2212 e<sup>-t/RC</sup>)", "C. v = V\u2080 t \u00f7 RC", "D. v = V\u2080 e<sup>-t/RC</sup>"],
+   ans:"D",
+   exp:"The voltage falls from V\u2080 towards zero. The rate of fall is in proportion to the voltage left, which gives an exponential curve."},
+  {q:"After a time of 5\u03c4, a discharging capacitor has",
+   opts:["A. lost over 99% of its voltage", "B. lost half of its voltage", "C. lost nothing at all", "D. kept 37% of its voltage"],
+   ans:"A",
+   exp:"e\u207b\u2075 = 0.0067, less than 1%. In practice a circuit is considered settled after 5 time constants."},
+  {q:"A 1 000 \u03bcF capacitor charged to 12 V discharges through 10 k\u03a9. The voltage after 10 s is",
+   opts:["A. 1.6 V", "B. 12 V", "C. 4.4 V", "D. 7.6 V"],
+   ans:"C",
+   exp:"\u03c4 = RC = 10 000 \u00d7 0.001 = 10 s. At t = \u03c4, v = 12 e\u207b\u00b9 = 4.41 V. The 7.6 V is 12 (1 \u2212 e\u207b\u00b9), the charging formula. The 1.6 V is the value at 20 s."},
+  {q:"The current in an RL circuit connected to a DC supply V grows as",
+   opts:["A. i = V \u00f7 R at once", "B. i = (V/R)(1 \u2212 e<sup>-t/\u03c4</sup>), with \u03c4 = L/R", "C. i = (V/R)(1 \u2212 e<sup>-t/\u03c4</sup>), with \u03c4 = R/L", "D. i = (V/R) e<sup>-t/\u03c4</sup>, with \u03c4 = L/R"],
+   ans:"B",
+   exp:"The inductor opposes the sudden rise of current. The time constant is L \u00f7 R: a bigger inductance makes the rise slower, and a bigger resistance makes it faster."},
+  {q:"At the instant a DC supply is switched on to an RL circuit, the inductor behaves as",
+   opts:["A. a short circuit at both times", "B. an open circuit at both times", "C. an open circuit; a long time later it behaves as a short circuit", "D. a short circuit; a long time later as an open circuit"],
+   ans:"C",
+   exp:"The inductor current cannot jump, so it starts at zero and acts like a break. When the current becomes steady, di/dt is zero and the voltage across it is zero, like a wire."},
+  {q:"A coil of 20 \u03a9 and 0.5 H is switched on to a 40 V DC supply. The time constant and the final current are",
+   opts:["A. 25 s and 2 A", "B. 40 ms and 2 A", "C. 25 ms and 0.5 A", "D. 25 ms and 2 A"],
+   ans:"D",
+   exp:"\u03c4 = L \u00f7 R = 0.5 \u00f7 20 = 0.025 s = 25 ms. Final current = V \u00f7 R = 40 \u00f7 20 = 2 A. The 40 ms uses R \u00f7 L upside down. The 0.5 A is wrong for the final current. The 25 s slips the unit."},
+  {q:"A diode connected across a relay coil, to protect the transistor that switches it, is called a",
+   opts:["A. flywheel (freewheel) diode", "B. Zener diode", "C. light-emitting diode", "D. rectifier bridge"],
+   ans:"A",
+   exp:"When the switch opens, the diode lets the coil current go on flowing round a loop, and it dies away slowly instead of making a spike. The diode is connected the opposite way to the supply voltage."},
+  {q:"A coil of 2 H carries 0.5 A. A switch opens and the current falls to zero in 1 ms. The average voltage induced is",
+   opts:["A. 1 V", "B. 10 000 V", "C. 100 V", "D. 1 000 V"],
+   ans:"D",
+   exp:"v = L \u0394I \u00f7 \u0394t = 2 \u00d7 0.5 \u00f7 0.001 = 1 000 V. The other values are slips of a power of ten. This shows why switching an inductive load without protection is dangerous."},
+  {q:"For a first-order circuit, the response after switching is x(t) =",
+   opts:["A. x_final e<sup>-t/\u03c4</sup> only", "B. x_initial + x_final", "C. x_final + (x_initial \u2212 x_final) e<sup>-t/\u03c4</sup>", "D. x_initial + x_final e<sup>-t/\u03c4</sup>"],
+   ans:"C",
+   exp:"The quantity moves from its starting value to its final value along an exponential curve. All that is needed is the initial value, the final value and the time constant."},
+  {q:"A capacitor at 2 V is switched to a 10 V source through a resistor. The voltage just after switching is",
+   opts:["A. 0 V", "B. 2 V", "C. 12 V", "D. 10 V"],
+   ans:"B",
+   exp:"The capacitor voltage cannot change at once, so it keeps its value of 2 V. It then rises towards 10 V."},
+  {q:"A capacitor at 2 V is switched to a 10 V source through 4 k\u03a9. C = 50 \u03bcF. The capacitor voltage after 0.2 s is",
+   opts:["A. 4.94 V", "B. 9.26 V", "C. 7.06 V", "D. 6.32 V"],
+   ans:"C",
+   exp:"\u03c4 = 4 000 \u00d7 50 \u00d7 10\u207b\u2076 = 0.2 s, so t = \u03c4. v = 10 + (2 \u2212 10) e\u207b\u00b9 = 10 \u2212 8 \u00d7 0.368 = 7.06 V. The 6.32 V forgets the initial 2 V. The 4.94 V and 9.26 V mix up the two terms."},
+  {q:"For a capacitor in a network, the time constant is \u03c4 = R_th C, where R_th is",
+   opts:["A. the sum of all the resistors in the circuit", "B. the resistance seen by the capacitor, sources off", "C. the largest single resistor in the network", "D. the internal resistance of the supply alone"],
+   ans:"B",
+   exp:"The capacitor sees the rest of the network as a Th\u00e9venin equivalent. Its resistance, found with the sources off, is the R in RC."},
+  {q:"A capacitor\u2019s C is doubled and the source voltage is doubled. The time constant",
+   opts:["A. stays the same, as nothing changes", "B. doubles, as only C changes", "C. quadruples, as both values double", "D. is halved, as V is doubled"],
+   ans:"B",
+   exp:"\u03c4 = RC does not depend on the source voltage. The source changes the final value of the voltage, but not the rate at which it is reached."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 180\" width=\"320\" role=\"img\" aria-label=\"Source with a 6 ohm series resistor and a 3 ohm resistor across terminals a and b\"><line x1=\"44.0\" y1=\"44.0\" x2=\"80.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><polyline points=\"80.0,44.0 86.0,44.0 92.0,35.0 100.0,53.0 108.0,35.0 116.0,53.0 122.0,44.0 128.0,44.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"128.0\" y1=\"44.0\" x2=\"200.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"44.0\" x2=\"44.0\" y2=\"80.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"80.0\" x2=\"44.0\" y2=\"98.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"32.0\" y1=\"98.0\" x2=\"56.0\" y2=\"98.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"38.0\" y1=\"106.0\" x2=\"50.0\" y2=\"106.0\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"106.0\" x2=\"44.0\" y2=\"124.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><text x=\"60.0\" y=\"94.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"start\" fill=\"currentColor\">+</text><line x1=\"44.0\" y1=\"124.0\" x2=\"44.0\" y2=\"140.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"44.0\" x2=\"200.0\" y2=\"70.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><polyline points=\"200.0,70.0 200.0,76.0 191.0,82.0 209.0,90.0 191.0,98.0 209.0,106.0 200.0,112.0 200.0,118.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"118.0\" x2=\"200.0\" y2=\"140.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"140.0\" x2=\"260.0\" y2=\"140.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"44.0\" x2=\"260.0\" y2=\"44.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><circle cx=\"260.0\" cy=\"44.0\" r=\"4.0\" fill=\"#fff\" stroke=\"currentColor\" stroke-width=\"2.2\"/><circle cx=\"260.0\" cy=\"140.0\" r=\"4.0\" fill=\"#fff\" stroke=\"currentColor\" stroke-width=\"2.2\"/><text x=\"274.0\" y=\"49.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">a</text><text x=\"274.0\" y=\"145.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">b</text><text x=\"104.0\" y=\"32.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">6 \u03a9</text><text x=\"216.0\" y=\"98.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">3 \u03a9</text><text x=\"60.0\" y=\"128.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"start\" fill=\"currentColor\">24 V</text></svg>A 500 \u03bcF capacitor is connected across terminals a\u2013b of the network. The time constant is",
+   opts:["A. 1 ms", "B. 1.5 ms", "C. 4.5 ms", "D. 3 ms"],
+   ans:"A",
+   exp:"With the source shorted, the capacitor sees 6 \u03a9 \u2225 3 \u03a9 = 2 \u03a9. \u03c4 = 2 \u00d7 500 \u00d7 10\u207b\u2076 = 1 ms. The 4.5 ms uses 9 \u03a9 (resistors in series). The 3 ms uses the 6 \u03a9 alone. The 1.5 ms uses the 3 \u03a9 alone."},
+
+  // ── SET 6 · AC basics: sinusoids, phasors and impedance ──
+  {q:"A sinusoidal voltage v = V<sub>m</sub> sin(\u03c9t + \u03c6) has an angular frequency \u03c9 equal to",
+   opts:["A. 2\u03c0f", "B. \u03c0 \u00f7 f", "C. f \u00f7 2\u03c0", "D. f"],
+   ans:"A",
+   exp:"One cycle is 2\u03c0 radians and there are f cycles each second, so \u03c9 = 2\u03c0f in rad/s. At 50 Hz, \u03c9 = 314 rad/s."},
+  {q:"The RMS value of a sine wave is",
+   opts:["A. the peak value \u00d7 \u221a2, or 1.414 of the peak", "B. the average over a whole cycle", "C. the peak value \u00f7 2, or 0.5 of the peak", "D. the peak \u00f7 \u221a2, about 0.707 of the peak"],
+   ans:"D",
+   exp:"The RMS value is the DC value that gives the same heating in a resistor. The average of a full sine wave is zero, so it cannot be used."},
+  {q:"A voltage is v = 325 sin(314t) V. Its RMS value and frequency are",
+   opts:["A. 230 V and 314 Hz", "B. 460 V and 50 Hz", "C. 230 V and 50 Hz", "D. 325 V and 50 Hz"],
+   ans:"C",
+   exp:"RMS = 325 \u00f7 \u221a2 = 230 V. f = \u03c9 \u00f7 2\u03c0 = 314 \u00f7 6.283 = 50 Hz. The 325 V is the peak. The 314 is the angular frequency, in rad/s."},
+  {q:"A phasor is used to represent a sinusoid by its",
+   opts:["A. peak and average value of the wave", "B. frequency and the time of day", "C. resistance and capacitance values", "D. magnitude and phase angle at one frequency"],
+   ans:"D",
+   exp:"All voltages and currents in the circuit have the same frequency, so only their sizes and phase angles are needed. This turns calculus into algebra."},
+  {q:"The complex number 3 + j4 in polar form is",
+   opts:["A. 5 \u2220 53.1\u00b0", "B. 25 \u2220 53.1\u00b0", "C. 7 \u2220 53.1\u00b0", "D. 5 \u2220 36.9\u00b0"],
+   ans:"A",
+   exp:"Magnitude = \u221a(3\u00b2 + 4\u00b2) = 5. Angle = tan\u207b\u00b9(4 \u00f7 3) = 53.1\u00b0. The 7 adds 3 and 4. The 36.9\u00b0 is the angle from the vertical axis, tan\u207b\u00b9(3 \u00f7 4)."},
+  {q:"A voltage of 10\u22200\u00b0 V is added to a voltage of 10\u222090\u00b0 V. The sum is",
+   opts:["A. 14.14 \u2220 45\u00b0 V", "B. 14.14 \u2220 90\u00b0 V", "C. 20 \u2220 45\u00b0 V", "D. 10 \u2220 45\u00b0 V"],
+   ans:"A",
+   exp:"In rectangular form: 10 + j10, which has magnitude \u221a(100 + 100) = 14.14 and angle 45\u00b0. The 20 V adds the magnitudes. Phasors at an angle to each other must be added as vectors."},
+  {q:"The impedances of an inductor and a capacitor are",
+   opts:["A. Z_L = \u03c9L and Z_C = \u03c9C, both real", "B. Z_L = 1 \u00f7 (j\u03c9L) and Z_C = j\u03c9C", "C. Z_L = jL and Z_C = jC", "D. Z_L = j\u03c9L and Z_C = 1 \u00f7 (j\u03c9C)"],
+   ans:"D",
+   exp:"The inductor\u2019s reactance rises with frequency and the capacitor\u2019s falls. In rectangular form Z_C = \u2212j \u00f7 (\u03c9C), which is the reason the capacitor\u2019s reactance has a negative sign."},
+  {q:"A 0.1 H coil is connected to a 50 Hz supply. Its reactance is",
+   opts:["A. 5.0 \u03a9", "B. 31.4 \u03a9", "C. 314 \u03a9", "D. 0.5 \u03a9"],
+   ans:"B",
+   exp:"X_L = 2\u03c0fL = 2\u03c0 \u00d7 50 \u00d7 0.1 = 31.4 \u03a9. The 5.0 \u03a9 is f \u00d7 L. The 314 \u03a9 slips a decimal place. The 0.5 \u03a9 divides L by f."},
+  {q:"A 100 \u03bcF capacitor is connected to a 50 Hz supply. Its reactance is",
+   opts:["A. 3.18 \u03a9", "B. 31.8 \u03a9", "C. 0.031 8 \u03a9", "D. 318 \u03a9"],
+   ans:"B",
+   exp:"X_C = 1 \u00f7 (2\u03c0fC) = 1 \u00f7 (314 \u00d7 100 \u00d7 10\u207b\u2076) = 31.8 \u03a9. The other values are slips of a power of ten when changing \u03bcF to F."},
+
+  // ── SET 7 · AC circuits: series, parallel and power ──
+  {q:"The impedance of a series RLC circuit is",
+   opts:["A. Z = R + j(X_L \u2212 X_C)", "B. Z = R \u00d7 X_L \u00d7 X_C", "C. Z = R + X_L + X_C", "D. Z = R \u2212 j(X_L + X_C)"],
+   ans:"A",
+   exp:"The inductor and the capacitor are 180\u00b0 apart in phase, so they cancel each other in part. The net reactance is X_L \u2212 X_C."},
+  {q:"The magnitude of the impedance of a series circuit with resistance R and net reactance X is",
+   opts:["A. \u221a(R\u00b2 + X\u00b2)", "B. R \u2212 X", "C. (R + X) \u00f7 2", "D. R + X"],
+   ans:"A",
+   exp:"R and X are at right angles, so they add as the sides of a right-angled triangle, not as plain numbers."},
+  {q:"A series circuit has R = 30 \u03a9, X_L = 50 \u03a9 and X_C = 10 \u03a9, and is connected to 100 V. The current is",
+   opts:["A. 1.1 A", "B. 3.3 A", "C. 1.5 A", "D. 2.0 A"],
+   ans:"D",
+   exp:"Net reactance = 50 \u2212 10 = 40 \u03a9. |Z| = \u221a(30\u00b2 + 40\u00b2) = 50 \u03a9. I = 100 \u00f7 50 = 2.0 A. The 1.1 A adds R, X_L and X_C (90 \u03a9). The 3.3 A uses R alone. The 1.5 A adds X_L and X_C (60 \u03a9)."},
+  {q:"The admittance Y of a circuit is",
+   opts:["A. the same thing as the impedance", "B. the plain sum of R and X in ohms", "C. the product of R and X in ohms", "D. the reciprocal of the impedance, 1 \u00f7 Z"],
+   ans:"D",
+   exp:"Admittance is in siemens. For parallel branches the admittances simply add, in the same way that resistances add in series."},
+  {q:"A resistor and an inductor are in parallel across an AC supply. The total current is",
+   opts:["A. the difference I_R \u2212 I_L", "B. the larger of the two", "C. the phasor sum, \u221a(I_R\u00b2 + I_L\u00b2)", "D. the sum I_R + I_L"],
+   ans:"C",
+   exp:"The resistor current is in phase with the voltage and the inductor current lags it by 90\u00b0, so they add at right angles."},
+  {q:"A 10 \u03a9 resistor and an inductor of reactance 10 \u03a9 are connected in parallel across 100 V. The total current is",
+   opts:["A. 20 A", "B. 10 A", "C. 14.1 A", "D. 7.07 A"],
+   ans:"C",
+   exp:"I_R = 100 \u00f7 10 = 10 A and I_L = 100 \u00f7 10 = 10 A, at 90\u00b0 to each other. Total = \u221a(10\u00b2 + 10\u00b2) = 14.1 A. The 20 A adds them as plain numbers. The 7.07 A is 14.1 \u00f7 2."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 220\" width=\"300\" role=\"img\" aria-label=\"phasor diagram: voltage along the reference axis, current behind it by an angle\"><line x1=\"70.0\" y1=\"100.0\" x2=\"250.0\" y2=\"100.0\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/><line x1=\"250.0\" y1=\"100.0\" x2=\"240.1\" y2=\"104.8\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/><line x1=\"250.0\" y1=\"100.0\" x2=\"240.1\" y2=\"95.2\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/><text x=\"254.0\" y=\"90.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"16\" text-anchor=\"start\" fill=\"currentColor\">V</text><line x1=\"70.0\" y1=\"100.0\" x2=\"192.9\" y2=\"186.0\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/><line x1=\"192.9\" y1=\"186.0\" x2=\"182.0\" y2=\"184.3\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/><line x1=\"192.9\" y1=\"186.0\" x2=\"187.5\" y2=\"176.4\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/><text x=\"200.9\" y=\"200.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"16\" text-anchor=\"start\" fill=\"currentColor\">I</text><path d=\"M124.0 100.0 A54 54 0 0 1 114.2 131.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.0\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"114.2\" y1=\"131.0\" x2=\"115.7\" y2=\"122.1\" stroke=\"currentColor\" stroke-width=\"2.0\" stroke-linecap=\"round\"/><line x1=\"114.2\" y1=\"131.0\" x2=\"122.1\" y2=\"126.6\" stroke=\"currentColor\" stroke-width=\"2.0\" stroke-linecap=\"round\"/><text x=\"140.0\" y=\"122.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">\u03c6</text></svg>In the phasor diagram, the current is behind the voltage by an angle \u03c6. The load is",
+   opts:["A. purely resistive", "B. a source of power only", "C. capacitive", "D. inductive"],
+   ans:"D",
+   exp:"A current that lags the voltage is the mark of an inductive load, such as a motor. A capacitive load has a current that leads. Real power is P = VI cos \u03c6."},
+  {q:"A capacitor is connected in parallel with an inductive load to improve the power factor. The real power drawn from the supply",
+   opts:["A. rises, while the current falls", "B. stays the same, while the current falls", "C. falls, since the capacitor takes power", "D. stays the same, with the current unchanged"],
+   ans:"B",
+   exp:"The capacitor supplies the reactive power that the load needs. The load still does the same work, so P is unchanged, but the supply no longer has to carry the reactive part of the current."},
+  {q:"A load takes 2 kW at 230 V with a lagging power factor of 0.8. The line current is",
+   opts:["A. 7.0 A", "B. 10.9 A", "C. 13.6 A", "D. 8.7 A"],
+   ans:"B",
+   exp:"I = P \u00f7 (V cos \u03c6) = 2 000 \u00f7 (230 \u00d7 0.8) = 10.9 A. The 8.7 A assumes unity power factor (2 000 \u00f7 230); that is the current after correction. The 13.6 A divides by 0.64 (cos\u00b2 \u03c6)."},
+
+  // ── SET 8 · Resonance, filters, matching and the transformer ──
+  {q:"A series RLC circuit is at resonance when",
+   opts:["A. X_L = R, so the current is zero", "B. X_C is exactly zero at all times", "C. the supply voltage drops to zero", "D. X_L = X_C, so the impedance is a minimum"],
+   ans:"D",
+   exp:"The reactances cancel, so the circuit looks purely resistive. The current is then at its maximum, V \u00f7 R, and is in phase with the voltage."},
+  {q:"At series resonance, the voltage across the inductor",
+   opts:["A. is always smaller than the supply voltage", "B. is always zero", "C. equals the voltage across the resistor", "D. can be much greater than the supply voltage"],
+   ans:"D",
+   exp:"The inductor and capacitor voltages are equal in size and opposite in sign, so they cancel in the loop, but each is Q times the supply voltage. A high-Q circuit can produce dangerous voltages."},
+  {q:"A series circuit has L = 0.1 H and C = 10 \u03bcF. The resonant frequency is",
+   opts:["A. 1 592 Hz", "B. 1 000 Hz", "C. 159 Hz", "D. 6 283 Hz"],
+   ans:"C",
+   exp:"f\u2080 = 1 \u00f7 (2\u03c0\u221a(LC)) = 1 \u00f7 (2\u03c0\u221a(10\u207b\u2076)) = 1 \u00f7 (2\u03c0 \u00d7 10\u207b\u00b3) = 159 Hz. The 1 000 is \u03c9\u2080 in rad/s, which is not a frequency in hertz. The 1 592 Hz slips a decimal place. The 6 283 Hz multiplies by 2\u03c0 instead of dividing."},
+  {q:"The Q factor of a series resonant circuit is",
+   opts:["A. Q = f\u2080 \u00d7 bandwidth", "B. Q = \u03c9\u2080L \u00f7 R = f\u2080 \u00f7 bandwidth", "C. Q = L \u00f7 C", "D. Q = R \u00f7 \u03c9\u2080L"],
+   ans:"B",
+   exp:"Q measures how sharp the resonance is. It is the ratio of the reactance of the inductor at resonance to the resistance, and it also equals the resonant frequency divided by the bandwidth."},
+  {q:"A circuit with a higher Q has",
+   opts:["A. a larger series resistance value", "B. a narrower and sharper resonance", "C. a lower and fixed resonant frequency", "D. a wider and flatter resonance"],
+   ans:"B",
+   exp:"Since BW = f\u2080 \u00f7 Q, a larger Q gives a smaller bandwidth. A radio tuner needs a high Q to select one station and reject its neighbours."},
+  {q:"A resonant circuit has f\u2080 = 1 kHz and a bandwidth of 100 Hz. Its Q is",
+   opts:["A. 0.1", "B. 100", "C. 10", "D. 1 100"],
+   ans:"C",
+   exp:"Q = f\u2080 \u00f7 BW = 1 000 \u00f7 100 = 10. The 0.1 turns the ratio upside down. The 100 is the bandwidth itself."},
+  {q:"A load receives the maximum power from an AC source when the load impedance is",
+   opts:["A. infinite in every case", "B. zero ohms in every case", "C. the complex conjugate of the source", "D. equal to the source impedance"],
+   ans:"C",
+   exp:"The reactances must cancel as well as the resistances matching. The load is Z_L = R_th \u2212 jX_th, where the source is R_th + jX_th."},
+  {q:"A source has a Th\u00e9venin impedance of 4 + j3 \u03a9. The load impedance for maximum power is",
+   opts:["A. 3 \u2212 j4 \u03a9", "B. 4 \u2212 j3 \u03a9", "C. 4 + j3 \u03a9", "D. 5 \u03a9"],
+   ans:"B",
+   exp:"The conjugate of 4 + j3 is 4 \u2212 j3. The 4 + j3 would double the net reactance instead of cancelling it. The 5 \u03a9 is the magnitude, which still leaves the source reactance uncancelled."},
+  {q:"A source has V_th = 20 V (RMS) and Z_th = 4 + j3 \u03a9. It is connected to the matching load. The maximum power is",
+   opts:["A. 25 W", "B. 12.5 W", "C. 100 W", "D. 50 W"],
+   ans:"A",
+   exp:"P_max = V_th\u00b2 \u00f7 (4R_th) = 400 \u00f7 16 = 25 W. The total resistance is 4 + 4 = 8 \u03a9 and the reactances cancel, so I = 20 \u00f7 8 = 2.5 A, and P = 2.5\u00b2 \u00d7 4 = 25 W in the load. The 100 W is V\u00b2 \u00f7 R, with no matching."},
+  {q:"The cut-off frequency of a simple RC filter is",
+   opts:["A. f<sub>c</sub> = 1 \u00f7 RC", "B. f<sub>c</sub> = 1 \u00f7 (2\u03c0RC)", "C. f<sub>c</sub> = 2\u03c0RC", "D. f<sub>c</sub> = R \u00f7 C"],
+   ans:"B",
+   exp:"At the cut-off frequency, X_C = R. Without the 2\u03c0, 1 \u00f7 RC is the angular frequency in rad/s, not the frequency in hertz."},
+  {q:"At the cut-off frequency of a low-pass RC filter, the output voltage is",
+   opts:["A. 0.707 of the input, a drop of 3 dB", "B. half of the input voltage exactly", "C. equal to the input voltage", "D. zero volts at all times"],
+   ans:"A",
+   exp:"At f<sub>c</sub> the resistor and capacitor have equal size, so the output is 1 \u00f7 \u221a2 of the input. The power is then half of its low-frequency value, which is \u22123 dB."},
+  {q:"An RC low-pass filter has R = 1.6 k\u03a9 and C = 0.1 \u03bcF. The cut-off frequency is about",
+   opts:["A. 6 250 Hz", "B. 995 Hz", "C. 100 Hz", "D. 9 950 Hz"],
+   ans:"B",
+   exp:"f<sub>c</sub> = 1 \u00f7 (2\u03c0 \u00d7 1 600 \u00d7 10\u207b\u2077) = 995 Hz. The 6 250 Hz is 1 \u00f7 RC, which forgets the 2\u03c0. The 9 950 Hz and 100 Hz are slips of a power of ten."},
+  {q:"For an ideal transformer, the voltage and current ratios are",
+   opts:["A. V\u2081 \u00f7 V\u2082 = N\u2082 \u00f7 N\u2081 and I\u2081 \u00f7 I\u2082 = N\u2082 \u00f7 N\u2081", "B. V\u2081 \u00f7 V\u2082 = N\u2081 \u00f7 N\u2082 and I\u2081 \u00f7 I\u2082 = N\u2082 \u00f7 N\u2081", "C. both equal to N\u2081 \u00d7 N\u2082", "D. V\u2081 \u00f7 V\u2082 = N\u2081 \u00f7 N\u2082 and I\u2081 \u00f7 I\u2082 = N\u2081 \u00f7 N\u2082"],
+   ans:"B",
+   exp:"The voltage follows the turns ratio, and the current follows its inverse, so that the power in equals the power out."},
+  {q:"A load Z_L on the secondary of an ideal transformer appears at the primary as",
+   opts:["A. (N\u2081 \u00f7 N\u2082)\u00b2 Z_L", "B. (N\u2081 \u00f7 N\u2082) Z_L", "C. Z_L unchanged", "D. (N\u2082 \u00f7 N\u2081) Z_L"],
+   ans:"A",
+   exp:"The voltage is multiplied by N\u2081 \u00f7 N\u2082 and the current is divided by it, so the ratio of voltage to current is multiplied by (N\u2081 \u00f7 N\u2082)\u00b2. This is used to match a load to a source."},
+  {q:"A 230 V to 23 V ideal transformer feeds a 5 \u03a9 load. The primary current is",
+   opts:["A. 0.46 A", "B. 0.046 A", "C. 46 A", "D. 4.6 A"],
+   ans:"A",
+   exp:"The secondary current is 23 \u00f7 5 = 4.6 A. The primary current is lower in the ratio 23 \u00f7 230: 4.6 \u00f7 10 = 0.46 A. Check: the load seen at the primary is 100 \u00d7 5 = 500 \u03a9 and 230 \u00f7 500 = 0.46 A."},
+
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'engineering';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>
