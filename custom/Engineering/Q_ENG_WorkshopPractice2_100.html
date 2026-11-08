@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Workshop Practice II — Engineering · Mastery Drill</title>
+    <link rel="icon" id="fav" type="image/svg+xml" href="../favicon.svg">
+    <link rel="alternate icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+
+        sub, sup { font-size: .68em; line-height: 0; }
+        .fr { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 .22em; line-height: 1.2; }
+        .fr .n { border-bottom: .12em solid currentColor; padding: 0 .28em .06em; }
+        .fr .d { padding: .08em .28em 0; }
+        .ov { border-top: .1em solid currentColor; padding: 0 .08em; }
+        .dg { display: block; max-width: 100%; height: auto; margin: 12px 0 14px; color: inherit; }
+        .option .dg { margin: 2px 0; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Workshop Practice II</div>
+    <div class="subtitle">100-question mastery drill · Engineering · Machining, CNC, press work and heat treatment</div>
+</div>
+
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// WORKSHOP PRACTICE II · 100 QUESTIONS
+// Spine: every machining calculation starts from the cutting speed, v = πDN ÷ 1000
+//   (v in m/min, D in mm, N in rev/min). From N: feed rate = feed per rev (or per tooth) × N;
+//   time = length ÷ feed rate; power = cutting force × v. Setting up: angles, indexing 40 ÷ N, 3-2-1 location.
+//   Forming: force = cut length × thickness × shear strength; bend allowance = angle × (R + 0.33 t).
+//   Heat: welding heat input = efficiency × V × I ÷ travel speed; spot-weld heat = I²Rt.
+// Every set runs rule → trap → calculation. Wrong options are the usual slips: an inverted formula,
+//   a missing π or 2, a unit left unconverted, or a radius used for a diameter.
+// ─────────────────────────────────────────────────────────────────────────────
+// SET 1  · Lathe: work holding, tool angles and tapers          Q1–12
+// SET 2  · Lathe: threads, surface finish, power and tool life  Q13–24
+// SET 3  · Milling: cutting direction, speed and removal rate   Q25–33
+// SET 4  · Indexing, gear blanks and hexagons                   Q34–44
+// SET 5  · Shaping and the quick-return stroke                  Q45–50
+// SET 6  · Grinding: wheel marking, speed and dressing          Q51–59
+// SET 7  · Drilling, jigs and fixtures                          Q60–64
+// SET 8  · CNC: axes, codes, feeds, offsets, cycles and accuracy Q65–82
+// SET 9  · Welding: arc heat input and spot welding             Q83–88
+// SET 10 · Press work: blanking, bending and deep drawing       Q89–97
+// SET 11 · Heat treatment of steel                              Q98–100
+// ─────────────────────────────────────────────────────────────────────────────
+
+const questions = {
+  engineering: [
+
+  // ── SET 1 · Lathe: work holding, tool angles and tapers ──
+  {q:"A three-jaw chuck holds a round bar running true without any adjusting, because",
+   opts:["A. each jaw is set by its own screw", "B. the tailstock centres the bar", "C. the jaws are ground to suit each bar", "D. the three jaws are moved together by one scroll"],
+   ans:"D",
+   exp:"A spiral groove (the scroll) moves all three jaws in or out at the same time, so the bar centres itself. Its accuracy depends on the wear of the scroll and jaws, so work needing high accuracy is turned in one setting."},
+  {q:"A square bar must be turned round about its own centre. The chuck needed is",
+   opts:["A. a magnetic chuck", "B. a collet chuck for round bar", "C. a three-jaw chuck with soft jaws", "D. a four-jaw chuck, each jaw set by hand"],
+   ans:"D",
+   exp:"Three jaws cannot grip a square section properly: they bear on corners and the bar can slip. A four-jaw chuck has independent jaws, so square, rectangular and off-centre pieces can be clamped and then set true with a dial indicator."},
+  {q:"A bar of 20 mm diameter sticks 300 mm out of the chuck and bends away from the tool, so the cut tapers. The usual remedy is to",
+   opts:["A. support the free end with a live centre or a steady rest", "B. take one deeper cut so the tool holds the bar", "C. run the spindle faster to stiffen the bar", "D. use a tool with a much larger nose radius"],
+   ans:"A",
+   exp:"The bar acts like a cantilever. The bend under the cutting force grows with the cube of the overhang, and 300 \u00f7 20 is a ratio of 15, far beyond the ratio of about 5 that a chuck alone can hold. A support at the free end removes the overhang. A deeper cut increases the force, and speed does not change the stiffness."},
+  {q:"When the rake angle of a turning tool is increased, the cutting force becomes",
+   opts:["A. larger, and the edge stronger", "B. larger, but the edge weaker", "C. smaller, but the edge is weaker", "D. smaller, and the edge stronger"],
+   ans:"C",
+   exp:"A larger positive rake lets the chip curl away easily, so the force and the heat fall. The wedge of metal behind the edge gets thinner, so the edge is more likely to chip. Hard materials are cut with small or negative rake for that reason."},
+  {q:"A tool with too little clearance angle will",
+   opts:["A. cut cleanly but break at the tip", "B. give a better finish, but wear faster", "C. dig into the work and chatter", "D. rub on the work, heat up and wear on its flank"],
+   ans:"D",
+   exp:"Clearance keeps the flank of the tool from touching the freshly cut surface. Without it the flank rubs, the friction heats the tool and the work, and the finish is poor. Too much clearance leaves a thin, weak edge, usually 5 to 10\u00b0 is used."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 180\" width=\"300\" role=\"img\" aria-label=\"single point cutting tool with rake and clearance angles\"><rect x=\"20.0\" y=\"110.0\" width=\"260.0\" height=\"50.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\"/><polygon points=\"120.0,110.0 140.2,34.7 250.2,34.7 290.0,88.4 220.0,92.4\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"120.0\" y1=\"110.0\" x2=\"120.0\" y2=\"10.0\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-dasharray=\"5 4\"/><line x1=\"80.0\" y1=\"110.0\" x2=\"240.0\" y2=\"110.0\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-dasharray=\"5 4\"/><path d=\"M120 50 A60 60 0 0 1 135.5 52.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><text x=\"114.0\" y=\"46.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"end\" fill=\"currentColor\">\u03b3</text><path d=\"M182 110 A62 62 0 0 0 181.1 99.2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><text x=\"190.0\" y=\"128.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">\u03b1</text><line x1=\"250.0\" y1=\"30.0\" x2=\"190.0\" y2=\"30.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"190.0\" y1=\"30.0\" x2=\"198.1\" y2=\"26.1\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"190.0\" y1=\"30.0\" x2=\"198.1\" y2=\"33.9\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><text x=\"220.0\" y=\"20.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">cutting motion</text><text x=\"80.0\" y=\"82.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"end\" fill=\"currentColor\">rake face</text><text x=\"60.0\" y=\"146.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\">work</text></svg>In the diagram, the angle \u03b3 between the tool face and the vertical dashed line is the",
+   opts:["A. cutting speed", "B. clearance angle", "C. helix angle", "D. rake angle"],
+   ans:"D",
+   exp:"The angle \u03b1 below the flank is the clearance angle."},
+  {q:"The compound slide is chosen for taper turning when the taper is",
+   opts:["A. more than 1 m long and parallel", "B. short and steep, and fed by hand", "C. long and gentle, and fed by power", "D. a thread, fed by the lead screw"],
+   ans:"B",
+   exp:"The slide can be set to any angle, but its travel is short and it is fed by hand, which leaves a poorer finish. Long, gentle tapers are turned by tailstock set-over or with a taper attachment."},
+  {q:"A taper has large diameter D, small diameter d and length L. The compound slide is set to the angle \u03b1 where",
+   opts:["A. sin \u03b1 = (D \u2212 d) / (2L)", "B. tan \u03b1 = (D \u2212 d) / L", "C. tan \u03b1 = (D + d) / (2L)", "D. tan \u03b1 = (D \u2212 d) / (2L)"],
+   ans:"D",
+   exp:"The slide is set to the half angle, because the tool moves only one side of the axis. The change of radius is (D \u2212 d) / 2 over the length L. Leaving out the 2 gives the full included angle in the wrong place. Adding the diameters has no meaning here."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 170\" width=\"300\" role=\"img\" aria-label=\"taper turning with the compound slide set over by the half angle\"><polygon points=\"40.0,40.0 250.0,60.0 250.0,100.0 40.0,120.0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"30.0\" y1=\"80.0\" x2=\"260.0\" y2=\"80.0\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-dasharray=\"14 4 3 4\"/><line x1=\"40.0\" y1=\"40.0\" x2=\"258.0\" y2=\"40.0\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-dasharray=\"5 4\"/><path d=\"M120 40 A80 80 0 0 1 119.6 47.6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><text x=\"136.0\" y=\"34.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"16\" text-anchor=\"start\" fill=\"currentColor\">\u03b1</text><line x1=\"26.0\" y1=\"40.0\" x2=\"26.0\" y2=\"120.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"26.0\" y1=\"40.0\" x2=\"29.0\" y2=\"47.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"26.0\" y1=\"40.0\" x2=\"23.0\" y2=\"47.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"26.0\" y1=\"120.0\" x2=\"23.0\" y2=\"112.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"26.0\" y1=\"120.0\" x2=\"29.0\" y2=\"112.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"31.0\" y=\"80.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\"></text><text x=\"18.0\" y=\"85.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"16\" text-anchor=\"end\" fill=\"currentColor\">D</text><line x1=\"266.0\" y1=\"60.0\" x2=\"266.0\" y2=\"100.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"266.0\" y1=\"60.0\" x2=\"269.0\" y2=\"67.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"266.0\" y1=\"60.0\" x2=\"263.0\" y2=\"67.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"266.0\" y1=\"100.0\" x2=\"263.0\" y2=\"92.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"266.0\" y1=\"100.0\" x2=\"269.0\" y2=\"92.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"271.0\" y=\"80.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\"></text><text x=\"274.0\" y=\"85.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"16\" text-anchor=\"start\" fill=\"currentColor\">d</text><line x1=\"40.0\" y1=\"124.0\" x2=\"40.0\" y2=\"150.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"250.0\" y1=\"104.0\" x2=\"250.0\" y2=\"150.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"40.0\" y1=\"144.0\" x2=\"250.0\" y2=\"144.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"40.0\" y1=\"144.0\" x2=\"47.4\" y2=\"141.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"40.0\" y1=\"144.0\" x2=\"47.4\" y2=\"147.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"250.0\" y1=\"144.0\" x2=\"242.6\" y2=\"147.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"250.0\" y1=\"144.0\" x2=\"242.6\" y2=\"141.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"145.0\" y=\"139.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">L</text></svg>A taper has D = 40 mm, d = 30 mm and L = 100 mm. The compound slide is set to about",
+   opts:["A. 10\u00b0", "B. 0.29\u00b0", "C. 2.86\u00b0", "D. 5.71\u00b0"],
+   ans:"C",
+   exp:"tan \u03b1 = 10 / 200 = 0.05, so \u03b1 = 2.86\u00b0."},
+  {q:"Tailstock set-over is best used for tapers that are",
+   opts:["A. internal, bored in a chuck", "B. long and gentle, turned between centres", "C. short and steep, turned in a chuck", "D. of any angle, turned by hand"],
+   ans:"B",
+   exp:"Moving the tailstock sideways tilts the bar, so the tool cuts a taper along it. It only suits a small angle, since the centres are no longer in line. It cannot be used when the work is held in a chuck."},
+  {q:"A bar of length L is turned between centres. Only a length l of it carries the taper, from D to d. The tailstock set-over is",
+   opts:["A. S = L (D \u2212 d) / l", "B. S = L (D \u2212 d) / (2 l)", "C. S = l (D \u2212 d) / (2 L)", "D. S = (D \u2212 d) / 2"],
+   ans:"B",
+   exp:"The bar is tilted by the half angle of the taper, so the end moves sideways by L times its tangent, and tan \u03b1 = (D \u2212 d) / (2l). The simpler form (D \u2212 d) / 2 is only right when the taper runs the full length of the bar (l = L)."},
+  {q:"A taper has D = 40 mm and d = 30 mm over a taper length of 100 mm. The bar is 200 mm long. The set-over is",
+   opts:["A. 20 mm", "B. 5 mm", "C. 10 mm", "D. 2.5 mm"],
+   ans:"C",
+   exp:"S = 200 \u00d7 (40 \u2212 30) \u00f7 (2 \u00d7 100) = 10 mm. The 5 mm is (D \u2212 d) / 2, which forgets the bar is longer than the taper. The 20 mm leaves out the 2. The 2.5 mm turns the length ratio upside down."},
+
+  // ── SET 2 · Lathe: threads, surface finish, power and tool life ──
+  {q:"During thread cutting, the carriage is driven by",
+   opts:["A. the feed rod, through the apron gears", "B. the lead screw, through a closed half-nut", "C. the cross-slide screw, turned by hand", "D. the tailstock quill, wound forward"],
+   ans:"B",
+   exp:"The lead screw gives a fixed, accurate movement for each turn of the spindle. The feed rod, which is smooth and gives only plain feeds, is not accurate enough for threads."},
+  {q:"A double-start thread has a pitch of 2 mm. The lead, which is the distance the nut moves in one turn, is",
+   opts:["A. 4 mm", "B. 8 mm", "C. 2 mm", "D. 1 mm"],
+   ans:"A",
+   exp:"Lead = pitch \u00d7 number of starts = 2 \u00d7 2 = 4 mm. For a single-start thread lead and pitch are equal. A lathe must be set to the lead, not the pitch, or the thread will have the wrong rate of advance."},
+  {q:"The lead screw of a lathe has a pitch of 6 mm. A thread of pitch 1.5 mm is to be cut. For each turn of the lead screw, the work must turn",
+   opts:["A. 0.25 times", "B. 1.5 times", "C. 4 times", "D. 7.5 times"],
+   ans:"C",
+   exp:"In one turn of the lead screw the carriage moves 6 mm. The tool must move 1.5 mm for each turn of the work, so the work turns 6 \u00f7 1.5 = 4 times. The 0.25 is the ratio upside down. The 7.5 adds the two pitches."},
+  {q:"To make a turned surface smoother, the operator should use",
+   opts:["A. a larger feed and a larger nose radius", "B. a smaller feed and a larger nose radius", "C. a larger feed and a smaller nose radius", "D. a smaller feed and a smaller nose radius"],
+   ans:"B",
+   exp:"The tool leaves a row of ridges, one for each turn of the work. A smaller feed makes the ridges closer together; a larger nose radius makes each ridge shallower. Both changes lower the roughness."},
+  {q:"The theoretical roughness is Ra = f\u00b2 \u00f7 (32 r). If the feed f is halved, the roughness",
+   opts:["A. falls to one half", "B. falls to one eighth", "C. falls to one quarter", "D. is unchanged"],
+   ans:"C",
+   exp:"Roughness depends on the square of the feed: (1/2)\u00b2 = 1/4. This is why a finishing cut uses a very small feed, and why the small feed is more effective than a bigger nose radius, which only enters once."},
+  {q:"A tool of nose radius 0.8 mm cuts with a feed of 0.2 mm/rev. The theoretical roughness Ra is about",
+   opts:["A. 1.6 \u03bcm", "B. 16 \u03bcm", "C. 3.1 \u03bcm", "D. 0.16 \u03bcm"],
+   ans:"A",
+   exp:"Ra = 0.2\u00b2 \u00f7 (32 \u00d7 0.8) = 0.04 \u00f7 25.6 = 0.00156 mm = 1.6 \u03bcm. The 16 and 0.16 are slips of a decimal place in the change from mm to \u03bcm. The 3.1 \u03bcm comes from using 16 instead of 32 in the formula."},
+  {q:"The power used at the cutting tool is found from",
+   opts:["A. cutting force \u00d7 cutting speed", "B. cutting speed \u00f7 feed", "C. depth of cut \u00d7 feed", "D. cutting force \u00f7 cutting speed"],
+   ans:"A",
+   exp:"Power is force times speed, in the same way as for a lifting or pushing force. The depth of cut and feed enter through the force, not directly."},
+  {q:"Cutting force is in newtons and cutting speed in m/min. To get the power in kW, the product Fc \u00d7 v is divided by",
+   opts:["A. 6 000", "B. 60", "C. 1 000", "D. 60 000"],
+   ans:"D",
+   exp:"N \u00d7 m/min is divided by 60 to give watts (N \u00d7 m/s). Watts are divided by 1 000 to give kilowatts. 60 \u00d7 1 000 = 60 000. Dividing by 1 000 only gives a result in kN\u00b7m/min; dividing by 60 only gives watts."},
+  {q:"A cutting force of 1 500 N acts at a cutting speed of 60 m/min. The machine is 75% efficient. The motor power needed is",
+   opts:["A. 1.5 kW", "B. 1.1 kW", "C. 2.0 kW", "D. 3.0 kW"],
+   ans:"C",
+   exp:"Power at the tool = 1 500 \u00d7 60 \u00f7 60 000 = 1.5 kW. The motor must supply more than this because of the losses: 1.5 \u00f7 0.75 = 2.0 kW. The 1.1 kW multiplies by the efficiency instead of dividing. The 1.5 kW forgets the losses. The 3.0 kW would be the answer for an efficiency of 50%."},
+  {q:"Taylor\u2019s tool life equation links",
+   opts:["A. feed and surface finish", "B. rake angle and clearance angle", "C. depth of cut and power", "D. cutting speed and tool life"],
+   ans:"D",
+   exp:"The equation is V T\u207f = C. V is the cutting speed, T the tool life in minutes, and n and C are constants for the tool and work material."},
+  {q:"Which increase shortens tool life the most, if each is raised by the same percentage?",
+   opts:["A. cutting speed", "B. coolant flow", "C. feed", "D. depth of cut"],
+   ans:"A",
+   exp:"Speed has the largest effect, since heat at the edge rises sharply with it. Feed comes next and depth of cut has the smallest effect. If production must go up, it is cheaper in tool life to increase depth and feed before speed."},
+  {q:"A tool lasts 60 min at a certain speed, with n = 0.25. The speed is raised by 20% (a factor of 1.2). The new tool life is about",
+   opts:["A. 50 min", "B. 72 min", "C. 29 min", "D. 12 min"],
+   ans:"C",
+   exp:"V T\u207f = C gives T\u2082 = T\u2081 \u00f7 1.2^(1/n) = 60 \u00f7 1.2\u2074 = 60 \u00f7 2.07 = 29 min. The 50 min divides by 1.2 only. The 72 min multiplies by 1.2. The 12 min divides by 5."},
+
+  // ── SET 3 · Milling: cutting direction, speed and removal rate ──
+  {q:"In up (conventional) milling, the chip",
+   opts:["A. has the same thickness all along", "B. starts thick and ends thin", "C. is cut only at the centre", "D. starts thin and ends thick"],
+   ans:"D",
+   exp:"The tooth enters the work at the surface moving against the feed, rubs before it bites, and cuts a chip that grows to full thickness as it leaves. In down milling it is the other way round."},
+  {q:"Down (climb) milling should be avoided on a machine with",
+   opts:["A. a ball-screw table drive", "B. a flood coolant system", "C. backlash in the table feed screw", "D. a rigid column and arbor"],
+   ans:"C",
+   exp:"In down milling the cutter pulls the work forward in the direction of the feed. If there is backlash, the table jumps forward into the gap, the cutter digs in and may break or ruin the work. A rigid machine with a ball-screw drive is safe."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 340 200\" width=\"340\" role=\"img\" aria-label=\"two milling cases, A and B, with cutter rotation and table feed\"><circle cx=\"80.0\" cy=\"62.0\" r=\"34.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.8\"/><circle cx=\"80.0\" cy=\"62.0\" r=\"3\" fill=\"currentColor\"/><line x1=\"113.5\" y1=\"56.1\" x2=\"119.4\" y2=\"55.1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"99.5\" y1=\"34.1\" x2=\"102.9\" y2=\"29.2\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"74.1\" y1=\"28.5\" x2=\"73.1\" y2=\"22.6\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"52.1\" y1=\"42.5\" x2=\"47.2\" y2=\"39.1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"46.5\" y1=\"67.9\" x2=\"40.6\" y2=\"68.9\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"60.5\" y1=\"89.9\" x2=\"57.1\" y2=\"94.8\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"85.9\" y1=\"95.5\" x2=\"86.9\" y2=\"101.4\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"107.9\" y1=\"81.5\" x2=\"112.8\" y2=\"84.9\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M107.5 22.7 A48 48 0 0 1 107.5 101.3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"107.5\" y1=\"101.3\" x2=\"111.9\" y2=\"93.5\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"107.5\" y1=\"101.3\" x2=\"116.4\" y2=\"99.9\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><rect x=\"12.0\" y=\"90.0\" width=\"136.0\" height=\"40.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\"/><line x1=\"40.0\" y1=\"148.0\" x2=\"120.0\" y2=\"148.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"120.0\" y1=\"148.0\" x2=\"111.9\" y2=\"151.9\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"120.0\" y1=\"148.0\" x2=\"111.9\" y2=\"144.1\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><text x=\"80.0\" y=\"166.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\">feed</text><text x=\"80.0\" y=\"12.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"18\" text-anchor=\"middle\" fill=\"currentColor\">A</text><circle cx=\"250.0\" cy=\"62.0\" r=\"34.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.8\"/><circle cx=\"250.0\" cy=\"62.0\" r=\"3\" fill=\"currentColor\"/><line x1=\"283.5\" y1=\"56.1\" x2=\"289.4\" y2=\"55.1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"269.5\" y1=\"34.1\" x2=\"272.9\" y2=\"29.2\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"244.1\" y1=\"28.5\" x2=\"243.1\" y2=\"22.6\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"222.1\" y1=\"42.5\" x2=\"217.2\" y2=\"39.1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"216.5\" y1=\"67.9\" x2=\"210.6\" y2=\"68.9\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"230.5\" y1=\"89.9\" x2=\"227.1\" y2=\"94.8\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"255.9\" y1=\"95.5\" x2=\"256.9\" y2=\"101.4\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><line x1=\"277.9\" y1=\"81.5\" x2=\"282.8\" y2=\"84.9\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M277.5 101.3 A48 48 0 0 0 277.5 22.7\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"277.5\" y1=\"22.7\" x2=\"286.4\" y2=\"24.1\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"277.5\" y1=\"22.7\" x2=\"281.9\" y2=\"30.5\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><rect x=\"182.0\" y=\"90.0\" width=\"136.0\" height=\"40.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\"/><line x1=\"210.0\" y1=\"148.0\" x2=\"290.0\" y2=\"148.0\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"290.0\" y1=\"148.0\" x2=\"281.9\" y2=\"151.9\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><line x1=\"290.0\" y1=\"148.0\" x2=\"281.9\" y2=\"144.1\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><text x=\"250.0\" y=\"166.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\">feed</text><text x=\"250.0\" y=\"12.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"18\" text-anchor=\"middle\" fill=\"currentColor\">B</text></svg>In the diagram, the cutter in B, at the point of contact, moves in the same direction as the feed. This is",
+   opts:["A. plain boring", "B. down (climb) milling", "C. drilling", "D. up (conventional) milling"],
+   ans:"B",
+   exp:"In A, the cutter moves against the feed."},
+  {q:"The cutting speed of a milling cutter is the speed of",
+   opts:["A. the table as it moves under the cutter", "B. the motor shaft in the gear box", "C. the chip as it leaves the work", "D. the cutter edge at its outer diameter"],
+   ans:"D",
+   exp:"It is the speed at which the cutting edge travels past the work, in m/min. It depends on the work material and the cutter material, not on the machine. The spindle speed is then set from it."},
+  {q:"A cutter of diameter D (mm) is to run at cutting speed v (m/min). The spindle speed N (rev/min) is",
+   opts:["A. N = 1000 v D / \u03c0", "B. N = 1000 v / D", "C. N = \u03c0 D / (1000 v)", "D. N = 1000 v / (\u03c0 D)"],
+   ans:"D",
+   exp:"The cutter edge travels \u03c0D mm in one turn. In one minute it must travel 1 000 v mm. So N = 1 000 v \u00f7 \u03c0D. The last option forgets the \u03c0 and the first is upside down."},
+  {q:"A cutter of 80 mm diameter is to run at a cutting speed of 25 m/min. The spindle speed is about",
+   opts:["A. 9.9 rev/min", "B. 313 rev/min", "C. 99 rev/min", "D. 990 rev/min"],
+   ans:"C",
+   exp:"N = 1 000 \u00d7 25 \u00f7 (\u03c0 \u00d7 80) = 99.5 rev/min. The 9.9 and 990 are slips of a decimal place. The 313 comes from leaving out \u03c0."},
+  {q:"The metal removal rate in milling is",
+   opts:["A. depth of cut \u00d7 table feed \u00f7 cutter diameter", "B. width of cut + depth of cut + table feed", "C. width of cut \u00d7 depth of cut \u00d7 table feed", "D. width of cut \u00d7 depth of cut \u00f7 table feed"],
+   ans:"C",
+   exp:"In one minute the table moves a length equal to the feed. The volume removed is the cross-section of the cut (width \u00d7 depth) times that length."},
+  {q:"The depth of cut is doubled and the table feed is halved. The width of cut is unchanged. The removal rate",
+   opts:["A. is unchanged", "B. doubles", "C. halves", "D. quadruples"],
+   ans:"A",
+   exp:"The rate depends on the product of depth and feed. Doubling one and halving the other gives 2 \u00d7 \u00bd = 1. Changing one variable at a time is easy; with two changes the product must be checked."},
+  {q:"A cut is 50 mm wide and 4 mm deep, at a table feed of 320 mm/min. The metal removal rate is",
+   opts:["A. 64 000 mm\u00b3/min", "B. 640 mm\u00b3/min", "C. 6 400 mm\u00b3/min", "D. 1 067 mm\u00b3/min"],
+   ans:"A",
+   exp:"50 \u00d7 4 \u00d7 320 = 64 000 mm\u00b3/min. The 6 400 and 640 are slips of a decimal place. The 1 067 is the correct value per second (64 000 \u00f7 60) with the wrong unit."},
+
+  // ── SET 4 · Indexing, gear blanks and hexagons ──
+  {q:"To divide the work into N equal parts by simple indexing on a 40:1 head, the crank is turned",
+   opts:["A. N \u00f7 40 turns", "B. 40 \u00f7 N turns", "C. 360 \u00f7 N turns", "D. 40 \u00d7 N turns"],
+   ans:"B",
+   exp:"One full turn of the work needs 40 turns of the crank. One of N divisions needs 40 \u00f7 N turns. The 360 \u00f7 N is the angle of each division in degrees, not the crank turns."},
+  {q:"A gear blank needs 18 divisions on a 40:1 head. The crank is turned",
+   opts:["A. 4 full turns and 2 holes on an 18-hole circle", "B. 2 full turns and 4 holes on a 20-hole circle", "C. 1 full turn and 4 holes on an 18-hole circle", "D. 2 full turns and 4 holes on an 18-hole circle"],
+   ans:"D",
+   exp:"40 \u00f7 18 = 2 and 4/18, so 2 full turns and 4 holes on a circle with 18 holes (or any multiple, such as 4 holes of 18). The fraction must be counted on a circle whose hole number matches the denominator; on a 20-hole circle the same 4 holes would give 4/20."},
+  {q:"To turn the work through \u03b8 degrees on a 40:1 head, the crank is turned",
+   opts:["A. \u03b8 \u00f7 9 turns", "B. \u03b8 \u00d7 9 turns", "C. \u03b8 \u00f7 40 turns", "D. 360 \u00f7 \u03b8 turns"],
+   ans:"A",
+   exp:"One crank turn gives 9\u00b0. So \u03b8 degrees need \u03b8 \u00f7 9 turns. The 360 \u00f7 \u03b8 is the number of equal divisions, not the crank turns."},
+  {q:"On a 40:1 head, moving the crank by one hole on an 18-hole circle turns the work by",
+   opts:["A. 0.05\u00b0", "B. 9\u00b0", "C. 5\u00b0", "D. 0.5\u00b0"],
+   ans:"D",
+   exp:"One hole is 1/18 of a crank turn, and a crank turn is 9\u00b0: 9 \u00f7 18 = 0.5\u00b0. The 9\u00b0 is the whole turn. Angles that are a whole number of half degrees can be set directly on the 18-hole circle."},
+  {q:"The work is to be turned through 47\u00b0 on a 40:1 head. The crank is turned",
+   opts:["A. 5 turns and 2 holes on an 18-hole circle", "B. 4 turns and 14 holes on an 18-hole circle", "C. 5 turns and 4 holes on an 18-hole circle", "D. 5 turns and 4 holes on a 20-hole circle"],
+   ans:"C",
+   exp:"47 \u00f7 9 = 5.222 turns. The 0.222 of a turn is 4/18, so 4 holes on the 18-hole circle. 5 turns and 2 holes would give 46\u00b0. 4 turns and 14 holes give 43\u00b0. On a 20-hole circle the 4 holes would give 5.2 turns, which is 46.8\u00b0."},
+  {q:"A spur gear of module m has z teeth. Its outside diameter is",
+   opts:["A. m (z + 1)", "B. m (z + 2)", "C. m z", "D. m (z \u2212 2)"],
+   ans:"B",
+   exp:"The pitch circle diameter is m \u00d7 z. The addendum, which is one module, adds to the radius on each side, so 2m is added to the diameter. m z alone is the pitch circle diameter."},
+  {q:"For a standard tooth, the addendum and the dedendum are",
+   opts:["A. 2 m and 2.25 m", "B. 1.25 m and 1 m", "C. 1 m and 1.25 m", "D. 1 m and 1 m"],
+   ans:"C",
+   exp:"The part of the tooth above the pitch circle is 1 m. The part below is 1.25 m, so that the tip of the mating tooth has a small clearance at the root. The whole depth is 2.25 m."},
+  {q:"A gear has module 2.5 mm and 24 teeth. The blank outside diameter is",
+   opts:["A. 65 mm", "B. 62.5 mm", "C. 67.5 mm", "D. 60 mm"],
+   ans:"A",
+   exp:"D = m (z + 2) = 2.5 \u00d7 26 = 65 mm. The 60 mm is the pitch circle diameter (2.5 \u00d7 24). The 62.5 mm uses z + 1. The 67.5 mm uses z + 3."},
+  {q:"A hexagon has a distance A across the flats. The distance across the corners is",
+   opts:["A. 1.414 A", "B. 1.155 A", "C. 2 A", "D. 0.866 A"],
+   ans:"B",
+   exp:"Across corners = A \u00f7 cos 30\u00b0 = 1.155 A. The 0.866 is A \u00d7 cos 30\u00b0 (the wrong way). The 1.414 is the ratio for a square, not a hexagon."},
+  {q:"A hexagon is cut by turning the work through 60\u00b0 between flats. On a 40:1 head, the crank is turned",
+   opts:["A. 6 turns", "B. 6 and 2/3 turns", "C. 6 and 1/3 turns", "D. 9 turns"],
+   ans:"B",
+   exp:"60 \u00f7 9 = 6.667, which is 6 and 2/3 turns. On a 27-hole circle this is 6 turns and 18 holes. Using 6 turns only would give 54\u00b0."},
+  {q:"A hexagon 30 mm across flats is milled from round bar. The bar must be at least",
+   opts:["A. 34.6 mm in diameter", "B. 26 mm in diameter", "C. 60 mm in diameter", "D. 30 mm in diameter"],
+   ans:"A",
+   exp:"The corners of the hexagon lie on a circle of 30 \u00f7 cos 30\u00b0 = 34.64 mm. A bar of 30 mm would leave the corners unfinished. The 26 mm is 30 \u00d7 cos 30\u00b0, which is too small. The 60 mm is twice the flat size."},
+
+  // ── SET 5 · Shaping and the quick-return stroke ──
+  {q:"A shaper cuts metal during",
+   opts:["A. the return stroke only", "B. the forward stroke of the ram only", "C. the downward movement of the table", "D. both the forward and the return strokes"],
+   ans:"B",
+   exp:"The tool cuts on the forward stroke. On the return stroke the tool head lifts on its hinge and the tool slides back clear of the work, so no metal is removed. That idle stroke is why the machine has a quick return."},
+  {q:"On a shaper, the table feed is applied",
+   opts:["A. continuously, while the tool is cutting", "B. once only, before the first cut", "C. during the cutting stroke, as on a lathe", "D. during the return stroke, clear of the work"],
+   ans:"D",
+   exp:"The table moves sideways by one feed at the end of each cutting stroke. Moving it while the tool is cutting would drag the tool across the work and break it."},
+  {q:"A flat surface 150 mm wide is shaped with a feed of 1.5 mm per stroke at 60 double strokes per minute. The cutting time is about",
+   opts:["A. 1.67 min", "B. 0.60 min", "C. 2.50 min", "D. 100 min"],
+   ans:"A",
+   exp:"Strokes needed = width \u00f7 feed = 150 \u00f7 1.5 = 100. Time = 100 \u00f7 60 = 1.67 min. The 0.60 min comes from dividing 60 by 100 (upside down). The 2.50 min comes from 150 \u00f7 60, which ignores the feed. The 100 min treats 100 strokes as 100 minutes."},
+  {q:"The quick-return ratio of a shaper is",
+   opts:["A. cutting-stroke time \u00f7 return-stroke time", "B. cutting speed \u00f7 feed per stroke", "C. return-stroke time \u00f7 cutting-stroke time", "D. stroke length \u00f7 cutting time"],
+   ans:"A",
+   exp:"The ratio is more than 1 because the return stroke takes less time. Shapers usually have a ratio between 3:2 and 2:1."},
+  {q:"The crank of a quick-return mechanism turns at constant speed. The cutting stroke uses 220\u00b0 of the turn and the return stroke uses 140\u00b0. The ratio is",
+   opts:["A. 1.00 : 1", "B. 2.20 : 1", "C. 1.57 : 1", "D. 0.64 : 1"],
+   ans:"C",
+   exp:"Because the crank speed is constant, the times are in the same ratio as the angles: 220 \u00f7 140 = 1.57. The 0.64 is the ratio upside down. A ratio of 1.00 would mean there is no quick return at all."},
+  {q:"A shaper makes 30 double strokes per minute with a stroke of 250 mm. The cutting stroke uses 220\u00b0 of the 360\u00b0 crank turn. The average cutting speed is about",
+   opts:["A. 7.5 m/min", "B. 15.0 m/min", "C. 19.3 m/min", "D. 12.3 m/min"],
+   ans:"D",
+   exp:"One cycle takes 60 \u00f7 30 = 2 s. The cutting part is 2 \u00d7 220/360 = 1.222 s. Speed = 0.25 m \u00f7 1.222 s = 0.2045 m/s = 12.3 m/min. The 7.5 m/min spreads the cut over the whole cycle (0.25 \u00d7 30). The 15.0 m/min counts both strokes. The 19.3 m/min is the return speed, found with 140\u00b0."},
+
+  // ── SET 6 · Grinding: wheel marking, speed and dressing ──
+  {q:"In the wheel marking A 60 K 5 V, the letter K gives the",
+   opts:["A. hardness (grade) of the wheel", "B. kind of abrasive grain", "C. kind of bond used", "D. size of the grains"],
+   ans:"A",
+   exp:"The marking is read in order: A = aluminium oxide abrasive, 60 = grit size (medium), K = grade (medium hardness), 5 = structure (spacing of grains), V = vitrified bond. Grade is how firmly the bond holds the grains."},
+  {q:"To grind a very hard steel, the wheel chosen should be",
+   opts:["A. a hard grade, so the grains last longer", "B. a coarse grit with a hard grade", "C. a soft grade, so dulled grains break away", "D. any grade, as hardness does not matter"],
+   ans:"C",
+   exp:"Hard work dulls the grains quickly. A soft-grade wheel releases dulled grains so fresh sharp ones come forward. A hard-grade wheel keeps the dull grains, which rub, heat and burn the work. The rule is: hard work, soft wheel; soft work, hard wheel."},
+  {q:"A hardened tool steel is to be finish-ground. The most suitable wheel is",
+   opts:["A. C 80 H 5 V", "B. A 24 T 5 V", "C. A 80 H 5 V", "D. C 24 T 5 V"],
+   ans:"C",
+   exp:"Steel needs aluminium oxide (A). Finish grinding needs a fine grit (80). Hard work needs a soft grade (H). C 24 T has silicon carbide, a coarse grit and a hard grade, so it is wrong on all three. A 24 T keeps aluminium oxide but is coarse and hard. C 80 H is fine and soft, but silicon carbide suits cast iron and non-ferrous metals, not steel."},
+  {q:"The maximum speed printed on a grinding wheel",
+   opts:["A. applies only to wheels with a vitrified bond", "B. may be exceeded by 10% for finishing", "C. can be ignored for wheels under 100 mm", "D. must never be exceeded by the machine spindle"],
+   ans:"D",
+   exp:"A wheel can burst when run too fast, because the stress in the wheel rises with the square of the speed. The limit is part of the wheel and applies to every size."},
+  {q:"A grinding wheel wears from 300 mm to 240 mm diameter, at the same spindle speed. The surface speed",
+   opts:["A. falls by 20%, in proportion to the diameter", "B. stays the same, since the rpm is unchanged", "C. falls by 36%", "D. rises by 20%"],
+   ans:"A",
+   exp:"v = \u03c0DN, so v is in proportion to D. 240 \u00f7 300 = 0.8, a fall of 20%. The 36% comes from squaring (0.8\u00b2). As the wheel wears, the operator may raise the rpm to bring the surface speed back, but never above the maximum rpm marked on the wheel."},
+  {q:"A wheel of 300 mm diameter runs at 1 800 rpm. Its surface speed is",
+   opts:["A. 56.5 m/s", "B. 1 696 m/s", "C. 28.3 m/s", "D. 14.1 m/s"],
+   ans:"C",
+   exp:"v = \u03c0 \u00d7 D \u00d7 N \u00f7 60 with D in metres: \u03c0 \u00d7 0.3 \u00d7 1 800 \u00f7 60 = 28.3 m/s. The 14.1 m/s uses the radius. The 56.5 m/s doubles the diameter. The 1 696 is the speed in metres per minute, written with the wrong unit."},
+  {q:"Dressing a grinding wheel",
+   opts:["A. balances the wheel on its spindle", "B. clears the face and exposes sharp grains", "C. adds new grains to the wheel rim", "D. bakes the wheel to make it harder"],
+   ans:"B",
+   exp:"A diamond or a dressing tool is passed over the face. It breaks off dull grains and clogged metal, so the wheel cuts freely again."},
+  {q:"Truing differs from dressing because truing",
+   opts:["A. changes the wheel to a softer grade", "B. is done by hand with the wheel stopped", "C. corrects the wheel shape and runout", "D. only brushes dust from the wheel"],
+   ans:"C",
+   exp:"Truing makes the wheel round and the face straight, or cuts a profile on it. Dressing sharpens it. One pass of a diamond often does both."},
+  {q:"A wheel grinding hardened steel has a shiny face and the work shows burn marks. The wheel is",
+   opts:["A. out of balance; add counterweights", "B. loaded with chips; cool it and slow the feed", "C. too soft; fit a harder grade", "D. glazed; dress it, then try a softer grade"],
+   ans:"D",
+   exp:"A shiny face means the grains are worn flat and are not breaking away, which is glazing. The wheel rubs instead of cutting, so the work heats and burns. Dressing restores the cut. If glazing returns, the grade is too hard for this work, so a softer one is needed. A loaded wheel looks dull and clogged with metal. Imbalance causes vibration, not burning."},
+
+  // ── SET 7 · Drilling, jigs and fixtures ──
+  {q:"A 20 mm drill is replaced by a 10 mm drill at the same cutting speed. The spindle speed",
+   opts:["A. doubles", "B. halves", "C. stays the same", "D. quadruples"],
+   ans:"A",
+   exp:"N = 1000 v \u00f7 (\u03c0D), so N is in inverse proportion to D. Half the diameter means double the speed. Quadrupling would only be right if N depended on D squared."},
+  {q:"A 10 mm drill cuts at 31.4 m/min with a feed of 0.15 mm per revolution. A 30 mm deep hole is drilled in about",
+   opts:["A. 24 s", "B. 200 s", "C. 0.2 s", "D. 12 s"],
+   ans:"D",
+   exp:"N = 1000 \u00d7 31.4 \u00f7 (\u03c0 \u00d7 10) = 1 000 rpm. Feed rate = 0.15 \u00d7 1 000 = 150 mm/min = 2.5 mm/s. Time = 30 \u00f7 2.5 = 12 s. The 0.2 s is 30 \u00f7 150 = 0.2 min with the unit changed to seconds. The 24 s comes from halving the rpm. The 200 s is 30 \u00f7 0.15, which forgets to multiply by the rpm."},
+  {q:"A drilling jig differs from a fixture because the jig",
+   opts:["A. is bolted to the table permanently", "B. is used on turning work only", "C. guides the cutting tool, usually through a bush", "D. holds the work only and never guides the tool"],
+   ans:"C",
+   exp:"A jig holds the work and guides the tool, so each hole lands in the same place without marking out. A fixture holds and locates the work but does not guide the tool; the tool is set to the work with a set block or gauge."},
+  {q:"The 3-2-1 principle of location holds a block on",
+   opts:["A. three side points and three end points", "B. three base points, two side points and one end point", "C. two base points, two side points and two end points", "D. six points on the same face"],
+   ans:"B",
+   exp:"A free block has 6 degrees of freedom: 3 movements along the axes and 3 turns about them. 3 + 2 + 1 = 6 points, placed on three faces at right angles, remove all six. Two base points would leave the block free to rock."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 170\" width=\"300\" role=\"img\" aria-label=\"plan view of a block located on three base pins, two side pins and one end pin\"><rect x=\"70.0\" y=\"40.0\" width=\"170.0\" height=\"90.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\"/><circle cx=\"95.0\" cy=\"60.0\" r=\"7.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-dasharray=\"3 3\"/><circle cx=\"210.0\" cy=\"60.0\" r=\"7.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-dasharray=\"3 3\"/><circle cx=\"152.0\" cy=\"108.0\" r=\"7.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-dasharray=\"3 3\"/><circle cx=\"105.0\" cy=\"137.0\" r=\"6.0\" fill=\"rgba(23,35,63,.85)\" stroke=\"currentColor\" stroke-width=\"1.6\"/><circle cx=\"200.0\" cy=\"137.0\" r=\"6.0\" fill=\"rgba(23,35,63,.85)\" stroke=\"currentColor\" stroke-width=\"1.6\"/><circle cx=\"63.0\" cy=\"85.0\" r=\"6.0\" fill=\"rgba(23,35,63,.85)\" stroke=\"currentColor\" stroke-width=\"1.6\"/><text x=\"155.0\" y=\"28.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">base: 3 points (below, dashed)</text><text x=\"155.0\" y=\"162.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">side: 2 points</text><text x=\"56.0\" y=\"118.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"end\" fill=\"currentColor\">end: 1</text><text x=\"56.0\" y=\"132.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"end\" fill=\"currentColor\">point</text></svg>The three base pins in the diagram remove how many of the block\u2019s 6 degrees of freedom?",
+   opts:["A. 2", "B. 6", "C. 3", "D. 1"],
+   ans:"C",
+   exp:"The three base points stop the block moving down and stop it tipping about both horizontal axes: 3. The two side points stop sideways movement and turning in the plan: 2. The end point stops movement along the length: 1. Total 6."},
+
+  // ── SET 8 · CNC: axes, codes, feeds, offsets, cycles and accuracy ──
+  {q:"On a CNC milling machine, the Z axis is",
+   opts:["A. along the table, front to back", "B. along the spindle axis", "C. along the table, left to right", "D. around the spindle"],
+   ans:"B",
+   exp:"Z always follows the spindle. X is the longest table movement and Y is the other horizontal one. Moving Z in the positive direction takes the tool away from the work."},
+  {q:"In absolute programming (G90), the coordinate values give",
+   opts:["A. the speed of each axis", "B. the position measured from program zero", "C. the distance from the previous point", "D. the depth of each pass"],
+   ans:"B",
+   exp:"In G90 every value is measured from the same fixed zero. In G91 (incremental) every value is measured from where the tool is now. Mixing them up is a common cause of a crashed tool."},
+  {q:"The tool is at X30 Y20 and must move to X70 Y50. In incremental mode (G91) the move is written",
+   opts:["A. X40 Y30", "B. X\u221240 Y\u221230", "C. X70 Y50", "D. X100 Y70"],
+   ans:"A",
+   exp:"Incremental values are the differences: 70 \u2212 30 = 40 and 50 \u2212 20 = 30. X70 Y50 is the absolute form. X100 Y70 adds the two positions. X\u221240 Y\u221230 has the right size but the wrong direction."},
+  {q:"The code G00 is used for",
+   opts:["A. rapid positioning without cutting", "B. a pause for a set time", "C. straight-line cutting at the set feed", "D. clockwise circular cutting"],
+   ans:"A",
+   exp:"G00 moves at the fastest speed of the machine and must never be used while the tool is in the material. G01 is straight cutting at the feed rate, G02 and G03 are arcs, and G04 is the pause (dwell)."},
+  {q:"G02 and G03 differ in that",
+   opts:["A. G02 uses inches and G03 uses millimetres", "B. G02 is a pause and G03 a tool change", "C. G02 is rapid and G03 is at the feed rate", "D. G02 cuts a clockwise arc and G03 an anticlockwise arc"],
+   ans:"D",
+   exp:"Both cut circular arcs at the programmed feed. The direction is seen looking down on the work from the spindle side. Inches and millimetres are chosen with G20 and G21."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 330 210\" width=\"330\" role=\"img\" aria-label=\"CNC tool path around a rectangle with corner coordinates\"><line x1=\"70.0\" y1=\"176.0\" x2=\"300.0\" y2=\"176.0\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"300.0\" y1=\"176.0\" x2=\"291.9\" y2=\"179.9\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"300.0\" y1=\"176.0\" x2=\"291.9\" y2=\"172.1\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"90.0\" y1=\"196.0\" x2=\"90.0\" y2=\"26.0\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"90.0\" y1=\"26.0\" x2=\"93.9\" y2=\"34.1\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"90.0\" y1=\"26.0\" x2=\"86.1\" y2=\"34.1\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><text x=\"306.0\" y=\"181.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">X</text><text x=\"82.0\" y=\"34.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"end\" fill=\"currentColor\">Y</text><rect x=\"90.0\" y=\"56.0\" width=\"180.0\" height=\"120.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"1.4\"/><line x1=\"90.0\" y1=\"176.0\" x2=\"270.0\" y2=\"176.0\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"210.0\" y1=\"176.0\" x2=\"240.0\" y2=\"176.0\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"240.0\" y1=\"176.0\" x2=\"230.1\" y2=\"180.8\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"240.0\" y1=\"176.0\" x2=\"230.1\" y2=\"171.2\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"270.0\" y1=\"176.0\" x2=\"270.0\" y2=\"56.0\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"270.0\" y1=\"98.0\" x2=\"270.0\" y2=\"74.0\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"270.0\" y1=\"74.0\" x2=\"274.8\" y2=\"83.9\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"270.0\" y1=\"74.0\" x2=\"265.2\" y2=\"83.9\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"270.0\" y1=\"56.0\" x2=\"90.0\" y2=\"56.0\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"162.0\" y1=\"56.0\" x2=\"132.0\" y2=\"56.0\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"132.0\" y1=\"56.0\" x2=\"141.9\" y2=\"51.2\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><line x1=\"132.0\" y1=\"56.0\" x2=\"141.9\" y2=\"60.8\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><circle cx=\"90.0\" cy=\"176.0\" r=\"4\" fill=\"currentColor\"/><text x=\"98.0\" y=\"196.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"start\" fill=\"currentColor\">A (0, 0)</text><circle cx=\"270.0\" cy=\"176.0\" r=\"4\" fill=\"currentColor\"/><text x=\"276.0\" y=\"196.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"end\" fill=\"currentColor\">B (60, 0)</text><circle cx=\"270.0\" cy=\"56.0\" r=\"4\" fill=\"currentColor\"/><text x=\"276.0\" y=\"46.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"end\" fill=\"currentColor\">C (60, 40)</text><circle cx=\"90.0\" cy=\"56.0\" r=\"4\" fill=\"currentColor\"/><text x=\"98.0\" y=\"46.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"start\" fill=\"currentColor\">D (0, 40)</text></svg>The tool starts at A (0, 0) and cuts to B, then C, then D at a feed of 80 mm/min. The cutting time is",
+   opts:["A. 2.5 min", "B. 0.5 min", "C. 2.0 min", "D. 1.5 min"],
+   ans:"C",
+   exp:"Path = AB + BC + CD = 60 + 40 + 60 = 160 mm. Time = 160 \u00f7 80 = 2.0 min. The 2.5 min adds the return from D to A (200 mm). The 1.5 min uses only two sides worth 120 mm. The 0.5 min uses the length of one short side only (40 mm)."},
+  {q:"In the feed-per-minute mode (G94), the value F gives the feed in",
+   opts:["A. revolutions per minute", "B. millimetres per revolution", "C. metres per second", "D. millimetres per minute"],
+   ans:"D",
+   exp:"G94 sets feed per minute, as used on most milling work. G95 sets feed per revolution, as used on most lathe work. S is the spindle speed in rpm."},
+  {q:"A lathe program changes from G94 to G95 and still contains F100. The machine will feed at",
+   opts:["A. 100 mm per revolution, overloading", "B. 0.1 mm per revolution", "C. 100 mm per minute, as before", "D. 100 mm per second"],
+   ans:"A",
+   exp:"The number is kept but the unit changes with the mode. 100 mm per revolution is a thousand times a normal finishing feed, so the tool breaks at once. After a mode change the F value must be rewritten (for example F0.1)."},
+  {q:"A 4-tooth milling cutter runs at 3 000 rpm with a feed of 0.05 mm per tooth. The programmed feed rate is",
+   opts:["A. F600", "B. F60", "C. F150", "D. F6000"],
+   ans:"A",
+   exp:"Feed rate = feed per tooth \u00d7 teeth \u00d7 rpm = 0.05 \u00d7 4 \u00d7 3 000 = 600 mm/min. F150 forgets the number of teeth. F60 and F6000 are wrong by a factor of 10."},
+  {q:"A work offset such as G54 tells the machine",
+   opts:["A. how long each tool is", "B. how fast to move between points", "C. which tool to load next", "D. where program zero lies on the table"],
+   ans:"D",
+   exp:"The program is written from a zero chosen on the part. The offset gives the position of that zero measured from the machine zero. Several offsets (G54 to G59) let one machine hold several set-ups."},
+  {q:"Tool length compensation (G43 with an H number) corrects for",
+   opts:["A. the wear of the machine lead screw", "B. the different lengths of the tools", "C. the width of the slot being cut", "D. the speed of the spindle motor"],
+   ans:"B",
+   exp:"Every tool sticks out of the holder by a different amount. The stored length lets all programs use the same Z values, whichever tool is fitted."},
+  {q:"A 10 mm diameter end mill cuts the outside of a 70 \u00d7 50 mm rectangle. Its centre must follow a path of",
+   opts:["A. 75 \u00d7 55 mm", "B. 80 \u00d7 60 mm", "C. 70 \u00d7 50 mm", "D. 60 \u00d7 40 mm"],
+   ans:"B",
+   exp:"The centre of the cutter runs one radius (5 mm) outside every edge: 70 + 10 = 80 and 50 + 10 = 60. A path of 70 \u00d7 50 mm would cut the part too small. A path of 75 \u00d7 55 mm offsets by 2.5 mm, half the radius. A path of 60 \u00d7 40 mm is the offset on the inside."},
+  {q:"A canned cycle such as G81",
+   opts:["A. repeats a drilling sequence from one short line", "B. measures the tool wear", "C. stops the spindle for a tool change", "D. sets the work offset"],
+   ans:"A",
+   exp:"One line gives the hole position, depth, feed and return height. The machine does the rapid approach, the feed down and the rapid return by itself, at each position listed."},
+  {q:"In a drilling cycle, the R plane is",
+   opts:["A. the height where rapid stops and feed begins", "B. the position of the machine home point", "C. the radius of the hole to be drilled", "D. the depth where the drill finally stops"],
+   ans:"A",
+   exp:"The tool moves quickly to the R plane, just above the surface, then slows to the programmed feed. This saves time because the drill does not feed through clear air."},
+  {q:"Four holes are drilled with a canned cycle. Each takes 12 s and the rapid move between holes takes 3 s. The time for all four holes is",
+   opts:["A. 48 s", "B. 60 s", "C. 51 s", "D. 57 s"],
+   ans:"D",
+   exp:"4 holes \u00d7 12 s = 48 s. Between four holes there are only three moves: 3 \u00d7 3 = 9 s. Total 57 s. The 60 s counts a fourth move after the last hole. The 48 s leaves out the moves. The 51 s counts one move."},
+  {q:"Backlash in a CNC axis is",
+   opts:["A. wasted coolant at the cutting nozzle", "B. wobble of the spindle at high speed", "C. heat built up in the spindle bearings", "D. lost motion when the axis reverses direction"],
+   ans:"D",
+   exp:"There is a small gap between the screw and nut. When the direction reverses, the screw turns through the gap before the table moves. The machine can store a correction, but the gap should be small to start with."},
+  {q:"Ball screws are used on CNC axes mainly because they",
+   opts:["A. need no lubrication at all, ever", "B. make the moving table lighter in weight", "C. give smooth motion with very little backlash", "D. are cheaper than ordinary lead screws"],
+   ans:"C",
+   exp:"Steel balls roll between screw and nut instead of sliding, so friction and play are both small. They cost more than ordinary screws, and they still need lubrication."},
+  {q:"A table with 0.005 mm of backlash moves 20.000 mm forward, then 20.000 mm back (both commanded). It ends",
+   opts:["A. exactly on the start point", "B. 0.005 mm beyond the start point", "C. 0.005 mm short of the start point", "D. 0.010 mm short of the start point"],
+   ans:"C",
+   exp:"The gap is taken up once, at the reversal. The table loses 0.005 mm on the way back, so it stops 0.005 mm before the start point (on the forward side). It does not lose it again, so the error is 0.005 mm, not 0.010 mm."},
+
+  // ── SET 9 · Welding: arc heat input and spot welding ──
+  {q:"The heat put into a weld, for each millimetre of its length, rises when",
+   opts:["A. the voltage falls", "B. the current falls", "C. the travel speed rises", "D. the travel speed falls"],
+   ans:"D",
+   exp:"Heat input = arc power \u00d7 efficiency \u00f7 travel speed. A slow torch leaves more heat in each millimetre. Too much heat widens the weld zone and softens the metal near it."},
+  {q:"An arc efficiency of 0.8 means",
+   opts:["A. 80% of the metal melts", "B. 80% of the arc energy enters the work", "C. the arc burns 80% of the time", "D. the current is 80% of the rated value"],
+   ans:"B",
+   exp:"The rest of the energy is lost to the air, the spatter and the radiation. Manual metal arc is about 0.8; submerged arc is about 0.95."},
+  {q:"A weld is made at 25 V and 200 A, travelling at 240 mm/min, with an arc efficiency of 0.8. The heat input is",
+   opts:["A. 16.7 kJ/mm", "B. 1.0 kJ/mm", "C. 0.8 kJ/mm", "D. 1.25 kJ/mm"],
+   ans:"B",
+   exp:"Power = 25 \u00d7 200 = 5 000 W; with efficiency 4 000 W. Speed = 240 \u00f7 60 = 4 mm/s. Heat input = 4 000 \u00f7 4 = 1 000 J/mm = 1.0 kJ/mm. The 1.25 leaves out the efficiency. The 0.8 applies the efficiency twice. The 16.7 divides by 240 without changing minutes to seconds."},
+  {q:"In resistance spot welding, the heat comes from",
+   opts:["A. an arc struck between electrode and work", "B. friction between the two sheets", "C. a gas flame on the joint", "D. current passing through the resistance of the joint"],
+   ans:"D",
+   exp:"The sheets are pressed between copper electrodes and a large current passes through them. The contact between the sheets has the highest resistance, so it gets hottest and melts into a nugget."},
+  {q:"In spot welding, the current is doubled and the time is unchanged. The heat produced",
+   opts:["A. stays the same", "B. doubles", "C. becomes eight times larger", "D. becomes four times larger"],
+   ans:"D",
+   exp:"Heat = I\u00b2Rt. Doubling I multiplies the heat by 2\u00b2 = 4. Eight times would need the time to double as well."},
+  {q:"A spot weld passes 8 kA through a joint resistance of 100 \u03bc\u03a9 for 0.2 s. The heat generated is",
+   opts:["A. 0.16 J", "B. 6 400 J", "C. 1 280 J", "D. 320 J"],
+   ans:"C",
+   exp:"Heat = I\u00b2Rt = 8 000\u00b2 \u00d7 0.0001 \u00d7 0.2 = 64 000 000 \u00d7 0.0001 \u00d7 0.2 = 1 280 J. The 6 400 J forgets the time. The 0.16 J uses I \u00d7 R \u00d7 t, without squaring the current. The 320 J is the heat at 4 kA."},
+
+  // ── SET 10 · Press work: blanking, bending and deep drawing ──
+  {q:"The force needed to blank a part is found from",
+   opts:["A. the weight of the blank \u00d7 the press speed", "B. the length of cut \u00d7 thickness \u00d7 shear strength", "C. the width of the sheet \u00d7 the punch speed", "D. the area of the blank \u00d7 the yield strength"],
+   ans:"B",
+   exp:"The metal fails in shear along the cut edge only. The area that matters is the cut length times the thickness, and the stress is the shear strength."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 180\" width=\"300\" role=\"img\" aria-label=\"blanking: punch, sheet and die with the clearance\"><rect x=\"30.0\" y=\"110.0\" width=\"80.0\" height=\"50.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\"/><rect x=\"190.0\" y=\"110.0\" width=\"80.0\" height=\"50.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\"/><rect x=\"20.0\" y=\"98.0\" width=\"260.0\" height=\"12.0\" rx=\"0\" fill=\"rgba(23,35,63,.18)\" stroke=\"currentColor\" stroke-width=\"2.4\"/><rect x=\"122.0\" y=\"30.0\" width=\"56.0\" height=\"68.0\" rx=\"0\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\"/><line x1=\"150.0\" y1=\"6.0\" x2=\"150.0\" y2=\"28.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"150.0\" y1=\"28.0\" x2=\"145.7\" y2=\"19.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"150.0\" y1=\"28.0\" x2=\"154.3\" y2=\"19.0\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><line x1=\"110.0\" y1=\"138.0\" x2=\"122.0\" y2=\"138.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"110.0\" y1=\"138.0\" x2=\"117.4\" y2=\"135.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"110.0\" y1=\"138.0\" x2=\"117.4\" y2=\"141.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"122.0\" y1=\"138.0\" x2=\"114.6\" y2=\"141.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"122.0\" y1=\"138.0\" x2=\"114.6\" y2=\"135.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"116.0\" y=\"133.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\"></text><line x1=\"110.0\" y1=\"134.0\" x2=\"110.0\" y2=\"146.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"122.0\" y1=\"134.0\" x2=\"122.0\" y2=\"146.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"116.0\" y=\"162.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">c</text><text x=\"150.0\" y=\"66.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\">punch</text><text x=\"70.0\" y=\"138.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\">die</text><text x=\"230.0\" y=\"138.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\">die</text><text x=\"278.0\" y=\"92.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">t</text></svg>The part cut out of the sheet is the blank. The clearance c is deducted from the",
+   opts:["A. press stroke, so the die is made deeper", "B. punch, so the die opening equals the blank size", "C. sheet thickness, so both equal the blank size", "D. die opening, so the punch equals the blank size"],
+   ans:"B",
+   exp:"For blanking, the blank must come out the right size, so the die opening is made to the blank size and the punch is made smaller by the clearance. For piercing, the hole must be the right size, so the punch is made to the hole size and the die opening is made larger."},
+  {q:"A disc of 40 mm diameter is blanked from 3 mm steel with a shear strength of 250 MPa. The blanking force is about",
+   opts:["A. 47.1 kN", "B. 314 kN", "C. 94.2 kN", "D. 188 kN"],
+   ans:"C",
+   exp:"Cut length = \u03c0D = \u03c0 \u00d7 40 = 125.7 mm. Force = 125.7 \u00d7 3 \u00d7 250 = 94 248 N = 94.2 kN. The 47.1 kN uses the radius. The 314 kN uses the area of the disc instead of the cut length. The 188 kN doubles the correct force."},
+  {q:"The neutral axis in a bent sheet is",
+   opts:["A. the line where cracks start", "B. the outer face, stretched most", "C. the line whose length does not change", "D. the inner face, compressed most"],
+   ans:"C",
+   exp:"The outer layers stretch and the inner layers are squeezed. Between them one layer stays the same length. The blank length is worked out on this layer. It lies about a third of the thickness from the inside for a tight bend."},
+  {q:"After the punch is removed, a bent sheet springs back a little. To get the required angle, the sheet must be",
+   opts:["A. heated to red heat first", "B. bent slightly beyond that angle", "C. bent exactly to that angle", "D. bent more slowly"],
+   ans:"B",
+   exp:"Part of the bend is elastic, and it recovers when the load is removed. The die is therefore made to over-bend by the amount of springback, which is larger for harder or thinner material and for larger bend radii."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 260 210\" width=\"260\" role=\"img\" aria-label=\"sheet bent through 90 degrees, with the neutral axis\"><path d=\"M20 64 L110 64 A54 54 0 0 1 164 118 L164 196 L150 196 L150 118 A40 40 0 0 0 110 78 L20 78 Z\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 73.4 L110 73.4 A44.6 44.6 0 0 1 154.6 118 L154.6 196\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-dasharray=\"6 4\"/><circle cx=\"110.0\" cy=\"118.0\" r=\"3.4\" fill=\"currentColor\"/><line x1=\"110.0\" y1=\"118.0\" x2=\"138.3\" y2=\"89.7\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><text x=\"118.0\" y=\"92.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"end\" fill=\"currentColor\">R</text><line x1=\"50.0\" y1=\"64.0\" x2=\"50.0\" y2=\"78.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"64.0\" x2=\"53.0\" y2=\"71.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"64.0\" x2=\"47.0\" y2=\"71.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"78.0\" x2=\"47.0\" y2=\"70.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"50.0\" y1=\"78.0\" x2=\"53.0\" y2=\"70.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"55.0\" y=\"71.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\"></text><line x1=\"30.0\" y1=\"64.0\" x2=\"56.0\" y2=\"64.0\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"round\"/><line x1=\"30.0\" y1=\"78.0\" x2=\"56.0\" y2=\"78.0\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"round\"/><text x=\"60.0\" y=\"60.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">t</text><text x=\"198.0\" y=\"160.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"start\" fill=\"currentColor\">neutral</text><text x=\"198.0\" y=\"174.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"start\" fill=\"currentColor\">axis</text><line x1=\"156.6\" y1=\"160.0\" x2=\"194.0\" y2=\"160.0\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"round\"/></svg>The bend in the diagram is 90\u00b0. The inside radius R is 4 mm, the thickness t is 2 mm and the neutral axis lies 0.33 t from the inside. The bend allowance is",
+   opts:["A. 7.32 mm", "B. 9.42 mm", "C. 7.85 mm", "D. 6.28 mm"],
+   ans:"A",
+   exp:"Bend allowance = angle (in radians) \u00d7 (R + 0.33 t) = 1.5708 \u00d7 (4 + 0.66) = 7.32 mm. The 6.28 mm uses R alone. The 7.85 mm puts the neutral axis at half the thickness. The 9.42 mm uses the outside radius R + t."},
+  {q:"In deep drawing, a blank holder is used to",
+   opts:["A. grip the punch in the press", "B. stop wrinkles forming in the flange", "C. warm the blank before drawing", "D. cut the blank to size"],
+   ans:"B",
+   exp:"As the flange is pulled inwards its circumference shrinks, which makes the metal buckle. The holder presses on the flange so it slides in smoothly. Too much pressure tears the cup; too little lets it wrinkle."},
+  {q:"The limiting draw ratio for a single draw is about 2. The largest blank that can be drawn into a 50 mm cup in one draw is about",
+   opts:["A. 100 mm", "B. 50 mm", "C. 200 mm", "D. 25 mm"],
+   ans:"A",
+   exp:"The draw ratio is blank diameter \u00f7 cup diameter. A ratio above the limit tears the cup at the base. A larger blank needs a second draw (redrawing)."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 170\" width=\"320\" role=\"img\" aria-label=\"a flat blank and the cup drawn from it\"><rect x=\"20.0\" y=\"100.0\" width=\"120.0\" height=\"7.0\" rx=\"0\" fill=\"rgba(23,35,63,.2)\" stroke=\"currentColor\" stroke-width=\"2.4\"/><line x1=\"20.0\" y1=\"130.0\" x2=\"140.0\" y2=\"130.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"20.0\" y1=\"130.0\" x2=\"27.4\" y2=\"127.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"20.0\" y1=\"130.0\" x2=\"27.4\" y2=\"133.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"140.0\" y1=\"130.0\" x2=\"132.6\" y2=\"133.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"140.0\" y1=\"130.0\" x2=\"132.6\" y2=\"127.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"80.0\" y=\"125.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">D</text><line x1=\"20.0\" y1=\"112.0\" x2=\"20.0\" y2=\"138.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"140.0\" y1=\"112.0\" x2=\"140.0\" y2=\"138.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><path d=\"M200 30 L200 107 L280 107 L280 30 L273 30 L273 100 L207 100 L207 30 Z\" fill=\"rgba(23,35,63,.07)\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"131.0\" x2=\"280.0\" y2=\"131.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"131.0\" x2=\"207.4\" y2=\"128.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"200.0\" y1=\"131.0\" x2=\"207.4\" y2=\"134.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"280.0\" y1=\"131.0\" x2=\"272.6\" y2=\"134.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"280.0\" y1=\"131.0\" x2=\"272.6\" y2=\"128.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"240.0\" y=\"126.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"middle\" fill=\"currentColor\">d</text><line x1=\"200.0\" y1=\"111.0\" x2=\"200.0\" y2=\"139.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"280.0\" y1=\"111.0\" x2=\"280.0\" y2=\"139.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"284.0\" y1=\"30.0\" x2=\"316.0\" y2=\"30.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"284.0\" y1=\"107.0\" x2=\"316.0\" y2=\"107.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"304.0\" y1=\"30.0\" x2=\"304.0\" y2=\"107.0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"304.0\" y1=\"30.0\" x2=\"307.0\" y2=\"37.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"304.0\" y1=\"30.0\" x2=\"301.0\" y2=\"37.4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"304.0\" y1=\"107.0\" x2=\"301.0\" y2=\"99.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><line x1=\"304.0\" y1=\"107.0\" x2=\"307.0\" y2=\"99.6\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><text x=\"309.0\" y=\"68.5\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"14\" text-anchor=\"middle\" fill=\"currentColor\"></text><text x=\"310.0\" y=\"72.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"15\" text-anchor=\"start\" fill=\"currentColor\">h</text></svg>A cup of inside diameter d = 50 mm and height h is drawn from a flat blank of diameter D = 100 mm. The areas are equal, which gives D\u00b2 = d\u00b2 + 4dh. The height h is",
+   opts:["A. 75 mm", "B. 37.5 mm", "C. 18.8 mm", "D. 150 mm"],
+   ans:"B",
+   exp:"h = (D\u00b2 \u2212 d\u00b2) \u00f7 (4d) = (10 000 \u2212 2 500) \u00f7 200 = 37.5 mm. The 75 mm uses 4 \u00d7 25 (the radius) on the bottom. The 18.8 mm uses 8d. The 150 mm forgets the factor 4."},
+
+  // ── SET 11 · Heat treatment of steel ──
+  {q:"Quenching plain carbon steel from above its critical temperature in water makes it",
+   opts:["A. soft and tough", "B. very hard and brittle", "C. unchanged in hardness", "D. soft and brittle"],
+   ans:"B",
+   exp:"The rapid cooling traps carbon in the iron and forms martensite, a hard and brittle structure. Steel treated this way is usually tempered before use."},
+  {q:"Tempering a quenched steel is done by",
+   opts:["A. reheating it to a lower temperature and cooling", "B. cooling it in a deep freezer", "C. heating it above the critical temperature", "D. quenching it a second time in brine"],
+   ans:"A",
+   exp:"A temperature of 200 to 600\u00b0C is used. The higher the tempering temperature, the more hardness is lost and the more toughness is gained."},
+  {q:"<svg class=\"dg\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 210\" width=\"300\" role=\"img\" aria-label=\"temperature against time for three cooling rates from the same temperature\"><line x1=\"44.0\" y1=\"164.0\" x2=\"286.0\" y2=\"164.0\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"286.0\" y1=\"164.0\" x2=\"277.9\" y2=\"167.9\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"286.0\" y1=\"164.0\" x2=\"277.9\" y2=\"160.1\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"164.0\" x2=\"44.0\" y2=\"12.0\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"12.0\" x2=\"47.9\" y2=\"20.1\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"44.0\" y1=\"12.0\" x2=\"40.1\" y2=\"20.1\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><text x=\"164.0\" y=\"202.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\">time</text><text x=\"36.0\" y=\"18.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"13\" text-anchor=\"end\" fill=\"currentColor\">temp</text><line x1=\"44.0\" y1=\"66.0\" x2=\"280.0\" y2=\"66.0\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-dasharray=\"6 4\"/><text x=\"278.0\" y=\"60.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"11\" text-anchor=\"end\" fill=\"currentColor\">critical temp</text><path d=\"M44 156 L70 44 L110 44\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.0\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><polyline points=\"110.0,44.0 111.5,60.3 113.0,74.3 114.5,86.1 116.0,96.2 117.5,104.9 119.0,112.2 120.5,118.4 122.0,123.8 123.5,128.3 125.0,132.2 126.5,135.5 128.0,138.3 129.5,140.7 131.0,142.7 132.5,144.5 134.0,146.0 135.5,147.2 137.0,148.3 138.5,149.2 140.0,150.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"140.0\" y1=\"150.0\" x2=\"140.0\" y2=\"168.0\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-dasharray=\"3 3\"/><text x=\"140.0\" y=\"184.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">quench</text><polyline points=\"110.0,44.0 114.0,60.3 118.0,74.3 122.0,86.1 126.0,96.2 130.0,104.9 134.0,112.2 138.0,118.4 142.0,123.8 146.0,128.3 150.0,132.2 154.0,135.5 158.0,138.3 162.0,140.7 166.0,142.7 170.0,144.5 174.0,146.0 178.0,147.2 182.0,148.3 186.0,149.2 190.0,150.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"190.0\" y1=\"150.0\" x2=\"190.0\" y2=\"168.0\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-dasharray=\"3 3\"/><text x=\"190.0\" y=\"184.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">air cool</text><polyline points=\"110.0,44.0 117.4,60.3 124.8,74.3 132.2,86.1 139.6,96.2 147.0,104.9 154.4,112.2 161.8,118.4 169.2,123.8 176.6,128.3 184.0,132.2 191.4,135.5 198.8,138.3 206.2,140.7 213.6,142.7 221.0,144.5 228.4,146.0 235.8,147.2 243.2,148.3 250.6,149.2 258.0,150.0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><line x1=\"258.0\" y1=\"150.0\" x2=\"258.0\" y2=\"168.0\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-dasharray=\"3 3\"/><text x=\"258.0\" y=\"184.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">furnace cool</text><text x=\"90.0\" y=\"36.0\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif\" font-weight=\"800\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">soak</text></svg>The three curves show the same steel cooled at three rates from above the critical temperature. The softest steel is given by",
+   opts:["A. furnace cooling (annealing)", "B. soaking, with no cooling", "C. quenching", "D. air cooling (normalising)"],
+   ans:"A",
+   exp:"The slower the cooling, the softer the steel. Furnace cooling is slowest and gives the softest, most ductile steel. Air cooling gives a finer, slightly harder steel. Quenching is fastest and gives the hardest. Soaking is the holding stage at temperature, before any of the cooling."},
+
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'engineering';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>
