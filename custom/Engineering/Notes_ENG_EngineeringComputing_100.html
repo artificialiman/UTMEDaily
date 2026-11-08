@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Engineering Computing — Engineering Worked Problems</title>
+<link rel="icon" id="fav" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" href="../favicon.ico">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<style>
+    :root {
+        --ios-bg: #F2F2F7; --ios-card: #FFFFFF; --ios-text: #000000;
+        --ios-text-secondary: rgba(60,60,67,0.85); --ios-text-tertiary: rgba(60,60,67,0.55);
+        --ios-blue: #007AFF; --ios-green: #34C759; --ios-red: #FF3B30;
+        --ios-orange: #FF9500; --ios-purple: #AF52DE; --ios-teal: #30B0C7;
+        --ios-separator: rgba(198,198,200,0.5); --ios-hover: #F8F8FA;
+        --radius: 14px; --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --ios-bg: #000; --ios-card: #1C1C1E; --ios-text: #FFF;
+            --ios-text-secondary: rgba(235,235,245,0.85); --ios-text-tertiary: rgba(235,235,245,0.55);
+            --ios-separator: rgba(56,56,58,0.6); --ios-hover: #2C2C2E;
+        }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif; font-size: 17px;
+        color: var(--ios-text); background: var(--ios-bg); line-height: 1.5;
+        padding-bottom: env(safe-area-inset-bottom); -webkit-font-smoothing: antialiased; }
+    .hero { padding: calc(env(safe-area-inset-top) + 48px) 24px 40px; max-width: 720px; margin: 0 auto; }
+    .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ios-blue); margin-bottom: 12px; }
+    .hero h1 { font-size: 40px; line-height: 1.08; letter-spacing: -0.02em; font-weight: 700; margin-bottom: 16px; }
+    .lede { font-size: 18px; color: var(--ios-text-secondary); line-height: 1.5; max-width: 560px; }
+    main { max-width: 720px; margin: 0 auto; padding: 0 24px 100px; }
+    .chapter { margin-top: 64px; }
+    .chapter-num { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; color: var(--ios-blue); margin-bottom: 8px; }
+    .chapter h2 { font-size: 28px; line-height: 1.15; letter-spacing: -0.015em; font-weight: 700; margin-bottom: 12px; }
+    .chapter h2 + p { font-size: 16px; color: var(--ios-text-secondary); margin-bottom: 24px; }
+    .card { background: var(--ios-card); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
+    .card h3 { font-size: 19px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.01em; }
+    .card p { margin-bottom: 12px; color: var(--ios-text-secondary); }
+    .card p:last-child { margin-bottom: 0; }
+    .card strong { color: var(--ios-text); font-weight: 600; }
+    .problem { background: var(--ios-card); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
+    .problem-label { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ios-blue); margin-bottom: 10px; }
+    .problem-q { font-size: 17px; line-height: 1.55; margin-bottom: 20px; font-weight: 500; }
+    .solution { border-top: 1px solid var(--ios-separator); padding-top: 18px; }
+    .solution-label { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ios-text-tertiary); margin-bottom: 12px; }
+    .step { margin-bottom: 12px; color: var(--ios-text-secondary); line-height: 1.6; }
+    .step:last-child { margin-bottom: 0; }
+    .step .tag { display: inline-block; font-size: 12px; font-weight: 600; color: var(--ios-purple);
+        background: color-mix(in srgb, var(--ios-purple) 12%, transparent); padding: 2px 8px; border-radius: 6px; margin-right: 6px; vertical-align: 1px; }
+    .key { background: color-mix(in srgb, var(--ios-blue) 8%, var(--ios-card)); border-left: 3px solid var(--ios-blue);
+        padding: 12px 14px; border-radius: 8px; margin-top: 16px; font-size: 15px; color: var(--ios-text-secondary); line-height: 1.55; }
+    .key strong { color: var(--ios-blue); font-weight: 600; }
+    .math { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 15px; background: var(--ios-hover);
+        padding: 10px 14px; border-radius: 8px; margin: 10px 0; overflow-x: auto; white-space: nowrap; color: var(--ios-text); line-height: 1.7; }
+    .math.multiline { white-space: pre; font-size: 14px; }
+    .math em { font-style: normal; color: var(--ios-blue); font-weight: 600; }
+    .math .op { color: var(--ios-purple); font-weight: 600; }
+    .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+    .cmp > div { border-radius: 10px; padding: 14px; font-size: 14px; line-height: 1.5; }
+    .cmp .sh { background: color-mix(in srgb, var(--ios-blue) 10%, var(--ios-card)); border-left: 3px solid var(--ios-blue); }
+    .cmp .lh { background: color-mix(in srgb, var(--ios-orange) 10%, var(--ios-card)); border-left: 3px solid var(--ios-orange); }
+    .cmp h4 { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+    .cmp .sh h4 { color: var(--ios-blue); }
+    .cmp .lh h4 { color: var(--ios-orange); }
+    .cmp p { color: var(--ios-text-secondary); font-size: 14px; line-height: 1.55; margin-bottom: 6px; }
+    .cmp p:last-child { margin-bottom: 0; }
+    .ref-wrap { overflow-x: auto; margin: 16px 0; padding-bottom: 4px; }
+    table.ref { border-collapse: separate; border-spacing: 0; margin: 0 auto; border: 1.5px solid var(--ios-separator);
+        border-radius: 12px; overflow: hidden; font-size: 14px; width: 100%; }
+    table.ref th, table.ref td { padding: 10px 12px; text-align: left; vertical-align: middle;
+        border-right: 1px solid var(--ios-separator); border-bottom: 1px solid var(--ios-separator); color: var(--ios-text); }
+    table.ref tr:last-child th, table.ref tr:last-child td { border-bottom: none; }
+    table.ref th:last-child, table.ref td:last-child { border-right: none; }
+    table.ref th { background: var(--ios-hover); color: var(--ios-blue); font-weight: 600; font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.06em; }
+    table.ref td.name { font-weight: 600; color: var(--ios-text); }
+    table.ref td.formula { font-family: ui-monospace, 'SF Mono', Menlo, monospace; color: var(--ios-blue); font-weight: 600; }
+    /* Ladder */
+    .ladder { margin: 20px 0; padding: 16px; background: var(--ios-hover); border-radius: 12px; }
+    .ladder-step { display: flex; align-items: center; gap: 14px; padding: 10px 0; }
+    .ladder-num { width: 34px; height: 34px; flex-shrink: 0; display: grid; place-items: center;
+        border-radius: 50%; background: var(--ios-blue); color: white; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .ladder-num.g { background: var(--ios-green); }
+    .ladder-num.o { background: var(--ios-orange); }
+    .ladder-num.p { background: var(--ios-purple); }
+    .ladder-body { flex: 1; }
+    .ladder-title { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--ios-text); margin-bottom: 2px; }
+    .ladder-formula { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--ios-text-secondary); }
+    .ladder-arrow { text-align: center; font-size: 16px; color: var(--ios-text-tertiary); margin: -4px 0; }
+    /* Heating curve */
+    .heat-curve { margin: 20px 0; padding: 16px; background: var(--ios-hover); border-radius: 12px; }
+    .heat-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .heat-label { width: 80px; flex-shrink: 0; font-family: ui-monospace, monospace; font-size: 12px; font-weight: 600; color: var(--ios-text-secondary); }
+    .heat-bar { flex: 1; height: 28px; border-radius: 6px; display: flex; align-items: center; padding: 0 12px;
+        font-family: ui-monospace, monospace; font-size: 12px; font-weight: 600; color: white; }
+    .heat-bar.solid { background: var(--ios-blue); }
+    .heat-bar.melting { background: var(--ios-orange); }
+    .heat-bar.liquid { background: var(--ios-green); }
+    .heat-bar.boiling { background: var(--ios-red); }
+    .heat-bar.gas { background: var(--ios-purple); }
+    .heat-caption { text-align: center; font-size: 13px; color: var(--ios-text-tertiary); margin-top: 12px; line-height: 1.55; }
+    figure.fig { margin: 20px 0; text-align: center; }
+    figure.fig svg { display: block; width: 100%; max-width: 440px; margin: 0 auto; }
+    figure.fig figcaption { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 10px; line-height: 1.5; }
+    svg .lbl { font: 600 13px ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--ios-text); }
+    svg .lbl-sm { font: 500 11px ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--ios-text-tertiary); }
+    svg .lbl-acc { font: 700 13px ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--ios-blue); }
+    svg .lbl-o { font: 700 13px ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--ios-orange); }
+    svg .lbl-g { font: 700 13px ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--ios-green); }
+    svg .lbl-r { font: 700 13px ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--ios-red); }
+    svg .lbl-p { font: 700 13px ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--ios-purple); }
+    svg .axis { stroke: var(--ios-text-tertiary); stroke-width: 1.3; fill: none; }
+    svg .line-dashed { stroke: var(--ios-text-tertiary); stroke-width: 1.2; stroke-dasharray: 4 5; fill: none; }
+    svg .curve { stroke: var(--ios-blue); stroke-width: 2.4; fill: none; }
+    svg .arrow-up { stroke: var(--ios-red); stroke-width: 2.4; fill: none; }
+    svg .arrow-down { stroke: var(--ios-blue); stroke-width: 2.4; fill: none; }
+    svg .dot-a { fill: var(--ios-blue); }
+    svg .dot-r { fill: var(--ios-red); }
+    .conv-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+        text-transform: uppercase; color: var(--ios-purple); border: 1.5px solid var(--ios-purple);
+        padding: 3px 9px; border-radius: 100px; margin-bottom: 14px; }
+    hr.div { border: none; border-top: 1px solid var(--ios-separator); margin: 40px 0; }
+    footer { max-width: 720px; margin: 0 auto; padding: 40px 24px 60px; border-top: 1px solid var(--ios-separator);
+        font-size: 14px; color: var(--ios-text-tertiary); line-height: 1.6; }
+    @media (max-width: 480px) {
+        .hero h1 { font-size: 34px; } .chapter h2 { font-size: 24px; }
+        .cmp { grid-template-columns: 1fr; }
+        table.ref th, table.ref td { padding: 8px 9px; font-size: 13px; }
+    }
+
+    sub, sup { font-size: .68em; line-height: 0; }
+    .fr { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 .22em; line-height: 1.2; }
+    .fr .n { border-bottom: .12em solid currentColor; padding: 0 .28em .06em; }
+    .fr .d { padding: .08em .28em 0; }
+    .ov { border-top: .1em solid currentColor; padding: 0 .08em; }
+    .ans { background: var(--ios-hover); border-radius: 8px; padding: 10px 14px; margin: 12px 0 0; color: var(--ios-text); line-height: 1.5; }
+    .ans strong { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ios-text-tertiary); margin-right: 8px; }
+    .ans em { font-style: normal; color: var(--ios-blue); font-weight: 600; }
+    .key + .key { margin-top: 10px; }
+    pre.code { background: var(--ios-hover); border-radius: 8px; padding: 10px 14px; overflow-x: auto; font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin: 10px 0; white-space: pre; color: var(--ios-text); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--ios-hover); padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+    figure.fig svg.dg { max-width: 440px; width: 100%; height: auto; margin: 0 auto; }
+    .problem figure.fig { margin: 4px 0 16px; }
+    .term { font-weight: 600; color: var(--ios-text); white-space: nowrap; }
+    table.ref td.formula { white-space: normal; }
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="eyebrow">Engineering · Shared Core, Year 2</div>
+<h1>Engineering Computing</h1>
+<p class="lede">A program stores numbers, combines them, repeats the combination and checks the result. Learn how a number is stored and each later step is a small trace. The language here is Python, and the same ideas carry to MATLAB, C and spreadsheets. One hundred problems, every step shown.</p>
+</header>
+<main>
+<section class="chapter">
+<div class="chapter-num">ORIENTATION</div>
+<h2>Store, compute, repeat, check</h2>
+<p>Every program in this course follows one chain. A value is stored in a fixed number of bits, so its range and its precision are limited. Expressions combine values in a fixed order of precedence. Loops and functions repeat the work. At the end the answer is compared with a tolerance, because stored numbers carry a small error.</p>
+<figure class="fig"><svg viewBox="0 0 640 140" role="img" aria-label="Store then Compute then Repeat then Check"><rect x="10" y="40" width="134" height="56" rx="10" fill="color-mix(in srgb, var(--ios-blue) 14%, var(--ios-card))" stroke="var(--ios-blue)" stroke-width="2"/><text class="lbl" x="77" y="64" text-anchor="middle">Store</text><text class="lbl-sm" x="77" y="82" text-anchor="middle">bits and types</text><line class="axis" x1="148" y1="68" x2="166" y2="68"/><polygon points="166,63 166,73 171,68" fill="var(--ios-text-tertiary)"/><rect x="172" y="40" width="134" height="56" rx="10" fill="color-mix(in srgb, var(--ios-blue) 14%, var(--ios-card))" stroke="var(--ios-blue)" stroke-width="2"/><text class="lbl" x="239" y="64" text-anchor="middle">Compute</text><text class="lbl-sm" x="239" y="82" text-anchor="middle">expressions</text><line class="axis" x1="310" y1="68" x2="328" y2="68"/><polygon points="328,63 328,73 333,68" fill="var(--ios-text-tertiary)"/><rect x="334" y="40" width="134" height="56" rx="10" fill="color-mix(in srgb, var(--ios-blue) 14%, var(--ios-card))" stroke="var(--ios-blue)" stroke-width="2"/><text class="lbl" x="401" y="64" text-anchor="middle">Repeat</text><text class="lbl-sm" x="401" y="82" text-anchor="middle">loops, functions</text><line class="axis" x1="472" y1="68" x2="490" y2="68"/><polygon points="490,63 490,73 495,68" fill="var(--ios-text-tertiary)"/><rect x="496" y="40" width="134" height="56" rx="10" fill="color-mix(in srgb, var(--ios-blue) 14%, var(--ios-card))" stroke="var(--ios-blue)" stroke-width="2"/><text class="lbl" x="563" y="64" text-anchor="middle">Check</text><text class="lbl-sm" x="563" y="82" text-anchor="middle">error, tolerance</text></svg><figcaption>The chain of every numerical program.</figcaption></figure>
+<div class="card"><h3>Master reference</h3><div class="ref-wrap"><table class="ref"><tr><th>Idea</th><th>Rule</th><th>Common trap</th></tr><tr><td class="name">Binary to decimal</td><td class="formula">weights 1, 2, 4, 8 from the right</td><td class="">Weights start at the right</td></tr><tr><td class="name">Two’s complement</td><td class="formula">invert all bits, then add 1</td><td class="">Inverting alone is not enough</td></tr><tr><td class="name">n-bit range</td><td class="formula">unsigned 0 to 2<sup>n</sup> − 1; signed −2<sup>n−1</sup> to 2<sup>n−1</sup> − 1</td><td class="">One more negative than positive</td></tr><tr><td class="name">Resolution</td><td class="formula">range ÷ 2<sup>n</sup></td><td class="">Divide by the number of levels</td></tr><tr><td class="name">Float comparison</td><td class="formula">abs(a − b) &lt; tolerance</td><td class="">0.1 + 0.2 == 0.3 is False</td></tr><tr><td class="name">Relative error</td><td class="formula">|true − approx| ÷ |true|</td><td class="">Divide by the true value</td></tr><tr><td class="name">Precedence</td><td class="formula">** then * / // % then + −</td><td class="">Not left to right</td></tr><tr><td class="name">Division</td><td class="formula"><code>/</code> true; <code>//</code> floor; <code>%</code> remainder</td><td class="">−7 // 2 is −4</td></tr><tr><td class="name">Logic</td><td class="formula"><code>not</code> then <code>and</code> then <code>or</code></td><td class="">and binds tighter than or</td></tr><tr><td class="name">Slicing</td><td class="formula"><code>a[i:j:k]</code> includes i, excludes j</td><td class="">Indices start at 0</td></tr><tr><td class="name">Copy and alias</td><td class="formula"><code>b = a</code> shares the list</td><td class="">Use <code>a.copy()</code></td></tr><tr><td class="name">range</td><td class="formula"><code>range(a, b, k)</code> stops before b</td><td class="">The end value is not included</td></tr><tr><td class="name">Recursion</td><td class="formula">a base case and a step towards it</td><td class="">No base case, no stop</td></tr><tr><td class="name">Binary search</td><td class="formula">⌊log<sub>2</sub> n⌋ + 1 looks</td><td class="">The list must be sorted</td></tr><tr><td class="name">Complexity</td><td class="formula">time ∝ n, n log n or n<sup>2</sup></td><td class="">Factor of n² means 9 times for 3 times n</td></tr><tr><td class="name">Newton</td><td class="formula">x<sub>n+1</sub> = x<sub>n</sub> − f ÷ f′</td><td class="">Needs a good start</td></tr><tr><td class="name">Trapezoid and Simpson</td><td class="formula">weights 1, 2, …, 2, 1 and 1, 4, 2, …, 4, 1</td><td class="">End points are counted once</td></tr><tr><td class="name">Euler</td><td class="formula">y<sub>n+1</sub> = y<sub>n</sub> + h f(x<sub>n</sub>, y<sub>n</sub>)</td><td class="">Error is proportional to h</td></tr></table></div></div>
+<div class="card"><h3>Terms used in this file</h3><div class="ref-wrap"><table class="ref"><tr><th>Term</th><th>Meaning</th></tr><tr><td class="name">Bit / byte</td><td class="">One binary digit; eight bits</td></tr><tr><td class="name">Two’s complement</td><td class="">The way a computer stores negative integers</td></tr><tr><td class="name">Overflow</td><td class="">A result too large for the bits available</td></tr><tr><td class="name">Machine epsilon</td><td class="">The gap between 1 and the next number a float can store</td></tr><tr><td class="name">Round-off error</td><td class="">Error from storing a number with limited digits</td></tr><tr><td class="name">Truncation error</td><td class="">Error from stopping a series or method early</td></tr><tr><td class="name">Cancellation</td><td class="">Loss of digits when two nearly equal numbers are subtracted</td></tr><tr><td class="name">Variable</td><td class="">A name attached to a stored value</td></tr><tr><td class="name">Expression</td><td class="">Values and operators that evaluate to one value</td></tr><tr><td class="name">Index</td><td class="">The position of an item in a list, counted from 0</td></tr><tr><td class="name">Function</td><td class="">A named block of code that takes inputs and returns a value</td></tr><tr><td class="name">Recursion</td><td class="">A function that calls itself on a simpler case</td></tr><tr><td class="name">Algorithm</td><td class="">A finite list of steps that solves a problem</td></tr><tr><td class="name">Complexity</td><td class="">How the work grows as the input size grows</td></tr><tr><td class="name">Iteration</td><td class="">One pass of a loop or of a numerical method</td></tr></table></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 1</div>
+<h2>The Ten Blocks</h2>
+<p>One card per block, with the rule and the trap to avoid.</p>
+<div class="card"><div class="conv-tag">Block 1 · Number systems</div><h3>Binary, hexadecimal, two’s complement</h3><div class="math">n bits give 2ⁿ values</div><div class="key"><strong>Rule:</strong> Hexadecimal groups binary in fours. A negative number is stored by invert and add 1. Resolution is range ÷ 2ⁿ.</div></div>
+<div class="card"><div class="conv-tag">Block 2 · Floating point and error</div><h3>Stored numbers are not exact</h3><div class="math">abs(a − b) < tolerance</div><div class="key"><strong>Rule:</strong> A decimal like 0.1 has no exact binary form. Never test floats with ==. Subtracting close numbers loses digits.</div></div>
+<div class="card"><div class="conv-tag">Block 3 · Expressions and types</div><h3>Trace the order of evaluation</h3><div class="math">** → * / // % → + −</div><div class="key"><strong>Rule:</strong> / gives a float, // floors, % is the remainder. A right-hand side is fully evaluated before assignment.</div></div>
+<div class="card"><div class="conv-tag">Block 4 · Conditionals and logic</div><h3>First true branch wins</h3><div class="math">not → and → or</div><div class="key"><strong>Rule:</strong> Test the strictest condition first. and stops early. De Morgan turns not (A and B) into not A or not B.</div></div>
+<div class="card"><div class="conv-tag">Block 5 · Loops</div><h3>Count the passes</h3><div class="math">range(a, b, k)</div><div class="key"><strong>Rule:</strong> The end is excluded. A loop variable keeps its last value. Nested loops multiply; a dependent inner limit adds.</div></div>
+<div class="card"><div class="conv-tag">Block 6 · Lists and arrays</div><h3>Index from zero</h3><div class="math">a[i:j:k]</div><div class="key"><strong>Rule:</strong> A slice excludes the end. b = a is an alias, not a copy. A comprehension is a loop in one line.</div></div>
+<div class="card"><div class="conv-tag">Block 7 · Functions</div><h3>Input, work, return</h3><div class="math">def f(x): return …</div><div class="key"><strong>Rule:</strong> No return gives None. A name assigned inside is local. Recursion needs a base case.</div></div>
+<div class="card"><div class="conv-tag">Block 8 · Algorithms and complexity</div><h3>Count the work</h3><div class="math">binary search: ⌊log₂ n⌋ + 1</div><div class="key"><strong>Rule:</strong> Bubble sort makes n(n − 1)/2 comparisons. Binary search needs a sorted list. A work ratio follows the power of n.</div></div>
+<div class="card"><div class="conv-tag">Block 9 · Numerical methods</div><h3>Repeat until the error is small</h3><div class="math">x_{n+1} = x_n − f/f′</div><div class="key"><strong>Rule:</strong> Bisection halves the interval. Simpson beats the trapezoid rule. Euler’s error is proportional to the step.</div></div>
+<div class="card"><div class="conv-tag">Block 10 · Matrices, data and text</div><h3>Rows times columns</h3><div class="math">C_ij = Σ A_ik B_kj</div><div class="key"><strong>Rule:</strong> A matrix product is not entry by entry. Split text, then convert it to numbers. A dictionary is looked up by key.</div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 1</div>
+<h2>Number systems</h2>
+<p>Questions 1–10. Convert, add and range-check in binary and hexadecimal.</p>
+<div class="problem"><div class="problem-label">Question 1</div><div class="problem-q">Convert 1101<sub>2</sub> to decimal.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Weights from the right are 1, 2, 4, 8.</div><div class="step"><span class="tag">2</span>1 × 8 + 1 × 4 + 0 × 2 + 1 × 1 = 13.</div><div class="ans"><strong>Answer</strong><em>13</em></div><div class="key"><strong>Common slips:</strong> The weights start at 1 on the right, not on the left; starting from the left gives 11.</div></div></div>
+<div class="problem"><div class="problem-label">Question 2</div><div class="problem-q">Convert 45 to binary.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Divide by 2 repeatedly and keep the remainders: 45 → 22 r 1, 22 → 11 r 0, 11 → 5 r 1, 5 → 2 r 1, 2 → 1 r 0, 1 → 0 r 1.</div><div class="step"><span class="tag">2</span>Read the remainders from last to first: 101101.</div><div class="step"><span class="tag">3</span>Check: 32 + 8 + 4 + 1 = 45.</div><div class="ans"><strong>Answer</strong><em>101101<sub>2</sub></em></div><div class="key"><strong>Common slips:</strong> The remainders are read from last to first; reading them in the order found gives the number reversed.</div></div></div>
+<div class="problem"><div class="problem-label">Question 3</div><div class="problem-q">Convert 2F<sub>16</sub> to decimal.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Each hexadecimal digit is worth 16 times the digit to its right. F = 15.</div><div class="step"><span class="tag">2</span>2 × 16 + 15 = 47.</div><div class="ans"><strong>Answer</strong><em>47</em></div><div class="key"><strong>Common slips:</strong> Using 10 instead of 16 as the weight gives 35.</div></div></div>
+<div class="problem"><div class="problem-label">Question 4</div><div class="problem-q">Convert 10110111<sub>2</sub> to hexadecimal.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Group the bits in fours from the right: 1011 | 0111.</div><div class="step"><span class="tag">2</span>1011 = 11 = B and 0111 = 7.</div><div class="ans"><strong>Answer</strong><em>B7<sub>16</sub></em></div><div class="key"><strong>Common slips:</strong> Group from the right; a number whose length is not a multiple of four is padded with zeros on the left.</div></div></div>
+<div class="problem"><div class="problem-label">Question 5</div><div class="problem-q">Add 1011<sub>2</sub> + 0110<sub>2</sub> in binary.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Add column by column from the right, carrying 1 when the sum reaches 2.</div><div class="step"><span class="tag">2</span>1 + 0 = 1; 1 + 1 = 10 (write 0, carry 1); 0 + 1 + 1 = 10 (write 0, carry 1); 1 + 0 + 1 = 10.</div><div class="step"><span class="tag">3</span>The result is 10001<sub>2</sub>.</div><div class="step"><span class="tag">4</span>Check: 11 + 6 = 17 = 16 + 1.</div><div class="ans"><strong>Answer</strong><em>10001<sub>2</sub></em></div><div class="key"><strong>Common slips:</strong> The carry out of the top column becomes a fifth bit.</div></div></div>
+<div class="problem"><div class="problem-label">Question 6</div><div class="problem-q">Write −5 as an 8-bit two’s complement number.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>+5 is 00000101.</div><div class="step"><span class="tag">2</span>Invert every bit: 11111010.</div><div class="step"><span class="tag">3</span>Add 1: 11111011.</div><div class="ans"><strong>Answer</strong><em>11111011</em></div><div class="key"><strong>Common slips:</strong> Inverting alone gives the one’s complement, 11111010, which is −5 minus one in two’s complement.</div></div></div>
+<div class="problem"><div class="problem-label">Question 7</div><div class="problem-q">The 8-bit two’s complement number 11110000 is read as a decimal. What is it?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The leading bit is 1, so the number is negative.</div><div class="step"><span class="tag">2</span>Invert: 00001111. Add 1: 00010000 = 16.</div><div class="step"><span class="tag">3</span>The value is −16.</div><div class="ans"><strong>Answer</strong><em>−16</em></div><div class="key"><strong>Common slips:</strong> Reading it as unsigned gives 240.</div></div></div>
+<div class="problem"><div class="problem-label">Question 8</div><div class="problem-q">Find the smallest and largest 8-bit two’s complement integers.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>One bit is the sign, leaving 7 bits for the size.</div><div class="step"><span class="tag">2</span>Largest: 01111111 = 127. Smallest: 10000000 = −128.</div><div class="ans"><strong>Answer</strong><em>−128 and 127</em></div><div class="key"><strong>Common slips:</strong> The range is not symmetric: there is one more negative number than positive.</div></div></div>
+<div class="problem"><div class="problem-label">Question 9</div><div class="problem-q">How many bits are needed to store 1000 distinct values?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>n bits give 2<sup>n</sup> values.</div><div class="step"><span class="tag">2</span>2<sup>9</sup> = 512 is too small; 2<sup>10</sup> = 1024 is enough.</div><div class="ans"><strong>Answer</strong><em>10 bits</em></div><div class="key"><strong>Common slips:</strong> Rounding log<sub>2</sub> 1000 = 9.97 down to 9 leaves 488 values with no code.</div></div></div>
+<div class="problem"><div class="problem-label">Question 10</div><div class="problem-q">A 12-bit analogue-to-digital converter measures 0 V to 5 V. Taking the step as range ÷ 2<sup>12</sup>, find its resolution.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The converter has 2<sup>12</sup> = 4096 levels.</div><div class="step"><span class="tag">2</span>Step = 5 ÷ 4096 = 0.00122 V.</div><div class="ans"><strong>Answer</strong><em>≈ 1.22 mV</em></div><div class="key"><strong>Common slips:</strong> Dividing by 12 instead of 4096 gives 0.42 V.</div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 2</div>
+<h2>Floating point and errors</h2>
+<p>Questions 11–20. Stored numbers carry a small error; know where it comes from.</p>
+<div class="problem"><div class="problem-label">Question 11</div><div class="problem-q">Convert 0.101<sub>2</sub> to decimal.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Weights after the point are 1/2, 1/4, 1/8.</div><div class="step"><span class="tag">2</span>1/2 + 0 + 1/8 = 0.625.</div><div class="ans"><strong>Answer</strong><em>0.625</em></div><div class="key"><strong>Common slips:</strong> The first digit after the point is worth 1/2, not 1/10.</div></div></div>
+<div class="problem"><div class="problem-label">Question 12</div><div class="problem-q">What does this print?<pre class="code">print(0.1 + 0.2 == 0.3)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>0.1 and 0.2 have no exact binary form, so each is stored with a tiny error.</div><div class="step"><span class="tag">2</span>Their sum is 0.30000000000000004, which is not the stored value of 0.3.</div><div class="step"><span class="tag">3</span>To compare floats, test whether the difference is smaller than a tolerance.</div><div class="ans"><strong>Answer</strong><em>False</em></div><div class="key"><strong>Common slips:</strong> The test is exact; it does not allow for round-off.</div></div></div>
+<div class="problem"><div class="problem-label">Question 13</div><div class="problem-q">A double precision number has a 52-bit fraction. Write the gap between 1 and the next larger number it can store.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The next number above 1 changes the last fraction bit.</div><div class="step"><span class="tag">2</span>That bit is worth 2<sup>−52</sup> ≈ 2.22 × 10<sup>−16</sup>.</div><div class="ans"><strong>Answer</strong><em>2<sup>−52</sup> ≈ 2.22 × 10<sup>−16</sup></em></div><div class="key"><strong>Common slips:</strong> This is machine epsilon; it gives about 15 to 16 correct decimal digits.</div></div></div>
+<div class="problem"><div class="problem-label">Question 14</div><div class="problem-q">The true value is 3.14159 and an approximation is 3.14. Find the absolute and relative errors.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Absolute error = |3.14159 − 3.14| = 0.00159.</div><div class="step"><span class="tag">2</span>Relative error = 0.00159 ÷ 3.14159 = 5.06 × 10<sup>−4</sup>, that is 0.0506%.</div><div class="ans"><strong>Answer</strong><em>0.00159 and 0.0506%</em></div><div class="key"><strong>Common slips:</strong> Relative error divides by the true value, not by the approximation.</div></div></div>
+<div class="problem"><div class="problem-label">Question 15</div><div class="problem-q">1/3 is stored as 0.333 (3 significant figures). Find the result of 3 × 0.333 and its error from 1.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>3 × 0.333 = 0.999.</div><div class="step"><span class="tag">2</span>Error = 1 − 0.999 = 0.001.</div><div class="ans"><strong>Answer</strong><em>0.999, error 0.001</em></div><div class="key"><strong>Common slips:</strong> Round-off in each stored number carries through the arithmetic.</div></div></div>
+<div class="problem"><div class="problem-label">Question 16</div><div class="problem-q">Each of 0.12345678 and 0.12345600 is accurate to 8 significant figures. How many significant figures does their difference keep?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>0.12345678 − 0.12345600 = 0.00000078.</div><div class="step"><span class="tag">2</span>Only the digits 7 and 8 survive: 2 significant figures.</div><div class="ans"><strong>Answer</strong><em>2</em></div><div class="key"><strong>Common slips:</strong> This loss is called subtractive cancellation; avoid subtracting two nearly equal numbers.</div></div></div>
+<div class="problem"><div class="problem-label">Question 17</div><div class="problem-q">Estimate e<sup>0.1</sup> using 1 + x + x<sup>2</sup>/2 and find the truncation error. (e<sup>0.1</sup> = 1.105171 to 6 decimals.)</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>1 + 0.1 + 0.005 = 1.105.</div><div class="step"><span class="tag">2</span>Error = 1.105171 − 1.105 = 0.000171 ≈ 1.7 × 10<sup>−4</sup>.</div><div class="step"><span class="tag">3</span>The first dropped term is x<sup>3</sup>/6 = 0.000167, which accounts for almost all of it.</div><div class="ans"><strong>Answer</strong><em>1.105; error ≈ 1.7 × 10<sup>−4</sup></em></div><div class="key"><strong>Common slips:</strong> Truncation error comes from the method; round-off comes from storage.</div></div></div>
+<div class="problem"><div class="problem-label">Question 18</div><div class="problem-q">An 8-bit unsigned counter holds 200. 100 is added to it. What does the counter now hold?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The largest value is 255 and 200 + 100 = 300.</div><div class="step"><span class="tag">2</span>The counter wraps around: 300 − 256 = 44.</div><div class="ans"><strong>Answer</strong><em>44</em></div><div class="key"><strong>Common slips:</strong> The result is the remainder on division by 2<sup>8</sup>.</div></div></div>
+<div class="problem"><div class="problem-label">Question 19</div><div class="problem-q">What does this print?<pre class="code">s = 0.0
+for i in range(10):
+    s += 0.1
+print(s)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Each addition of 0.1 carries a small stored error.</div><div class="step"><span class="tag">2</span>After ten additions the errors have built up to just under 1.</div><div class="step"><span class="tag">3</span>The loop result is therefore not exactly 1.0.</div><div class="ans"><strong>Answer</strong><em>0.9999999999999999</em></div><div class="key"><strong>Common slips:</strong> The value is close to 1 but a test s == 1.0 would be False.</div></div></div>
+<div class="problem"><div class="problem-label">Question 20</div><div class="problem-q">Multiply 2.5 by 3.14 and give the answer to the correct number of significant figures.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>2.5 × 3.14 = 7.85.</div><div class="step"><span class="tag">2</span>The factor 2.5 has 2 significant figures, so the answer is given to 2: 7.9.</div><div class="ans"><strong>Answer</strong><em>7.9</em></div><div class="key"><strong>Common slips:</strong> A product keeps the smallest number of significant figures among its factors.</div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 3</div>
+<h2>Variables, types and expressions</h2>
+<p>Questions 21–30. Work out the value by following the order of evaluation.</p>
+<div class="problem"><div class="problem-label">Question 21</div><div class="problem-q">What does this print?<pre class="code">print(7 / 2)
+print(7 // 2)
+print(7 % 2)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>/ is true division: 3.5.</div><div class="step"><span class="tag">2</span>// is floor division: the quotient rounded down, 3.</div><div class="step"><span class="tag">3</span>% is the remainder: 7 − 2 × 3 = 1.</div><div class="ans"><strong>Answer</strong><em>3.5, 3, 1</em></div><div class="key"><strong>Common slips:</strong> // does not round: it floors.</div></div></div>
+<div class="problem"><div class="problem-label">Question 22</div><div class="problem-q">What does this print?<pre class="code">x = 3
+y = x ** 2 + 2 * x
+print(y)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>x ** 2 = 9 and 2 * x = 6.</div><div class="step"><span class="tag">2</span>9 + 6 = 15.</div><div class="ans"><strong>Answer</strong><em>15</em></div><div class="key"><strong>Common slips:</strong> ** is power, not multiplication.</div></div></div>
+<div class="problem"><div class="problem-label">Question 23</div><div class="problem-q">What does this print?<pre class="code">print(10 - 2 * 3 ** 2)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Order: ** first, then *, then −.</div><div class="step"><span class="tag">2</span>3 ** 2 = 9, 2 * 9 = 18, 10 − 18 = −8.</div><div class="ans"><strong>Answer</strong><em>−8</em></div><div class="key"><strong>Common slips:</strong> Working left to right would give (10 − 2) × 9 = 72, which is wrong.</div></div></div>
+<div class="problem"><div class="problem-label">Question 24</div><div class="problem-q">What does this print?<pre class="code">print(-7 // 2)
+print(-7 % 2)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Floor division rounds toward −∞: −7 ÷ 2 = −3.5 floors to −4.</div><div class="step"><span class="tag">2</span>The remainder satisfies −7 = 2 × (−4) + 1, so it is 1.</div><div class="ans"><strong>Answer</strong><em>−4 and 1</em></div><div class="key"><strong>Common slips:</strong> −3 would be truncation toward zero, which Python does not use here.</div></div></div>
+<div class="problem"><div class="problem-label">Question 25</div><div class="problem-q">What does this print?<pre class="code">print(4 / 2)
+print(type(4 / 2))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>/ always gives a float in Python 3.</div><div class="step"><span class="tag">2</span>4 / 2 is therefore 2.0, of type float.</div><div class="ans"><strong>Answer</strong><em>2.0 and <class 'float'></em></div><div class="key"><strong>Common slips:</strong> // would give the integer 2.</div></div></div>
+<div class="problem"><div class="problem-label">Question 26</div><div class="problem-q">What does this print?<pre class="code">a = 5
+b = a
+a = a + 1
+print(b)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>b = a copies the value 5.</div><div class="step"><span class="tag">2</span>a = a + 1 creates a new value for a; b keeps 5.</div><div class="ans"><strong>Answer</strong><em>5</em></div><div class="key"><strong>Common slips:</strong> Integers cannot be changed in place, so b does not follow a.</div></div></div>
+<div class="problem"><div class="problem-label">Question 27</div><div class="problem-q">What does this print?<pre class="code">a, b = 3, 4
+a, b = b, a - b
+print(a, b)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The right side is evaluated first, using the old values: (4, 3 − 4) = (4, −1).</div><div class="step"><span class="tag">2</span>Then a = 4 and b = −1.</div><div class="ans"><strong>Answer</strong><em>4 −1</em></div><div class="key"><strong>Common slips:</strong> If a is updated first, b would use the new a: that gives 4 and 0.</div></div></div>
+<div class="problem"><div class="problem-label">Question 28</div><div class="problem-q">What does this print?<pre class="code">print(&#x27;12&#x27; + &#x27;3&#x27;)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The quotes make both items strings.</div><div class="step"><span class="tag">2</span>+ joins strings, so the result is the text 123.</div><div class="ans"><strong>Answer</strong><em>123 (text, not 15)</em></div><div class="key"><strong>Common slips:</strong> int('12') + 3 would give 15.</div></div></div>
+<div class="problem"><div class="problem-label">Question 29</div><div class="problem-q">What does this print?<pre class="code">print(round(2.5), round(3.5))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Python rounds a half to the nearest even number.</div><div class="step"><span class="tag">2</span>round(2.5) = 2 and round(3.5) = 4.</div><div class="ans"><strong>Answer</strong><em>2 4</em></div><div class="key"><strong>Common slips:</strong> Rounding every half upwards would give 3 4.</div></div></div>
+<div class="problem"><div class="problem-label">Question 30</div><div class="problem-q">What does this print?<pre class="code">m = 1000
+v = 72 / 3.6
+print(0.5 * m * v ** 2)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>72 km/h ÷ 3.6 = 20 m/s.</div><div class="step"><span class="tag">2</span>Kinetic energy = ½ m v² = 0.5 × 1000 × 400 = 200 000 J.</div><div class="ans"><strong>Answer</strong><em>200000.0</em></div><div class="key"><strong>Common slips:</strong> Forgetting to convert km/h to m/s gives 2 592 000.0.</div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 4</div>
+<h2>Conditionals and logic</h2>
+<p>Questions 31–40. Follow the first branch whose test is true.</p>
+<div class="problem"><div class="problem-label">Question 31</div><div class="problem-q">What does this print?<pre class="code">print(not (True and False))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>True and False is False.</div><div class="step"><span class="tag">2</span>not False is True.</div><div class="ans"><strong>Answer</strong><em>True</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 32</div><div class="problem-q">What does this print?<pre class="code">print(True or False and False)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>and binds tighter than or.</div><div class="step"><span class="tag">2</span>False and False = False, then True or False = True.</div><div class="ans"><strong>Answer</strong><em>True</em></div><div class="key"><strong>Common slips:</strong> Working left to right gives (True or False) and False = False.</div></div></div>
+<div class="problem"><div class="problem-label">Question 33</div><div class="problem-q">What does this print?<pre class="code">x = 15
+if x &gt; 20:
+    print(&quot;A&quot;)
+elif x &gt; 10:
+    print(&quot;B&quot;)
+else:
+    print(&quot;C&quot;)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>x > 20 is False, so the first branch is skipped.</div><div class="step"><span class="tag">2</span>x > 10 is True, so B is printed and the rest is skipped.</div><div class="ans"><strong>Answer</strong><em>B</em></div><div class="key"><strong>Common slips:</strong> Once a branch is chosen, the later branches are never tested.</div></div></div>
+<div class="problem"><div class="problem-label">Question 34</div><div class="problem-q">What does this print?<pre class="code">print(1 &lt; 5 &lt; 3)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>A chained comparison means 1 < 5 and 5 < 3.</div><div class="step"><span class="tag">2</span>5 < 3 is False.</div><div class="ans"><strong>Answer</strong><em>False</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 35</div><div class="problem-q">Write an expression equal to <code>not (A and B)</code> using only <code>not</code> and <code>or</code>.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>De Morgan: the negation of an and is the or of the negations.</div><div class="ans"><strong>Answer</strong><em>not A or not B</em></div><div class="key"><strong>Common slips:</strong> not (A or B) is different: that equals (not A) and (not B).</div></div></div>
+<div class="problem"><div class="problem-label">Question 36</div><div class="problem-q">What does this print?<pre class="code">print(True + True + False)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>True counts as 1 and False as 0.</div><div class="step"><span class="tag">2</span>1 + 1 + 0 = 2.</div><div class="ans"><strong>Answer</strong><em>2</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 37</div><div class="problem-q">A score of 65 is graded A for 70 or more, B for 60 or more, C for 50 or more. What does this print?<pre class="code">score = 65
+if score &gt;= 70:
+    print(&quot;A&quot;)
+elif score &gt;= 60:
+    print(&quot;B&quot;)
+elif score &gt;= 50:
+    print(&quot;C&quot;)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>65 ≥ 70 is False, 65 ≥ 60 is True.</div><div class="step"><span class="tag">2</span>B is printed and the C test is not reached.</div><div class="ans"><strong>Answer</strong><em>B</em></div><div class="key"><strong>Common slips:</strong> Testing the lowest limit first would give C for every pass mark.</div></div></div>
+<div class="problem"><div class="problem-label">Question 38</div><div class="problem-q">What does this print?<pre class="code">print(6 &amp; 3, 6 | 3, 6 ^ 3)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>6 = 110 and 3 = 011 in binary.</div><div class="step"><span class="tag">2</span>AND: 010 = 2. OR: 111 = 7. XOR: 101 = 5.</div><div class="ans"><strong>Answer</strong><em>2 7 5</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 39</div><div class="problem-q">Does this raise an error? What does it print?<pre class="code">x = 0
+print(x != 0 and 10 / x &gt; 1)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>x != 0 is False.</div><div class="step"><span class="tag">2</span>and stops as soon as the first part is False, so 10 / x is never evaluated.</div><div class="ans"><strong>Answer</strong><em>no error; prints False</em></div><div class="key"><strong>Common slips:</strong> Reversing the order would raise a division-by-zero error.</div></div></div>
+<div class="problem"><div class="problem-label">Question 40</div><div class="problem-q">A leap year is divisible by 4 and not by 100, or divisible by 400. What does this print?<pre class="code">year = 1900
+print(year % 4 == 0 and year % 100 != 0 or year % 400 == 0)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>1900 % 4 == 0 is True but 1900 % 100 != 0 is False, so the first group is False.</div><div class="step"><span class="tag">2</span>1900 % 400 = 300, so the second group is False too.</div><div class="ans"><strong>Answer</strong><em>False</em></div><div class="key"><strong>Common slips:</strong> 2000 would print True because it is divisible by 400.</div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 5</div>
+<h2>Loops</h2>
+<p>Questions 41–50. Count the passes and track the variables.</p>
+<div class="problem"><div class="problem-label">Question 41</div><div class="problem-q">What does this print?<pre class="code">s = 0
+for i in range(1, 5):
+    s += i
+print(s)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>range(1, 5) gives 1, 2, 3, 4; the 5 is not included.</div><div class="step"><span class="tag">2</span>1 + 2 + 3 + 4 = 10.</div><div class="ans"><strong>Answer</strong><em>10</em></div><div class="key"><strong>Common slips:</strong> Including 5 would give 15.</div></div></div>
+<div class="problem"><div class="problem-label">Question 42</div><div class="problem-q">How many times does the body run, and what is the last value of i?<pre class="code">count = 0
+for i in range(2, 20, 3):
+    count += 1
+    last = i
+print(count, last)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The values are 2, 5, 8, 11, 14, 17; the next would be 20, which is excluded.</div><div class="step"><span class="tag">2</span>That is 6 values, last 17.</div><div class="ans"><strong>Answer</strong><em>6 times, last i = 17</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 43</div><div class="problem-q">What does this print?<pre class="code">n = 1
+while n &lt; 50:
+    n *= 2
+print(n)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>n goes 1, 2, 4, 8, 16, 32 and then 64.</div><div class="step"><span class="tag">2</span>At 64 the test n < 50 fails and the loop stops, so the final value is 64.</div><div class="ans"><strong>Answer</strong><em>64</em></div><div class="key"><strong>Common slips:</strong> The loop ends after n passes 50, not when it equals 50.</div></div></div>
+<div class="problem"><div class="problem-label">Question 44</div><div class="problem-q">What does this print?<pre class="code">f = 1
+for k in range(1, 6):
+    f *= k
+print(f)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>f becomes 1, 2, 6, 24, 120.</div><div class="step"><span class="tag">2</span>This is 5! = 120.</div><div class="ans"><strong>Answer</strong><em>120</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 45</div><div class="problem-q">How many times does the inner statement run?<pre class="code">count = 0
+for i in range(3):
+    for j in range(4):
+        count += 1
+print(count)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The inner loop runs 4 times for each of the 3 outer passes.</div><div class="step"><span class="tag">2</span>3 × 4 = 12.</div><div class="ans"><strong>Answer</strong><em>12</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 46</div><div class="problem-q">How many times does the inner statement run?<pre class="code">count = 0
+for i in range(1, 4):
+    for j in range(i):
+        count += 1
+print(count)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The inner loop runs i times: 1, 2, 3.</div><div class="step"><span class="tag">2</span>1 + 2 + 3 = 6.</div><div class="ans"><strong>Answer</strong><em>6</em></div><div class="key"><strong>Common slips:</strong> The count here is not 3 × 3 because the inner limit depends on i.</div></div></div>
+<div class="problem"><div class="problem-label">Question 47</div><div class="problem-q">What does this print?<pre class="code">for i in range(10):
+    if i * i &gt; 20:
+        break
+print(i)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>i = 4 gives 16, not above 20. i = 5 gives 25, which is above 20.</div><div class="step"><span class="tag">2</span>The loop breaks with i = 5, and that value is still available.</div><div class="ans"><strong>Answer</strong><em>5</em></div><div class="key"><strong>Common slips:</strong> A loop variable keeps its last value after the loop.</div></div></div>
+<div class="problem"><div class="problem-label">Question 48</div><div class="problem-q">What does this print?<pre class="code">data = [3, 5, 10]
+total = 0
+for d in data:
+    total += d
+print(total / len(data))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The total is 18.</div><div class="step"><span class="tag">2</span>18 ÷ 3 = 6.0.</div><div class="ans"><strong>Answer</strong><em>6.0</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 49</div><div class="problem-q">How many halvings does it take for x to drop below 1?<pre class="code">x = 100
+steps = 0
+while x &gt;= 1:
+    x = x / 2
+    steps += 1
+print(steps)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>x goes 50, 25, 12.5, 6.25, 3.125, 1.5625, 0.78125.</div><div class="step"><span class="tag">2</span>It first falls below 1 after the 7th halving: 2<sup>7</sup> = 128 > 100.</div><div class="ans"><strong>Answer</strong><em>7</em></div><div class="key"><strong>Common slips:</strong> log<sub>2</sub> 100 = 6.64, rounded up, gives 7.</div></div></div>
+<div class="problem"><div class="problem-label">Question 50</div><div class="problem-q">A sum of 1000 is invested at 10% a year, added once a year. What is it worth after 3 years (to the nearest unit)?<pre class="code">p = 1000
+for year in range(3):
+    p = p * 1.1
+print(round(p))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Each pass multiplies by 1.1: 1100, 1210, 1331.</div><div class="step"><span class="tag">2</span>Compound growth is 1000 × 1.1<sup>3</sup> = 1331.</div><div class="ans"><strong>Answer</strong><em>1331</em></div><div class="key"><strong>Common slips:</strong> Simple interest would give 1300.</div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 6</div>
+<h2>Lists and arrays</h2>
+<p>Questions 51–60. Index from zero, slice to the end minus one, and watch for aliases.</p>
+<div class="problem"><div class="problem-label">Question 51</div><div class="problem-q">What does this print?<pre class="code">a = [10, 20, 30, 40, 50]
+print(a[2], a[-2])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Index 0 is the first item, so a[2] is the third: 30.</div><div class="step"><span class="tag">2</span>a[-2] counts from the end: the second from last, 40.</div><div class="ans"><strong>Answer</strong><em>30 40</em></div><div class="key"><strong>Common slips:</strong> a[2] is not 20; counting starts at 0.</div></div></div>
+<div class="problem"><div class="problem-label">Question 52</div><div class="problem-q">What does this print?<pre class="code">a = [10, 20, 30, 40, 50]
+print(a[1:4])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>A slice a[i:j] runs from index i up to but not including j.</div><div class="step"><span class="tag">2</span>Indices 1, 2, 3 give 20, 30, 40.</div><div class="ans"><strong>Answer</strong><em>[20, 30, 40]</em></div><div class="key"><strong>Common slips:</strong> Including the item at index 4 would give [20, 30, 40, 50].</div></div></div>
+<div class="problem"><div class="problem-label">Question 53</div><div class="problem-q">What does this print?<pre class="code">a = [10, 20, 30, 40, 50]
+print(a[::2])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The third number in a slice is the step.</div><div class="step"><span class="tag">2</span>Step 2 from the start takes indices 0, 2, 4.</div><div class="ans"><strong>Answer</strong><em>[10, 30, 50]</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 54</div><div class="problem-q">What does this print?<pre class="code">b = [1, 2]
+b.append(3)
+b += [4]
+print(len(b))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>append adds the single item 3: [1, 2, 3].</div><div class="step"><span class="tag">2</span>+= [4] adds one more item: [1, 2, 3, 4].</div><div class="ans"><strong>Answer</strong><em>4</em></div><div class="key"><strong>Common slips:</strong> append([3, 4]) would add one item that is itself a list.</div></div></div>
+<div class="problem"><div class="problem-label">Question 55</div><div class="problem-q">What does this print?<pre class="code">a = [1, 2, 3]
+b = a
+b[0] = 9
+print(a)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>b = a gives the list a second name; it does not copy it.</div><div class="step"><span class="tag">2</span>Changing b[0] changes the one list that both names point to.</div><div class="ans"><strong>Answer</strong><em>[9, 2, 3]</em></div><div class="key"><strong>Common slips:</strong> Use b = a.copy() or a[:] to get an independent list.</div></div></div>
+<div class="problem"><div class="problem-label">Question 56</div><div class="problem-q">What does this print?<pre class="code">print([x ** 2 for x in range(5)])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>range(5) gives 0 to 4.</div><div class="step"><span class="tag">2</span>Each is squared.</div><div class="ans"><strong>Answer</strong><em>[0, 1, 4, 9, 16]</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 57</div><div class="problem-q">What does this print?<pre class="code">print([x for x in range(10) if x % 3 == 0])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Only values with remainder 0 on division by 3 are kept.</div><div class="ans"><strong>Answer</strong><em>[0, 3, 6, 9]</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 58</div><div class="problem-q">Find the dot product of the two lists.<pre class="code">a = [1, 2, 3]
+b = [4, 5, 6]
+print(sum(x * y for x, y in zip(a, b)))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Multiply matching items: 4, 10, 18.</div><div class="step"><span class="tag">2</span>Add them: 32.</div><div class="ans"><strong>Answer</strong><em>32</em></div><div class="key"><strong>Common slips:</strong> a * b on two plain lists is an error; the products must be taken item by item.</div></div></div>
+<div class="problem"><div class="problem-label">Question 59</div><div class="problem-q">What does this print?<pre class="code">m = [[1, 2, 3], [4, 5, 6]]
+print(m[1][2])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>m[1] is the second row, [4, 5, 6].</div><div class="step"><span class="tag">2</span>Its index 2 is the third item, 6.</div><div class="ans"><strong>Answer</strong><em>6</em></div><div class="key"><strong>Common slips:</strong> The first index picks the row and the second picks the column.</div></div></div>
+<div class="problem"><div class="problem-label">Question 60</div><div class="problem-q">What happens when this runs?<pre class="code">a = [1, 2, 3, 4, 5]
+print(a[5])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>A list of 5 items has indices 0 to 4.</div><div class="step"><span class="tag">2</span>Index 5 is out of range, so Python raises an IndexError.</div><div class="ans"><strong>Answer</strong><em>IndexError</em></div><div class="key"><strong>Common slips:</strong> The last valid index is len(a) − 1.</div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 7</div>
+<h2>Functions and recursion</h2>
+<p>Questions 61–70. Follow the inputs in and the value out.</p>
+<div class="problem"><div class="problem-label">Question 61</div><div class="problem-q">What does this print?<pre class="code">def f(x):
+    return 2 * x + 1
+print(f(f(2)))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>f(2) = 5.</div><div class="step"><span class="tag">2</span>f(5) = 11.</div><div class="ans"><strong>Answer</strong><em>11</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 62</div><div class="problem-q">What does this print?<pre class="code">def g(a, b=3):
+    return a * b
+print(g(4) + g(4, 2))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>g(4) uses the default b = 3: 12.</div><div class="step"><span class="tag">2</span>g(4, 2) uses b = 2: 8.</div><div class="step"><span class="tag">3</span>12 + 8 = 20.</div><div class="ans"><strong>Answer</strong><em>20</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 63</div><div class="problem-q">What does this print?<pre class="code">x = 5
+def h():
+    x = 10
+    return x
+h()
+print(x)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Inside h, x = 10 makes a new local variable.</div><div class="step"><span class="tag">2</span>The outside x is untouched, so it is still 5.</div><div class="ans"><strong>Answer</strong><em>5</em></div><div class="key"><strong>Common slips:</strong> To change the outside value the function would need to declare global x, which is bad practice.</div></div></div>
+<div class="problem"><div class="problem-label">Question 64</div><div class="problem-q">What does this print?<pre class="code">def p(x):
+    x + 1
+print(p(2))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>p computes x + 1 but has no return statement.</div><div class="step"><span class="tag">2</span>A function without return gives None.</div><div class="ans"><strong>Answer</strong><em>None</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 65</div><div class="problem-q">How many times is fact called, counting the first call, for fact(4)?<pre class="code">calls = 0
+def fact(n):
+    global calls
+    calls += 1
+    if n &lt;= 1:
+        return 1
+    return n * fact(n - 1)
+fact(4)
+print(calls)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>fact(4) calls fact(3), which calls fact(2), which calls fact(1).</div><div class="step"><span class="tag">2</span>fact(1) returns 1 without another call: 4 calls in all.</div><div class="ans"><strong>Answer</strong><em>4</em></div><div class="key"><strong>Common slips:</strong> The result is 24; the number of calls is 4.</div></div></div>
+<div class="problem"><div class="problem-label">Question 66</div><div class="problem-q">What does fib(6) return? (fib(0) = 0 and fib(1) = 1.)<pre class="code">def fib(n):
+    if n &lt; 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+print(fib(6))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The sequence is 0, 1, 1, 2, 3, 5, 8.</div><div class="step"><span class="tag">2</span>fib(6) is the seventh term, 8.</div><div class="ans"><strong>Answer</strong><em>8</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 67</div><div class="problem-q">What happens when f(3) is called?<pre class="code">def f(n):
+    return n * f(n - 1)
+f(3)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>There is no base case, so f never stops calling itself.</div><div class="step"><span class="tag">2</span>Python gives up when the depth limit is reached and raises RecursionError.</div><div class="ans"><strong>Answer</strong><em>RecursionError</em></div><div class="key"><strong>Common slips:</strong> A recursive function needs a case that returns without calling itself.</div></div></div>
+<div class="problem"><div class="problem-label">Question 68</div><div class="problem-q">What does this print?<pre class="code">def divmod2(a, b):
+    return a // b, a % b
+q, r = divmod2(17, 5)
+print(q, r)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>17 // 5 = 3 and 17 % 5 = 2.</div><div class="step"><span class="tag">2</span>The function returns both as a pair, which is unpacked into q and r.</div><div class="ans"><strong>Answer</strong><em>3 2</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 69</div><div class="problem-q">What does this print?<pre class="code">print(list(map(lambda x: x * x, [1, 2, 3])))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The lambda squares its input.</div><div class="step"><span class="tag">2</span>map applies it to each item.</div><div class="ans"><strong>Answer</strong><em>[1, 4, 9]</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 70</div><div class="problem-q">The power in a resistor is V² ÷ R. What does this print?<pre class="code">def power(V, R):
+    return V ** 2 / R
+print(power(12, 6))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>12² = 144.</div><div class="step"><span class="tag">2</span>144 ÷ 6 = 24.0 W.</div><div class="ans"><strong>Answer</strong><em>24.0</em></div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 8</div>
+<h2>Algorithms and complexity</h2>
+<p>Questions 71–80. Trace the steps and count the work.</p>
+<div class="problem"><div class="problem-label">Question 71</div><div class="problem-q">What is the list after the first pass of bubble sort on [5, 1, 4, 2, 8]?<pre class="code">a = [5, 1, 4, 2, 8]
+for i in range(len(a) - 1):
+    if a[i] &gt; a[i + 1]:
+        a[i], a[i + 1] = a[i + 1], a[i]
+print(a)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Compare neighbours and swap if out of order: 5 > 1 swap, 5 > 4 swap, 5 > 2 swap, 5 < 8 no swap.</div><div class="step"><span class="tag">2</span>The largest value of the unsorted part, 8, ends at the end.</div><div class="ans"><strong>Answer</strong><em>[1, 4, 2, 5, 8]</em></div><div class="key"><strong>Common slips:</strong> One pass does not sort the list; it only moves the largest item into place.</div></div></div>
+<div class="problem"><div class="problem-label">Question 72</div><div class="problem-q">How many comparisons does bubble sort make on 5 items if it does not stop early?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The passes compare 4, 3, 2 and 1 pairs.</div><div class="step"><span class="tag">2</span>4 + 3 + 2 + 1 = 10, which is n(n − 1)/2 with n = 5.</div><div class="ans"><strong>Answer</strong><em>10</em></div><div class="key"><strong>Common slips:</strong> The count grows with n², so doubling the list roughly quadruples the work.</div></div></div>
+<div class="problem"><div class="problem-label">Question 73</div><div class="problem-q">A sorted list holds 16 items. What is the greatest number of comparisons binary search needs?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Each comparison halves the list: 16, 8, 4, 2, 1.</div><div class="step"><span class="tag">2</span>That is 5 looks: ⌊log<sub>2</sub> 16⌋ + 1 = 5.</div><div class="ans"><strong>Answer</strong><em>5</em></div><div class="key"><strong>Common slips:</strong> The list must be sorted for binary search to work.</div></div></div>
+<div class="problem"><div class="problem-label">Question 74</div><div class="problem-q">A linear search for an item that is certainly present is equally likely to find it in any of 100 positions. Find the average number of comparisons.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The number of comparisons is 1 to 100, equally likely.</div><div class="step"><span class="tag">2</span>Average = (1 + 100) ÷ 2 = 50.5.</div><div class="ans"><strong>Answer</strong><em>50.5</em></div><div class="key"><strong>Common slips:</strong> The average is not 100; that is the worst case.</div></div></div>
+<div class="problem"><div class="problem-label">Question 75</div><div class="problem-q">An O(n<sup>2</sup>) routine takes 2 s when n = 1000. Estimate the time when n = 3000.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>The time is proportional to n².</div><div class="step"><span class="tag">2</span>n is 3 times larger, so the time is 3² = 9 times larger: 18 s.</div><div class="ans"><strong>Answer</strong><em>18 s</em></div><div class="key"><strong>Common slips:</strong> A linear algorithm would take 6 s.</div></div></div>
+<div class="problem"><div class="problem-label">Question 76</div><div class="problem-q">About how many comparisons does binary search need for a sorted list of one million items?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>log<sub>2</sub> 10<sup>6</sup> = 6 × 3.32 = 19.93.</div><div class="step"><span class="tag">2</span>Round up: about 20 comparisons.</div><div class="ans"><strong>Answer</strong><em>≈ 20</em></div><div class="key"><strong>Common slips:</strong> A linear search would take up to a million.</div></div></div>
+<div class="problem"><div class="problem-label">Question 77</div><div class="problem-q">Euclid’s method for the greatest common divisor of 48 and 18: how many remainder steps are needed, and what is the answer?<pre class="code">a, b = 48, 18
+steps = 0
+while b:
+    a, b = b, a % b
+    steps += 1
+print(steps, a)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>48 % 18 = 12, then 18 % 12 = 6, then 12 % 6 = 0.</div><div class="step"><span class="tag">2</span>The last non-zero remainder is 6.</div><div class="ans"><strong>Answer</strong><em>3 steps, GCD 6</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 78</div><div class="problem-q">Test whether 91 is prime by trial division up to its square root.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>√91 ≈ 9.5, so test divisors 2, 3, 5, 7.</div><div class="step"><span class="tag">2</span>91 ÷ 7 = 13 exactly.</div><div class="ans"><strong>Answer</strong><em>not prime (7 × 13)</em></div><div class="key"><strong>Common slips:</strong> A number needs to be tested only up to its square root: a larger factor always pairs with a smaller one.</div></div></div>
+<div class="problem"><div class="problem-label">Question 79</div><div class="problem-q">What does this print?<pre class="code">data = [3, 9, 2, 9, 5]
+big = data[0]
+idx = 0
+for i in range(1, len(data)):
+    if data[i] &gt; big:
+        big = data[i]
+        idx = i
+print(big, idx)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>3 is replaced by 9 at index 1.</div><div class="step"><span class="tag">2</span>The second 9 is not greater than 9, so the index stays 1.</div><div class="ans"><strong>Answer</strong><em>9 1</em></div><div class="key"><strong>Common slips:</strong> Using >= would move the index to 3.</div></div></div>
+<div class="problem"><div class="problem-label">Question 80</div><div class="problem-q">How many times does the loop body run?<pre class="code">i = 1
+count = 0
+while i &lt;= 100:
+    i *= 3
+    count += 1
+print(count)</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>i takes the values 1, 3, 9, 27, 81 inside the test; 243 stops it.</div><div class="step"><span class="tag">2</span>The body runs 5 times: 3<sup>4</sup> = 81 ≤ 100 < 243.</div><div class="ans"><strong>Answer</strong><em>5</em></div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 9</div>
+<h2>Numerical methods</h2>
+<p>Questions 81–90. Iterate, bracket and step, and compare with the exact value.</p>
+<div class="problem"><div class="problem-label">Question 81</div><div class="problem-q">Use Newton’s method to find √2: x<sub>n+1</sub> = (x<sub>n</sub> + 2/x<sub>n</sub>)/2, starting at x<sub>0</sub> = 1. Find x<sub>2</sub>.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>x<sub>1</sub> = (1 + 2/1)/2 = 1.5.</div><div class="step"><span class="tag">2</span>x<sub>2</sub> = (1.5 + 2/1.5)/2 = (1.5 + 1.3333)/2 = 1.41667.</div><div class="step"><span class="tag">3</span>Exact √2 = 1.41421, so two steps are already accurate to 3 decimals.</div><div class="ans"><strong>Answer</strong><em>1.4167 (= 17/12)</em></div><div class="key"><strong>Common slips:</strong> Each step roughly doubles the number of correct digits.</div></div></div>
+<div class="problem"><div class="problem-label">Question 82</div><div class="problem-q">Apply bisection to f(x) = x<sup>2</sup> − 2 on [1, 2]. Give the interval after two steps.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Step 1: midpoint 1.5, f(1.5) = 0.25 > 0, so the root is in [1, 1.5].</div><div class="step"><span class="tag">2</span>Step 2: midpoint 1.25, f(1.25) = −0.4375 < 0, so the root is in [1.25, 1.5].</div><div class="ans"><strong>Answer</strong><em>[1.25, 1.5]</em></div><div class="key"><strong>Common slips:</strong> Keep the half in which f changes sign.</div></div></div>
+<div class="problem"><div class="problem-label">Question 83</div><div class="problem-q">Bisection starts with an interval of length 1. How many steps guarantee an error below 0.001?</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>After n steps the length is 1/2<sup>n</sup>.</div><div class="step"><span class="tag">2</span>2<sup>n</sup> > 1000 needs n ≥ 10 (2<sup>10</sup> = 1024).</div><div class="ans"><strong>Answer</strong><em>10</em></div><div class="key"><strong>Common slips:</strong> Nine steps leave 1/512 = 0.00195, which is too large.</div></div></div>
+<div class="problem"><div class="problem-label">Question 84</div><div class="problem-q">Use the trapezoidal rule with 2 strips to estimate the integral of x<sup>2</sup> from 0 to 2.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>h = 1. The values are f(0) = 0, f(1) = 1, f(2) = 4.</div><div class="step"><span class="tag">2</span>T = (h/2)[f(0) + 2f(1) + f(2)] = 0.5(0 + 2 + 4) = 3.</div><div class="step"><span class="tag">3</span>The exact value is 8/3 = 2.667, so the rule overestimates a curve that bends upward.</div><div class="ans"><strong>Answer</strong><em>3</em></div><div class="key"><strong>Common slips:</strong> The middle value is counted twice.</div></div></div>
+<div class="problem"><div class="problem-label">Question 85</div><div class="problem-q">Use Simpson’s rule with 2 strips to estimate the integral of x<sup>2</sup> from 0 to 2.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>h = 1, f(0) = 0, f(1) = 1, f(2) = 4.</div><div class="step"><span class="tag">2</span>S = (h/3)[f(0) + 4f(1) + f(2)] = (1/3)(8) = 8/3.</div><div class="step"><span class="tag">3</span>Simpson’s rule is exact for polynomials up to degree 3.</div><div class="ans"><strong>Answer</strong><em>8/3 ≈ 2.667</em></div><div class="key"><strong>Common slips:</strong> The middle value has weight 4, not 2.</div></div></div>
+<div class="problem"><div class="problem-label">Question 86</div><div class="problem-q">Use Euler’s method for y′ = y, y(0) = 1, with step h = 0.5. Find y(1).</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>y<sub>n+1</sub> = y<sub>n</sub> + h·y<sub>n</sub> = 1.5y<sub>n</sub>.</div><div class="step"><span class="tag">2</span>y(0.5) = 1.5 and y(1) = 2.25.</div><div class="ans"><strong>Answer</strong><em>2.25</em></div><div class="key"><strong>Common slips:</strong> The exact answer is e = 2.718.</div></div></div>
+<div class="problem"><div class="problem-label">Question 87</div><div class="problem-q">For the same problem, find the error of Euler’s estimate at x = 1. (e = 2.71828.)</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Error = 2.71828 − 2.25 = 0.468.</div><div class="step"><span class="tag">2</span>Halving the step to 0.25 would reduce the error roughly by half.</div><div class="ans"><strong>Answer</strong><em>≈ 0.468</em></div><div class="key"><strong>Common slips:</strong> Euler’s method error is proportional to h.</div></div></div>
+<div class="problem"><div class="problem-label">Question 88</div><div class="problem-q">Estimate the derivative of f(x) = x<sup>2</sup> at x = 1 with the forward difference and h = 0.1.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>f(1.1) = 1.21 and f(1) = 1.</div><div class="step"><span class="tag">2</span>(1.21 − 1)/0.1 = 2.1.</div><div class="ans"><strong>Answer</strong><em>2.1</em></div><div class="key"><strong>Common slips:</strong> The exact derivative is 2, so the forward difference is off by h.</div></div></div>
+<div class="problem"><div class="problem-label">Question 89</div><div class="problem-q">Estimate the derivative of f(x) = x<sup>2</sup> at x = 1 with the central difference and h = 0.1.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>f(1.1) = 1.21 and f(0.9) = 0.81.</div><div class="step"><span class="tag">2</span>(1.21 − 0.81)/0.2 = 2.0.</div><div class="ans"><strong>Answer</strong><em>2.0</em></div><div class="key"><strong>Common slips:</strong> The central difference is exact for a quadratic.</div></div></div>
+<div class="problem"><div class="problem-label">Question 90</div><div class="problem-q">Fixed-point iteration x<sub>n+1</sub> = cos x<sub>n</sub> starts at x<sub>0</sub> = 1. What is x<sub>2</sub>?<pre class="code">import math
+x = 1
+for i in range(2):
+    x = math.cos(x)
+print(round(x, 4))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>x<sub>1</sub> = cos 1 = 0.5403.</div><div class="step"><span class="tag">2</span>x<sub>2</sub> = cos 0.5403 = 0.8576.</div><div class="step"><span class="tag">3</span>The iterates settle slowly towards 0.7391.</div><div class="ans"><strong>Answer</strong><em>0.8576</em></div><div class="key"><strong>Common slips:</strong> Use radians, not degrees.</div></div></div>
+</section>
+<hr class="div">
+<section class="chapter">
+<div class="chapter-num">CHAPTER 2 · BLOCK 10</div>
+<h2>Matrices, data and text</h2>
+<p>Questions 91–100. Rows times columns, summaries of data, and handling text.</p>
+<div class="problem"><div class="problem-label">Question 91</div><div class="problem-q">Find the entry in row 1, column 2 of C = AB for A = [[1, 2], [3, 4]] and B = [[5, 6], [7, 8]].</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Row 1 of A is (1, 2); column 2 of B is (6, 8).</div><div class="step"><span class="tag">2</span>1 × 6 + 2 × 8 = 22.</div><div class="ans"><strong>Answer</strong><em>22</em></div><div class="key"><strong>Common slips:</strong> The entry multiplies a row by a column, not a row by a row.</div></div></div>
+<div class="problem"><div class="problem-label">Question 92</div><div class="problem-q">Find the full product AB for the same A and B.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>C<sub>11</sub> = 1·5 + 2·7 = 19; C<sub>12</sub> = 1·6 + 2·8 = 22.</div><div class="step"><span class="tag">2</span>C<sub>21</sub> = 3·5 + 4·7 = 43; C<sub>22</sub> = 3·6 + 4·8 = 50.</div><div class="ans"><strong>Answer</strong><em>[[19, 22], [43, 50]]</em></div><div class="key"><strong>Common slips:</strong> Multiplying entry by entry gives [[5, 12], [21, 32]], which is not the matrix product.</div></div></div>
+<div class="problem"><div class="problem-label">Question 93</div><div class="problem-q">Find the determinant of [[2, 1], [5, 3]].</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>det = (2)(3) − (1)(5).</div><div class="step"><span class="tag">2</span>= 6 − 5 = 1.</div><div class="ans"><strong>Answer</strong><em>1</em></div><div class="key"><strong>Common slips:</strong> The product of the main diagonal minus the product of the other diagonal.</div></div></div>
+<div class="problem"><div class="problem-label">Question 94</div><div class="problem-q">Solve 2x + y = 5 and x − y = 1.</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Add the equations: 3x = 6, so x = 2.</div><div class="step"><span class="tag">2</span>Put x = 2 in x − y = 1: y = 1.</div><div class="step"><span class="tag">3</span>Check: 2(2) + 1 = 5.</div><div class="ans"><strong>Answer</strong><em>x = 2, y = 1</em></div><div class="key"><strong>Common slips:</strong> Always check in the equation you did not use.</div></div></div>
+<div class="problem"><div class="problem-label">Question 95</div><div class="problem-q">Find the mean and the population standard deviation of the data.<pre class="code">import statistics as st
+d = [2, 4, 4, 4, 5, 5, 7, 9]
+print(st.mean(d), st.pstdev(d))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Mean = 40 ÷ 8 = 5.</div><div class="step"><span class="tag">2</span>Squared deviations: 9, 1, 1, 1, 0, 0, 4, 16, which add to 32.</div><div class="step"><span class="tag">3</span>Variance = 32 ÷ 8 = 4, so the standard deviation is 2.</div><div class="ans"><strong>Answer</strong><em>mean 5, standard deviation 2</em></div><div class="key"><strong>Common slips:</strong> Dividing by n − 1 gives the sample standard deviation, 2.14.</div></div></div>
+<div class="problem"><div class="problem-label">Question 96</div><div class="problem-q">Fit y = mx + c by least squares through (1, 2), (2, 3), (3, 5).</div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>n = 3, Σx = 6, Σy = 10, Σxy = 2 + 6 + 15 = 23, Σx<sup>2</sup> = 14.</div><div class="step"><span class="tag">2</span>m = (nΣxy − ΣxΣy)/(nΣx<sup>2</sup> − (Σx)<sup>2</sup>) = (69 − 60)/(42 − 36) = 1.5.</div><div class="step"><span class="tag">3</span>c = (Σy − mΣx)/n = (10 − 9)/3 = 1/3.</div><div class="ans"><strong>Answer</strong><em>y = 1.5x + 0.333</em></div><div class="key"><strong>Common slips:</strong> The denominator is nΣx² − (Σx)², not Σx² − Σx.</div></div></div>
+<div class="problem"><div class="problem-label">Question 97</div><div class="problem-q">What does this print?<pre class="code">print(&quot;{:.3e}&quot;.format(12345.678))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>.3e means scientific form with 3 digits after the point.</div><div class="step"><span class="tag">2</span>12345.678 = 1.2345678 × 10<sup>4</sup>, rounded to 1.235 × 10<sup>4</sup>.</div><div class="ans"><strong>Answer</strong><em>1.235e+04</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 98</div><div class="problem-q">What does this print?<pre class="code">s = &#x27;engineer&#x27;
+print(s[2:5], s[-3:])</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>Letters are numbered from 0: e0 n1 g2 i3 n4 e5 e6 r7.</div><div class="step"><span class="tag">2</span>s[2:5] is indices 2, 3, 4: gin.</div><div class="step"><span class="tag">3</span>s[-3:] is the last three letters: eer.</div><div class="ans"><strong>Answer</strong><em>gin eer</em></div></div></div>
+<div class="problem"><div class="problem-label">Question 99</div><div class="problem-q">What does this print?<pre class="code">d = {&#x27;Cu&#x27;: 8.96, &#x27;Fe&#x27;: 7.87}
+print(round(d[&#x27;Fe&#x27;] + d[&#x27;Cu&#x27;], 2))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>A dictionary is looked up by key: d['Fe'] = 7.87 and d['Cu'] = 8.96.</div><div class="step"><span class="tag">2</span>Their sum is 16.83.</div><div class="ans"><strong>Answer</strong><em>16.83</em></div><div class="key"><strong>Common slips:</strong> A key that is not in the dictionary raises a KeyError.</div></div></div>
+<div class="problem"><div class="problem-label">Question 100</div><div class="problem-q">A line of a data file reads 12.5,3.1,7.4. What does this print?<pre class="code">line = &#x27;12.5,3.1,7.4&#x27;
+print(sum(float(t) for t in line.split(&#x27;,&#x27;)))</pre></div><div class="solution"><div class="solution-label">Solution</div><div class="step"><span class="tag">1</span>split(',') breaks the line into the text pieces '12.5', '3.1', '7.4'.</div><div class="step"><span class="tag">2</span>float converts each to a number; the sum is 23.0.</div><div class="ans"><strong>Answer</strong><em>23.0</em></div><div class="key"><strong>Common slips:</strong> Adding the pieces without float would fail, because they are text.</div></div></div>
+</section>
+</main>
+<footer><p>Engineering Computing. Every solution is fully worked and shown, with no interaction and no hidden steps. Each course note in this series uses the same layout.</p></footer>
+</body>
+</html>
