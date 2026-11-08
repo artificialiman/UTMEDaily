@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Introduction to Engineering and Ethics — Mastery Drill</title>
+    <link rel="icon" id="fav" type="image/svg+xml" href="../favicon.svg">
+    <link rel="alternate icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.85);
+            --ios-text-tertiary: rgba(60, 60, 67, 0.55);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-separator: rgba(198, 198, 200, 0.5);
+            --ios-hover: #F8F8FA;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.85);
+                --ios-text-tertiary: rgba(235, 235, 245, 0.55);
+                --ios-separator: rgba(56, 56, 58, 0.5);
+                --ios-hover: #2C2C2E;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            font-size: 17px;
+            color: var(--ios-text);
+            background: var(--ios-bg);
+            line-height: 1.47;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--ios-card);
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding: calc(env(safe-area-inset-top) + 16px) 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; color: var(--ios-text-tertiary); }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--ios-card);
+            color: var(--ios-text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--ios-blue); color: white; }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: var(--ios-card);
+            border-radius: var(--radius);
+            margin: 12px 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            margin-bottom: 8px;
+        }
+        .question-text {
+            font-size: 17px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .timer-ring {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .timer-ring .bg { fill: none; stroke: var(--ios-separator); stroke-width: 4; }
+        .timer-ring .fg {
+            fill: none;
+            stroke: var(--ios-green);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke 0.4s, stroke-dashoffset 0.25s linear;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        .timer-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-green);
+            transition: color 0.4s;
+            min-width: 42px;
+        }
+        .timer-label {
+            font-size: 13px;
+            color: var(--ios-text-tertiary);
+        }
+        /* colour zones */
+        .timer-ring.warning .fg { stroke: var(--ios-orange); }
+        .timer-ring.danger  .fg { stroke: var(--ios-red); }
+        .timer-text.warning { color: var(--ios-orange); }
+        .timer-text.danger  { color: var(--ios-red); }
+
+        /* ── Options ── */
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--ios-hover);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+        .option:active { transform: scale(0.98); }
+        .option.selected {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        .option.correct {
+            background: rgba(52, 199, 89, 0.1);
+            border-color: var(--ios-green);
+        }
+        .option.wrong {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--ios-red);
+        }
+
+        /* ── Check button ── */
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .answer-btn:active { opacity: 0.8; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Explanation ── */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--ios-hover);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--ios-text-secondary);
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom Stats Bar ── */
+        .stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: var(--ios-card);
+            border-top: 0.5px solid var(--ios-separator);
+        }
+        .stat { flex: 1; text-align: center; padding: 12px; background: var(--ios-hover); border-radius: 10px; }
+        .stat-value { font-size: 24px; font-weight: 700; display: block; }
+        .stat-label { font-size: 13px; color: var(--ios-text-tertiary); margin-top: 4px; }
+
+        sub, sup { font-size: .68em; line-height: 0; }
+        .fr { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 .22em; line-height: 1.2; }
+        .fr .n { border-bottom: .12em solid currentColor; padding: 0 .28em .06em; }
+        .fr .d { padding: .08em .28em 0; }
+        .ov { border-top: .1em solid currentColor; padding: 0 .08em; }
+        .dg { display: block; max-width: 100%; height: auto; margin: 12px 0 14px; color: inherit; }
+        .option .dg { margin: 2px 0; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="title">Introduction to Engineering and Ethics</div>
+    <div class="subtitle">100-question mastery drill · Engineering · Profession, ethics, units, measurement and safety</div>
+</div>
+
+
+<!-- Questions -->
+<div id="questions-container"></div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="answered">0</span>
+        <div class="stat-label">Answered</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="correct">0</span>
+        <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="score">0%</span>
+        <div class="stat-label">Score</div>
+    </div>
+</div>
+
+<script>
+// ─── QUESTIONS ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// INTRODUCTION TO ENGINEERING AND ETHICS · 100 QUESTIONS
+// Spine: every number carries a unit, so convert to a common unit before calculating.
+//   Ratios decide most answers: percentage error = error ÷ true value; factor of safety = failure load ÷ working load;
+//   efficiency = useful output ÷ input; risk = likelihood × severity; reliability in parallel = 1 − (1 − R)ⁿ.
+//   Ethics follows one order: public safety first, then honesty, then the client and employer.
+// Every set runs rule → trap → calculation or case. Wrong options are the usual slips: a unit left unconverted,
+//   a formula upside down, a result rounded to pass, or a duty put before safety.
+// ─────────────────────────────────────────────────────────────────────────────
+// SET 1  · The profession and its regulation                    Q1–12
+// SET 2  · Ethics: safety, conflict of interest and confidentiality Q13–21
+// SET 3  · Ethics: honesty, gifts, competence and intellectual property Q22–33
+// SET 4  · SI units, prefixes and conversions                   Q34–44
+// SET 5  · Significant figures, standard form and dimensions    Q45–53
+// SET 6  · Measurement: error, accuracy, uncertainty and tolerance Q54–65
+// SET 7  · Design process, requirements and factor of safety    Q66–74
+// SET 8  · Risk, controls, reliability and safety signs         Q75–86
+// SET 9  · Projects, cost and depreciation                      Q87–95
+// SET 10 · Efficiency, power and energy                         Q96–100
+// ─────────────────────────────────────────────────────────────────────────────
+
+const questions = {
+  engineering: [
+
+  // ── SET 1 · The profession and its regulation ──
+  {q:"COREN stands for",
+   opts:["A. Council of Registered Engineers of Nigeria", "B. Council for Research in Engineering and Nigerian Industry", "C. Committee for the Regulation of Engineering Standards", "D. Council for the Regulation of Engineering in Nigeria"],
+   ans:"D",
+   exp:"COREN is the body set up by law to regulate the practice of engineering in Nigeria. It keeps the register of engineers, technologists, technicians and craftspeople, and it can discipline those on it."},
+  {q:"The Nigerian Society of Engineers (NSE) differs from COREN because the NSE is",
+   opts:["A. the agency that runs industrial training", "B. the body that sets national product standards", "C. the court that tries engineers", "D. a professional society of members, not the regulator"],
+   ans:"D",
+   exp:"The NSE is the learned and professional society: it holds conferences, publishes work and represents members. The power to register and to discipline belongs to COREN. Product standards are set by the Standards Organisation of Nigeria (SON), and industrial training is run by the Industrial Training Fund (ITF)."},
+  {q:"A new graduate wants to be legally recognised to practise as an engineer in Nigeria. The graduate must be",
+   opts:["A. registered with COREN after training and assessment", "B. a member of any engineering club", "C. employed by an oil company", "D. holding a degree alone, with no registration"],
+   ans:"A",
+   exp:"A degree is the first step, followed by approved practical training and an assessment, then registration with COREN. Membership of the NSE is useful but does not give the legal right to practise."},
+  {q:"SIWES stands for",
+   opts:["A. Students Industrial Welfare and Education Service", "B. School Industrial Workshop Evaluation System", "C. Students Industrial Work Experience Scheme", "D. Skills Improvement and Work Examination Scheme"],
+   ans:"C",
+   exp:"The scheme places students in industry during their course so that they see real work. It was started in 1973 and is run by the Industrial Training Fund (ITF) with the universities and employers."},
+  {q:"The main purpose of SIWES is to",
+   opts:["A. replace lectures with factory work", "B. test students for entry to the university", "C. give students a salary for the year", "D. link classroom theory to real work in industry"],
+   ans:"D",
+   exp:"It adds practical skill to the theory in the course. It does not replace lectures, and the allowance paid to students is small and not a salary."},
+  {q:"A student\u2019s SIWES logbook entry is acceptable when it is",
+   opts:["A. copied from a friend\u2019s logbook", "B. written at the end of the placement from memory", "C. a general description of the company", "D. written daily, factual, and signed by the supervisor"],
+   ans:"D",
+   exp:"The logbook is evidence of what the student did. Daily entries are more accurate, and the supervisor\u2019s signature confirms they are true. Copying from another student is a form of dishonesty."},
+  {q:"The design of roads, bridges and water supply belongs mainly to",
+   opts:["A. electronic engineering", "B. civil engineering", "C. chemical engineering", "D. metallurgical engineering"],
+   ans:"B",
+   exp:"Civil engineering deals with the structures and networks built for the public: roads, bridges, buildings, dams and water systems."},
+  {q:"Mechatronics is the combination of",
+   opts:["A. agricultural, textile and printing engineering", "B. civil, chemical and mining engineering", "C. petroleum, gas and marine engineering", "D. mechanical, electronic and computer control engineering"],
+   ans:"D",
+   exp:"A robot arm is a typical example: it has mechanical parts, sensors and motors from electronics, and a program that controls them. The name joins \u201cmechanics\u201d and \u201celectronics\u201d."},
+  {q:"A company plans a plant that turns crude oil into petrol, diesel and kerosene by heating and separation. The discipline that leads the design of the process is",
+   opts:["A. computer engineering, with no other discipline", "B. agricultural engineering, with crop scientists", "C. chemical engineering, with petroleum engineers", "D. civil engineering, with no other discipline"],
+   ans:"C",
+   exp:"Processes in which materials are changed by heat, pressure and reactions are the field of chemical engineering. Petroleum engineers work with the oil in the ground; civil, electrical and computer engineers work on the same plant, but do not lead the process design."},
+  {q:"Science mainly asks why things happen. Engineering mainly asks",
+   opts:["A. who discovered the law first", "B. how to build something that works", "C. whether the theory is beautiful", "D. how to avoid all measurement"],
+   ans:"B",
+   exp:"The engineer uses science to build a solution to a need. The solution has to work and it also has to meet limits of cost, time, safety and regulation."},
+  {q:"A design meets every performance target, but costs twice the budget. In engineering terms the design",
+   opts:["A. is a science result, not an engineering one", "B. fails, because cost is a constraint", "C. succeeds, since performance is all that matters", "D. is acceptable if nobody finds out"],
+   ans:"B",
+   exp:"Every real design has constraints as well as targets. A solution that cannot be afforded cannot be built, so it does not solve the client\u2019s problem."},
+  {q:"An engineer is asked to choose between a heavy cheap steel part and a light costly aluminium part for a truck. The most defensible approach is to",
+   opts:["A. choose the cheaper one without checking strength", "B. choose the one that looks better", "C. compare both against the stated requirements and costs", "D. choose the lighter one because lighter is always better"],
+   ans:"C",
+   exp:"The choice is made against the requirements: load, life, weight limit and cost. A choice made only on appearance or on one number is not an engineering decision."},
+
+  // ── SET 2 · Ethics: safety, conflict of interest and confidentiality ──
+  {q:"In codes of engineering ethics, the first duty of an engineer is to",
+   opts:["A. the employer\u2019s profit", "B. public safety, health and welfare", "C. the engineer\u2019s own promotion", "D. the client\u2019s wishes"],
+   ans:"B",
+   exp:"All the other duties, to the client, the employer and colleagues, come after the safety of the public. The codes are written this way because the public cannot check the work for itself."},
+  {q:"A client insists on a cheaper concrete mix that is weaker than the design code requires. The engineer should",
+   opts:["A. refuse, explain the risk, and report if the client persists", "B. accept, and keep quiet to protect the contract", "C. accept, because the client pays", "D. accept, but charge a higher fee"],
+   ans:"A",
+   exp:"The code sets the minimum strength for safety and the engineer cannot lower it on the client\u2019s request. If the client goes ahead anyway, the engineer reports it to the proper authority, such as the regulator."},
+  {q:"A site engineer sees that scaffolding is unsafe and the contractor says the work cannot stop. The engineer should",
+   opts:["A. let the work continue and write a note", "B. wait for an accident before acting", "C. stop the work until it is made safe", "D. leave the site to avoid blame"],
+   ans:"C",
+   exp:"A danger to workers is a danger to the public. The engineer\u2019s duty is to prevent harm, not to record it afterwards, and a written record protects both the engineer and the workers."},
+  {q:"A conflict of interest arises when",
+   opts:["A. two engineers disagree on a design", "B. a personal interest could affect professional judgement", "C. an engineer works for two employers on different days", "D. an engineer is paid the agreed salary"],
+   ans:"B",
+   exp:"The risk is a judgement that is, or looks, unfair. Having a second job is not itself a conflict; the conflict is in what the two interests ask of the engineer in the same decision."},
+  {q:"An engineer who evaluates tenders finds that the engineer\u2019s brother owns one of the bidding firms. The engineer should",
+   opts:["A. say nothing, since the best bid will win anyway", "B. give the brother\u2019s firm a fair score only", "C. declare the relationship and step out of that evaluation", "D. score the brother\u2019s firm lower to look fair"],
+   ans:"C",
+   exp:"Even a fair score cannot be trusted if the engineer has a stake in the result. The relationship is declared and someone else judges. Scoring a relative down is also unfair, in the other direction."},
+  {q:"An engineer advises a client to buy equipment and is also paid a commission by the seller, which the client does not know. This is",
+   opts:["A. unethical, because the interest was hidden", "B. acceptable, because the equipment is good", "C. a normal part of the fee", "D. acceptable, if the commission is small"],
+   ans:"A",
+   exp:"The client is relying on independent advice. A hidden payment from the seller damages that trust whether or not the equipment is good. The interest must be disclosed to the client, and the client decides."},
+  {q:"Information that a client gives an engineer about a new product should be",
+   opts:["A. kept private unless the client agrees", "B. posted on social media sites", "C. used to start a rival company", "D. shared with the client\u2019s competitors"],
+   ans:"A",
+   exp:"Clients share secrets because they trust the engineer. Using or sharing the information without permission breaks that trust and may break the law."},
+  {q:"The duty of confidentiality is overridden when",
+   opts:["A. the engineer changes employer", "B. the project has finished", "C. a competitor offers to pay for the information", "D. keeping quiet would put the public at serious risk"],
+   ans:"D",
+   exp:"Public safety is the first duty. If a hidden fault could hurt people, the engineer reports it to the proper authority, even if the client wanted it kept private. A payment or a change of job does not release the duty."},
+  {q:"An engineer leaves a firm and joins a competitor. The engineer may",
+   opts:["A. tell the new employer the old firm\u2019s prices", "B. take all the old firm\u2019s drawings to the new job", "C. use general skills, but not the old firm\u2019s confidential designs", "D. use the old firm\u2019s client list freely"],
+   ans:"C",
+   exp:"What the engineer has learnt is the engineer\u2019s to use. The old firm\u2019s drawings, prices and client lists are its property, and they stay private even after the engineer has left."},
+
+  // ── SET 3 · Ethics: honesty, gifts, competence and intellectual property ──
+  {q:"An engineer\u2019s test report should",
+   opts:["A. show only the results that pass", "B. round every result up to meet the limit", "C. copy results from an earlier job", "D. state the results as they were measured"],
+   ans:"D",
+   exp:"The report is a record that others will rely on to make safe decisions. A changed number is false, however small the change."},
+  {q:"A strength test gives 29.6 MPa. The specification needs 30 MPa. The engineer rounds this to 30 MPa so the batch passes. This is",
+   opts:["A. falsifying a result, and unethical", "B. acceptable, if the supervisor is told afterwards", "C. normal rounding to the nearest integer", "D. acceptable, since the error is only 1.3%"],
+   ans:"A",
+   exp:"Rounding to the nearest unit would give 30, but the specification is a limit and the measured value falls below it. Reporting 30 is a false statement. The right action is to report 29.6 and let the client decide on a re-test or rejection."},
+  {q:"Of 20 tests, 3 fail the limit. The engineer drops the 3 results as \u201coutliers\u201d without a reason. This is",
+   opts:["A. good practice that removes bad data", "B. acceptable, since 17 of 20 passed", "C. unethical, since failures cannot be dropped", "D. allowed, as long as no one asks"],
+   ans:"C",
+   exp:"A result can only be excluded for a recorded reason, such as a fault in the machine. Dropping results only because they fail is selecting data to get a wanted answer. The engineer reports all 20 and investigates why 3 failed."},
+  {q:"An engineer who approves payments to a contractor receives a gift from that contractor during the tender. The engineer should",
+   opts:["A. accept it, and buy the contractor lunch", "B. accept it, if it is small", "C. accept it after the contract is signed", "D. refuse it and report the offer"],
+   ans:"D",
+   exp:"A gift from a bidder can look like payment for a favourable decision, whatever its size. Many organisations set a strict rule of no gifts during a tender."},
+  {q:"A small token, such as a calendar with the supplier\u2019s name, is given to all clients at the end of the year. Most codes treat this as",
+   opts:["A. acceptable only if it is cash", "B. forbidden for every engineer in every case", "C. acceptable, since it is open and of little value", "D. always a bribe"],
+   ans:"C",
+   exp:"The test is whether the gift could influence a decision. A cheap, open, general gift to everyone does not. A gift to one person, in secret or of high value, does."},
+  {q:"A contractor offers an engineer 5% of the contract value for approving an inflated valuation. The engineer must",
+   opts:["A. accept, if the project is delayed anyway", "B. refuse and report it to the authorities", "C. decline, but say nothing", "D. accept, and inflate the valuation a little"],
+   ans:"B",
+   exp:"This is a bribe and the inflated valuation would be fraud on the client and the public. Refusing is the first step. Staying silent leaves the offer to be made to someone else, so it is also reported."},
+  {q:"An engineer should accept only work that is",
+   opts:["A. well paid, whatever the subject", "B. urgent, whatever the subject", "C. offered by a friend or relative", "D. within the engineer\u2019s area of competence"],
+   ans:"D",
+   exp:"Engineering mistakes harm people, so an engineer must know the limits of his or her skill and training."},
+  {q:"A registered structural engineer is asked to design an electrical installation. The proper reply is to",
+   opts:["A. accept, and copy a design from the internet", "B. accept, and let the contractor decide", "C. accept, since all engineers know the basics", "D. decline or involve a competent electrical engineer"],
+   ans:"D",
+   exp:"Registration shows a general standard; each design needs a competent person. Copying a design that has not been checked does not make the engineer competent."},
+  {q:"A senior engineer is asked to sign drawings prepared by a junior and does so without checking them. This is",
+   opts:["A. normal practice for seniors", "B. acceptable if the client is in a hurry", "C. unethical, since a signature means checked", "D. acceptable if the junior is clever"],
+   ans:"C",
+   exp:"A signature or stamp makes the engineer answerable for the work. If it is given without review, a person can rely on a safety check that did not take place."},
+  {q:"A patent protects",
+   opts:["A. a person\u2019s handwriting or voice", "B. the name or logo of a company", "C. an invention, such as a new device", "D. the words of a report or a book"],
+   ans:"C",
+   exp:"A patent gives the inventor the sole right to make and sell the invention for a fixed period, in exchange for describing it. Copyright protects the written or drawn work; a trademark protects names and logos."},
+  {q:"A student copies several paragraphs of a published paper into a report and gives no source. This is",
+   opts:["A. plagiarism, even if the words are changed slightly", "B. acceptable, since the paper is public", "C. acceptable, if the paper is old", "D. acceptable if there are fewer than ten paragraphs"],
+   ans:"A",
+   exp:"Plagiarism is presenting another person\u2019s work as your own. A paper being public does not make it free to copy without credit. The fix is to cite the source and put quoted material in quotation marks."},
+  {q:"An engineer uses a short piece of code written by another person under a licence that requires credit. The engineer must",
+   opts:["A. give the credit the licence asks for", "B. claim the code as his or her own", "C. remove the licence text and keep the code", "D. sell the code as a new product without notice"],
+   ans:"A",
+   exp:"Open licences allow use, but with conditions. Giving credit is the condition here, and ignoring it breaks the licence terms."},
+
+  // ── SET 4 · SI units, prefixes and conversions ──
+  {q:"The SI base unit of mass is",
+   opts:["A. the gram", "B. the kilogram", "C. the newton", "D. the pound"],
+   ans:"B",
+   exp:"The kilogram is the only base unit that carries a prefix in its name. The gram is a thousandth of it. The newton is a unit of force, not mass, and the pound is not an SI unit."},
+  {q:"Which of these is NOT an SI base unit?",
+   opts:["A. ampere", "B. kelvin", "C. mole", "D. newton"],
+   ans:"D",
+   exp:"The seven base units are metre, kilogram, second, ampere, kelvin, mole and candela. The newton is derived: it is built from the kilogram, metre and second."},
+  {q:"The newton, written in SI base units, is",
+   opts:["A. kg\u00b7m/s\u00b2", "B. kg\u00b7m/s", "C. kg\u00b7m\u00b2/s\u00b2", "D. kg/(m\u00b7s\u00b2)"],
+   ans:"A",
+   exp:"Force = mass \u00d7 acceleration = kg \u00d7 m/s\u00b2. The kg\u00b7m\u00b2/s\u00b2 is the joule (energy). The kg/(m\u00b7s\u00b2) is the pascal (pressure). The kg\u00b7m/s is momentum."},
+  {q:"A generator is rated at 2.5 MW. In kilowatts this is",
+   opts:["A. 2 500 000 kW", "B. 2.5 kW", "C. 250 kW", "D. 2 500 kW"],
+   ans:"D",
+   exp:"1 MW = 1 000 kW, so 2.5 MW = 2 500 kW. The 2.5 kW leaves the number unchanged. The 250 kW slips a decimal place. The 2 500 000 kW converts in the wrong direction by a further factor of 1 000."},
+  {q:"A wire has a cross-section of 0.45 mm\u00b2. In square metres this is",
+   opts:["A. 4.5 \u00d7 10<sup>-4</sup> m<sup>2</sup>", "B. 4.5 \u00d7 10<sup>-10</sup> m<sup>2</sup>", "C. 4.5 \u00d7 10<sup>-7</sup> m<sup>2</sup>", "D. 4.5 \u00d7 10<sup>-6</sup> m<sup>2</sup>"],
+   ans:"C",
+   exp:"1 mm = 10\u207b\u00b3 m, so 1 mm\u00b2 = (10\u207b\u00b3)\u00b2 = 10\u207b\u2076 m\u00b2. Then 0.45 \u00d7 10\u207b\u2076 = 4.5 \u00d7 10\u207b\u2077 m\u00b2. The 4.5 \u00d7 10\u207b\u2074 uses 10\u207b\u00b3 for the area, and the 4.5 \u00d7 10\u207b\u2076 forgets the 0.45 is a tenth of 4.5."},
+  {q:"The pascal, the unit of pressure, is",
+   opts:["A. one kilogram per metre", "B. one newton per square metre", "C. one newton per metre", "D. one joule per second"],
+   ans:"B",
+   exp:"Pressure is force over area, N/m\u00b2. One joule per second is the watt (power)."},
+  {q:"The kilowatt-hour (kWh) is a unit of",
+   opts:["A. pressure", "B. power", "C. energy", "D. force"],
+   ans:"C",
+   exp:"The kilowatt is power (energy per second). Multiplying by hours gives energy. 1 kWh = 3.6 MJ. A bill is charged on the energy used, not on the power rating."},
+  {q:"A 2 kW heater runs for 3 hours. The energy used, in megajoules, is",
+   opts:["A. 21.6 MJ", "B. 7.2 MJ", "C. 2.16 MJ", "D. 6 MJ"],
+   ans:"A",
+   exp:"Energy = 2 kW \u00d7 3 h = 6 kWh. Since 1 kWh = 3.6 MJ, this is 6 \u00d7 3.6 = 21.6 MJ. The 6 MJ treats kWh as MJ. The 7.2 MJ is for 1 hour only (2 \u00d7 3.6). The 2.16 MJ slips a decimal place."},
+  {q:"To change a speed from km/h to m/s, divide by",
+   opts:["A. 3 600", "B. 3.6", "C. 1 000", "D. 60"],
+   ans:"B",
+   exp:"1 km/h = 1 000 m \u00f7 3 600 s = 1/3.6 m/s. Dividing by 60 would change km/h to km/min."},
+  {q:"A speed of 90 km/h is",
+   opts:["A. 0.025 m/s", "B. 25 m/s", "C. 324 m/s", "D. 1.5 m/s"],
+   ans:"B",
+   exp:"90 \u00f7 3.6 = 25 m/s. The 324 comes from multiplying by 3.6, in the wrong direction. The 1.5 divides by 60. The 0.025 divides by 3 600 and also changes the km."},
+  {q:"A pump delivers 36 m\u00b3 of water in one hour. In litres per second this is",
+   opts:["A. 10 L/s", "B. 0.01 L/s", "C. 129.6 L/s", "D. 600 L/s"],
+   ans:"A",
+   exp:"36 m\u00b3 = 36 000 L and 1 hour = 3 600 s, so the flow is 36 000 \u00f7 3 600 = 10 L/s. The 600 divides by 60 instead of 3 600. The 0.01 forgets to turn m\u00b3 into litres. The 129.6 multiplies by 3.6."},
+
+  // ── SET 5 · Significant figures, standard form and dimensions ──
+  {q:"The number 0.004050 has how many significant figures?",
+   opts:["A. 3", "B. 4", "C. 6", "D. 2"],
+   ans:"B",
+   exp:"Zeros at the start only show the position of the point. The zero between 4 and 5 counts, and so does the zero after the 5 when it is written on the end of a decimal. The significant figures are 4, 0, 5, 0."},
+  {q:"A length is written as 1200 m with no decimal point. The trailing zeros are",
+   opts:["A. significant only if there is a 1 in front", "B. never significant", "C. always significant", "D. not necessarily significant"],
+   ans:"D",
+   exp:"Without a decimal point, we cannot tell whether the writer measured to the nearest metre or the nearest hundred metres. Writing 1.200 \u00d7 10\u00b3 m removes the doubt."},
+  {q:"A rectangle measures 3.2 m by 1.45 m. The area, with the correct number of significant figures, is",
+   opts:["A. 4.6 m<sup>2</sup>", "B. 4.64 m<sup>2</sup>", "C. 4.640 m<sup>2</sup>", "D. 4.7 m<sup>2</sup>"],
+   ans:"A",
+   exp:"3.2 \u00d7 1.45 = 4.64. In a product, the answer can have no more significant figures than the least precise number, and 3.2 has 2. So the answer is 4.6. The 4.7 rounds the wrong way."},
+  {q:"A number in standard form is written as",
+   opts:["A. a \u00d7 10\u207f with 1 \u2264 a < 10", "B. a + 10\u207f with any a", "C. a \u00d7 10\u207f with 10 \u2264 a < 100", "D. a \u00f7 10\u207f with 0 < a < 1"],
+   ans:"A",
+   exp:"The first factor has one digit before the decimal point. This makes very large and very small numbers easy to compare by looking at the power of ten."},
+  {q:"The number 0.00072 in standard form is",
+   opts:["A. 7.2 \u00d7 10<sup>4</sup>", "B. 72 \u00d7 10<sup>-5</sup>", "C. 7.2 \u00d7 10<sup>-4</sup>", "D. 7.2 \u00d7 10<sup>-3</sup>"],
+   ans:"C",
+   exp:"The decimal point is moved 4 places to the right, so the power is \u22124. The 72 \u00d7 10\u207b\u2075 has the right value but is not in standard form, since 72 is larger than 10."},
+  {q:"The product (3 \u00d7 10<sup>4</sup>) \u00d7 (2 \u00d7 10<sup>-2</sup>) is",
+   opts:["A. 6 \u00d7 10<sup>6</sup>", "B. 6 \u00d7 10<sup>-8</sup>", "C. 5 \u00d7 10<sup>2</sup>", "D. 6 \u00d7 10<sup>2</sup>"],
+   ans:"D",
+   exp:"Multiply the numbers (3 \u00d7 2 = 6) and add the powers (4 + (\u22122) = 2), which gives 600. The 6 \u00d7 10\u2076 multiplies the powers. The 5 \u00d7 10\u00b2 adds the numbers."},
+  {q:"An equation is dimensionally consistent when",
+   opts:["A. every term has the same dimensions", "B. it has no numbers in it", "C. both sides have the same number of letters", "D. it uses only SI units"],
+   ans:"A",
+   exp:"Only quantities with the same dimensions can be added or set equal. A check of dimensions cannot prove an equation is right, but it can prove it is wrong."},
+  {q:"The dimensions of pressure are",
+   opts:["A. MLT\u207b\u00b2", "B. ML\u00b2T\u207b\u00b2", "C. ML\u207b\u00b9T\u207b\u00b2", "D. ML\u207b\u00b3"],
+   ans:"C",
+   exp:"Pressure = force \u00f7 area = MLT\u207b\u00b2 \u00f7 L\u00b2 = ML\u207b\u00b9T\u207b\u00b2. The MLT\u207b\u00b2 is force and the ML\u00b2T\u207b\u00b2 is energy. The ML\u207b\u00b3 is density."},
+  {q:"In the pendulum formula T = 2\u03c0\u221a(L/g), the quantity L/g has the dimensions of",
+   opts:["A. length squared (L\u00b2)", "B. acceleration (LT\u207b\u00b2)", "C. time squared (T\u00b2)", "D. time (T)"],
+   ans:"C",
+   exp:"L has dimensions of length and g of LT\u207b\u00b2, so L \u00f7 g = L \u00f7 (LT\u207b\u00b2) = T\u00b2. Its square root has the dimension of time, which matches T on the left. This is the check that the formula is consistent."},
+
+  // ── SET 6 · Measurement: error, accuracy, uncertainty and tolerance ──
+  {q:"The percentage error of a measurement is",
+   opts:["A. true \u00f7 measured \u00d7 100", "B. |measured \u2212 true| \u00f7 measured \u00d7 100", "C. (measured + true) \u00f7 2 \u00d7 100", "D. |measured \u2212 true| \u00f7 true \u00d7 100"],
+   ans:"D",
+   exp:"The error is the difference between the measured and the true value. It is compared with the true value, since that is the reference."},
+  {q:"The true length of a bar is 50.0 mm. A student measures 48.0 mm. The percentage error is",
+   opts:["A. 4.0%", "B. 2.0%", "C. 96%", "D. 4.2%"],
+   ans:"A",
+   exp:"(50.0 \u2212 48.0) \u00f7 50.0 \u00d7 100 = 4.0%. The 4.2% divides by the measured value, 48.0. The 96% is the measured value as a percentage of the true value (48 \u00f7 50 \u00d7 100)."},
+  {q:"A length is measured with an error of up to 2% on a true value of 150 mm. The largest reading possible is",
+   opts:["A. 152 mm", "B. 300 mm", "C. 153 mm", "D. 147 mm"],
+   ans:"C",
+   exp:"2% of 150 = 3 mm. The reading can be as high as 150 + 3 = 153 mm, or as low as 147 mm. The 152 mm uses 2 mm, and the 300 mm doubles the length."},
+  {q:"Precision describes how close",
+   opts:["A. a result is to the expected answer", "B. repeated readings are to each other", "C. an instrument is to a ruler", "D. a reading is to the true value"],
+   ans:"B",
+   exp:"Accuracy is closeness to the true value. Precision is the scatter of repeated readings. A measurement can be one without the other."},
+  {q:"Three readings of a length are 10.51, 10.52 and 10.51 mm. The true length is 10.00 mm. The readings are",
+   opts:["A. both accurate and precise", "B. neither accurate nor precise", "C. precise but not accurate", "D. accurate but not precise"],
+   ans:"C",
+   exp:"The readings agree closely, so they are precise. They are all about 0.5 mm above the true length, so they are not accurate. A fixed fault, such as a zero error, usually causes this."},
+  {q:"A micrometer reads +0.03 mm when closed. It then reads 12.48 mm on a part. The corrected reading is",
+   opts:["A. 12.43 mm", "B. 12.51 mm", "C. 12.48 mm", "D. 12.45 mm"],
+   ans:"D",
+   exp:"A positive zero error means every reading is too high by 0.03 mm, so it is subtracted: 12.48 \u2212 0.03 = 12.45 mm. The 12.51 adds it. The 12.48 does not correct it at all."},
+  {q:"When two measured lengths are added, the uncertainty in the sum is found by adding",
+   opts:["A. the absolute uncertainties", "B. the percentage uncertainties", "C. the two lengths themselves", "D. the squares of the lengths"],
+   ans:"A",
+   exp:"For a sum or a difference, the uncertainties in the same unit are added. For a product or a quotient, the percentage uncertainties are added."},
+  {q:"When two measured quantities are multiplied, the uncertainty in the product is found by adding",
+   opts:["A. the two quantities", "B. the square roots of the quantities", "C. the absolute uncertainties", "D. the percentage uncertainties"],
+   ans:"D",
+   exp:"A product is sensitive to the relative size of each error, so the percentages are used. A 1% error in each quantity gives about a 2% error in the product."},
+  {q:"A plate is 2.00 \u00b1 0.02 m long and 1.00 \u00b1 0.01 m wide. The uncertainty in its area is about",
+   opts:["A. \u00b1 0.02 m\u00b2", "B. \u00b1 0.0004 m\u00b2", "C. \u00b1 0.04 m\u00b2", "D. \u00b1 0.03 m\u00b2"],
+   ans:"C",
+   exp:"Each length has 1% uncertainty. For the area the percentages add: 1% + 1% = 2%. The area is 2.00 m\u00b2, and 2% of that is 0.04 m\u00b2. The \u00b1 0.03 adds the absolute uncertainties (0.02 + 0.01)."},
+  {q:"The tolerance on a dimension is",
+   opts:["A. the error of the measuring tool", "B. the total variation allowed in it", "C. the mean of the largest and smallest sizes", "D. the nominal size of the part"],
+   ans:"B",
+   exp:"A shaft with a size of 20.00 +0.00/\u22120.04 mm has a tolerance of 0.04 mm. No part is made to exactly the nominal size, so the tolerance sets how far from it a part may be."},
+  {q:"A hole is 20.00 +0.03/\u22120.00 mm and a shaft is 19.98 +0.00/\u22120.02 mm. The smallest clearance is",
+   opts:["A. 0.05 mm", "B. 0.00 mm", "C. 0.02 mm", "D. 0.07 mm"],
+   ans:"C",
+   exp:"Smallest clearance = smallest hole \u2212 largest shaft = 20.00 \u2212 19.98 = 0.02 mm. The 0.07 mm is the largest clearance (20.03 \u2212 19.96). The 0.05 mm combines the largest hole with the largest shaft."},
+  {q:"For the same hole and shaft (hole 20.00 to 20.03 mm, shaft 19.96 to 19.98 mm), the largest clearance is",
+   opts:["A. 0.05 mm", "B. 0.07 mm", "C. 0.02 mm", "D. 0.03 mm"],
+   ans:"B",
+   exp:"Largest clearance = largest hole \u2212 smallest shaft = 20.03 \u2212 19.96 = 0.07 mm. The 0.02 mm is the smallest clearance. The 0.05 mm uses the largest shaft by mistake. The 0.03 mm is the tolerance on the hole."},
+
+  // ── SET 7 · Design process, requirements and factor of safety ──
+  {q:"The first step of the engineering design process is to",
+   opts:["A. choose the material first", "B. define the problem clearly", "C. build a prototype at once", "D. order the parts early"],
+   ans:"B",
+   exp:"Without a clear statement of the need, the effort goes into solving the wrong problem. Concepts, selection, detail design, building and testing follow it."},
+  {q:"After several design concepts have been generated, the next step is to",
+   opts:["A. compare them with the requirements", "B. build every concept in full", "C. order the parts for all of them", "D. stop and ask the client to pick"],
+   ans:"A",
+   exp:"The concepts are scored against requirements such as cost, safety, size and performance. The selected one is developed in detail. Building all of them would waste time and money."},
+  {q:"A walkway is slippery in rain. The correct first action is to",
+   opts:["A. state a measurable slip-resistance requirement", "B. paint the walkway a darker colour", "C. buy the most expensive surface at once", "D. put up a sign and take no other action"],
+   ans:"A",
+   exp:"A requirement that can be measured, such as a minimum slip-resistance value, tells whether any option works. Buying first is guessing, and a sign alone leaves the hazard in place."},
+  {q:"A good requirement in a specification is",
+   opts:["A. written in technical words only", "B. free of numbers", "C. short and vague", "D. measurable and testable"],
+   ans:"D",
+   exp:"If it cannot be measured, no one can show whether the design meets it. \u201cStrong\u201d is a wish; \u201ccarries 50 kN\u201d is a requirement."},
+  {q:"Which of these is a measurable requirement?",
+   opts:["A. The pump shall work well in all cases", "B. The pump shall be of good quality", "C. The pump shall deliver 5 L/s at a head of 20 m", "D. The pump shall be powerful and reliable"],
+   ans:"C",
+   exp:"It has a number, a unit and a condition, so a test can say yes or no. The others are opinions."},
+  {q:"A client asks for \u201ca bridge that lasts a long time\u201d. The engineer\u2019s best response is to",
+   opts:["A. choose the lowest cost option", "B. write \u201clong time\u201d into the contract", "C. design for 5 years, since the client did not say", "D. agree a design life in years and the loads it must carry"],
+   ans:"D",
+   exp:"A vague wish is turned into numbers, such as a design life of 50 years and a traffic load per axle. Both sides can then check that the bridge meets it."},
+  {q:"The factor of safety is",
+   opts:["A. failure load \u00f7 working load", "B. working load \u2212 failure load", "C. working load \u00f7 failure load", "D. failure load \u00d7 working load"],
+   ans:"A",
+   exp:"It shows how many times larger the load that breaks the part is than the load it carries. The margin covers errors in loads, materials and workmanship."},
+  {q:"A part has a factor of safety of exactly 1. This means",
+   opts:["A. it has no margin, and is at the point of failure", "B. it can carry twice its working load", "C. it is perfectly safe under any overload", "D. it will last for ever without failing"],
+   ans:"A",
+   exp:"At 1 the working load equals the failure load, so a small overload or a weak batch of material causes failure. Real designs use values well above 1."},
+  {q:"A cable fails at 120 kN. A factor of safety of 4 is required. The allowable load is",
+   opts:["A. 116 kN", "B. 480 kN", "C. 4.8 kN", "D. 30 kN"],
+   ans:"D",
+   exp:"Allowable load = failure load \u00f7 factor of safety = 120 \u00f7 4 = 30 kN. The 480 kN multiplies instead of dividing. The 116 kN subtracts 4. The 4.8 kN is 120 \u00f7 25."},
+
+  // ── SET 8 · Risk, controls, reliability and safety signs ──
+  {q:"Risk is usually estimated as",
+   opts:["A. likelihood + severity", "B. likelihood \u00d7 severity", "C. severity \u00f7 likelihood", "D. cost \u00d7 time"],
+   ans:"B",
+   exp:"A hazard that is likely and severe has a high risk. Multiplying the two scores shows how the risks compare, so the money and effort go to the biggest ones first."},
+  {q:"A hazard has a very low likelihood but would cause deaths. The engineer should",
+   opts:["A. ignore it, if it has never happened", "B. still control it, as severity is high", "C. ignore it, because it is unlikely", "D. ignore it, if the cost is high"],
+   ans:"B",
+   exp:"A low likelihood does not remove the risk when the outcome is catastrophic. Many standards set controls by severity as well as by score."},
+  {q:"A machine hazard scores likelihood 4 and severity 5 (both out of 5). After an interlocked guard is fitted, the likelihood falls to 1. The new risk score is",
+   opts:["A. 5", "B. 9", "C. 20", "D. 4"],
+   ans:"A",
+   exp:"Before: 4 \u00d7 5 = 20. After: 1 \u00d7 5 = 5. The guard reduces the likelihood but the severity of an accident is unchanged. The 9 adds the two scores."},
+  {q:"In the hierarchy of controls, the most effective measure is to",
+   opts:["A. eliminate the hazard", "B. put up a warning sign", "C. train workers to be careful", "D. give workers protective equipment"],
+   ans:"A",
+   exp:"The order is elimination, substitution, engineering controls, administrative controls and personal protective equipment (PPE). Removing the hazard does not depend on anyone\u2019s behaviour."},
+  {q:"Personal protective equipment (PPE) is placed",
+   opts:["A. first, as the cheapest control", "B. first, since it protects the person", "C. in the middle, as it is the standard", "D. last, as the least reliable control"],
+   ans:"D",
+   exp:"PPE leaves the hazard in place and depends on the person wearing it correctly all the time. It is used when the controls higher in the list cannot remove the risk."},
+  {q:"A workshop replaces a solvent-based paint with a water-based paint. This is an example of",
+   opts:["A. elimination", "B. personal protective equipment", "C. an engineering control", "D. substitution"],
+   ans:"D",
+   exp:"The hazard is changed to a less harmful one, but not removed, since paint is still used. An interlocked guard or ventilation would be an engineering control. Earmuffs and masks are PPE."},
+  {q:"In a series system, the whole system works only if",
+   opts:["A. half of the components work", "B. the strongest component works", "C. every component works", "D. one component works"],
+   ans:"C",
+   exp:"A chain is only as strong as its weakest link. The reliabilities multiply, so the series system is less reliable than any one part."},
+  {q:"A parallel (redundant) arrangement is used to",
+   opts:["A. reduce the cost of the system", "B. lower the weight of the system", "C. keep working when one part fails", "D. make every part cheaper to buy"],
+   ans:"C",
+   exp:"A spare path takes over if one fails. Redundancy costs more and weighs more, but it makes the system more reliable. It is used in aircraft and hospital power supply."},
+  {q:"Two pumps, each with a reliability of 0.90, work in parallel. The system works if at least one pump works. Its reliability is",
+   opts:["A. 0.95", "B. 0.90", "C. 0.81", "D. 0.99"],
+   ans:"D",
+   exp:"The system fails only if both fail: 0.10 \u00d7 0.10 = 0.01. So reliability = 1 \u2212 0.01 = 0.99. The 0.81 is the series value (0.9 \u00d7 0.9). The 0.90 is the value of a single pump."},
+  {q:"In the standard system of safety signs, a red circle with a diagonal bar means",
+   opts:["A. a mandatory action to be done", "B. a prohibition: do not do it", "C. a warning of danger ahead", "D. a safe condition or exit"],
+   ans:"B",
+   exp:"Red is for prohibition and fire equipment. Blue circles give mandatory actions. Yellow triangles warn of hazards. Green is for safe conditions such as exits."},
+  {q:"A yellow triangle with a black symbol is a sign of",
+   opts:["A. safe condition", "B. warning", "C. mandatory action", "D. prohibition"],
+   ans:"B",
+   exp:"It warns of a hazard ahead, such as electricity or a slippery floor. It does not tell people to do or not to do anything on its own."},
+  {q:"A blue circle with a white safety helmet on it means",
+   opts:["A. a helmet is for sale", "B. a helmet may be worn", "C. no helmets are allowed", "D. a helmet must be worn"],
+   ans:"D",
+   exp:"A blue circle is a mandatory sign: the action is required, not just advised. A helmet in a red circle with a bar would mean the opposite."},
+
+  // ── SET 9 · Projects, cost and depreciation ──
+  {q:"The critical path of a project is",
+   opts:["A. the chain with the most workers", "B. the shortest chain of tasks", "C. the chain that costs the most", "D. the longest chain of tasks"],
+   ans:"D",
+   exp:"Every task on the critical path has no spare time. If one is late, the whole project is late. A shorter chain can run alongside and finish earlier."},
+  {q:"A task that is not on the critical path has float (spare time). If this task is delayed by less than its float, the project",
+   opts:["A. costs nothing more", "B. is late by the same amount", "C. finishes on time", "D. must restart"],
+   ans:"C",
+   exp:"The task can slip until its float is used up without moving the finish date. When the delay is greater than the float, the task joins the critical path."},
+  {q:"A project has task A (3 weeks), then B (4 weeks) and C (6 weeks) running side by side, then D (2 weeks), which needs both B and C. The shortest time for the project is",
+   opts:["A. 15 weeks", "B. 11 weeks", "C. 8 weeks", "D. 9 weeks"],
+   ans:"B",
+   exp:"The two parallel tasks take as long as the longer one: A + C + D = 3 + 6 + 2 = 11 weeks. The 9 weeks uses B (3 + 4 + 2). The 15 weeks adds all four tasks. The 8 weeks is C + D alone."},
+  {q:"A basic cost estimate for a job adds",
+   opts:["A. profit and tax only", "B. materials, labour and overheads", "C. labour and transport only", "D. materials and profit only"],
+   ans:"B",
+   exp:"Materials and labour are the direct costs. Overheads are the shared costs, such as rent, power and supervision. A price to the client then adds profit."},
+  {q:"Overheads are the costs that",
+   opts:["A. belong to one job, such as its steel", "B. are paid by the client directly", "C. are shared by all jobs, such as rent", "D. are always zero for small jobs"],
+   ans:"C",
+   exp:"They cannot be charged to one job, so they are spread over all of them, often as a percentage of the direct costs."},
+  {q:"Materials cost \u20a6120 000. Labour is 40% of the materials cost. Overheads are 10% of materials plus labour. The total cost is",
+   opts:["A. \u20a6172 800", "B. \u20a6180 000", "C. \u20a6184 800", "D. \u20a6168 000"],
+   ans:"C",
+   exp:"Labour = 0.40 \u00d7 120 000 = 48 000. Materials plus labour = 168 000. Overheads = 10% of 168 000 = 16 800. Total = 184 800. The 168 000 leaves out the overheads. The 180 000 takes the overheads on materials alone (12 000). The 172 800 takes them on labour alone (4 800)."},
+  {q:"Straight-line depreciation is found from",
+   opts:["A. cost \u00f7 (salvage value \u00d7 life)", "B. (cost \u2212 salvage) \u00f7 life", "C. cost \u00d7 life in years", "D. (cost + salvage) \u00f7 2"],
+   ans:"B",
+   exp:"The same amount is taken from the value of the asset each year until it reaches its salvage value at the end of its life."},
+  {q:"Depreciation in the accounts of a company",
+   opts:["A. lowers the book value; it is not cash paid", "B. is paid to the tax office", "C. increases the value of the asset", "D. is the cash paid to the supplier each year"],
+   ans:"A",
+   exp:"The cash was paid when the asset was bought. Depreciation spreads that cost over the years in which the asset is used. It does not move money in or out each year."},
+  {q:"A machine costs \u20a62.4 million, has a salvage value of \u20a60.4 million and a life of 8 years. The yearly depreciation is",
+   opts:["A. \u20a6300 000", "B. \u20a6250 000", "C. \u20a6200 000", "D. \u20a6500 000"],
+   ans:"B",
+   exp:"(2 400 000 \u2212 400 000) \u00f7 8 = 250 000. The 300 000 leaves out the salvage value (2 400 000 \u00f7 8). The 200 000 subtracts the salvage value twice. The 500 000 divides by 4 years."},
+
+  // ── SET 10 · Efficiency, power and energy ──
+  {q:"Efficiency is",
+   opts:["A. useful output \u00f7 total input \u00d7 100%", "B. total input \u00f7 useful output \u00d7 100%", "C. useful output \u00d7 total input", "D. losses \u00f7 useful output"],
+   ans:"A",
+   exp:"The part of the input that does the wanted job is compared with all that is put in. The rest is lost, mostly as heat."},
+  {q:"A machine is claimed to be 120% efficient. This claim is",
+   opts:["A. possible, when the machine is new and clean", "B. impossible, as output cannot exceed input", "C. possible, with very good lubrication", "D. normal for very large machines"],
+   ans:"B",
+   exp:"Energy cannot be created. A claim above 100% means that an input has been left out, or that the claim is false."},
+  {q:"A motor takes 5 kW and delivers 4 kW of shaft power. Its efficiency and the rate of heat loss are",
+   opts:["A. 125% and 1 kW", "B. 80% and 1 kW", "C. 20% and 1 kW", "D. 80% and 4 kW"],
+   ans:"B",
+   exp:"Efficiency = 4 \u00f7 5 = 0.80, or 80%. The 1 kW difference is lost as heat. The 125% divides the other way. The 20% is the share lost, not the efficiency."},
+  {q:"A pump rated at 3 kW is run for 2 hours. The quantity 6 kWh is",
+   opts:["A. the energy used", "B. the force on the water", "C. the speed of the pump", "D. the power of the pump"],
+   ans:"A",
+   exp:"The unit of power is the kilowatt and the product of power and time is energy. It is therefore the energy used in the two hours, and it is what the electricity bill is charged on."},
+  {q:"A lift raises a 800 kg load through 15 m in 20 s. Taking g = 10 m/s\u00b2, the useful power is",
+   opts:["A. 6.0 kW", "B. 2.4 kW", "C. 120 kW", "D. 0.6 kW"],
+   ans:"A",
+   exp:"Weight = 800 \u00d7 10 = 8 000 N. Work = 8 000 \u00d7 15 = 120 000 J. Power = 120 000 \u00f7 20 = 6 000 W = 6.0 kW. The 120 kW forgets to divide by the time. The 0.6 kW slips a decimal place."},
+
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+let currentSubject = 'engineering';
+let userAnswers   = {};
+let stats         = { answered: 0, correct: 0 };
+
+// Per-card timer state  →  key = subject + index
+let timerIds      = {};   // setInterval id
+let timerSecs     = {};   // seconds remaining
+
+// ── Constants ──
+const TOTAL_SECS  = 600;                          // 10 minutes
+const CIRC        = 2 * Math.PI * 14;             // circumference (r=14)
+
+// ─── RENDER ────────────────────────────────────────────────
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    const qs        = questions[currentSubject];
+
+    container.innerHTML = qs.map((q, i) => `
+        <div class="question-card" data-index="${i}">
+            <div class="question-number">Question ${i+1} of ${qs.length}</div>
+            <div class="question-text">${q.q}</div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+                <svg class="timer-ring" id="ring-${i}" viewBox="0 0 38 38">
+                    <circle class="bg" cx="19" cy="19" r="14"/>
+                    <circle class="fg" cx="19" cy="19" r="14"
+                            style="stroke-dasharray:${CIRC};stroke-dashoffset:0"/>
+                </svg>
+                <span class="timer-text" id="timer-text-${i}">10:00</span>
+                <span class="timer-label">left</span>
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                ${q.opts.map(opt => `<div class="option" data-answer="${opt.charAt(0)}">${opt}</div>`).join('')}
+            </div>
+
+            <button class="answer-btn" disabled>Check Answer</button>
+            <div class="explanation">
+                <strong>Correct Answer: ${q.ans}</strong><br>${q.exp}
+            </div>
+        </div>
+    `).join('');
+
+    attachListeners();
+    startAllTimers();
+}
+
+// ─── TIMERS ────────────────────────────────────────────────
+function startAllTimers() {
+    const qs = questions[currentSubject];
+    qs.forEach((_, i) => {
+        const key = currentSubject + i;
+        timerSecs[key] = TOTAL_SECS;
+        timerIds[key]  = setInterval(() => tickTimer(i, key), 1000);
+    });
+}
+
+function tickTimer(i, key) {
+    timerSecs[key]--;
+    const secs = timerSecs[key];
+
+    if (secs <= 0) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+        timerSecs[key] = 0;
+        updateTimerUI(i, 0);
+        // auto-reveal answer when time runs out
+        autoReveal(i);
+        return;
+    }
+
+    updateTimerUI(i, secs);
+}
+
+function updateTimerUI(i, secs) {
+    const ring     = document.getElementById('ring-' + i);
+    const textEl   = document.getElementById('timer-text-' + i);
+    if (!ring || !textEl) return;
+
+    const fg       = ring.querySelector('.fg');
+    const frac     = secs / TOTAL_SECS;
+    const offset   = CIRC * (1 - frac);
+
+    fg.style.strokeDashoffset = offset;
+
+    // colour zones: green > 300 s (5 min), orange 120-300 s (2-5 min), red < 120 s (< 2 min)
+    ring.classList.remove('warning','danger');
+    textEl.classList.remove('warning','danger');
+    if (secs <= 120) {
+        ring.classList.add('danger');
+        textEl.classList.add('danger');
+    } else if (secs <= 300) {
+        ring.classList.add('warning');
+        textEl.classList.add('warning');
+    }
+
+    // format M:SS
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    textEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function stopTimer(i) {
+    const key = currentSubject + i;
+    if (timerIds[key]) {
+        clearInterval(timerIds[key]);
+        timerIds[key] = null;
+    }
+}
+
+function clearAllTimers() {
+    Object.keys(timerIds).forEach(k => {
+        if (timerIds[k]) clearInterval(timerIds[k]);
+    });
+    timerIds  = {};
+    timerSecs = {};
+}
+
+// ─── AUTO-REVEAL on timeout ────────────────────────────────
+function autoReveal(i) {
+    const card = document.querySelector(`.question-card[data-index="${i}"]`);
+    if (!card) return;
+
+    const btn = card.querySelector('.answer-btn');
+    // already answered?
+    if (btn.disabled && card.querySelector('.explanation.show')) return;
+
+    const q = questions[currentSubject][i];
+
+    card.querySelectorAll('.option').forEach(opt => {
+        if (opt.dataset.answer === q.ans) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    card.querySelector('.explanation').classList.add('show');
+    btn.disabled = true;
+
+    // count as answered (wrong) only if not already answered
+    const key = currentSubject + i;
+    if (!userAnswers[key]) {
+        userAnswers[key] = '—';   // sentinel: timed out
+        stats.answered++;
+        updateStats();
+    }
+}
+
+// ─── LISTENERS ─────────────────────────────────────────────
+function attachListeners() {
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function () {
+            const card  = this.closest('.question-card');
+            const index = card.dataset.index;
+            const key   = currentSubject + index;
+
+            // already locked?
+            if (this.style.pointerEvents === 'none') return;
+
+            card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            userAnswers[key] = this.dataset.answer;
+            card.querySelector('.answer-btn').disabled = false;
+        });
+    });
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const card      = this.closest('.question-card');
+            const index     = +card.dataset.index;
+            const key       = currentSubject + index;
+            const q         = questions[currentSubject][index];
+            const userAns   = userAnswers[key];
+            const isCorrect = userAns === q.ans;
+
+            // stop this card's timer
+            stopTimer(index);
+
+            // colour options
+            card.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.answer === q.ans)           opt.classList.add('correct');
+                else if (opt.dataset.answer === userAns)    opt.classList.add('wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            card.querySelector('.explanation').classList.add('show');
+            this.disabled = true;
+
+            stats.answered++;
+            if (isCorrect) stats.correct++;
+            updateStats();
+        });
+    });
+}
+
+// ─── STATS ─────────────────────────────────────────────────
+function updateStats() {
+    document.getElementById('answered').textContent = stats.answered;
+    document.getElementById('correct').textContent  = stats.correct;
+    const pct = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+    document.getElementById('score').textContent    = pct + '%';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderQuestions();
+</script>
+</body>
+</html>
